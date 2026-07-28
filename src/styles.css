@@ -2199,3 +2199,37 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   :root[data-seite="home"] .modulkarte{
     grid-template-columns:38px minmax(0,1fr) auto 11px}
 }
+
+/* ---------- Retro-Boost ohne Layoutaenderung ---------- */
+:root{--app-outline:rgba(0,20,84,.58);--app-hard-shadow:rgba(0,20,84,.14)}
+:root[data-theme="dark"]{--app-outline:rgba(237,240,246,.30);--app-hard-shadow:rgba(0,0,0,.34)}
+:root:not([data-theme="dark"]) #view{
+  background-image:var(--muster-dreieck);background-attachment:fixed}
+:root[data-theme="dark"] #view{
+  background-image:var(--muster-dreieck-dunkel);background-attachment:fixed}
+
+.app-kopf{border-bottom-width:2px}
+.produktmarke{font-family:var(--display);font-style:italic;font-weight:700}
+.produktmarke-pixel{border-width:2px}
+.seitenkopf .section-title,.listen-titel,.food-toolbar h2,.mini-title{
+  font-family:var(--display);font-style:italic;font-weight:700}
+
+.card,.modulraster,.reminder-group,.profile-abschnitt,.food-card,.food-form-card{
+  border-width:2px!important;box-shadow:3px 3px 0 var(--app-hard-shadow)}
+:root[data-seite="home"] .modulraster{box-shadow:3px 3px 0 var(--app-hard-shadow)}
+.modulkarte:not(:last-child),.reminder-row{border-bottom-color:var(--app-outline)}
+.zurueck,.pushbar,.themeseg{border-width:2px!important}
+.btn,.profile-datei-knopf,.reminder-add span,.food-add-icon{
+  border-width:2px;border-color:var(--app-outline)}
+.btn-primary,[data-save-reminders],.phase-reset{
+  border:2px solid var(--app-outline)}
+.input{border-color:var(--app-outline)}
+
+:root[data-seite="home"] .listen-titel{
+  margin-top:25px;margin-left:5px;font-size:22px;color:var(--navy)}
+:root[data-seite="home"] .modulstatus{
+  padding:2px 6px;border:1px solid var(--app-outline)!important;border-radius:999px!important;
+  background:var(--surface2)!important;font-family:var(--mono);font-weight:800}
+.reminder-group-head em{font-family:var(--mono)}
+.seitenkopf-kicker,label.fld-l,.falte span,.reminder-grid label span{
+  font-family:var(--mono)}

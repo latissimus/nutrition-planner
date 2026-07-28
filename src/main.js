@@ -220,12 +220,6 @@ function mountHome(container) {
   setSeite('home');
   container.innerHTML = `
     <div class="wrap pad-bottom">
-      <a class="dashboard-hero" href="#reminders" aria-label="Tagesplan und Erinnerungen öffnen">
-        <span class="seitenkopf-kicker">Dein System</span>
-        <h1>Dein Tag</h1>
-        <p>Ernährung, Supplements und Regeneration – ruhig sortiert, schnell erreichbar.</p>
-        <span class="dashboard-hero-link">Tagesplan öffnen <b>›</b></span>
-      </a>
       <h2 class="listen-titel">Meine Bereiche</h2>
       <section class="modulraster" aria-label="Meine Bereiche">
         ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
