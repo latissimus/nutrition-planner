@@ -269,6 +269,10 @@ label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercas
 .input{width:100%;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r);
   color:var(--text);font-family:var(--mono);font-size:16px;padding:12px;margin-bottom:14px}
 .input:focus{outline:none;border-color:var(--pink)}
+/* Datum und Uhrzeit enthalten kurze, feste Werte. Sie bleiben deshalb auch in
+   breiten Karten kompakt, statt wie Freitext die ganze Zeile einzunehmen. */
+.input[type="date"]{width:min(100%,12rem)}
+.input[type="time"]{width:min(100%,8.5rem)}
 
 /* ---------- Auth ---------- */
 /* Gesamter Anmelde-Block mittig im Viewport; Abstände untereinander bleiben unverändert.
@@ -1425,13 +1429,13 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 .reminder-grid label span{display:block;margin:0 0 4px;font-size:10px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .reminder-grid .input{width:100%;min-width:0}
+.reminder-grid .input[type="time"]{width:min(100%,8.5rem)}
 
 @media(max-width:520px){
   .gew-eingabe{grid-template-columns:1fr 1fr}
   .gew-einheit{align-self:center}
   .gew-eingabe .btn{grid-column:1/-1}
-  .reminder-grid{grid-template-columns:1fr}
-  .compact-input{width:100%}
+  .reminder-grid{grid-template-columns:repeat(auto-fit,minmax(108px,1fr))}
 }
 
 @media(max-width:420px){
