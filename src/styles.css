@@ -266,7 +266,7 @@ html.statusleiste-overlay .topbar::before{background:var(--bg)}
 
 /* ---------- Inputs ---------- */
 label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 5px}
-.input{width:100%;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r);
+.input{display:block;width:100%;max-width:100%;min-width:0;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r);
   color:var(--text);font-family:var(--mono);font-size:16px;padding:12px;margin-bottom:14px}
 .input:focus{outline:none;border-color:var(--pink)}
 /* Datum und Uhrzeit enthalten kurze, feste Werte. Sie bleiben deshalb auch in
@@ -1317,6 +1317,28 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 .app-kopf .nav-av img{width:100%;height:100%;object-fit:cover}
 .app-kopf .nav-av span{line-height:1}
 
+/* Die neue App benutzt eine eigene, im Dokumentfluss liegende
+   Unterseiten-Navigation. So bleibt der Rueckweg auf jeder Displaybreite beim
+   Titel und kann weder Karten ueberlagern noch aus dem Viewport rutschen. */
+:root[data-seite="body"] .seitenkopf,
+:root[data-seite="reminders"] .seitenkopf,
+:root[data-seite="food-log"] .seitenkopf{
+  align-items:flex-end;padding:28px 0 14px}
+:root[data-seite="body"] .zurueck,
+:root[data-seite="reminders"] .zurueck,
+:root[data-seite="food-log"] .zurueck{
+  position:static;z-index:auto;flex:0 0 auto;margin-left:auto;background:var(--surface);
+  -webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-seite="body"] #view,
+:root[data-seite="reminders"] #view,
+:root[data-seite="food-log"] #view{overflow-x:clip}
+:root[data-seite="body"] main .wrap,
+:root[data-seite="reminders"] main .wrap,
+:root[data-seite="food-log"] main .wrap{width:100%}
+:root[data-seite="body"] main .wrap>*,
+:root[data-seite="reminders"] main .wrap>*,
+:root[data-seite="food-log"] main .wrap>*{min-width:0}
+
 .auth-marquee{display:flex;overflow:hidden;background:var(--navy);color:#fff;border-bottom:var(--bw) solid var(--ink);
   font-size:11px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
 .auth-marquee span{min-width:max-content;padding:9px 0;animation:nutrition-laufband 24s linear infinite}
@@ -1372,12 +1394,18 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 :root[data-seite="reminders"] .seitenkopf-kicker{background:#FFDE59;color:#141414;border-color:#141414}
 :root[data-seite="food-log"] .seitenkopf-kicker{background:#FF69AE;color:#141414;border-color:#141414}
 
-.food-form-card{margin-bottom:24px}
+.food-form-card{position:relative;margin-bottom:28px;overflow:hidden}
+.food-form-card::before{content:"";position:absolute;inset:0 0 auto;height:7px;background:var(--pink)}
+.food-form-card form{display:grid;gap:0;padding-top:4px}
 .food-note{min-height:92px;resize:vertical}
-.food-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.food-file{padding:8px;font-size:12px}
+.food-form-grid{display:grid;grid-template-columns:minmax(0,12rem) minmax(0,1fr);gap:12px 16px;align-items:end}
+.food-form-grid>label{display:block;min-width:0}
+.food-form-grid .input{margin-bottom:0}
+.food-file{width:100%;padding:8px;font-size:12px;overflow:hidden}
+.food-file::file-selector-button{max-width:10rem;margin-right:8px;padding:6px 8px;border:1.5px solid var(--ink);
+  border-radius:4px;background:var(--surface2);color:var(--text);font:700 11px var(--mono);cursor:pointer}
 .food-form-actions,.food-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.food-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 2px 10px}
+.food-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 2px 12px}
 .food-toolbar h2{font-size:24px;color:var(--navy)}
 .food-toolbar span,.food-date{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted)}
 .food-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -1394,7 +1422,9 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 .food-empty span{color:var(--muted);font-size:12px}
 
 @media (max-width:520px){
-  .food-form-grid,.food-grid{grid-template-columns:1fr}
+  .food-form-grid,.food-grid{grid-template-columns:minmax(0,1fr)}
+  .food-form-grid{gap:12px}
+  .food-form-grid .input[type="date"]{width:min(100%,12rem)}
 }
 
 .mini-title{font-size:19px;margin:0 0 12px}
@@ -1406,7 +1436,8 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 .d-down{background:#FFE0D8;color:#8A2A12}
 .d-hold{background:var(--surface2);color:var(--muted)}
 
-.falten-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:8px 0 4px}
+.falten-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin:12px 0 6px}
+.falte{min-width:0}
 .falte span{display:block;font-size:10.5px;font-weight:800;text-transform:uppercase;
   letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
 .falte .input{margin-bottom:0;padding:9px;text-align:center;font-size:15px}
@@ -1416,26 +1447,51 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 .mess-einst{margin-top:14px;border-top:2px dashed var(--faint);padding-top:12px;
   display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
 .mess-zeile{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
-.gew-eingabe{display:grid;grid-template-columns:1fr 1fr auto auto;align-items:center;gap:8px;margin-top:12px}
+.gew-eingabe{display:grid;grid-template-columns:minmax(0,12rem) minmax(92px,8rem) auto minmax(0,auto);
+  align-items:center;gap:10px;margin-top:16px}
 .gew-eingabe .input{margin:0;text-align:center}
 .gew-einheit{font-family:var(--mono);font-size:13px;color:var(--muted)}
 
 .reminder-list{display:grid;gap:12px;margin:14px 0}
-.reminder-row{border:var(--bw) solid var(--ink);border-radius:var(--r);padding:12px;background:var(--surface2)}
+.reminder-row{position:relative;min-width:0;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  padding:14px;background:var(--surface2);overflow:hidden}
+.reminder-row::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--pink)}
 .switchline{display:flex;align-items:center;gap:9px;margin:0 0 10px;font-family:var(--display);
   font-style:italic;font-weight:700;text-transform:uppercase}
 .switchline input{width:20px;height:20px;accent-color:var(--pink)}
-.reminder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end}
+.reminder-grid{display:grid;grid-template-columns:repeat(3,minmax(108px,1fr));gap:10px;align-items:end}
+.reminder-grid label{min-width:0}
 .reminder-grid label span{display:block;margin:0 0 4px;font-size:10px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .reminder-grid .input{width:100%;min-width:0}
 .reminder-grid .input[type="time"]{width:min(100%,8.5rem)}
 
+/* Sektionen lesen sich wie eigenstaendige Module: ruhiger Innenabstand,
+   klarer Abschluss und genug Luft zwischen Diagramm und Eingabe. */
+[data-skinfold-card],[data-weight-card],[data-reminders-card]{position:relative;overflow:hidden}
+[data-skinfold-card]::before,[data-weight-card]::before,[data-reminders-card]::before{
+  content:"";position:absolute;inset:0 0 auto;height:7px;background:var(--pink)}
+[data-skinfold-card]>.mini-title,[data-weight-card]>.mini-title{margin-top:4px}
+.mess-neu{border-top:1.5px dashed var(--faint);padding-top:5px}
+.mess-neu summary{min-height:42px;display:flex;align-items:center}
+[data-skinfold-form]{padding-top:4px}
+
 @media(max-width:520px){
-  .gew-eingabe{grid-template-columns:1fr 1fr}
+  .gew-eingabe{grid-template-columns:minmax(0,1fr) minmax(86px,.62fr) auto}
   .gew-einheit{align-self:center}
-  .gew-eingabe .btn{grid-column:1/-1}
+  .gew-eingabe .btn{grid-column:1/-1;width:100%}
   .reminder-grid{grid-template-columns:repeat(auto-fit,minmax(108px,1fr))}
+  :root[data-seite="body"] .seitenkopf,
+  :root[data-seite="reminders"] .seitenkopf,
+  :root[data-seite="food-log"] .seitenkopf{align-items:flex-start;flex-wrap:wrap;padding-top:22px}
+  :root[data-seite="body"] .zurueck,
+  :root[data-seite="reminders"] .zurueck,
+  :root[data-seite="food-log"] .zurueck{margin-left:0}
+  .seiten-einstieg b{white-space:normal}
+  .card{padding:16px}
+  .food-form-card form{padding-top:6px}
+  .food-toolbar{align-items:flex-start}
+  .food-toolbar span{text-align:right;line-height:1.2}
 }
 
 @media(max-width:420px){
