@@ -9,7 +9,7 @@ erst nach den Kernfunktionen.
 1. `npm install`
 2. `.env.local` aus `.env.example` anlegen
 3. neues Supabase-Projekt erstellen
-4. `supabase/migrations/20260728000100_foundation.sql` im Zielprojekt anwenden
+4. Migrationen aus `supabase/migrations/` in Reihenfolge im Zielprojekt anwenden
 5. `npm run dev`
 
 Ohne Supabase-Werte zeigt die App eine Einrichtungsseite, der Build funktioniert
@@ -22,6 +22,8 @@ trotzdem.
 - eigener Service Worker für Offline-Start und spätere Web-Push-Erinnerungen
 - Retro-/Dark-Designsystem aus LOGMAN
 - Hash-Routing, damit GitHub Pages keinen SPA-Fallback benötigt
+- Körperwerte mit Gewicht, 7-Tage-Schnitt und Hautfalten-Summe
+- generisches Reminder-Modell fuer Mahlzeiten, Supplements und Trinken
 
 ## Deployment
 

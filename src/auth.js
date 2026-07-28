@@ -35,7 +35,7 @@ export async function loadProfile(userId) {
   for (let versuch = 0; versuch < 4; versuch++) {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, role, full_name, avatar_url, zeitzone, created_at, updated_at')
+      .select('id, role, full_name, avatar_url, zeitzone, falten_intervall_wochen, falten_erinnerung, falten_uhrzeit, created_at, updated_at')
       .eq('id', userId)
       .maybeSingle();
     if (error) throw error;

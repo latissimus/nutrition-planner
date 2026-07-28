@@ -4,6 +4,8 @@ import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './au
 import { getTheme, applyTheme, setTheme } from './theme.js';
 import { brandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
+import { mountBodyMetrics } from './bodyMetrics.js';
+import { mountReminders, startReminderLoop } from './reminders.js';
 import { registriereServiceWorker } from './pwa.js';
 
 applyTheme(getTheme());
@@ -205,12 +207,12 @@ function renderChrome() {
 }
 
 const module = [
-  ['Heute', 'Plane Mahlzeiten, Wasser, Supplements und Schlaf an einem Ort.', 'Startpunkt'],
-  ['Körperwerte', 'Gewicht und Hautfalten mit ehrlichen Verlaufskurven.', 'Als Nächstes'],
-  ['Food-Log', 'Gegessene Mahlzeiten als Inspiration festhalten.', 'Geplant'],
-  ['Rezepte', 'Eigene Rezepte und schnelle Cheat-Code-Mahlzeiten.', 'Geplant'],
-  ['Einkauf', 'Aus Rezepten und eigenen Einträgen eine Liste bauen.', 'Geplant'],
-  ['Gewohnheiten', 'Kleine Routinen planen und täglich abhaken.', 'Geplant'],
+  ['Heute', 'Plane Mahlzeiten, Wasser, Supplements und Schlaf an einem Ort.', 'Startpunkt', '#reminders', true],
+  ['Körperwerte', 'Gewicht und Hautfalten mit ehrlichen Verlaufskurven.', 'Aktiv', '#body', true],
+  ['Erinnerungen', 'Mahlzeiten, Supplement-Stack und Trinken im Tagesrhythmus.', 'Aktiv', '#reminders', true],
+  ['Food-Log', 'Gegessene Mahlzeiten als Inspiration festhalten.', 'Geplant', '#home', false],
+  ['Rezepte', 'Eigene Rezepte und schnelle Cheat-Code-Mahlzeiten.', 'Geplant', '#home', false],
+  ['Gewohnheiten', 'Kleine Routinen planen und täglich abhaken.', 'Geplant', '#home', false],
 ];
 
 function mountHome(container) {
@@ -223,12 +225,12 @@ function mountHome(container) {
         <p>Das technische Fundament steht. Die Funktionsbereiche werden jetzt nacheinander aktiviert.</p>
       </section>
       <section class="modulraster">
-        ${module.map(([titel, text, status], index) => `
-          <article class="card modulkarte${index === 0 ? ' aktiv' : ''}">
+        ${module.map(([titel, text, status, href, enabled], index) => `
+          <a class="card modulkarte${index === 0 ? ' aktiv' : ''}${enabled ? '' : ' disabled'}" href="${href}" aria-disabled="${enabled ? 'false' : 'true'}">
             <span class="modulstatus">${status}</span>
             <h2>${titel}</h2>
             <p>${text}</p>
-          </article>`).join('')}
+          </a>`).join('')}
       </section>
     </div>`;
 }
@@ -275,6 +277,16 @@ async function render() {
         if (slot) slot.innerHTML = avatarMarkup();
       },
     });
+  } else if (route === 'body') {
+    setSeite('body');
+    mountBodyMetrics(view, {
+      session,
+      profile,
+      onProfileUpdated: (aktuell) => { profile = aktuell; },
+    });
+  } else if (route === 'reminders') {
+    setSeite('reminders');
+    mountReminders(view, { session, profile });
   } else {
     mountHome(view);
   }
@@ -289,10 +301,12 @@ if (!supabaseKonfiguriert) {
     session = neueSession;
     if (event === 'PASSWORD_RECOVERY') recovery = true;
     if (event === 'SIGNED_OUT') profile = null;
+    if (session?.user?.id) startReminderLoop(session.user.id);
     setTimeout(() => render(), 0);
   });
   supabase.auth.getSession().then(({ data }) => {
     session = data.session;
+    if (session?.user?.id) startReminderLoop(session.user.id);
     render();
   });
 }

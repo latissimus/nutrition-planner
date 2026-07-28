@@ -3,7 +3,7 @@
 Der sichtbare Produktname bleibt bis zum Ende ein Platzhalter. RSS-Feeds werden
 ebenfalls erst nach den Kernfunktionen umgesetzt.
 
-## 1. Fundament — begonnen
+## 1. Fundament — erledigt
 
 - eigenständige Vite-PWA
 - Retro- und Dark-Theme aus LOGMAN
@@ -12,12 +12,13 @@ ebenfalls erst nach den Kernfunktionen umgesetzt.
 - GitHub-Pages-Workflow
 - Service Worker und PWA-Icons
 
-## 2. Körperwerte und Erinnerungsbasis
+## 2. Körperwerte und Erinnerungsbasis — erledigt
 
 - Gewichtsverlauf und 7-Tage-Schnitt
 - zwölf Hautfalten-Messstellen
 - allgemeines Reminder-Datenmodell
-- Web-Push-Dispatcher mit Zeitzonen und Duplikatschutz
+- lokale Browser-Benachrichtigungen mit Duplikatschutz
+- serverseitiger Web-Push-Dispatcher folgt spaeter
 
 ## 3. Tagesplanung
 

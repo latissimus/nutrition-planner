@@ -254,6 +254,9 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
         rolle: profile.role,
         zeitzone: profile.zeitzone,
         darstellung: getTheme(),
+        hautfalten_erinnerung: profile.falten_erinnerung,
+        hautfalten_intervall_wochen: profile.falten_intervall_wochen,
+        hautfalten_uhrzeit: profile.falten_uhrzeit,
       },
     });
     daten.querySelector('.profile-daten-status').textContent = 'Export heruntergeladen.';

@@ -1342,11 +1342,12 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 :root[data-theme="dark"] .dashboard-hero h1{color:var(--text)}
 .dashboard-hero p{max-width:440px;margin:0;color:var(--muted);font-size:13px}
 .modulraster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.modulkarte{position:relative;min-height:174px;margin:0!important;padding:16px;overflow:hidden}
+.modulkarte{position:relative;display:block;min-height:174px;margin:0!important;padding:16px;overflow:hidden;text-decoration:none}
 .modulkarte.aktiv{background:var(--pink);color:var(--accent-ink)}
 .modulkarte h2{margin:38px 0 7px;font-size:20px}
 .modulkarte p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.45}
 .modulkarte.aktiv p{color:#352334}
+.modulkarte.disabled{opacity:.76}
 .modulstatus{position:absolute;top:14px;left:14px;padding:3px 7px;border:1.5px solid var(--ink);
   border-radius:999px;background:var(--surface2);color:var(--text);font-size:8px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase}
@@ -1356,6 +1357,54 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   color:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r);font-size:12px;font-weight:800;
   opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
 .app-toast.sichtbar{opacity:1;transform:translate(-50%,0)}
+
+:root[data-seite="body"]{--bg:#B1E7FF}
+:root[data-seite="reminders"]{--bg:#B1E7FF}
+:root[data-theme="dark"][data-seite="body"],
+:root[data-theme="dark"][data-seite="reminders"]{--bg:#101A2B}
+:root[data-seite="body"] .seitenkopf-kicker{background:#BFE7D2;color:#141414;border-color:#141414}
+:root[data-seite="reminders"] .seitenkopf-kicker{background:#FFDE59;color:#141414;border-color:#141414}
+
+.mini-title{font-size:19px;margin:0 0 12px}
+.compact-input{width:auto;min-width:96px;margin:0;padding:9px}
+.delta{display:inline-flex;align-items:center;margin-left:8px;padding:3px 6px;border:1.5px solid var(--ink);
+  border-radius:999px;background:var(--surface);font-family:var(--mono);font-size:10px;font-style:normal;
+  font-weight:900;vertical-align:middle;color:var(--text)}
+.d-up{background:#D8F5E6;color:#0B5C33}
+.d-down{background:#FFE0D8;color:#8A2A12}
+.d-hold{background:var(--surface2);color:var(--muted)}
+
+.falten-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:8px 0 4px}
+.falte span{display:block;font-size:10.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.falte .input{margin-bottom:0;padding:9px;text-align:center;font-size:15px}
+.falten-summe{font-family:var(--mono);font-size:13px;margin:12px 0;text-align:center}
+.falten-summe b{font-size:17px}
+.mess-fehlt{color:var(--down);font-size:11.5px}
+.mess-einst{margin-top:14px;border-top:2px dashed var(--faint);padding-top:12px;
+  display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.mess-zeile{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.gew-eingabe{display:grid;grid-template-columns:1fr 1fr auto auto;align-items:center;gap:8px;margin-top:12px}
+.gew-eingabe .input{margin:0;text-align:center}
+.gew-einheit{font-family:var(--mono);font-size:13px;color:var(--muted)}
+
+.reminder-list{display:grid;gap:12px;margin:14px 0}
+.reminder-row{border:var(--bw) solid var(--ink);border-radius:var(--r);padding:12px;background:var(--surface2)}
+.switchline{display:flex;align-items:center;gap:9px;margin:0 0 10px;font-family:var(--display);
+  font-style:italic;font-weight:700;text-transform:uppercase}
+.switchline input{width:20px;height:20px;accent-color:var(--pink)}
+.reminder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end}
+.reminder-grid label span{display:block;margin:0 0 4px;font-size:10px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.reminder-grid .input{width:100%;min-width:0}
+
+@media(max-width:520px){
+  .gew-eingabe{grid-template-columns:1fr 1fr}
+  .gew-einheit{align-self:center}
+  .gew-eingabe .btn{grid-column:1/-1}
+  .reminder-grid{grid-template-columns:1fr}
+  .compact-input{width:100%}
+}
 
 @media(max-width:420px){
   .modulraster{grid-template-columns:1fr}
