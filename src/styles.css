@@ -1742,6 +1742,168 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   :root[data-seite="home"] .modul-icon{aspect-ratio:1.8}
 }
 
+/* ============================================================
+   NUTRITION UI 2 — ruhige Listenoberflaeche
+
+   Die Retro-Farben bleiben als Akzente, die Flaechenhierarchie folgt einer
+   modernen Reminder-App: keine schweren schwarzen Kartenrahmen, stattdessen
+   weisse Gruppen, feine Trenner und wenige, klare Signalfarben.
+   ============================================================ */
+:root{
+  --app-bg:#F4F3F8;
+  --app-card:#FFFFFF;
+  --app-field:#F1F0F4;
+  --app-divider:#E3E1E8;
+  --app-purple:#5952D6;
+  --app-purple-soft:#E9E7FF;
+  --app-secondary:#7D7A84;
+}
+:root[data-theme="dark"]{
+  --app-bg:#111218;
+  --app-card:#1C1D24;
+  --app-field:#272832;
+  --app-divider:#353640;
+  --app-purple:#9B96FF;
+  --app-purple-soft:#302D56;
+  --app-secondary:#9C9AA5;
+}
+
+:root[data-seite="home"],
+:root[data-seite="body"],
+:root[data-seite="reminders"],
+:root[data-seite="food-log"],
+:root[data-seite="profile"]{--bg:var(--app-bg)}
+:root[data-seite="auth"],:root[data-seite="setup"],
+:root[data-theme="dark"][data-seite="auth"],
+:root[data-theme="dark"][data-seite="setup"]{--bg:var(--app-bg)}
+body{font-family:var(--ui)}
+.wrap{max-width:560px;padding-inline:12px}
+.pad-bottom{padding-bottom:88px}
+.app-kopf{border-bottom:0;background:color-mix(in srgb,var(--app-bg) 88%,transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
+.app-kopf::after,.app-kopf::before{background:transparent}
+.app-kopf .wrap{min-height:62px}
+.produktmarke{color:var(--app-purple);font-style:normal;font-size:18px;letter-spacing:-.02em}
+.produktmarke small{color:var(--app-secondary)}
+.produktmarke-pixel{width:32px;height:32px;border:0;border-radius:10px;background:var(--pink)}
+.app-kopf .nav-av{width:38px;height:38px;border:0;background:var(--app-card);box-shadow:0 5px 18px rgba(20,18,32,.09)}
+
+h1,h2,h3,.display,.section-title{font-style:normal;letter-spacing:-.025em}
+.seitenkopf{padding-top:20px!important}
+.seitenkopf .section-title{color:var(--app-purple);font-size:27px}
+.seitenkopf-kicker{padding:0;border:0!important;border-radius:0!important;background:none!important;
+  color:var(--app-secondary)!important;font-family:var(--ui);font-size:10px;letter-spacing:.08em}
+.zurueck,
+:root[data-seite="body"] .zurueck,
+:root[data-seite="reminders"] .zurueck,
+:root[data-seite="food-log"] .zurueck,
+:root[data-seite="profile"] .zurueck{
+  min-height:36px;padding:7px 11px;border:0;border-radius:18px;background:rgba(255,255,255,.68);
+  color:var(--text);box-shadow:0 5px 18px rgba(20,18,32,.09);
+  font-family:var(--ui);font-style:normal;font-size:11px}
+:root[data-theme="dark"] .zurueck{background:rgba(38,39,48,.78)}
+.seiten-einstieg{gap:3px;margin-bottom:16px;padding:0 2px;border:0;background:transparent}
+.seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:13px}
+.seiten-einstieg span{font-family:var(--ui);font-size:12px;color:var(--app-secondary)}
+
+.card{border:0;border-radius:20px;background:var(--app-card);box-shadow:0 1px 0 rgba(20,18,32,.02)}
+.card + .card{margin-top:14px}
+.input{border:1px solid var(--app-divider);border-radius:11px;background:var(--app-field);
+  font-family:var(--ui);font-size:15px}
+.input:focus{border-color:var(--app-purple);box-shadow:0 0 0 3px color-mix(in srgb,var(--app-purple) 18%,transparent)}
+label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:var(--app-secondary)}
+.btn{min-height:44px;border:0;border-radius:12px;background:var(--app-field);
+  font-family:var(--ui);font-style:normal;font-size:14px}
+.btn-primary{background:var(--app-purple);color:#fff}
+.btn-danger{background:#F25F71;color:#fff}
+
+/* Start: pinke Tageskarte und darunter eine einzige, native Listenbox. */
+:root[data-seite="home"] .dashboard-hero{
+  margin:16px 0 24px;padding:15px 16px 16px;border-radius:16px;background:linear-gradient(135deg,#F181B2,#E25791);
+  color:#fff;text-align:left;box-shadow:0 8px 24px rgba(213,70,135,.18)}
+:root[data-seite="home"] .dashboard-hero .seitenkopf-kicker{margin:0;color:#fff!important;opacity:.86}
+:root[data-seite="home"] .dashboard-hero h1{margin:8px 0 5px;color:#fff;font-size:28px}
+:root[data-seite="home"] .dashboard-hero p{margin:0;color:#fff;font-family:var(--ui);font-size:12px;opacity:.9}
+:root[data-seite="home"] .listen-titel{margin:0 10px 9px;text-align:left;font-size:19px}
+:root[data-seite="home"] .modulraster{
+  display:block;overflow:hidden;background:var(--app-card);border:0;border-radius:20px;box-shadow:none}
+:root[data-seite="home"] .modulkarte{
+  display:grid;grid-template-columns:36px minmax(0,1fr) auto 10px;align-items:center;gap:10px;
+  min-height:64px;padding:9px 12px;border:0;border-bottom:1px solid var(--app-divider);
+  border-radius:0;background:transparent;text-align:left}
+:root[data-seite="home"] .modulkarte:last-child{border-bottom:0}
+:root[data-seite="home"] .modul-icon{
+  width:34px;height:34px;aspect-ratio:1;border:0;border-radius:50%}
+:root[data-seite="home"] .modul-icon::before{display:none}
+:root[data-seite="home"] .modul-icon .app-icon{width:18px;height:18px}
+:root[data-seite="home"] .modul-inhalt{display:block;padding:0}
+:root[data-seite="home"] .modulkarte h2{font-family:var(--ui);font-style:normal;font-size:13px;letter-spacing:0}
+:root[data-seite="home"] .modulkarte p,
+:root[data-seite="home"] .modulkarte.aktiv p{margin-top:2px;font-family:var(--ui);font-size:10px;white-space:nowrap}
+:root[data-seite="home"] .modulstatus{display:block;margin:0;padding:0;border:0!important;background:none!important;
+  color:var(--app-secondary)!important;font-family:var(--ui);font-size:9px}
+:root[data-seite="home"] .modul-pfeil{display:block;color:#B7B4BD;font-size:20px}
+
+/* Reminder-Gruppen und Profil-Dropdowns nutzen exakt dieselbe Formsprache. */
+[data-reminders-card]{background:transparent}
+.pushbar{border:0!important;border-radius:14px;box-shadow:none}
+.reminder-group,.profile-abschnitt{
+  margin-bottom:12px;border:0;border-radius:18px;background:var(--app-card);box-shadow:none}
+.reminder-group-head,.profile-abschnitt>summary{
+  min-height:60px;padding:11px 14px;background:transparent;border:0!important;
+  font-family:var(--ui);font-style:normal;letter-spacing:0}
+.profile-abschnitt>summary{display:flex;align-items:center;font-size:15px}
+.reminder-group[open] .reminder-group-head,.profile-abschnitt[open]>summary{background:transparent}
+.reminder-group-icon{border:0;background:var(--pink)}
+.reminder-group-list{padding-left:14px}
+.reminder-row{border-bottom:1px solid var(--app-divider);padding-right:14px}
+.switchline{font-family:var(--ui);font-style:normal}
+.reminder-row>[data-label]{background:var(--app-field)}
+.reminder-add{border-top:1px solid var(--app-divider);font-family:var(--ui);font-style:normal;color:var(--app-purple)}
+.reminder-add span{border:0;background:var(--app-purple);color:#fff}
+.reminder-group-chevron{color:var(--app-secondary)}
+[data-save-reminders]{background:rgba(89,82,214,.82);color:#fff;border:0;border-radius:14px;
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}
+
+/* Food-Log und Messwerte werden zu ruhigen weissen Gruppen. */
+.food-form-card{border-radius:18px}
+.food-form-card>summary{font-family:var(--ui)}
+.food-form-card>summary::after{color:var(--app-purple)}
+.food-form-card>summary>span:not(.food-add-icon){font-family:var(--ui);font-style:normal}
+.food-add-icon{border:0;background:var(--app-purple);color:#fff}
+.food-form-card form{border-top:1px solid var(--app-divider)}
+.food-card{border-radius:18px}
+.food-image{border-right:1px solid var(--app-divider)}
+.food-toolbar h2{color:var(--app-purple);font-style:normal}
+[data-skinfold-card],[data-weight-card]{border-radius:20px}
+[data-skinfold-card]::before,[data-weight-card]::before{display:none}
+.mess-kopf{border:0;border-radius:14px;background:var(--app-purple-soft);color:var(--text)}
+.mess-label,.mess-datum,.mess-wert,.mess-wert span{color:var(--text)}
+.mess-neu{border-top:1px solid var(--app-divider)}
+.mess-neu summary{font-family:var(--ui);font-style:normal!important}
+.falte .input{background:var(--app-field)}
+.falten-summe{font-family:var(--ui)}
+
+.profile-abschnitt-inhalt{padding:15px}
+.profile-abschnitt>summary::after{opacity:.65}
+.themeseg{border:0;border-radius:13px;background:var(--app-field)}
+.themebtn{border:0;border-right:1px solid var(--app-divider);font-family:var(--ui);font-style:normal}
+.themebtn.on{background:var(--app-purple);color:#fff}
+.role-tag{border:0;background:var(--pink)}
+.auth-marquee{border:0;background:var(--app-purple)}
+.auth-shell .card,.setup-card{border:0;border-radius:20px;background:var(--app-card)}
+.auth-title{color:var(--app-purple);font-style:normal}
+.auth-sub{color:var(--app-secondary)}
+.auth-switch button{color:var(--app-purple)}
+
+@media(max-width:520px){
+  .wrap{padding-inline:12px}
+  .card{padding:15px}
+  :root[data-seite="home"] .modulraster{display:block}
+  :root[data-seite="home"] .modulkarte{grid-template-columns:34px minmax(0,1fr) auto 10px}
+  .seitenkopf .zurueck{margin-left:auto}
+}
+
 /* Einmaliger Hinweis fuer Benachrichtigungen. Kein Dauergast: Nach dem Tippen
    oder Wegwischen ist er fuer immer weg. */
 .pushbar{display:flex;align-items:center;gap:8px;margin-top:12px;
