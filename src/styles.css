@@ -1,0 +1,1530 @@
+/* ============================================================
+   LOGMAN — RetroMuscle Design System (Light / Neo-Brutalismus)
+   Hellblau · Navy · Pink-Akzent · harte schwarze Ränder, keine Schatten
+   ============================================================ */
+:root{
+  --bg:#B1E7FF;      /* gemessen auf retromuscle.net */
+  --surface:#FFFFFF;
+  --surface2:#EAF4FC;
+  --navy:#001454;
+  --pink:#FF69AE;
+  --pink-press:#F0448F;
+  --ink:#141414;
+  --text:#141414;
+  --accent-ink:#141414;
+  --muted:#586274;
+  --faint:#8A94A3;
+  --line:#0A0A0A;
+
+  --load:#443199;   /* Heavy violet */
+  --middle:#225e61; /* progressive 10–15er-Arbeit */
+  --pump:#FF69AE;   /* pink  */
+  --mr:#FFDE59;     /* yellow*/
+  /* Flieder: gehoert nur dem Set-O-Meter. Bewusst eine Farbe, die sonst nichts
+     benutzt – der schwebende Knopf soll sich vom pinken Speichern daneben auf
+     einen Blick unterscheiden. Wie die anderen Akzente in beiden Themes gleich. */
+  --lila:#DFBAFF;
+  --lila-ink:#2A1240;   /* Symbol auf Flieder – in beiden Themes derselbe Kontrast */
+  --prio:#67318F;       /* Set-O-Lasche und Prioritaetsplanung */
+  --prio-text:#67318F;
+  --prio-soft:#EADDF3;
+  --prio-wash:rgba(103,49,143,.14);
+  /* Entspricht dem 72%-Dimmer ueber dem hellblauen Log. Dieselbe Vollfarbe
+     fuellt waehrend des Tutorials die iOS-Safe-Area und die Scrollmaske. */
+  --up:#12A150;
+  /* Clusters bekommen eine eigene, klar gruene Kennfarbe. So sind sie von
+     Heavy (Navy), Pump (Pink) und gelben Hinweisen sofort unterscheidbar. */
+  --cluster:#215E61;
+  --cluster-ink:#ffffff;
+  --link:#001454;
+  --navy-panel:#001454;
+  --green:#154C2B;  /* "erledigt / weiter" – Knopf zum naechsten Tag */
+  --down:#E8785B;
+  --hold:#C7912A;
+
+  --mq-h:34px;      /* Hoehe des Laufbands – auth-shell rechnet damit */
+  --brand-outline:#001454;   /* Kontur und Schatten des Schriftzugs */
+  --sil-filter:none;         /* Silhouette hinter dem Schriftzug */
+
+  /* EINE Randstaerke fuer alles. Vorher lag sie je nach Element bei 2 oder 3px;
+     das Vorbild (retromuscle.net) haelt sie durchgehend gleich und duenner.
+     Die frueheren --shadow-Variablen sind ersatzlos entfallen: Die Flaechen
+     tragen jetzt nur noch ihre Kontur. */
+  --bw:2px;
+  /* ZWEI Radien, nicht einer. Das Vorbild rundet Karten grosszuegig (1rem =
+     18px), Bedienelemente aber fast eckig (0.375rem = 6.75px). Pauschal alles
+     gleich zu runden war mein Fehler – Knoepfe wurden runder als dort, Karten
+     eckiger. */
+  --r-karte:18px;
+  --r:7px;
+  /* Seitenmuster als Variablen – siehe Abschnitt "Seitenmuster" weiter unten. */
+  --muster-dreieck:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%230B1B44' fill-opacity='.07'/%3E%3C/svg%3E");
+  --muster-tropfen:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%230B1B44' fill-opacity='.07' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --display:"Helvetica Neue",Arial,system-ui,sans-serif;
+}
+
+/* ============================================================
+   Theme "Dark" — derselbe Neo-Brutalismus, nur umgedreht.
+   Text und Kontur sind bewusst getrennt: Text bleibt hell und gut lesbar,
+   waehrend die Ränder im Dunkeln ruhiger als im Retro-Theme auftreten.
+   ============================================================ */
+:root[data-theme="dark"]{
+  --bg:#101A2B;       /* einheitliches tiefes Navy aus dem Notizbuch */
+  --surface:#191C24;
+  --surface2:#232733;
+  --ink:#697486;
+  --line:#697486;
+  --text:#EDF0F6;
+  --accent-ink:#0B1B44;
+  --muted:#98A2B3;
+  --faint:#8490A3;
+
+  /* Navy verschwindet auf Fast-Schwarz. Aufgehellt bleibt es erkennbar
+     dasselbe Blau und traegt weiter Laufband, LOAD-Badge, aktiven Tab. */
+  --navy:#4B6FD6;
+  --load:#443199;
+  --middle:#225e61;
+  --navy-panel:#1B2C5C;
+  --link:#91A9FF;
+
+  /* Akzente bleiben unveraendert – sie sind die Marke. */
+  --up:#28C46B;        /* nur aufgehellt: das Original war auf dunkel zu satt */
+  --green:#1E6E3C;
+  --hold:#E0A93C;
+  --prio-soft:#362641;
+  --prio-wash:rgba(201,164,223,.16);
+  --prio-text:#D7B3EF;
+
+  /* Logo: Das gedeckte Navy verschwindet auf dunklem Grund, die Kontur waere
+     weg. Dunkles Blau bleibt als Kontur, ist aber vom Hintergrund abgesetzt. */
+  --brand-outline:#0A1330;
+  /* Silhouette weiss: die saubere Umkehrung von "dunkle Form auf hellem Grund".
+     brightness(0) faerbt das PNG schwarz und laesst die Transparenz stehen,
+     invert(1) macht daraus Weiss – so bleibt es bei einer Bilddatei. */
+  --sil-filter:brightness(0) invert(1);
+  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.03'/%3E%3C/svg%3E");
+  --muster-tropfen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23EDF0F6' fill-opacity='.032' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+html{background:var(--bg)}
+/* Safari zeigt beim Scroll-Gummiband die Leinwand von <html>. Waere sie trotz
+   offenem Overlay noch weiss oder seitenfarben, blitzt genau der geschuetzte
+   Bereich um Uhrzeit und Akku beim Scrollen um. */
+html.statusleiste-overlay{background:var(--bg)}
+/* Zweite Absicherung fuer den iOS-Web-App-Canvas: Je nach Scrollzustand nimmt
+   WebKit fuer den transparenten Statusbereich den Body statt des html-Elements.
+   Der eigentliche App-Inhalt behaelt separat seine Seitenfarbe und wird wie
+   bisher vom Overlay abgedunkelt. */
+html.statusleiste-overlay body{background:var(--bg)}
+html.statusleiste-overlay #app{min-height:100dvh;background:var(--bg)}
+html.statusleiste-overlay #view{min-height:100dvh;background:var(--bg)}
+/* Nicht das iOS-Fenster und auch nicht der Body, sondern nur der eigentliche
+   Seiteninhalt #view scrollt waehrend eines Overlays.
+   Dadurch bleibt der transparente Statusbereich auf derselben dunklen Flaeche,
+   auch wenn das Tutorial automatisch zur naechsten Uebung faehrt. */
+html.overlay-scroll-gesperrt{height:100%;overflow:hidden}
+html.overlay-scroll-gesperrt body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}
+html.overlay-scroll-gesperrt #app{display:flex;flex-direction:column;height:100%;overflow:hidden}
+html.overlay-scroll-gesperrt #view{flex:1 1 auto;min-height:0;overflow-y:auto;
+  padding-top:var(--tutorial-kartenraum,0px);
+  overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--mono);
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+/* 700 statt 900: Das Vorbild setzt --heading-font-weight auf 700. Unsere
+   kursiven Versalien waren spuerbar wuchtiger als dort. */
+h1,h2,h3,.display{
+  font-family:var(--display);font-style:italic;font-weight:700;
+  text-transform:uppercase;letter-spacing:-.01em;line-height:.95;margin:0;
+}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--link)}
+.wrap{max-width:580px;margin:0 auto;padding:0 14px}
+body:not([data-seite="log"]) #view>.wrap{animation:seiteEin .18s cubic-bezier(.22,.75,.3,1)}
+@keyframes seiteEin{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ---------- Top bar / nav ---------- */
+.topbar{position:sticky;top:0;z-index:20;isolation:isolate;background:var(--bg);
+  border-bottom:var(--bw) solid var(--ink);padding:calc(env(safe-area-inset-top) + 10px) 0 10px}
+/* Beim iOS-Gummiband wandert der Sticky-Header kurz nach unten, waehrend
+   fixed Elemente am Viewport bleiben. Diese unsichtbare Fortsetzung deckt
+   den Bereich oberhalb des Headers ab, damit Set-O-Meter und Zurueck-Chip
+   dort auch bei starkem Herunterziehen nicht hervorscheinen. */
+.topbar::before{content:"";position:absolute;z-index:-1;left:0;right:0;bottom:100%;
+  height:100vh;background:var(--bg);pointer-events:none}
+/* Eigene Deckflaeche zwischen Lasche und Header-Inhalt: So kann die Lasche
+   innerhalb der Kopfzeile hochfahren, ohne jemals vor Logo oder Avatar zu
+   erscheinen. Sichtbar ist ausschliesslich der Teil unterhalb der Kontur. */
+.topbar::after{content:"";position:absolute;z-index:1;left:0;right:0;top:0;bottom:0;
+  background:var(--bg);pointer-events:none}
+/* Der Header liegt in der installierten iOS-App direkt unter Uhrzeit und Akku.
+   Bei einem Overlay muss deshalb die komplette Kopfzeile denselben dunklen
+   Grund tragen – sonst bleibt zwischen Statusleiste und Tutorialkarte ein
+   heller Streifen stehen. */
+html.statusleiste-overlay .topbar,
+html.statusleiste-overlay .topbar::after,
+html.statusleiste-overlay .topbar::before{background:var(--bg)}
+.topbar .wrap{position:relative;z-index:2;display:flex;align-items:center;gap:10px}
+/* LOGMAN-Wortmarke als Logo im RetroMuscle-Stil: pinke Füllung, Navy-Kontur, harter Schatten.
+   Kein Layout-Effekt (Kontur/Schatten ändern die Header-Höhe nicht). */
+/* Der Schriftzug selbst steckt in brand.js als SVG (gekruemmter Text geht in CSS
+   nicht). Hier bleibt nur die Huelle: font-size steuert weiterhin die Groesse,
+   damit die Aufrufstellen unveraendert bleiben. */
+.brand{position:relative;z-index:0;display:inline-block;font-size:22px;line-height:0}
+.brand-svg{display:block;width:5.3em;height:auto;overflow:visible}
+/* Athleten-Silhouette (Navy) hinter dem Schriftzug.
+   Das Bild ist navy und geht auf dunklem Grund unter – im Dark-Theme hellt ein
+   Filter es auf, statt eine zweite Bilddatei zu pflegen. */
+.brand::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:1.9em;height:1.9em;z-index:-1;pointer-events:none;
+  filter:var(--sil-filter);
+  background:none}
+:root[data-theme="dark"] .brand::before{opacity:1}
+.nav{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.nav-btn{background:var(--surface);border:var(--bw) solid var(--ink);color:var(--text);
+  padding:7px 11px;border-radius:var(--r);font-size:13px;font-weight:700;
+  font-family:var(--display);font-style:italic;text-transform:uppercase}
+.nav-btn.active{background:var(--navy);color:#fff}
+.nav-btn.pink{background:var(--pink);color:var(--accent-ink)}
+/* FAQ-Knopf, solange das Sheet offen ist. Gelb passt auf den hellblauen Grund
+   des Retro-Themes; im Dark-Mode traegt Pink besser – jeweils mit dunkler
+   Schrift, damit es lesbar bleibt. */
+.nav-btn.faq-on{background:var(--mr);color:var(--accent-ink)}
+:root[data-theme="dark"] .nav-btn.faq-on{background:var(--pink);color:#0B1B44}
+/* 44px = Apples Mindestmass fuer Tippziele. Groesser waere es nicht wert:
+   Der Kopf richtet sich an der Logo-Hoehe aus, darueber schiebt der Knopf ihn auf. */
+.nav-av{width:44px;height:44px;padding:0;border:var(--bw) solid var(--ink);border-radius:50%;overflow:hidden;
+  background:var(--surface2);flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.nav-av img{width:100%;height:100%;object-fit:cover;display:block}
+.nav-av-fb{font-family:var(--display);font-style:italic;font-weight:700;font-size:16px;color:var(--link)}
+.nav-av.active{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink)}
+
+/* ---------- Generic card / buttons ---------- */
+.card{background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte);padding:18px}
+/* Zwei Karten direkt untereinander (Profil) sollen sich nicht beruehren. */
+.card + .card{margin-top:22px}
+
+/* Begruessung nach dem Einloggen: nur das Logo, das aufzieht.
+   Verzoegert zum Schluss (cubic-bezier), damit es ankommt statt abzubrechen. */
+/* Bottom-Safe-Area einrechnen: Auf dem iPhone (Standalone) sitzt sonst der
+   Home-Indicator-Bereich unten mit im Zentrierraum und das Logo wirkt zu tief. */
+.splash{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);padding:20px 20px calc(20px + env(safe-area-inset-bottom))}
+.splash .brand{font-size:46px;animation:splash-in 2s cubic-bezier(.16,.84,.32,1) both}
+@keyframes splash-in{
+  from{transform:scale(.45);opacity:0}
+  30%{opacity:1}
+  to{transform:scale(1.25);opacity:1}
+}
+@media (prefers-reduced-motion:reduce){.splash .brand{animation:none}}
+
+/* Ladebildschirm beim Kaltstart – dieselbe Geste wie der Splash, nur mit dem
+   Laufband darueber und einer Zeile darunter. Er zieht auf und atmet dann
+   weiter: Ohne WLAN steht er laenger, und ein eingefrorenes Logo laesst die
+   App haengend wirken. Der Puls startet bei 1.25, wo splash-in aufhoert. */
+/* Der Abstand ist bewusst gross: Der Schriftzug ist ein SVG mit
+   overflow:visible – Kontur, Schatten und Silhouette werden AUSSERHALB der Box
+   gezeichnet, und die Skalierung auf 125% traegt weiter auf. Das Layout weiss
+   von beidem nichts, mit knappem Abstand lag "lädt…" unter dem Logo. */
+.ladebild{min-height:calc(100dvh - var(--mq-h) - 90px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:38px;
+  padding:20px 20px calc(20px + env(safe-area-inset-bottom))}
+.ladebild .brand{font-size:40px;
+  animation:splash-in 2s cubic-bezier(.16,.84,.32,1) both,
+            splash-puls 2.6s 2s ease-in-out infinite}
+.ladebild .auth-sub{margin:0}
+@keyframes splash-puls{
+  0%,100%{transform:scale(1.25)}
+  50%{transform:scale(1.08)}
+}
+@media (prefers-reduced-motion:reduce){.ladebild .brand{animation:none}}
+/* Theme-Wahl im Profil – gleiche Optik wie die Tier-Umschaltung im Log. */
+.themeseg{display:flex;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);overflow:hidden}
+.themebtn{flex:1;background:var(--surface);border:0;border-right:var(--bw) solid var(--ink);color:var(--text);
+  padding:12px 0;font-family:var(--display);font-style:italic;font-weight:700;font-size:15.5px;
+  text-transform:uppercase;cursor:pointer}
+.themebtn:last-child{border-right:0}
+.themebtn.on{background:var(--navy);color:#fff}
+.btn{border:var(--bw) solid var(--ink);border-radius:var(--r);padding:14px 16px;font-size:16px;
+  font-weight:700;font-family:var(--display);font-style:italic;text-transform:uppercase;
+  letter-spacing:.02em;background:var(--surface);color:var(--text)}
+.btn-primary{background:var(--pink);color:var(--accent-ink);transition:background .3s ease}
+/* Bestaetigung beim Speichern: sofort gelb, danach zurueck ins Pink faden.
+   transition:none beim Aufleuchten, damit der Farbwechsel nicht selbst faded. */
+.btn-primary.flash{background:var(--mr);transition:none}
+@media (prefers-reduced-motion:reduce){.btn-primary{transition:none}}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-block{width:100%}
+.btn:disabled{opacity:.5}
+.btn:active,.nb-chip:active,.log-tutorial-weiter:active,.som-prio-toggle:active,
+.som-modusseg button:active,.som-spender-wahl:active,.faq-tutorial-start:active{
+  transform:translateY(1px)}
+
+/* ---------- Inputs ---------- */
+label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 5px}
+.input{width:100%;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r);
+  color:var(--text);font-family:var(--mono);font-size:16px;padding:12px;margin-bottom:14px}
+.input:focus{outline:none;border-color:var(--pink)}
+
+/* ---------- Auth ---------- */
+/* Gesamter Anmelde-Block mittig im Viewport; Abstände untereinander bleiben unverändert.
+   min-height statt height: ist der Inhalt höher (Signup/Tastatur), wächst er normal weiter. */
+/* Laufband oben, nur auf den abgemeldeten Ansichten.
+   Zwei gleiche Haelften laufen um je 100% ihrer Breite nach links – dadurch
+   rueckt die zweite exakt dorthin, wo die erste war, und die Schleife hat
+   keinen Sprung. */
+.marquee{display:flex;overflow:hidden;height:var(--mq-h);align-items:center;
+  background:var(--navy);color:#fff;border-bottom:var(--bw) solid var(--ink);
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.09em;white-space:nowrap}
+.marquee span{flex:0 0 auto;animation:mq 26s linear infinite}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+/* Dauerbewegung ist fuer manche unertraeglich – Systemwunsch respektieren. */
+@media (prefers-reduced-motion:reduce){.marquee span{animation:none}}
+
+/* Polster unten groesser als oben: schiebt den zentrierten Block etwas ueber die Mitte.
+   Die Banner-Hoehe abziehen, sonst waechst die Seite darueber hinaus. */
+.auth-shell{max-width:420px;margin:0 auto;padding:24px 14px 96px;
+  min-height:calc(100vh - var(--mq-h));min-height:calc(100dvh - var(--mq-h));
+  display:flex;flex-direction:column;justify-content:center}
+.auth-title{font-size:26px;margin:0 0 4px;text-align:center}
+.auth-sub{text-align:center;color:var(--muted);font-size:14.5px;margin:0 0 22px}
+.auth-switch{text-align:center;font-size:14.5px;margin-top:16px}
+.auth-switch button{background:none;border:0;color:var(--link);font-weight:800;text-decoration:underline;font-family:var(--mono)}
+.msg{border:var(--bw) solid var(--ink);border-radius:var(--r-karte);padding:11px 13px;font-size:14.5px;margin-bottom:14px;font-weight:600}
+.msg.err{background:#FFE0D8;color:#8A2A12}
+.msg.ok{background:#D8F5E6;color:#0B5C33}
+
+/* ---------- Log: Info-Button + dezenter Sync-Status ---------- */
+.ibtn{background:var(--surface);border:var(--bw) solid var(--ink);color:var(--text);
+  width:30px;height:30px;border-radius:var(--r);font-size:15.5px;font-weight:700;
+  font-family:var(--display);font-style:italic}
+/* align-self, weil die Nav ihre Kinder streckt: Der Punkt hat eine feste Hoehe
+   und saesse sonst oben statt auf einer Linie mit "Log". */
+.save-dot{flex:0 0 auto;align-self:center;display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;font-size:18px;font-weight:700;font-family:var(--mono);color:var(--muted)}
+.save-dot.ok{color:var(--up)}
+.save-dot.saving{color:var(--faint)}
+/* wartet auf Verbindung – kein Fehler, die Daten liegen lokal sicher */
+.save-dot.wait{color:var(--link)}
+.save-dot.err{color:var(--down)}
+
+/* ---------- Log: week / rotation ---------- */
+/* Phase. Der Overreach ist der Normalzustand und bleibt eine ruhige
+   Beschriftung; der Deload ist die Ausnahme, in der sich wirklich etwas
+   aendert – der darf auffallen. */
+.phasechip[hidden]{display:none}
+.phasechip{flex:0 0 auto;font-family:var(--display);font-style:italic;font-weight:700;
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 10px;border-radius:20px;border:2px solid var(--faint);
+  color:var(--muted);background:transparent}
+.phasechip.laut{background:var(--mr);border-color:var(--ink);color:var(--accent-ink)}
+/* Gelb wirkt auf dunklem Grund grell und liegt nah an den Warnfarben. Hellblau
+   ist auf Dunkel ruhiger und bleibt trotzdem der lauteste Chip der Kopfleiste. */
+:root[data-theme="dark"] .phasechip.laut{background:#AEDCF6;border-color:#AEDCF6;color:#0B1B44}
+/* Umbrechen statt kappen: "Unterkörper Heavy · Oberkörper Pump" braucht neben
+   dem Phasen-Chip ein paar Pixel mehr, als die Zeile hat. Abgeschnitten waere
+   die zweite Haelfte des Tages nicht mehr lesbar. */
+.daymeta{font-size:12.5px;color:var(--muted);font-weight:600;min-width:0;line-height:1.35}
+
+/* ---------- Blocks ---------- */
+.block{position:relative;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte);margin-bottom:14px;overflow:hidden}
+.block::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:5px;pointer-events:none}
+.block-load::before{background:var(--load)}
+.block-middle::before{background:var(--middle)}
+.block-pump::before{background:var(--pink)}
+.block-mr::before{background:var(--cluster)}
+.block.opt{border-style:dashed}
+.bhead{display:flex;align-items:center;gap:8px;padding:15px 13px 9px;border-bottom:var(--bw) solid var(--ink)}
+.bhead .mus{font-family:var(--display);font-style:italic;font-weight:700;font-size:16px;text-transform:uppercase}
+.badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:999px;text-transform:uppercase;border:var(--bw) solid var(--ink);font-family:var(--display);font-style:italic}
+.b-load{background:var(--load);color:#fff}
+.b-middle{background:var(--middle);color:#fff}
+.b-pump{background:var(--pump);color:var(--accent-ink)}
+.b-mr{background:var(--cluster);color:var(--cluster-ink)}
+.target{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap;font-weight:700}
+.target b{color:var(--text);font-weight:800}
+.target.met b{color:var(--up)}
+
+/* Luecke und Seitenpolster knapp: Mit der groesseren Chip-Schrift brauchten
+   "Versagen nur letzter Minisatz" und "2 min" zusammen 6px mehr als die
+   Zeile hergab und rutschten untereinander. */
+.cue{display:flex;gap:8px;flex-wrap:wrap;padding:11px 11px 11px}
+/* Seitliches Polster knapper als frueher (war 11px): Mit der groesseren Schrift
+   lief der laengste Pump-Hinweis 5px aus dem Block. Lieber am
+   Polster sparen als am Text – das ist eine Ansage, die man im Studio liest. */
+/* inline-flex statt inline: Als reines Inline-Element wirkt das Polster nicht
+   auf die Zeilenbox – der Text sass sichtbar zu hoch im Chip. Jetzt wird er
+   ueber die volle Hoehe zentriert. */
+.chip{display:inline-flex;align-items:center;justify-content:center;line-height:1.2;
+  font-size:12.5px;color:var(--text);background:var(--surface2);border:var(--bw) solid var(--ink);
+  padding:7px 7px;border-radius:20px;font-weight:600;white-space:nowrap}
+.chip.stretch{background:var(--pink);color:var(--accent-ink)}
+.chip.rest{background:var(--surface);font-family:var(--mono);font-weight:700}
+.chip.rest:disabled{opacity:.55}
+
+.ex{border-top:2px dashed var(--ink);padding:12px 13px}
+.exhead{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap}
+.role{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);border:var(--bw) solid var(--ink);
+  padding:2px 7px;border-radius:999px;flex:0 0 auto;font-family:var(--display);font-style:italic;background:var(--surface2)}
+.role.comp{color:#fff;background:var(--navy)}
+/* Uebungsauswahl. Ein <select>, kein Eingabefeld – eintragbar ist nur, was im
+   Katalog steht. Eigenes Pfeil-Zeichen statt des Systemsteuerelements, damit es
+   in beiden Themes zum Rest passt; das rechte padding haelt ihm den Platz frei. */
+.exname{width:100%;min-width:0;flex:1 1 190px;background:var(--surface2);border:var(--bw) solid var(--ink);border-radius:var(--r);
+  color:var(--text);font-size:16px;font-weight:700;padding:9px 26px 9px 10px;font-family:var(--ui);
+  text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  /* Gezeichnetes Chevron statt zweier CSS-Farbverlaeufe. Die Verlauf-Loesung
+     ergab ein hartes Dreieck, das bei groesseren Radien und duennen Raendern
+     grob wirkte. Das SVG steckt als data-URI drin – kein zusaetzlicher Abruf.
+     stroke ist fest auf die Tintenfarbe gesetzt; ein SVG im Hintergrund erbt
+     currentColor nicht. */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E");
+  background-size:13px 13px;
+  background-position:calc(100% - 10px) 52%;
+  background-repeat:no-repeat}
+/* Im Dark-Mode ist die Tinte hell – dasselbe Zeichen in Weiss. */
+:root[data-theme="dark"] .exname{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23EDF0F6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")}
+/* Solange nichts gewaehlt ist, soll das Feld leer wirken und nicht wie eine
+   bereits getroffene Entscheidung. */
+.exname.leer{color:var(--faint)}
+.exname:focus{outline:none;border-color:var(--pink)}
+.exname:disabled{cursor:default;opacity:.75}
+/* Die Klappliste zeichnet das System. Ohne diese Zeile stuende sie im
+   Dark-Mode auf manchen Geraeten schwarz auf schwarz. */
+.exname option,.exname optgroup{background:var(--surface2);color:var(--text)}
+
+/* Durchsuchbarer Uebungswaehler. Ein Dialog statt 199 Eintraegen im
+   System-Scrollrad; die Treffer bleiben nach "zuletzt" und Muskel gruppiert. */
+/* Die Deckflaeche dunkelt SELBST ab und traegt das Feld in sich. Kein <dialog>
+   und kein ::backdrop mehr: Ein modaler Dialog liegt in der Top-Layer, und
+   dort endete die Abdunkelung auf dem installierten iPhone oberhalb der
+   Safe-Area – der Streifen unter Uhrzeit und Akku blieb hellblau. Der
+   Tutorial-Dimmer daneben schafft es zuverlaessig, weil er ein gewoehnliches
+   festes Element mit inset:0 ist. Das hier ist dieselbe Bauweise.
+   z 80 muss ueber der Tutorialkarte (60) und dem Statusleisten-Riegel (70)
+   liegen: Der Waehler wird auch MITTEN im Tutorial geoeffnet, und als modaler
+   Dialog lag er frueher in der Top-Layer, also ueber allem. Bei z 45 war er
+   hinter der Tutorialkarte verschwunden. Unter der Startanimation (100)
+   bleibt er, die deckt bewusst alles zu. */
+.ex-picker-lage{position:fixed;inset:0;z-index:80;
+  display:flex;align-items:center;justify-content:center;padding:9px;
+  background:transparent;
+  overscroll-behavior:contain}
+.ex-picker-lage[hidden]{display:none}
+/* Bei offener Tastatur klebt das Feld oben – aber UNTERHALB der Safe-Area.
+   viewport-fit=cover laesst den Layout-Viewport am Displayrand beginnen, der
+   Abstand aus visualViewport.offsetTop war auf dem iPhone nur 12px. Das Feld
+   ist weiss (--surface) und schob sich damit unter Uhrzeit und Akku.
+   Die Hoehe verliert denselben Betrag, sonst haengt es unten ueber. */
+.ex-picker-lage.tastatur{align-items:flex-start;
+  --picker-hoehe-sicher:min(
+    calc(var(--picker-hoehe,calc(100dvh - 12px)) - env(safe-area-inset-top)),720px);
+  padding-top:calc(env(safe-area-inset-top) + var(--picker-top,6px))}
+.ex-picker{width:min(560px,100%);max-height:min(78vh,720px);
+  padding:0;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface);color:var(--text);overflow:hidden;
+  box-shadow:0 10px 30px rgba(10,19,48,.38),0 2px 7px rgba(10,19,48,.24)}
+.ex-picker-schale{display:flex;flex-direction:column;max-height:min(78vh,720px);padding:12px}
+.ex-picker-lage.tastatur .ex-picker,
+.ex-picker-lage.tastatur .ex-picker-schale{max-height:var(--picker-hoehe-sicher)}
+.ex-picker-kopf{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ex-picker-kopf>div{display:flex;flex-direction:column;min-width:0;flex:1}
+.ex-picker-kopf small{font-size:9px;font-weight:800;text-transform:uppercase;color:var(--muted)}
+.ex-picker-kopf b{font-family:var(--display);font-style:italic;font-size:18px;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex-picker-zu{flex:0 0 36px;width:36px;height:36px;padding:0;border:var(--bw) solid var(--ink);
+  border-radius:50%;background:var(--surface2);color:var(--text);font-size:20px;font-weight:800}
+.ex-picker-suche{width:100%;padding:11px 12px;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface2);color:var(--text);font:700 16px var(--ui)}
+.ex-picker-suche:focus{outline:none;border-color:var(--pink)}
+/* overscroll-behavior: Ohne <dialog> gibt es keine eingebaute Sperre mehr –
+   sonst scrollt am Ende der Liste die Seite dahinter weiter. */
+.ex-picker-liste{overflow:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;margin-top:8px;padding-right:2px}
+.ex-picker-gruppe{position:sticky;top:0;z-index:1;margin:8px 0 4px;padding:5px 7px;
+  background:var(--surface);border-bottom:2px dashed var(--ink);
+  font-family:var(--display);font-style:italic;font-size:10px;font-weight:700;
+  text-transform:uppercase;color:var(--muted)}
+.ex-picker-option{display:block;width:100%;padding:11px 10px;border:0;border-bottom:1px solid var(--faint);
+  background:transparent;color:var(--text);text-align:left;font:700 14px/1.3 var(--ui)}
+.ex-picker-option.gewaehlt{background:var(--prio-soft);color:var(--prio-text)}
+.ex-picker-option.gewaehlt::before{content:"✓ ";font-weight:900}
+.ex-picker-kein{padding:28px 12px;text-align:center;color:var(--muted);font-size:14px}
+.ex-picker-leeren{margin-top:10px;padding:9px;border:2px dashed var(--ink);border-radius:var(--r);
+  background:transparent;color:var(--muted);font-family:var(--display);font-style:italic;
+  font-weight:700;text-transform:uppercase}
+/* "zuletzt: 60 kg × 8" – die wichtigste Lesezeile im Log, direkt vor dem
+   naechsten Satz. Stand auf 12px und war damit kleiner als alles andere,
+   was man waehrend der Einheit liest. */
+.prev{font-size:14px;color:var(--muted);font-family:var(--mono);margin:8px 0 9px;min-height:17px}
+.prev b{color:var(--text);font-weight:700}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;font-family:var(--mono);padding:2px 8px;border-radius:999px;margin-left:6px;border:var(--bw) solid var(--ink)}
+.d-up{background:#D8F5E6;color:var(--up)}
+.d-hold{background:#FBEFD2;color:var(--hold)}
+.d-down{background:#FFE0D8;color:var(--down)}
+:root[data-theme="dark"] .d-up{background:#163527;color:#7DE0A7}
+:root[data-theme="dark"] .d-hold{background:#3A3018;color:#F0C96A}
+:root[data-theme="dark"] .d-down{background:#3B211D;color:#FF9A83}
+
+.setrow{display:flex;align-items:center;gap:7px;margin-top:8px}
+.sidx{font-family:var(--display);font-style:italic;font-size:14.5px;color:var(--text);width:16px;text-align:center;flex:0 0 auto;font-weight:700}
+.fld{position:relative;flex:1;min-width:0}
+.fld input{width:100%;background:var(--surface);border:var(--bw) solid var(--ink);color:var(--text);
+  font-family:var(--mono);font-size:17px;font-weight:700;text-align:center;padding:11px 4px;border-radius:var(--r)}
+.fld input:focus{outline:none;border-color:var(--pink)}
+.fld .u{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--faint);font-family:var(--mono);pointer-events:none}
+.times{color:var(--text);font-family:var(--display);font-style:italic;font-size:16px;flex:0 0 auto;font-weight:700}
+.fld.rir{flex:0 0 56px}
+.fld.rir input{padding:11px 2px;font-size:16px}
+/* Muscle-Round-Cluster-Zeile: Gewicht · 6×4 · Wdh im letzten Satz */
+.mrrow .mrclu{font-family:var(--display);font-style:italic;font-weight:700;font-size:15.5px;color:var(--cluster);flex:0 0 auto;padding:0 1px}
+.fld.mrlast{flex:0 0 96px}
+.fld.mrlast input{padding-right:42px}
+.fld.mrlast .u{right:6px;font-size:8.5px}
+.delrow{background:none;border:0;color:var(--text);font-size:20px;width:26px;padding:0;flex:0 0 auto;font-weight:700}
+.delrow:active{color:var(--down)}
+.addset{margin-top:10px;background:var(--surface2);border:2px dashed var(--ink);color:var(--text);
+  width:100%;padding:9px;border-radius:var(--r);font-size:13.5px;font-weight:800;font-family:var(--display);font-style:italic;text-transform:uppercase}
+.addset:active{background:var(--pink);color:var(--accent-ink)}
+.notewrap{margin-top:8px}
+.addnote{background:var(--surface2);border:2px dashed var(--ink);color:var(--muted);
+  width:100%;padding:9px;border-radius:var(--r);font-size:13px;font-weight:800;font-family:var(--display);
+  font-style:italic;text-transform:uppercase}
+.exnote{width:100%;background:var(--surface2);border:2px dashed var(--ink);border-radius:var(--r);color:var(--text);
+  font-family:var(--mono);font-size:14.5px;padding:9px 10px;resize:vertical;min-height:46px;line-height:1.4}
+.exnote:focus{outline:none}
+
+/* ---------- Volume ---------- */
+
+/* ---------- untere Bedienleiste ----------
+   Woche, Tag, Level, Datum und das Set-O-Meter. Alles, was man einmal je
+   Einheit einstellt, liegt hier unten im Daumenbereich – oben faengt dafuer
+   der erste Trainingsblock direkt unter der Kopfleiste an.
+
+   Je Feld zwei Zeilen: oben der Wert, unten wofuer er steht. Ohne die zweite
+   Zeile waere "II" oder "19.07." nicht deutbar, und mit einer einzelnen Zeile
+   passte beides nicht in 60px. */
+/* Seitliches Polster bestimmt auf dem Telefon die Breite der Leiste – nicht
+   max-width, die greift dort nie.
+   UNTERGRENZE sind 7px: Der Schlagschatten steht 4px nach rechts, darunter
+   beruehrt die rechte untere Ecke den Bildschirmrand. */
+.ctrlbar{--ctrlbar-bottom:max(6px, calc(env(safe-area-inset-bottom) - 6px));
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  padding:0 7px var(--ctrlbar-bottom);overflow:hidden;
+  background:linear-gradient(180deg,transparent 0,var(--bg) 8px,transparent 8px)}
+/* Auch ausserhalb der Milchglasleiste darf beim Tutorial kein heller
+   Seitenstreifen sichtbar bleiben – besonders nicht an den unteren Ecken. */
+html.statusleiste-overlay .ctrlbar{z-index:50;background:var(--bg)}
+/* overflow:hidden ist noetig, nicht kosmetisch: Das native <select> darunter
+   ist rechteckig und blitzte beim Antippen als weisse Ecke ueber der Rundung
+   auf. Der Schatten liegt ausserhalb und wird davon nicht beschnitten. */
+.ctrlbar .slots{display:contents}
+.ctrlbar .slots[hidden]{display:none}
+/* WICHTIG: Flaeche, Rahmen und Rundung liegen in einem Pseudo-Element, nicht
+   auf .inner selbst.
+   Grund: .inner ist der Flex-Behaelter, dessen Kinder bei jeder Auswahl neu
+   ausgemessen werden. Malte er auch die gerundete Flaeche, liess der Browser
+   beim Neuzeichnen gelegentlich eckige weisse Reste ueber der Rundung stehen –
+   zu sehen an der linken oberen und unteren Ecke beim Wechsel von Tag oder
+   Level. Das Pseudo-Element wird vom Layout der Kinder nicht beruehrt und
+   einmal gerastert.
+   Kein transform: Ein transformierter Vorfahr verschiebt die Bezugsflaeche des
+   backdrop-filter, dann zeichnet er nicht mehr die Seite dahinter. */
+.ctrlbar .inner{position:relative;z-index:0;max-width:580px;margin:0 auto;display:flex;gap:4px;padding:5px;
+  border-radius:16px}
+.ctrlbar .inner::before{content:'';position:absolute;inset:0;z-index:-1;
+  background:rgba(255,255,255,.27);
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);backdrop-filter:blur(6.65px) saturate(1.25);
+  /* Ohne Schlagschatten (testweise). Er war der Grund fuer die 7px Polster an
+     .ctrlbar – ohne ihn koennte die Leiste wieder breiter werden. */
+  border:var(--bw) solid var(--ink);border-radius:16px}
+.ctrlbar .inner::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;
+  border-radius:16px;box-shadow:0 0 0 100vmax var(--bg);
+  clip-path:inset(8px -100vmax -100vmax -100vmax)}
+html.statusleiste-overlay .ctrlbar .inner::after{box-shadow:0 0 0 100vmax var(--bg)}
+.ci{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;padding:8px 2px;
+  border:0;border-radius:11px;background:none;color:var(--text);cursor:pointer}
+.ci .wert{font-family:var(--display);font-style:italic;font-weight:700;font-size:15px;
+  height:22px;line-height:22px;text-transform:uppercase;letter-spacing:.01em;
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci .wert.leer{color:var(--faint)}
+/* Beschriftungen in Versalien: Die App setzt jede andere Kleinbeschriftung
+   ebenso (Badges, Chips, Blocktitel). Die WERTE bleiben gemischt – "WO 3" und
+   "TAG 3" in Versalkursive wirken laut, und beim Datum aendert sich ohnehin
+   nichts. */
+/* 9.5px statt 8px und ein dunkleres Grau: Bei 8px war die Beschriftung im
+   Studio kaum zu lesen. Das Sperren faellt dabei von .06 auf .04em – sonst
+   wuerde "NOTIZBUCH" auf einem schmalen Telefon abgeschnitten. */
+.ci .lbl{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--text);opacity:.72;
+  text-transform:uppercase;letter-spacing:.04em;
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Das native Element liegt unsichtbar ueber dem Feld: <select> und
+   type="date" oeffnen so die Systemauswahl von iOS, ohne dass wir sie
+   nachbauen – nachgebaut waere sie in jedem Punkt schlechter. */
+.ci select,.ci input{position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;border:0;border-radius:11px;background:none;
+  -webkit-appearance:none;appearance:none}
+.ci select:disabled{cursor:default}
+.ci:has(select:disabled) .wert{opacity:.55}
+/* Das Menue rechts. Das kleine Computerfenster greift die Cyan-, Pink- und
+   Violetttoene alter Desktop-Oberflaechen auf und hebt sich damit von den
+   vier Einstellfeldern ab:
+   Die aendern den Inhalt der Seite, dieses wechselt die Seite. */
+:root[data-theme="dark"] .ctrlbar .inner::before{background:rgba(30,33,42,.27)}
+.ci.menue{flex:0 0 62px;align-self:stretch;padding:0;overflow:hidden;isolation:isolate}
+.menue-computer{position:absolute;inset:2px 1px 1px;z-index:1;display:block;pointer-events:none}
+.menue-computer svg{display:block;width:100%;height:100%;overflow:visible}
+:root[data-theme="dark"] .menue-computer-text{fill:#FFFFFF}
+.ci.menue select{z-index:3}
+
+/* Pausentimer. Er uebernimmt die GANZE Leiste, statt sich ein Feld zu teilen:
+   Waehrend der Pause waehlt man ohnehin nichts aus, und jede Auswahl wuerde den
+   Timer abbrechen. So ist die Zahl gross genug, um sie zwischen zwei Saetzen
+   aus zwei Metern Entfernung abzulesen. */
+.ctrlbar.timer-an .inner::before{background:var(--navy);-webkit-backdrop-filter:none;backdrop-filter:none}
+/* Im Dark-Mode hellblau und deckend, Ziffer schwarz. Weiss stand darauf bei
+   1.35:1 und war unlesbar – schwarz bringt 14.6:1. */
+:root[data-theme="dark"] .ctrlbar.timer-an .inner::before{background:#AEDCF6}
+:root[data-theme="dark"] .ctrlbar.timer-an .timerfeld,
+:root[data-theme="dark"] .ctrlbar.timer-an .timerfeld .x{color:#0A0A0A}
+/* Der abgelaufene Zustand traegt sonst ein helles Gruen, das auf Hellblau
+   ebenfalls verschwindet. Dunkelgruen haelt den Unterschied zum Lauf. */
+:root[data-theme="dark"] .ctrlbar.timer-an .timerfeld.done{color:#0E5B30}
+.ctrlbar.timer-an .slots,.ctrlbar.timer-an .menue{display:none}
+.ctrlbar.ohne-menue .menue{display:none}
+.ctrlbar.nur-menue .slots{display:none}
+.ctrlbar.nur-menue{background:none;overflow:visible;pointer-events:none}
+.ctrlbar.nur-menue .inner{max-width:104px;padding:0;pointer-events:auto}
+.ctrlbar.nur-menue .inner::before,.ctrlbar.nur-menue .inner::after{display:none}
+/* Auf Unterseiten entfaellt die Leiste ganz. Zurueck ins Log fuehrt der
+   "← Log"-Chip unter dem Kopf, und das Log ist die Seite, zu der man ohnehin
+   staendig zurueckkehrt – das Menue unten war der zweite Weg zum selben Ziel.
+   Der Admin behaelt seine volle Leiste (er bekommt nie .nur-menue), weil die
+   vier Felder dort die einzige Moeglichkeit sind, durch fremde Wochen zu
+   blaettern. Eine laufende Pause holt die Leiste sofort zurueck – siehe unten. */
+.ctrlbar.nur-menue:not(.timer-an){display:none}
+/* Ohne Leiste braucht der Seitenfuss keinen Platz mehr freizuhalten. Laeuft
+   gerade eine Pause, steht die Leiste wieder da und der Abstand ebenso. */
+body:has(.ctrlbar.nur-menue:not(.timer-an)) .pad-bottom{padding-bottom:24px}
+
+/* Eine laufende Pause gehört der ganzen App. Auf Unterseiten nimmt der Timer
+   deshalb wieder die volle Leistenbreite ein, statt in der schmalen
+   Nur-Menü-Hülle zu stecken. */
+.ctrlbar.nur-menue.timer-an{pointer-events:auto}
+.ctrlbar.nur-menue.timer-an .inner{max-width:580px;padding:5px}
+.ctrlbar.nur-menue.timer-an .inner::before{display:block}
+/* Das × liegt absolut rechts und zaehlt nicht zur Breite – sonst waere die
+   Zahl um dessen halbe Breite nach links verschoben statt wirklich mittig. */
+.timerfeld{position:relative;flex:1;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--mono);font-size:26px;font-weight:800;letter-spacing:-.02em;
+  padding:6px 0}
+.timerfeld .mitte{display:inline-flex;align-items:center;gap:9px}
+.timerfeld .pausensymbol{display:block;fill:currentColor;opacity:.85}
+.timerfeld[hidden]{display:none}
+.timerfeld .x{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  background:none;border:0;color:#fff;font-size:20px;opacity:.7;padding:0 6px;line-height:1}
+.ctrlbar.timer-an .timerfeld.done{color:#8FE9B4}
+
+/* Kopfzeile ueber dem ersten Block: nur noch Phase und Tagesbeschreibung. */
+/* Genau so viel Luft wie zwischen zwei Bloecken (.block hat margin-bottom:14px).
+   Stand vorher auf 22px, damit der Anfang der Liste als Anfang liest – im
+   Gebrauch wirkte der Sonderabstand aber nur wie ein Versehen. */
+.erstblock{padding-top:14px}
+
+/* Einmaliger Schnellstart. Er erklaert nur die erste Eingabe; Set-O,
+   A/B-Rotation und Hintergrundwissen bleiben bewusst im FAQ. */
+.log-einstieg{position:relative;isolation:isolate;overflow:hidden;margin-bottom:12px;padding:13px;
+  background:var(--surface);border:var(--bw) solid var(--prio);border-radius:var(--r-karte)}
+.log-einstieg-kicker{margin:0 0 8px;font-family:var(--display);font-style:italic;font-weight:700;
+  text-transform:uppercase;font-size:19px}
+.log-einstieg ol{margin:0;padding-left:21px;color:var(--muted);font-size:13px;line-height:1.65}
+.log-einstieg ol li::marker{font-weight:800;color:var(--prio-text)}
+.log-einstieg-text{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.log-einstieg>div{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-top:11px}
+.log-einstieg-los{flex:1;padding:11px;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--pink);color:var(--accent-ink);font-family:var(--display);font-style:italic;
+  font-size:14px;font-weight:700;text-transform:uppercase}
+.log-einstieg-skip{padding:11px;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface2);color:var(--text);font-family:var(--display);font-style:italic;
+  font-size:14px;font-weight:700;text-transform:uppercase}
+.log-einstieg a{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--text);
+  text-underline-offset:2px;text-align:center}
+/* Nach der Registrierungsanimation liegt diese Karte bereits hinter der
+   herunterfahrenden Flaeche. Der ruhige Impuls bleibt bis zur Entscheidung;
+   waehrenddessen tritt alles andere zurueck. */
+body.einstieg-fokus #app{isolation:isolate}
+body.einstieg-fokus #app::after{content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:39;
+  background:transparent;pointer-events:none}
+.log-einstieg.willkommen-fokus{position:relative;z-index:40;
+  animation:einstiegFokus 1.05s ease-in-out infinite;background:var(--surface)}
+@keyframes einstiegFokus{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.025)}
+}
+
+/* Gefuehrtes Heavy-Setup. Die Karte ist genauso breit wie die untere
+   Bedienleiste. Der feste Dimmer liegt ueber der restlichen App; nur Karte und
+   der gerade erklaerte Muskelblock werden darueber angehoben. */
+.tutorial-dimmer{position:fixed;top:var(--topbar-h,0px);right:0;bottom:0;left:0;z-index:35;
+  background:transparent;
+  touch-action:pan-y}
+.tutorial-dimmer[hidden]{display:none}
+/* Die installierte iOS-App behandelt die Statusleiste bei
+   black-translucent nicht wie einen normalen Teil des fixed Viewports:
+   theme-color und der Canvas-Hintergrund allein reichen deshalb nicht. Diese
+   feste, deckende Schutzflaeche liegt waehrend JEDES Overlays direkt unter
+   Uhrzeit und Akku. Sie scrollt nicht mit und liegt ueber Tutorialkarte (60)
+   und Uebungswaehler (80), endet aber exakt vor deren Inhalt. So kann weder
+   der hellblaue Header noch die weisse Tutorialkarte in die Safe Area rutschen. */
+html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
+  top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 3px);
+  background:var(--bg);pointer-events:none}
+.tutorial-ebene{position:fixed;z-index:60;inset:0;pointer-events:none}
+.tutorial-ebene[hidden]{display:none}
+.log-tutorial{position:absolute;top:calc(env(safe-area-inset-top) + 3px);left:50%;
+  isolation:isolate;overflow:hidden;
+  width:min(580px,calc(100vw - 14px));
+  max-height:calc(100dvh - env(safe-area-inset-top) - 6px);
+  margin:0;
+  padding:17px;
+  transform:translateX(-50%);background-color:#fff;pointer-events:auto;
+  overflow-x:hidden;overflow-y:auto;
+  border:var(--bw) solid var(--ink);border-radius:16px;
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:0 10px 30px rgba(10,19,48,.34),0 2px 7px rgba(10,19,48,.22);
+  animation:tutorialKarteEin .28s cubic-bezier(.22,.75,.3,1) both}
+@keyframes tutorialKarteEin{
+  from{opacity:.82}
+  to{opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .log-tutorial{animation:tutorialKarteEin .28s cubic-bezier(.22,.75,.3,1) both}
+}
+:root[data-theme="dark"] .log-tutorial{background-color:#1E212A}
+.log-tutorial-basics{border-color:var(--prio)}
+.log-tutorial-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.log-tutorial-kopf span{padding:5px 8px;border-radius:999px;background:var(--prio);
+  color:#fff;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.log-tutorial-kopf button{width:36px;height:36px;padding:0;border:var(--bw) solid var(--ink);
+  border-radius:50%;background:var(--surface2);color:var(--text);font-size:20px;line-height:1}
+.log-tutorial h2{margin:0 0 9px;font-family:var(--display);font-style:italic;
+  font-size:20px;text-transform:uppercase;line-height:1.05}
+.log-tutorial p{margin:0 0 14px;color:var(--muted);font-size:13.5px;line-height:1.55}
+.log-tutorial p b{color:var(--text)}
+.tutorial-fortschritt{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:1px 0 11px}
+.tutorial-fortschritt i{height:4px;border:1px solid var(--prio);background:transparent}
+.tutorial-fortschritt i.an{background:var(--prio)}
+.tutorial-planpunkte{display:grid;margin:12px 0 11px;border:var(--bw) solid var(--ink);
+  border-radius:var(--r);overflow:hidden}
+.tutorial-planpunkte>div{display:grid;grid-template-columns:38px 1fr;align-items:center;gap:10px;
+  min-height:53px;padding:7px 10px;border-bottom:1.5px solid var(--ink);background:var(--surface)}
+.tutorial-planpunkte>div:last-child{border-bottom:0}
+.tutorial-planpunkte>div>b{display:grid;place-items:center;width:36px;height:36px;border-radius:5px;
+  background:var(--prio);color:#fff;font-family:var(--display);font-style:italic;font-size:16px}
+.tutorial-planpunkte span{display:flex;flex-direction:column;gap:1px}
+.tutorial-planpunkte strong{font-family:var(--display);font-style:italic;font-size:12.5px;
+  text-transform:uppercase}
+.tutorial-planpunkte small{color:var(--muted);font-size:11.5px;line-height:1.4}
+.tutorial-heavyinfo{margin-bottom:12px;padding:11px;border-left:5px solid var(--prio);
+  background:var(--prio-wash)}
+.tutorial-heavyinfo>strong{display:block;margin-bottom:5px;font-family:var(--display);
+  font-style:italic;font-size:13px;text-transform:uppercase}
+.tutorial-heavyinfo p{margin:0 0 7px;font-size:12px;line-height:1.48}
+.tutorial-heavyinfo p:last-of-type{margin-bottom:8px}
+.tutorial-rollen{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tutorial-rollen span{display:flex;align-items:center;gap:6px;padding:6px 7px;
+  border:1.5px solid var(--ink);border-radius:5px;background:var(--surface)}
+.tutorial-rollen b{font-family:var(--display);font-style:italic;font-size:12px;text-transform:uppercase}
+.tutorial-rollen small{color:var(--muted);font-size:10.5px;line-height:1.3}
+.tutorial-zielkopf{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.tutorial-zielkopf h2{flex:1;margin:0}
+.tutorial-zielkopf>span{padding:4px 8px;border:var(--bw) solid var(--ink);border-radius:999px;
+  background:var(--navy);color:#fff;font-family:var(--display);font-style:italic;
+  font-size:10px;font-weight:700;text-transform:uppercase}
+.tutorial-kurzziel{margin-bottom:10px!important;font-size:12.5px!important}
+.log-tutorial-typen{padding:10px 11px!important;margin-bottom:12px!important;
+  border:1.5px dashed var(--ink);background:var(--surface2)}
+.log-tutorial-stand{padding:8px 10px!important;margin-bottom:11px!important;
+  background:var(--prio-wash);border-left:4px solid var(--prio)}
+.tutorial-eingabe{display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;margin:11px 0 12px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r)}
+.tutorial-eingabe span{display:flex;flex-direction:column;gap:2px;padding:9px 7px;
+  border-right:1.5px solid var(--ink);background:var(--surface2);text-align:center}
+.tutorial-eingabe span:last-child{border-right:0}
+.tutorial-eingabe b{font-family:var(--mono);font-size:13px;color:var(--text)}
+.tutorial-eingabe small{font-size:10.5px;line-height:1.25;color:var(--muted)}
+.log-tutorial-weiter{width:100%;padding:13px;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--pink);color:var(--accent-ink);font-family:var(--display);font-style:italic;
+  font-size:15px;font-weight:700;text-transform:uppercase}
+.tutorial-pf{font-family:var(--mono);font-style:normal;font-size:19px;margin-left:3px;line-height:1}
+.log-tutorial-weiter[data-offen]{background:var(--prio);color:#fff}
+.log-tutorial-ende{display:grid;gap:12px;margin-top:17px}
+.block.tutorial-aktiv{position:relative;z-index:41;outline:4px solid var(--pink);outline-offset:3px;
+  /* Negative Seiten lassen die pinke Kontur normal stehen; nur der Bereich,
+     der hinter der Tutorialkarte liegt, wird oben abgeschnitten. */
+  clip-path:inset(var(--tutorial-clip-top,0px) -8px -8px -8px);
+  transition:outline-color .3s ease,transform .3s ease}
+.tutorial-ziel{position:relative;z-index:2;outline:4px solid var(--pink)!important;outline-offset:3px;
+  animation:tutorialPuls 1.3s ease-in-out infinite}
+@keyframes tutorialPuls{0%,100%{outline-color:var(--pink)}50%{outline-color:var(--prio)}}
+
+/* Hellblauer Retro-Auftakt und -Abschluss. Der Grund entspricht dem Log bis in
+   die iOS-Statusleiste; ohne Scanlines bleibt das Logo-Muster der einzige
+   Hintergrundreiz. */
+.tutorial-startfx{position:fixed;inset:0;z-index:100;display:grid;place-items:center;
+  --navy:#001454;--pink:#FF69AE;
+  overflow:hidden;background:#B1E7FF;color:var(--navy);opacity:0;
+  pointer-events:auto}
+.tutorial-startfx-strahlen{position:absolute;inset:-8%;opacity:.11;
+  background:none}
+.tutorial-startfx.an{animation:tutorialStartFlaeche 6.6s cubic-bezier(.58,.05,.25,1) both}
+.tutorial-startfx-inhalt{position:relative;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;top:-5vh;width:min(100%,420px);gap:15px;padding:30px 22px;
+  text-align:center;opacity:0}
+.tutorial-startfx.an .tutorial-startfx-inhalt{animation:tutorialStartText 5.7s .35s cubic-bezier(.16,.84,.32,1) both}
+.tutorial-startfx small,.tutorial-startfx span{font-family:var(--mono);font-weight:800;
+  color:var(--navy);text-transform:uppercase;letter-spacing:.08em}
+.tutorial-startfx small{font-size:10.5px;line-height:1.4}
+.action-title-svg{display:block;width:min(274px,80vw);height:auto;overflow:visible}
+.willkommen-fx .action-title-svg{width:min(248px,74vw)}
+.tutorial-startfx span{max-width:290px;padding:6px 9px;border:2px solid var(--navy);
+  font-size:11px;line-height:1.35}
+.willkommen-fx span{max-width:266px;padding:5px 8px;font-size:10px}
+.willkommen-fx.an{animation-duration:7.8s}
+.willkommen-fx.an .tutorial-startfx-inhalt{
+  animation:willkommenStartText 6s .45s cubic-bezier(.2,.72,.28,1) both}
+@keyframes tutorialStartFlaeche{
+  0%{opacity:0;transform:translateY(0)}
+  11%,84%{opacity:1;transform:translateY(0)}
+  100%{opacity:1;transform:translateY(102%)}
+}
+@keyframes tutorialStartText{
+  0%{opacity:0;transform:scale(.86)}
+  14%{opacity:1;transform:scale(1)}
+  58%{opacity:1;transform:scale(1.075)}
+  76%,88%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(.96)}
+}
+@keyframes willkommenStartText{
+  0%{opacity:0;transform:scale(.9)}
+  15%{opacity:1;transform:scale(1)}
+  68%{opacity:1;transform:scale(1.075)}
+  84%{opacity:1;transform:scale(.99)}
+  100%{opacity:0;transform:scale(.96)}
+}
+.willkommen-nachzug{animation:willkommenNachzug 1.6s cubic-bezier(.22,.8,.3,1) both}
+@keyframes willkommenNachzug{
+  from{transform:translateY(-24px)}
+  to{transform:translateY(0)}
+}
+
+/* Erst nach einer vollstaendigen Einheit. Der Nutzer entscheidet selbst, ob
+   er wechselt; die App bietet nur den naechsten offenen Tag an. */
+.log-weiter{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  margin:0 0 12px;padding:10px 12px;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--green);color:#fff;text-align:left}
+.log-weiter span{font-size:9px;font-weight:800;text-transform:uppercase;opacity:.8}
+.log-weiter b{font-family:var(--display);font-style:italic;font-size:12px;text-transform:uppercase;text-align:right}
+.chip-hilfe{border-style:dashed;color:var(--muted)}
+/* Kopf der Unterseiten: Titel links, Rueckweg rechts. Der Chip ist der
+   kuerzeste Weg zurueck ins Log – ueber das Menue waeren es zwei Tipps. */
+.seitenkopf{display:flex;align-items:flex-end;gap:10px;padding:28px 90px 13px 0}
+.seitenkopf-text{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.seitenkopf-kicker{width:max-content;padding:3px 7px;border:1.5px solid var(--ink);border-radius:999px;
+  background:var(--surface);color:var(--muted);font-family:var(--mono);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.seitenkopf .section-title{margin:0;min-width:0;font-size:27px}
+.seiten-einstieg{display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+  margin:0 0 10px;padding:8px 11px;border:var(--bw) solid var(--ink);
+  border-radius:var(--r);background:var(--surface)}
+.seiten-einstieg b{font-family:var(--display);font-style:italic;font-size:13px;
+  text-transform:uppercase;white-space:nowrap}
+.seiten-einstieg span{color:var(--muted);font-size:12px;line-height:1.35;text-align:left}
+.zurueck{position:absolute;top:calc(100% + 18px);
+  right:max(14px,calc((100vw - 580px) / 2 + 14px));z-index:-1;
+  display:inline-flex;align-items:center;text-decoration:none;
+  background:rgba(255,255,255,.41);border:var(--bw) solid var(--ink);border-radius:16px;
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);backdrop-filter:blur(6.65px) saturate(1.25);
+  color:var(--text);padding:8px 12px;
+  font-family:var(--display);font-style:italic;font-weight:700;font-size:13px;text-transform:uppercase}
+:root[data-theme="dark"] .zurueck{background:rgba(30,33,42,.41)}
+.zurueck .pf{font-family:var(--mono);font-style:normal;font-size:16px;margin-right:3px;line-height:1}
+
+/* ---------- Set-O-Meter ----------
+   Eigene Planungsseite, erreichbar ueber das App-Menue. */
+.som-einstieg{margin:0 0 8px;padding:7px 8px;background:var(--surface);
+  border:var(--bw) solid var(--ink);border-radius:var(--r-karte)}
+.som-einstieg .som-statuskopf{margin:0 0 6px;padding:0 0 6px;border:0;
+  border-bottom:1.5px solid var(--ink);border-radius:0;background:transparent}
+.som-einstieg .som-einfach{margin:0;padding:0;border:0;border-radius:0;background:transparent}
+.som-einstieg .som-einfach p{margin:0 0 5px}
+.som-einstieg .som-legende{margin:6px 0 0;padding:6px 2px 0;
+  border-top:1.5px dashed var(--ink)}
+.som-statuskopf{display:flex;align-items:stretch;gap:8px;margin-bottom:8px;padding:8px;
+  background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte)}
+.som-lage{display:grid;grid-template-columns:repeat(2,1fr);gap:0;flex:1;margin:0;font-family:var(--mono)}
+.som-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:1px 8px;
+  border-right:1.5px solid var(--ink)}
+.som-stat:last-child{border-right:0}
+.som-stat small{font-size:10px;line-height:1.1;font-weight:800;color:var(--muted);text-transform:uppercase}
+.som-stat b{margin-top:3px;font-size:16px;line-height:1;color:var(--text)}
+.som-info-knopf{flex:0 0 auto;width:34px;height:34px;padding:0;border:var(--bw) solid var(--ink);border-radius:50%;
+  align-self:center;background:var(--prio);color:#fff;font-family:var(--mono);font-size:13px;font-weight:800}
+.som-kurzhilfe{margin:0 0 9px;padding:10px 11px;background:var(--surface);border:var(--bw) solid var(--ink);
+  border-radius:var(--r);font-size:11.5px;line-height:1.45;color:var(--text)}
+.som-kurzhilfe p{margin:0 0 7px}
+.som-kurzhilfe p:last-child{margin-bottom:0}
+.som-einfach{margin:0 0 7px;padding:8px 10px;border:2px dashed var(--ink);border-radius:var(--r);
+  background:var(--surface);color:var(--muted);font-size:12px;line-height:1.45}
+.som-einfach p{margin:0 0 7px}
+.som-einfach b{color:var(--text)}
+.som-ablauf{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.som-ablauf span{display:flex;align-items:center;gap:5px;min-width:0;font-size:10.5px;
+  font-weight:700;line-height:1.2;color:var(--text)}
+.som-ablauf i{display:grid;place-items:center;flex:0 0 21px;height:21px;border:1.5px solid var(--ink);
+  border-radius:50%;background:var(--prio);color:#fff;font-family:var(--mono);font-style:normal;font-size:10px}
+.prog-statuskopf{align-items:center}
+.prog-info-titel{flex:1;margin:0;padding:2px 4px;font-family:var(--display);font-style:italic;
+  font-size:13px;font-weight:700;text-transform:uppercase;color:var(--text)}
+.som-legende{display:flex;gap:13px;margin:0 3px 9px;font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase}
+.som-legende span{display:flex;align-items:center;gap:5px}
+.som-legende i{display:inline-block;width:17px;height:7px;border-radius:999px;border:1px solid var(--ink)}
+.som-legende i.direkt{background:var(--navy)}
+.som-legende i.indirekt{background:#AEDCF6}
+:root[data-theme="dark"] .som-legende i.indirekt,
+:root[data-theme="dark"] .som-fill-indirekt{background:#69AFC9}
+.som-liste{display:grid;gap:6px}
+.som-gruppe{display:flex;align-items:center;gap:8px;margin:11px 2px 2px;font-family:var(--display);font-style:italic;
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.som-gruppe:not(.prio)::after{content:"";flex:1;border-top:2px dashed var(--ink);opacity:.45}
+.som-gruppe.prio{width:max-content;padding:3px 8px;background:var(--prio);border:1.5px solid var(--ink);
+  border-radius:999px;color:#fff}
+.som-muskel{overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte)}
+.som-muskel.priorisiert{border-color:var(--prio-text)}
+.som-muskel.priorisiert>.som-zeile{background:linear-gradient(90deg,var(--prio-soft) 0%,var(--prio-wash) 58%,transparent 100%)}
+.som-muskel.offen{background:var(--surface2)}
+.som-zeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 10px;width:100%;padding:10px 12px;
+  background:transparent;border:0;color:var(--text);text-align:left}
+.som-zeile-kopf,.som-zeile-fuss{display:flex;align-items:center;gap:7px;min-width:0}
+.som-zeile-kopf{grid-column:1;grid-row:1}
+.som-zeile-fuss{grid-column:2;grid-row:1;justify-content:flex-end}
+.som-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);
+  font-style:italic;font-weight:700;font-size:15px;text-transform:uppercase}
+.som-prio-marke{flex:0 0 auto;padding:3px 6px;border-radius:999px;background:var(--prio);color:#fff;
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.som-track{grid-column:1/-1;grid-row:2;display:flex;width:100%;height:9px;background:var(--surface2);
+  border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.som-fill-direkt,.som-fill-indirekt{display:block;height:100%;transition:width .18s ease}
+.som-fill-direkt{background:var(--navy)}
+.som-fill-indirekt{background:#AEDCF6;border-left:1px solid rgba(10,10,10,.4)}
+.som-wert{display:grid;grid-template-columns:auto auto;align-items:baseline;gap:4px;white-space:nowrap}
+.som-wert small{font-size:10px;font-weight:800;text-transform:uppercase;color:var(--muted)}
+.som-wert b{font-family:var(--mono);font-size:13px;color:var(--text)}
+.som-pfeil{flex:0 0 auto;font-family:var(--mono);font-size:17px;font-weight:800;color:var(--muted);line-height:1;
+  transition:transform .16s ease}
+.som-muskel.offen .som-pfeil{transform:rotate(180deg)}
+.som-inline-editor{padding:0 12px 12px;border-top:2px dashed var(--ink)}
+.som-inline-editor>.som-ed-label{margin-top:16px}
+.som-indirekt-quellen{margin:9px 0 0;color:var(--muted)}
+.som-indirekt-quellen>span{display:block;margin-bottom:5px;font-size:10.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em}
+.som-indirekt-quellen>div{display:flex;flex-wrap:wrap;gap:4px}
+.som-indirekt-quellen small{display:inline-flex;gap:4px;padding:3px 6px;background:var(--prio-soft);
+  border:1px solid var(--prio);border-radius:999px;font-size:11px;line-height:1.2;color:var(--text)}
+.som-indirekt-quellen small b{color:var(--prio-text)}
+.som-prio-status{font-size:11.5px;line-height:1.45;margin:10px 0 0;padding:8px 9px;
+  border-left:4px solid var(--prio);background:var(--surface)}
+.som-prio-status.neutral{border-left-color:var(--muted)}
+.som-prio-toggle{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:42px;margin-top:10px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--prio);color:#fff;
+  font-family:var(--display);font-style:italic;font-weight:700;text-transform:uppercase;font-size:13px}
+.som-prio-toggle.on{background:var(--prio);color:#fff}
+.som-prio-toggle:disabled{opacity:.35;cursor:not-allowed}
+.som-inline-plan{margin-top:11px}
+.som-ed-label{display:block;margin-bottom:6px;font-size:11px;color:var(--muted);font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em}
+.som-modusseg{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border:var(--bw) solid var(--ink);border-radius:var(--r)}
+.som-modusseg button{min-width:0;padding:8px 6px;border:0;border-right:var(--bw) solid var(--ink);
+  background:var(--surface);color:var(--text)}
+.som-modusseg button:last-child{border-right:0}
+.som-modusseg button.on{background:var(--prio);color:#fff}
+.som-modusseg b,.som-modusseg small{display:block}
+.som-modusseg b{font-family:var(--display);font-style:italic;text-transform:uppercase;font-size:12px}
+.som-modusseg small{margin-top:2px;font-size:10.5px;opacity:.8}
+.som-spender{margin-top:12px}
+.som-spender-wahl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;width:100%;margin-top:6px;padding:8px 9px;
+  text-align:left;background:var(--surface);color:var(--text);border:1.5px solid var(--ink);border-radius:var(--r)}
+.som-spender-wahl.on{border-color:var(--prio-text);background:var(--prio);color:#fff}
+.som-spender-wahl.on small,.som-spender-wahl.on .som-spender-zahlen{color:rgba(255,255,255,.78)}
+.som-spender-wahl.on em{color:#fff}
+.som-spender-wahl span:first-child{min-width:0}
+.som-spender-wahl b,.som-spender-wahl small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.som-spender-wahl b{font-family:var(--display);font-style:italic;text-transform:uppercase;font-size:12px}
+.som-spender-wahl small{margin-top:1px;font-size:11px;color:var(--muted)}
+.som-spender-zahlen{align-self:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.som-spender-wahl em{grid-column:1/-1;font-style:normal;font-size:10px;font-weight:800;color:var(--prio-text);text-transform:uppercase}
+.som-spender-frei{display:block;margin-top:10px}
+.som-spender-frei select{width:100%;min-height:40px;padding:8px 34px 8px 10px;background:var(--surface);
+  border:var(--bw) solid var(--ink);border-radius:var(--r);color:var(--text);font-family:var(--mono);
+  font-size:11px;font-weight:700}
+.som-hinweis{margin:10px 0 0;font-size:12px;line-height:1.45;color:var(--muted)}
+.som-hinweis-oben{margin:0 2px 5px;padding:2px 0;background:transparent;border:0;border-radius:0;
+  font-size:12px;text-align:left}
+.som-speicher{min-height:18px;margin:8px 2px 0;text-align:center;font-size:11px;color:var(--muted)}
+
+/* Direkt am Uebungsfeld sichtbar: Der Satz stammt aus der Prioritaetsplanung. */
+.volrolle{display:inline-flex;align-items:center;flex:0 0 auto;border:1px solid var(--ink);border-radius:999px;
+  padding:2px 6px;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
+.volrolle.prio{background:var(--prio);color:#fff}
+.volrolle.minus{background:var(--prio-soft);border-color:var(--prio);color:var(--text)}
+
+/* Prioritaetskarten ergaenzen nur den gewaehlten Slot. Der Status-Chip sitzt
+   bei der Uebungswahl, wo auch Umverteilungs-Chips erscheinen. */
+.prioritaets-block.prioritaets-angedockt{margin-top:-7px}
+.prioritaets-block .bhead{padding-top:12px;padding-bottom:7px}
+.prioritaets-block .ex{padding-top:9px;padding-bottom:10px}
+.prioritaets-block .volrolle{font-size:8.5px}
+.prioritaets-block .exhead .role{order:0}
+.prioritaets-block .exhead .exname{order:1}
+.prioritaets-block .exhead::after{content:"";order:2;flex-basis:100%;height:0}
+.prioritaets-block .exhead .volrolle.prio{order:3}
+
+/* Level III: Zusatzvolumen bewusst je Übung statt pauschal für den ganzen Plan. */
+.satz-extra{display:inline-flex;align-items:center;gap:4px;margin-left:auto}
+.satz-extra button{min-height:30px;border:var(--bw) solid var(--ink);background:var(--surface);
+  color:var(--text);border-radius:999px;font-family:var(--mono);font-size:11px;font-weight:800}
+.satz-extra-plus{padding:4px 9px}
+.satz-extra-plus span{font-size:16px;line-height:.7;vertical-align:-1px}
+.satz-extra-minus{width:30px;padding:0;font-size:16px!important}
+.satz-extra b{min-width:22px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--prio-text)}
+
+.volbar{background:var(--navy-panel);color:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);padding:14px 15px;margin-bottom:14px}
+.volbar h3{margin:0 0 4px;font-size:13px;color:#fff}
+/* Kein margin-bottom mehr: Unter der Zahl kommt nichts mehr. Die Muskelzeilen
+   (.volrow/.track/.fill) sind mit der Verschlankung entfallen. */
+.voltot{font-family:var(--mono);font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--pink)}
+.voltot span{font-size:12px;color:#B9C6E8;font-weight:600;letter-spacing:.04em}
+
+.foot{font-size:12px;color:var(--muted);text-align:center;padding:8px 6px 20px;line-height:1.7;font-weight:600}
+
+/* ---------- Sticky save + timer ---------- */
+/* Unterer Abstand: Safe-Area minus 8px (mind. 4px) – tief, aber der
+   iPhone-Home-Indicator bleibt frei. */
+
+/* "Neue Phase" – Reset-Button (nur letzte Woche) */
+.phase-ende{margin:2px 0 6px}
+.phase-ende>p{margin:0 0 8px;text-align:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--muted)}
+.phase-ende-aktionen{display:grid;gap:8px}
+.phase-reset{display:block;width:100%;margin:0;background:var(--mr);border:var(--bw) solid var(--ink);
+  border-radius:var(--r);padding:15px;font-family:var(--display);font-style:italic;
+  font-weight:700;text-transform:uppercase;font-size:15.5px;color:var(--accent-ink);text-align:center;letter-spacing:.02em}
+.phase-deload{background:var(--surface)}
+/* Im Dark-Mode ist Gelb + helle Schrift kaum lesbar. Stattdessen hellblau mit
+   dunkler Kontur/Schrift – steht klar auf dem dunklen Grund und bleibt on-brand. */
+:root[data-theme="dark"] .phase-reset{background:#AEDCF6;color:#0B1B44;border-color:#0B1B44}
+:root[data-theme="dark"] .phase-deload{background:var(--surface);color:var(--text);border-color:var(--ink)}
+
+/* Platz fuer die feste Bedienleiste unten. Zwei Zeilen je Feld machen sie
+   hoeher als die fruehere Speicherleiste – ohne das verdeckt sie den
+   letzten Block. */
+.pad-bottom{padding-bottom:118px}
+
+.toast{position:fixed;left:50%;bottom:112px;transform:translateX(-50%) translateY(18px);opacity:0;
+  background:var(--navy);color:#fff;font-size:13.5px;font-weight:800;padding:11px 18px;border-radius:var(--r);
+  border:var(--bw) solid var(--ink);z-index:40;transition:.22s;pointer-events:none;
+  white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis;font-family:var(--display);font-style:italic;text-transform:uppercase}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
+/* ---------- Seitenfarben ----------
+   Jede Unterseite hat ihren eigenen Grundton, das Log bleibt hellblau. Gesetzt
+   wird nur --bg: Kopfleiste, Bedienleiste und Karten lesen die Variable
+   ohnehin, also faerbt sich alles von selbst mit.
+
+   Im Dark-Mode werden daraus tiefe Toene derselben Familie – ein flaechiges
+   Flieder oder Gelb waere dort eine Leuchtreklame. Die Akzente (Pink, Navy,
+   Flieder auf dem Menue) bleiben in beiden Themes gleich, sie sind die Marke.
+
+   Das Dreiecksmuster ist dasselbe wie auf dem Menue-Feld und haelt die
+   grossen Flaechen davon ab, leer zu wirken. */
+/* Set-O bleibt bewusst im Kernsystem der App: derselbe hellblaue Grund und
+   dieselben weissen Karten wie im Log, Pink markiert nur aktive Planung. */
+:root[data-seite="meter"]{--bg:#B1E7FF;--surface:#FFFFFF;--surface2:#EAF4FC}
+:root[data-seite="prog"]{--bg:#D9BBF7}
+:root[data-seite="feedback"]{--bg:#D9BBF7}
+:root[data-seite="faq"]{--bg:#FBE7A4}
+:root[data-seite="profile"]{--bg:#BFE7D2}
+/* Hellblauer Grund, weisse Flaechen. Anders als die uebrigen Seiten setzt diese
+   auch --surface und --surface2 um: Damit werden Karte, Notizfeld UND der
+   "+ Bild"-Chip von selbst weiss, statt jede Flaeche einzeln einzufaerben.
+   (--surface2 traegt sonst einen Blaustich, den der Chip sichtbar machen wuerde.) */
+/* Kein eigenes --bg mehr: Die Seite nimmt das globale Hellblau. Frueher stand
+   hier der alte Wert #AEDCF6 und blieb nach der Farbanpassung zurueck. */
+:root[data-seite="notizbuch"]{--surface:#FFFFFF;--surface2:#FFFFFF}
+
+:root[data-theme="dark"][data-seite="meter"]{--bg:#101A2B;--surface:#191C24;--surface2:#232733}
+/* Dunkel: ein gemeinsamer Navy-Grund, die individuellen Muster bleiben bestehen. */
+:root[data-theme="dark"][data-seite="notizbuch"]{--bg:#101A2B;--surface:#1C2637;--surface2:#1C2637}
+:root[data-theme="dark"][data-seite="prog"]{--bg:#101A2B}
+:root[data-theme="dark"][data-seite="feedback"]{--bg:#101A2B}
+:root[data-theme="dark"][data-seite="faq"]{--bg:#101A2B}
+:root[data-theme="dark"][data-seite="profile"]{--bg:#101A2B}
+
+/* Im Dark-Mode bleibt die Seitenidentitaet am kleinen Farbstempel erhalten.
+   Der grosse Hintergrund bleibt dadurch ruhig und konsistent. */
+:root[data-seite="meter"] .seitenkopf-kicker{background:#EADDF3;color:#141414;border-color:#141414}
+:root[data-seite="prog"] .seitenkopf-kicker{background:#D9BBF7;color:#141414;border-color:#141414}
+:root[data-seite="feedback"] .seitenkopf-kicker{background:#FF69AE;color:#141414;border-color:#141414}
+:root[data-seite="faq"] .seitenkopf-kicker{background:#FBE7A4;color:#141414;border-color:#141414}
+:root[data-seite="profile"] .seitenkopf-kicker{background:#BFE7D2;color:#141414;border-color:#141414}
+:root[data-seite="notizbuch"] .seitenkopf-kicker{background:#AEDCF6;color:#141414;border-color:#141414}
+
+/* ---------- Seitenmuster ----------
+   Zwei Muster, ueber Variablen waehlbar: die bisherigen Dreiecke und die
+   organischen Tropfen von der Kollektionsseite (dort als CSS-Maske, 112px
+   gekachelt, Deckkraft 0.25).
+   Beide liegen ton-in-ton in der Tintenfarbe statt in einem festen Lila –
+   so tragen sie jeden Seitengrund und kippen im Dark-Mode von selbst mit.
+   Welches Muster eine Seite bekommt, ist unten eine Zeile. */
+/* Auf :root (html), nicht auf body: Body ist nur so hoch wie sein Inhalt,
+   html traegt die Farbe des kompletten Scrollbereichs (siehe --bg oben).
+   Stand das Muster nur auf body, endete es an dessen Unterkante – auf kurzen
+   Seiten wie Progression war die untere Haelfte einfarbig statt gemustert. */
+:root[data-seite="meter"],:root[data-seite="prog"],:root[data-seite="feedback"],
+:root[data-seite="faq"],:root[data-seite="profile"],:root[data-seite="notizbuch"]{
+  background-image:var(--muster-dreieck);background-size:auto}
+:root[data-theme="dark"][data-seite="meter"],
+:root[data-theme="dark"][data-seite="prog"],
+:root[data-theme="dark"][data-seite="feedback"],
+:root[data-theme="dark"][data-seite="faq"],
+:root[data-theme="dark"][data-seite="profile"],
+:root[data-theme="dark"][data-seite="notizbuch"]{
+  background-image:var(--muster-dreieck-dunkel)}
+:root[data-theme="dark"][data-seite="log"]{background-image:none}
+
+/* Der bisherige Set-O-Hintergrund liegt jetzt auf Progression und Notizbuch. */
+:root[data-seite="prog"],:root[data-seite="notizbuch"]{
+  background-image:var(--muster-tropfen);background-size:112px}
+:root[data-theme="dark"][data-seite="prog"],
+:root[data-theme="dark"][data-seite="notizbuch"]{
+  background-image:var(--muster-tropfen-dunkel)}
+
+/* body traegt auf allen Seiten eine eigene, deckende --bg-Flaeche (siehe
+   oben, "html,body"). Bekommt eine Seite ihr Muster vom html-Element, liegt
+   diese deckende Body-Flaeche genau darueber und verschluckt das Muster
+   ersatzlos – sichtbar wird nur der schmale Rand, wo html unter body
+   hervorschaut. Deshalb hier transparent: html scheint durch, inklusive
+   Muster, und liefert exakt dieselbe --bg-Farbe. */
+body[data-seite="meter"],body[data-seite="prog"],body[data-seite="feedback"],
+body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
+  background:transparent}
+
+/* ---------- Feedback ---------- */
+.feedback-intro{margin:0;padding:12px 13px;background:var(--surface);
+  border:var(--bw) solid var(--ink);border-bottom:0;border-radius:var(--r-karte) var(--r-karte) 0 0}
+.feedback-intro p{margin:0 0 5px;font-family:var(--display);font-style:italic;
+  font-size:17px;font-weight:700;text-transform:uppercase;line-height:1.15}
+.feedback-intro span{display:block;color:var(--muted);font-size:13px;line-height:1.45}
+.admin-feedback-eingang .feedback-intro{margin:0 0 10px;border-bottom:var(--bw) solid var(--ink);
+  border-radius:var(--r-karte)}
+.feedback-form{position:relative;overflow:hidden;padding:18px 14px 14px;background:var(--surface);
+  border:var(--bw) solid var(--ink);border-radius:0 0 var(--r-karte) var(--r-karte)}
+.feedback-form::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:var(--pink)}
+.feedback-form .fld-l:not(:first-child){margin-top:14px}
+.feedback-text{display:block;min-height:164px;resize:vertical;line-height:1.55}
+.feedback-zaehler{display:flex;justify-content:space-between;gap:10px;margin:5px 1px 13px;
+  color:var(--muted);font-size:10.5px}
+.feedback-zaehler b{color:var(--text)}
+.feedback-status{margin-top:10px}
+.feedback-status:empty{display:none}
+.feedback-eingang{margin-top:24px}
+.feedback-eingang>.section-title{margin-bottom:10px}
+.feedback-laden{color:var(--muted);font-size:13px}
+.feedback-eintrag{margin-bottom:8px;padding:11px;background:var(--surface);
+  border:var(--bw) solid var(--ink);border-radius:var(--r)}
+.feedback-eintrag-kopf{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.feedback-eintrag-kopf b{font-family:var(--display);font-style:italic;text-transform:uppercase}
+.feedback-eintrag-kopf time,.feedback-eintrag small{color:var(--muted);font-size:10px}
+.feedback-eintrag small{display:block;margin:2px 0 7px}
+.feedback-eintrag p{margin:0;white-space:pre-wrap;font-size:13px;line-height:1.5}
+
+/* ---------- FAQ- und Meter-Seite ---------- */
+.src{font-size:12px;color:var(--faint);margin-top:16px;line-height:1.5;border-top:var(--bw) solid var(--ink);padding-top:10px}
+.faq-credit{margin-top:8px;text-align:left}
+.faq-spruenge{display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;margin:0 0 12px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--surface)}
+.faq-spruenge a{padding:9px 4px;border-right:1.5px solid var(--ink);color:var(--text);
+  font-family:var(--display);font-style:italic;font-size:11px;font-weight:700;
+  text-align:center;text-decoration:none;text-transform:uppercase}
+.faq-spruenge a:last-child{border-right:0}
+.faq-suche{margin:0 0 12px;padding:11px 12px;background:var(--surface);
+  border:var(--bw) solid var(--ink);border-radius:var(--r-karte)}
+.faq-suche label{display:block;margin:0 0 5px;color:var(--muted);font-family:var(--display);
+  font-style:italic;font-size:12px;font-weight:700;text-transform:uppercase}
+.faq-suche-zeile{position:relative;display:flex;align-items:center}
+.faq-suche input{width:100%;min-width:0;padding:10px 37px 10px 11px;border:var(--bw) solid var(--ink);
+  border-radius:var(--r);background:var(--surface2);color:var(--text);font:14px var(--mono)}
+.faq-suche input:focus{outline:none;border-color:var(--prio)}
+.faq-suche button{position:absolute;right:6px;width:32px;height:32px;padding:0;border:0;
+  border-radius:50%;background:var(--prio);color:#fff;font-size:18px;line-height:1}
+.faq-suche p{margin:8px 0 0;color:var(--muted);font-size:12px}
+.faq[hidden]{display:none}
+.faq-startkarte{position:relative;overflow:hidden;margin:0 0 16px;padding:16px 15px 14px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface)}
+.faq-startkarte::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:var(--pink)}
+.faq-start-kicker{display:inline-block;margin-bottom:8px;padding:3px 7px;border-radius:999px;
+  background:var(--navy);color:#fff;font-family:var(--mono);font-size:10px;
+  font-weight:800;text-transform:uppercase}
+.faq-startkarte h2{margin:0 0 10px;font-size:19px}
+.faq-startkarte ol{display:grid;gap:8px;margin:0;padding:0;list-style:none;counter-reset:faqstart}
+.faq-startkarte li{position:relative;min-height:28px;padding:4px 0 4px 37px;color:var(--muted);
+  font-size:12.5px;line-height:1.45;counter-increment:faqstart}
+.faq-startkarte li::before{content:counter(faqstart);position:absolute;left:0;top:0;display:grid;
+  place-items:center;width:27px;height:27px;border:1.5px solid var(--ink);border-radius:5px;
+  background:var(--prio);color:#fff;font-family:var(--mono);font-weight:800}
+.faq-startkarte li b{color:var(--text)}
+/* FAQ-Accordion */
+/* Abschnittsueberschrift im FAQ. Die Liste ist lang genug, dass man sonst nicht
+   mehr weiss, auf welcher Ebene man liest – vom Prinzip bis zur Bedienung. */
+.faq-sektion{scroll-margin-top:calc(var(--topbar-h) + 10px);border-top:2px dashed var(--ink);margin:22px 0 12px;padding-top:12px;
+  font-family:var(--display);font-style:italic;font-weight:700;font-size:14.5px;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.faq-sektion:first-of-type{border-top:0;margin-top:4px;padding-top:0}
+/* Aufklapper nach dem Vorbild ihrer FAQ-Seite. Dort gemessen: Karte weiss,
+   2px Rand, Radius 18px, Polster 18px – und die FRAGE in Monospace 18px mit
+   Gewicht 400, nicht in der kursiven Display-Schrift. Die Versalien stehen
+   dort im Text, nicht im CSS; wir behalten text-transform, weil unsere Fragen
+   gemischt geschrieben sind. */
+.faq{scroll-margin-top:calc(var(--topbar-h) + 10px);border:var(--bw) solid var(--ink);
+  border-radius:var(--r-karte);background:var(--surface);margin-bottom:10px;overflow:hidden}
+.faq>summary{list-style:none;cursor:pointer;padding:18px 46px 18px 18px;position:relative;
+  font-family:var(--mono);font-weight:400;text-transform:uppercase;font-size:16px;
+  line-height:1.35;color:var(--text)}
+.faq>summary::-webkit-details-marker{display:none}
+/* Gezeichnetes Chevron statt "+"/"–" – dasselbe Zeichen wie in den
+   Auswahlfeldern, damit Aufklappen ueberall gleich aussieht. */
+.faq>summary::after{content:"";position:absolute;right:16px;top:50%;
+  width:22px;height:22px;margin-top:-11px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E") center/22px no-repeat;
+  transition:transform .18s}
+.faq[open]>summary::after{transform:rotate(180deg)}
+:root[data-theme="dark"] .faq>summary::after{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23EDF0F6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")}
+.faq[open]>summary{border-bottom:var(--bw) solid var(--ink);background:var(--surface2)}
+.faq-a{padding:18px}
+/* Antworten bleiben linksbuendig: Zentrierter Fliesstext liest sich schlecht,
+   und dort steht ganze Absaetze, keine Kurzhinweise. */
+.faq-a p{margin:0 0 8px;font-size:14px;color:var(--muted);line-height:1.55}
+.faq-a p:last-child{margin-bottom:0}
+.faq-a p b{color:var(--text);font-weight:700}
+.faq-tutorial-start{display:block;margin-top:12px;padding:10px;border:var(--bw) solid var(--ink);
+  border-radius:var(--r);background:var(--pink);color:var(--accent-ink);text-align:center;
+  font-family:var(--display);font-style:italic;font-weight:700;text-transform:uppercase;
+  text-decoration:none}
+
+/* ---------- Profile ---------- */
+.profile-abschnitt{overflow:hidden;margin-bottom:10px;border:var(--bw) solid var(--ink);
+  border-radius:var(--r-karte);background:var(--surface)}
+.profile-abschnitt>summary{position:relative;padding:16px 48px 16px 17px;list-style:none;
+  font-family:var(--display);font-style:italic;font-size:17px;font-weight:700;
+  text-transform:uppercase;cursor:pointer}
+.profile-abschnitt>summary::-webkit-details-marker{display:none}
+.profile-abschnitt>summary::after{content:"";position:absolute;right:16px;top:50%;width:20px;height:20px;
+  margin-top:-10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E") center/20px no-repeat;
+  transition:transform .18s}
+.profile-abschnitt[open]>summary{border-bottom:var(--bw) solid var(--ink);background:var(--surface2)}
+.profile-abschnitt[open]>summary::after{transform:rotate(180deg)}
+.profile-abschnitt-inhalt{padding:17px}
+.profile-abschnitt.gefahr>summary{color:var(--down)}
+.profile-abschnitt.gefahr[open]>summary{background:#FFE0D8}
+.profile-ausloggen{margin-top:18px}
+:root[data-theme="dark"] .profile-abschnitt.gefahr[open]>summary{background:#3B211D}
+:root[data-theme="dark"] .profile-abschnitt>summary::after{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23EDF0F6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")}
+.profile-top{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.profile-meta{min-width:0;flex:1}
+.profile-name{font-weight:800;font-size:16px;overflow-wrap:anywhere}
+.profile-email{font-size:12px;color:var(--muted);overflow-wrap:anywhere;word-break:break-word}
+.avatar{width:88px;height:88px;border-radius:50%;border:var(--bw) solid var(--ink);object-fit:cover;background:var(--surface2);flex:0 0 auto}
+.avatar-fallback{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-style:italic;font-weight:700;font-size:34px;color:var(--link)}
+.role-tag{display:inline-block;background:var(--pink);color:var(--accent-ink);border:var(--bw) solid var(--ink);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;text-transform:uppercase;font-family:var(--display);font-style:italic;margin-top:4px}
+.role-tag.admin{background:var(--mr);color:var(--accent-ink)}
+.profile-datei{display:flex;align-items:center;gap:9px;min-width:0;margin-bottom:14px;padding:8px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--surface2);cursor:pointer}
+.profile-datei input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.profile-datei-knopf{flex:0 0 auto;padding:7px 9px;border:1.5px solid var(--ink);border-radius:5px;
+  background:var(--pink);color:var(--accent-ink);font-family:var(--display);font-style:italic;
+  font-size:12px;font-weight:700;text-transform:uppercase}
+.profile-dateiname{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--muted);font-size:11.5px}
+.profile-hinweis{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
+.btn-danger{background:#FFE0D8;color:var(--down)}
+:root[data-theme="dark"] .btn-danger{background:#3B211D;color:#FF9A83}
+:root[data-theme="dark"] .profile-abschnitt.gefahr>summary{color:#FF9A83}
+.profile-daten-status{min-height:17px;margin-top:8px;color:var(--muted);font-size:11.5px;text-align:center}
+
+/* ---------- Admin ---------- */
+.cust-row{display:flex;align-items:center;gap:12px;padding:12px;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);margin-bottom:10px;width:100%;text-align:left}
+.cust-row .av{width:44px;height:44px;border-radius:50%;border:var(--bw) solid var(--ink);object-fit:cover;background:var(--surface2);flex:0 0 auto}
+.cust-row .nm{font-weight:800}
+.cust-row .em{font-size:13px;color:var(--muted)}
+.cust-row .chev{margin-left:auto;font-size:20px;font-weight:700}
+.section-title{font-size:26px;margin:6px 0 16px}
+.back-link{background:none;border:0;color:var(--link);font-weight:800;font-family:var(--mono);padding:0;margin-bottom:12px;text-decoration:underline}
+.readonly-note{background:var(--mr);color:var(--accent-ink);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:10px 13px;font-size:13px;font-weight:700;margin-bottom:14px}
+.empty{color:var(--muted);font-weight:600;padding:20px 0;text-align:center}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+
+/* Baustand, unten im Profil – bewusst unauffaellig. */
+/* Dicht unter den Abmelden-Knopf: Der Abstand von dort bis zur Leiste soll dem
+   im Log entsprechen (Phasenende, "Neue Phase starten"). Die Versionszeile ist
+   Diagnose, kein eigener Abschnitt – sie braucht keinen Absatz davor. */
+.buildinfo{text-align:center;font-size:12px;color:var(--faint);margin:10px 0 0;font-family:var(--mono)}
+
+/* ============================================================
+   NUTRITION PLANNER — neue App-Shell
+
+   Die Variablen und Grundkomponenten oben sind bewusst 1:1 aus LOGMAN
+   uebernommen. Dieser Abschnitt enthaelt nur die neue Navigation und das
+   vorlaeufige Dashboard; ein Produktname ist noch nicht fest eingebrannt.
+   ============================================================ */
+
+.produktmarke{
+  display:inline-flex;align-items:center;gap:9px;color:var(--navy);font-family:var(--display);
+  font-style:italic;font-weight:700;font-size:20px;line-height:.85;text-transform:uppercase}
+.produktmarke small{display:block;margin-bottom:4px;color:var(--muted);font-family:var(--mono);
+  font-size:8px;font-style:normal;letter-spacing:.18em}
+.produktmarke-pixel{display:grid;place-items:center;width:34px;height:34px;background:var(--pink);
+  color:var(--accent-ink);border:var(--bw) solid var(--ink);border-radius:8px;font-size:15px}
+:root[data-theme="dark"] .produktmarke{color:var(--text)}
+
+.app-kopf .wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.kopf-marke{text-decoration:none}
+.app-kopf .nav-av{display:grid;place-items:center;text-decoration:none;overflow:hidden}
+.app-kopf .nav-av img{width:100%;height:100%;object-fit:cover}
+.app-kopf .nav-av span{line-height:1}
+
+.auth-marquee{display:flex;overflow:hidden;background:var(--navy);color:#fff;border-bottom:var(--bw) solid var(--ink);
+  font-size:11px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+.auth-marquee span{min-width:max-content;padding:9px 0;animation:nutrition-laufband 24s linear infinite}
+@keyframes nutrition-laufband{to{transform:translateX(-100%)}}
+.auth-marke{text-align:center;margin-bottom:28px}
+.auth-shell .produktmarke{font-size:27px;text-align:left}
+.auth-shell .produktmarke-pixel{width:46px;height:46px}
+
+.setup-shell{padding-top:max(42px,env(safe-area-inset-top));padding-bottom:40px}
+.setup-shell>.produktmarke{margin-bottom:28px}
+.setup-card{margin-top:22px}
+.setup-card p,.setup-card li{font-size:13px;color:var(--muted);line-height:1.55}
+.setup-card code{padding:2px 5px;background:var(--surface2);border-radius:4px;color:var(--text)}
+.setup-theme{display:flex;margin-top:20px;border:var(--bw) solid var(--ink);
+  border-radius:var(--r);overflow:hidden}
+.setup-theme .themebtn{border-radius:0}
+
+:root[data-seite="home"]{--bg:#B1E7FF}
+:root[data-seite="auth"],:root[data-seite="setup"]{--bg:#B1E7FF}
+:root[data-theme="dark"][data-seite="home"],
+:root[data-theme="dark"][data-seite="auth"],
+:root[data-theme="dark"][data-seite="setup"]{--bg:#101A2B}
+
+.dashboard-hero{padding:34px 3px 26px}
+.dashboard-hero h1{margin:7px 0 12px;color:var(--navy);font-size:clamp(34px,10vw,54px);
+  line-height:.94;letter-spacing:-.045em}
+:root[data-theme="dark"] .dashboard-hero h1{color:var(--text)}
+.dashboard-hero p{max-width:440px;margin:0;color:var(--muted);font-size:13px}
+.modulraster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.modulkarte{position:relative;min-height:174px;margin:0!important;padding:16px;overflow:hidden}
+.modulkarte.aktiv{background:var(--pink);color:var(--accent-ink)}
+.modulkarte h2{margin:38px 0 7px;font-size:20px}
+.modulkarte p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.45}
+.modulkarte.aktiv p{color:#352334}
+.modulstatus{position:absolute;top:14px;left:14px;padding:3px 7px;border:1.5px solid var(--ink);
+  border-radius:999px;background:var(--surface2);color:var(--text);font-size:8px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase}
+.modulkarte.aktiv .modulstatus{background:var(--mr);color:var(--accent-ink)}
+.app-toast{position:fixed;z-index:100;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));
+  max-width:min(90vw,430px);transform:translate(-50%,20px);padding:10px 14px;background:var(--navy);
+  color:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r);font-size:12px;font-weight:800;
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.app-toast.sichtbar{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:420px){
+  .modulraster{grid-template-columns:1fr}
+  .modulkarte{min-height:142px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .auth-marquee span{animation:none}
+}
+
+/* Einmaliger Hinweis fuer Benachrichtigungen. Kein Dauergast: Nach dem Tippen
+   oder Wegwischen ist er fuer immer weg. */
+.pushbar{display:flex;align-items:center;gap:8px;margin-top:12px;
+  background:var(--mr);border:var(--bw) solid var(--ink);border-radius:var(--r);
+  color:var(--accent-ink);padding:4px 4px 4px 12px}
+.pb-go{flex:1;background:none;border:0;text-align:left;color:inherit;
+  font-family:var(--display);font-style:italic;font-weight:700;font-size:14.5px;
+  text-transform:uppercase;padding:8px 0}
+.pb-x{background:none;border:0;color:inherit;font-size:20px;line-height:1;
+  padding:6px 10px;opacity:.6}
+
+/* Setzt die Verlaufs-Box von den Profileinstellungen darueber ab. */
+.abschnitt-trenner{border-top:2px dashed var(--ink);opacity:.45;margin:26px 2px 20px}
+
+/* ---------- Wert-Box mit Verlaufskurve (Heavy-Progression) ---------- */
+.mess-kopf{margin-bottom:14px;padding:14px;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--navy-panel);color:#fff}
+.mess-label{display:block;margin-bottom:6px;font-family:var(--mono);font-size:10px;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;color:#B9C6E8}
+.mess-wert{font-family:var(--display);font-style:italic;font-weight:700;font-size:30px;line-height:1;color:#fff}
+.mess-wert span{font-size:16px;opacity:.72}
+/* Bildunterschrift zur Kennzahl – gleiche Groesse wie die uebrigen
+   Erklaertexte, aber linksbuendig: Sie gehoert zur Zahl darueber. */
+.mess-datum{font-size:13px;color:#D8E0F5;margin-top:7px}
+.mess-kopf>.mess-datum:first-child{margin:0 0 6px}
+.mess-leer{font-size:14.5px;color:var(--muted)}
+.prog-leer,.nb-leer{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:190px;padding:24px 18px;text-align:center}
+.prog-leer-icon,.nb-leer-icon{display:grid;place-items:center;width:48px;height:48px;margin-bottom:12px;
+  border:var(--bw) solid var(--ink);border-radius:10px;background:var(--pink);color:var(--accent-ink);
+  font-family:var(--display);font-style:italic;font-size:27px;font-weight:700}
+.nb-leer-icon{font-family:var(--mono);font-style:normal;line-height:1}
+.prog-leer b,.nb-leer b{font-family:var(--display);font-style:italic;font-size:18px;
+  text-transform:uppercase}
+.prog-leer p,.nb-leer p{max-width:360px;margin:7px 0 0;color:var(--muted);
+  font-size:13px;line-height:1.5}
+.mess-hinweis{font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;
+  border-left:var(--bw) solid var(--faint);padding-left:9px}
+.mess-neu{margin-top:14px}
+.mess-neu summary{font-family:var(--display);font-style:italic;font-weight:700;font-size:14px;
+  text-transform:uppercase;cursor:pointer;padding:8px 0}
+.prog-kurvenkopf{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:0 2px 8px}
+.prog-kurvenkopf b{font-family:var(--display);font-style:italic;font-size:14px;text-transform:uppercase}
+.prog-kurvenkopf span{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase}
+
+/* Kurve. Der Tageswert ist blass, der Trend kraeftig – das Auge soll dem
+   Signal folgen, nicht dem Rauschen. */
+.kurve{width:100%;height:auto;display:block;margin:6px 0 2px;overflow:visible}
+.k-linie{fill:none;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.k-linie.roh{stroke:var(--faint);stroke-width:1.5;opacity:.55}
+.k-linie.trend{stroke:var(--pink);stroke-width:3}
+.k-pt{fill:var(--pink);stroke:var(--ink);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.k-raster{stroke:var(--faint);stroke-width:1;stroke-dasharray:3 3;opacity:.5;vector-effect:non-scaling-stroke}
+.k-achse{fill:var(--muted);font-family:var(--mono);font-size:9px}
+.kurve-leer{font-size:13px;color:var(--muted);text-align:center;padding:18px 0;line-height:1.6}
+.kurve-leer span{font-size:12px;opacity:.75}
+
+/* ---------- Notizbuch ---------- */
+/* Zweispaltiges Raster statt gestapelter Karten: Frueher trug jede Notiz das
+   volle Karten-Gewicht der App (3px Rand, Schatten, 18px Polster, 21px Titel) –
+   dieselbe Lautstaerke, mit der im Log ein ganzer Trainingsblock gerahmt wird,
+   bei einem Zehntel Inhalt. */
+/* Luft nach dem "+ Neue Notiz"-Chip: Der Chip ist eine Handlung, die Kacheln
+   sind Inhalt. Ohne Abstand lasen sich beide wie eine zusammenhaengende Gruppe. */
+/* Abstand wie auf der Kollektionsseite (dort 22.5px). */
+.nb-raster{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+/* Hinweis, wenn der Spiegel gezeigt wird statt frischer Serverdaten. */
+.nb-offline{margin:14px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted);
+  border-left:var(--bw) solid var(--ink);padding-left:9px;border-radius:0}
+.nb-kachel{position:relative;display:flex;flex-direction:column;gap:5px;text-align:left;
+  background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
+  padding:15px 10px 10px;min-height:84px;overflow:hidden}
+.nb-kachel::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:var(--pink)}
+.nb-k-titel{font-family:var(--display);font-style:italic;font-weight:700;
+  font-size:15.5px;line-height:1.15;color:var(--text);overflow-wrap:anywhere}
+/* Zwei Zeilen Vorschau, dann Schluss – mehr waere Fliesstext in Briefmarken. */
+.nb-k-text{font-size:12px;line-height:1.4;color:var(--muted);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nb-k-bilder{font-size:11px;color:var(--faint);margin-top:auto}
+
+/* Knoepfe nach dem Vorbild der Kollektionsseite (FILTER / SORT).
+   Gemessen dort: 18px, kursiv, Versalien, Gewicht 700, Polster 13.5/18px,
+   Radius 6.75px, 2px Rand – und als FLAECHE DIE SEITENFARBE, nicht Weiss.
+   Das Letzte ist ihr eigentliches Kennzeichen: Die Knoepfe sind Umrisse auf
+   dem Grund, keine aufgesetzten Flaechen.
+   Polster seitlich 12px statt der dort gemessenen 18px: Mit 18px war die
+   Mindestbreite zweier Knoepfe groesser als die Zeile, sie stapelten sich
+   statt nebeneinander zu sitzen. */
+.nb-leiste{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.nb-leer{margin-top:18px;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface)}
+.nb-chip{flex:1 1 105px;min-height:44px;font-family:var(--display);font-style:italic;font-weight:700;
+  font-size:16px;text-transform:uppercase;letter-spacing:.01em;
+  color:var(--text);background:var(--bg);
+  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  padding:9px 10px;text-align:center;white-space:nowrap;cursor:pointer}
+.nb-chip.pink{background:var(--pink);color:var(--accent-ink)}
+
+/* Leseansicht – der einzige Ort, an dem Links anklickbar sind. */
+.nb-titel{font-size:20px;margin:0 0 8px;overflow-wrap:anywhere}
+.nb-text{margin:0;font-size:16px;line-height:1.65;overflow-wrap:anywhere}
+.nb-text a{color:var(--link);text-decoration:underline;text-underline-offset:2px}
+:root[data-theme="dark"] .nb-text a{color:var(--pink)}
+
+.nb-bilder{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.nb-bild{max-width:100%;width:120px;height:120px;object-fit:cover;
+  border:var(--bw) solid var(--ink);border-radius:10px;background:var(--surface2);display:block}
+/* Antippbare Vorschau: nur in der Leseansicht, im Formular traegt das Bild
+   stattdessen sein Entfernen-Kreuz. */
+.nb-bild.auf{cursor:zoom-in}
+.nb-lupe{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.88);
+  display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px)}
+.nb-lupe img{max-width:100%;max-height:100%;object-fit:contain;
+  border:var(--bw) solid #fff;border-radius:10px;display:block}
+.nb-lupe-zu{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:14px;
+  width:40px;height:40px;padding:0;border:var(--bw) solid #0A0A0A;border-radius:50%;
+  background:#fff;color:#0A0A0A;font-size:22px;font-weight:700;line-height:1}
+.nb-slot{position:relative;display:inline-block}
+.nb-bildweg{position:absolute;top:-7px;right:-7px;width:24px;height:24px;padding:0;
+  border:var(--bw) solid var(--ink);border-radius:50%;background:var(--surface);
+  font-weight:700;line-height:1;font-size:15.5px;color:var(--text)}
+
+.nb-in-titel{font-family:var(--display);font-style:italic;font-weight:700;font-size:18px}
+.nb-in-text{font-size:16px;line-height:1.6;resize:vertical}
+/* Die Dateiauswahl liegt versteckt im Label – der Chip IST das Label. */
+.nb-upload{display:block}
+
+/* ---------- Erklaertexte ----------
+   Diese kurzen Hinweise lagen vorher bei 10, 12, 12.5, 13 und 14.5px, mal
+   linksbuendig, mal mittig – ohne System. Jetzt EINE Groesse, EINE Farbe und
+   mittig im Kasten, wie der weisse Kasten auf ihrer Bewertungsseite (dort
+   18px, zentriert, Monospace, Zeilenhoehe 1.2).
+   Ausgenommen bleiben Fliesstexte (FAQ-Antworten) und Randnotizen mit eigener
+   Auszeichnung (.nb-offline, .src). */
+.som-hinweis,.mess-leer,.mess-hinweis,.kurve-leer{
+  font-family:var(--mono);font-size:14px;line-height:1.5;color:var(--muted);text-align:center}
+
+/* Funktionale Kleinschrift hat eine feste Untergrenze. Diese Texte vermitteln
+   Status, Einheiten oder Bedienlogik und duerfen deshalb nicht wie Dekoration
+   behandelt werden. */
+.phasechip,.badge,.role,.ex-picker-kopf small,.ex-picker-gruppe,.delta,.fld .u,
+.ci .lbl,.log-tutorial-kopf span,.tutorial-rollen small,.tutorial-zielkopf>span,
+.tutorial-eingabe small,.tutorial-startfx small,.willkommen-fx span,.log-weiter span,
+.seitenkopf-kicker,.som-stat small,.som-ablauf span,.som-ablauf i,.som-legende,
+.som-prio-marke,.som-wert small,.som-indirekt-quellen>span,.som-modusseg small,
+.som-spender-zahlen,.som-spender-wahl em,.volrolle,.feedback-zaehler,
+.feedback-eintrag-kopf time,.feedback-eintrag small,.faq-start-kicker,
+.mess-label,.prog-kurvenkopf span,.k-achse{
+  font-size:11px!important}
+.som-hinweis.som-hinweis-oben{font-size:12px;text-align:left}
+
+/* Kleine runde Symbole bleiben optisch kompakt, erhalten aber eine echte
+   44×44-px-Trefferflaeche. Das Pseudoelement gehoert zum jeweiligen Button
+   und ist damit ebenfalls anklickbar. */
+.ibtn,.delrow,.ex-picker-zu,.log-tutorial-kopf button,.som-info-knopf,
+.nb-lupe-zu,.pb-x{position:relative}
+.ibtn::after,.delrow::after,.ex-picker-zu::after,.log-tutorial-kopf button::after,
+.som-info-knopf::after,.faq-suche button::after,.nb-bildweg::after,
+.nb-lupe-zu::after,.timerfeld .x::after,.pb-x::after{
+  content:"";position:absolute;left:50%;top:50%;width:max(44px,100%);
+  height:max(44px,100%);transform:translate(-50%,-50%)}
