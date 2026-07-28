@@ -1750,13 +1750,19 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
    weisse Gruppen, feine Trenner und wenige, klare Signalfarben.
    ============================================================ */
 :root{
-  --app-bg:#F4F3F8;
+  --app-bg:#B1E7FF;
   --app-card:#FFFFFF;
-  --app-field:#F1F0F4;
-  --app-divider:#E3E1E8;
-  --app-purple:#5952D6;
-  --app-purple-soft:#E9E7FF;
-  --app-secondary:#7D7A84;
+  --app-field:#EAF4FC;
+  --app-divider:#C7DFEC;
+  --app-purple:#001454;
+  --app-purple-soft:#DCEBFF;
+  --app-secondary:#586274;
+  --app-fs-label:10px;
+  --app-fs-small:12px;
+  --app-fs-body:13px;
+  --app-fs-button:14px;
+  --app-control-h:44px;
+  --app-gap:12px;
 }
 :root[data-theme="dark"]{
   --app-bg:#111218;
@@ -1792,7 +1798,7 @@ h1,h2,h3,.display,.section-title{font-style:normal;letter-spacing:-.025em}
 .seitenkopf{padding-top:20px!important}
 .seitenkopf .section-title{color:var(--app-purple);font-size:27px}
 .seitenkopf-kicker{padding:0;border:0!important;border-radius:0!important;background:none!important;
-  color:var(--app-secondary)!important;font-family:var(--ui);font-size:10px;letter-spacing:.08em}
+  color:var(--app-secondary)!important;font-family:var(--mono);font-size:var(--app-fs-label);letter-spacing:.08em}
 .zurueck,
 :root[data-seite="body"] .zurueck,
 :root[data-seite="reminders"] .zurueck,
@@ -1800,30 +1806,30 @@ h1,h2,h3,.display,.section-title{font-style:normal;letter-spacing:-.025em}
 :root[data-seite="profile"] .zurueck{
   min-height:36px;padding:7px 11px;border:0;border-radius:18px;background:rgba(255,255,255,.68);
   color:var(--text);box-shadow:0 5px 18px rgba(20,18,32,.09);
-  font-family:var(--ui);font-style:normal;font-size:11px}
+  font-family:var(--ui);font-style:normal;font-size:12px}
 :root[data-theme="dark"] .zurueck{background:rgba(38,39,48,.78)}
 .seiten-einstieg{gap:3px;margin-bottom:16px;padding:0 2px;border:0;background:transparent}
-.seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:13px}
-.seiten-einstieg span{font-family:var(--ui);font-size:12px;color:var(--app-secondary)}
+.seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:var(--app-fs-body)}
+.seiten-einstieg span{font-family:var(--mono);font-size:var(--app-fs-small);color:var(--app-secondary)}
 
 .card{border:0;border-radius:20px;background:var(--app-card);box-shadow:0 1px 0 rgba(20,18,32,.02)}
 .card + .card{margin-top:14px}
 .input{border:1px solid var(--app-divider);border-radius:11px;background:var(--app-field);
-  font-family:var(--ui);font-size:15px}
+  font-family:var(--mono);font-size:15px}
 .input:focus{border-color:var(--app-purple);box-shadow:0 0 0 3px color-mix(in srgb,var(--app-purple) 18%,transparent)}
 label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:var(--app-secondary)}
-.btn{min-height:44px;border:0;border-radius:12px;background:var(--app-field);
-  font-family:var(--ui);font-style:normal;font-size:14px}
-.btn-primary{background:var(--app-purple);color:#fff}
+.btn{min-height:var(--app-control-h);border:0;border-radius:12px;background:var(--app-field);
+  font-family:var(--display);font-style:italic;font-size:var(--app-fs-button)}
+.btn-primary{background:var(--pink);color:var(--accent-ink)}
 .btn-danger{background:#F25F71;color:#fff}
 
 /* Start: pinke Tageskarte und darunter eine einzige, native Listenbox. */
 :root[data-seite="home"] .dashboard-hero{
-  margin:16px 0 24px;padding:15px 16px 16px;border-radius:16px;background:linear-gradient(135deg,#F181B2,#E25791);
+  margin:16px 0 24px;padding:15px 16px 16px;border-radius:16px;background:linear-gradient(135deg,#FF83BB,#F45C9D);
   color:#fff;text-align:left;box-shadow:0 8px 24px rgba(213,70,135,.18)}
 :root[data-seite="home"] .dashboard-hero .seitenkopf-kicker{margin:0;color:#fff!important;opacity:.86}
 :root[data-seite="home"] .dashboard-hero h1{margin:8px 0 5px;color:#fff;font-size:28px}
-:root[data-seite="home"] .dashboard-hero p{margin:0;color:#fff;font-family:var(--ui);font-size:12px;opacity:.9}
+:root[data-seite="home"] .dashboard-hero p{margin:0;color:#fff;font-family:var(--mono);font-size:var(--app-fs-small);opacity:.94}
 :root[data-seite="home"] .listen-titel{margin:0 10px 9px;text-align:left;font-size:19px}
 :root[data-seite="home"] .modulraster{
   display:block;overflow:hidden;background:var(--app-card);border:0;border-radius:20px;box-shadow:none}
@@ -1837,9 +1843,9 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 :root[data-seite="home"] .modul-icon::before{display:none}
 :root[data-seite="home"] .modul-icon .app-icon{width:18px;height:18px}
 :root[data-seite="home"] .modul-inhalt{display:block;padding:0}
-:root[data-seite="home"] .modulkarte h2{font-family:var(--ui);font-style:normal;font-size:13px;letter-spacing:0}
+:root[data-seite="home"] .modulkarte h2{font-family:var(--display);font-style:italic;font-size:var(--app-fs-body);letter-spacing:0}
 :root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{margin-top:2px;font-family:var(--ui);font-size:10px;white-space:nowrap}
+:root[data-seite="home"] .modulkarte.aktiv p{margin-top:2px;font-family:var(--mono);font-size:10px;white-space:nowrap}
 :root[data-seite="home"] .modulstatus{display:block;margin:0;padding:0;border:0!important;background:none!important;
   color:var(--app-secondary)!important;font-family:var(--ui);font-size:9px}
 :root[data-seite="home"] .modul-pfeil{display:block;color:#B7B4BD;font-size:20px}
@@ -1851,7 +1857,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   margin-bottom:12px;border:0;border-radius:18px;background:var(--app-card);box-shadow:none}
 .reminder-group-head,.profile-abschnitt>summary{
   min-height:60px;padding:11px 14px;background:transparent;border:0!important;
-  font-family:var(--ui);font-style:normal;letter-spacing:0}
+  font-family:var(--display);font-style:italic;letter-spacing:0}
 .profile-abschnitt>summary{display:flex;align-items:center;font-size:15px}
 .reminder-group[open] .reminder-group-head,.profile-abschnitt[open]>summary{background:transparent}
 .reminder-group-icon{border:0;background:var(--pink)}
@@ -1859,10 +1865,11 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .reminder-row{border-bottom:1px solid var(--app-divider);padding-right:14px}
 .switchline{font-family:var(--ui);font-style:normal}
 .reminder-row>[data-label]{background:var(--app-field)}
-.reminder-add{border-top:1px solid var(--app-divider);font-family:var(--ui);font-style:normal;color:var(--app-purple)}
-.reminder-add span{border:0;background:var(--app-purple);color:#fff}
+.reminder-add{min-height:var(--app-control-h);border-top:1px solid var(--app-divider);
+  font-family:var(--display);font-style:italic;font-size:12px;color:var(--app-purple)}
+.reminder-add span{border:0;background:var(--pink);color:var(--accent-ink)}
 .reminder-group-chevron{color:var(--app-secondary)}
-[data-save-reminders]{background:rgba(89,82,214,.82);color:#fff;border:0;border-radius:14px;
+[data-save-reminders]{background:rgba(255,105,174,.82);color:var(--accent-ink);border:0;border-radius:14px;
   -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}
 
 /* Food-Log und Messwerte werden zu ruhigen weissen Gruppen. */
@@ -1870,15 +1877,16 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .food-form-card>summary{font-family:var(--ui)}
 .food-form-card>summary::after{color:var(--app-purple)}
 .food-form-card>summary>span:not(.food-add-icon){font-family:var(--ui);font-style:normal}
-.food-add-icon{border:0;background:var(--app-purple);color:#fff}
+.food-add-icon{border:0;background:var(--pink);color:var(--accent-ink)}
 .food-form-card form{border-top:1px solid var(--app-divider)}
 .food-card{border-radius:18px}
 .food-image{border-right:1px solid var(--app-divider)}
 .food-toolbar h2{color:var(--app-purple);font-style:normal}
 [data-skinfold-card],[data-weight-card]{border-radius:20px}
 [data-skinfold-card]::before,[data-weight-card]::before{display:none}
-.mess-kopf{border:0;border-radius:14px;background:var(--app-purple-soft);color:var(--text)}
+.mess-kopf{border:0;border-radius:14px;background:var(--navy);color:#fff}
 .mess-label,.mess-datum,.mess-wert,.mess-wert span{color:var(--text)}
+.mess-kopf .mess-label,.mess-kopf .mess-datum,.mess-kopf .mess-wert,.mess-kopf .mess-wert span{color:#fff}
 .mess-neu{border-top:1px solid var(--app-divider)}
 .mess-neu summary{font-family:var(--ui);font-style:normal!important}
 .falte .input{background:var(--app-field)}
@@ -1888,9 +1896,9 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .profile-abschnitt>summary::after{opacity:.65}
 .themeseg{border:0;border-radius:13px;background:var(--app-field)}
 .themebtn{border:0;border-right:1px solid var(--app-divider);font-family:var(--ui);font-style:normal}
-.themebtn.on{background:var(--app-purple);color:#fff}
+.themebtn.on{background:var(--navy);color:#fff}
 .role-tag{border:0;background:var(--pink)}
-.auth-marquee{border:0;background:var(--app-purple)}
+.auth-marquee{border:0;background:var(--navy)}
 .auth-shell .card,.setup-card{border:0;border-radius:20px;background:var(--app-card)}
 .auth-title{color:var(--app-purple);font-style:normal}
 .auth-sub{color:var(--app-secondary)}
@@ -2066,3 +2074,57 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .nb-lupe-zu::after,.timerfeld .x::after,.pb-x::after{
   content:"";position:absolute;left:50%;top:50%;width:max(44px,100%);
   height:max(44px,100%);transform:translate(-50%,-50%)}
+
+/* ============================================================
+   NUTRITION — finaler Konsistenz-Pass
+   Diese Regeln stehen bewusst zuletzt: Der uebernommene LOGMAN-Bestand
+   enthaelt weiter oben und unten Komponentenregeln mit eigenen Einzelwerten.
+   ============================================================ */
+:root[data-seite="home"],
+:root[data-seite="body"],
+:root[data-seite="reminders"],
+:root[data-seite="food-log"],
+:root[data-seite="profile"]{
+  --bg:var(--app-bg);
+  --surface:var(--app-card);
+  --surface2:var(--app-field);
+  --link:var(--navy);
+}
+.btn,.pb-go,[data-save-reminders],.profile-datei-knopf{
+  min-height:var(--app-control-h);font-size:var(--app-fs-button);line-height:1.15}
+.btn,.pb-go,[data-save-reminders]{
+  font-family:var(--display);font-style:italic;font-weight:700;text-transform:uppercase}
+.pb-go{padding:8px 2px;text-align:left}
+.pushbar{min-height:52px;margin:0 0 12px;padding:4px 8px 4px 12px;
+  border:0!important;border-radius:14px;background:var(--mr);box-shadow:none}
+.food-actions .btn{min-height:36px;padding:7px 10px;font-size:12px}
+.seiten-einstieg{margin-bottom:14px}
+.card + .card{margin-top:14px}
+.reminder-list{gap:12px;margin-block:0 14px}
+.reminder-group,.profile-abschnitt{margin-bottom:12px}
+.reminder-group-head,.profile-abschnitt>summary{min-height:58px}
+.reminder-row{padding-block:11px}
+.switchline{font-size:14px}
+.reminder-grid label span,.falte span,label.fld-l{font-size:var(--app-fs-label)}
+.reminder-grid .input{min-height:40px}
+.mess-kopf{margin-bottom:12px;padding:13px;border:0;border-radius:14px;
+  background:var(--navy);color:#fff}
+.mess-kopf .mess-label,.mess-kopf .mess-datum,.mess-kopf .mess-wert,
+.mess-kopf .mess-wert span{color:#fff}
+.mess-neu{margin-top:10px;border-top:1px solid var(--app-divider)}
+.mess-neu summary{min-height:42px;padding:7px 0;font-family:var(--display);
+  font-size:14px;font-style:italic!important}
+.falten-grid{gap:8px 10px;margin-top:10px}
+.gew-eingabe{gap:8px;margin-top:14px}
+.food-form-card{margin-bottom:18px}
+.food-form-card>summary{min-height:60px}
+.food-form-card form{padding:14px}
+.food-form-actions{margin-top:12px}
+.profile-abschnitt-inhalt{padding:15px}
+.profile-top{margin-bottom:16px}
+
+@media(max-width:520px){
+  .seitenkopf{padding-top:18px!important;padding-bottom:12px!important}
+  .dashboard-hero{margin-top:12px!important;margin-bottom:20px!important}
+  .card{padding:15px}
+}
