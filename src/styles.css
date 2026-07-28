@@ -2233,3 +2233,57 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .reminder-group-head em{font-family:var(--mono)}
 .seitenkopf-kicker,label.fld-l,.falte span,.reminder-grid label span{
   font-family:var(--mono)}
+
+/* ============================================================
+   Seitenfarben und vollflaechige Muster
+   Jede Unterseite bekommt eine eigene "Tapete". Der Header verwendet nur
+   deren Vollfarbe, damit Text und Navigation ruhig lesbar bleiben.
+   ============================================================ */
+:root{
+  --muster-punkte:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='11' cy='11' r='1.5' fill='%23001454' fill-opacity='.075'/%3E%3C/svg%3E");
+  --muster-plus:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M14 10v8M10 14h8' fill='none' stroke='%23001454' stroke-width='1.5' stroke-linecap='round' stroke-opacity='.07'/%3E%3C/svg%3E");
+  --muster-welle:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24'%3E%3Cpath d='M-2 12c5-6 10-6 15 0s10 6 15 0 10-6 15 0' fill='none' stroke='%23001454' stroke-width='1.4' stroke-opacity='.065'/%3E%3C/svg%3E");
+  --muster-punkte-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='11' cy='11' r='1.5' fill='%23EDF0F6' fill-opacity='.045'/%3E%3C/svg%3E");
+  --muster-plus-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M14 10v8M10 14h8' fill='none' stroke='%23EDF0F6' stroke-width='1.5' stroke-linecap='round' stroke-opacity='.045'/%3E%3C/svg%3E");
+  --muster-welle-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24'%3E%3Cpath d='M-2 12c5-6 10-6 15 0s10 6 15 0 10-6 15 0' fill='none' stroke='%23EDF0F6' stroke-width='1.4' stroke-opacity='.04'/%3E%3C/svg%3E");
+}
+:root[data-seite="home"]{--bg:#B1E7FF;--app-pattern:var(--muster-dreieck)}
+:root[data-seite="body"]{--bg:#CDEFD9;--app-pattern:var(--muster-punkte)}
+:root[data-seite="reminders"]{--bg:#FBE7A4;--app-pattern:var(--muster-plus)}
+:root[data-seite="food-log"]{--bg:#FFE6A7;--app-pattern:var(--muster-tropfen)}
+:root[data-seite="profile"]{--bg:#E3D7F3;--app-pattern:var(--muster-welle)}
+:root[data-seite="auth"],:root[data-seite="setup"]{--bg:#B1E7FF;--app-pattern:var(--muster-dreieck)}
+
+:root[data-theme="dark"][data-seite="home"],
+:root[data-theme="dark"][data-seite="body"],
+:root[data-theme="dark"][data-seite="reminders"],
+:root[data-theme="dark"][data-seite="food-log"],
+:root[data-theme="dark"][data-seite="profile"],
+:root[data-theme="dark"][data-seite="auth"],
+:root[data-theme="dark"][data-seite="setup"]{--bg:#101A2B}
+:root[data-theme="dark"][data-seite="home"]{--app-pattern:var(--muster-dreieck-dunkel)}
+:root[data-theme="dark"][data-seite="body"]{--app-pattern:var(--muster-punkte-dunkel)}
+:root[data-theme="dark"][data-seite="reminders"]{--app-pattern:var(--muster-plus-dunkel)}
+:root[data-theme="dark"][data-seite="food-log"]{--app-pattern:var(--muster-tropfen-dunkel)}
+:root[data-theme="dark"][data-seite="profile"]{--app-pattern:var(--muster-welle-dunkel)}
+
+html,body,#app{min-height:100%;background-color:var(--bg)}
+#app{min-height:100dvh}
+#view{
+  min-height:calc(100dvh - 68px);background-color:var(--bg);
+  background-image:var(--app-pattern);background-repeat:repeat;background-attachment:fixed}
+:root[data-seite] #view{background-image:var(--app-pattern)}
+
+/* Deckender, musterfreier Kopf in exakt derselben Unterseitenfarbe. */
+.app-kopf{
+  background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
+.app-kopf::before,.app-kopf::after{background:var(--bg)}
+
+/* Keine weichen oder harten Schlagschatten. Kontur und Farbe reichen. */
+:root[data-seite="home"] #app *,
+:root[data-seite="body"] #app *,
+:root[data-seite="reminders"] #app *,
+:root[data-seite="food-log"] #app *,
+:root[data-seite="profile"] #app *,
+:root[data-seite="auth"] #app *,
+:root[data-seite="setup"] #app *{box-shadow:none!important}
