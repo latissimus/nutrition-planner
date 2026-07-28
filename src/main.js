@@ -6,6 +6,7 @@ import { brandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
+import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 
 applyTheme(getTheme());
@@ -210,7 +211,7 @@ const module = [
   ['Heute', 'Plane Mahlzeiten, Wasser, Supplements und Schlaf an einem Ort.', 'Startpunkt', '#reminders', true],
   ['Körperwerte', 'Gewicht und Hautfalten mit ehrlichen Verlaufskurven.', 'Aktiv', '#body', true],
   ['Erinnerungen', 'Mahlzeiten, Supplement-Stack und Trinken im Tagesrhythmus.', 'Aktiv', '#reminders', true],
-  ['Food-Log', 'Gegessene Mahlzeiten als Inspiration festhalten.', 'Geplant', '#home', false],
+  ['Food-Log', 'Gegessene Mahlzeiten als Inspiration festhalten.', 'Aktiv', '#food-log', true],
   ['Rezepte', 'Eigene Rezepte und schnelle Cheat-Code-Mahlzeiten.', 'Geplant', '#home', false],
   ['Gewohnheiten', 'Kleine Routinen planen und täglich abhaken.', 'Geplant', '#home', false],
 ];
@@ -287,6 +288,9 @@ async function render() {
   } else if (route === 'reminders') {
     setSeite('reminders');
     mountReminders(view, { session, profile });
+  } else if (route === 'food-log') {
+    setSeite('food-log');
+    mountFoodLog(view, { session, profile });
   } else {
     mountHome(view);
   }

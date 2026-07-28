@@ -33,12 +33,13 @@ ebenfalls erst nach den Kernfunktionen umgesetzt.
 - tägliche Check-ins
 - einfache Serien und Rückblick
 
-## 5. Food-Log
+## 5. Food-Log — Basis erledigt
 
-- Mahlzeit fotografieren und beschreiben
-- Bilder komprimieren
-- privater Supabase-Storage-Bucket
-- Inspiration filtern und wiederfinden
+- Mahlzeit fotografieren und beschreiben — erledigt
+- privater Supabase-Storage-Bucket mit RLS — erledigt
+- Einträge bearbeiten und vollständig löschen — erledigt
+- Bilder vor dem Upload komprimieren — folgt
+- Inspiration filtern und wiederfinden — folgt
 
 ## 6. Rezepte und Einkauf
 

@@ -18,12 +18,13 @@ trotzdem.
 ## Architektur
 
 - Vite + Vanilla JavaScript
-- Supabase Auth, Postgres und Row-Level Security
+- Supabase Auth, Postgres, privater Storage und Row-Level Security
 - eigener Service Worker für Offline-Start und spätere Web-Push-Erinnerungen
 - Retro-/Dark-Designsystem aus LOGMAN
 - Hash-Routing, damit GitHub Pages keinen SPA-Fallback benötigt
 - Körperwerte mit Gewicht, 7-Tage-Schnitt und Hautfalten-Summe
 - generisches Reminder-Modell fuer Mahlzeiten, Supplements und Trinken
+- Food-Log mit privater Bildergalerie, Bearbeiten und Löschen
 
 ## Deployment
 

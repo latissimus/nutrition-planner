@@ -13,5 +13,8 @@ Dateinamensreihenfolge angewendet und nach dem Ausrollen nicht mehr verändert.
 - Schutz vor eigener Rollenerhöhung
 - serverseitige Löschung des eigenen Accounts
 
-Körperwerte und das allgemeine Erinnerungssystem folgen in getrennten
-Migrationen.
+`20260728000200_body_and_reminders.sql` legt Körperwerte und das allgemeine
+Erinnerungssystem an.
+
+`20260728000300_food_log.sql` legt das private Food-Log sowie den privaten
+Storage-Bucket `food-log` mit nutzerbezogenen Policies an.
