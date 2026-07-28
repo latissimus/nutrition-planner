@@ -1677,6 +1677,71 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   .food-image{width:72px}
 }
 
+/* ---------- Kachel-Uebersicht nach RetroMuscle-Raster ---------- */
+:root[data-seite="home"] .dashboard-hero{text-align:center;padding:34px 14px 24px}
+:root[data-seite="home"] .dashboard-hero .seitenkopf-kicker{margin-inline:auto}
+:root[data-seite="home"] .dashboard-hero p{max-width:430px;margin-inline:auto}
+:root[data-seite="home"] .listen-titel{text-align:center;margin-bottom:12px}
+:root[data-seite="home"] .modulraster{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+  overflow:visible;background:none;border:0;border-radius:0}
+:root[data-seite="home"] .modulkarte{
+  display:flex;flex-direction:column;align-items:stretch;gap:0;min-height:0;padding:0;
+  overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);
+  border-radius:var(--r-karte);text-align:center}
+:root[data-seite="home"] .modul-icon{
+  position:relative;width:100%;height:auto;aspect-ratio:1.35;border:0;border-bottom:var(--bw) solid var(--ink);
+  border-radius:0;background:var(--surface2)}
+:root[data-seite="home"] .modul-icon::before{
+  content:"";position:absolute;inset:12%;border:1.5px dashed color-mix(in srgb,var(--ink) 30%,transparent);
+  border-radius:50%}
+:root[data-seite="home"] .modul-icon.pink{background:#F39AC2}
+:root[data-seite="home"] .modul-icon.mint{background:#9ADDB8}
+:root[data-seite="home"] .modul-icon.yellow{background:#F7DF78}
+:root[data-seite="home"] .modul-icon.violet{background:#D8B9F0}
+:root[data-seite="home"] .modul-icon.blue{background:#A8DAF4}
+:root[data-seite="home"] .modul-icon.green{background:#B9DF9E}
+:root[data-seite="home"] .modul-icon .app-icon{position:relative;z-index:1;width:42%;height:42%;
+  color:#141414;vector-effect:non-scaling-stroke}
+:root[data-seite="home"] .modul-inhalt{display:flex;flex:1;flex-direction:column;padding:11px 9px 9px}
+:root[data-seite="home"] .modulkarte h2{font-size:14px;line-height:1.08}
+:root[data-seite="home"] .modulkarte p,
+:root[data-seite="home"] .modulkarte.aktiv p{margin-top:5px;white-space:normal;font-size:9.5px;line-height:1.35}
+:root[data-seite="home"] .modulstatus{display:inline-block;align-self:center;margin:0 0 10px;padding:3px 7px;
+  border:1.5px solid var(--ink)!important;border-radius:999px!important;background:var(--surface2)!important;
+  color:var(--text)!important;font-size:8px}
+:root[data-seite="home"] .modul-pfeil{display:none}
+
+/* Einheitliche SVG-Masse: Das Bild sitzt geometrisch, nicht nur optisch,
+   exakt in seinem Kreis. */
+.app-icon{display:block;width:20px;height:20px;margin:auto;overflow:visible}
+.reminder-group-icon .app-icon{width:18px;height:18px}
+.reminder-group-head{
+  padding:14px 16px;font-size:inherit;
+  font-family:var(--display);font-style:italic;font-weight:700;text-transform:uppercase}
+.reminder-group-head .reminder-group-icon{align-self:center;justify-self:center}
+.reminder-group-chevron{display:grid;place-items:center;width:20px;height:20px}
+
+/* Native Datum-/Zeitsegmente haben je nach Browser eine eigene Innenbox.
+   Beide Ebenen werden zentriert, damit der Wert nicht nur ungefaehr mittig
+   wirkt. */
+.input[type="date"],.input[type="time"]{text-align:center;text-align-last:center}
+.input[type="date"]::-webkit-datetime-edit,
+.input[type="time"]::-webkit-datetime-edit{display:block;width:100%;text-align:center}
+.input[type="date"]::-webkit-calendar-picker-indicator,
+.input[type="time"]::-webkit-calendar-picker-indicator{margin-left:4px}
+
+@media(max-width:520px){
+  :root[data-seite="home"] .dashboard-hero{padding-top:28px}
+  :root[data-seite="home"] .modulraster{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  :root[data-seite="home"] .modul-icon{aspect-ratio:1.25}
+}
+
+@media(max-width:330px){
+  :root[data-seite="home"] .modulraster{grid-template-columns:minmax(0,1fr)}
+  :root[data-seite="home"] .modul-icon{aspect-ratio:1.8}
+}
+
 /* Einmaliger Hinweis fuer Benachrichtigungen. Kein Dauergast: Nach dem Tippen
    oder Wegwischen ist er fuer immer weg. */
 .pushbar{display:flex;align-items:center;gap:8px;margin-top:12px;

@@ -8,6 +8,7 @@ import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
+import { iconMarkup } from './icons.js';
 
 applyTheme(getTheme());
 registriereServiceWorker().catch(() => {});
@@ -208,11 +209,11 @@ function renderChrome() {
 }
 
 const module = [
-  ['Körperwerte', 'Gewicht und Hautfalten verfolgen.', 'Aktiv', '#body', true, '↗', 'mint'],
-  ['Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'Aktiv', '#reminders', true, '≡', 'yellow'],
-  ['Food-Log', 'Gute Mahlzeiten wiederfinden.', 'Aktiv', '#food-log', true, '◆', 'violet'],
-  ['Rezepte', 'Eigene Rezepte und schnelle Standards.', 'Bald', '#home', false, '▤', 'blue'],
-  ['Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'Bald', '#home', false, '✓', 'green'],
+  ['Körperwerte', 'Gewicht und Hautfalten verfolgen.', 'Aktiv', '#body', true, 'body', 'mint'],
+  ['Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'Aktiv', '#reminders', true, 'reminders', 'yellow'],
+  ['Food-Log', 'Gute Mahlzeiten wiederfinden.', 'Aktiv', '#food-log', true, 'food', 'violet'],
+  ['Rezepte', 'Eigene Rezepte und schnelle Standards.', 'Bald', '#home', false, 'recipes', 'blue'],
+  ['Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'Bald', '#home', false, 'habits', 'green'],
 ];
 
 function mountHome(container) {
@@ -227,8 +228,8 @@ function mountHome(container) {
       <h2 class="listen-titel">Meine Bereiche</h2>
       <section class="modulraster" aria-label="Meine Bereiche">
         ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
-          <a class="modulkarte${enabled ? '' : ' disabled'}" href="${href}" aria-disabled="${enabled ? 'false' : 'true'}">
-            <span class="modul-icon ${farbe}" aria-hidden="true">${icon}</span>
+          <a class="modulkarte${enabled ? '' : ' disabled'}" href="${href}" data-icon="${icon}" aria-disabled="${enabled ? 'false' : 'true'}">
+            <span class="modul-icon ${farbe}" aria-hidden="true">${iconMarkup(icon)}</span>
             <span class="modul-inhalt">
               <h2>${titel}</h2>
               <p>${text}</p>

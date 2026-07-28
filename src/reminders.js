@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
+import { iconMarkup } from './icons.js';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
@@ -169,17 +170,17 @@ function reminderCard(reminder) {
 
 function reminderGroups(reminders) {
   const groups = [
-    ['meal', 'Mahlzeiten', 'Frühstück, Snacks und Hauptmahlzeiten', '●'],
-    ['supplement', 'Supplemente', 'Dein Stack zur richtigen Zeit', '◆'],
-    ['drink', 'Trinken', 'Regelmäßig über den Tag verteilt', '≈'],
+    ['meal', 'Mahlzeiten', 'Frühstück, Snacks und Hauptmahlzeiten'],
+    ['supplement', 'Supplemente', 'Dein Stack zur richtigen Zeit'],
+    ['drink', 'Trinken', 'Regelmäßig über den Tag verteilt'],
   ];
-  return groups.map(([type, title, subtitle, icon]) => {
+  return groups.map(([type, title, subtitle]) => {
     const rows = reminders.filter((reminder) => reminder.type === type);
     if (!rows.length) return '';
     const canAdd = type === 'meal' || type === 'supplement';
     return `<details class="reminder-group" data-reminder-group="${type}" open>
       <summary class="reminder-group-head">
-        <span class="reminder-group-icon" aria-hidden="true">${icon}</span>
+        <span class="reminder-group-icon" aria-hidden="true">${iconMarkup(type)}</span>
         <span><b>${title}</b><small>${subtitle}</small></span>
         <em>${rows.length}</em>
         <span class="reminder-group-chevron" aria-hidden="true">⌄</span>
