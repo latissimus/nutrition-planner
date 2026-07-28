@@ -208,7 +208,6 @@ function renderChrome() {
 }
 
 const module = [
-  ['Heute', 'Dein Tagesrhythmus auf einen Blick.', 'Start', '#reminders', true, '◷', 'pink'],
   ['Körperwerte', 'Gewicht und Hautfalten verfolgen.', 'Aktiv', '#body', true, '↗', 'mint'],
   ['Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'Aktiv', '#reminders', true, '≡', 'yellow'],
   ['Food-Log', 'Gute Mahlzeiten wiederfinden.', 'Aktiv', '#food-log', true, '◆', 'violet'],
@@ -227,8 +226,8 @@ function mountHome(container) {
       </section>
       <h2 class="listen-titel">Meine Bereiche</h2>
       <section class="modulraster" aria-label="Meine Bereiche">
-        ${module.map(([titel, text, status, href, enabled, icon, farbe], index) => `
-          <a class="modulkarte${index === 0 ? ' aktiv' : ''}${enabled ? '' : ' disabled'}" href="${href}" aria-disabled="${enabled ? 'false' : 'true'}">
+        ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
+          <a class="modulkarte${enabled ? '' : ' disabled'}" href="${href}" aria-disabled="${enabled ? 'false' : 'true'}">
             <span class="modul-icon ${farbe}" aria-hidden="true">${icon}</span>
             <span class="modul-inhalt">
               <h2>${titel}</h2>

@@ -148,7 +148,8 @@ function permissionMarkup() {
 
 function reminderCard(reminder) {
   const isDrink = reminder.type === 'drink';
-  return `<article class="reminder-row" data-reminder-id="${reminder.id}" data-type="${reminder.type}">
+  const key = reminder._key || reminder.id;
+  return `<article class="reminder-row" data-reminder-key="${key}" data-type="${reminder.type}">
     <label class="switchline">
       <input type="checkbox" data-active ${reminder.active ? 'checked' : ''}>
       <span>${TYPE_LABEL[reminder.type] || reminder.type}</span>
@@ -175,14 +176,17 @@ function reminderGroups(reminders) {
   return groups.map(([type, title, subtitle, icon]) => {
     const rows = reminders.filter((reminder) => reminder.type === type);
     if (!rows.length) return '';
-    return `<section class="reminder-group" data-reminder-group="${type}">
-      <header class="reminder-group-head">
+    const canAdd = type === 'meal' || type === 'supplement';
+    return `<details class="reminder-group" data-reminder-group="${type}" open>
+      <summary class="reminder-group-head">
         <span class="reminder-group-icon" aria-hidden="true">${icon}</span>
         <span><b>${title}</b><small>${subtitle}</small></span>
         <em>${rows.length}</em>
-      </header>
+        <span class="reminder-group-chevron" aria-hidden="true">⌄</span>
+      </summary>
       <div class="reminder-group-list">${rows.map(reminderCard).join('')}</div>
-    </section>`;
+      ${canAdd ? `<button class="reminder-add" type="button" data-add-reminder="${type}"><span>+</span> ${type === 'meal' ? 'Mahlzeit' : 'Supplement'} hinzufügen</button>` : ''}
+    </details>`;
   }).join('');
 }
 
@@ -228,24 +232,48 @@ export async function mountReminders(container, { session }) {
     return;
   }
 
+  const rowsFromDom = () => [...list.querySelectorAll('[data-reminder-key]')].map((row) => {
+    const reminder = reminders.find((item) => (item._key || item.id) === row.dataset.reminderKey);
+    return {
+      ...reminder,
+      active: row.querySelector('[data-active]').checked,
+      label: row.querySelector('[data-label]').value || reminder.label,
+      time: row.querySelector('[data-time]').value || reminder.time,
+      metadata: row.dataset.type === 'drink'
+        ? {
+            bis: row.querySelector('[data-end]').value || '21:00',
+            intervall_minuten: Number(row.querySelector('[data-interval]').value || 120),
+          }
+        : reminder.metadata || {},
+    };
+  });
+
+  list.onclick = (event) => {
+    const addButton = event.target.closest('[data-add-reminder]');
+    if (!addButton) return;
+    const type = addButton.dataset.addReminder;
+    reminders = rowsFromDom();
+    reminders.push({
+      id: null,
+      _key: `new:${crypto.randomUUID()}`,
+      type,
+      label: type === 'meal' ? 'Neue Mahlzeit' : 'Neues Supplement',
+      time: type === 'meal' ? '12:00' : '08:00',
+      weekdays: WEEKDAYS,
+      active: false,
+      metadata: {},
+      route: '#reminders',
+    });
+    list.innerHTML = reminderGroups(reminders);
+    const input = list.querySelector(`[data-reminder-key="${reminders.at(-1)._key}"] [data-label]`);
+    input?.focus();
+    input?.select();
+  };
+
   card.querySelector('[data-save-reminders]').onclick = async (event) => {
     const button = event.currentTarget;
     button.disabled = true;
-    const rows = [...list.querySelectorAll('[data-reminder-id]')].map((row) => {
-      const reminder = reminders.find((item) => item.id === row.dataset.reminderId);
-      return {
-        ...reminder,
-        active: row.querySelector('[data-active]').checked,
-        label: row.querySelector('[data-label]').value || reminder.label,
-        time: row.querySelector('[data-time]').value || reminder.time,
-        metadata: row.dataset.type === 'drink'
-          ? {
-              bis: row.querySelector('[data-end]').value || '21:00',
-              intervall_minuten: Number(row.querySelector('[data-interval]').value || 120),
-            }
-          : reminder.metadata || {},
-      };
-    });
+    const rows = rowsFromDom();
     try {
       reminders = [];
       for (const reminder of rows) reminders.push(await saveReminder(userId, reminder));
