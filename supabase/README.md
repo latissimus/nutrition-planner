@@ -18,3 +18,7 @@ Erinnerungssystem an.
 
 `20260728000300_food_log.sql` legt das private Food-Log sowie den privaten
 Storage-Bucket `food-log` mit nutzerbezogenen Policies an.
+
+`20260728000400_web_push.sql` legt private Geräte-Abos und eine idempotente
+Versandhistorie an. Die Edge Function `send-reminders` versendet Test- und
+fällige Erinnerungen.

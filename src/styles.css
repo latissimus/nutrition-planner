@@ -2311,3 +2311,17 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
   --muster-knochen-gross:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='150' viewBox='0 0 220 150'%3E%3Cdefs%3E%3Cg id='b' fill='%23A86ED2' fill-opacity='.14'%3E%3Cpath d='M8 8a6 6 0 1 1 7-9 6 6 0 0 1 5 10l18 16a6 6 0 0 1 10 5 6 6 0 1 1-9 7L20 20a6 6 0 0 1-10-5A6 6 0 0 1 8 8z'/%3E%3C/g%3E%3C/defs%3E%3Cuse href='%23b' x='5' y='7' transform='rotate(8 30 32)'/%3E%3Cuse href='%23b' x='126' y='0' transform='rotate(-18 151 25)'/%3E%3Cuse href='%23b' x='62' y='87' transform='rotate(17 87 112)'/%3E%3Cuse href='%23b' x='174' y='82' transform='rotate(-9 199 107)'/%3E%3C/svg%3E");
   --muster-steak-gross:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='235' height='160' viewBox='0 0 235 160'%3E%3Cdefs%3E%3Cg id='s'%3E%3Cpath fill='%23C95777' fill-opacity='.105' d='M7 39C3 24 17 8 36 6c18-2 31 8 34 23 4 17-8 30-25 34-17 4-33-6-38-24z'/%3E%3Cpath d='M31 17v32m0-16h17' fill='none' stroke='%23FFE6A7' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/defs%3E%3Cuse href='%23s' x='2' y='6' transform='rotate(-8 38 41)'/%3E%3Cuse href='%23s' x='132' y='0' transform='rotate(14 167 34) scale(.86)'/%3E%3Cuse href='%23s' x='57' y='90' transform='rotate(11 92 124) scale(.92)'/%3E%3Cuse href='%23s' x='179' y='91' transform='rotate(-16 214 125) scale(.78)'/%3E%3C/svg%3E");
 }
+
+/* Push-Status: kompakt, aber auf dem Handy gut bedienbar. */
+.push-status{margin-bottom:12px}
+.push-status .msg{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.push-status .msg span{font-size:12px;font-weight:600;opacity:.8}
+.push-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.push-actions .btn{min-width:0;padding-inline:10px;font-size:12px}
+.pushbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.pushbar>span{font-size:12px;font-weight:700;line-height:1.3}
+.pushbar .pb-go{text-align:center}
+@media(max-width:420px){
+  .push-actions,.pushbar{grid-template-columns:1fr}
+  .pushbar .pb-go{text-align:left}
+}

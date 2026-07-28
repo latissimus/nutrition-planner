@@ -1,6 +1,13 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
+import {
+  activatePush,
+  disablePush,
+  getPushState,
+  sendTestPush,
+  syncPushSubscription,
+} from './push.js';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
@@ -102,16 +109,13 @@ async function maybeNotify(reminder, slot, now, userId) {
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
   const text = notificationText(reminder);
-  const notification = new Notification(text.title, {
+  const worker = await navigator.serviceWorker?.ready;
+  if (!worker) return;
+  await worker.showNotification(text.title, {
     body: text.body,
     tag: `nutrition-${reminder.id}-${slot}`,
     data: { url: reminder.route || '#reminders' },
   });
-  notification.onclick = () => {
-    window.focus();
-    location.hash = (reminder.route || '#reminders').replace(/^#/, '');
-    notification.close();
-  };
 }
 
 async function tickReminders(userId) {
@@ -127,24 +131,107 @@ async function tickReminders(userId) {
   });
 }
 
-export function startReminderLoop(userId) {
+export async function startReminderLoop(userId) {
   if (!userId || reminderUserId === userId) return;
+  const serverPushActive = await syncPushSubscription(userId).catch(() => false);
+  if (serverPushActive) {
+    if (reminderTimer) clearInterval(reminderTimer);
+    reminderTimer = null;
+    reminderUserId = userId;
+    return;
+  }
   if (reminderTimer) clearInterval(reminderTimer);
   reminderUserId = userId;
   tickReminders(userId);
   reminderTimer = setInterval(() => tickReminders(userId), CHECK_INTERVAL_MS);
 }
 
-function permissionMarkup() {
-  if (!('Notification' in window)) {
-    return '<div class="msg err">Dieser Browser unterstuetzt keine Benachrichtigungen.</div>';
+function permissionMarkup(state) {
+  if (!state) {
+    return '<div class="msg">Push-Status wird geprüft …</div>';
   }
-  if (Notification.permission === 'granted') {
-    return '<div class="msg ok">Benachrichtigungen sind aktiv.</div>';
+  if (!state.ready) {
+    return `<div class="msg err">${state.reason}</div>`;
+  }
+  if (state.permission === 'denied') {
+    return '<div class="msg err">Benachrichtigungen sind blockiert. Bitte in den System­einstellungen für diese App erlauben.</div>';
+  }
+  if (state.subscribed) {
+    return `<div class="push-status">
+      <div class="msg ok"><b>Push ist aktiv</b><span>Dieses Gerät empfängt Erinnerungen auch bei geschlossener App.</span></div>
+      <div class="push-actions">
+        <button class="btn btn-primary" type="button" data-test-push>Test senden</button>
+        <button class="btn" type="button" data-disable-push>Auf diesem Gerät ausschalten</button>
+      </div>
+    </div>`;
   }
   return `<div class="pushbar">
-    <button class="pb-go" type="button" data-notification-permission>Benachrichtigungen aktivieren</button>
+    <span>Dieses Gerät ist noch nicht für Push registriert.</span>
+    <button class="pb-go" type="button" data-activate-push>Benachrichtigungen aktivieren</button>
   </div>`;
+}
+
+async function renderPushControls(container, userId) {
+  const slot = container.querySelector('[data-permission]');
+  if (!slot) return;
+  slot.innerHTML = permissionMarkup();
+
+  let state;
+  try {
+    state = await getPushState();
+  } catch (error) {
+    slot.innerHTML = `<div class="msg err">${error.message}</div>`;
+    return;
+  }
+  slot.innerHTML = permissionMarkup(state);
+
+  const activate = slot.querySelector('[data-activate-push]');
+  if (activate) {
+    activate.onclick = async () => {
+      activate.disabled = true;
+      try {
+        await activatePush(userId);
+        await renderPushControls(container, userId);
+        await startReminderLoop(userId);
+        toast('Push-Benachrichtigungen aktiviert');
+      } catch (error) {
+        toast(error.message || 'Push konnte nicht aktiviert werden');
+        await renderPushControls(container, userId);
+      }
+    };
+  }
+
+  const test = slot.querySelector('[data-test-push]');
+  if (test) {
+    test.onclick = async () => {
+      test.disabled = true;
+      try {
+        await sendTestPush();
+        toast('Testnachricht wurde gesendet');
+      } catch (error) {
+        toast(error.message || 'Testnachricht fehlgeschlagen');
+      } finally {
+        if (test.isConnected) test.disabled = false;
+      }
+    };
+  }
+
+  const disable = slot.querySelector('[data-disable-push]');
+  if (disable) {
+    disable.onclick = async () => {
+      disable.disabled = true;
+      try {
+        await disablePush();
+        reminderUserId = null;
+        await startReminderLoop(userId);
+        await renderPushControls(container, userId);
+        toast('Push auf diesem Gerät ausgeschaltet');
+      } catch (error) {
+        toast(error.message || 'Push konnte nicht ausgeschaltet werden');
+        if (disable.isConnected) disable.disabled = false;
+      }
+    };
+  }
 }
 
 function reminderCard(reminder) {
@@ -215,14 +302,7 @@ export async function mountReminders(container, { session }) {
 
   const list = container.querySelector('[data-reminder-list]');
   const card = container.querySelector('[data-reminders-card]');
-  const permissionButton = container.querySelector('[data-notification-permission]');
-  if (permissionButton) {
-    permissionButton.onclick = async () => {
-      const permission = await Notification.requestPermission();
-      container.querySelector('[data-permission]').innerHTML = permissionMarkup();
-      toast(permission === 'granted' ? 'Benachrichtigungen aktiv' : 'Benachrichtigungen nicht aktiv');
-    };
-  }
+  renderPushControls(container, userId);
 
   let reminders = [];
   try {
