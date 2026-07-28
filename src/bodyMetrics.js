@@ -226,7 +226,8 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
   weightForm.querySelector('[data-save-weight]').onclick = async (event) => {
     const kg = zahl(weightForm.querySelector('#weight-value').value);
     if (kg == null || kg <= 0 || kg >= 500) return toast('Bitte ein Gewicht in kg eintragen');
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    button.disabled = true;
     try {
       await saveWeight(userId, kg, weightForm.querySelector('#weight-date').value || heute());
       await renderWeights();
@@ -234,12 +235,13 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
     } catch (error) {
       toast('Speichern fehlgeschlagen');
     }
-    event.currentTarget.disabled = false;
+    if (button.isConnected) button.disabled = false;
   };
 
   container.querySelector('[data-delete-measurements]').onclick = async (event) => {
     if (!confirm('Alle Hautfalten- und Gewichts-Messungen loeschen?')) return;
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    button.disabled = true;
     try {
       await deleteMeasurements(userId);
       weightForm.querySelector('#weight-value').value = '';
@@ -249,7 +251,7 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
     } catch (error) {
       toast('Zuruecksetzen fehlgeschlagen');
     }
-    event.currentTarget.disabled = false;
+    if (button.isConnected) button.disabled = false;
   };
 
   renderSkinfolds();

@@ -207,9 +207,10 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
     const msg = passwort.querySelector('[data-pw-msg]');
     if (p1.length < 6) return void (msg.innerHTML = '<div class="msg err">Mindestens 6 Zeichen.</div>');
     if (p1 !== p2) return void (msg.innerHTML = '<div class="msg err">Die Passwörter stimmen nicht überein.</div>');
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    button.disabled = true;
     const { error } = await supabase.auth.updateUser({ password: p1 });
-    event.currentTarget.disabled = false;
+    if (button.isConnected) button.disabled = false;
     if (error) {
       msg.replaceChildren();
       const fehler = document.createElement('div');
@@ -270,12 +271,13 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
   gefahr.querySelector('[data-delete]').onclick = async (event) => {
     const bestaetigung = prompt('Der Account und alle Daten werden endgültig gelöscht.\n\nTippe LÖSCHEN zum Bestätigen:');
     if (bestaetigung !== 'LÖSCHEN') return;
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    button.disabled = true;
     const status = gefahr.querySelector('.profile-daten-status');
     status.textContent = 'Account wird gelöscht…';
     const { error } = await supabase.rpc('delete_own_account', { nur_pruefen: false });
     if (error) {
-      event.currentTarget.disabled = false;
+      if (button.isConnected) button.disabled = false;
       status.textContent = 'Löschen fehlgeschlagen. Es wurden keine Daten entfernt.';
       return;
     }

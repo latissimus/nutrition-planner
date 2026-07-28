@@ -209,7 +209,8 @@ export async function mountReminders(container, { session }) {
   }
 
   card.querySelector('[data-save-reminders]').onclick = async (event) => {
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    button.disabled = true;
     const rows = [...list.querySelectorAll('[data-reminder-id]')].map((row) => {
       const reminder = reminders.find((item) => item.id === row.dataset.reminderId);
       return {
@@ -234,6 +235,6 @@ export async function mountReminders(container, { session }) {
     } catch (error) {
       toast('Speichern fehlgeschlagen');
     }
-    event.currentTarget.disabled = false;
+    if (button.isConnected) button.disabled = false;
   };
 }
