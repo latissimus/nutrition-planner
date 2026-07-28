@@ -1503,6 +1503,140 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   .auth-marquee span{animation:none}
 }
 
+/* ============================================================
+   NUTRITION — Listenansicht
+
+   Die Informationshierarchie folgt einer Reminder-App: grosse Seitentitel,
+   ruhige Gruppen und kompakte Zeilen. Konturen, Farben und Display-Typografie
+   halten die Oberflaeche klar im Retro-System.
+   ============================================================ */
+.listen-titel{margin:2px 4px 10px;font-size:20px}
+.dashboard-hero{padding:30px 3px 22px}
+.dashboard-hero h1{margin:10px 0 8px;font-size:clamp(38px,11vw,54px);line-height:.9}
+.dashboard-hero p{font-size:12.5px;line-height:1.5}
+.modulraster{
+  display:block;overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);
+  border-radius:var(--r-karte)}
+.modulkarte{
+  display:grid;grid-template-columns:38px minmax(0,1fr) auto 12px;align-items:center;gap:10px;
+  min-height:72px;margin:0;padding:11px 12px;text-decoration:none;color:var(--text);
+  background:var(--surface);border:0;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 24%,transparent)}
+.modulkarte:last-child{border-bottom:0}
+.modulkarte.aktiv{background:var(--surface);color:var(--text)}
+.modulkarte.disabled{opacity:.58}
+.modul-icon{display:grid;place-items:center;width:36px;height:36px;border:1.5px solid var(--ink);
+  border-radius:50%;color:#141414;font-family:var(--display);font-style:italic;font-weight:800;font-size:17px}
+.modul-icon.pink{background:var(--pink)}
+.modul-icon.mint{background:#68D89B}
+.modul-icon.yellow{background:var(--mr)}
+.modul-icon.violet{background:var(--lila)}
+.modul-icon.blue{background:#79C8F2}
+.modul-icon.green{background:#9ADB76}
+.modul-inhalt{min-width:0}
+.modulkarte h2{margin:0 0 3px;font-size:15px;line-height:1.05}
+.modulkarte p,.modulkarte.aktiv p{margin:0;color:var(--muted);font-size:10.5px;line-height:1.35;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modulstatus{position:static;padding:0;background:none!important;border:0!important;color:var(--muted)!important;
+  font-size:9px;white-space:nowrap}
+.modul-pfeil{color:var(--faint);font-size:23px;line-height:1}
+
+/* Unterseiten: ein kompakter Navigationskopf wie in einer nativen Listen-App. */
+:root[data-seite="profile"] .seitenkopf{align-items:flex-end;padding:28px 0 14px}
+:root[data-seite="profile"] .zurueck{position:static;z-index:auto;flex:0 0 auto;margin-left:auto;
+  background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+.seitenkopf-text{gap:6px}
+.seiten-einstieg{margin-bottom:14px;padding:10px 12px;border-radius:12px}
+
+/* Erinnerungen werden nach Zweck gruppiert. Innerhalb der Gruppe ersetzen
+   feine Trenner die vielen ineinander geschachtelten Karten. */
+[data-reminders-card]{padding:0;border:0;background:transparent;overflow:visible}
+[data-reminders-card]::before{display:none}
+[data-permission]:empty{display:none}
+.pushbar{margin:0 0 14px;padding:5px 6px 5px 12px}
+.reminder-list{gap:16px;margin:0 0 16px}
+.reminder-group{overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);
+  border-radius:var(--r-karte)}
+.reminder-group-head{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;
+  gap:10px;padding:12px 14px;background:var(--surface2);border-bottom:var(--bw) solid var(--ink)}
+.reminder-group-icon{display:grid;place-items:center;width:34px;height:34px;border:1.5px solid var(--ink);
+  border-radius:50%;background:var(--pink);color:var(--accent-ink);font-weight:900}
+.reminder-group[data-reminder-group="supplement"] .reminder-group-icon{background:var(--lila)}
+.reminder-group[data-reminder-group="drink"] .reminder-group-icon{background:#79C8F2}
+.reminder-group-head b,.reminder-group-head small{display:block}
+.reminder-group-head b{font-family:var(--display);font-style:italic;text-transform:uppercase;font-size:15px}
+.reminder-group-head small{margin-top:2px;color:var(--muted);font-size:9.5px;line-height:1.3}
+.reminder-group-head em{font-style:normal;color:var(--muted);font-size:11px;font-weight:800}
+.reminder-group-list{padding-left:14px}
+.reminder-row{padding:13px 14px 13px 0;border:0;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 22%,transparent);
+  border-radius:0;background:transparent;overflow:visible}
+.reminder-row:last-child{border-bottom:0}
+.reminder-row::before{display:none}
+.switchline{margin-bottom:8px}
+.switchline input{flex:0 0 auto;width:21px;height:21px}
+.reminder-row>.fld-l{margin-left:30px}
+.reminder-row>[data-label]{width:calc(100% - 30px);margin:0 0 10px 30px;padding:8px 10px;background:var(--surface2)}
+.reminder-grid{margin-left:30px;grid-template-columns:repeat(3,minmax(0,8.5rem));justify-content:start}
+.reminder-grid .input{margin:0;padding:8px 9px}
+[data-save-reminders]{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom));z-index:5;
+  box-shadow:0 0 0 5px var(--bg)}
+
+/* Food-Log: Eingabe als aufklappbare Aktion, gespeicherte Ideen als kompakte
+   Medienliste. Damit ist die Sammlung der Hauptinhalt, nicht ein Dauerformular. */
+.food-form-card{padding:0;background:var(--surface)}
+.food-form-card::before{display:none}
+.food-form-card>summary{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;
+  gap:10px;padding:12px 14px;list-style:none;cursor:pointer}
+.food-form-card>summary::-webkit-details-marker{display:none}
+.food-form-card>summary::after{content:"+";grid-column:3;grid-row:1/3;color:var(--link);
+  font-family:var(--display);font-size:25px;font-style:italic;font-weight:800}
+.food-form-card[open]>summary::after{content:"−"}
+.food-form-card>summary>span:not(.food-add-icon){font-family:var(--display);font-style:italic;
+  font-weight:700;text-transform:uppercase}
+.food-form-card>summary small{grid-column:2;color:var(--muted);font-size:9.5px}
+.food-add-icon{grid-row:1/3;display:grid;place-items:center;width:36px;height:36px;
+  border:1.5px solid var(--ink);border-radius:50%;background:var(--pink);color:var(--accent-ink);
+  font-size:24px;font-weight:800}
+.food-form-card form{padding:16px;border-top:var(--bw) solid var(--ink)}
+.food-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.food-card{display:grid;grid-template-columns:96px minmax(0,1fr);min-height:96px}
+.food-image{width:96px;height:100%;min-height:96px;aspect-ratio:auto;border:0;border-right:var(--bw) solid var(--ink)}
+.food-placeholder{font-size:34px}
+.food-card-body{min-width:0;padding:12px}
+.food-card h2{margin:3px 0 5px;font-size:17px}
+.food-card p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.food-actions{margin-top:9px}
+
+/* Messwerte bleiben datenreich, bekommen aber dieselbe Listenruhe. */
+[data-skinfold-card],[data-weight-card]{padding:16px}
+.mess-kopf{padding:12px;margin-bottom:10px}
+.mess-neu{margin-top:8px}
+.mess-neu summary{justify-content:space-between}
+.mess-neu summary::after{content:"⌄";font-family:var(--mono);font-style:normal}
+.mess-neu[open] summary::after{content:"⌃"}
+
+@media(max-width:520px){
+  .app-kopf .wrap{min-height:64px}
+  .produktmarke{font-size:17px}
+  .produktmarke-pixel{width:32px;height:32px}
+  .seitenkopf .section-title{font-size:25px}
+  .seitenkopf .zurueck{padding:7px 10px;font-size:11px}
+  .modulkarte{grid-template-columns:36px minmax(0,1fr) 10px}
+  .modulstatus{display:none}
+  .reminder-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-left:0}
+  .reminder-row>.fld-l{margin-left:0}
+  .reminder-row>[data-label]{width:100%;margin-left:0}
+  .food-card{grid-template-columns:82px minmax(0,1fr)}
+  .food-image{width:82px;min-height:100%}
+}
+
+@media(max-width:350px){
+  .seitenkopf{display:block!important}
+  .seitenkopf .zurueck{margin-top:10px!important}
+  .reminder-grid{grid-template-columns:minmax(0,1fr)}
+  .food-card{grid-template-columns:72px minmax(0,1fr)}
+  .food-image{width:72px}
+}
+
 /* Einmaliger Hinweis fuer Benachrichtigungen. Kein Dauergast: Nach dem Tippen
    oder Wegwischen ist er fuer immer weg. */
 .pushbar{display:flex;align-items:center;gap:8px;margin-top:12px;

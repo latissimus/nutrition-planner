@@ -166,6 +166,26 @@ function reminderCard(reminder) {
   </article>`;
 }
 
+function reminderGroups(reminders) {
+  const groups = [
+    ['meal', 'Mahlzeiten', 'Frühstück, Snacks und Hauptmahlzeiten', '●'],
+    ['supplement', 'Supplemente', 'Dein Stack zur richtigen Zeit', '◆'],
+    ['drink', 'Trinken', 'Regelmäßig über den Tag verteilt', '≈'],
+  ];
+  return groups.map(([type, title, subtitle, icon]) => {
+    const rows = reminders.filter((reminder) => reminder.type === type);
+    if (!rows.length) return '';
+    return `<section class="reminder-group" data-reminder-group="${type}">
+      <header class="reminder-group-head">
+        <span class="reminder-group-icon" aria-hidden="true">${icon}</span>
+        <span><b>${title}</b><small>${subtitle}</small></span>
+        <em>${rows.length}</em>
+      </header>
+      <div class="reminder-group-list">${rows.map(reminderCard).join('')}</div>
+    </section>`;
+  }).join('');
+}
+
 export async function mountReminders(container, { session }) {
   const userId = session.user.id;
   container.innerHTML = `
@@ -202,7 +222,7 @@ export async function mountReminders(container, { session }) {
   let reminders = [];
   try {
     reminders = await ensureDefaults(userId);
-    list.innerHTML = reminders.map(reminderCard).join('');
+    list.innerHTML = reminderGroups(reminders);
   } catch (error) {
     list.innerHTML = `<div class="msg err">${error.message}</div>`;
     return;
@@ -229,7 +249,7 @@ export async function mountReminders(container, { session }) {
     try {
       reminders = [];
       for (const reminder of rows) reminders.push(await saveReminder(userId, reminder));
-      list.innerHTML = reminders.map(reminderCard).join('');
+      list.innerHTML = reminderGroups(reminders);
       startReminderLoop(userId);
       toast('Erinnerungen gespeichert');
     } catch (error) {

@@ -96,7 +96,8 @@ export async function mountFoodLog(container, { session }) {
         <b>Was hat richtig gut funktioniert?</b>
         <span>Halte Mahlzeiten fest und greif an ideenlosen Tagen darauf zurück.</span>
       </section>
-      <section class="card food-form-card">
+      <details class="card food-form-card" data-food-panel>
+        <summary><span class="food-add-icon">+</span><span>Neue Mahlzeit</span><small>Idee festhalten</small></summary>
         <form data-food-form>
           <input type="hidden" data-food-id>
           <label class="fld-l" for="food-title">Mahlzeit</label>
@@ -112,7 +113,7 @@ export async function mountFoodLog(container, { session }) {
             <button class="btn" type="button" data-food-cancel hidden>Abbrechen</button>
           </div>
         </form>
-      </section>
+      </details>
       <div class="food-toolbar">
         <h2>Meine Ideen</h2>
         <span data-food-count></span>
@@ -121,6 +122,7 @@ export async function mountFoodLog(container, { session }) {
     </div>`;
 
   const form = container.querySelector('[data-food-form]');
+  const panel = container.querySelector('[data-food-panel]');
   const list = container.querySelector('[data-food-list]');
   const count = container.querySelector('[data-food-count]');
   const cancelButton = container.querySelector('[data-food-cancel]');
@@ -135,6 +137,7 @@ export async function mountFoodLog(container, { session }) {
     dateInput.value = heute();
     form.querySelector('[data-food-save]').textContent = 'Mahlzeit speichern';
     cancelButton.hidden = true;
+    panel.open = false;
   };
 
   const renderEntries = () => {
@@ -156,6 +159,7 @@ export async function mountFoodLog(container, { session }) {
     if (!entry) return;
     if (event.target.closest('[data-food-edit]')) {
       editingId = entry.id;
+      panel.open = true;
       titleInput.value = entry.title;
       noteInput.value = entry.note || '';
       dateInput.value = entry.eaten_at;
@@ -163,7 +167,7 @@ export async function mountFoodLog(container, { session }) {
       form.querySelector('[data-food-save]').textContent = 'Änderungen speichern';
       cancelButton.hidden = false;
       titleInput.focus();
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     if (!event.target.closest('[data-food-delete]')) return;

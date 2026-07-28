@@ -208,12 +208,12 @@ function renderChrome() {
 }
 
 const module = [
-  ['Heute', 'Plane Mahlzeiten, Wasser, Supplements und Schlaf an einem Ort.', 'Startpunkt', '#reminders', true],
-  ['Körperwerte', 'Gewicht und Hautfalten mit ehrlichen Verlaufskurven.', 'Aktiv', '#body', true],
-  ['Erinnerungen', 'Mahlzeiten, Supplement-Stack und Trinken im Tagesrhythmus.', 'Aktiv', '#reminders', true],
-  ['Food-Log', 'Gegessene Mahlzeiten als Inspiration festhalten.', 'Aktiv', '#food-log', true],
-  ['Rezepte', 'Eigene Rezepte und schnelle Cheat-Code-Mahlzeiten.', 'Geplant', '#home', false],
-  ['Gewohnheiten', 'Kleine Routinen planen und täglich abhaken.', 'Geplant', '#home', false],
+  ['Heute', 'Dein Tagesrhythmus auf einen Blick.', 'Start', '#reminders', true, '◷', 'pink'],
+  ['Körperwerte', 'Gewicht und Hautfalten verfolgen.', 'Aktiv', '#body', true, '↗', 'mint'],
+  ['Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'Aktiv', '#reminders', true, '≡', 'yellow'],
+  ['Food-Log', 'Gute Mahlzeiten wiederfinden.', 'Aktiv', '#food-log', true, '◆', 'violet'],
+  ['Rezepte', 'Eigene Rezepte und schnelle Standards.', 'Bald', '#home', false, '▤', 'blue'],
+  ['Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'Bald', '#home', false, '✓', 'green'],
 ];
 
 function mountHome(container) {
@@ -222,15 +222,20 @@ function mountHome(container) {
     <div class="wrap pad-bottom">
       <section class="dashboard-hero">
         <span class="seitenkopf-kicker">Dein System</span>
-        <h1>Planen. Erinnern.<br>Dranbleiben.</h1>
-        <p>Das technische Fundament steht. Die Funktionsbereiche werden jetzt nacheinander aktiviert.</p>
+        <h1>Heute</h1>
+        <p>Ernährung, Supplements und Regeneration – ruhig sortiert, schnell erreichbar.</p>
       </section>
-      <section class="modulraster">
-        ${module.map(([titel, text, status, href, enabled], index) => `
-          <a class="card modulkarte${index === 0 ? ' aktiv' : ''}${enabled ? '' : ' disabled'}" href="${href}" aria-disabled="${enabled ? 'false' : 'true'}">
+      <h2 class="listen-titel">Meine Bereiche</h2>
+      <section class="modulraster" aria-label="Meine Bereiche">
+        ${module.map(([titel, text, status, href, enabled, icon, farbe], index) => `
+          <a class="modulkarte${index === 0 ? ' aktiv' : ''}${enabled ? '' : ' disabled'}" href="${href}" aria-disabled="${enabled ? 'false' : 'true'}">
+            <span class="modul-icon ${farbe}" aria-hidden="true">${icon}</span>
+            <span class="modul-inhalt">
+              <h2>${titel}</h2>
+              <p>${text}</p>
+            </span>
             <span class="modulstatus">${status}</span>
-            <h2>${titel}</h2>
-            <p>${text}</p>
+            <span class="modul-pfeil" aria-hidden="true">›</span>
           </a>`).join('')}
       </section>
     </div>`;
