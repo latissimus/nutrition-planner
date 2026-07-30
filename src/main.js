@@ -2,7 +2,7 @@ import './styles.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
-import { brandMarkup } from './brand.js';
+import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
@@ -201,7 +201,7 @@ function renderChrome() {
   app.innerHTML = `
     <header class="topbar app-kopf">
       <div class="wrap">
-        <a class="kopf-marke" href="#home">${brandMarkup()}</a>
+        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Übersicht">${headerBrandMarkup()}</a>
         <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil">${avatarMarkup()}</a>
       </div>
     </header>

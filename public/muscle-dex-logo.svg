@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" role="img" aria-labelledby="title desc">
+  <title id="title">MUSCLE-DEX</title>
+  <desc id="desc">Weiße Retro-Wortmarke mit langem braunem Schatten vor einer vereinfachten elektronischen Index-Gerätesilhouette.</desc>
+
+  <defs>
+    <path id="word-arc" d="M 70 325 Q 500 265 930 325"/>
+  </defs>
+
+  <!-- Bewusst reduzierter und schmalerer DEX hinter der Wortmarke -->
+  <g stroke="#492426" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M190 128Q190 91 228 91H453Q480 91 494 116V443Q494 467 468 467H220Q190 467 190 438Z"
+          fill="#05BDE8" stroke-width="14"/>
+    <path d="M506 151H620Q651 151 675 172L724 217Q742 234 769 234H790Q810 234 810 256V438Q810 467 780 467H532Q506 467 506 443Z"
+          fill="#05BDE8" stroke-width="14"/>
+
+    <!-- Scharnier als einziger verbindender Gerätedetail -->
+    <rect x="482" y="115" width="36" height="359" rx="16" fill="#E54682" stroke-width="11"/>
+    <path d="M484 167H516M484 211H516M484 408H516M484 447H516"
+          fill="none" stroke-width="6" opacity=".75"/>
+
+    <!-- Nur wenige prägnante Details -->
+    <circle cx="257" cy="158" r="41" fill="#E54682" stroke-width="11"/>
+    <circle cx="257" cy="158" r="23" fill="#05BDE8" stroke="#fff" stroke-width="8"/>
+    <circle cx="257" cy="158" r="8" fill="#fff" stroke="none"/>
+
+    <path d="M317 112H445Q470 112 484 135" fill="none" stroke-width="10"/>
+    <rect x="227" y="237" width="221" height="117" rx="18" fill="#DDF8FF" stroke-width="11"/>
+    <rect x="545" y="264" width="210" height="67" rx="13" fill="#492426" stroke-width="7"/>
+    <rect x="564" y="282" width="172" height="31" rx="6" fill="#E54682" stroke="none"/>
+
+    <circle cx="259" cy="412" r="24" fill="#E54682" stroke-width="10"/>
+    <path d="M385 391H414V365H445V391H474V421H445V447H414V421H385Z"
+          fill="#492426" stroke-width="5"/>
+    <g fill="#DDF8FF" stroke-width="7">
+      <rect x="552" y="369" width="82" height="47" rx="10"/>
+      <rect x="658" y="369" width="82" height="47" rx="10"/>
+    </g>
+  </g>
+
+  <!-- Langer, deckender brauner Schlagschatten -->
+  <g font-family="'Arial Rounded MT Bold','Arial Rounded Bold','Arial Black',sans-serif"
+     font-size="154" font-weight="900" text-anchor="middle" letter-spacing="-6">
+    <g fill="#492426" stroke="#492426" stroke-width="27" paint-order="stroke fill">
+      <text transform="translate(0 42)">
+        <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+      </text>
+      <text transform="translate(0 34)">
+        <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+      </text>
+      <text transform="translate(0 26)">
+        <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+      </text>
+      <text transform="translate(0 18)">
+        <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+      </text>
+      <text transform="translate(0 10)">
+        <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+      </text>
+    </g>
+
+    <!-- Schmale weiße Außenkante wie bei der Referenz -->
+    <text fill="#fff" stroke="#fff" stroke-width="39" paint-order="stroke fill">
+      <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+    </text>
+
+    <!-- Weiße Schrift mit brauner Innenkontur -->
+    <text fill="#fff" stroke="#492426" stroke-width="18" paint-order="stroke fill">
+      <textPath href="#word-arc" startOffset="50%" textLength="860" lengthAdjust="spacingAndGlyphs">MUSCLE-DEX</textPath>
+    </text>
+  </g>
+</svg>

@@ -2325,3 +2325,20 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
   .push-actions,.pushbar{grid-template-columns:1fr}
   .pushbar .pb-go{text-align:left}
 }
+
+/* MUSCLE-DEX Hauptlogo im App-Header. Die Login-/Setup-Marke bleibt vorerst
+   separat, damit das hohe Vollmotiv nur dort eingesetzt wird, wo genug Raum ist. */
+.app-kopf .wrap{min-height:82px}
+.kopf-marke{
+  display:flex;align-items:center;min-width:0;line-height:0;
+  text-decoration:none}
+.kopf-logo{
+  display:block;width:clamp(164px,46vw,190px);height:auto;
+  max-height:76px;object-fit:contain;object-position:left center}
+#view{min-height:calc(100dvh - 82px)}
+
+@media(max-width:520px){
+  .app-kopf .wrap{min-height:76px}
+  .kopf-logo{width:clamp(156px,46vw,174px);max-height:70px}
+  #view{min-height:calc(100dvh - 76px)}
+}
