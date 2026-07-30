@@ -2702,6 +2702,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
    Kraeftige Produktflaechen, kompakte Typografie und gezielte Konturen.
    Gilt fuer den Retro-Modus; der bestehende Darkmode bleibt eigenstaendig.
    ============================================================ */
+@media not all {
 :root:not([data-theme="dark"]){
   --ink:#492426;
   --line:#492426;
@@ -2894,3 +2895,298 @@ button,a,[role="button"],summary{touch-action:manipulation}
     min-height:92px;
   }
 }
+}
+
+/* ============================================================
+   FEASTABLES × MUSCLEDEX — quellengetreuer Designpass
+   Analysiert aus dem mobilen Shop-Layout: Blue Cloud, Off White,
+   schwarze 4-px-Sektionskanten, schwere Typografie, Pink-CTAs,
+   horizontale Produktkarten und die Wellenkante der Medienflaechen.
+   ============================================================ */
+:root:not([data-theme="dark"]){
+  --ink:#000;
+  --line:#000;
+  --text:#000;
+  --muted:#492426;
+  --faint:#786668;
+  --surface:#F2EBE0;
+  --surface2:#FFFFFF;
+  --app-card:#F2EBE0;
+  --app-field:#FFFFFF;
+  --app-divider:rgba(0,0,0,.22);
+  --app-outline:#000;
+  --navy:#0069A6;
+  --link:#000;
+  --pink:#F54588;
+  --pink-press:#ED2E8E;
+  --lila:#CBA7EA;
+  --mr:#F2EBE0;
+  --prio:#60269E;
+  --feast-cloud:#72E2FF;
+  --feast-light:#58DCFF;
+  --feast-medium:#15CCFF;
+  --feast-navy:#0069A6;
+  --feast-pink:#F54588;
+  --feast-purple:#60269E;
+  --feast-cream:#F2EBE0;
+  --feast-brown:#492426;
+  --display:"Arial Black","Helvetica Neue",Arial,system-ui,sans-serif;
+  --feast-rays:
+    conic-gradient(from 196deg at 36% 42%,
+      rgba(0,179,227,.19) 0 8deg,transparent 8deg 22deg,
+      rgba(82,201,232,.18) 22deg 35deg,transparent 35deg 53deg,
+      rgba(150,217,232,.22) 53deg 68deg,transparent 68deg 91deg,
+      rgba(0,179,227,.16) 91deg 108deg,transparent 108deg 137deg,
+      rgba(82,201,232,.2) 137deg 153deg,transparent 153deg 180deg,
+      rgba(150,217,232,.18) 180deg 203deg,transparent 203deg 232deg,
+      rgba(0,179,227,.18) 232deg 249deg,transparent 249deg 278deg,
+      rgba(82,201,232,.16) 278deg 299deg,transparent 299deg 329deg,
+      rgba(150,217,232,.19) 329deg 347deg,transparent 347deg 360deg);
+}
+
+:root:not([data-theme="dark"]) body{
+  font-family:"Helvetica Neue",Arial,system-ui,sans-serif;font-weight:500;
+}
+:root:not([data-theme="dark"]) h1,
+:root:not([data-theme="dark"]) h2,
+:root:not([data-theme="dark"]) h3,
+:root:not([data-theme="dark"]) .section-title,
+:root:not([data-theme="dark"]) .listen-titel,
+:root:not([data-theme="dark"]) .mini-title{
+  font-family:var(--display);font-style:normal;font-weight:900;
+  letter-spacing:-.045em;line-height:.92;text-transform:uppercase;
+}
+
+/* Die Seite bleibt Blue Cloud; Funktionsbereiche variieren innerhalb der
+   Karten statt die gesamte Markenbuehne auszutauschen. */
+:root:not([data-theme="dark"])[data-seite="home"],
+:root:not([data-theme="dark"])[data-seite="body"],
+:root:not([data-theme="dark"])[data-seite="reminders"],
+:root:not([data-theme="dark"])[data-seite="food-log"],
+:root:not([data-theme="dark"])[data-seite="profile"],
+:root:not([data-theme="dark"])[data-seite="auth"],
+:root:not([data-theme="dark"])[data-seite="setup"]{
+  --bg:var(--feast-cloud);--app-pattern:var(--feast-rays);
+}
+:root:not([data-theme="dark"])[data-seite] #view{
+  position:relative;isolation:isolate;background:transparent;background-image:none;
+}
+:root:not([data-theme="dark"])[data-seite] #view::before{
+  content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;
+  background-color:var(--feast-cloud);background-image:var(--feast-rays);
+  background-size:100% 100%;background-repeat:no-repeat;
+}
+
+/* Feastables-Header: 75 px Inhaltszeile, vier Pixel Schwarz darunter. */
+:root:not([data-theme="dark"]) .app-kopf{
+  background:var(--feast-cloud);border-bottom:4px solid #000;
+}
+:root:not([data-theme="dark"]) .app-kopf::before,
+:root:not([data-theme="dark"]) .app-kopf::after{background:var(--feast-cloud)}
+:root:not([data-theme="dark"]) .app-kopf .wrap{min-height:51px}
+:root:not([data-theme="dark"]) .app-kopf .nav-av{
+  border:2px solid #000;background:transparent;color:#000;
+}
+:root:not([data-theme="dark"]) .kopf-aktionen .save-dot{color:var(--feast-purple)}
+
+/* Vollbreiter, plakativ konturierter Lauftext wie zwischen den Shop-Sektionen. */
+.home-feast-marquee{
+  overflow:hidden;padding:8px 0 10px;background:var(--feast-cloud);
+  border-bottom:4px solid #000;
+}
+.home-feast-marquee>div{
+  display:flex;align-items:center;width:max-content;gap:10px;padding-left:10px;
+  white-space:nowrap;
+}
+.home-feast-marquee span{
+  color:var(--feast-cream);font-family:var(--display);font-size:25px;
+  font-style:italic;font-weight:900;line-height:.9;
+  -webkit-text-stroke:1.5px #000;text-shadow:2px 2px 0 var(--feast-pink);
+}
+.home-feast-marquee i{
+  display:block;width:9px;height:9px;border:2px solid #000;border-radius:50%;
+}
+
+/* Feastables verwendet Off-White, Schwarz und 3–4 px Konturen. */
+:root:not([data-theme="dark"]) .card,
+:root:not([data-theme="dark"]) .reminder-group,
+:root:not([data-theme="dark"]) .profile-abschnitt,
+:root:not([data-theme="dark"]) .food-card,
+:root:not([data-theme="dark"]) .food-form-card{
+  overflow:hidden;background:var(--feast-cream);
+  border:3px solid #000!important;border-radius:12px;
+}
+:root:not([data-theme="dark"]) .input{
+  min-height:44px;border:2px solid #000;border-radius:6px;
+  background:#fff;color:#000;
+}
+:root:not([data-theme="dark"]) .input:focus{
+  border-color:#000;outline:3px solid var(--feast-pink);
+}
+:root:not([data-theme="dark"]) .btn{
+  min-height:44px;border:3px solid #000;border-radius:6px;
+  background:var(--feast-cream);color:#000;
+  font-family:var(--display);font-style:italic;font-weight:900;text-transform:uppercase;
+}
+:root:not([data-theme="dark"]) .btn-primary,
+:root:not([data-theme="dark"]) [data-save-reminders]{
+  background:var(--feast-pink);color:#000;
+}
+:root:not([data-theme="dark"]) .btn-danger{background:#FF4347;color:#000}
+
+/* Unterseiten arbeiten wie Shop-Sektionen: grosse Headline, Off-White-Karten. */
+:root:not([data-theme="dark"]) .seitenkopf{padding-top:26px}
+:root:not([data-theme="dark"]) .seitenkopf .section-title{
+  max-width:390px;color:#000;font-size:clamp(29px,8vw,42px);
+}
+:root:not([data-theme="dark"]) .seitenkopf-kicker{
+  visibility:visible;padding:4px 8px;border:2px solid #000;border-radius:4px;
+  background:var(--feast-pink);color:#000;
+  font-family:var(--display);font-style:italic;font-weight:900;
+}
+:root:not([data-theme="dark"]) .zurueck{
+  border:3px solid #000;border-radius:6px;background:var(--feast-cream);color:#000;
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+:root:not([data-theme="dark"]) .seiten-einstieg{
+  border:3px solid #000;border-radius:8px;background:var(--feast-cream);
+}
+
+/* Suche bleibt sticky, sieht aber wie ein Shop-Steuerelement aus. */
+:root:not([data-theme="dark"])[data-seite="home"] .wrap.pad-bottom{padding-top:16px}
+:root:not([data-theme="dark"])[data-seite="home"] .home-suche{
+  top:calc(env(safe-area-inset-top) + 75px);min-height:50px;margin-bottom:14px;
+  border:3px solid #000;border-radius:8px;background:var(--feast-cream);color:#000;
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .home-suche em{
+  padding:5px 7px;border:2px solid #000;border-radius:4px;
+  background:var(--feast-pink);color:#000;
+}
+
+/* Die vier Schnellbereiche entsprechen kompakten Shop-Buttons. */
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnell{
+  gap:10px;margin-bottom:28px;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte{
+  min-height:68px;padding:10px;border:3px solid #000;border-radius:8px;
+  background:var(--feast-cream);color:#000;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte.pink{background:var(--feast-pink)}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte.violet{background:#CBA7EA}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte.blue{background:var(--feast-medium)}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte.royal{background:#A2DEDA}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte>span{
+  border:0;background:transparent;color:#000;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte b{
+  font-family:var(--display);font-size:13px;font-style:italic;font-weight:900;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .home-schnellkarte small{
+  color:rgba(0,0,0,.68);font-weight:700;
+}
+
+/* Hauptbereiche als horizontales Produkt-Carousel. */
+:root:not([data-theme="dark"])[data-seite="home"] .listen-titel{
+  margin:0 0 10px;padding:0;color:#000;font-size:31px;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .listen-titel::before{display:none}
+:root:not([data-theme="dark"])[data-seite="home"] .modulraster{
+  display:grid!important;grid-auto-flow:column;grid-auto-columns:min(78vw,300px);
+  grid-template-columns:none!important;gap:16px!important;
+  margin-inline:-14px;padding:3px 14px 18px;
+  overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;
+  background:transparent!important;border:0!important;border-radius:0!important;
+  scrollbar-width:none;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modulraster::-webkit-scrollbar{display:none}
+:root:not([data-theme="dark"])[data-seite="home"] .modulkarte,
+:root:not([data-theme="dark"])[data-seite="home"] .modulkarte:last-child{
+  display:flex;flex-direction:column;align-items:stretch;min-height:318px;padding:0 0 14px;
+  overflow:hidden;scroll-snap-align:start;border:0!important;border-radius:12px;
+  background:#fff;text-align:center;
+  box-shadow:0 6px 0 rgba(0,0,0,.16)!important;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon,
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.mint,
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.yellow,
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.violet,
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.blue,
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.green{
+  position:relative;display:grid;place-items:center;flex:0 0 auto;
+  width:100%;height:166px;margin:0 0 22px;border:0!important;border-radius:0;
+  color:#000;opacity:1;background:var(--feast-medium);
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.yellow{background:var(--feast-pink)}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.violet{background:#CBA7EA}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.blue{background:#58DCFF}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon.green{background:#A2DEDA}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon::before{
+  content:"";display:block;position:absolute;inset:0;background:var(--feast-rays);
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon::after{
+  content:"";position:absolute;left:0;right:0;top:calc(100% - 2px);height:18px;
+  background:inherit;
+  clip-path:polygon(0 0,100% 0,100% 46%,92% 72%,84% 88%,76% 94%,68% 86%,60% 68%,52% 43%,44% 24%,36% 15%,28% 18%,20% 34%,12% 55%,4% 69%,0 67%);
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-icon .app-icon{
+  position:relative;z-index:1;width:68px;height:68px;stroke-width:1.5;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-inhalt{
+  display:block;flex:1;padding:14px 18px 8px;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modulkarte h2{
+  margin:0 0 8px;color:#000;font-family:var(--display);
+  font-size:26px;font-style:normal;font-weight:900;line-height:.9;text-transform:none;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modulkarte p,
+:root:not([data-theme="dark"])[data-seite="home"] .modulkarte.aktiv p{
+  margin:0;color:#492426;font-size:12px;font-weight:600;line-height:1.35;white-space:normal;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modulstatus{
+  align-self:center;margin:0 18px;padding:9px 18px;border:0!important;border-radius:6px!important;
+  background:var(--feast-pink)!important;color:#000!important;
+  font-family:var(--display);font-size:11px;font-style:normal;font-weight:900;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .modul-pfeil{display:none}
+:root:not([data-theme="dark"])[data-seite="home"] .modulkarte.disabled{opacity:.72}
+
+/* Unterseitenkarten greifen Off-White, schwarze Kontur und farbige Medienkoepfe auf. */
+:root:not([data-theme="dark"]) .reminder-group-head,
+:root:not([data-theme="dark"]) .profile-abschnitt>summary{
+  border-bottom:3px solid #000!important;background:var(--feast-cream);
+  color:#000;font-family:var(--display);font-style:italic;font-weight:900;
+}
+:root:not([data-theme="dark"]) .reminder-group:not([open]) .reminder-group-head,
+:root:not([data-theme="dark"]) .profile-abschnitt:not([open])>summary{border-bottom:0!important}
+:root:not([data-theme="dark"]) .reminder-group[data-reminder-group="meal"] .reminder-group-head{background:#FF9FC5}
+:root:not([data-theme="dark"]) .reminder-group[data-reminder-group="supplement"] .reminder-group-head{background:#CBA7EA}
+:root:not([data-theme="dark"]) .reminder-group[data-reminder-group="drink"] .reminder-group-head{background:#A2DEDA}
+:root:not([data-theme="dark"]) .reminder-group-icon{border:0;background:transparent!important;color:#000}
+:root:not([data-theme="dark"]) .reminder-row{border-bottom:2px solid #000}
+:root:not([data-theme="dark"]) .profile-abschnitt[open]>summary{background:var(--feast-pink)}
+:root:not([data-theme="dark"]) .themeseg{border:3px solid #000!important;background:#fff}
+:root:not([data-theme="dark"]) .themebtn.on{background:var(--feast-purple);color:#fff}
+:root:not([data-theme="dark"]) .food-form-card::before{height:10px;background:var(--feast-pink)}
+:root:not([data-theme="dark"]) .food-add-icon{background:var(--feast-pink);color:#000}
+
+@media(max-width:420px){
+  :root:not([data-theme="dark"])[data-seite="home"] .modulraster{
+    grid-auto-columns:min(82vw,286px);
+  }
+  :root:not([data-theme="dark"])[data-seite="home"] .modulkarte{min-height:305px}
+  :root:not([data-theme="dark"])[data-seite="home"] .modul-icon{height:154px}
+}
+
+@media(prefers-reduced-motion:no-preference){
+  .home-feast-marquee>div{animation:home-feast-lauf 18s linear infinite}
+}
+@keyframes home-feast-lauf{to{transform:translateX(-50%)}}
+
+:root[data-theme="dark"] .home-feast-marquee{
+  background:#101A2B;border-bottom-color:#697486;
+}
+:root[data-theme="dark"] .home-feast-marquee span{
+  color:#EDF0F6;-webkit-text-stroke-color:#0A1330;text-shadow:2px 2px 0 #60269E;
+}
+:root[data-theme="dark"] .home-feast-marquee i{border-color:#697486}

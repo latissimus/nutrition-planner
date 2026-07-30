@@ -242,6 +242,14 @@ function mountHome(container) {
     ['Schlaf', 'Bald verfügbar', '#home', 'sleep', 'royal', false],
   ];
   container.innerHTML = `
+    <div class="home-feast-marquee" aria-hidden="true">
+      <div>
+        <span>PLANEN</span><i></i><span>TRACKEN</span><i></i>
+        <span>ESSEN</span><i></i><span>ERHOLEN</span><i></i>
+        <span>PLANEN</span><i></i><span>TRACKEN</span><i></i>
+        <span>ESSEN</span><i></i><span>ERHOLEN</span><i></i>
+      </div>
+    </div>
     <div class="wrap pad-bottom">
       <button class="home-suche" type="button" aria-label="MUSCLEDEX durchsuchen – demnächst verfügbar">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
