@@ -25,7 +25,7 @@ export default defineConfig({
       manifest: false,
       injectManifest: {
         // Private Supabase-Antworten werden nie vom Worker gecacht.
-        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest,woff,woff2}'],
       },
       devOptions: { enabled: true, type: 'module' },
     }),

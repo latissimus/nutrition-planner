@@ -1,11 +1,14 @@
 import './styles.css';
+import '@fontsource/nunito/latin-700.css';
+import '@fontsource/nunito/latin-800.css';
+import '@fontsource/nunito/latin-900.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
-import { mountReminders, startReminderLoop } from './reminders.js';
+import { loadReminderDashboard, mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
@@ -236,10 +239,10 @@ const module = [
 function mountHome(container) {
   setSeite('home');
   const schnellzugriff = [
-    ['Mahlzeiten', 'Tagesplan', '#reminders', 'meal', 'pink', true],
-    ['Supplements', 'Stack', '#reminders', 'supplement', 'violet', true],
-    ['Trinken', 'Erinnerungen', '#reminders', 'drink', 'blue', true],
-    ['Schlaf', 'Bald verfügbar', '#home', 'sleep', 'royal', false],
+    ['meal', 'Mahlzeit', '–', 'wird geladen', '#reminders', 'meal', 'pink', true],
+    ['supplement', 'Supplements', '–', 'wird geladen', '#reminders', 'supplement', 'violet', true],
+    ['drink', 'Trinken', '–', 'wird geladen', '#reminders', 'drink', 'blue', true],
+    ['sleep', 'Schlaf', 'Noch offen', 'Tracking folgt', '#home', 'sleep', 'royal', false],
   ];
   container.innerHTML = `
     <div class="wrap pad-bottom">
@@ -249,12 +252,13 @@ function mountHome(container) {
         <em>Später</em>
       </button>
       <section class="home-schnell" aria-label="Tagesübersicht">
-        ${schnellzugriff.map(([titel, info, href, icon, farbe, enabled]) => `
+        ${schnellzugriff.map(([key, titel, wert, info, href, icon, farbe, enabled]) => `
           <a class="home-schnellkarte ${farbe}${enabled ? '' : ' disabled'}" href="${href}"
-            aria-disabled="${enabled ? 'false' : 'true'}">
+            data-home-status="${key}" aria-disabled="${enabled ? 'false' : 'true'}">
             <span aria-hidden="true">${iconMarkup(icon)}</span>
-            <b>${titel}</b>
-            <small>${info}</small>
+            <small>${titel}</small>
+            <strong data-status-value>${wert}</strong>
+            <em data-status-detail>${info}</em>
           </a>`).join('')}
       </section>
       <h2 class="listen-titel">Alle Bereiche</h2>
@@ -271,6 +275,21 @@ function mountHome(container) {
           </a>`).join('')}
       </section>
     </div>`;
+
+  loadReminderDashboard(session.user.id).then((status) => {
+    Object.entries(status).forEach(([key, data]) => {
+      const card = container.querySelector(`[data-home-status="${key}"]`);
+      if (!card) return;
+      card.querySelector('[data-status-value]').textContent = data.value;
+      card.querySelector('[data-status-detail]').textContent = data.detail;
+      card.setAttribute('aria-label', `${card.querySelector('small').textContent}: ${data.value}, ${data.detail}`);
+    });
+  }).catch(() => {
+    container.querySelectorAll('[data-home-status]:not([data-home-status="sleep"])').forEach((card) => {
+      card.querySelector('[data-status-value]').textContent = '–';
+      card.querySelector('[data-status-detail]').textContent = 'Nicht verfügbar';
+    });
+  });
 }
 
 async function profilLaden() {

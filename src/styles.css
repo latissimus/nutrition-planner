@@ -2696,3 +2696,58 @@ button,a,[role="button"],summary{touch-action:manipulation}
   content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;
   background-color:var(--bg);background-image:var(--app-pattern);background-repeat:repeat;
 }
+
+/* ---------- Nunito und echte Tagesstatus-Karten ---------- */
+:root{--display:"Nunito","Arial Rounded MT Bold","Helvetica Neue",Arial,system-ui,sans-serif}
+h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
+  font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.035em;
+}
+
+.home-schnell{gap:9px;margin-bottom:24px}
+.home-schnellkarte,
+.home-schnellkarte.violet{
+  display:grid;grid-template-columns:29px minmax(0,1fr);
+  grid-template-rows:auto auto auto;column-gap:8px;align-content:center;
+  min-height:82px;padding:9px 10px;border:0;border-radius:13px;
+  color:#141414;background:var(--feast-cream);opacity:1;
+}
+.home-schnellkarte.pink{background:#F69EC5}
+.home-schnellkarte.violet{background:#CBA7EA}
+.home-schnellkarte.blue{background:#69C3D2}
+.home-schnellkarte.royal{background:#A2DEDA}
+.home-schnellkarte>span,
+.home-schnellkarte.violet>span{
+  grid-column:1;grid-row:1/4;align-self:center;
+  display:grid;place-items:center;width:27px;height:27px;
+  border:0;border-radius:0;background:transparent;color:#141414;
+}
+.home-schnellkarte .app-icon{width:22px;height:22px}
+.home-schnellkarte small{
+  grid-column:2;grid-row:1;align-self:end;margin:0;
+  color:rgba(20,20,20,.66);font-family:var(--display);font-size:9px;
+  font-weight:800;line-height:1.05;letter-spacing:.055em;text-transform:uppercase;
+}
+.home-schnellkarte strong{
+  grid-column:2;grid-row:2;display:block;min-width:0;margin:2px 0 1px;
+  overflow:hidden;color:#141414;font-family:var(--display);font-size:19px;
+  font-weight:900;line-height:1;letter-spacing:-.035em;white-space:nowrap;text-overflow:ellipsis;
+}
+.home-schnellkarte em{
+  grid-column:2;grid-row:3;display:block;min-width:0;
+  overflow:hidden;color:rgba(20,20,20,.72);font-family:var(--display);
+  font-size:8.5px;font-style:normal;font-weight:700;line-height:1.1;
+  white-space:nowrap;text-overflow:ellipsis;
+}
+.home-schnellkarte.disabled{opacity:.72}
+
+@media(max-width:360px){
+  .home-schnellkarte,
+  .home-schnellkarte.violet{
+    grid-template-columns:25px minmax(0,1fr);column-gap:6px;min-height:78px;padding-inline:8px;
+  }
+  .home-schnellkarte>span,.home-schnellkarte.violet>span{width:24px;height:24px}
+  .home-schnellkarte .app-icon{width:19px;height:19px}
+  .home-schnellkarte strong{font-size:17px}
+  .home-schnellkarte small{font-size:8px}
+  .home-schnellkarte em{font-size:7.75px}
+}
