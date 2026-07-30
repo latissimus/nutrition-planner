@@ -25,6 +25,19 @@ let profile = null;
 let recovery = false;
 let authMode = 'login';
 
+function syncStatusAktualisieren() {
+  const sync = document.querySelector('#app-sync');
+  if (!sync) return;
+  const online = navigator.onLine;
+  sync.className = `save-dot ${online ? 'ok' : 'wait'}`;
+  sync.textContent = online ? '✓' : '↑';
+  sync.title = online ? 'Online – Synchronisierung aktiv' : 'Offline – Synchronisierung wartet';
+  sync.setAttribute('aria-label', sync.title);
+}
+
+window.addEventListener('online', syncStatusAktualisieren);
+window.addEventListener('offline', syncStatusAktualisieren);
+
 function fehlertext(error) {
   const text = (error?.message || '').toLowerCase();
   if (text.includes('invalid login')) return 'E-Mail oder Passwort falsch.';
@@ -202,10 +215,14 @@ function renderChrome() {
     <header class="topbar app-kopf">
       <div class="wrap">
         <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Übersicht">${headerBrandMarkup()}</a>
-        <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil">${avatarMarkup()}</a>
+        <nav class="kopf-aktionen" aria-label="App-Status und Profil">
+          <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
+          <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil">${avatarMarkup()}</a>
+        </nav>
       </div>
     </header>
     <main id="view"></main>`;
+  syncStatusAktualisieren();
 }
 
 const module = [
@@ -220,6 +237,11 @@ function mountHome(container) {
   setSeite('home');
   container.innerHTML = `
     <div class="wrap pad-bottom">
+      <section class="home-band" aria-label="MUSCLE-DEX Übersicht">
+        <span>DEIN SYSTEM</span>
+        <strong>Planen. Tracken. Dranbleiben.</strong>
+        <b>5</b>
+      </section>
       <h2 class="listen-titel">Meine Bereiche</h2>
       <section class="modulraster" aria-label="Meine Bereiche">
         ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
