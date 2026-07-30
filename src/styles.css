@@ -2479,3 +2479,100 @@ button,a,[role="button"],summary{touch-action:manipulation}
   textarea,
   .falte .input{font-size:16px}
 }
+
+/* ---------- Startseite nach der Headspace-Informationshierarchie ---------- */
+:root[data-seite="home"] .wrap.pad-bottom{padding-top:18px}
+.home-suche{
+  display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:11px;
+  width:100%;min-height:54px;padding:0 16px;margin:0 0 14px;
+  border:2px solid var(--feast-brown);border-radius:17px;background:var(--feast-cream);
+  color:var(--feast-brown);text-align:left;
+}
+.home-suche svg{
+  width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;
+}
+.home-suche span{font:700 14px/1 var(--ui)}
+.home-suche em{
+  padding:4px 7px;border-radius:999px;background:var(--feast-violet);color:#fff;
+  font:800 8px/1 var(--mono);font-style:normal;text-transform:uppercase;letter-spacing:.05em;
+}
+.home-schnell{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:25px;
+}
+.home-schnellkarte{
+  display:grid;grid-template-columns:34px minmax(0,1fr);grid-template-rows:auto auto;
+  align-items:center;column-gap:9px;min-height:70px;padding:10px 11px;
+  border:2px solid var(--feast-brown);border-radius:15px;background:var(--feast-cream);
+  color:var(--feast-brown);text-decoration:none;overflow:hidden;
+}
+.home-schnellkarte>span{
+  grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+  border:2px solid var(--feast-brown);
+}
+.home-schnellkarte .app-icon{width:18px;height:18px}
+.home-schnellkarte b{
+  align-self:end;min-width:0;font:700 13px/1.05 var(--display);font-style:italic;
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.home-schnellkarte small{
+  align-self:start;margin-top:3px;color:#6A5555;font:700 8.5px/1.1 var(--mono);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.home-schnellkarte.pink>span{background:var(--feast-pink)}
+.home-schnellkarte.violet>span{background:#CBA7EA}
+.home-schnellkarte.blue>span{background:var(--feast-blue-strong)}
+.home-schnellkarte.royal>span{background:var(--feast-royal);color:#fff}
+.home-schnellkarte.disabled{opacity:.64}
+
+:root[data-seite="home"] .listen-titel{
+  margin:0 4px 11px;font-size:21px;
+}
+:root[data-seite="home"] .modulraster{
+  display:grid;grid-template-columns:1fr;gap:12px;
+  overflow:visible;background:transparent;border:0;border-radius:0;
+}
+:root[data-seite="home"] .modulkarte{
+  display:grid;grid-template-columns:minmax(0,1fr) 104px;
+  grid-template-rows:1fr auto;grid-template-areas:"inhalt bild" "status bild";
+  align-items:center;gap:4px 10px;min-height:124px;padding:15px 0 12px 16px;
+  overflow:hidden;border:2px solid var(--feast-brown);border-radius:17px;
+  background:var(--feast-cream);text-align:left;
+}
+:root[data-seite="home"] .modulkarte:last-child{border-bottom:2px solid var(--feast-brown)}
+:root[data-seite="home"] .modul-inhalt{
+  grid-area:inhalt;align-self:end;display:block;padding:0;min-width:0;
+}
+:root[data-seite="home"] .modulkarte h2{
+  margin:0 0 6px;font-size:19px;line-height:1;color:var(--feast-brown);
+}
+:root[data-seite="home"] .modulkarte p,
+:root[data-seite="home"] .modulkarte.aktiv p{
+  margin:0;display:-webkit-box;overflow:hidden;color:#6A5555;font-size:11px;
+  line-height:1.38;white-space:normal;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+:root[data-seite="home"] .modul-icon{
+  grid-area:bild;align-self:stretch;justify-self:stretch;position:relative;
+  width:auto;height:auto;min-height:94px;margin:-15px 0 -12px;
+  border:0;border-left:2px solid var(--feast-brown);border-radius:52% 0 0 42%;
+}
+:root[data-seite="home"] .modul-icon .app-icon{width:46px;height:46px}
+:root[data-seite="home"] .modul-icon::before{
+  content:"";display:block;position:absolute;right:-16px;bottom:-25px;width:72px;height:72px;
+  border:2px solid var(--feast-brown);border-radius:50%;background:rgba(255,255,255,.24);
+}
+:root[data-seite="home"] .modulstatus{
+  grid-area:status;align-self:end;justify-self:start;display:inline-block;
+  margin:8px 0 0;padding:4px 7px;border:1.5px solid var(--feast-brown)!important;
+  border-radius:999px!important;background:#fff!important;
+  color:var(--feast-violet)!important;font:800 8px/1 var(--mono);
+  text-transform:uppercase;
+}
+:root[data-seite="home"] .modul-pfeil{display:none}
+
+@media(max-width:360px){
+  .home-schnellkarte{grid-template-columns:30px minmax(0,1fr);padding-inline:8px}
+  .home-schnellkarte>span{width:30px;height:30px}
+  .home-schnellkarte b{font-size:11px}
+  :root[data-seite="home"] .modulkarte{grid-template-columns:minmax(0,1fr) 88px}
+}

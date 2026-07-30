@@ -235,15 +235,30 @@ const module = [
 
 function mountHome(container) {
   setSeite('home');
+  const schnellzugriff = [
+    ['Mahlzeiten', 'Tagesplan', '#reminders', 'meal', 'pink', true],
+    ['Supplements', 'Stack', '#reminders', 'supplement', 'violet', true],
+    ['Trinken', 'Erinnerungen', '#reminders', 'drink', 'blue', true],
+    ['Schlaf', 'Bald verfügbar', '#home', 'sleep', 'royal', false],
+  ];
   container.innerHTML = `
     <div class="wrap pad-bottom">
-      <section class="home-band" aria-label="MUSCLE-DEX Übersicht">
-        <span>DEIN SYSTEM</span>
-        <strong>Planen. Tracken. Dranbleiben.</strong>
-        <b>5</b>
+      <button class="home-suche" type="button" aria-label="MUSCLEDEX durchsuchen – demnächst verfügbar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+        <span>MUSCLEDEX durchsuchen</span>
+        <em>Später</em>
+      </button>
+      <section class="home-schnell" aria-label="Tagesübersicht">
+        ${schnellzugriff.map(([titel, info, href, icon, farbe, enabled]) => `
+          <a class="home-schnellkarte ${farbe}${enabled ? '' : ' disabled'}" href="${href}"
+            aria-disabled="${enabled ? 'false' : 'true'}">
+            <span aria-hidden="true">${iconMarkup(icon)}</span>
+            <b>${titel}</b>
+            <small>${info}</small>
+          </a>`).join('')}
       </section>
-      <h2 class="listen-titel">Meine Bereiche</h2>
-      <section class="modulraster" aria-label="Meine Bereiche">
+      <h2 class="listen-titel">Alle Bereiche</h2>
+      <section class="modulraster" aria-label="Alle Bereiche">
         ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
           <a class="modulkarte${enabled ? '' : ' disabled'}" href="${href}" data-icon="${icon}" aria-disabled="${enabled ? 'false' : 'true'}">
             <span class="modul-icon ${farbe}" aria-hidden="true">${iconMarkup(icon)}</span>
