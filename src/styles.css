@@ -2381,10 +2381,10 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 }
 
 /* LOGMAN: 44-px Bedienelement plus je 10 px vertikaler Innenabstand. */
-.app-kopf{border-bottom:4px solid var(--feast-line)}
+.app-kopf{border-bottom:2px solid var(--feast-line)}
 .app-kopf .wrap{min-height:44px;gap:10px}
 .kopf-logo{
-  width:clamp(94px,27vw,108px);
+  width:clamp(104px,30vw,120px);
   max-height:44px;
 }
 .kopf-aktionen{
@@ -2395,7 +2395,7 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 }
 .kopf-aktionen .save-dot.wait{color:var(--feast-brown)}
 .app-kopf .nav-av{width:44px;height:44px;border:2px solid var(--feast-brown)}
-#view{min-height:calc(100dvh - 68px)}
+#view{min-height:calc(100dvh - 66px)}
 
 :root:not([data-theme="dark"])[data-seite="home"]{
   --bg:var(--feast-blue);
@@ -2466,6 +2466,6 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 
 @media(max-width:520px){
   .app-kopf .wrap{min-height:44px}
-  .kopf-logo{width:clamp(90px,26vw,102px);max-height:42px}
-  #view{min-height:calc(100dvh - 68px)}
+  .kopf-logo{width:clamp(100px,29vw,114px);max-height:42px}
+  #view{min-height:calc(100dvh - 66px)}
 }
