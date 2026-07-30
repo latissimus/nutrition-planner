@@ -2630,3 +2630,58 @@ button,a,[role="button"],summary{touch-action:manipulation}
   margin-top:6px;padding:0;border:0!important;background:transparent!important;
   color:var(--feast-violet)!important;
 }
+
+/* ---------- Ruhige, inhaltsorientierte Startkarten ---------- */
+.home-suche{
+  border:0;box-shadow:none;background:rgba(242,235,224,.52);
+  color:var(--feast-brown);
+}
+.home-schnellkarte{
+  border:0;box-shadow:none;background:rgba(242,235,224,.86);
+}
+.home-schnellkarte.violet{background:rgba(103,49,143,.16)}
+
+:root[data-seite="home"] .listen-titel{
+  position:relative;padding-left:12px;color:var(--feast-brown);
+}
+:root[data-seite="home"] .listen-titel::before{
+  content:"";position:absolute;left:0;top:2px;bottom:2px;width:4px;
+  border-radius:4px;background:var(--feast-brown);
+}
+:root[data-seite="home"] .modulkarte,
+:root[data-seite="home"] .modulkarte:last-child{
+  position:relative;display:grid;
+  grid-template-columns:minmax(0,1fr) 34px;
+  grid-template-rows:1fr auto;grid-template-areas:"inhalt bild" "status bild";
+  min-height:88px;padding:13px 14px 11px 17px;
+  border:0!important;border-radius:14px;background:rgba(242,235,224,.94);
+}
+:root[data-seite="home"] .modulkarte::before{
+  content:"";position:absolute;left:0;top:13px;bottom:13px;width:5px;
+  border-radius:0 5px 5px 0;background:var(--feast-violet);
+}
+:root[data-seite="home"] .modulkarte[data-icon="body"]::before{background:var(--feast-blue-strong)}
+:root[data-seite="home"] .modulkarte[data-icon="reminders"]::before{background:var(--feast-pink)}
+:root[data-seite="home"] .modulkarte[data-icon="food"]::before{background:var(--feast-violet)}
+:root[data-seite="home"] .modulkarte[data-icon="recipes"]::before{background:var(--feast-royal)}
+:root[data-seite="home"] .modulkarte[data-icon="habits"]::before{background:var(--feast-brown)}
+:root[data-seite="home"] .modul-icon,
+:root[data-seite="home"] .modul-icon.mint,
+:root[data-seite="home"] .modul-icon.yellow,
+:root[data-seite="home"] .modul-icon.violet,
+:root[data-seite="home"] .modul-icon.blue,
+:root[data-seite="home"] .modul-icon.green{
+  grid-area:bild;align-self:center;justify-self:end;
+  display:grid;place-items:center;width:30px;height:30px;min-height:0;margin:0;
+  border:0!important;border-radius:0;background:transparent;color:var(--feast-brown);
+  opacity:.72;
+}
+:root[data-seite="home"] .modul-icon .app-icon{width:25px;height:25px}
+:root[data-seite="home"] .modulkarte h2{
+  color:var(--feast-brown);font-size:17px;
+}
+:root[data-seite="home"] .modulkarte p,
+:root[data-seite="home"] .modulkarte.aktiv p{color:rgba(73,36,37,.72)}
+:root[data-seite="home"] .modulstatus{
+  color:var(--feast-brown)!important;opacity:.72;
+}
