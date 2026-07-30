@@ -2576,3 +2576,57 @@ button,a,[role="button"],summary{touch-action:manipulation}
   .home-schnellkarte b{font-size:11px}
   :root[data-seite="home"] .modulkarte{grid-template-columns:minmax(0,1fr) 88px}
 }
+
+/* ---------- Flacher Feastables-Pass ---------- */
+.home-suche{
+  position:sticky;top:calc(env(safe-area-inset-top) + 72px);z-index:15;
+  min-height:50px;margin:0 0 13px;border:1px solid rgba(73,36,37,.24);
+  border-radius:16px;background:rgba(242,235,224,.48);
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
+  backdrop-filter:blur(6.65px) saturate(1.25);
+}
+.home-suche em{background:var(--feast-violet)}
+
+.home-schnell{gap:8px;margin-bottom:22px}
+.home-schnellkarte{
+  min-height:58px;padding:8px 10px;border:1px solid rgba(73,36,37,.22);
+  border-radius:12px;background:rgba(242,235,224,.88);
+}
+.home-schnellkarte>span{
+  width:30px;height:30px;border:0;border-radius:9px;
+}
+.home-schnellkarte .app-icon{width:17px;height:17px}
+.home-schnellkarte b{font-size:12px}
+.home-schnellkarte small{font-size:8px}
+.home-schnellkarte.violet{background:rgba(103,49,143,.14)}
+.home-schnellkarte.violet>span{background:var(--feast-violet);color:#fff}
+
+:root[data-seite="home"] .modulraster{
+  display:grid!important;gap:9px!important;background:transparent!important;
+  border:0!important;outline:0!important;border-radius:0!important;
+}
+:root[data-seite="home"] .modulkarte{
+  grid-template-columns:minmax(0,1fr) 78px;min-height:94px;
+  padding:13px 0 11px 14px;border:1px solid rgba(73,36,37,.22)!important;
+  border-radius:14px;background:rgba(242,235,224,.94);
+}
+:root[data-seite="home"] .modulkarte:last-child{
+  border:1px solid rgba(73,36,37,.22)!important;
+}
+:root[data-seite="home"] .modulkarte h2{margin-bottom:4px;font-size:17px}
+:root[data-seite="home"] .modulkarte p,
+:root[data-seite="home"] .modulkarte.aktiv p{font-size:10px}
+:root[data-seite="home"] .modul-icon{
+  min-height:72px;margin:-13px 0 -11px;border:0!important;border-radius:14px 0 0 14px;
+}
+:root[data-seite="home"] .modul-icon .app-icon{width:34px;height:34px}
+:root[data-seite="home"] .modul-icon::before{display:none}
+:root[data-seite="home"] .modul-icon.mint{background:var(--feast-blue-strong)}
+:root[data-seite="home"] .modul-icon.yellow{background:var(--feast-pink)}
+:root[data-seite="home"] .modul-icon.violet{background:var(--feast-violet);color:#fff}
+:root[data-seite="home"] .modul-icon.blue{background:var(--feast-royal);color:#fff}
+:root[data-seite="home"] .modul-icon.green{background:#CBA7EA;color:var(--feast-brown)}
+:root[data-seite="home"] .modulstatus{
+  margin-top:6px;padding:0;border:0!important;background:transparent!important;
+  color:var(--feast-violet)!important;
+}
