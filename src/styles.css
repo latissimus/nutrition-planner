@@ -2469,3 +2469,13 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
   .kopf-logo{width:clamp(100px,29vw,114px);max-height:42px}
   #view{min-height:calc(100dvh - 66px)}
 }
+
+/* App-artige Bedienung auf dem Homescreen: kein Doppeltipp-Zoom und kein
+   automatisches iOS-Hineinzoomen bei klein gesetzten Formfeldern. */
+button,a,[role="button"],summary{touch-action:manipulation}
+@media(max-width:820px){
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .falte .input{font-size:16px}
+}
