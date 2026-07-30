@@ -8,7 +8,7 @@ import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
-import { iconMarkup, filledIconMarkup } from './icons.js';
+import { iconMarkup } from './icons.js';
 
 applyTheme(getTheme());
 registriereServiceWorker().catch(() => {});
@@ -252,7 +252,7 @@ function mountHome(container) {
         ${schnellzugriff.map(([titel, info, href, icon, farbe, enabled]) => `
           <a class="home-schnellkarte ${farbe}${enabled ? '' : ' disabled'}" href="${href}"
             aria-disabled="${enabled ? 'false' : 'true'}">
-            <span aria-hidden="true">${filledIconMarkup(icon)}</span>
+            <span aria-hidden="true">${iconMarkup(icon)}</span>
             <b>${titel}</b>
             <small>${info}</small>
           </a>`).join('')}
@@ -261,7 +261,7 @@ function mountHome(container) {
       <section class="modulraster" aria-label="Alle Bereiche">
         ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
           <a class="modulkarte${enabled ? '' : ' disabled'}" href="${href}" data-icon="${icon}" aria-disabled="${enabled ? 'false' : 'true'}">
-            <span class="modul-icon ${farbe}" aria-hidden="true">${filledIconMarkup(icon)}</span>
+            <span class="modul-icon ${farbe}" aria-hidden="true">${iconMarkup(icon)}</span>
             <span class="modul-inhalt">
               <h2>${titel}</h2>
               <p>${text}</p>

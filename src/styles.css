@@ -2686,63 +2686,13 @@ button,a,[role="button"],summary{touch-action:manipulation}
   color:var(--feast-brown)!important;opacity:.72;
 }
 
-/* ---------- Retro-Packungsfarben, ohne gegenstaendliches Retro-Motiv ---------- */
-.home-suche{
-  background:rgba(103,49,143,.18);color:var(--feast-brown);
+/* iOS ignoriert background-attachment:fixed bei scrollbaren Seitenelementen
+   teilweise. Eine eigene feste Tapetenebene bleibt dagegen wirklich am
+   Viewport stehen, waehrend nur die Inhalte darueber scrollen. */
+:root[data-seite="home"] #view{
+  position:relative;isolation:isolate;background:transparent;background-image:none;
 }
-.home-suche em{background:var(--feast-brown);color:var(--feast-cream)}
-.home-schnellkarte,
-.home-schnellkarte.violet{
-  color:#141414;background:var(--feast-cream);
-}
-.home-schnellkarte.pink{background:var(--feast-pink)}
-.home-schnellkarte.violet{background:#CBA7EA}
-.home-schnellkarte.blue{background:#69C3D2}
-.home-schnellkarte.royal{background:#A2DEDA}
-.home-schnellkarte>span,
-.home-schnellkarte.violet>span,
-.home-schnellkarte.pink>span,
-.home-schnellkarte.blue>span,
-.home-schnellkarte.royal>span{
-  background:transparent;color:#141414;
-}
-.home-schnellkarte .app-icon{width:19px;height:19px}
-.home-schnellkarte small{color:rgba(20,20,20,.68)}
-
-:root[data-seite="home"] .modulkarte,
-:root[data-seite="home"] .modulkarte:last-child{
-  grid-template-columns:34px minmax(0,1fr) auto;
-  grid-template-rows:auto 1fr;
-  grid-template-areas:"bild inhalt status" "bild inhalt status";
-  column-gap:11px;min-height:86px;padding:12px 30px 12px 14px;
-  overflow:hidden;background:rgba(242,235,224,.94);
-}
-:root[data-seite="home"] .modulkarte[data-icon="reminders"]{background:rgba(255,47,159,.18)}
-:root[data-seite="home"] .modulkarte[data-icon="food"]{background:rgba(103,49,143,.18)}
-:root[data-seite="home"] .modulkarte[data-icon="recipes"]{background:rgba(47,75,166,.20)}
-:root[data-seite="home"] .modulkarte[data-icon="habits"]{background:rgba(162,222,218,.72)}
-:root[data-seite="home"] .modulkarte::before{display:none}
-:root[data-seite="home"] .modulkarte::after{
-  content:"";position:absolute;display:block;right:0;top:0;bottom:0;width:15px;
-  background:linear-gradient(to bottom,
-    #2F4BA6 0 20%,
-    #1277BB 20% 40%,
-    #2E9DCA 40% 60%,
-    #69C3D2 60% 80%,
-    #A2DEDA 80% 100%);
-}
-:root[data-seite="home"] .modul-icon,
-:root[data-seite="home"] .modul-icon.mint,
-:root[data-seite="home"] .modul-icon.yellow,
-:root[data-seite="home"] .modul-icon.violet,
-:root[data-seite="home"] .modul-icon.blue,
-:root[data-seite="home"] .modul-icon.green{
-  grid-area:bild;align-self:center;justify-self:center;
-  width:30px;height:30px;background:transparent;color:#141414;opacity:1;
-}
-:root[data-seite="home"] .modul-icon .app-icon{width:25px;height:25px}
-:root[data-seite="home"] .modul-inhalt{grid-area:inhalt;align-self:center}
-:root[data-seite="home"] .modulstatus{
-  grid-area:status;align-self:center;justify-self:end;margin:0;
-  color:var(--feast-brown)!important;opacity:.72;
+:root[data-seite="home"] #view::before{
+  content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;
+  background-color:var(--bg);background-image:var(--app-pattern);background-repeat:repeat;
 }
