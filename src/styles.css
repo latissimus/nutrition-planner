@@ -2328,17 +2328,37 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 
 /* MUSCLE-DEX Hauptlogo im App-Header. Die Login-/Setup-Marke bleibt vorerst
    separat, damit das hohe Vollmotiv nur dort eingesetzt wird, wo genug Raum ist. */
-.app-kopf .wrap{min-height:82px}
+.app-kopf .wrap{min-height:70px}
 .kopf-marke{
   display:flex;align-items:center;min-width:0;line-height:0;
   text-decoration:none}
 .kopf-logo{
-  display:block;width:clamp(164px,46vw,190px);height:auto;
-  max-height:76px;object-fit:contain;object-position:left center}
-#view{min-height:calc(100dvh - 82px)}
+  display:block;width:clamp(138px,39vw,154px);height:auto;
+  max-height:62px;object-fit:contain;object-position:left center}
+#view{min-height:calc(100dvh - 70px)}
 
 @media(max-width:520px){
-  .app-kopf .wrap{min-height:76px}
-  .kopf-logo{width:clamp(156px,46vw,174px);max-height:70px}
-  #view{min-height:calc(100dvh - 76px)}
+  .app-kopf .wrap{min-height:66px}
+  .kopf-logo{width:clamp(132px,38vw,146px);max-height:58px}
+  #view{min-height:calc(100dvh - 66px)}
+}
+
+/* Dunkles Retro-Petrol für die Übersicht. Es bleibt farbig und warm genug,
+   um sich klar vom nahezu schwarzen Darkmode zu unterscheiden. */
+:root{
+  --muster-home-petrol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='230' height='155' viewBox='0 0 230 155'%3E%3Cg fill='%23F3C178' fill-opacity='.12'%3E%3Cpath d='M14 18h38L14 56z'/%3E%3Cpath d='M151 7h48l-48 48z' transform='rotate(13 175 31)'/%3E%3Cpath d='M72 99h43l-43 43z' transform='rotate(-10 93 120)'/%3E%3Cpath d='M194 111h29l-29 29z' transform='rotate(20 208 125)'/%3E%3C/g%3E%3C/svg%3E");
+}
+:root:not([data-theme="dark"])[data-seite="home"]{
+  --bg:#285B60;
+  --app-pattern:var(--muster-home-petrol);
+}
+:root:not([data-theme="dark"])[data-seite="home"] .listen-titel{
+  color:#FFF0CE;
+}
+:root:not([data-theme="dark"])[data-seite="home"] .app-kopf{
+  border-bottom-color:rgba(255,240,206,.28);
+}
+:root[data-theme="dark"][data-seite="home"]{
+  --bg:#101A2B;
+  --app-pattern:var(--muster-dreieck-dunkel);
 }
