@@ -213,7 +213,16 @@ function avatarMarkup() {
   return `<span>${zeichen}</span>`;
 }
 
-function renderChrome() {
+const bereiche = [
+  ['home', 'Übersicht'],
+  ['body', 'Körperwerte'],
+  ['reminders', 'Erinnerungen'],
+  ['food-log', 'Food-Log'],
+  ['recipes', 'Rezepte'],
+  ['habits', 'Gewohnheiten'],
+];
+
+function renderChrome(route) {
   app.innerHTML = `
     <header class="topbar app-kopf">
       <div class="wrap">
@@ -224,17 +233,31 @@ function renderChrome() {
         </nav>
       </div>
     </header>
+    <section class="app-navigation" aria-label="App-Navigation">
+      <div class="wrap app-suche-wrap">
+        <button class="app-suche" type="button" aria-label="MUSCLEDEX durchsuchen – demnächst verfügbar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+          <span>MUSCLEDEX durchsuchen</span>
+          <em>Bald</em>
+        </button>
+      </div>
+      <nav class="bereichsleiste" aria-label="Bereiche">
+        <div class="bereichsleiste-track">
+          ${bereiche.map(([ziel, label]) => `
+            <a href="#${ziel}" data-bereich="${ziel}"${route === ziel ? ' class="aktiv" aria-current="page"' : ''}>${label}</a>`).join('')}
+        </div>
+      </nav>
+    </section>
     <main id="view"></main>`;
   syncStatusAktualisieren();
-}
 
-const module = [
-  ['Körperwerte', 'Gewicht und Hautfalten verfolgen.', 'Aktiv', '#body', true, 'body', 'mint'],
-  ['Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'Aktiv', '#reminders', true, 'reminders', 'yellow'],
-  ['Food-Log', 'Gute Mahlzeiten wiederfinden.', 'Aktiv', '#food-log', true, 'food', 'violet'],
-  ['Rezepte', 'Eigene Rezepte und schnelle Standards.', 'Bald', '#home', false, 'recipes', 'blue'],
-  ['Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'Bald', '#home', false, 'habits', 'green'],
-];
+  const track = app.querySelector('.bereichsleiste-track');
+  const active = track?.querySelector('.aktiv');
+  if (track && active) requestAnimationFrame(() => {
+    const left = active.offsetLeft - ((track.clientWidth - active.offsetWidth) / 2);
+    track.scrollTo({ left, behavior: 'smooth' });
+  });
+}
 
 function mountHome(container) {
   setSeite('home');
@@ -245,12 +268,11 @@ function mountHome(container) {
     ['sleep', 'Schlaf', 'Noch offen', 'Tracking folgt', '#home', 'sleep', 'royal', false],
   ];
   container.innerHTML = `
-    <div class="wrap pad-bottom">
-      <button class="home-suche" type="button" aria-label="MUSCLEDEX durchsuchen – demnächst verfügbar">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
-        <span>MUSCLEDEX durchsuchen</span>
-        <em>Später</em>
-      </button>
+    <div class="wrap pad-bottom home-inhalt">
+      <header class="home-inhalt-kopf">
+        <span>Übersicht</span>
+        <h1>Heute im Blick</h1>
+      </header>
       <section class="home-schnell" aria-label="Tagesübersicht">
         ${schnellzugriff.map(([key, titel, wert, info, href, icon, farbe, enabled]) => `
           <a class="home-schnellkarte ${farbe}${enabled ? '' : ' disabled'}" href="${href}"
@@ -259,19 +281,6 @@ function mountHome(container) {
             <small>${titel}</small>
             <strong data-status-value>${wert}</strong>
             <em data-status-detail>${info}</em>
-          </a>`).join('')}
-      </section>
-      <h2 class="listen-titel">Alle Bereiche</h2>
-      <section class="modulraster" aria-label="Alle Bereiche">
-        ${module.map(([titel, text, status, href, enabled, icon, farbe]) => `
-          <a class="modulkarte${enabled ? '' : ' disabled'}" href="${href}" data-icon="${icon}" aria-disabled="${enabled ? 'false' : 'true'}">
-            <span class="modul-icon ${farbe}" aria-hidden="true">${iconMarkup(icon)}</span>
-            <span class="modul-inhalt">
-              <h2>${titel}</h2>
-              <p>${text}</p>
-            </span>
-            <span class="modulstatus">${status}</span>
-            <span class="modul-pfeil" aria-hidden="true">›</span>
           </a>`).join('')}
       </section>
     </div>`;
@@ -290,6 +299,31 @@ function mountHome(container) {
       card.querySelector('[data-status-detail]').textContent = 'Nicht verfügbar';
     });
   });
+}
+
+function mountComingSoon(container, route) {
+  const recipes = route === 'recipes';
+  setSeite(route);
+  container.innerHTML = `
+    <div class="wrap pad-bottom bereich-vorschau">
+      <div class="seitenkopf">
+        <div class="seitenkopf-text">
+          <span class="seitenkopf-kicker">${recipes ? 'Sammlung' : 'Routine'}</span>
+          <h1 class="section-title">${recipes ? 'Rezepte' : 'Gewohnheiten'}</h1>
+        </div>
+      </div>
+      <section class="seiten-einstieg">
+        <b>${recipes ? 'Deine Standards an einem Ort' : 'Kleine Schritte, die bleiben'}</b>
+        <span>${recipes
+          ? 'Eigene Rezepte, Cheat-Code-Mahlzeiten und gespeicherte Videos folgen hier.'
+          : 'Tägliche Routinen, Serien und Fortschritt werden hier aufgebaut.'}</span>
+      </section>
+      <section class="card vorschau-karte">
+        <span aria-hidden="true">${iconMarkup(recipes ? 'recipes' : 'habits')}</span>
+        <strong>Dieser Bereich kommt als Nächstes.</strong>
+        <p>Die Navigation ist bereits aktiv, die Funktionen ergänzen wir im nächsten Schritt.</p>
+      </section>
+    </div>`;
 }
 
 async function profilLaden() {
@@ -320,9 +354,9 @@ async function render() {
       return;
     }
   }
-  renderChrome();
-  const view = app.querySelector('#view');
   const route = (location.hash || '#home').slice(1);
+  renderChrome(route);
+  const view = app.querySelector('#view');
   if (route === 'profile') {
     setSeite('profile');
     mountProfile(view, {
@@ -347,6 +381,8 @@ async function render() {
   } else if (route === 'food-log') {
     setSeite('food-log');
     mountFoodLog(view, { session, profile });
+  } else if (route === 'recipes' || route === 'habits') {
+    mountComingSoon(view, route);
   } else {
     mountHome(view);
   }
