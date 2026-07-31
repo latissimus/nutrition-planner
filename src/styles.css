@@ -2751,3 +2751,110 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
   .home-schnellkarte small{font-size:8px}
   .home-schnellkarte em{font-size:7.75px}
 }
+
+/* ============================================================
+   Persistente Bereichsnavigation
+   Header, Suche und Reiter bleiben stehen; nur #view wechselt.
+   ============================================================ */
+:root{
+  --app-header-gesamt:calc(env(safe-area-inset-top) + 66px);
+}
+
+.app-navigation{
+  position:sticky;top:var(--app-header-gesamt);z-index:19;
+  padding-top:10px;background:var(--bg);color:var(--feast-brown);
+}
+.app-suche-wrap{padding-bottom:10px}
+.app-suche{
+  display:grid;grid-template-columns:27px minmax(0,1fr) auto;align-items:center;gap:12px;
+  width:100%;min-height:64px;margin:0;padding:0 18px;
+  border:0;border-radius:18px;background:rgba(242,235,224,.58);
+  color:var(--feast-brown);text-align:left;
+  -webkit-backdrop-filter:blur(9px) saturate(1.18);
+  backdrop-filter:blur(9px) saturate(1.18);
+}
+.app-suche svg{
+  width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;
+}
+.app-suche span{
+  overflow:hidden;font-family:var(--display);font-size:16px;font-weight:900;
+  letter-spacing:-.02em;white-space:nowrap;text-overflow:ellipsis;
+}
+.app-suche em{
+  padding:5px 9px;border-radius:999px;background:var(--feast-violet);color:#fff;
+  font:900 8px/1 var(--display);font-style:normal;letter-spacing:.08em;text-transform:uppercase;
+}
+
+.bereichsleiste{
+  width:100%;overflow:hidden;border-top:2px solid var(--feast-brown);
+  border-bottom:2px solid var(--feast-brown);background:var(--feast-cream);
+}
+.bereichsleiste-track{
+  display:flex;width:100%;overflow-x:auto;overscroll-behavior-x:contain;
+  scrollbar-width:none;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+}
+.bereichsleiste-track::-webkit-scrollbar{display:none}
+.bereichsleiste a{
+  display:flex;flex:0 0 auto;align-items:center;justify-content:center;
+  min-height:42px;padding:0 16px;border-right:1px solid rgba(73,36,37,.32);
+  background:var(--feast-cream);color:var(--feast-brown);text-decoration:none;
+  font-family:var(--display);font-size:11px;font-style:italic;font-weight:900;
+  letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;scroll-snap-align:center;
+  touch-action:pan-x manipulation;
+}
+.bereichsleiste a:last-child{border-right:0}
+.bereichsleiste a.aktiv{
+  background:var(--feast-brown);color:#fff;
+}
+
+/* Die feste Bereichsleiste ersetzt den bisherigen Zurueck-zur-Uebersicht-Chip. */
+.app-navigation + #view .seitenkopf .zurueck{display:none}
+.app-navigation + #view .seitenkopf{
+  padding-top:18px!important;padding-bottom:11px!important;
+}
+.app-navigation + #view{min-height:calc(100dvh - var(--app-header-gesamt) - 118px)}
+
+.home-inhalt{padding-top:18px}
+.home-inhalt-kopf{margin:0 2px 13px;color:var(--feast-brown)}
+.home-inhalt-kopf span{
+  display:block;margin-bottom:3px;font-family:var(--display);font-size:9px;font-weight:900;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.home-inhalt-kopf h1{
+  color:var(--feast-brown);font-family:var(--display);font-size:27px;font-style:normal;
+  font-weight:900;letter-spacing:-.04em;text-transform:uppercase;
+}
+
+:root[data-seite="recipes"]{
+  --bg:#FFE6A7;--app-pattern:var(--muster-steak-gross);
+}
+:root[data-seite="habits"]{
+  --bg:#CDEFD9;--app-pattern:var(--muster-dreiecke-gross);
+}
+:root[data-seite="recipes"] #view,
+:root[data-seite="habits"] #view{background-image:var(--app-pattern)}
+:root[data-seite="recipes"] #app *,
+:root[data-seite="habits"] #app *{box-shadow:none!important}
+.bereich-vorschau .seitenkopf{padding-right:0}
+.vorschau-karte{
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:5px 12px;align-items:center;
+}
+.vorschau-karte>span{grid-row:1/3;display:grid;place-items:center;color:var(--feast-brown)}
+.vorschau-karte .app-icon{width:30px;height:30px}
+.vorschau-karte strong{font-family:var(--display);font-weight:900}
+.vorschau-karte p{margin:0;color:var(--muted);font-size:12px}
+
+@media(max-width:520px){
+  .app-suche{min-height:62px;padding-inline:16px}
+  .app-suche span{font-size:15px}
+  .bereichsleiste a{min-height:40px;padding-inline:14px;font-size:10.5px}
+  .home-inhalt{padding-top:15px}
+}
+
+@media(max-width:360px){
+  .app-suche{grid-template-columns:24px minmax(0,1fr) auto;gap:9px;padding-inline:13px}
+  .app-suche svg{width:22px;height:22px}
+  .app-suche span{font-size:14px}
+  .app-suche em{padding-inline:7px}
+}
