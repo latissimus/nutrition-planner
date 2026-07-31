@@ -2858,3 +2858,45 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
   .app-suche span{font-size:14px}
   .app-suche em{padding-inline:7px}
 }
+
+/* ---------- Gemeinsamer Feastables-Untergrund ohne Uebersichtsseite ---------- */
+:root{
+  --app-chrome-bg:var(--feast-blue);
+  --app-content-bg:#F2EBE0;
+}
+:root:not([data-theme="dark"])[data-seite="body"],
+:root:not([data-theme="dark"])[data-seite="reminders"],
+:root:not([data-theme="dark"])[data-seite="food-log"],
+:root:not([data-theme="dark"])[data-seite="recipes"],
+:root:not([data-theme="dark"])[data-seite="habits"],
+:root:not([data-theme="dark"])[data-seite="profile"]{
+  --bg:var(--app-chrome-bg);--app-pattern:none;
+}
+:root[data-theme="dark"]{
+  --app-chrome-bg:#101A2B;
+  --app-content-bg:#191C24;
+}
+
+.app-navigation{background:var(--app-chrome-bg)}
+.app-kopf,.app-kopf::before,.app-kopf::after{background:var(--app-chrome-bg)}
+:root[data-seite] #view{
+  background-color:var(--app-content-bg);background-image:none!important;
+}
+.app-navigation + #view > .wrap{padding-top:14px}
+
+/* Der aktive Reiter ist nun der Seitentitel. */
+.app-navigation + #view .seitenkopf{display:none!important}
+
+.bereichsleiste{background:var(--app-content-bg)}
+.bereichsleiste a{
+  min-height:50px;background:var(--app-content-bg);font-size:11.5px;
+}
+.bereichsleiste a.aktiv{background:var(--feast-brown);color:#fff}
+.app-navigation + #view{
+  min-height:calc(100dvh - var(--app-header-gesamt) - 126px);
+}
+
+@media(max-width:520px){
+  .bereichsleiste a{min-height:48px;padding-inline:15px;font-size:11px}
+  .app-navigation + #view > .wrap{padding-top:12px}
+}

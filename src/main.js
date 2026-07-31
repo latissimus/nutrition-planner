@@ -8,7 +8,7 @@ import { getTheme, applyTheme, setTheme } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
-import { loadReminderDashboard, mountReminders, startReminderLoop } from './reminders.js';
+import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
@@ -214,7 +214,6 @@ function avatarMarkup() {
 }
 
 const bereiche = [
-  ['home', 'Übersicht'],
   ['body', 'Körperwerte'],
   ['reminders', 'Erinnerungen'],
   ['food-log', 'Food-Log'],
@@ -226,7 +225,7 @@ function renderChrome(route) {
   app.innerHTML = `
     <header class="topbar app-kopf">
       <div class="wrap">
-        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Übersicht">${headerBrandMarkup()}</a>
+        <a class="kopf-marke" href="#body" aria-label="MUSCLE-DEX – Körperwerte">${headerBrandMarkup()}</a>
         <nav class="kopf-aktionen" aria-label="App-Status und Profil">
           <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
           <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil">${avatarMarkup()}</a>
@@ -256,48 +255,6 @@ function renderChrome(route) {
   if (track && active) requestAnimationFrame(() => {
     const left = active.offsetLeft - ((track.clientWidth - active.offsetWidth) / 2);
     track.scrollTo({ left, behavior: 'smooth' });
-  });
-}
-
-function mountHome(container) {
-  setSeite('home');
-  const schnellzugriff = [
-    ['meal', 'Mahlzeit', '–', 'wird geladen', '#reminders', 'meal', 'pink', true],
-    ['supplement', 'Supplements', '–', 'wird geladen', '#reminders', 'supplement', 'violet', true],
-    ['drink', 'Trinken', '–', 'wird geladen', '#reminders', 'drink', 'blue', true],
-    ['sleep', 'Schlaf', 'Noch offen', 'Tracking folgt', '#home', 'sleep', 'royal', false],
-  ];
-  container.innerHTML = `
-    <div class="wrap pad-bottom home-inhalt">
-      <header class="home-inhalt-kopf">
-        <span>Übersicht</span>
-        <h1>Heute im Blick</h1>
-      </header>
-      <section class="home-schnell" aria-label="Tagesübersicht">
-        ${schnellzugriff.map(([key, titel, wert, info, href, icon, farbe, enabled]) => `
-          <a class="home-schnellkarte ${farbe}${enabled ? '' : ' disabled'}" href="${href}"
-            data-home-status="${key}" aria-disabled="${enabled ? 'false' : 'true'}">
-            <span aria-hidden="true">${iconMarkup(icon)}</span>
-            <small>${titel}</small>
-            <strong data-status-value>${wert}</strong>
-            <em data-status-detail>${info}</em>
-          </a>`).join('')}
-      </section>
-    </div>`;
-
-  loadReminderDashboard(session.user.id).then((status) => {
-    Object.entries(status).forEach(([key, data]) => {
-      const card = container.querySelector(`[data-home-status="${key}"]`);
-      if (!card) return;
-      card.querySelector('[data-status-value]').textContent = data.value;
-      card.querySelector('[data-status-detail]').textContent = data.detail;
-      card.setAttribute('aria-label', `${card.querySelector('small').textContent}: ${data.value}, ${data.detail}`);
-    });
-  }).catch(() => {
-    container.querySelectorAll('[data-home-status]:not([data-home-status="sleep"])').forEach((card) => {
-      card.querySelector('[data-status-value]').textContent = '–';
-      card.querySelector('[data-status-detail]').textContent = 'Nicht verfügbar';
-    });
   });
 }
 
@@ -354,7 +311,10 @@ async function render() {
       return;
     }
   }
-  const route = (location.hash || '#home').slice(1);
+  const angefragt = (location.hash || '#body').slice(1);
+  const route = angefragt === 'profile' || bereiche.some(([ziel]) => ziel === angefragt)
+    ? angefragt
+    : 'body';
   renderChrome(route);
   const view = app.querySelector('#view');
   if (route === 'profile') {
@@ -384,7 +344,12 @@ async function render() {
   } else if (route === 'recipes' || route === 'habits') {
     mountComingSoon(view, route);
   } else {
-    mountHome(view);
+    setSeite('body');
+    mountBodyMetrics(view, {
+      session,
+      profile,
+      onProfileUpdated: (aktuell) => { profile = aktuell; },
+    });
   }
 }
 
