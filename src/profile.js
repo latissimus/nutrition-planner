@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { signOut } from './auth.js';
-import { getTheme, setTheme } from './theme.js';
+import { getTheme, setTheme, getSchatten, setSchatten } from './theme.js';
 import { toast } from './toast.js';
 
 const initials = (name, email) => {
@@ -240,6 +240,19 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
     seg.appendChild(button);
   });
   darstellung.appendChild(seg);
+
+  // Der harte Versatzschatten ist Geschmackssache und in jedem Theme einzeln
+  // sinnvoll – deshalb ein eigener Schalter statt zusaetzlicher Themes.
+  const schattenzeile = document.createElement('label');
+  schattenzeile.className = 'switchline schattenschalter';
+  const schattenbox = document.createElement('input');
+  schattenbox.type = 'checkbox';
+  schattenbox.checked = getSchatten();
+  schattenbox.onchange = () => setSchatten(schattenbox.checked);
+  const schattentext = document.createElement('span');
+  schattentext.textContent = 'Schlagschatten';
+  schattenzeile.append(schattenbox, schattentext);
+  darstellung.appendChild(schattenzeile);
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
