@@ -2762,7 +2762,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
      beginnt am physischen Displayrand und liegt damit auch hinter Uhrzeit,
      Empfang und Akku. Kein Safe-Area-Padding und kein theme-color-Trick. */
   position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;
-  background:rgba(5,10,24,.82);opacity:1;
+  background:rgba(0,0,0,.55);opacity:1;
   overscroll-behavior:contain;
 }
 .kategorie-sheet{
