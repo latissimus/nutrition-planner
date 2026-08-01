@@ -2718,6 +2718,9 @@ button,a,[role="button"],summary{touch-action:manipulation}
   background:var(--ordner);color:var(--accent-ink);
 }
 .tuck-icon .app-icon{width:23px;height:23px}
+.tuck-icon .muscledex-sammlungsicon{
+  display:block;width:39px;height:39px;object-fit:contain;
+}
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
    uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei
    "Erinnerungen" auf schmalen Karten ist genau das gewollt. */

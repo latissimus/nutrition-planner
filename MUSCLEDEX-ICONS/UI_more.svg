@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 29 29" role="img" aria-label="Weitere Optionen">
+  <title>Weitere Optionen</title>
+  <g data-part="shadow" transform="translate(1.1 1.25)" fill="#000000" stroke="#000000" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+  </g>
+  <g data-part="face" fill="#FFFFFF" stroke="#000000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+  </g>
+</svg>

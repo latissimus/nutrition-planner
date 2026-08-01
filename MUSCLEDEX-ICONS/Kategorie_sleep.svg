@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 29 29" role="img" aria-label="Schlaf">
+  <title>Schlaf</title>
+  <g data-part="shadow" transform="translate(1.1 1.25)" fill="#000000" stroke="#000000" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19.5 15.5A8 8 0 0 1 8.5 4.7a8 8 0 1 0 11 10.8Z" fill="#000000"/><path d="M17.5 4v3M16 5.5h3" fill="none"/>
+  </g>
+  <g data-part="face" fill="#FFFFFF" stroke="#000000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19.5 15.5A8 8 0 0 1 8.5 4.7a8 8 0 1 0 11 10.8Z" fill="#FFFFFF"/><path d="M17.5 4v3M16 5.5h3" fill="none"/>
+  </g>
+</svg>
