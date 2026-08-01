@@ -3040,7 +3040,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-leer span{max-width:280px;font-size:14px}
 .eigene-sammlung .tuck-icon .material-svg,.eigene-sammlung .tuck-icon svg{width:30px;height:30px;fill:#000}
 @keyframes dexAblegen{0%,18%{transform:translateY(-8px);opacity:.62}52%,82%{transform:translateY(27px);opacity:1}100%{transform:translateY(-8px);opacity:.62}}
-@keyframes dexInfoEin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes dexInfoEin{from{opacity:0}to{opacity:1}}
 :root:not([data-seite="home"]):not([data-seite="search"]):not([data-seite="profile"]) .app-shell>#view>.wrap>:not(.kategorie-kopf){
   animation:dexInfoEin .16s ease-out both;
 }
@@ -3055,6 +3055,44 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor form>h3,.dex-appearance-form>h3{
   margin:22px 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.07em
 }
+.dex-farbband{
+  display:grid;grid-auto-flow:column;grid-auto-columns:64px;gap:8px;max-width:100%;
+  padding:3px 5px 11px 1px;overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+}
+.dex-farbband .farb-option{scroll-snap-align:start}
+.dex-farbband .farb-option i,.dex-eigene-farbe i{width:47px;height:47px}
+.dex-eigene-farbe{
+  position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;
+  width:64px;padding:3px;color:var(--text);font-size:9px;font-weight:700;text-align:center;
+  scroll-snap-align:start;cursor:pointer;
+}
+.dex-eigene-farbe input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.dex-eigene-farbe i{
+  display:block;border:1.5px solid #000;border-radius:8px;
+  background:conic-gradient(#F54588,#FF7B42,#F1D889,#64C5AE,#58DCFF,#9D78E8,#F54588);
+}
+.dex-icon-suche{
+  display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:9px;
+  min-height:48px;margin-bottom:11px;padding:0 13px;border:1.5px solid var(--ink);
+  border-radius:12px;background:var(--surface2);
+}
+.dex-icon-suche .material-svg,.dex-icon-suche svg{width:20px;height:20px;fill:#000}
+.dex-icon-suche input{min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:600 14px var(--ui)}
+.dex-iconliste{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
+  max-height:238px;padding:2px 4px 8px 1px;overflow-y:auto;overscroll-behavior:contain;
+}
+.dex-iconliste button{
+  display:flex;min-width:0;min-height:70px;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;padding:6px 3px;border:1.5px solid transparent;border-radius:10px;
+  background:var(--surface2);color:var(--text);font:inherit;
+}
+.dex-iconliste button.aktiv{border-color:var(--ink);background:var(--ordner,var(--fe-pink));box-shadow:2px 2px 0 #000}
+.dex-iconliste button[hidden]{display:none}
+.dex-iconliste svg{display:block;width:27px;height:27px;fill:#000}
+.dex-iconliste button span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:700}
+@media(max-width:350px){.dex-iconliste{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .sammlung-editor-label{display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px;
   font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
 .sammlung-editor-label span{color:var(--muted);font-weight:500;letter-spacing:0}

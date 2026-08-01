@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, dexEditorColors, materialIconMarkup,
+  availableCategoryIcons, dexEditorColors, materialIconMarkup, openDexAppearanceSheet,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -84,6 +84,23 @@ export async function deleteCollection(userId, item) {
   const { error } = await supabase.from('collections').delete()
     .eq('id', item.id).eq('user_id', userId);
   if (error) throw error;
+}
+
+export function openCollectionAppearanceEditor({ userId, existing, onSaved }) {
+  return openDexAppearanceSheet({
+    selectedIcon: existing.icon_key,
+    selectedColor: existing.color,
+    onSave: async ({ iconKey, color }) => {
+      const saved = await saveCollection(userId, {
+        rootKey: existing.root_key,
+        parentId: existing.parent_id,
+        name: existing.name,
+        color,
+        iconKey,
+      }, existing);
+      await onSaved?.(saved);
+    },
+  });
 }
 
 function closeEditor(backdrop) {

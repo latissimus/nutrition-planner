@@ -24,7 +24,8 @@ import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 import {
-  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
+  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections,
+  openCollectionAppearanceEditor, openCollectionEditor,
 } from './collections.js';
 
 applyTheme(getTheme());
@@ -471,9 +472,7 @@ async function mountCustomCollection(container, item, signal) {
     onRename: () => openCollectionEditor({
       userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
-    onEditAppearance: () => openCollectionEditor({
-      userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
-    }),
+    onEditAppearance: () => openCollectionAppearanceEditor({ userId: session.user.id, existing: item, onSaved: refresh }),
     onDelete: async () => {
       if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
       try {
