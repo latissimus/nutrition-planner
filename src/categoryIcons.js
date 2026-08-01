@@ -15,6 +15,12 @@ const defaults = {
   recipes: 'menu_book', habits: 'bucket_check',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
+const emojis = [
+  '💪','📐','🔔','🥩','🍗','🧀','🥤','💧','☕','🫖','🧠','🧘',
+  '⭐','😴','🌙','🛏️','💊','⏰','📅','📷','🖼️','📖','📝','✅',
+  '🔥','⚡','❤️','🏋️','🥚','🍳','🥗','🍎','🍌','🥑','🫐','🍚',
+  '🍝','🍔','🥪','🛒','🧴','🧃','🎯','🛠️','🔧','⚙️','🔍','🏷️','🔗','📁',
+];
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const defaultColors = {
   body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
@@ -46,6 +52,10 @@ export const materialIconMarkup = materialIcon;
 
 export function categoryIconMarkup(route, className = 'kategorie-svg') {
   const saved = localStorage.getItem(storageKey(route));
+  if (saved?.startsWith('emoji:')) {
+    const emoji = saved.slice(6).replace(/[<>&"']/g, '');
+    return `<span class="${className} kategorie-emoji" data-category-icon="${route}" title="Emoji">${emoji}</span>`;
+  }
   const icon = iconById(saved) || iconById(defaults[route]);
   if (!icon) return '';
   return `<span class="${className}" data-category-icon="${route}" title="${icon.title}">${icon.svg}</span>`;
@@ -69,16 +79,35 @@ function iconPicker(route, onChange) {
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Kategorie-Icon ändern</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <h3 class="icon-picker-titel">Icons</h3>
     <div class="icon-auswahl">
       ${icons.map((icon) => `<button class="icon-option${icon.id === current ? ' aktiv' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
-    </div>`);
-  backdrop.querySelector('.icon-auswahl').onclick = (event) => {
-    const button = event.target.closest('[data-icon-id]');
+    </div>
+    <h3 class="icon-picker-titel">Emojis</h3>
+    <div class="emoji-auswahl">
+      ${emojis.map((emoji) => `<button class="emoji-option${current === `emoji:${emoji}` ? ' aktiv' : ''}" data-emoji="${emoji}" aria-label="Emoji ${emoji}">${emoji}</button>`).join('')}
+    </div>
+    <form class="emoji-eigen" data-emoji-form>
+      <label for="eigenes-emoji">Eigenes Emoji</label>
+      <div><input id="eigenes-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🦾" aria-label="Eigenes Emoji"><button type="submit">Übernehmen</button></div>
+    </form>`);
+  backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
+    const button = event.target.closest('[data-icon-id],[data-emoji]');
     if (!button) return;
-    localStorage.setItem(storageKey(route), button.dataset.iconId);
+    const value = button.dataset.iconId || `emoji:${button.dataset.emoji}`;
+    localStorage.setItem(storageKey(route), value);
     backdrop.remove();
     onChange?.();
     toast('Kategorie-Icon geändert.');
+  };
+  backdrop.querySelector('[data-emoji-form]').onsubmit = (event) => {
+    event.preventDefault();
+    const emoji = event.currentTarget.querySelector('input').value.trim();
+    if (!emoji) return;
+    localStorage.setItem(storageKey(route), `emoji:${emoji}`);
+    backdrop.remove();
+    onChange?.();
+    toast('Eigenes Emoji übernommen.');
   };
 }
 

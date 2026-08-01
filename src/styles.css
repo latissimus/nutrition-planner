@@ -2725,6 +2725,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-icon .muscledex-sammlungsicon svg{
   display:block;width:29px;height:29px;
 }
+.tuck-icon .kategorie-emoji{
+  width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  font-size:27px;line-height:1;
+}
 .tuck-fach .muscledex-sammlungsicon [data-part="face"],
 .tuck-fach .muscledex-sammlungsicon [data-part="clapper"]{
   fill:var(--ordner);
@@ -2798,6 +2802,22 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .icon-option.aktiv{border-color:var(--ink);background:var(--fe-pink)}
 .icon-option svg{display:block;width:44px;height:44px;fill:#000}
 .icon-option span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:700}
+.icon-picker-titel{margin:18px 1px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.04em}
+.emoji-auswahl{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.emoji-option{
+  display:grid;place-items:center;min-width:0;aspect-ratio:1;padding:3px;border:2px solid transparent;
+  border-radius:12px;background:var(--surface2);font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  font-size:27px;line-height:1;
+}
+.emoji-option.aktiv{border-color:#000;background:#fff}
+.emoji-eigen{display:grid;gap:7px;margin-top:16px;padding-bottom:4px}
+.emoji-eigen>label{font-size:13px;font-weight:700}
+.emoji-eigen>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.emoji-eigen input,.emoji-eigen button{
+  min-height:46px;border:1.5px solid #000;border-radius:12px;background:#fff;color:var(--text);font:inherit;
+}
+.emoji-eigen input{min-width:0;padding:0 13px;font-family:"Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:22px}
+.emoji-eigen button{padding:0 14px;background:var(--fe-pink);font-size:13px;font-weight:800}
 .farb-auswahl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;padding-bottom:8px}
 .farb-option{
   display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:8px 4px 10px;
@@ -2813,6 +2833,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   .kategorie-kopf{grid-template-columns:48px minmax(0,1fr) 48px 48px;gap:6px}
   .kategorie-kopfknopf{width:48px;height:48px}
   .icon-auswahl{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .emoji-auswahl{grid-template-columns:repeat(5,minmax(0,1fr))}
   .farb-auswahl{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
