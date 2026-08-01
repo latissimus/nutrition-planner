@@ -3109,7 +3109,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="home"] #view{
   background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 94%,transparent),color-mix(in srgb,var(--bg) 94%,transparent)),
+    linear-gradient(color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 92%,transparent)),
     url("../Flo ill Grafik .svg")!important;
   background-size:auto,112px!important;
 }
@@ -3124,8 +3124,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] #view{
   background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 90%,transparent),color-mix(in srgb,var(--bg) 90%,transparent)),
-    url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg")!important;
+    linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),
+    url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
   background-size:auto,112px!important;
 }
 :root[data-theme="dark"][data-seite="body"] #view,:root[data-theme="dark"][data-seite="food-log"] #view,
@@ -3138,11 +3138,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"][data-seite="home"] #view{
   background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 94%,transparent),color-mix(in srgb,var(--bg) 94%,transparent)),
+    linear-gradient(color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 92%,transparent)),
     url("../Flo ill Grafik .svg")!important;
 }
 :root[data-theme="dark"][data-seite="reminders"] #view{
   background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 92%,transparent)),
-    url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg")!important;
+    linear-gradient(color-mix(in srgb,var(--bg) 55%,transparent),color-mix(in srgb,var(--bg) 55%,transparent)),
+    url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
 }
