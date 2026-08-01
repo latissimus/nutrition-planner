@@ -295,7 +295,7 @@ function zaehlerText(route, anzahl) {
 function zaehlerEintragen(container, zaehler) {
   container.querySelectorAll('[data-sammlung]').forEach((karte) => {
     const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
-    const meta = karte.querySelector('.dex-statuszeile, .dex-test-meta, .dex-vhs-meta');
+    const meta = karte.querySelector('.dex-datensatz-meta');
     if (text && meta) meta.innerHTML = text;
   });
 }
@@ -346,68 +346,30 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     const iconFeld = iconInhalt
       ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
       : '';
-    if (route === 'body') {
-      return `
-      <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
-        <a class="tuck-karte dex-test-karte" href="#${route}" data-sammlung="${route}">
-          <span class="dex-test-streifen" aria-hidden="true"></span>
-          ${iconFeld}
-          <span class="dex-test-text">
-            <h2>${titel}</h2>
-            <span class="dex-test-meta">${meta}</span>
-          </span>
-        </a>
-      </div>`;
-    }
-    if (route === 'reminders') {
-      return `
-      <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
-        <a class="tuck-karte dex-vhs-karte" href="#${route}" data-sammlung="${route}">
-          ${iconFeld}
-          <span class="dex-vhs-text">
-            <h2>${titel}</h2>
-            <span class="dex-vhs-meta">${meta}</span>
-          </span>
-          <span class="dex-vhs-baender" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span class="dex-vhs-marke" aria-hidden="true"></span>
-        </a>
-      </div>`;
-    }
     return `
     <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
-      <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
-        <span class="dex-kartenhauptzeile">
-          ${iconFeld}
-          <span class="dex-kartentext">
-            <h2>${titel}</h2>
-            <span>${status}</span>
-          </span>
+      <a class="tuck-karte dex-datensatz-karte" href="#${route}" data-sammlung="${route}">
+        <span class="dex-datensatz-streifen" aria-hidden="true"></span>
+        ${iconFeld}
+        <span class="dex-datensatz-text">
+          <h2>${titel}</h2>
+          <span class="dex-datensatz-meta">${meta}</span>
         </span>
-        <span class="dex-statuszeile">${meta}</span>
       </a>
     </div>`;
   }).join('');
 }
 
-function dexAnlagedatum(value) {
-  const datum = value ? new Date(value) : null;
-  return datum && !Number.isNaN(datum.getTime())
-    ? `angelegt ${new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' }).format(datum)}`
-    : 'bereit für Einträge';
-}
-
 function eigeneSammlungsKarten(items) {
   return items.map((item) => `
     <div class="tuck-fach eigene-sammlung" style="--ordner:${item.color}">
-      <a class="tuck-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
-        <span class="dex-kartenhauptzeile">
-          <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
-          <span class="dex-kartentext">
-            <h2>${escapeHtml(item.name)}</h2>
-            <span>Eigener Dex</span>
-          </span>
+      <a class="tuck-karte dex-datensatz-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
+        <span class="dex-datensatz-streifen" aria-hidden="true"></span>
+        <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
+        <span class="dex-datensatz-text">
+          <h2>${escapeHtml(item.name)}</h2>
+          <span class="dex-datensatz-meta"><b>Eigener</b><span>Dex</span></span>
         </span>
-        <span class="dex-statuszeile"><b>Dex</b><span>${dexAnlagedatum(item.created_at)}</span></span>
       </a>
     </div>`).join('');
 }
@@ -471,7 +433,7 @@ function collectionEmptyMarkup(hasChildren) {
   return `<section class="sammlung-alle">
     <h2>Alle Einträge (0)</h2>
     ${hasChildren ? '' : `<div class="sammlung-leer">
-      <div class="dex-leer-symbol">${materialIconMarkup('create_new_folder')}<i></i></div>
+      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div>
       <strong>Leerer Dex</strong>
       <span>Dieser Dex wartet auf seinen ersten Eintrag.</span>
     </div>`}
@@ -557,7 +519,7 @@ function mountSearch(container, signal) {
           <div><b>${sichtbar.length - aktiv}</b><small>Geplant</small></div>
         </div>
       </section>
-      <h2 class="tuck-abschnittstitel">Bereiche</h2>
+      <h2 class="tuck-abschnittstitel">Dex-Treffer</h2>
       <section class="tuck-grid" data-search-results>${sammlungsKarten(sichtbar, zaehlerStand)}</section>
       <div class="tuck-leer" data-search-empty hidden>
         ${iconMarkup('search')}

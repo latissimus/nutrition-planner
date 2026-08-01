@@ -2665,61 +2665,28 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-karte{
   position:relative;z-index:1;flex:1 1 auto;
   display:flex;flex-direction:column;min-width:0;min-height:126px;
-  padding:17px 13px 11px;
+  padding:13px;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
   background:var(--surface);color:var(--text);text-decoration:none;
   box-shadow:var(--hart);
   overflow:hidden;
 }
-.tuck-karte::before{
-  content:"";position:absolute;left:0;right:0;top:0;height:7px;background:var(--ordner);
-}
-.tuck-karte::after{
-  content:"";position:absolute;right:-8px;top:25px;width:15px;height:25px;
-  border:2px solid var(--ink);border-right:0;border-radius:12px 0 0 12px;
-  background:var(--bg);
-}
-.tuck-karte.dex-test-karte{
+.tuck-karte.dex-datensatz-karte{
   display:grid;grid-template-columns:46px minmax(0,1fr);align-content:center;align-items:center;
   gap:11px;min-height:126px;padding:21px 13px 13px;
 }
-.tuck-karte.dex-test-karte::before,.tuck-karte.dex-test-karte::after{content:none}
-.dex-test-streifen{
+.dex-datensatz-streifen{
   position:absolute;left:12px;top:0;width:42%;height:7px;border-radius:0 0 4px 4px;
   background:var(--ordner);
 }
-.dex-test-text{display:flex;min-width:0;flex-direction:column;gap:7px}
-.dex-test-text h2{
+.dex-datensatz-text{display:flex;min-width:0;flex-direction:column;gap:7px}
+.dex-datensatz-text h2{
   margin:0;color:var(--text);font-size:15px;line-height:1.05;text-transform:uppercase;
   letter-spacing:-.01em;overflow-wrap:anywhere;
 }
-.dex-test-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 5px;min-width:0;line-height:1.1}
-.dex-test-meta b{color:var(--text);font-size:14px;font-weight:800}
-.dex-test-meta span{color:var(--muted);font-size:10px;font-weight:600}
-.tuck-karte.dex-vhs-karte{
-  display:grid;grid-template-columns:46px minmax(0,1fr);align-content:center;align-items:center;gap:11px;
-  min-height:126px;padding:18px 15px 27px 13px;
-}
-.tuck-karte.dex-vhs-karte::before,.tuck-karte.dex-vhs-karte::after{content:none}
-.dex-vhs-text{display:flex;min-width:0;flex-direction:column;gap:7px;padding-right:3px}
-.dex-vhs-text h2{
-  margin:0;color:var(--text);font-size:15px;line-height:1.05;text-transform:uppercase;
-  letter-spacing:-.01em;overflow-wrap:anywhere;
-}
-.dex-vhs-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 5px;line-height:1.1}
-.dex-vhs-meta b{color:var(--text);font-size:14px;font-weight:800}
-.dex-vhs-meta span{color:var(--muted);font-size:10px;font-weight:600}
-.dex-vhs-baender{
-  position:absolute;left:13px;right:22px;bottom:9px;height:9px;
-  display:grid;grid-template-rows:repeat(3,2px);gap:1px;border-radius:2px;overflow:hidden;
-}
-.dex-vhs-baender i:nth-child(1){background:var(--ordner)}
-.dex-vhs-baender i:nth-child(2){background:color-mix(in srgb,var(--ordner) 72%,#6b5bd2)}
-.dex-vhs-baender i:nth-child(3){background:color-mix(in srgb,var(--ordner) 50%,#34268f)}
-.dex-vhs-marke{
-  position:absolute;right:12px;bottom:9px;width:10px;height:9px;background:var(--ink);
-  clip-path:polygon(0 0,100% 50%,0 100%);
-}
+.dex-datensatz-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 5px;min-width:0;line-height:1.1}
+.dex-datensatz-meta b{color:var(--text);font-size:14px;font-weight:800}
+.dex-datensatz-meta span{color:var(--muted);font-size:10px;font-weight:600}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
@@ -2728,13 +2695,6 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-fach.gelb{--ordner:var(--fe-yellow)}
 .tuck-fach.gruen{--ordner:var(--fe-green)}
 
-.dex-kartenhauptzeile{display:flex;align-items:center;gap:10px;min-width:0}
-.dex-kartentext{display:flex;flex-direction:column;gap:5px;min-width:0;padding-right:5px}
-.dex-kartentext h2{
-  margin:0;color:var(--text);font-size:15px;line-height:1.05;text-transform:uppercase;
-  letter-spacing:-.01em;overflow-wrap:anywhere;
-}
-.dex-kartentext>span{color:var(--muted);font-size:11px;font-weight:600;line-height:1.1}
 .tuck-icon{
   display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;
   border:var(--icon-bw) solid var(--ink);border-radius:9px;
@@ -2872,14 +2832,6 @@ button,a,[role="button"],summary{touch-action:manipulation}
    bei 13 px schon 82,3 px – 1,2 px Reserve, und jedes laengere Wort bricht
    mitten durch. Deshalb hier gestapelt: Die Einheit bekommt die volle Breite
    und liegt bei 12 px mit 76 px komfortabel darunter. */
-.dex-statuszeile{
-  display:flex;flex-direction:column;gap:1px;min-width:0;padding-top:2px;
-  margin-top:auto;border-top:1px solid color-mix(in srgb,var(--ink) 22%,transparent);
-  padding-top:7px;line-height:1.15;overflow-wrap:break-word;
-}
-.dex-statuszeile b{color:var(--text);font-size:12px;font-weight:800}
-.dex-statuszeile span{color:var(--muted);font-size:10px;font-weight:600}
-
 /* ---------- Suche ---------- */
 .tuck-suche-seite{padding-top:16px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
 .tuck-suchzeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
@@ -3014,7 +2966,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   .tuck-karte{min-height:120px;padding:10px 11px 11px}
   .kopf-logo{width:104px;max-height:43px}
   .kopf-aktionen{gap:7px}
-  .dex-kartentext h2{font-size:14px}
+  .dex-datensatz-text h2{font-size:14px}
 }
 
 @media(max-width:350px){
@@ -3071,17 +3023,32 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-alle{margin:28px 2px 0}
 .sammlung-leer{display:flex;min-height:300px;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;text-align:center;color:var(--muted)}
-.dex-leer-symbol{position:relative;isolation:isolate;display:grid;place-items:center;width:112px;height:90px;margin-bottom:5px;color:var(--text)}
-.dex-leer-symbol .material-svg{position:relative;z-index:1}
-.dex-leer-symbol i{position:absolute;z-index:0;width:42px;height:30px;top:9px;border:2px solid var(--ink);
-  border-radius:5px;background:var(--ordner,var(--fe-pink));animation:dexAblegen 2.4s ease-in-out infinite}
+.dex-leer-symbol{position:relative;width:120px;height:88px;margin-bottom:5px}
+.dex-leer-symbol i{
+  position:absolute;left:34px;top:5px;width:52px;height:58px;border:2px solid var(--ink);
+  border-radius:6px;background:var(--surface);box-shadow:4px 4px 0 var(--ordner,var(--fe-pink));
+  animation:dexAblegen 2.6s ease-in-out infinite;
+}
+.dex-leer-symbol i::before,.dex-leer-symbol i::after{content:"";position:absolute;left:9px;right:9px;height:2px;background:var(--muted)}
+.dex-leer-symbol i::before{top:15px}.dex-leer-symbol i::after{top:25px}
+.dex-leer-symbol b{
+  position:absolute;z-index:2;left:13px;right:13px;bottom:8px;height:20px;
+  border:2px solid var(--ink);border-radius:5px;background:var(--surface);box-shadow:3px 3px 0 var(--ink);
+}
 .sammlung-leer .material-svg,.sammlung-leer svg{width:55px;height:55px;fill:currentColor;opacity:.58}
 .sammlung-leer strong{color:var(--text);font-size:21px}
 .sammlung-leer span{max-width:280px;font-size:14px}
 .eigene-sammlung .tuck-icon .material-svg,.eigene-sammlung .tuck-icon svg{width:30px;height:30px;fill:#000}
-@keyframes dexAblegen{0%,18%{transform:translateY(-9px);opacity:.55}52%,82%{transform:translateY(22px);opacity:1}100%{transform:translateY(-9px);opacity:.55}}
+@keyframes dexAblegen{0%,18%{transform:translateY(-8px);opacity:.62}52%,82%{transform:translateY(27px);opacity:1}100%{transform:translateY(-8px);opacity:.62}}
+@keyframes dexInfoEin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+:root:not([data-seite="home"]):not([data-seite="search"]):not([data-seite="profile"]) .app-shell>#view>.wrap>:not(.kategorie-kopf){
+  animation:dexInfoEin .16s ease-out both;
+}
+:root:not([data-seite="home"]):not([data-seite="search"]):not([data-seite="profile"]) .app-shell>#view>.wrap>:not(.kategorie-kopf):nth-child(2){animation-delay:35ms}
+:root:not([data-seite="home"]):not([data-seite="search"]):not([data-seite="profile"]) .app-shell>#view>.wrap>:not(.kategorie-kopf):nth-child(n+3){animation-delay:70ms}
 @media(prefers-reduced-motion:reduce){
-  .dex-leer-symbol i{animation:none;transform:translateY(17px)}
+  .dex-leer-symbol i{animation:none;transform:translateY(25px)}
+  .app-shell>#view>.wrap>*{animation:none!important}
 }
 
 .sammlung-editor{max-height:min(91dvh,850px);padding-inline:22px}
