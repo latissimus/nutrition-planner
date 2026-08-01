@@ -21,7 +21,7 @@ import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import { categoryIconMarkup, mountCategoryChrome } from './categoryIcons.js';
+import { categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 
 applyTheme(getTheme());
 applySchatten(getSchatten());
@@ -290,7 +290,7 @@ function renderChrome(route) {
         <nav class="kopf-aktionen" aria-label="App-Status und Profil">
           <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
           <a class="tuck-quadrat${route === 'search' ? ' aktiv' : ''}" href="#search" aria-label="MUSCLE-DEX durchsuchen">
-            ${iconMarkup('search')}
+            ${materialIconMarkup('search')}
           </a>
           <a class="nav-av nav-av-fb${route === 'profile' ? ' aktiv' : ''}" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
         </nav>
@@ -339,16 +339,16 @@ function mountHome(container) {
           <b aria-hidden="true">#</b>
           <input id="schnell-link" type="url" inputmode="url" autocomplete="off"
                  placeholder="Link einfügen" aria-label="Link einfügen und ablegen">
-          ${iconMarkup('folder')}
+          ${materialIconMarkup('bookmark_star')}
         </label>
         <button class="tuck-ablage-knopf" type="button" aria-label="Abgelegten Link speichern">
-          ${iconMarkup('plus')}
+          ${materialIconMarkup('add')}
         </button>
       </div>
       <header class="tuck-titelzeile">
         <h1>Meine Sammlungen</h1>
         <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
-          ${iconMarkup('folderPlus')}
+          ${materialIconMarkup('add')}
         </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Sammlungen">
