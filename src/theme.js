@@ -2,6 +2,10 @@
 // waehrend derselbe Account am Rechner Retro nutzt.
 const KEY = 'nutrition:theme';
 const overlayQuellen = new Set();
+// Overlays, die ihre eigene vollflaechige Abdunkelung mitbringen (Sheets mit
+// Backdrop). Sie duerfen NICHT zusaetzlich vorgedunkelt werden – siehe
+// setStatusleistenOverlay.
+const overlayVollflaechig = new Set();
 let overlayScrollY = 0;
 
 // Zwei Darstellungen. "retro" traegt die Feastables-Palette und ist der
@@ -37,19 +41,41 @@ function abgedunkelt(farbe, anteil = 0.28) {
     .map((wert) => wert.toString(16).padStart(2, '0')).join('')}`;
 }
 
-export function setStatusleistenOverlay(quelle, offen) {
+// vollflaechig: Das Overlay legt selbst eine durchscheinende Flaeche ueber den
+// ganzen Viewport. Weil "viewport-fit=cover" gesetzt ist, reicht ein
+// position:fixed mit inset:0 dabei bis unter Uhrzeit und Akku – die Flaeche
+// deckt die Safe Area also von sich aus ab.
+//
+// In dem Fall darf nichts vorgedunkelt werden. Sonst liegen zwei Schichten
+// uebereinander: --statusbar-bg dunkelt html/body/#app auf 72% ab, der Backdrop
+// legt nochmal 28% drauf, und die Kopfzeile landet bei 52%. Der deckende
+// Schutzstreifen ueber der Safe Area traegt aber nur die 72% – dadurch wirkt
+// genau der iOS-Bereich heller als alles darunter, statt mitgedunkelt zu sein.
+export function setStatusleistenOverlay(quelle, offen, { vollflaechig = false } = {}) {
   if (!quelle) return;
   const root = document.documentElement;
   const warOffen = overlayQuellen.size > 0;
-  if (offen) overlayQuellen.add(quelle);
-  else overlayQuellen.delete(quelle);
+  if (offen) {
+    overlayQuellen.add(quelle);
+    if (vollflaechig) overlayVollflaechig.add(quelle);
+  } else {
+    overlayQuellen.delete(quelle);
+    overlayVollflaechig.delete(quelle);
+  }
   const istOffen = overlayQuellen.size > 0;
+  // Nur wenn ALLE offenen Overlays ihre eigene Flaeche mitbringen, darf die
+  // Vordunkelung entfallen – sonst steht ein Overlay ohne Backdrop ungeschuetzt da.
+  const alleVollflaechig = istOffen && overlayVollflaechig.size === overlayQuellen.size;
   root.classList.toggle('statusleiste-overlay', istOffen);
+  root.classList.toggle('overlay-vollflaechig', alleVollflaechig);
 
   if (istOffen) {
     const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
     const overlayBg = abgedunkelt(bg);
-    root.style.setProperty('--statusbar-bg', overlayBg);
+    // Die Meta-Farbe wird in beiden Faellen gesetzt: Sie faerbt die
+    // Browser-Oberflaeche und soll zum abgedunkelten Bild passen.
+    if (alleVollflaechig) root.style.removeProperty('--statusbar-bg');
+    else root.style.setProperty('--statusbar-bg', overlayBg);
     metaFarbeSetzen(overlayBg);
   } else {
     root.style.removeProperty('--statusbar-bg');

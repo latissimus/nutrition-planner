@@ -779,6 +779,11 @@ html.statusleiste-overlay body::before{content:"";position:fixed;z-index:1010;
   top:calc(0px - env(safe-area-inset-top));left:0;right:0;
   height:calc(env(safe-area-inset-top) + env(safe-area-inset-top) + 3px);
   background:var(--statusbar-bg,var(--bg));pointer-events:none}
+/* Bringt das Overlay seine eigene durchscheinende Flaeche mit, muss der
+   deckende Streifen weg: Er laege mit z-index 1010 ueber dem Backdrop (1000)
+   und schnitte die Abdunkelung genau an der Safe Area ab. Der Backdrop
+   erreicht diesen Bereich selbst, weil viewport-fit=cover gesetzt ist. */
+html.overlay-vollflaechig body::before{display:none}
 .tutorial-ebene{position:fixed;z-index:60;inset:0;pointer-events:none}
 .tutorial-ebene[hidden]{display:none}
 .log-tutorial{position:absolute;top:calc(env(safe-area-inset-top) + 3px);left:50%;
