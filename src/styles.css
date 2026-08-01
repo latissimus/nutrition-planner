@@ -2803,6 +2803,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .icon-option svg{display:block;width:44px;height:44px;fill:#000}
 .icon-option span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:700}
 .icon-picker-titel{margin:18px 1px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.04em}
+.farbgruppe-titel{margin-top:22px;color:#492425}
+.farbgruppe-titel:first-of-type{margin-top:12px}
 .emoji-auswahl{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
 .emoji-option{
   display:grid;place-items:center;min-width:0;aspect-ratio:1;padding:3px;border:2px solid transparent;
