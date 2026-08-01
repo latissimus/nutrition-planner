@@ -21,7 +21,7 @@ import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import erinnerungenIconUrl from '../MUSCLEDEX-ICONS/01_Glocke_Slab.svg?url';
+import erinnerungenIconSvg from '../MUSCLEDEX-ICONS/01_Glocke_Slab.svg?raw';
 
 applyTheme(getTheme());
 applySchatten(getSchatten());
@@ -313,14 +313,15 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     // Reiter und Karte sind Geschwister, nicht Kind und Elternteil: Nur so
     // deckt die Karte den Reiter zuverlaessig ab (siehe Kommentar im CSS).
     const iconInhalt = route === 'reminders'
-      ? `<img class="muscledex-sammlungsicon" src="${erinnerungenIconUrl}" alt="">`
+      ? `<span class="muscledex-sammlungsicon">${erinnerungenIconSvg}</span>`
       : iconMarkup(icon);
+    const iconKlasse = route === 'reminders' ? 'tuck-icon muscledex-iconfeld' : 'tuck-icon';
     return `
     <div class="tuck-fach ${farbe}">
       <span class="tuck-reiter" aria-hidden="true"></span>
       <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
         <span class="tuck-karte-oben">
-          <span class="tuck-icon" aria-hidden="true">${iconInhalt}</span>
+          <span class="${iconKlasse}" aria-hidden="true">${iconInhalt}</span>
           <span class="tuck-meta">${meta}</span>
         </span>
         <h2>${titel}</h2>

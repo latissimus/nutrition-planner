@@ -2718,8 +2718,16 @@ button,a,[role="button"],summary{touch-action:manipulation}
   background:var(--ordner);color:var(--accent-ink);
 }
 .tuck-icon .app-icon{width:23px;height:23px}
-.tuck-icon .muscledex-sammlungsicon{
-  display:block;width:39px;height:39px;object-fit:contain;
+.tuck-icon.muscledex-iconfeld{
+  width:46px;height:46px;flex-basis:46px;border:0;border-radius:0;background:transparent;
+}
+.tuck-icon .muscledex-sammlungsicon,
+.tuck-icon .muscledex-sammlungsicon svg{
+  display:block;width:46px;height:46px;
+}
+.tuck-fach.pink .muscledex-sammlungsicon [data-part="face"],
+.tuck-fach.pink .muscledex-sammlungsicon [data-part="clapper"]{
+  fill:var(--ordner);
 }
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
    uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei
