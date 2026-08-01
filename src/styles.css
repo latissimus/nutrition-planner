@@ -2610,10 +2610,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-quadrat .app-icon{width:22px;height:22px}
 .tuck-quadrat.aktiv{background:var(--akzent);color:var(--akzent-ink)}
 .tuck-quadrat.betont{background:var(--akzent);color:var(--akzent-ink)}
-.tuck-titelzeile .neu-sammlung{background:#492426;color:#fff}
-.tuck-titelzeile .neu-sammlung .material-svg,
-.tuck-titelzeile .neu-sammlung .material-svg svg{width:24px;height:24px;color:#fff;fill:#fff}
-.tuck-titelzeile .neu-sammlung .material-svg svg{stroke:#fff;stroke-width:12px;stroke-linejoin:round}
+.tuck-titelzeile .neu-sammlung{background:var(--surface);color:var(--text)}
 /* Der Druckpunkt: Die Flaeche faehrt in ihren eigenen Schatten hinein. Ohne
    Schatten (Retro) bleibt nur der Versatz – das genuegt als Rueckmeldung. */
 .tuck-quadrat:active{transform:translate(2px,2px);box-shadow:none}
@@ -2651,9 +2648,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-ablage-knopf{
   display:grid;place-items:center;width:62px;padding:0;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
-  background:var(--akzent);color:var(--akzent-ink);box-shadow:var(--hart-klein);
+  background:#492426;color:#fff;box-shadow:var(--hart-klein);
 }
-.tuck-ablage-knopf .app-icon{width:26px;height:26px;stroke-width:2.6}
+.tuck-ablage-knopf .material-svg,
+.tuck-ablage-knopf .material-svg svg{width:27px;height:27px;color:#fff;fill:#fff}
+.tuck-ablage-knopf .material-svg svg{stroke:#fff;stroke-width:14px;stroke-linejoin:round}
 .tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Start: Bibliothek ---------- */
