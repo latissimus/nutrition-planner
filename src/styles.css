@@ -2755,6 +2755,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .kategorie-kopfknopf .material-svg,
 .kategorie-kopfknopf svg{display:block;width:26px;height:26px}
 .kategorie-kopfknopf.kategorie-plus{background:var(--fe-pink)}
+.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus{background:var(--ordner)}
+.hat-kategoriefarbe .kategorie-kopfknopf .material-svg svg{fill:var(--ordner)}
+.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus .material-svg svg{fill:#000}
+.hat-kategoriefarbe .app-icon{color:var(--ordner)}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{
@@ -2792,10 +2796,22 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .icon-option.aktiv{border-color:var(--ink);background:var(--fe-pink)}
 .icon-option svg{display:block;width:44px;height:44px;fill:#000}
 .icon-option span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:700}
+.farb-auswahl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;padding-bottom:8px}
+.farb-option{
+  display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:8px 4px 10px;
+  border:2px solid transparent;border-radius:14px;background:var(--surface2);color:var(--text);font:inherit;
+}
+.farb-option i{
+  display:block;width:46px;height:46px;border:1px solid rgba(0,0,0,.3);border-radius:50%;background:var(--farbe);
+}
+.farb-option span{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:700;white-space:nowrap}
+.farb-option.aktiv{border-color:#000;background:#fff}
+.farb-option.aktiv i{box-shadow:0 0 0 3px #fff,0 0 0 5px #000}
 @media(max-width:370px){
   .kategorie-kopf{grid-template-columns:48px minmax(0,1fr) 48px 48px;gap:6px}
   .kategorie-kopfknopf{width:48px;height:48px}
   .icon-auswahl{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .farb-auswahl{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
    uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei

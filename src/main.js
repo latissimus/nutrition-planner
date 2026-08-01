@@ -21,7 +21,7 @@ import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import { categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
+import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 
 applyTheme(getTheme());
 applySchatten(getSchatten());
@@ -317,7 +317,7 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
       ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
       : '';
     return `
-    <div class="tuck-fach ${farbe}">
+    <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
       <span class="tuck-reiter" aria-hidden="true"></span>
       <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
         <span class="tuck-karte-oben">
