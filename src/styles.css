@@ -3107,28 +3107,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite] #view{
   background-repeat:repeat!important;background-attachment:fixed!important;
 }
-:root[data-seite="home"] #view,
-:root[data-seite="reminders"] #view{
-  position:relative;isolation:isolate;background-image:none!important;
-}
-:root[data-seite="home"] #view>.wrap,
-:root[data-seite="reminders"] #view>.wrap{position:relative;z-index:1}
-:root[data-seite="home"] #view::before,
-:root[data-seite="home"] #view::after,
-:root[data-seite="reminders"] #view::before,
-:root[data-seite="reminders"] #view::after{
-  content:"";position:fixed;z-index:0;inset:-42vmax;pointer-events:none;
-  background-repeat:repeat;background-size:112px 112px;
-}
-:root[data-seite="home"] #view::before,
-:root[data-seite="home"] #view::after{
-  background-image:url("../Flo ill Grafik .svg");opacity:.045;
-}
-:root[data-seite="home"] #view::before{
-  background-position:13px 19px;transform:rotate(13deg);
-}
-:root[data-seite="home"] #view::after{
-  background-position:67px 74px;transform:rotate(-17deg);
+:root[data-seite="home"] #view{
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 94%,transparent),color-mix(in srgb,var(--bg) 94%,transparent)),
+    url("../Flo ill Grafik .svg")!important;
+  background-size:auto,112px!important;
 }
 :root[data-seite="body"] #view,:root[data-seite="food-log"] #view,
 :root[data-seite="habits"] #view,:root[data-seite="search"] #view{
@@ -3139,16 +3122,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen)!important;
   background-size:auto,112px!important;
 }
-:root[data-seite="reminders"] #view::before,
-:root[data-seite="reminders"] #view::after{
-  background-image:url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg");
-  opacity:.18;
-}
-:root[data-seite="reminders"] #view::before{
-  background-position:9px 15px;transform:rotate(14deg);
-}
-:root[data-seite="reminders"] #view::after{
-  background-position:65px 71px;transform:rotate(-16deg);
+:root[data-seite="reminders"] #view{
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 90%,transparent),color-mix(in srgb,var(--bg) 90%,transparent)),
+    url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg")!important;
+  background-size:auto,112px!important;
 }
 :root[data-theme="dark"][data-seite="body"] #view,:root[data-theme="dark"][data-seite="food-log"] #view,
 :root[data-theme="dark"][data-seite="habits"] #view,:root[data-theme="dark"][data-seite="search"] #view{
@@ -3158,7 +3136,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="collection"] #view,:root[data-theme="dark"][data-seite="profile"] #view{
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen-dunkel)!important;
 }
-:root[data-theme="dark"][data-seite="home"] #view::before,
-:root[data-theme="dark"][data-seite="home"] #view::after{opacity:.065}
-:root[data-theme="dark"][data-seite="reminders"] #view::before,
-:root[data-theme="dark"][data-seite="reminders"] #view::after{opacity:.12}
+:root[data-theme="dark"][data-seite="home"] #view{
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 94%,transparent),color-mix(in srgb,var(--bg) 94%,transparent)),
+    url("../Flo ill Grafik .svg")!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] #view{
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 92%,transparent)),
+    url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg")!important;
+}
