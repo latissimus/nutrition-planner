@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Kalender 12">
-  <title>Kalender 12</title>
-  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="11" width="50" height="46" rx="7"/></g>
-  <g data-part="outline" fill="#000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="11" width="50" height="46" rx="7"/></g>
-  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="11" width="50" height="46" rx="7"/></g>
-  <g data-part="details" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 5v13M47 5v13M8 23h48M20 34v14M17 37l3-3M30 38c2-7 14-6 14 1 0 4-5 6-12 11h13"/></g>
-</svg>

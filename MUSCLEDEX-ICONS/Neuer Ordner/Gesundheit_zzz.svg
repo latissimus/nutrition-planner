@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Schlafen zZz">
-  <title>Schlafen zZz</title>
-  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h20L12 30h17v8H3l13-18H5Zm28-8h18L40 18h13v7H30l11-14h-8Zm3 29h16L42 46h12v7H32l10-13h-6Z"/></g>
-  <g data-part="outline" fill="#000000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h20L12 30h17v8H3l13-18H5Zm28-8h18L40 18h13v7H30l11-14h-8Zm3 29h16L42 46h12v7H32l10-13h-6Z"/></g>
-  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h20L12 30h17v8H3l13-18H5Zm28-8h18L40 18h13v7H30l11-14h-8Zm3 29h16L42 46h12v7H32l10-13h-6Z"/></g>
-</svg>

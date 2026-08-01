@@ -2729,6 +2729,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-fach .muscledex-sammlungsicon [data-part="clapper"]{
   fill:var(--ordner);
 }
+.tuck-fach .muscledex-sammlungsicon svg,
+.tuck-fach .muscledex-sammlungsicon svg path{
+  fill:var(--ordner);
+}
 
 /* ---------- Gemeinsamer Kopf und Sammlungsmenü ---------- */
 .kategorie-kopf{

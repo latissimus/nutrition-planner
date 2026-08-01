@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Waage in Kilogramm">
-  <title>Waage in Kilogramm</title>
-  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="9" width="50" height="46" rx="10"/></g>
-  <g data-part="outline" fill="#000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="9" width="50" height="46" rx="10"/></g>
-  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="9" width="50" height="46" rx="10"/></g>
-  <g data-part="details" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20h24M22 35v13M22 41l8-6M22 41l8 7M42 37c-8-5-12 10-3 11 3 0 5-2 5-5h-5"/></g>
-</svg>

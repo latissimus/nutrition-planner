@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rezept">
-  <title>Rezept</title>
-  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h34c6 0 10 4 10 10v38H18c-5 0-8-3-8-8Z"/></g>
-  <g data-part="outline" fill="#000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h34c6 0 10 4 10 10v38H18c-5 0-8-3-8-8Z"/></g>
-  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h34c6 0 10 4 10 10v38H18c-5 0-8-3-8-8Z"/></g>
-  <g data-part="details" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 8v48M27 22h18M27 31h18M27 40h14M27 49h10"/></g>
-</svg>

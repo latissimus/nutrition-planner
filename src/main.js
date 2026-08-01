@@ -313,13 +313,15 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     // Reiter und Karte sind Geschwister, nicht Kind und Elternteil: Nur so
     // deckt die Karte den Reiter zuverlaessig ab (siehe Kommentar im CSS).
     const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
-    const iconKlasse = 'tuck-icon muscledex-iconfeld';
+    const iconFeld = iconInhalt
+      ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
+      : '';
     return `
     <div class="tuck-fach ${farbe}">
       <span class="tuck-reiter" aria-hidden="true"></span>
       <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
         <span class="tuck-karte-oben">
-          <span class="${iconKlasse}" aria-hidden="true">${iconInhalt}</span>
+          ${iconFeld}
           <span class="tuck-meta">${meta}</span>
         </span>
         <h2>${titel}</h2>
