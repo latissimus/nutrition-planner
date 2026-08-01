@@ -28,15 +28,6 @@ function metaFarbeSetzen(farbe) {
   alt.replaceWith(neu);
 }
 
-function abgedunkelt(farbe, anteil = 0.28) {
-  const hex = farbe.match(/^#([0-9a-f]{6})$/i)?.[1];
-  if (!hex) return farbe;
-  const faktor = 1 - anteil;
-  const kanal = (start) => Math.round(parseInt(hex.slice(start, start + 2), 16) * faktor);
-  return `#${[kanal(0), kanal(2), kanal(4)]
-    .map((wert) => wert.toString(16).padStart(2, '0')).join('')}`;
-}
-
 export function setStatusleistenOverlay(quelle, offen) {
   if (!quelle) return;
   const root = document.documentElement;
@@ -45,17 +36,6 @@ export function setStatusleistenOverlay(quelle, offen) {
   else overlayQuellen.delete(quelle);
   const istOffen = overlayQuellen.size > 0;
   root.classList.toggle('statusleiste-overlay', istOffen);
-
-  if (istOffen) {
-    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
-    const overlayBg = abgedunkelt(bg);
-    root.style.setProperty('--statusbar-bg', overlayBg);
-    metaFarbeSetzen(overlayBg);
-  } else {
-    root.style.removeProperty('--statusbar-bg');
-    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
-    if (bg) metaFarbeSetzen(bg);
-  }
 
   if (!warOffen && istOffen) {
     overlayScrollY = window.scrollY;

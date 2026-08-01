@@ -198,17 +198,6 @@
 *::-webkit-scrollbar{display:none;width:0;height:0}
 html,body{margin:0;padding:0}
 html{background:var(--bg)}
-/* Safari zeigt beim Scroll-Gummiband die Leinwand von <html>. Waere sie trotz
-   offenem Overlay noch weiss oder seitenfarben, blitzt genau der geschuetzte
-   Bereich um Uhrzeit und Akku beim Scrollen um. */
-html.statusleiste-overlay{background:var(--statusbar-bg,var(--bg))}
-/* Zweite Absicherung fuer den iOS-Web-App-Canvas: Je nach Scrollzustand nimmt
-   WebKit fuer den transparenten Statusbereich den Body statt des html-Elements.
-   Der eigentliche App-Inhalt behaelt separat seine Seitenfarbe und wird wie
-   bisher vom Overlay abgedunkelt. */
-html.statusleiste-overlay body{background:var(--statusbar-bg,var(--bg))}
-html.statusleiste-overlay #app{min-height:100dvh;background:var(--statusbar-bg,var(--bg))}
-html.statusleiste-overlay #view{min-height:100dvh;background:var(--bg)}
 /* Nicht das iOS-Fenster und auch nicht der Body, sondern nur der eigentliche
    Seiteninhalt #view scrollt waehrend eines Overlays.
    Dadurch bleibt der transparente Statusbereich auf derselben dunklen Flaeche,
@@ -249,13 +238,6 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
    erscheinen. Sichtbar ist ausschliesslich der Teil unterhalb der Kontur. */
 .topbar::after{content:"";position:absolute;z-index:1;left:0;right:0;top:0;bottom:0;
   background:var(--bg);pointer-events:none}
-/* Der Header liegt in der installierten iOS-App direkt unter Uhrzeit und Akku.
-   Bei einem Overlay muss deshalb die komplette Kopfzeile denselben dunklen
-   Grund tragen – sonst bleibt zwischen Statusleiste und Tutorialkarte ein
-   heller Streifen stehen. */
-html.statusleiste-overlay .topbar,
-html.statusleiste-overlay .topbar::after,
-html.statusleiste-overlay .topbar::before{background:var(--statusbar-bg,var(--bg))}
 .topbar .wrap{position:relative;z-index:2;display:flex;align-items:center;gap:10px}
 /* LOGMAN-Wortmarke als Logo im RetroMuscle-Stil: pinke Füllung, Navy-Kontur, harter Schatten.
    Kein Layout-Effekt (Kontur/Schatten ändern die Header-Höhe nicht). */
@@ -768,17 +750,6 @@ body.einstieg-fokus #app::after{content:"";position:fixed;top:0;left:0;width:100
   background:transparent;
   touch-action:pan-y}
 .tutorial-dimmer[hidden]{display:none}
-/* Die installierte iOS-App behandelt die Statusleiste bei
-   black-translucent nicht wie einen normalen Teil des fixed Viewports:
-   theme-color und der Canvas-Hintergrund allein reichen deshalb nicht. Diese
-   feste, deckende Schutzflaeche liegt waehrend JEDES Overlays direkt unter
-   Uhrzeit und Akku. Sie scrollt nicht mit und liegt ueber Tutorialkarte (60)
-   und Uebungswaehler (80), endet aber exakt vor deren Inhalt. So kann weder
-   der hellblaue Header noch die weisse Tutorialkarte in die Safe Area rutschen. */
-html.statusleiste-overlay body::before{content:"";position:fixed;z-index:1010;
-  top:calc(0px - env(safe-area-inset-top));left:0;right:0;
-  height:calc(env(safe-area-inset-top) + env(safe-area-inset-top) + 3px);
-  background:var(--statusbar-bg,var(--bg));pointer-events:none}
 .tutorial-ebene{position:fixed;z-index:60;inset:0;pointer-events:none}
 .tutorial-ebene[hidden]{display:none}
 .log-tutorial{position:absolute;top:calc(env(safe-area-inset-top) + 3px);left:50%;
@@ -2779,7 +2750,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{
+  /* viewport-fit=cover + black-translucent: Diese EINE gerenderte Flaeche
+     beginnt am physischen Displayrand und liegt damit auch hinter Uhrzeit,
+     Empfang und Akku. Kein Safe-Area-Padding und kein theme-color-Trick. */
   position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;
+  width:100vw;height:100dvh;
   background:rgba(0,0,0,.28);opacity:0;transition:opacity .18s ease;
 }
 .kategorie-sheet-backdrop.offen{opacity:1}
