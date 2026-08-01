@@ -2661,11 +2661,24 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 /* Die Ordnerkarte: ein Reiter liegt hinter der Karte und schaut oben links
    heraus, die Karte selbst deckt ihn ab. Der Reiter ist ein eigenes Element
    und kein Pseudo-Element, damit er den Schatten der Karte nicht schneidet. */
-.tuck-karte{
+/* Reiter und Karte sind Geschwister im Fach.
+
+   Der naheliegende Weg – Reiter als Kind der Karte mit z-index:-1 – geht
+   nicht: Sobald die Karte ein Stapelkontext ist (isolation:isolate), zeichnet
+   der Browser Kinder mit negativem z-index NACH Hintergrund und Rand des
+   Elternteils, also darueber. Der Reiter deckte dadurch 2 der 3 Randpixel der
+   Karte zu. Ohne isolation wiederum rutscht er hinter den undurchsichtigen
+   Grund von #view und verschwindet ganz.
+
+   Als Geschwister entscheidet schlicht der z-index: Reiter 0, Karte 1. Die
+   Karte deckt den Reiter sauber ab, und der darf beliebig weit hinter sie
+   reichen. */
+.tuck-fach{
   --ordner:var(--fe-blue-cloud);
-  /* isolation: Der Reiter liegt auf z-index -1. Ohne eigenen Stapelkontext
-     rutscht er hinter den undurchsichtigen Grund von #view und verschwindet. */
-  position:relative;isolation:isolate;
+  position:relative;display:flex;min-width:0;
+}
+.tuck-karte{
+  position:relative;z-index:1;flex:1 1 auto;
   display:flex;flex-direction:column;min-width:0;min-height:129px;
   padding:11px 13px 13px;
   border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
@@ -2676,21 +2689,20 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
    eingerueckt und ist 49% der Kartenbreite breit. Buendig gesetzt liest er
    sich als zweite Flaeche, die in die Karte hineinlaeuft, statt als Reiter.
    Sichtbar sind 18 pt; der Rest liegt hinter der Karte. */
-/* Hoehe exakt bis zur Kartenoberkante: 21px minus die 3px Rand heisst, der
-   Reiter endet unter dem oberen Rand der Karte und nicht dahinter. Reichte er
-   tiefer, schiene er durch die abgerundete Ecke in die weisse Flaeche. */
+/* 18 pt sichtbar wie im Vorbild, der Rest liegt hinter der Karte. Die Hoehe
+   darf jetzt grosszuegig sein: Die Karte deckt zuverlaessig ab. */
 .tuck-reiter{
-  position:absolute;left:5px;top:-21px;z-index:-1;width:51%;height:20px;
+  position:absolute;left:8px;top:-18px;z-index:0;width:49%;height:30px;
   border:var(--bw) solid var(--ink);border-bottom:0;border-radius:10px 10px 0 0;
   background:var(--ordner);
 }
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
-.tuck-karte.cyan{--ordner:var(--fe-blue-cloud)}
-.tuck-karte.pink{--ordner:var(--fe-pink)}
-.tuck-karte.violet{--ordner:var(--fe-blurple)}
-.tuck-karte.blue{--ordner:var(--fe-blue)}
-.tuck-karte.gelb{--ordner:var(--fe-yellow)}
-.tuck-karte.gruen{--ordner:var(--fe-green)}
+.tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
+.tuck-fach.pink{--ordner:var(--fe-pink)}
+.tuck-fach.violet{--ordner:var(--fe-blurple)}
+.tuck-fach.blue{--ordner:var(--fe-blue)}
+.tuck-fach.gelb{--ordner:var(--fe-yellow)}
+.tuck-fach.gruen{--ordner:var(--fe-green)}
 
 .tuck-karte-oben{display:flex;align-items:flex-start;gap:11px;margin-bottom:auto}
 .tuck-icon{

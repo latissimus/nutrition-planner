@@ -307,15 +307,19 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     // Nachtragen nur um eine Zeile und nicht um ihre halbe Hoehe.
     const meta = zaehlerText(route, zaehler[route])
       || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
+    // Reiter und Karte sind Geschwister, nicht Kind und Elternteil: Nur so
+    // deckt die Karte den Reiter zuverlaessig ab (siehe Kommentar im CSS).
     return `
-    <a class="tuck-karte ${farbe}" href="#${route}" data-sammlung="${route}">
+    <div class="tuck-fach ${farbe}">
       <span class="tuck-reiter" aria-hidden="true"></span>
-      <span class="tuck-karte-oben">
-        <span class="tuck-icon" aria-hidden="true">${iconMarkup(icon)}</span>
-        <span class="tuck-meta">${meta}</span>
-      </span>
-      <h2>${titel}</h2>
-    </a>`;
+      <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
+        <span class="tuck-karte-oben">
+          <span class="tuck-icon" aria-hidden="true">${iconMarkup(icon)}</span>
+          <span class="tuck-meta">${meta}</span>
+        </span>
+        <h2>${titel}</h2>
+      </a>
+    </div>`;
   }).join('');
 }
 
