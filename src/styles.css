@@ -1625,6 +1625,12 @@ html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
 .reminder-row::before{display:none}
 .switchline{margin-bottom:8px}
 .switchline input{flex:0 0 auto;width:21px;height:21px}
+.sammlung-sichtbarkeit{display:flex;align-items:center;gap:10px;min-height:52px;margin:0;border-bottom:1px solid rgba(0,0,0,.14)}
+.sammlung-sichtbarkeit:last-child{border-bottom:0}
+.sammlung-sichtbarkeit>.switchline{flex:1 1 auto;margin:0;min-width:0}
+.sortier-tasten{display:flex;gap:6px}
+.sortier-tasten button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--ink);border-radius:9px;background:var(--surface);color:var(--text);font:800 18px/1 var(--ui)}
+.sortier-tasten button:disabled{opacity:.25}
 .reminder-row>.fld-l{margin-left:30px}
 .reminder-row>[data-label]{width:calc(100% - 30px);margin:0 0 10px 30px;padding:8px 10px;background:var(--surface2)}
 .reminder-grid{margin-left:30px;grid-template-columns:repeat(3,minmax(0,8.5rem));justify-content:start}

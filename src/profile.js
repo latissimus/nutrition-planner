@@ -2,6 +2,9 @@ import { supabase } from './supabase.js';
 import { signOut } from './auth.js';
 import { getTheme, setTheme, getSchatten, setSchatten } from './theme.js';
 import { toast } from './toast.js';
+import {
+  collectionIsVisible, collectionOrder, moveCollection, setCollectionVisible,
+} from './collectionPreferences.js';
 
 const initials = (name, email) => {
   const quelle = (name || email || '?').trim();
@@ -251,6 +254,55 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
   schattentext.textContent = 'Schlagschatten';
   schattenzeile.append(schattenbox, schattentext);
   darstellung.appendChild(schattenzeile);
+
+  const startseite = abschnitt(wrap, 'Startseite anpassen');
+  const startHinweis = document.createElement('p');
+  startHinweis.className = 'profile-hinweis';
+  startHinweis.textContent = 'Lege fest, welche Sammlungen auf der Startseite und in der Suche erscheinen.';
+  startseite.appendChild(startHinweis);
+  const sammlungsNamen = new Map([
+    ['body', 'KFA-LOG'], ['reminders', 'MAHLZEITEN'], ['food-log', 'FOOD-LOG'],
+    ['recipes', 'REZEPTE'], ['habits', 'ROUTINEN'],
+  ]);
+  const sammlungsListe = document.createElement('div');
+  sammlungsListe.className = 'sammlungs-sortierung';
+  const renderSammlungen = () => {
+    const order = collectionOrder();
+    sammlungsListe.replaceChildren(...order.map((route, index) => {
+      const title = sammlungsNamen.get(route);
+      const zeile = document.createElement('div');
+      zeile.className = 'sammlung-sichtbarkeit';
+      const label = document.createElement('label');
+      label.className = 'switchline';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = collectionIsVisible(route);
+      checkbox.onchange = () => {
+        setCollectionVisible(route, checkbox.checked);
+        toast(`${title} ${checkbox.checked ? 'eingeblendet' : 'ausgeblendet'}.`);
+      };
+      const text = document.createElement('span');
+      text.textContent = title;
+      label.append(checkbox, text);
+      const tasten = document.createElement('span');
+      tasten.className = 'sortier-tasten';
+      [['↑', -1, 'nach oben'], ['↓', 1, 'nach unten']].forEach(([zeichen, richtung, beschreibung]) => {
+        const taste = document.createElement('button');
+        taste.type = 'button';
+        taste.textContent = zeichen;
+        taste.disabled = richtung < 0 ? index === 0 : index === order.length - 1;
+        taste.setAttribute('aria-label', `${title} ${beschreibung}`);
+        taste.onclick = () => {
+          if (moveCollection(route, richtung)) renderSammlungen();
+        };
+        tasten.appendChild(taste);
+      });
+      zeile.append(label, tasten);
+      return zeile;
+    }));
+  };
+  renderSammlungen();
+  startseite.appendChild(sammlungsListe);
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `

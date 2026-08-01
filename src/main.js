@@ -15,6 +15,7 @@ import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './au
 import { getTheme, applyTheme, setTheme, getSchatten, applySchatten } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
+import { visibleCollectionRoutes } from './collectionPreferences.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
@@ -229,13 +230,17 @@ function avatarMarkup() {
 // Stand. Die Beschreibung steht bewusst nicht auf der Karte: Tuckii zeigt dort
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
-  ['body', 'Körperwerte', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
-  ['reminders', 'Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
+  ['body', 'KFA-LOG', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
+  ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Food-Log', 'Gute Mahlzeiten wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['recipes', 'Rezepte', 'Eigene Rezepte und schnelle Standards.', 'recipes', 'blue', 'Bald'],
-  ['habits', 'Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
+  ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
+const sichtbareSammlungen = () => {
+  const nachRoute = new Map(sammlungen.map((sammlung) => [sammlung[0], sammlung]));
+  return visibleCollectionRoutes().map((route) => nachRoute.get(route)).filter(Boolean);
+};
 
 // Welche Tabelle den Zaehler einer Sammlung fuellt. Rezepte und Gewohnheiten
 // haben noch keine Tabelle – ihre Karten zeigen weiter "Bald".
@@ -332,6 +337,7 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
 
 function mountHome(container) {
   setSeite('home');
+  const sichtbar = sichtbareSammlungen();
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
       <div class="tuck-ablage">
@@ -352,7 +358,7 @@ function mountHome(container) {
         </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Sammlungen">
-        ${sammlungsKarten(sammlungen, zaehlerStand)}
+        ${sammlungsKarten(sichtbar, zaehlerStand)}
       </section>
     </div>`;
 
@@ -379,7 +385,8 @@ function mountHome(container) {
 
 function mountSearch(container) {
   setSeite('search');
-  const aktiv = sammlungen.filter(([, , , , , status]) => status === 'Aktiv').length;
+  const sichtbar = sichtbareSammlungen();
+  const aktiv = sichtbar.filter(([, , , , , status]) => status === 'Aktiv').length;
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-suche-seite">
       <div class="tuck-suchzeile">
@@ -392,13 +399,13 @@ function mountSearch(container) {
       <section class="tuck-bibliothek">
         <span>Deine Bibliothek</span>
         <div class="tuck-bibliothek-werte">
-          <div><b>${sammlungen.length}</b><small>Sammlungen</small></div>
+          <div><b>${sichtbar.length}</b><small>Sammlungen</small></div>
           <div><b data-summe>…</b><small>Einträge</small></div>
-          <div><b>${sammlungen.length - aktiv}</b><small>Geplant</small></div>
+          <div><b>${sichtbar.length - aktiv}</b><small>Geplant</small></div>
         </div>
       </section>
       <h2 class="tuck-abschnittstitel">Bereiche</h2>
-      <section class="tuck-grid" data-search-results>${sammlungsKarten(sammlungen, zaehlerStand)}</section>
+      <section class="tuck-grid" data-search-results>${sammlungsKarten(sichtbar, zaehlerStand)}</section>
       <div class="tuck-leer" data-search-empty hidden>
         ${iconMarkup('search')}
         <b>Nichts gefunden</b>
@@ -411,7 +418,7 @@ function mountSearch(container) {
   const empty = container.querySelector('[data-search-empty]');
   input.oninput = () => {
     const query = input.value.trim().toLocaleLowerCase('de');
-    const treffer = sammlungen.filter(([, titel, text]) => `${titel} ${text}`.toLocaleLowerCase('de').includes(query));
+    const treffer = sichtbar.filter(([, titel, text]) => `${titel} ${text}`.toLocaleLowerCase('de').includes(query));
     results.innerHTML = sammlungsKarten(treffer, zaehlerStand);
     empty.hidden = treffer.length > 0;
   };
@@ -438,7 +445,7 @@ function mountComingSoon(container, route) {
       <div class="seitenkopf">
         <div class="seitenkopf-text">
           <span class="seitenkopf-kicker">${recipes ? 'Sammlung' : 'Routine'}</span>
-          <h1 class="section-title">${recipes ? 'Rezepte' : 'Gewohnheiten'}</h1>
+          <h1 class="section-title">${recipes ? 'REZEPTE' : 'ROUTINEN'}</h1>
         </div>
       </div>
       <section class="seiten-einstieg">
@@ -511,18 +518,18 @@ async function render() {
       profile,
       onProfileUpdated: (aktuell) => { profile = aktuell; },
     });
-    mountCategoryChrome(view, route, 'Körperwerte');
+    mountCategoryChrome(view, route, 'KFA-LOG');
   } else if (route === 'reminders') {
     setSeite('reminders');
     mountReminders(view, { session, profile });
-    mountCategoryChrome(view, route, 'Erinnerungen');
+    mountCategoryChrome(view, route, 'MAHLZEITEN');
   } else if (route === 'food-log') {
     setSeite('food-log');
     mountFoodLog(view, { session, profile });
     mountCategoryChrome(view, route, 'Food-Log');
   } else if (route === 'recipes' || route === 'habits') {
     mountComingSoon(view, route);
-    mountCategoryChrome(view, route, route === 'recipes' ? 'Rezepte' : 'Gewohnheiten');
+    mountCategoryChrome(view, route, route === 'recipes' ? 'REZEPTE' : 'ROUTINEN');
   } else {
     mountHome(view);
   }
