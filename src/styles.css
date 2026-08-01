@@ -2674,6 +2674,35 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .app-kopf .nav-av img{width:100%;height:100%;object-fit:cover}
 .app-kopf .nav-av span{font:800 15px/1 var(--ui);font-style:normal;letter-spacing:.01em}
 
+/* ---------- Start: Schnellablage ---------- */
+/* Tuckii setzt ueber die Bibliothek ein Eingabefeld plus einen Knopf im
+   Akzent (IMG_5109). Feld und Knopf teilen sich eine Zeile, der Knopf ist
+   quadratisch und so hoch wie das Feld. */
+.tuck-ablage{
+  display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:10px;align-items:stretch;
+  margin:4px 2px 22px;
+}
+.tuck-ablage-feld{
+  display:grid;grid-template-columns:20px minmax(0,1fr) 22px;gap:10px;align-items:center;
+  min-height:56px;padding:0 14px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
+}
+.tuck-ablage-feld>b{font-size:19px;font-weight:800;line-height:1}
+.tuck-ablage-feld input{
+  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
+  font-family:var(--ui);font-size:15px;font-weight:600;
+}
+.tuck-ablage-feld input::placeholder{color:var(--faint);opacity:1}
+.tuck-ablage-feld .app-icon{width:20px;height:20px;color:var(--muted)}
+.tuck-ablage-knopf{
+  display:grid;place-items:center;width:56px;padding:0;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--akzent);color:var(--akzent-ink);box-shadow:var(--hart-klein);
+  font:800 28px/1 var(--ui);
+}
+.tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
+
 /* ---------- Start: Bibliothek ---------- */
 .tuck-home{padding-top:22px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
 /* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
@@ -2684,9 +2713,13 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .tuck-titelzeile h1{
   min-width:0;color:var(--text);font-size:clamp(24px,7vw,30px);line-height:1.05;
 }
+/* Masse aus Inspirationen/IMG_5109, per Pixelmessung bei 390 pt Breite:
+   Spaltenabstand 18,7 pt, und zwischen Kartenunterkante und dem Reiter der
+   naechsten Reihe liegen 30,7 pt. Der Zeilenabstand im Raster muss diese
+   30,7 pt plus die 18 pt sichtbaren Reiter tragen, also rund 49 pt. */
 .tuck-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:26px 14px;padding:14px 3px 6px;
+  gap:49px 19px;padding:20px 3px 6px;
 }
 
 /* Die Ordnerkarte: ein Reiter liegt hinter der Karte und schaut oben links
@@ -2697,15 +2730,19 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
   /* isolation: Der Reiter liegt auf z-index -1. Ohne eigenen Stapelkontext
      rutscht er hinter den undurchsichtigen Grund von #view und verschwindet. */
   position:relative;isolation:isolate;
-  display:flex;flex-direction:column;min-width:0;min-height:132px;
-  padding:14px 13px 13px;
+  display:flex;flex-direction:column;min-width:0;min-height:129px;
+  padding:11px 13px 13px;
   border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
   background:var(--surface);color:var(--text);text-decoration:none;
   box-shadow:var(--hart);
 }
+/* Der Reiter ist NICHT buendig mit der Kartenkante: Bei Tuckii sitzt er 8 pt
+   eingerueckt und ist 49% der Kartenbreite breit. Buendig gesetzt liest er
+   sich als zweite Flaeche, die in die Karte hineinlaeuft, statt als Reiter.
+   Sichtbar sind 18 pt; der Rest liegt hinter der Karte. */
 .tuck-reiter{
-  position:absolute;left:-3px;top:-19px;z-index:-1;width:54%;height:32px;
-  border:var(--bw) solid var(--ink);border-bottom:0;border-radius:11px 11px 0 0;
+  position:absolute;left:5px;top:-21px;z-index:-1;width:51%;height:33px;
+  border:var(--bw) solid var(--ink);border-bottom:0;border-radius:10px 10px 0 0;
   background:var(--ordner);
 }
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
@@ -2726,12 +2763,17 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
    uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei
    "Erinnerungen" auf schmalen Karten ist genau das gewollt. */
-/* "6 Erinnerungen" passt mit 2px Rest genau in die Spalte. Damit ein
-   dreistelliger Zaehler oder ein laengeres Wort nicht ueber die Kontur laeuft,
-   darf die Zeile umbrechen – die Karte hat die Hoehe dafuer. */
-.tuck-meta{min-width:0;padding-top:4px;line-height:1.25;overflow-wrap:anywhere}
-.tuck-meta b{color:var(--text);font-size:13px;font-weight:800}
-.tuck-meta span{margin-left:4px;color:var(--muted);font-size:13px;font-weight:500}
+/* Tuckii setzt Zahl und Einheit in eine Zeile ("0 links"). Auf Deutsch geht
+   das nicht auf: In der Metaspalte sind 83,5 px Platz, "Erinnerungen" misst
+   bei 13 px schon 82,3 px – 1,2 px Reserve, und jedes laengere Wort bricht
+   mitten durch. Deshalb hier gestapelt: Die Einheit bekommt die volle Breite
+   und liegt bei 12 px mit 76 px komfortabel darunter. */
+.tuck-meta{
+  display:flex;flex-direction:column;gap:1px;min-width:0;padding-top:2px;
+  line-height:1.2;overflow-wrap:break-word;
+}
+.tuck-meta b{color:var(--text);font-size:16px;font-weight:800}
+.tuck-meta span{color:var(--muted);font-size:12px;font-weight:500}
 /* Der Name steht unten und in Versalien – bei Tuckii die einzige Stelle im
    Kartenlayout, die Versalien traegt. */
 .tuck-karte h2{
@@ -2858,17 +2900,17 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .input{box-shadow:none}
 .input:focus{border-color:var(--prio);box-shadow:0 0 0 3px var(--prio-wash)}
 
-@media(max-width:420px){
-  .wrap{padding-inline:16px}
+@media(max-width:370px){
+  .wrap{padding-inline:14px}
+  .tuck-grid{gap:44px 14px}
+  .tuck-karte{min-height:120px;padding:10px 11px 11px}
   .kopf-logo{width:104px;max-height:43px}
   .kopf-aktionen{gap:7px}
-  .tuck-grid{gap:24px 12px}
-  .tuck-karte{min-height:126px;padding:13px 12px 12px}
   .tuck-karte h2{font-size:15px}
 }
 
 @media(max-width:350px){
   .kopf-aktionen .save-dot{display:none}
   .tuck-grid{grid-template-columns:1fr}
-  .tuck-reiter{width:44%}
+  .tuck-reiter{width:42%}
 }

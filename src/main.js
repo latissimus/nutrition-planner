@@ -322,6 +322,15 @@ function mountHome(container) {
   setSeite('home');
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
+      <div class="tuck-ablage">
+        <label class="tuck-ablage-feld" for="schnell-link">
+          <b aria-hidden="true">#</b>
+          <input id="schnell-link" type="url" inputmode="url" autocomplete="off"
+                 placeholder="Link einfügen" aria-label="Link einfügen und ablegen">
+          ${iconMarkup('folder')}
+        </label>
+        <button class="tuck-ablage-knopf" type="button" aria-label="Abgelegten Link speichern">+</button>
+      </div>
       <header class="tuck-titelzeile">
         <h1>Meine Sammlungen</h1>
         <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
@@ -335,6 +344,16 @@ function mountHome(container) {
 
   container.querySelector('.neu-sammlung').onclick = () => {
     toast('Eigene Sammlungen ergänzen wir im nächsten Schritt.');
+  };
+
+  // Feld und Knopf stehen, die Ablage dahinter fehlt noch: Fuer Links gibt es
+  // bislang keine Tabelle (Roadmap 7 "Externe Rezeptmedien"). Bis dahin sagt
+  // die App das offen, statt eine Eingabe stillschweigend zu verschlucken.
+  container.querySelector('.tuck-ablage-knopf').onclick = () => {
+    const feld = container.querySelector('#schnell-link');
+    toast(feld.value.trim()
+      ? 'Links ablegen kommt mit den externen Rezeptmedien.'
+      : 'Erst einen Link einfügen.');
   };
 
   zaehlerLaden().then((zaehler) => {
