@@ -3,13 +3,15 @@ import { toast } from './toast.js';
 import { curveSvg } from './curve.js';
 import { FALTEN, datumKurz, heute, schnitt7, summe, zahl } from './measurements.js';
 
-async function loadSkinfolds(userId, limit = 60) {
-  const { data, error } = await supabase
+async function loadSkinfolds(userId, limit = 60, signal) {
+  let query = supabase
     .from('skinfolds')
     .select('gemessen_am, falten')
     .eq('user_id', userId)
     .order('gemessen_am', { ascending: true })
     .limit(limit);
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map((row) => ({ datum: row.gemessen_am, falten: row.falten, summe: summe(row.falten) }));
 }
@@ -21,13 +23,15 @@ async function saveSkinfolds(userId, folds, date = heute()) {
   if (error) throw error;
 }
 
-async function loadWeights(userId, limit = 180) {
-  const { data, error } = await supabase
+async function loadWeights(userId, limit = 180, signal) {
+  let query = supabase
     .from('weights')
     .select('gemessen_am, kg')
     .eq('user_id', userId)
     .order('gemessen_am', { ascending: true })
     .limit(limit);
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map((row) => ({ datum: row.gemessen_am, kg: Number(row.kg) }));
 }
@@ -69,7 +73,7 @@ function pageHeader() {
     </section>`;
 }
 
-export function mountBodyMetrics(container, { session, profile, onProfileUpdated }) {
+export function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal }) {
   const userId = session.user.id;
   container.innerHTML = `
     <div class="wrap pad-bottom">
@@ -107,7 +111,8 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
 
   async function renderSkinfolds() {
     try {
-      const rows = await loadSkinfolds(userId);
+      const rows = await loadSkinfolds(userId, 60, signal);
+      if (signal?.aborted) return;
       const valid = rows.filter((row) => row.summe != null);
       const last = valid[valid.length - 1];
       const previous = valid[valid.length - 2];
@@ -202,7 +207,8 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
 
   async function renderWeights() {
     try {
-      const rows = await loadWeights(userId);
+      const rows = await loadWeights(userId, 180, signal);
+      if (signal?.aborted) return;
       const trend = schnitt7(rows);
       const lastTrend = trend[trend.length - 1];
       const dayNumber = (iso) => Math.floor(new Date(`${iso}T12:00:00`).getTime() / 86400000);

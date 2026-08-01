@@ -31,22 +31,23 @@ function validateImage(file) {
   if (file.size > MAX_FILE_SIZE) throw new Error('Das Bild darf maximal 8 MB gross sein.');
 }
 
-async function signedImage(path) {
-  if (!path) return null;
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600);
-  if (error) return null;
-  return data.signedUrl;
-}
-
-async function loadEntries(userId) {
-  const { data, error } = await supabase
+async function loadEntries(userId, signal) {
+  let query = supabase
     .from('food_logs')
     .select('id, title, note, eaten_at, image_path, created_at')
     .eq('user_id', userId)
     .order('eaten_at', { ascending: false })
     .order('created_at', { ascending: false });
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
   if (error) throw error;
-  return Promise.all((data || []).map(async (entry) => ({ ...entry, image_url: await signedImage(entry.image_path) })));
+  if (signal?.aborted) return [];
+  const entries = data || [];
+  const paths = [...new Set(entries.map((entry) => entry.image_path).filter(Boolean))];
+  if (!paths.length) return entries.map((entry) => ({ ...entry, image_url: null }));
+  const { data: signed, error: signedError } = await supabase.storage.from(BUCKET).createSignedUrls(paths, 3600);
+  const urls = new Map((signedError ? [] : signed || []).map((item) => [item.path, item.signedUrl]));
+  return entries.map((entry) => ({ ...entry, image_url: urls.get(entry.image_path) || null }));
 }
 
 async function uploadImage(userId, file) {
@@ -78,7 +79,7 @@ function entryMarkup(entry) {
   </article>`;
 }
 
-export async function mountFoodLog(container, { session }) {
+export async function mountFoodLog(container, { session, signal }) {
   const userId = session.user.id;
   let entries = [];
   let editingId = null;
@@ -118,7 +119,7 @@ export async function mountFoodLog(container, { session }) {
         <h2>Meine Ideen</h2>
         <span data-food-count></span>
       </div>
-      <section class="food-grid" data-food-list aria-live="polite"></section>
+      <section class="food-grid" data-food-list aria-live="polite"><div class="daten-laden" role="status">Food-Log wird geladen …</div></section>
     </div>`;
 
   const form = container.querySelector('[data-food-form]');
@@ -148,7 +149,8 @@ export async function mountFoodLog(container, { session }) {
   };
 
   const refresh = async () => {
-    entries = await loadEntries(userId);
+    entries = await loadEntries(userId, signal);
+    if (signal?.aborted) return;
     renderEntries();
   };
 

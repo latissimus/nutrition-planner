@@ -35,9 +35,9 @@ export function pushSupport() {
   return { ready: true, reason: '' };
 }
 
-async function registration() {
+async function registration(update = false) {
   const current = await navigator.serviceWorker.ready;
-  await current.update().catch(() => {});
+  if (update) await current.update().catch(() => {});
   return current;
 }
 
@@ -99,7 +99,7 @@ export async function activatePush(userId) {
 export async function syncPushSubscription(userId) {
   const support = pushSupport();
   if (!support.ready || Notification.permission !== 'granted') return false;
-  const current = await registration();
+  const current = await registration(true);
   const subscription = await current.pushManager.getSubscription();
   if (!subscription) return false;
   await saveSubscription(userId, subscription);
@@ -128,4 +128,3 @@ export async function sendTestPush() {
   if (!data?.ok) throw new Error(data?.error || 'Testnachricht konnte nicht gesendet werden.');
   return data;
 }
-

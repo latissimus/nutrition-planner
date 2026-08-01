@@ -37,8 +37,11 @@ if ('serviceWorker' in navigator) {
 const app = document.querySelector('#app');
 let session = null;
 let profile = null;
+let profileLadePromise = null;
 let recovery = false;
 let authMode = 'login';
+let renderGeneration = 0;
+let routeAbortController = null;
 
 function syncStatusAktualisieren() {
   const sync = document.querySelector('#app-sync');
@@ -64,7 +67,6 @@ function fehlertext(error) {
 
 function setSeite(name) {
   document.documentElement.dataset.seite = name;
-  applyTheme(getTheme());
 }
 
 function meldung(slot, text, art) {
@@ -259,10 +261,12 @@ const ZAEHLQUELLEN = {
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
 // leere Antworten statt der kompletten Tabellen.
-async function zaehlerLaden() {
+async function zaehlerLaden(signal) {
   const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle }]) => {
     try {
-      const { count, error } = await supabase.from(tabelle).select('*', { count: 'exact', head: true });
+      const { count, error } = await supabase.from(tabelle)
+        .select('*', { count: 'exact', head: true })
+        .abortSignal(signal);
       return [route, error ? null : (count ?? 0)];
     } catch (e) {
       return [route, null];   // offline: die Karte behaelt ihren Platzhalter
@@ -288,21 +292,33 @@ function zaehlerEintragen(container, zaehler) {
 }
 
 function renderChrome(route) {
-  app.innerHTML = `
-    <header class="topbar app-kopf">
-      <div class="wrap">
-        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Sammlungen">${headerBrandMarkup()}</a>
-        <nav class="kopf-aktionen" aria-label="App-Status und Profil">
-          <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
-          <a class="tuck-quadrat${route === 'search' ? ' aktiv' : ''}" href="#search" aria-label="MUSCLE-DEX durchsuchen">
-            ${materialIconMarkup('search')}
-          </a>
-          <a class="nav-av nav-av-fb${route === 'profile' ? ' aktiv' : ''}" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
-        </nav>
-      </div>
-    </header>
-    <main id="view"></main>`;
+  let header = app.querySelector(':scope > .app-kopf');
+  let view = app.querySelector(':scope > #view');
+  if (!header || !view) {
+    app.innerHTML = `
+      <header class="topbar app-kopf">
+        <div class="wrap">
+          <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Sammlungen">${headerBrandMarkup()}</a>
+          <nav class="kopf-aktionen" aria-label="App-Status und Profil">
+            <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
+            <a class="tuck-quadrat" href="#search" aria-label="MUSCLE-DEX durchsuchen">
+              ${materialIconMarkup('search')}
+            </a>
+            <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+          </nav>
+        </div>
+      </header>
+      <main id="view"></main>`;
+    header = app.querySelector(':scope > .app-kopf');
+    view = app.querySelector(':scope > #view');
+  }
+  header.querySelector('[href="#search"]')?.classList.toggle('aktiv', route === 'search');
+  header.querySelector('[href="#profile"]')?.classList.toggle('aktiv', route === 'profile');
+  view.replaceChildren();
+  view.className = '';
+  view.removeAttribute('style');
   syncStatusAktualisieren();
+  return view;
 }
 
 // Der Aufbau folgt der Ordnerkarte aus Inspirationen/IMG_5109: ein farbiger
@@ -335,7 +351,7 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
   }).join('');
 }
 
-function mountHome(container) {
+function mountHome(container, signal) {
   setSeite('home');
   const sichtbar = sichtbareSammlungen();
   container.innerHTML = `
@@ -376,14 +392,15 @@ function mountHome(container) {
       : 'Erst einen Link einfügen.');
   };
 
-  zaehlerLaden().then((zaehler) => {
+  zaehlerLaden(signal).then((zaehler) => {
+    if (signal?.aborted) return;
     zaehlerStand = zaehler;
     // Zwischenzeitlich kann eine andere Seite gemountet sein.
     if (container.isConnected) zaehlerEintragen(container, zaehler);
   });
 }
 
-function mountSearch(container) {
+function mountSearch(container, signal) {
   setSeite('search');
   const sichtbar = sichtbareSammlungen();
   const aktiv = sichtbar.filter(([, , , , , status]) => status === 'Aktiv').length;
@@ -424,7 +441,8 @@ function mountSearch(container) {
   };
   requestAnimationFrame(() => input.focus({ preventScroll: true }));
 
-  zaehlerLaden().then((zaehler) => {
+  zaehlerLaden(signal).then((zaehler) => {
+    if (signal?.aborted) return;
     zaehlerStand = zaehler;
     if (!container.isConnected) return;
     zaehlerEintragen(container, zaehler);
@@ -472,13 +490,24 @@ async function profilLaden() {
   }
 }
 
+async function profilSicherLaden() {
+  if (profile) return profile;
+  if (!profileLadePromise) {
+    profileLadePromise = profilLaden().finally(() => { profileLadePromise = null; });
+  }
+  await profileLadePromise;
+  return profile;
+}
+
 async function render() {
+  const generation = ++renderGeneration;
   if (!supabaseKonfiguriert) return renderSetup();
   if (recovery) return renderRecovery();
   if (!session) return renderAuth();
   if (!profile) {
-    try { await profilLaden(); }
+    try { await profilSicherLaden(); }
     catch (error) {
+      if (generation !== renderGeneration) return;
       app.replaceChildren();
       const main = document.createElement('main');
       main.className = 'setup-shell wrap';
@@ -490,21 +519,25 @@ async function render() {
       return;
     }
   }
+  if (generation !== renderGeneration) return;
   const angefragt = (location.hash || '#home').slice(1);
   const route = ['home', 'search', 'profile'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     ? angefragt
     : 'home';
-  renderChrome(route);
-  const view = app.querySelector('#view');
+  routeAbortController?.abort();
+  routeAbortController = new AbortController();
+  const { signal } = routeAbortController;
+  const view = renderChrome(route);
   if (route === 'home') {
-    mountHome(view);
+    mountHome(view, signal);
   } else if (route === 'search') {
-    mountSearch(view);
+    mountSearch(view, signal);
   } else if (route === 'profile') {
     setSeite('profile');
     mountProfile(view, {
       session,
       profile,
+      signal,
       onProfileUpdated: (aktuell) => {
         profile = aktuell;
         const slot = app.querySelector('.nav-av');
@@ -516,22 +549,23 @@ async function render() {
     mountBodyMetrics(view, {
       session,
       profile,
+      signal,
       onProfileUpdated: (aktuell) => { profile = aktuell; },
     });
     mountCategoryChrome(view, route, 'KFA-LOG');
   } else if (route === 'reminders') {
     setSeite('reminders');
-    mountReminders(view, { session, profile });
+    mountReminders(view, { session, profile, signal });
     mountCategoryChrome(view, route, 'MAHLZEITEN');
   } else if (route === 'food-log') {
     setSeite('food-log');
-    mountFoodLog(view, { session, profile });
+    mountFoodLog(view, { session, profile, signal });
     mountCategoryChrome(view, route, 'Food-Log');
   } else if (route === 'recipes' || route === 'habits') {
     mountComingSoon(view, route);
     mountCategoryChrome(view, route, route === 'recipes' ? 'REZEPTE' : 'ROUTINEN');
   } else {
-    mountHome(view);
+    mountHome(view, signal);
   }
 }
 
@@ -541,15 +575,23 @@ if (!supabaseKonfiguriert) {
   renderSetup();
 } else {
   supabase.auth.onAuthStateChange((event, neueSession) => {
+    const bisherigeUserId = session?.user?.id;
     session = neueSession;
     if (event === 'PASSWORD_RECOVERY') recovery = true;
-    if (event === 'SIGNED_OUT') profile = null;
+    if (event === 'SIGNED_OUT') {
+      profile = null;
+      profileLadePromise = null;
+    }
+    if (event === 'SIGNED_IN' && bisherigeUserId && bisherigeUserId !== session?.user?.id) {
+      profile = null;
+      profileLadePromise = null;
+    }
     if (session?.user?.id) startReminderLoop(session.user.id);
+    // Ein still erneuertes Zugriffstoken darf die gerade benutzte Unterseite
+    // nicht neu aufbauen. Auch wiederholte SIGNED_IN-Ereignisse desselben
+    // Nutzers (z. B. nach Rueckkehr in die PWA) aktualisieren nur die Session.
+    if (event === 'TOKEN_REFRESHED') return;
+    if (event === 'SIGNED_IN' && bisherigeUserId === session?.user?.id && profile) return;
     setTimeout(() => render(), 0);
-  });
-  supabase.auth.getSession().then(({ data }) => {
-    session = data.session;
-    if (session?.user?.id) startReminderLoop(session.user.id);
-    render();
   });
 }

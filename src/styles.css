@@ -232,8 +232,8 @@ h1,h2,h3,.display{
 button{font-family:inherit;cursor:pointer}
 a{color:var(--link)}
 .wrap{max-width:580px;margin:0 auto;padding:0 14px}
-body:not([data-seite="log"]) #view>.wrap{animation:seiteEin .18s cubic-bezier(.22,.75,.3,1)}
-@keyframes seiteEin{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:none}}
+body:not([data-seite="log"]) #view>.wrap{animation:none}
+.daten-laden{padding:18px 4px;color:var(--muted);font-size:14px;font-weight:700}
 
 /* ---------- Top bar / nav ---------- */
 .topbar{position:sticky;top:0;z-index:20;isolation:isolate;background:var(--bg);

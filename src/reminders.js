@@ -13,6 +13,7 @@ const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
 let reminderTimer = null;
 let reminderUserId = null;
+let reminderStartPromise = null;
 
 const DEFAULT_REMINDERS = [
   { type: 'meal', label: 'Fruehstueck', time: '08:00', route: '#reminders' },
@@ -60,13 +61,15 @@ function notificationText(reminder) {
   return { title: reminder.label, body: 'Geplante Erinnerung.' };
 }
 
-async function loadReminders(userId) {
-  const { data, error } = await supabase
+async function loadReminders(userId, signal) {
+  let query = supabase
     .from('reminders')
     .select('id, type, label, time, weekdays, active, metadata, route')
     .eq('user_id', userId)
     .order('type')
     .order('time');
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
   if (error) throw error;
   return data ?? [];
 }
@@ -105,8 +108,8 @@ export async function loadReminderDashboard(userId, now = new Date()) {
   };
 }
 
-async function saveReminder(userId, reminder) {
-  const payload = {
+function reminderPayload(userId, reminder) {
+  return {
     user_id: userId,
     type: reminder.type,
     label: reminder.label.trim(),
@@ -116,6 +119,10 @@ async function saveReminder(userId, reminder) {
     metadata: reminder.metadata || {},
     route: reminder.route || '#reminders',
   };
+}
+
+async function saveReminder(userId, reminder) {
+  const payload = reminderPayload(userId, reminder);
   const query = supabase.from('reminders');
   const request = reminder.id
     ? query.update(payload).eq('id', reminder.id).eq('user_id', userId)
@@ -127,14 +134,20 @@ async function saveReminder(userId, reminder) {
   return data;
 }
 
-async function ensureDefaults(userId) {
-  const current = await loadReminders(userId);
+async function ensureDefaults(userId, signal) {
+  const current = await loadReminders(userId, signal);
   if (current.length) return current;
-  const saved = [];
-  for (const reminder of DEFAULT_REMINDERS) {
-    saved.push(await saveReminder(userId, { ...reminder, active: false, weekdays: WEEKDAYS }));
-  }
-  return saved;
+  const payloads = DEFAULT_REMINDERS.map((reminder) => reminderPayload(userId, {
+    ...reminder, active: false, weekdays: WEEKDAYS,
+  }));
+  let query = supabase
+    .from('reminders')
+    .upsert(payloads, { onConflict: 'user_id,type,label' })
+    .select('id, type, label, time, weekdays, active, metadata, route');
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data ?? [];
 }
 
 async function maybeNotify(reminder, slot, now, userId) {
@@ -166,18 +179,21 @@ async function tickReminders(userId) {
 }
 
 export async function startReminderLoop(userId) {
-  if (!userId || reminderUserId === userId) return;
-  const serverPushActive = await syncPushSubscription(userId).catch(() => false);
-  if (serverPushActive) {
+  if (!userId) return;
+  if (reminderUserId === userId) return reminderStartPromise;
+  reminderUserId = userId;
+  reminderStartPromise = (async () => {
+    const serverPushActive = await syncPushSubscription(userId).catch(() => false);
+    if (reminderUserId !== userId) return;
     if (reminderTimer) clearInterval(reminderTimer);
     reminderTimer = null;
-    reminderUserId = userId;
-    return;
-  }
-  if (reminderTimer) clearInterval(reminderTimer);
-  reminderUserId = userId;
-  tickReminders(userId);
-  reminderTimer = setInterval(() => tickReminders(userId), CHECK_INTERVAL_MS);
+    if (serverPushActive) return;
+    tickReminders(userId);
+    reminderTimer = setInterval(() => tickReminders(userId), CHECK_INTERVAL_MS);
+  })().finally(() => {
+    if (reminderUserId === userId) reminderStartPromise = null;
+  });
+  return reminderStartPromise;
 }
 
 function permissionMarkup(state) {
@@ -312,7 +328,7 @@ function reminderGroups(reminders) {
   }).join('');
 }
 
-export async function mountReminders(container, { session }) {
+export async function mountReminders(container, { session, signal }) {
   const userId = session.user.id;
   container.innerHTML = `
     <div class="wrap pad-bottom">
@@ -329,7 +345,7 @@ export async function mountReminders(container, { session }) {
       </section>
       <section class="card" data-reminders-card>
         <div data-permission>${permissionMarkup()}</div>
-        <div data-reminder-list class="reminder-list"></div>
+        <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
         <button class="btn btn-primary btn-block" type="button" data-save-reminders>Erinnerungen speichern</button>
       </section>
     </div>`;
@@ -340,7 +356,8 @@ export async function mountReminders(container, { session }) {
 
   let reminders = [];
   try {
-    reminders = await ensureDefaults(userId);
+    reminders = await ensureDefaults(userId, signal);
+    if (signal?.aborted) return;
     list.innerHTML = reminderGroups(reminders);
   } catch (error) {
     list.innerHTML = `<div class="msg err">${error.message}</div>`;
