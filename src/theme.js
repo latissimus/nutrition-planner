@@ -33,7 +33,8 @@ function abgedunkelt(farbe, anteil = 0.28) {
   if (!hex) return farbe;
   const faktor = 1 - anteil;
   const kanal = (start) => Math.round(parseInt(hex.slice(start, start + 2), 16) * faktor);
-  return `rgb(${kanal(0)} ${kanal(2)} ${kanal(4)})`;
+  return `#${[kanal(0), kanal(2), kanal(4)]
+    .map((wert) => wert.toString(16).padStart(2, '0')).join('')}`;
 }
 
 export function setStatusleistenOverlay(quelle, offen) {

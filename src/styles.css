@@ -255,7 +255,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
    heller Streifen stehen. */
 html.statusleiste-overlay .topbar,
 html.statusleiste-overlay .topbar::after,
-html.statusleiste-overlay .topbar::before{background:var(--bg)}
+html.statusleiste-overlay .topbar::before{background:var(--statusbar-bg,var(--bg))}
 .topbar .wrap{position:relative;z-index:2;display:flex;align-items:center;gap:10px}
 /* LOGMAN-Wortmarke als Logo im RetroMuscle-Stil: pinke Füllung, Navy-Kontur, harter Schatten.
    Kein Layout-Effekt (Kontur/Schatten ändern die Header-Höhe nicht). */
@@ -776,7 +776,8 @@ body.einstieg-fokus #app::after{content:"";position:fixed;top:0;left:0;width:100
    und Uebungswaehler (80), endet aber exakt vor deren Inhalt. So kann weder
    der hellblaue Header noch die weisse Tutorialkarte in die Safe Area rutschen. */
 html.statusleiste-overlay body::before{content:"";position:fixed;z-index:1010;
-  top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 3px);
+  top:calc(0px - env(safe-area-inset-top));left:0;right:0;
+  height:calc(env(safe-area-inset-top) + env(safe-area-inset-top) + 3px);
   background:var(--statusbar-bg,var(--bg));pointer-events:none}
 .tutorial-ebene{position:fixed;z-index:60;inset:0;pointer-events:none}
 .tutorial-ebene[hidden]{display:none}
