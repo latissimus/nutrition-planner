@@ -2620,12 +2620,12 @@ button,a,[role="button"],summary{touch-action:manipulation}
    Akzent (IMG_5109). Feld und Knopf teilen sich eine Zeile, der Knopf ist
    quadratisch und so hoch wie das Feld. */
 .tuck-ablage{
-  display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:10px;align-items:stretch;
-  margin:0 2px 46px;
+  display:grid;grid-template-columns:minmax(0,1fr) 62px;gap:10px;align-items:stretch;
+  margin:0 2px 56px;
 }
 .tuck-ablage-feld{
   display:grid;grid-template-columns:20px minmax(0,1fr) 22px;gap:10px;align-items:center;
-  min-height:62px;padding:0 14px;
+  min-height:68px;padding:0 16px;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
 }
@@ -2639,7 +2639,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 /* Das Plus ist ein SVG, kein Textzeichen: Als Schrift sitzt "+" auf der
    Grundlinie und damit sichtbar unter der Mitte des Knopfes. */
 .tuck-ablage-knopf{
-  display:grid;place-items:center;width:56px;padding:0;
+  display:grid;place-items:center;width:62px;padding:0;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--akzent);color:var(--akzent-ink);box-shadow:var(--hart-klein);
 }

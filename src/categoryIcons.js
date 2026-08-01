@@ -27,6 +27,14 @@ const defaultColors = {
   recipes: '#83CFE0', habits: '#B7C98B',
 };
 const colorGroups = [
+  ['Knallig-Retro', [
+    ['Himmelblau', '#B1E7FF'], ['Cyan', '#72E2FF'],
+    ['Eisblau', '#B1F1FF'], ['Hellblau', '#58DCFF'], ['Blau', '#15CCFF'],
+    ['Pink', '#F54588'], ['Hot Pink', '#FF69AE'], ['Rose', '#F64974'],
+    ['Orange', '#FF7B42'], ['Chartreuse', '#CEFC17'], ['Acid', '#F3FF00'],
+    ['Navy', '#001454'], ['Nachtblau', '#1A1A2E'], ['Braun', '#492425'],
+    ['Off-White', '#F4F3EF'], ['Creme', '#F2EBE0'],
+  ]],
   ['Pastell-Retro', [
     ['Bubblegum', '#E99ABF'], ['Koralle', '#F3A09A'], ['Tomatenrot', '#D9796F'],
     ['Burnt Orange', '#D99067'], ['Senf', '#D6B45F'], ['Buttergelb', '#F1D889'],
@@ -36,18 +44,6 @@ const colorGroups = [
     ['Periwinkle', '#9FAFE0'], ['Lavendel', '#C0A9D8'], ['Violett', '#9B83BD'],
     ['Pflaume', '#9C708E'], ['Navy', '#647C96'], ['Schokobraun', '#A9826C'],
     ['Creme', '#F2EBE0'],
-  ]],
-  ['Retro Muscle Original', [
-    ['RM Himmelblau', '#B1E7FF'], ['RM Pink', '#FF69AE'],
-    ['RM Navy', '#001454'], ['RM Nachtblau', '#1A1A2E'],
-    ['RM Off-White', '#F4F3EF'], ['RM Acid', '#F3FF00'],
-  ]],
-  ['Feastables Original', [
-    ['Feastables Cyan', '#72E2FF'], ['Feastables Eisblau', '#B1F1FF'],
-    ['Feastables Hellblau', '#58DCFF'], ['Feastables Blau', '#15CCFF'],
-    ['Feastables Pink', '#F54588'], ['Feastables Rose', '#F64974'],
-    ['Feastables Orange', '#FF7B42'], ['Feastables Chartreuse', '#CEFC17'],
-    ['Feastables Braun', '#492425'], ['Feastables Creme', '#F2EBE0'],
   ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
