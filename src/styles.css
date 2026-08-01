@@ -2758,6 +2758,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus{background:var(--ordner)}
 .hat-kategoriefarbe .kategorie-kopfknopf .material-svg svg{fill:var(--ordner)}
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus .material-svg svg{fill:#000}
+.hat-kategoriefarbe .kategorie-kopfknopf[href="#home"] .material-svg svg,
+.hat-kategoriefarbe .kategorie-kopfknopf[data-category-settings] .material-svg svg{fill:#000}
 .hat-kategoriefarbe .app-icon{color:var(--ordner)}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 

@@ -17,20 +17,24 @@ const defaults = {
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const defaultColors = {
-  body: '#72E2FF', reminders: '#F54588', 'food-log': '#7651A8',
-  recipes: '#15CCFF', habits: '#CEFC17',
+  body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
+  recipes: '#83CFE0', habits: '#B7C98B',
 };
 const retroColors = [
-  ['Bubblegum', '#F54588'], ['Koralle', '#FF6B6B'], ['Burnt Orange', '#E76F51'],
-  ['Senf', '#D9A21B'], ['Buttergelb', '#F4D35E'], ['Avocado', '#8FAF54'],
-  ['Mint', '#63C7B2'], ['Petrol', '#2A9D8F'], ['Aqua', '#15CCFF'],
-  ['Puderblau', '#72E2FF'], ['Periwinkle', '#729EFE'], ['Lavendel', '#B79CED'],
-  ['Violett', '#7651A8'], ['Pflaume', '#63345E'], ['Navy', '#264653'],
-  ['Schokobraun', '#8B5E3C'], ['Creme', '#F2EBE0'], ['Tomatenrot', '#D94A3A'],
+  ['Bubblegum', '#E99ABF'], ['Koralle', '#F3A09A'], ['Tomatenrot', '#D9796F'],
+  ['Burnt Orange', '#D99067'], ['Senf', '#D6B45F'], ['Buttergelb', '#F1D889'],
+  ['Avocado', '#A7B879'], ['Pistazie', '#B7C98B'], ['Salbei', '#A8BFA0'],
+  ['Moos', '#91A77A'], ['Mint', '#9FD5C0'], ['Seafoam', '#8FCBB9'],
+  ['Pastell-Petrol', '#76B7B2'], ['Aqua', '#83CFE0'], ['Puderblau', '#A9DCE8'],
+  ['Periwinkle', '#9FAFE0'], ['Lavendel', '#C0A9D8'], ['Violett', '#9B83BD'],
+  ['Pflaume', '#9C708E'], ['Navy', '#647C96'], ['Schokobraun', '#A9826C'],
+  ['Creme', '#F2EBE0'],
 ];
 
 export function categoryColor(route) {
-  return localStorage.getItem(colorKey(route)) || defaultColors[route] || '#72E2FF';
+  const saved = localStorage.getItem(colorKey(route));
+  const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
+  return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
 }
 
 function materialIcon(id, className = '') {
@@ -101,7 +105,7 @@ function settingsSheet(route, onChange) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <div class="sheet-menue">
       <button data-action="icon">${materialIcon('edit', 'sheet-list-icon')}<span>Kategorie-Icon ändern</span></button>
-      <button data-action="color">${materialIcon('brightness_empty', 'sheet-list-icon')}<span>Retrofarbe ändern</span></button>
+      <button data-action="color">${materialIcon('brightness_empty', 'sheet-list-icon')}<span>Farbe ändern</span></button>
       <button data-action="select">${materialIcon('bucket_check', 'sheet-list-icon')}<span>Auswahl</span></button>
       <button data-action="sub">${materialIcon('add', 'sheet-list-icon')}<span>Unter-Sammlung erstellen</span></button>
     </div>`);
@@ -143,7 +147,7 @@ export function mountCategoryChrome(container, route, title) {
     <a class="kategorie-kopfknopf" href="#home" aria-label="Zurück zur Übersicht">${materialIcon('arrow_back_ios')}</a>
     <div class="kategorie-kopftitel"><strong>${title}</strong></div>
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${title} hinzufügen">${materialIcon('add')}</button>
-    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${title}">${materialIcon('settings')}</button>`;
+    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${title}">${materialIcon('build')}</button>`;
   wrap.prepend(bar);
   bar.querySelector('.kategorie-plus').onclick = () => plusAction(container, route);
   bar.querySelector('[data-category-settings]').onclick = () => settingsSheet(route, () => window.dispatchEvent(new HashChangeEvent('hashchange')));
