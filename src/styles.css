@@ -2679,6 +2679,23 @@ button,a,[role="button"],summary{touch-action:manipulation}
   border:2px solid var(--ink);border-right:0;border-radius:12px 0 0 12px;
   background:var(--bg);
 }
+.tuck-karte.dex-test-karte{
+  display:grid;grid-template-columns:46px minmax(0,1fr);align-content:center;align-items:center;
+  gap:11px;min-height:126px;padding:21px 13px 13px;
+}
+.tuck-karte.dex-test-karte::before,.tuck-karte.dex-test-karte::after{content:none}
+.dex-test-streifen{
+  position:absolute;left:12px;top:0;width:42%;height:7px;border-radius:0 0 4px 4px;
+  background:var(--ordner);
+}
+.dex-test-text{display:flex;min-width:0;flex-direction:column;gap:7px}
+.dex-test-text h2{
+  margin:0;color:var(--text);font-size:15px;line-height:1.05;text-transform:uppercase;
+  letter-spacing:-.01em;overflow-wrap:anywhere;
+}
+.dex-test-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 5px;min-width:0;line-height:1.1}
+.dex-test-meta b{color:var(--text);font-size:14px;font-weight:800}
+.dex-test-meta span{color:var(--muted);font-size:10px;font-weight:600}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}

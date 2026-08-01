@@ -295,7 +295,7 @@ function zaehlerText(route, anzahl) {
 function zaehlerEintragen(container, zaehler) {
   container.querySelectorAll('[data-sammlung]').forEach((karte) => {
     const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
-    const meta = karte.querySelector('.dex-statuszeile');
+    const meta = karte.querySelector('.dex-statuszeile, .dex-test-meta');
     if (text && meta) meta.innerHTML = text;
   });
 }
@@ -346,6 +346,19 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     const iconFeld = iconInhalt
       ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
       : '';
+    if (route === 'body') {
+      return `
+      <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
+        <a class="tuck-karte dex-test-karte" href="#${route}" data-sammlung="${route}">
+          <span class="dex-test-streifen" aria-hidden="true"></span>
+          ${iconFeld}
+          <span class="dex-test-text">
+            <h2>${titel}</h2>
+            <span class="dex-test-meta">${meta}</span>
+          </span>
+        </a>
+      </div>`;
+    }
     return `
     <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
       <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
