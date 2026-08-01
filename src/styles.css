@@ -2723,7 +2723,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .tuck-icon .muscledex-sammlungsicon,
 .tuck-icon .muscledex-sammlungsicon svg{
-  display:block;width:46px;height:46px;
+  display:block;width:38px;height:38px;
 }
 .tuck-fach .muscledex-sammlungsicon [data-part="face"],
 .tuck-fach .muscledex-sammlungsicon [data-part="clapper"]{
@@ -2731,7 +2731,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .tuck-fach .muscledex-sammlungsicon svg,
 .tuck-fach .muscledex-sammlungsicon svg path{
-  fill:var(--ordner);
+  fill:#000;
 }
 
 /* ---------- Gemeinsamer Kopf und Sammlungsmenü ---------- */
