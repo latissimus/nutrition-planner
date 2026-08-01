@@ -21,7 +21,7 @@ import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import erinnerungenIconSvg from '../MUSCLEDEX-ICONS/01_Glocke_Slab.svg?raw';
+import { categoryIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 
 applyTheme(getTheme());
 applySchatten(getSchatten());
@@ -312,10 +312,8 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
       || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
     // Reiter und Karte sind Geschwister, nicht Kind und Elternteil: Nur so
     // deckt die Karte den Reiter zuverlaessig ab (siehe Kommentar im CSS).
-    const iconInhalt = route === 'reminders'
-      ? `<span class="muscledex-sammlungsicon">${erinnerungenIconSvg}</span>`
-      : iconMarkup(icon);
-    const iconKlasse = route === 'reminders' ? 'tuck-icon muscledex-iconfeld' : 'tuck-icon';
+    const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
+    const iconKlasse = 'tuck-icon muscledex-iconfeld';
     return `
     <div class="tuck-fach ${farbe}">
       <span class="tuck-reiter" aria-hidden="true"></span>
@@ -511,14 +509,18 @@ async function render() {
       profile,
       onProfileUpdated: (aktuell) => { profile = aktuell; },
     });
+    mountCategoryChrome(view, route, 'Körperwerte');
   } else if (route === 'reminders') {
     setSeite('reminders');
     mountReminders(view, { session, profile });
+    mountCategoryChrome(view, route, 'Erinnerungen');
   } else if (route === 'food-log') {
     setSeite('food-log');
     mountFoodLog(view, { session, profile });
+    mountCategoryChrome(view, route, 'Food-Log');
   } else if (route === 'recipes' || route === 'habits') {
     mountComingSoon(view, route);
+    mountCategoryChrome(view, route, route === 'recipes' ? 'Rezepte' : 'Gewohnheiten');
   } else {
     mountHome(view);
   }

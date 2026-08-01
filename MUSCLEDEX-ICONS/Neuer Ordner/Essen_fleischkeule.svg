@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fleischkeule">
+  <title>Fleischkeule</title>
+  <g data-part="shadow" transform="translate(4 5)" fill="#000" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 38c-8-7-7-19 1-27s20-9 27-1c6 7 3 17-4 24-7 8-17 10-24 4Zm25-3 5 5 4-2 5 5-5 5-5-5-4 2-5-5Z"/></g>
+  <g data-part="face" fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 38c-8-7-7-19 1-27s20-9 27-1c6 7 3 17-4 24-7 8-17 10-24 4Zm25-3 5 5 4-2 5 5-5 5-5-5-4 2-5-5Z"/></g>
+</svg>

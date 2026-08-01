@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 29 29" role="img" aria-label="Tag">
-  <title>Tag</title>
-  <g data-part="shadow" transform="translate(1.1 1.25)" fill="#000000" stroke="#000000" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9Z" fill="#000000"/><circle cx="8" cy="8" r="1.5"/>
-  </g>
-  <g data-part="face" fill="#FFFFFF" stroke="#000000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9Z" fill="#FFFFFF"/><circle cx="8" cy="8" r="1.5"/>
-  </g>
-</svg>

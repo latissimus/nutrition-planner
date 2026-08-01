@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bizeps">
+  <title>Bizeps</title>
+  <g data-part="shadow" transform="translate(4 5)" fill="#000" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 27c3-7 8-10 13-8l3-8 7 3-2 8c7 1 13 6 15 14-6 8-15 12-25 10-8-2-13-8-11-19Z"/><circle cx="28" cy="14" r="5"/></g>
+  <g data-part="face" fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 27c3-7 8-10 13-8l3-8 7 3-2 8c7 1 13 6 15 14-6 8-15 12-25 10-8-2-13-8-11-19Z"/><circle cx="28" cy="14" r="5"/></g>
+</svg>

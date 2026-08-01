@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 29 29" role="img" aria-label="Einkauf">
+  <title>Einkauf</title>
+  <g data-part="shadow" transform="translate(1.1 1.25)" fill="#000000" stroke="#000000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 9h16l-1.5 11h-13L4 9ZM8 9l4-6 4 6M8.5 13v3M12 13v3M15.5 13v3" fill="#000000"/>
+  </g>
+  <g data-part="face" fill="#FFFFFF" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 9h16l-1.5 11h-13L4 9ZM8 9l4-6 4 6M8.5 13v3M12 13v3M15.5 13v3" fill="#FFFFFF"/>
+  </g>
+</svg>
