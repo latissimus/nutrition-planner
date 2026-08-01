@@ -202,12 +202,7 @@ html{background:var(--bg)}
    Seiteninhalt #view scrollt waehrend eines Overlays.
    Dadurch bleibt der transparente Statusbereich auf derselben dunklen Flaeche,
    auch wenn das Tutorial automatisch zur naechsten Uebung faehrt. */
-html.overlay-scroll-gesperrt{height:100%;overflow:hidden}
-html.overlay-scroll-gesperrt body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}
-html.overlay-scroll-gesperrt #app{display:flex;flex-direction:column;height:100%;overflow:hidden}
-html.overlay-scroll-gesperrt #view{flex:1 1 auto;min-height:0;overflow-y:auto;
-  padding-top:var(--tutorial-kartenraum,0px);
-  overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+html.overlay-scroll-gesperrt .app-shell #view{overflow:hidden}
 body{
   background:var(--bg);color:var(--text);font-family:var(--mono);
   font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
@@ -225,7 +220,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 .daten-laden{padding:18px 4px;color:var(--muted);font-size:14px;font-weight:700}
 
 /* ---------- Top bar / nav ---------- */
-.topbar{position:sticky;top:0;z-index:20;isolation:isolate;background:var(--bg);
+.topbar{position:relative;z-index:20;isolation:isolate;background:var(--bg);
   border-bottom:var(--bw) solid var(--ink);padding:calc(env(safe-area-inset-top) + 10px) 0 10px}
 /* Beim iOS-Gummiband wandert der Sticky-Header kurz nach unten, waehrend
    fixed Elemente am Viewport bleiben. Diese unsichtbare Fortsetzung deckt
@@ -3004,3 +2999,32 @@ button,a,[role="button"],summary{touch-action:manipulation}
   .tuck-grid{grid-template-columns:1fr}
   .tuck-reiter{width:42%}
 }
+
+/* ============================================================
+   KONSEQUENTE APP-SHELL
+
+   Der Browser-Viewport und der Markenkopf scrollen nie. Ausschliesslich
+   #view ist die Scrollflaeche der angemeldeten App. Diese Regeln stehen am
+   Ende, damit keine historische min-height-/sticky-Regel das Modell wieder
+   in Dokument-Scrollen zurueckkippt.
+   ============================================================ */
+html,body{width:100%;height:100%;overflow:hidden}
+body{overscroll-behavior:none}
+#app{
+  width:100%;height:100%;min-height:0;overflow-y:auto;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+}
+#app.app-shell{
+  display:grid;grid-template-rows:auto minmax(0,1fr);
+  width:100%;height:100dvh;min-height:0;overflow:hidden;
+}
+.app-shell>.app-kopf{
+  position:relative;inset:auto;align-self:stretch;flex:none;
+}
+.app-shell>#view{
+  width:100%;height:auto;min-height:0!important;overflow-x:hidden;overflow-y:auto;
+  overscroll-behavior-x:none;overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;scroll-behavior:auto;
+  background-attachment:scroll!important;
+}
+html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}

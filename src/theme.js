@@ -83,17 +83,13 @@ export function setStatusleistenOverlay(quelle, offen, { vollflaechig = false } 
   }
 
   if (!warOffen && istOffen) {
-    overlayScrollY = window.scrollY;
-    root.classList.add('overlay-scroll-gesperrt');
     const scroller = document.querySelector('#view');
-    if (scroller) scroller.scrollTop = overlayScrollY;
-    window.scrollTo(0, 0);
+    overlayScrollY = scroller?.scrollTop || 0;
+    root.classList.add('overlay-scroll-gesperrt');
   } else if (warOffen && !istOffen) {
     const scroller = document.querySelector('#view');
-    overlayScrollY = scroller?.scrollTop || overlayScrollY;
     root.classList.remove('overlay-scroll-gesperrt');
-    if (scroller) scroller.scrollTop = 0;
-    window.scrollTo(0, overlayScrollY);
+    if (scroller) scroller.scrollTop = overlayScrollY;
   }
 }
 

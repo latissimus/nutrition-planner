@@ -78,6 +78,7 @@ function meldung(slot, text, art) {
 }
 
 function renderSetup() {
+  app.classList.remove('app-shell');
   setSeite('setup');
   app.innerHTML = `
     <main class="setup-shell wrap">
@@ -108,6 +109,7 @@ function renderSetup() {
 }
 
 function renderAuth() {
+  app.classList.remove('app-shell');
   setSeite('auth');
   const login = authMode === 'login';
   app.innerHTML = `
@@ -183,6 +185,7 @@ function renderAuth() {
 }
 
 function renderRecovery() {
+  app.classList.remove('app-shell');
   setSeite('auth');
   app.innerHTML = `
     <main class="auth-shell">
@@ -292,6 +295,7 @@ function zaehlerEintragen(container, zaehler) {
 }
 
 function renderChrome(route) {
+  app.classList.add('app-shell');
   let header = app.querySelector(':scope > .app-kopf');
   let view = app.querySelector(':scope > #view');
   if (!header || !view) {
@@ -317,6 +321,10 @@ function renderChrome(route) {
   view.replaceChildren();
   view.className = '';
   view.removeAttribute('style');
+  // Jede Route beginnt in ihrem eigenen, einzigen Scrollcontainer oben. Das
+  // Dokument selbst bewegt sich nie; dadurch muss iOS keinen Sticky-Header
+  // gegen eine alte Dokument-Scrollposition neu zusammensetzen.
+  view.scrollTop = 0;
   syncStatusAktualisieren();
   return view;
 }
