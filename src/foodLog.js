@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
+import { materialIconMarkup } from './categoryIcons.js';
 
 const BUCKET = 'food-log';
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -146,7 +147,12 @@ export async function mountFoodLog(container, { session, signal, collectionId = 
     count.textContent = `${entries.length} ${entries.length === 1 ? 'Mahlzeit' : 'Mahlzeiten'}`;
     list.innerHTML = entries.length
       ? entries.map(entryMarkup).join('')
-      : '<div class="card food-empty"><b>Noch keine Mahlzeit gespeichert.</b><span>Deine Galerie beginnt mit dem ersten guten Essen.</span></div>';
+      : `<div class="sammlung-leer food-empty">
+          <div class="dex-leer-scanner">${materialIconMarkup('fork_spoon')}<i></i></div>
+          <small>DEX // EMPTY SLOT</small>
+          <strong>Noch kein Datensatz</strong>
+          <span>Dieser Food-Dex wartet auf seine erste Mahlzeit.</span>
+        </div>`;
   };
 
   const refresh = async () => {

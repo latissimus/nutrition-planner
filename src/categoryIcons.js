@@ -248,9 +248,11 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   bar.setAttribute('aria-label', `${title} bedienen`);
   const safeTitle = escapeHtml(title);
   const safeMeta = escapeHtml(options.meta || '');
+  const defaultCodes = { body: 'DEX-01', reminders: 'DEX-02', 'food-log': 'DEX-03', recipes: 'DEX-04', habits: 'DEX-05' };
+  const safeCode = escapeHtml(options.code || defaultCodes[route] || 'DEX-ID');
   bar.innerHTML = `
     <a class="kategorie-kopfknopf" href="${options.backHref || '#home'}" aria-label="Zurück">${materialIcon('arrow_back_ios')}</a>
-    <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
+    <div class="kategorie-kopftitel"><span>${safeCode} · ARCHIV</span><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${safeTitle} hinzufügen">${materialIcon('add')}</button>
     <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('more_horiz')}</button>`;
   wrap.prepend(bar);

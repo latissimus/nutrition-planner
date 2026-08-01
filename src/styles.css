@@ -2692,9 +2692,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
    darf jetzt grosszuegig sein: Die Karte deckt zuverlaessig ab. */
 .tuck-reiter{
   position:absolute;left:8px;top:-18px;z-index:0;width:49%;height:30px;
-  border:var(--karten-bw) solid var(--ink);border-bottom:0;border-radius:10px 10px 0 0;
-  background:var(--ordner);
+  border:0;border-radius:0;background:var(--ink);
+  clip-path:polygon(0 100%,0 32%,8px 0,72% 0,100% 42%,100% 100%);
 }
+.tuck-reiter::after,.unter-sammlung-reiter::after{content:"";position:absolute;inset:var(--karten-bw) var(--karten-bw) 0;
+  background:var(--ordner);clip-path:inherit}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
@@ -2737,7 +2739,9 @@ button,a,[role="button"],summary{touch-action:manipulation}
   display:grid;grid-template-columns:52px minmax(0,1fr) 52px 52px;
   align-items:center;gap:9px;margin:18px 0 24px;
 }
-.kategorie-kopftitel{min-width:0;text-align:center}
+.kategorie-kopftitel{min-width:0;text-align:left;padding-left:3px}
+.kategorie-kopftitel>span{display:block;margin-bottom:4px;color:var(--ordner,var(--muted));
+  font:800 9px/1 var(--ui);letter-spacing:.12em;text-transform:uppercase}
 .kategorie-kopftitel strong{
   display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-size:clamp(17px,4.8vw,21px);font-weight:800;line-height:1;
@@ -3035,7 +3039,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .unter-sammlungen-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
 .unter-sammlung{position:relative;display:block;min-width:0;padding-top:13px;color:var(--text);text-decoration:none}
 .unter-sammlung-reiter{position:absolute;z-index:0;left:10px;top:0;width:68%;height:31px;
-  border:var(--karten-bw) solid var(--ink);border-bottom:0;border-radius:17px 17px 0 0;background:var(--ordner)}
+  border:0;border-radius:0;background:var(--ink);
+  clip-path:polygon(0 100%,0 30%,8px 0,72% 0,100% 44%,100% 100%)}
 .unter-sammlung-kartenflaeche{position:relative;z-index:1;display:flex;flex-direction:column;min-height:130px;
   padding:12px;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
   background:var(--surface);box-shadow:var(--hart-klein)}
@@ -3044,13 +3049,37 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .unter-sammlung-icon .material-svg,.unter-sammlung-icon svg{width:27px;height:27px;fill:#000}
 .unter-sammlung strong{font-size:16px;line-height:1.05;text-transform:uppercase;overflow-wrap:anywhere}
 .unter-sammlung small{margin-top:5px;color:var(--muted);font-size:12px;font-weight:600}
+.unter-sammlung em{position:absolute;right:10px;bottom:9px;color:var(--muted);
+  font-size:8px;font-style:normal;font-weight:800;letter-spacing:.08em}
 .sammlung-alle{margin:28px 2px 0}
 .sammlung-leer{display:flex;min-height:300px;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;text-align:center;color:var(--muted)}
-.sammlung-leer .material-svg,.sammlung-leer svg{width:76px;height:76px;fill:currentColor;opacity:.42}
+.dex-leer-scanner{position:relative;display:grid;place-items:center;width:112px;height:112px;margin-bottom:4px;
+  border:1.5px solid var(--muted);border-radius:50%}
+.dex-leer-scanner::before,.dex-leer-scanner::after{content:"";position:absolute;background:var(--muted);opacity:.45}
+.dex-leer-scanner::before{left:-9px;right:-9px;top:50%;height:1px}
+.dex-leer-scanner::after{top:-9px;bottom:-9px;left:50%;width:1px}
+.dex-leer-scanner i{position:absolute;inset:7px;border:2px solid var(--ordner,var(--fe-pink));
+  border-radius:50%;border-left-color:transparent;animation:dexScanner 2.8s linear infinite}
+.sammlung-leer .material-svg,.sammlung-leer svg{width:55px;height:55px;fill:currentColor;opacity:.58}
+.sammlung-leer>small{font-size:9px;font-weight:800;letter-spacing:.15em;color:var(--ordner,var(--muted))}
 .sammlung-leer strong{color:var(--text);font-size:21px}
 .sammlung-leer span{max-width:280px;font-size:14px}
 .eigene-sammlung .tuck-icon .material-svg,.eigene-sammlung .tuck-icon svg{width:30px;height:30px;fill:#000}
+.dex-index{position:absolute;right:11px;bottom:10px;color:var(--muted);
+  font-size:8px;font-weight:800;line-height:1;letter-spacing:.09em}
+.tuck-karte h2{padding-right:43px}
+
+@keyframes dexScanner{to{transform:rotate(360deg)}}
+@keyframes dexDatensatzEin{
+  from{opacity:.35;clip-path:inset(0 0 12% 0)}
+  to{opacity:1;clip-path:inset(0)}
+}
+.app-shell>#view>.wrap{animation:dexDatensatzEin .22s steps(3,end) both}
+@media(prefers-reduced-motion:reduce){
+  .app-shell>#view>.wrap{animation:none}
+  .dex-leer-scanner i{animation:none}
+}
 
 .sammlung-editor{max-height:min(91dvh,850px);padding-inline:22px}
 .sammlung-editor form>h3,.dex-appearance-form>h3{

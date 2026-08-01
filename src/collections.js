@@ -43,13 +43,14 @@ export function collectionIconMarkup(value) {
   return materialIconMarkup(value || 'create_new_folder');
 }
 
-export function collectionCardMarkup(item, count = 0) {
+export function collectionCardMarkup(item, count = 0, index = 0) {
   return `<a class="unter-sammlung" href="#collection/${item.id}" style="--ordner:${item.color}">
     <span class="unter-sammlung-reiter" aria-hidden="true"></span>
     <span class="unter-sammlung-kartenflaeche">
       <span class="unter-sammlung-icon">${collectionIconMarkup(item.icon_key)}</span>
       <strong>${escapeHtml(item.name)}</strong>
       <small>${count} ${count === 1 ? 'Eintrag' : 'Einträge'}</small>
+      <em>SUB-${String(index + 1).padStart(2, '0')}</em>
     </span>
   </a>`;
 }
@@ -58,7 +59,7 @@ export function collectionGridMarkup(items) {
   if (!items.length) return '';
   return `<section class="unter-sammlungen-block">
     <h2>Unter-Dex (${items.length})</h2>
-    <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item)).join('')}</div>
+    <div class="unter-sammlungen-grid">${items.map((item, index) => collectionCardMarkup(item, 0, index)).join('')}</div>
   </section>`;
 }
 
