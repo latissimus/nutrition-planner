@@ -1,13 +1,10 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, materialIconMarkup,
+  availableCategoryIcons, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
-export const COLLECTION_COLORS = [
-  '#F3C84B', '#F54588', '#9D78E8', '#5C8ED8', '#64C5AE', '#72B957', '#B9DC59', '#FF7B42',
-  '#F1DCAA', '#C9C9C9', '#8CA1BD', '#BE80B9', '#B58A62', '#492426', '#E97777', '#6C5CF2',
-];
+export const COLLECTION_COLORS = dexEditorColors;
 
 export const COLLECTION_ICONS = availableCategoryIcons.map((icon) => icon.id);
 

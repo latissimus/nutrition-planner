@@ -48,6 +48,10 @@ const colorGroups = [
   ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
+export const dexEditorColors = [
+  '#F3C84B', '#F54588', '#9D78E8', '#5C8ED8', '#64C5AE', '#72B957', '#B9DC59', '#FF7B42',
+  '#F1DCAA', '#C9C9C9', '#8CA1BD', '#BE80B9', '#B58A62', '#492426', '#E97777', '#6C5CF2',
+];
 
 export function categoryColor(route) {
   const saved = localStorage.getItem(colorKey(route));
@@ -137,21 +141,18 @@ function appearancePicker(route, onChange) {
   let selectedColor = categoryColor(route).toUpperCase();
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Icon & Farbe ändern</h2><button data-sheet-close aria-label="Schließen">×</button></header>
-    <h3 class="icon-picker-titel">Icon</h3>
-    <div class="icon-auswahl">
-      ${icons.map((icon) => `<button class="icon-option${icon.id === selectedIcon ? ' aktiv' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
-    </div>
-    <div class="emoji-eigen">
-      <label for="eigenes-emoji-appearance">Eigenes Emoji</label>
-      <div><input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}" aria-label="Eigenes Emoji"></div>
-    </div>
-    ${colorGroups.map(([group, colors]) => `
-      <h3 class="icon-picker-titel farbgruppe-titel">${group}</h3>
-      <div class="farb-auswahl">
-        ${colors.map(([name, color]) => `<button class="farb-option${color === selectedColor ? ' aktiv' : ''}" data-color="${color}" style="--farbe:${color}" aria-label="${name}"><i></i><span>${name}</span></button>`).join('')}
-      </div>`).join('')}
-    <button class="btn btn-primary btn-block appearance-save" type="button">Änderungen speichern</button>`);
+    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <div class="dex-appearance-form">
+      <h3>Farbe</h3>
+      <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
+      <h3>Icon</h3>
+      <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>
+      <label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
+        <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
+      </label>
+      <button class="btn btn-primary btn-block sammlung-editor-speichern appearance-save" type="button">Änderungen speichern</button>
+    </div>`);
+  backdrop.querySelector('.kategorie-sheet').classList.add('sammlung-editor');
   const emojiInput = backdrop.querySelector('#eigenes-emoji-appearance');
   backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
     const iconButton = event.target.closest('[data-icon-id]');
