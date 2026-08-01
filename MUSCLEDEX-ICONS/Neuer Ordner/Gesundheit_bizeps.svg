@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bizeps">
   <title>Bizeps</title>
-  <g data-part="shadow" transform="translate(4 5)" fill="#000" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 27c3-7 8-10 13-8l3-8 7 3-2 8c7 1 13 6 15 14-6 8-15 12-25 10-8-2-13-8-11-19Z"/><circle cx="28" cy="14" r="5"/></g>
-  <g data-part="face" fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 27c3-7 8-10 13-8l3-8 7 3-2 8c7 1 13 6 15 14-6 8-15 12-25 10-8-2-13-8-11-19Z"/><circle cx="28" cy="14" r="5"/></g>
+  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16c0-6 5-10 11-10h10c5 0 9 4 9 9v10l-7 8 5 5c5-8 16-11 23-4 6 8 0 18-9 23-12 6-29 3-37-7-6-8-5-18 1-25l5-5-5-5Z"/></g>
+  <g data-part="outline" fill="#000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16c0-6 5-10 11-10h10c5 0 9 4 9 9v10l-7 8 5 5c5-8 16-11 23-4 6 8 0 18-9 23-12 6-29 3-37-7-6-8-5-18 1-25l5-5-5-5Z"/></g>
+  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16c0-6 5-10 11-10h10c5 0 9 4 9 9v10l-7 8 5 5c5-8 16-11 23-4 6 8 0 18-9 23-12 6-29 3-37-7-6-8-5-18 1-25l5-5-5-5Z"/></g>
+  <g data-part="details" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M30 47c7-8 16-9 24-5"/></g>
 </svg>

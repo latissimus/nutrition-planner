@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Schraubenschlüssel">
   <title>Schraubenschlüssel</title>
-  <g data-part="shadow" transform="translate(4 5)" fill="#000" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M38 5c-9-3-18 5-15 14L6 36c-5 5-5 12 0 17s12 5 17 0l17-17c9 3 17-6 14-15l-9 9-8-3-3-8Z"/><circle cx="15" cy="44" r="4" fill="#000"/></g>
-  <g data-part="face" fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M38 5c-9-3-18 5-15 14L6 36c-5 5-5 12 0 17s12 5 17 0l17-17c9 3 17-6 14-15l-9 9-8-3-3-8Z"/><circle cx="15" cy="44" r="4" fill="#fff"/></g>
+  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M42 7c-11-3-21 7-16 18L9 42c-6 6-4 14 2 17 5 3 10 2 14-2l17-17c11 4 20-6 16-17l-10 10-9-3-3-9 10-10Z"/></g>
+  <g data-part="outline" fill="#000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M42 7c-11-3-21 7-16 18L9 42c-6 6-4 14 2 17 5 3 10 2 14-2l17-17c11 4 20-6 16-17l-10 10-9-3-3-9 10-10Z"/></g>
+  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M42 7c-11-3-21 7-16 18L9 42c-6 6-4 14 2 17 5 3 10 2 14-2l17-17c11 4 20-6 16-17l-10 10-9-3-3-9 10-10Z"/></g>
+  <g data-part="details" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="49" r="5"/></g>
 </svg>

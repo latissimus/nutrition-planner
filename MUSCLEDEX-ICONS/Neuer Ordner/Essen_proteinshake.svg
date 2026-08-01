@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Proteinshake">
-  <title>Proteinshake</title>
-  <g data-part="shadow" transform="translate(4 5)" fill="#000" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7h20l3 9-4 34H19l-4-34Zm-2 9h25M21 7V2h14v5M22 27h12l-6 12Z" fill-rule="evenodd"/></g>
-  <g data-part="face" fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7h20l3 9-4 34H19l-4-34Zm-2 9h25M21 7V2h14v5M22 27h12l-6 12Z" fill-rule="evenodd"/></g>
-</svg>

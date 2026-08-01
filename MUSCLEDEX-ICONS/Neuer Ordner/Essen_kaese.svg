@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Käse">
   <title>Käse</title>
-  <g data-part="shadow" transform="translate(4 5)" fill="#000" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 23 31 7l18 15v27H7Zm0 0h42M18 32a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm20 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" fill-rule="evenodd"/></g>
-  <g data-part="face" fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 23 31 7l18 15v27H7Zm0 0h42M18 32a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm20 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" fill-rule="evenodd"/></g>
+  <g data-part="shadow" transform="translate(2.3 2.6)" fill="#000" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M7 27 37 8l20 17v31H7Z"/></g>
+  <g data-part="outline" fill="#000" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 27 37 8l20 17v31H7Z"/></g>
+  <g data-part="face" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 27 37 8l20 17v31H7Z"/></g>
+  <g data-part="details" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 28h48"/><circle cx="22" cy="39" r="5"/><circle cx="43" cy="47" r="6"/><circle cx="43" cy="22" r="3"/></g>
 </svg>
