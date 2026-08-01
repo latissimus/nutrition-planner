@@ -55,7 +55,7 @@ export const dexEditorColors = [
 
 export function categoryColor(route) {
   const saved = localStorage.getItem(colorKey(route));
-  const valid = saved && /^#[0-9A-F]{6}$/i.test(saved);
+  const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
 }
 
@@ -136,21 +136,17 @@ function iconPicker(route, onChange) {
   };
 }
 
-export function openDexAppearanceSheet({ selectedIcon: initialIcon, selectedColor: initialColor, onSave }) {
-  let selectedIcon = initialIcon || icons[0]?.id || '';
-  let selectedColor = (initialColor || dexEditorColors[0]).toUpperCase();
+function appearancePicker(route, onChange) {
+  let selectedIcon = localStorage.getItem(storageKey(route)) || defaults[route];
+  let selectedColor = categoryColor(route).toUpperCase();
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Icon &amp; Farbe</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="dex-appearance-form">
-      <h3>Retro-Farbe</h3>
-      <div class="dex-farbband">
-        ${retroColors.map(([name, color]) => `<button type="button" data-color="${color}" class="farb-option${color === selectedColor ? ' aktiv' : ''}" style="--farbe:${color}" aria-label="${name}"><i></i><span>${name}</span></button>`).join('')}
-        <label class="dex-eigene-farbe"><input type="color" value="${selectedColor}" data-native-color><i></i><span>Eigene Farbe</span></label>
-      </div>
+      <h3>Farbe</h3>
+      <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Icon</h3>
-      <label class="dex-icon-suche">${materialIcon('search')}<input type="search" data-icon-search placeholder="Icons durchsuchen …" autocomplete="off"></label>
-      <div class="dex-iconliste">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" data-icon-title="${escapeHtml(icon.title.toLocaleLowerCase('de'))}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}</div>
+      <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>
       <label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
         <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
       </label>
@@ -158,7 +154,6 @@ export function openDexAppearanceSheet({ selectedIcon: initialIcon, selectedColo
     </div>`);
   backdrop.querySelector('.kategorie-sheet').classList.add('sammlung-editor');
   const emojiInput = backdrop.querySelector('#eigenes-emoji-appearance');
-  const iconSearch = backdrop.querySelector('[data-icon-search]');
   backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
     const iconButton = event.target.closest('[data-icon-id]');
     if (iconButton) {
@@ -173,39 +168,16 @@ export function openDexAppearanceSheet({ selectedIcon: initialIcon, selectedColo
     }
     if (!event.target.closest('.appearance-save')) return;
     const emoji = emojiInput.value.trim();
-    const saveButton = event.target.closest('.appearance-save');
-    saveButton.disabled = true;
-    Promise.resolve(onSave?.({ iconKey: emoji ? `emoji:${emoji}` : selectedIcon, color: selectedColor }))
-      .then(() => { closeSheet(backdrop); toast('Icon und Farbe geändert.'); })
-      .catch((error) => { saveButton.disabled = false; toast(error?.message || 'Speichern fehlgeschlagen.'); });
-  };
-  backdrop.querySelector('[data-native-color]').oninput = (event) => {
-    selectedColor = event.target.value.toUpperCase();
-    backdrop.querySelectorAll('[data-color]').forEach((button) => button.classList.remove('aktiv'));
-  };
-  iconSearch.oninput = () => {
-    const query = iconSearch.value.trim().toLocaleLowerCase('de');
-    backdrop.querySelectorAll('[data-icon-id]').forEach((button) => {
-      button.hidden = Boolean(query) && !button.dataset.iconTitle.includes(query);
-    });
+    localStorage.setItem(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
+    localStorage.setItem(colorKey(route), selectedColor);
+    closeSheet(backdrop);
+    onChange?.();
+    toast('Icon und Farbe geändert.');
   };
   emojiInput.oninput = () => {
     if (!emojiInput.value.trim()) return;
     backdrop.querySelectorAll('[data-icon-id]').forEach((button) => button.classList.remove('aktiv'));
   };
-  return backdrop;
-}
-
-function appearancePicker(route, onChange) {
-  return openDexAppearanceSheet({
-    selectedIcon: localStorage.getItem(storageKey(route)) || defaults[route],
-    selectedColor: categoryColor(route),
-    onSave: ({ iconKey, color }) => {
-      localStorage.setItem(storageKey(route), iconKey);
-      localStorage.setItem(colorKey(route), color);
-      onChange?.();
-    },
-  });
 }
 
 function colorPicker(route, onChange) {
@@ -233,7 +205,7 @@ function settingsSheet(route, onChange, actions = {}) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="sheet-menue">
-      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe</span></button>
+      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe ändern</span></button>
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}

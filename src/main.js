@@ -24,8 +24,7 @@ import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 import {
-  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections,
-  openCollectionAppearanceEditor, openCollectionEditor,
+  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 
 applyTheme(getTheme());
@@ -351,11 +350,11 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
       <a class="tuck-karte dex-datensatz-karte" href="#${route}" data-sammlung="${route}">
         <span class="dex-datensatz-streifen" aria-hidden="true"></span>
-        ${iconFeld}
         <span class="dex-datensatz-text">
           <h2>${titel}</h2>
           <span class="dex-datensatz-meta">${meta}</span>
         </span>
+        ${iconFeld}
       </a>
     </div>`;
   }).join('');
@@ -366,11 +365,11 @@ function eigeneSammlungsKarten(items) {
     <div class="tuck-fach eigene-sammlung" style="--ordner:${item.color}">
       <a class="tuck-karte dex-datensatz-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
         <span class="dex-datensatz-streifen" aria-hidden="true"></span>
-        <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
         <span class="dex-datensatz-text">
           <h2>${escapeHtml(item.name)}</h2>
           <span class="dex-datensatz-meta"><b>Eigener</b><span>Dex</span></span>
         </span>
+        <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
       </a>
     </div>`).join('');
 }
@@ -472,7 +471,9 @@ async function mountCustomCollection(container, item, signal) {
     onRename: () => openCollectionEditor({
       userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
-    onEditAppearance: () => openCollectionAppearanceEditor({ userId: session.user.id, existing: item, onSaved: refresh }),
+    onEditAppearance: () => openCollectionEditor({
+      userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
+    }),
     onDelete: async () => {
       if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
       try {
