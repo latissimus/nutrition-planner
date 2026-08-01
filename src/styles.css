@@ -2597,7 +2597,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
    Plus, Neuer Ordner. Tuckii setzt genau eine Form fuer alle davon. */
 .tuck-quadrat{
   display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;
-  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--surface);color:var(--text);
   box-shadow:var(--hart-klein);text-decoration:none;
 }
@@ -2610,7 +2610,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 /* Das Profilbild ist derselbe Knopf, nur mit Bild statt Symbol. */
 .app-kopf .nav-av{
   width:44px;height:44px;border-radius:var(--r);overflow:hidden;
-  border:var(--bw) solid var(--ink);box-shadow:var(--hart-klein);
+  border:var(--karten-bw) solid var(--ink);box-shadow:var(--hart-klein);
 }
 .app-kopf .nav-av img{width:100%;height:100%;object-fit:cover}
 .app-kopf .nav-av span{font:800 15px/1 var(--ui);font-style:normal;letter-spacing:.01em}
@@ -2626,7 +2626,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-ablage-feld{
   display:grid;grid-template-columns:20px minmax(0,1fr) 22px;gap:10px;align-items:center;
   min-height:56px;padding:0 14px;
-  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
 }
 .tuck-ablage-feld>b{font-size:19px;font-weight:800;line-height:1}
@@ -2640,7 +2640,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
    Grundlinie und damit sichtbar unter der Mitte des Knopfes. */
 .tuck-ablage-knopf{
   display:grid;place-items:center;width:56px;padding:0;
-  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--akzent);color:var(--akzent-ink);box-shadow:var(--hart-klein);
 }
 .tuck-ablage-knopf .app-icon{width:26px;height:26px;stroke-width:2.6}
