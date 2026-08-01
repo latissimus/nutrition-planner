@@ -348,7 +348,7 @@ function mountHome(container) {
       <header class="tuck-titelzeile">
         <h1>Meine Sammlungen</h1>
         <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
-          ${materialIconMarkup('add')}
+          ${materialIconMarkup('create_new_folder')}
         </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Sammlungen">

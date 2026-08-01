@@ -148,8 +148,8 @@ function settingsSheet(route, onChange) {
     <div class="sheet-menue">
       <button data-action="icon">${materialIcon('edit', 'sheet-list-icon')}<span>Kategorie-Icon ändern</span></button>
       <button data-action="color">${materialIcon('brightness_empty', 'sheet-list-icon')}<span>Farbe ändern</span></button>
-      <button data-action="select">${materialIcon('bucket_check', 'sheet-list-icon')}<span>Auswahl</span></button>
-      <button data-action="sub">${materialIcon('add', 'sheet-list-icon')}<span>Unter-Sammlung erstellen</span></button>
+      <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
+      <button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Sammlung erstellen</span></button>
     </div>`);
   backdrop.querySelector('.sheet-menue').onclick = (event) => {
     const action = event.target.closest('[data-action]')?.dataset.action;
