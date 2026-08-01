@@ -750,6 +750,22 @@ body.einstieg-fokus #app::after{content:"";position:fixed;top:0;left:0;width:100
   background:transparent;
   touch-action:pan-y}
 .tutorial-dimmer[hidden]{display:none}
+/* Die installierte iOS-App behandelt die Statusleiste bei
+   black-translucent nicht wie einen normalen Teil des fixed Viewports:
+   theme-color und der Canvas-Hintergrund allein reichen deshalb nicht. Diese
+   feste, deckende Schutzflaeche liegt waehrend JEDES Overlays direkt unter
+   Uhrzeit und Akku. Sie scrollt nicht mit und liegt ueber Tutorialkarte (60)
+   und Uebungswaehler (80), endet aber exakt vor deren Inhalt. So kann weder
+   der hellblaue Header noch die weisse Tutorialkarte in die Safe Area rutschen. */
+html.statusleiste-overlay body::before{content:"";position:fixed;z-index:1010;
+  top:calc(0px - env(safe-area-inset-top));left:0;right:0;
+  height:calc(env(safe-area-inset-top) + env(safe-area-inset-top) + 3px);
+  background:var(--statusbar-bg,var(--bg));pointer-events:none}
+/* Bringt das Overlay seine eigene durchscheinende Flaeche mit, muss der
+   deckende Streifen weg: Er laege mit z-index 1010 ueber dem Backdrop (1000)
+   und schnitte die Abdunkelung genau an der Safe Area ab. Der Backdrop
+   erreicht diesen Bereich selbst, weil viewport-fit=cover gesetzt ist. */
+html.overlay-vollflaechig body::before{display:none}
 .tutorial-ebene{position:fixed;z-index:60;inset:0;pointer-events:none}
 .tutorial-ebene[hidden]{display:none}
 .log-tutorial{position:absolute;top:calc(env(safe-area-inset-top) + 3px);left:50%;

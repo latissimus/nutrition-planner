@@ -82,7 +82,9 @@ function sheet(markup) {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeSheet(backdrop);
   });
   document.body.append(backdrop);
-  setStatusleistenOverlay('kategorie-sheet', true);
+  // Der Backdrop deckt dank viewport-fit=cover den ganzen Viewport ab, auch
+  // die Safe Area. Vorgedunkelt werden darf deshalb nichts.
+  setStatusleistenOverlay('kategorie-sheet', true, { vollflaechig: true });
   requestAnimationFrame(() => backdrop.classList.add('offen'));
   return backdrop;
 }

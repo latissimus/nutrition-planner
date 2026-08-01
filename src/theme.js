@@ -2,6 +2,10 @@
 // waehrend derselbe Account am Rechner Retro nutzt.
 const KEY = 'nutrition:theme';
 const overlayQuellen = new Set();
+// Overlays, die ihre eigene vollflaechige Abdunkelung mitbringen (Sheets mit
+// Backdrop). Sie duerfen NICHT zusaetzlich vorgedunkelt werden – siehe
+// setStatusleistenOverlay.
+const overlayVollflaechig = new Set();
 let overlayScrollY = 0;
 
 // Zwei Darstellungen. "retro" traegt die Feastables-Palette und ist der
@@ -28,14 +32,55 @@ function metaFarbeSetzen(farbe) {
   alt.replaceWith(neu);
 }
 
-export function setStatusleistenOverlay(quelle, offen) {
+function abgedunkelt(farbe, anteil = 0.28) {
+  const hex = farbe.match(/^#([0-9a-f]{6})$/i)?.[1];
+  if (!hex) return farbe;
+  const faktor = 1 - anteil;
+  const kanal = (start) => Math.round(parseInt(hex.slice(start, start + 2), 16) * faktor);
+  return `#${[kanal(0), kanal(2), kanal(4)]
+    .map((wert) => wert.toString(16).padStart(2, '0')).join('')}`;
+}
+
+// vollflaechig: Das Overlay legt selbst eine durchscheinende Flaeche ueber den
+// ganzen Viewport. Weil "viewport-fit=cover" gesetzt ist, reicht ein
+// position:fixed mit inset:0 dabei bis unter Uhrzeit und Akku – die Flaeche
+// deckt die Safe Area also von sich aus ab.
+//
+// In dem Fall darf nichts vorgedunkelt werden. Sonst liegen zwei Schichten
+// uebereinander: --statusbar-bg dunkelt html/body/#app auf 72% ab, der Backdrop
+// legt nochmal 28% drauf, und die Kopfzeile landet bei 52%. Der deckende
+// Schutzstreifen ueber der Safe Area traegt aber nur die 72% – dadurch wirkt
+// genau der iOS-Bereich heller als alles darunter, statt mitgedunkelt zu sein.
+export function setStatusleistenOverlay(quelle, offen, { vollflaechig = false } = {}) {
   if (!quelle) return;
   const root = document.documentElement;
   const warOffen = overlayQuellen.size > 0;
-  if (offen) overlayQuellen.add(quelle);
-  else overlayQuellen.delete(quelle);
+  if (offen) {
+    overlayQuellen.add(quelle);
+    if (vollflaechig) overlayVollflaechig.add(quelle);
+  } else {
+    overlayQuellen.delete(quelle);
+    overlayVollflaechig.delete(quelle);
+  }
   const istOffen = overlayQuellen.size > 0;
+  // Nur wenn ALLE offenen Overlays ihre eigene Flaeche mitbringen, darf die
+  // Vordunkelung entfallen – sonst steht ein Overlay ohne Backdrop ungeschuetzt da.
+  const alleVollflaechig = istOffen && overlayVollflaechig.size === overlayQuellen.size;
   root.classList.toggle('statusleiste-overlay', istOffen);
+  root.classList.toggle('overlay-vollflaechig', alleVollflaechig);
+
+  // theme-color wird hier bewusst NICHT angefasst. Bei
+  // apple-mobile-web-app-status-bar-style=black-translucent liest iOS das
+  // Meta-Tag fuer die Symbolfarbe nicht – es schaut sich an, was die Seite in
+  // dem Bereich tatsaechlich zeichnet, und waehlt Schwarz oder Weiss danach.
+  // Ueber theme-color zu steuern hat deshalb nie gewirkt und nur verschleiert,
+  // dass die abdunkelnde Flaeche selbst bis dort oben reichen muss.
+  if (istOffen && !alleVollflaechig) {
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    root.style.setProperty('--statusbar-bg', abgedunkelt(bg));
+  } else {
+    root.style.removeProperty('--statusbar-bg');
+  }
 
   if (!warOffen && istOffen) {
     overlayScrollY = window.scrollY;
@@ -56,8 +101,10 @@ export function applyTheme(theme) {
   const wert = gueltig(theme);
   document.documentElement.dataset.theme = wert;
   requestAnimationFrame(() => {
+    // theme-color folgt nur noch dem Theme. Der Vorbehalt gegen offene Overlays
+    // ist entfallen, weil kein Overlay die Farbe mehr ueberschreibt.
     const farbe = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-    if (farbe && !overlayQuellen.size) metaFarbeSetzen(farbe);
+    if (farbe) metaFarbeSetzen(farbe);
   });
 }
 
