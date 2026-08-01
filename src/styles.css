@@ -2610,7 +2610,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-quadrat .app-icon{width:22px;height:22px}
 .tuck-quadrat.aktiv{background:var(--akzent);color:var(--akzent-ink)}
 .tuck-quadrat.betont{background:var(--akzent);color:var(--akzent-ink)}
-.tuck-titelzeile .neu-sammlung{background:var(--surface);color:var(--text)}
+.tuck-titelzeile .neu-sammlung{background:#492426;color:#fff}
+.tuck-titelzeile .neu-sammlung .material-svg,
+.tuck-titelzeile .neu-sammlung .material-svg svg{width:24px;height:24px;color:#fff;fill:#fff}
+.tuck-titelzeile .neu-sammlung .material-svg svg{stroke:#fff;stroke-width:12px;stroke-linejoin:round}
 /* Der Druckpunkt: Die Flaeche faehrt in ihren eigenen Schatten hinein. Ohne
    Schatten (Retro) bleibt nur der Versatz – das genuegt als Rueckmeldung. */
 .tuck-quadrat:active{transform:translate(2px,2px);box-shadow:none}
