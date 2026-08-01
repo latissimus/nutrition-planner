@@ -33,6 +33,9 @@ const colorGroups = [
     ['Pink', '#F54588'], ['Hot Pink', '#FF69AE'], ['Rose', '#F64974'],
     ['Orange', '#FF7B42'], ['Chartreuse', '#CEFC17'], ['Acid', '#F3FF00'],
     ['Navy', '#001454'], ['Nachtblau', '#1A1A2E'], ['Braun', '#492425'],
+    ['Indigo', '#443199'], ['Purpur', '#723EC3'],
+    ['Petrol', '#077A7D'], ['Türkis', '#03A6A1'], ['Jade', '#64E2B7'],
+    ['Vanille', '#FFF58A'],
     ['Off-White', '#F4F3EF'], ['Creme', '#F2EBE0'],
   ]],
   ['Pastell-Retro', [
