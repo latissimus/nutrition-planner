@@ -8,9 +8,30 @@ const ICONS = {
   supplement: '<path d="M8 5a4 4 0 0 1 6 0l5 5a4.2 4.2 0 0 1-6 6l-5-5a4.2 4.2 0 0 1 0-6Zm3 9 6-6"/>',
   drink: '<path d="M7 4h10l-1 16H8L7 4Zm1 5h8M10 13h4"/>',
   sleep: '<path d="M18.5 15.5A7.5 7.5 0 0 1 8.5 5a7.5 7.5 0 1 0 10 10.5ZM17 4v4M15 6h4"/>',
+  search: '<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/>',
+  folder: '<path d="M3 7.2c0-1.1.9-2 2-2h5l2 2h7c1.1 0 2 .9 2 2v8.3c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V7.2Z"/>',
+  folderPlus: '<path d="M3 7.2c0-1.1.9-2 2-2h5l2 2h7c1.1 0 2 .9 2 2v8.3c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V7.2Z"/><path d="M12 10.5v5M9.5 13h5"/>',
+  heart: '<path d="M20.4 5.8a5.1 5.1 0 0 0-7.2 0L12 7l-1.2-1.2a5.1 5.1 0 1 0-7.2 7.2L12 21l8.4-8a5.1 5.1 0 0 0 0-7.2Z"/>',
+  star: '<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>',
+  bolt: '<path d="m13.4 2-8 11H11l-.4 9 8-11H13l.4-9Z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
 };
 
-export const ICON_OPTIONS = Object.keys(ICONS);
+export const ICON_OPTIONS = [
+  ['body', 'Körperwerte'],
+  ['reminders', 'Erinnerung'],
+  ['food', 'Essen'],
+  ['recipes', 'Rezept'],
+  ['habits', 'Gewohnheit'],
+  ['supplement', 'Supplement'],
+  ['drink', 'Trinken'],
+  ['sleep', 'Schlaf'],
+  ['folder', 'Ordner'],
+  ['heart', 'Herz'],
+  ['star', 'Stern'],
+  ['bolt', 'Energie'],
+  ['sun', 'Tag'],
+];
 
 export function iconMarkup(name, className = 'app-icon') {
   const path = ICONS[name] || ICONS.habits;

@@ -2900,3 +2900,272 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
   .bereichsleiste a{min-height:48px;padding-inline:15px;font-size:11px}
   .app-navigation + #view > .wrap{padding-top:12px}
 }
+
+/* ============================================================
+   TUCKII-INSPIRIERTE APP-STRUKTUR · FEASTABLES-FARBPALETTE
+
+   Archivo (OFL) ersetzt die bisherigen System-/Display-Schriften. Die
+   Bedienlogik folgt einer Bibliothek aus Sammlungen; die Marke und sämtliche
+   bestehenden Funktionsseiten bleiben MUSCLE-DEX.
+   ============================================================ */
+:root{
+  --tuck-ink:#111111;
+  --tuck-brown:#492426;
+  --tuck-cyan:#72E2FF;
+  --tuck-cyan-strong:#58DCFF;
+  --tuck-cream:#F2EBE0;
+  --tuck-paper:#FFFDF9;
+  --tuck-pink:#F64974;
+  --tuck-purple:#67318F;
+  --tuck-blue:#729EFE;
+  --ui:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --display:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --bg:var(--tuck-cream);
+  --surface:var(--tuck-paper);
+  --surface2:#E9E3DA;
+  --text:var(--tuck-ink);
+  --ink:var(--tuck-brown);
+  --line:var(--tuck-brown);
+  --muted:#715F5D;
+  --link:var(--tuck-purple);
+  --app-chrome-bg:var(--tuck-cyan);
+  --app-content-bg:var(--tuck-cream);
+  --app-card:var(--tuck-paper);
+  --app-field:#FFFDF9;
+  --app-outline:var(--tuck-brown);
+  --app-divider:rgba(73,36,38,.22);
+}
+
+body{font-family:var(--ui);font-weight:500;letter-spacing:-.012em}
+h1,h2,h3,.display,.section-title{
+  font-family:var(--display);font-style:normal;font-weight:900;
+  letter-spacing:-.045em;text-transform:none;
+}
+button,input,select,textarea{font-family:var(--ui)}
+
+:root:not([data-theme="dark"])[data-seite]{
+  --bg:var(--tuck-cream);--app-pattern:none;
+}
+:root:not([data-theme="dark"])[data-seite] #view{
+  min-height:calc(100dvh - 68px);background:var(--tuck-cream)!important;
+  background-image:none!important;
+}
+
+/* Fester Markenheader: Logo, Sync, Suche, Profil/Einstellungen. */
+.app-kopf,.app-kopf::before,.app-kopf::after{background:var(--app-chrome-bg)}
+.app-kopf{
+  padding:calc(env(safe-area-inset-top) + 8px) 0 8px;
+  border-bottom:2px solid var(--tuck-brown);box-shadow:none;
+}
+.app-kopf .wrap{min-height:48px;gap:9px}
+.kopf-logo{width:clamp(100px,29vw,116px);max-height:46px}
+.kopf-aktionen{gap:8px}
+.kopf-aktionen .save-dot{
+  width:23px;height:23px;padding:0;border:0;background:transparent;
+  color:var(--tuck-purple);font:900 18px/1 var(--ui);
+}
+.kopf-quadrat,.tuckii-quadrat{
+  display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;
+  border:2px solid var(--tuck-brown)!important;border-radius:11px!important;
+  background:var(--tuck-paper)!important;color:var(--tuck-brown)!important;
+  box-shadow:3px 3px 0 var(--tuck-brown)!important;text-decoration:none;
+}
+.kopf-quadrat .app-icon,.tuckii-quadrat .app-icon{width:23px;height:23px}
+.kopf-quadrat.aktiv{background:var(--tuck-pink)!important;color:#fff!important}
+.app-kopf .nav-av{width:44px;height:44px;border-radius:11px!important;overflow:hidden}
+.app-kopf .nav-av img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.app-kopf .nav-av span{font:900 14px/1 var(--ui);letter-spacing:.02em}
+
+/* Start: zweispaltige Ordnerbibliothek wie bei Tuckii. */
+.tuckii-home{padding-top:24px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+.sammlungs-kopf{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  margin:0 2px 18px;
+}
+.sammlungs-kopf>div{min-width:0}
+.sammlungs-kopf span{
+  display:block;margin-bottom:4px;color:var(--tuck-purple);
+  font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
+}
+.sammlungs-kopf h1{
+  color:var(--tuck-brown);font-size:clamp(27px,8vw,34px);line-height:1;
+}
+.neu-sammlung{background:var(--tuck-pink)!important;color:#fff!important}
+.sammlungs-grid,.such-ergebnisse{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 14px;
+  padding:12px 3px 6px;
+}
+.sammlungskarte{
+  --ordnerfarbe:var(--tuck-cyan);position:relative;isolation:isolate;
+  display:flex;flex-direction:column;min-width:0;min-height:180px;padding:18px 14px 14px;
+  border:2px solid var(--tuck-brown);border-radius:14px;background:var(--tuck-paper);
+  color:var(--tuck-brown);text-decoration:none;
+}
+:root[data-seite="home"] #app .sammlungskarte,
+:root[data-seite="search"] #app .sammlungskarte{
+  box-shadow:4px 4px 0 var(--tuck-brown)!important;
+}
+.sammlungskarte::before{
+  content:"";position:absolute;z-index:-2;left:-2px;top:-15px;width:58%;height:30px;
+  border:2px solid var(--tuck-brown);border-bottom:0;border-radius:12px 12px 0 0;
+  background:var(--ordnerfarbe);
+}
+.sammlungskarte::after{
+  content:"";position:absolute;z-index:-1;inset:-2px;border:2px solid var(--tuck-brown);
+  border-radius:14px;background:var(--tuck-paper);pointer-events:none;
+}
+.sammlungs-tab{display:none}
+.sammlungskarte.cyan{--ordnerfarbe:var(--tuck-cyan)}
+.sammlungskarte.pink{--ordnerfarbe:var(--tuck-pink)}
+.sammlungskarte.violet{--ordnerfarbe:#CFA9E9}
+.sammlungskarte.blue{--ordnerfarbe:var(--tuck-blue)}
+.sammlungskarte.cream{--ordnerfarbe:#E0C8B5}
+.sammlungs-icon{
+  display:grid;place-items:center;width:46px;height:46px;margin-bottom:auto;
+  border:2px solid var(--tuck-brown);border-radius:11px;background:var(--ordnerfarbe);
+  color:var(--tuck-brown);
+}
+.sammlungs-icon .app-icon{width:25px;height:25px;stroke-width:2.2}
+.sammlungs-status{
+  position:absolute;top:14px;right:12px;color:var(--muted);
+  font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+}
+.sammlungskarte h2{
+  margin:17px 0 5px;color:var(--tuck-brown);font-size:19px;line-height:1;
+  overflow-wrap:anywhere;
+}
+.sammlungskarte p{
+  margin:0;color:#715F5D;font-size:10.5px;font-weight:600;line-height:1.28;
+}
+.sammlungskarte:active,.kopf-quadrat:active,.tuckii-quadrat:active{
+  transform:translate(2px,2px);box-shadow:1px 1px 0 var(--tuck-brown)!important;
+}
+
+/* Suche ist – wie in Tuckii – eine eigene, ruhige Bibliotheksansicht. */
+.tuckii-suche-seite{padding-top:22px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+.tuckii-suchzeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.tuckii-suchzeile>a{color:var(--tuck-brown);font-size:12px;font-weight:800;text-decoration:none}
+.tuckii-suchfeld{
+  display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:center;
+  min-height:52px;padding:0 14px;border:2px solid var(--tuck-brown);border-radius:13px;
+  background:var(--tuck-paper);color:var(--tuck-brown);
+  box-shadow:3px 3px 0 var(--tuck-brown);
+}
+.tuckii-suchfeld .app-icon{width:23px;height:23px}
+.tuckii-suchfeld input{
+  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--tuck-ink);
+  font-size:16px;font-weight:700;
+}
+.tuckii-suchfeld input::placeholder{color:#8A7775;opacity:1}
+.such-bibliothek{
+  display:grid;grid-template-columns:minmax(0,1fr) repeat(3,auto);gap:12px;align-items:center;
+  margin:22px 0 24px;padding:15px;border:2px solid var(--tuck-brown);border-radius:14px;
+  background:var(--tuck-cyan);color:var(--tuck-brown);box-shadow:3px 3px 0 var(--tuck-brown);
+}
+.such-bibliothek>span{font-size:12px;font-weight:900}
+.such-bibliothek>div{display:flex;flex-direction:column;text-align:center}
+.such-bibliothek b{font-size:18px;line-height:1}
+.such-bibliothek small{margin-top:4px;font-size:7px;font-weight:800;text-transform:uppercase}
+.such-ergebnis-titel{margin:0 2px 10px;color:var(--tuck-brown);font-size:23px}
+.such-leer{display:grid;place-items:center;gap:8px;padding:50px 20px;text-align:center;color:var(--muted)}
+.such-leer .app-icon{width:30px;height:30px}
+.such-leer span{font-size:11px}
+
+/* Funktionsseiten: zentrierter Titel und quadratischer Zurück-Knopf. */
+:root[data-seite] #view>.wrap{padding-top:0}
+:root[data-seite] .seitenkopf{
+  display:grid!important;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center!important;
+  gap:10px;padding:20px 0 14px!important;
+}
+:root[data-seite] .seitenkopf-text{
+  grid-column:2;grid-row:1;align-items:center;gap:0;text-align:center;
+}
+:root[data-seite] .seitenkopf-kicker{display:none}
+:root[data-seite] .seitenkopf .section-title{
+  margin:0;color:var(--tuck-brown);font-size:25px;line-height:1;
+  font-family:var(--display)!important;font-style:normal!important;font-weight:900!important;
+}
+:root[data-seite] .seitenkopf .zurueck{
+  grid-column:1;grid-row:1;display:grid;place-items:center;width:44px;height:44px;
+  margin:0!important;padding:0!important;border:2px solid var(--tuck-brown);border-radius:11px;
+  background:var(--tuck-paper);color:var(--tuck-brown);box-shadow:3px 3px 0 var(--tuck-brown);
+  font-size:0;text-decoration:none;
+}
+:root[data-seite] .seitenkopf .zurueck .pf{font:900 24px/1 var(--ui)}
+.seiten-einstieg{margin-bottom:14px;padding:0 2px;background:transparent}
+.seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:13px;font-weight:800}
+.seiten-einstieg span{font-family:var(--ui);font-size:11px;font-weight:500}
+
+/* Bestehende Module erhalten dieselbe Formsprache, ihre Logik bleibt unberührt. */
+.card,.reminder-group,.profile-abschnitt,.food-form-card,.food-card{
+  border:1.5px solid var(--tuck-brown);border-radius:15px;background:var(--tuck-paper);
+  box-shadow:3px 3px 0 var(--tuck-brown)!important;
+}
+.card + .card{margin-top:18px}
+.input{
+  border:1.5px solid rgba(73,36,38,.55);border-radius:10px;background:#fff;
+  color:var(--tuck-ink);font-weight:600;box-shadow:none!important;
+}
+.input:focus{border-color:var(--tuck-purple);box-shadow:0 0 0 3px rgba(103,49,143,.15)!important}
+.btn,.profile-datei-knopf,.pb-go{
+  border:1.5px solid var(--tuck-brown);border-radius:10px;background:var(--tuck-paper);
+  color:var(--tuck-brown);font-family:var(--ui);font-style:normal;font-weight:800;
+  box-shadow:2px 2px 0 var(--tuck-brown)!important;
+}
+.btn-primary,[data-save-reminders],.phase-reset{background:var(--tuck-pink);color:#fff}
+.reminder-group-head,.profile-abschnitt summary{font-family:var(--ui);font-style:normal}
+.mess-neu summary,.switchline,.food-form-card summary{
+  font-family:var(--ui);font-style:normal;font-weight:800;
+}
+.reminder-group-icon{border-color:var(--tuck-brown)}
+.reminder-row{border-color:rgba(73,36,38,.55);background:#F7F1E9}
+.food-image{border-bottom-color:var(--tuck-brown)}
+.profile-avatar{border-radius:12px!important;border-color:var(--tuck-brown)!important}
+.app-toast{background:var(--tuck-purple);border-color:var(--tuck-brown);font-family:var(--ui)}
+
+/* Dark bleibt ein eigenständiger Modus; nur Geometrie und Akzente werden geteilt. */
+:root[data-theme="dark"]{
+  --bg:#10131D;--surface:#1C202C;--surface2:#252A37;--text:#F7F1E9;
+  --ink:#D9C8C2;--line:#D9C8C2;--muted:#B6A8A4;--link:#CFA9E9;
+  --app-chrome-bg:#171B27;--app-content-bg:#10131D;--app-card:#1C202C;
+  --app-field:#252A37;--app-outline:#8B7774;--app-divider:#544643;
+}
+:root[data-theme="dark"][data-seite] #view{background:#10131D!important}
+:root[data-theme="dark"] .sammlungskarte,
+:root[data-theme="dark"] .sammlungskarte::after,
+:root[data-theme="dark"] .tuckii-suchfeld,
+:root[data-theme="dark"] .kopf-quadrat,
+:root[data-theme="dark"] .tuckii-quadrat,
+:root[data-theme="dark"] .seitenkopf .zurueck{background:#1C202C!important;color:#F7F1E9!important}
+:root[data-theme="dark"] .sammlungskarte h2,
+:root[data-theme="dark"] .sammlungs-kopf h1,
+:root[data-theme="dark"] .seitenkopf .section-title,
+:root[data-theme="dark"] .such-ergebnis-titel{color:#F7F1E9}
+:root[data-theme="dark"] .sammlungskarte p{color:#B6A8A4}
+:root[data-theme="dark"] .input{background:#252A37;color:#F7F1E9}
+
+@media(max-width:420px){
+  .wrap{padding-inline:14px}
+  .app-kopf .wrap{min-height:46px}
+  .kopf-logo{width:104px;max-height:43px}
+  .kopf-aktionen{gap:7px}
+  .kopf-quadrat{width:42px;height:42px;flex-basis:42px}
+  .app-kopf .nav-av{width:42px;height:42px}
+  .tuckii-home{padding-top:22px}
+  .sammlungs-kopf{margin-bottom:16px}
+  .sammlungs-grid,.such-ergebnisse{gap:19px 12px;padding-inline:2px}
+  .sammlungskarte{min-height:172px;padding:17px 12px 12px}
+  .sammlungs-icon{width:43px;height:43px}
+  .sammlungskarte h2{font-size:17.5px}
+  .sammlungskarte p{font-size:9.8px}
+  .such-bibliothek{grid-template-columns:minmax(0,1fr) repeat(3,38px);gap:6px;padding-inline:12px}
+  :root[data-seite] .seitenkopf{display:grid!important;padding-top:18px!important}
+  :root[data-seite] .seitenkopf .zurueck{margin:0!important}
+}
+
+@media(max-width:350px){
+  .kopf-aktionen .save-dot{display:none}
+  .sammlungs-grid,.such-ergebnisse{grid-template-columns:1fr}
+  .sammlungskarte{min-height:150px}
+}

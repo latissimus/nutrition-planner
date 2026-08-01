@@ -1,7 +1,9 @@
 import './styles.css';
-import '@fontsource/nunito/latin-700.css';
-import '@fontsource/nunito/latin-800.css';
-import '@fontsource/nunito/latin-900.css';
+import '@fontsource/archivo/latin-500.css';
+import '@fontsource/archivo/latin-600.css';
+import '@fontsource/archivo/latin-700.css';
+import '@fontsource/archivo/latin-800.css';
+import '@fontsource/archivo/latin-900.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
@@ -12,6 +14,7 @@ import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
+import { toast } from './toast.js';
 
 applyTheme(getTheme());
 registriereServiceWorker().catch(() => {});
@@ -213,49 +216,103 @@ function avatarMarkup() {
   return `<span>${zeichen}</span>`;
 }
 
-const bereiche = [
-  ['body', 'Körperwerte'],
-  ['reminders', 'Erinnerungen'],
-  ['food-log', 'Food-Log'],
-  ['recipes', 'Rezepte'],
-  ['habits', 'Gewohnheiten'],
+const sammlungen = [
+  ['body', 'Körperwerte', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
+  ['reminders', 'Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
+  ['food-log', 'Food-Log', 'Gute Mahlzeiten wiederfinden.', 'food', 'violet', 'Aktiv'],
+  ['recipes', 'Rezepte', 'Eigene Rezepte und schnelle Standards.', 'recipes', 'blue', 'Bald'],
+  ['habits', 'Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'habits', 'cream', 'Bald'],
 ];
+const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 
 function renderChrome(route) {
   app.innerHTML = `
     <header class="topbar app-kopf">
       <div class="wrap">
-        <a class="kopf-marke" href="#body" aria-label="MUSCLE-DEX – Körperwerte">${headerBrandMarkup()}</a>
+        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Sammlungen">${headerBrandMarkup()}</a>
         <nav class="kopf-aktionen" aria-label="App-Status und Profil">
           <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
-          <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil">${avatarMarkup()}</a>
+          <a class="kopf-quadrat kopf-suche${route === 'search' ? ' aktiv' : ''}" href="#search" aria-label="MUSCLEDEX durchsuchen">
+            ${iconMarkup('search')}
+          </a>
+          <a class="nav-av nav-av-fb kopf-quadrat${route === 'profile' ? ' aktiv' : ''}" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
         </nav>
       </div>
     </header>
-    <section class="app-navigation" aria-label="App-Navigation">
-      <div class="wrap app-suche-wrap">
-        <button class="app-suche" type="button" aria-label="MUSCLEDEX durchsuchen – demnächst verfügbar">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
-          <span>MUSCLEDEX durchsuchen</span>
-          <em>Bald</em>
-        </button>
-      </div>
-      <nav class="bereichsleiste" aria-label="Bereiche">
-        <div class="bereichsleiste-track">
-          ${bereiche.map(([ziel, label]) => `
-            <a href="#${ziel}" data-bereich="${ziel}"${route === ziel ? ' class="aktiv" aria-current="page"' : ''}>${label}</a>`).join('')}
-        </div>
-      </nav>
-    </section>
     <main id="view"></main>`;
   syncStatusAktualisieren();
+}
 
-  const track = app.querySelector('.bereichsleiste-track');
-  const active = track?.querySelector('.aktiv');
-  if (track && active) requestAnimationFrame(() => {
-    const left = active.offsetLeft - ((track.clientWidth - active.offsetWidth) / 2);
-    track.scrollTo({ left, behavior: 'smooth' });
-  });
+function sammlungsKarten(daten = sammlungen) {
+  return daten.map(([route, titel, text, icon, farbe, status]) => `
+    <a class="sammlungskarte ${farbe}" href="#${route}" data-sammlung="${route}">
+      <span class="sammlungs-tab" aria-hidden="true"></span>
+      <span class="sammlungs-icon" aria-hidden="true">${iconMarkup(icon)}</span>
+      <span class="sammlungs-status">${status}</span>
+      <h2>${titel}</h2>
+      <p>${text}</p>
+    </a>`).join('');
+}
+
+function mountHome(container) {
+  setSeite('home');
+  container.innerHTML = `
+    <div class="wrap pad-bottom tuckii-home">
+      <header class="sammlungs-kopf">
+        <div>
+          <span>Bibliothek</span>
+          <h1>Meine Sammlungen</h1>
+        </div>
+        <button class="tuckii-quadrat neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
+          ${iconMarkup('folderPlus')}
+        </button>
+      </header>
+      <section class="sammlungs-grid" aria-label="Meine Sammlungen">
+        ${sammlungsKarten()}
+      </section>
+    </div>`;
+
+  container.querySelector('.neu-sammlung').onclick = () => {
+    toast('Eigene Sammlungen ergänzen wir im nächsten Schritt.');
+  };
+}
+
+function mountSearch(container) {
+  setSeite('search');
+  container.innerHTML = `
+    <div class="wrap pad-bottom tuckii-suche-seite">
+      <div class="tuckii-suchzeile">
+        <label class="tuckii-suchfeld" for="global-search">
+          ${iconMarkup('search')}
+          <input id="global-search" type="search" autocomplete="off" placeholder="Sammlungen durchsuchen …">
+        </label>
+        <a href="#home">Abbrechen</a>
+      </div>
+      <section class="such-bibliothek">
+        <span>Deine Bibliothek</span>
+        <div><b>${sammlungen.length}</b><small>Sammlungen</small></div>
+        <div><b>3</b><small>Aktiv</small></div>
+        <div><b>2</b><small>Geplant</small></div>
+      </section>
+      <h1 class="such-ergebnis-titel">Bereiche</h1>
+      <section class="such-ergebnisse" data-search-results>${sammlungsKarten()}</section>
+      <div class="such-leer" data-search-empty hidden>
+        ${iconMarkup('search')}
+        <b>Nichts gefunden</b>
+        <span>Die Suche in einzelnen Einträgen ergänzen wir später.</span>
+      </div>
+    </div>`;
+
+  const input = container.querySelector('#global-search');
+  const results = container.querySelector('[data-search-results]');
+  const empty = container.querySelector('[data-search-empty]');
+  input.oninput = () => {
+    const query = input.value.trim().toLocaleLowerCase('de');
+    const treffer = sammlungen.filter(([, titel, text]) => `${titel} ${text}`.toLocaleLowerCase('de').includes(query));
+    results.innerHTML = sammlungsKarten(treffer);
+    empty.hidden = treffer.length > 0;
+  };
+  requestAnimationFrame(() => input.focus({ preventScroll: true }));
 }
 
 function mountComingSoon(container, route) {
@@ -311,13 +368,17 @@ async function render() {
       return;
     }
   }
-  const angefragt = (location.hash || '#body').slice(1);
-  const route = angefragt === 'profile' || bereiche.some(([ziel]) => ziel === angefragt)
+  const angefragt = (location.hash || '#home').slice(1);
+  const route = ['home', 'search', 'profile'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     ? angefragt
-    : 'body';
+    : 'home';
   renderChrome(route);
   const view = app.querySelector('#view');
-  if (route === 'profile') {
+  if (route === 'home') {
+    mountHome(view);
+  } else if (route === 'search') {
+    mountSearch(view);
+  } else if (route === 'profile') {
     setSeite('profile');
     mountProfile(view, {
       session,
@@ -344,12 +405,7 @@ async function render() {
   } else if (route === 'recipes' || route === 'habits') {
     mountComingSoon(view, route);
   } else {
-    setSeite('body');
-    mountBodyMetrics(view, {
-      session,
-      profile,
-      onProfileUpdated: (aktuell) => { profile = aktuell; },
-    });
+    mountHome(view);
   }
 }
 
