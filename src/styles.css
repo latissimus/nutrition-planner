@@ -43,7 +43,7 @@
   --fe-brown:#492425;         /* brown        */
   --fe-cream:#F2EBE0;         /* cream        */
 
-  --bg:#F4F3EF;
+  --bg:#FFFFFF;
   --surface:#FFFFFF;
   --surface2:#FBF7F0;   /* aufgehelltes Cream fuer eingelassene Flaechen */
   --ink:#000000;
@@ -2669,7 +2669,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
    30,7 pt plus die 18 pt sichtbaren Reiter tragen, also rund 49 pt. */
 .tuck-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:49px 19px;padding:30px 3px 6px;
+  gap:49px 14px;padding:30px 3px 6px;
 }
 
 /* Die Ordnerkarte: ein Reiter liegt hinter der Karte und schaut oben links
