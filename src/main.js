@@ -363,13 +363,13 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
       return `
       <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
         <a class="tuck-karte dex-vhs-karte" href="#${route}" data-sammlung="${route}">
-          <span class="dex-vhs-punkte" aria-hidden="true">${'<i></i>'.repeat(12)}</span>
+          ${iconFeld}
           <span class="dex-vhs-text">
             <h2>${titel}</h2>
             <span class="dex-vhs-meta">${meta}</span>
           </span>
           <span class="dex-vhs-baender" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span class="dex-vhs-einzug" aria-hidden="true"></span>
+          <span class="dex-vhs-marke" aria-hidden="true"></span>
         </a>
       </div>`;
     }

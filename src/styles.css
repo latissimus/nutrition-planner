@@ -2697,16 +2697,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-test-meta b{color:var(--text);font-size:14px;font-weight:800}
 .dex-test-meta span{color:var(--muted);font-size:10px;font-weight:600}
 .tuck-karte.dex-vhs-karte{
-  display:grid;grid-template-columns:45px minmax(0,1fr);align-items:start;gap:11px;
-  min-height:126px;padding:17px 15px 42px 13px;
+  display:grid;grid-template-columns:46px minmax(0,1fr);align-content:center;align-items:center;gap:11px;
+  min-height:126px;padding:18px 15px 27px 13px;
 }
 .tuck-karte.dex-vhs-karte::before,.tuck-karte.dex-vhs-karte::after{content:none}
-.dex-vhs-punkte{
-  display:grid;grid-template-columns:repeat(4,6px);grid-auto-rows:6px;gap:3px;
-  align-content:start;justify-content:center;padding-top:1px;
-}
-.dex-vhs-punkte i{width:6px;height:6px;border-radius:50%;background:var(--ordner)}
-.dex-vhs-punkte i:nth-child(3n){transform:scale(.68)}
 .dex-vhs-text{display:flex;min-width:0;flex-direction:column;gap:7px;padding-right:3px}
 .dex-vhs-text h2{
   margin:0;color:var(--text);font-size:15px;line-height:1.05;text-transform:uppercase;
@@ -2715,13 +2709,16 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-vhs-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 5px;line-height:1.1}
 .dex-vhs-meta b{color:var(--text);font-size:14px;font-weight:800}
 .dex-vhs-meta span{color:var(--muted);font-size:10px;font-weight:600}
-.dex-vhs-baender{position:absolute;left:0;right:0;bottom:0;height:34px;display:grid;grid-template-rows:repeat(3,1fr)}
+.dex-vhs-baender{
+  position:absolute;left:13px;right:22px;bottom:9px;height:9px;
+  display:grid;grid-template-rows:repeat(3,2px);gap:1px;border-radius:2px;overflow:hidden;
+}
 .dex-vhs-baender i:nth-child(1){background:var(--ordner)}
 .dex-vhs-baender i:nth-child(2){background:color-mix(in srgb,var(--ordner) 72%,#6b5bd2)}
 .dex-vhs-baender i:nth-child(3){background:color-mix(in srgb,var(--ordner) 50%,#34268f)}
-.dex-vhs-einzug{
-  position:absolute;right:0;bottom:0;width:34px;height:34px;background:var(--ink);
-  clip-path:polygon(55% 0,100% 0,100% 100%,55% 100%,0 50%);
+.dex-vhs-marke{
+  position:absolute;right:12px;bottom:9px;width:10px;height:9px;background:var(--ink);
+  clip-path:polygon(0 0,100% 50%,0 100%);
 }
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
