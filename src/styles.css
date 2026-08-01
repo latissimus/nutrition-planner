@@ -2733,7 +2733,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 
 /* ---------- Gemeinsamer Kopf und Sammlungsmenü ---------- */
 .kategorie-kopf{
-  display:grid;grid-template-columns:minmax(0,1fr) 52px 52px;
+  display:grid;grid-template-columns:minmax(0,1fr) 52px 52px 52px;
   align-items:center;gap:9px;margin:18px 0 24px;
 }
 .kategorie-kopftitel{min-width:0;text-align:left;padding-left:3px}
@@ -2758,6 +2758,13 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .hat-kategoriefarbe .kategorie-kopfknopf[data-category-settings] .material-svg svg{fill:#000}
 .hat-kategoriefarbe .app-icon{color:#000}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
+.seiten-x{
+  display:grid!important;place-items:center;width:52px;min-width:52px;height:52px;padding:0!important;
+  border:var(--bw) solid var(--ink)!important;border-radius:12px!important;
+  background:var(--surface)!important;color:#000!important;box-shadow:var(--hart-klein);
+  font:900 30px/1 var(--ui)!important;text-decoration:none!important;
+}
+.seiten-x:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{
   /* viewport-fit=cover + black-translucent: Diese EINE gerenderte Flaeche
@@ -2825,7 +2832,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .farb-option span{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:9px;font-weight:700;white-space:nowrap}
 .farb-option.aktiv i{box-shadow:3px 3px 0 #000}
 @media(max-width:370px){
-  .kategorie-kopf{grid-template-columns:minmax(0,1fr) 48px 48px;gap:6px}
+  .kategorie-kopf{grid-template-columns:minmax(0,1fr) 48px 48px 48px;gap:6px}
   .kategorie-kopfknopf{width:48px;height:48px}
 }
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
@@ -3098,24 +3105,37 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-repeat:repeat!important;background-attachment:fixed!important;
 }
 :root[data-seite="home"] #view{
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 91%,transparent),color-mix(in srgb,var(--bg) 91%,transparent)),url("../Flo ill Grafik .svg")!important;
-  background-size:auto,270px 270px!important;
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 94%,transparent),color-mix(in srgb,var(--bg) 94%,transparent)),
+    url("../Flo ill Grafik .svg"),url("../Flo ill Grafik .svg"),url("../Flo ill Grafik .svg")!important;
+  background-size:auto,92px 92px,124px 124px,158px 158px!important;
+  background-position:0 0,16px 20px,137px 91px,244px 178px!important;
 }
 :root[data-seite="body"] #view,:root[data-seite="food-log"] #view,
 :root[data-seite="habits"] #view,:root[data-seite="search"] #view{
   background-image:var(--muster-dreieck)!important;background-size:auto!important;
 }
-:root[data-seite="reminders"] #view,:root[data-seite="recipes"] #view,
+:root[data-seite="recipes"] #view,
 :root[data-seite="collection"] #view,:root[data-seite="profile"] #view{
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen)!important;
   background-size:auto,112px!important;
+}
+:root[data-seite="reminders"] #view{
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 88%,transparent)),
+    url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg")!important;
+  background-size:auto,76px 76px!important;background-position:0 0,11px 9px!important;
 }
 :root[data-theme="dark"][data-seite="body"] #view,:root[data-theme="dark"][data-seite="food-log"] #view,
 :root[data-theme="dark"][data-seite="habits"] #view,:root[data-theme="dark"][data-seite="search"] #view{
   background-image:var(--muster-dreieck-dunkel)!important;
 }
-:root[data-theme="dark"][data-seite="reminders"] #view,:root[data-theme="dark"][data-seite="recipes"] #view,
+:root[data-theme="dark"][data-seite="recipes"] #view,
 :root[data-theme="dark"][data-seite="collection"] #view,:root[data-theme="dark"][data-seite="profile"] #view{
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen-dunkel)!important;
 }
-.header-schliessen[hidden]{display:none!important}
+:root[data-theme="dark"][data-seite="reminders"] #view{
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--bg) 90%,transparent),color-mix(in srgb,var(--bg) 90%,transparent)),
+    url("../MUSCLEDEX-ICONS/pet_supplies_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg")!important;
+}

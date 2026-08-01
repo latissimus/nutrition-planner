@@ -313,9 +313,6 @@ function renderChrome(route) {
           <nav class="kopf-aktionen" aria-label="App-Status und Profil">
             <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
             <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
-            <a class="tuck-quadrat header-schliessen" href="#home" aria-label="Unterseite schließen">
-              ${materialIconMarkup('close')}
-            </a>
           </nav>
         </div>
       </header>
@@ -324,8 +321,6 @@ function renderChrome(route) {
     view = app.querySelector(':scope > #view');
   }
   header.querySelector('[href="#profile"]')?.classList.toggle('aktiv', route === 'profile');
-  const schliessen = header.querySelector('.header-schliessen');
-  if (schliessen) schliessen.hidden = route === 'home';
   view.replaceChildren();
   view.className = '';
   view.removeAttribute('style');
@@ -510,7 +505,7 @@ function mountSearch(container, signal) {
           ${iconMarkup('search')}
           <input id="global-search" type="search" autocomplete="off" placeholder="Dex-Einträge durchsuchen …">
         </label>
-        <a href="#home">Abbrechen</a>
+        <a class="seiten-x" href="#home" aria-label="Suche schließen">×</a>
       </div>
       <section class="tuck-bibliothek">
         <span>Deine Bibliothek</span>

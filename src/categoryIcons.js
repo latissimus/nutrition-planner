@@ -237,6 +237,35 @@ function plusAction(container, route) {
   } else toast('Hinzufügen wird mit den Inhalten dieses Dex aktiviert.');
 }
 
+function eintragTypWaehlen(container, route, options = {}) {
+  const backdrop = sheet(`
+    <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <div class="sheet-menue eintrag-typ-menue">
+      <button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>
+      <button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>
+      <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>
+    </div>`);
+  backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
+    const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
+    if (!type) return;
+    closeSheet(backdrop);
+    if (type === 'note') {
+      if (options.onAddNote) return options.onAddNote();
+      return toast('Notizen sind für diesen Dex vorbereitet.');
+    }
+    if (type === 'link') {
+      if (options.onAddLink) return options.onAddLink();
+      return toast('Links sind für diesen Dex vorbereitet.');
+    }
+    if (type === 'image') {
+      if (options.onAddImage) return options.onAddImage();
+      if (options.onPlus) return options.onPlus();
+      if (route === 'food-log') return plusAction(container, route);
+      return toast('Bilder sind für diesen Dex vorbereitet.');
+    }
+  };
+}
+
 export function mountCategoryChrome(container, route, title, options = {}) {
   const wrap = container.querySelector(':scope > .wrap');
   if (!wrap) return;
@@ -250,13 +279,11 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const safeMeta = escapeHtml(options.meta || '');
   bar.innerHTML = `
     <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
-    <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${safeTitle} hinzufügen">${materialIcon('add')}</button>
-    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>`;
+    <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Eintrag in ${safeTitle} ablegen">${materialIcon('place_item')}</button>
+    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
+    <a class="kategorie-kopfknopf kategorie-schliessen" href="#home" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
   wrap.prepend(bar);
-  bar.querySelector('.kategorie-plus').onclick = () => {
-    if (options.onPlus) options.onPlus();
-    else plusAction(container, route);
-  };
+  bar.querySelector('.kategorie-plus').onclick = () => eintragTypWaehlen(container, route, options);
   bar.querySelector('[data-category-settings]').onclick = () => settingsSheet(
     route,
     () => window.dispatchEvent(new HashChangeEvent('hashchange')),

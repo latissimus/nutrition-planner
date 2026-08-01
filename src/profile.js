@@ -85,7 +85,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
         <span class="seitenkopf-kicker">Konto</span>
         <h1 class="section-title">Mein Profil</h1>
       </div>
-      <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
+      <a class="seiten-x" href="#home" aria-label="Profil schließen">×</a>
     </div>
     <section class="seiten-einstieg">
       <b>Alles zu deinem Konto</b>
