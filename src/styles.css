@@ -2453,11 +2453,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 
 
 
-/* ---------- Nunito und echte Tagesstatus-Karten ---------- */
-:root{--display:"Nunito","Arial Rounded MT Bold","Helvetica Neue",Arial,system-ui,sans-serif}
-h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
-  font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.035em;
-}
+/* Die Typografie wird ausschliesslich ueber die Figtree-Tokens am Dateianfang
+   gesteuert. Hier stand zuvor noch ein alter Nunito-Override. Weil Nunito nicht
+   mehr installiert ist, fiel Safari auf Arial Rounded zurueck und machte vor
+   allem Startseitentitel und Kartennamen deutlich runder als vorgesehen. */
 
 .home-schnell{gap:9px;margin-bottom:24px}
 
