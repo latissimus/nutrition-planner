@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, enableSheetSwipe, materialIconMarkup,
+  availableCategoryIcons, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -161,7 +161,6 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     if (!(event.target instanceof Element) || !event.target.closest('.sammlung-editor')) event.preventDefault();
   }, { passive: false });
   document.body.append(backdrop);
-  enableSheetSwipe(backdrop, close);
   requestAnimationFrame(() => {
     backdrop.classList.add('offen');
     input.focus({ preventScroll: true });

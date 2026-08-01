@@ -90,7 +90,6 @@ function sheet(markup) {
     }
   }, { passive: false });
   document.body.append(backdrop);
-  enableSheetSwipe(backdrop);
   requestAnimationFrame(() => backdrop.classList.add('offen'));
   return backdrop;
 }
@@ -98,36 +97,6 @@ function sheet(markup) {
 function closeSheet(backdrop) {
   if (!backdrop?.isConnected) return;
   backdrop.remove();
-}
-
-export function enableSheetSwipe(backdrop, close = () => closeSheet(backdrop)) {
-  const panel = backdrop.querySelector('.kategorie-sheet');
-  if (!panel) return;
-  let startY = null;
-  let distance = 0;
-  panel.addEventListener('touchstart', (event) => {
-    if (event.touches.length !== 1 || panel.scrollTop > 0) return;
-    startY = event.touches[0].clientY;
-    distance = 0;
-  }, { passive: true });
-  panel.addEventListener('touchmove', (event) => {
-    if (startY === null) return;
-    distance = Math.max(0, event.touches[0].clientY - startY);
-    if (!distance) return;
-    event.preventDefault();
-    panel.style.transition = 'none';
-    panel.style.transform = `translateY(${distance}px)`;
-  }, { passive: false });
-  const finish = () => {
-    if (startY === null) return;
-    const dismiss = distance > 84;
-    startY = null;
-    panel.style.removeProperty('transition');
-    panel.style.removeProperty('transform');
-    if (dismiss) close();
-  };
-  panel.addEventListener('touchend', finish);
-  panel.addEventListener('touchcancel', finish);
 }
 
 function iconPicker(route, onChange) {
@@ -163,6 +132,53 @@ function iconPicker(route, onChange) {
   };
 }
 
+function appearancePicker(route, onChange) {
+  let selectedIcon = localStorage.getItem(storageKey(route)) || defaults[route];
+  let selectedColor = categoryColor(route).toUpperCase();
+  const backdrop = sheet(`
+    <div class="sheet-griff" aria-hidden="true"></div>
+    <header><h2>Icon & Farbe ändern</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <h3 class="icon-picker-titel">Icon</h3>
+    <div class="icon-auswahl">
+      ${icons.map((icon) => `<button class="icon-option${icon.id === selectedIcon ? ' aktiv' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
+    </div>
+    <div class="emoji-eigen">
+      <label for="eigenes-emoji-appearance">Eigenes Emoji</label>
+      <div><input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}" aria-label="Eigenes Emoji"></div>
+    </div>
+    ${colorGroups.map(([group, colors]) => `
+      <h3 class="icon-picker-titel farbgruppe-titel">${group}</h3>
+      <div class="farb-auswahl">
+        ${colors.map(([name, color]) => `<button class="farb-option${color === selectedColor ? ' aktiv' : ''}" data-color="${color}" style="--farbe:${color}" aria-label="${name}"><i></i><span>${name}</span></button>`).join('')}
+      </div>`).join('')}
+    <button class="btn btn-primary btn-block appearance-save" type="button">Änderungen speichern</button>`);
+  const emojiInput = backdrop.querySelector('#eigenes-emoji-appearance');
+  backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
+    const iconButton = event.target.closest('[data-icon-id]');
+    if (iconButton) {
+      selectedIcon = iconButton.dataset.iconId;
+      emojiInput.value = '';
+      backdrop.querySelectorAll('[data-icon-id]').forEach((button) => button.classList.toggle('aktiv', button === iconButton));
+    }
+    const colorButton = event.target.closest('[data-color]');
+    if (colorButton) {
+      selectedColor = colorButton.dataset.color;
+      backdrop.querySelectorAll('[data-color]').forEach((button) => button.classList.toggle('aktiv', button === colorButton));
+    }
+    if (!event.target.closest('.appearance-save')) return;
+    const emoji = emojiInput.value.trim();
+    localStorage.setItem(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
+    localStorage.setItem(colorKey(route), selectedColor);
+    closeSheet(backdrop);
+    onChange?.();
+    toast('Icon und Farbe geändert.');
+  };
+  emojiInput.oninput = () => {
+    if (!emojiInput.value.trim()) return;
+    backdrop.querySelectorAll('[data-icon-id]').forEach((button) => button.classList.remove('aktiv'));
+  };
+}
+
 function colorPicker(route, onChange) {
   const current = categoryColor(route).toUpperCase();
   const backdrop = sheet(`
@@ -186,9 +202,9 @@ function colorPicker(route, onChange) {
 function settingsSheet(route, onChange, actions = {}) {
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
+    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="sheet-menue">
-      <button data-action="icon">${materialIcon('edit', 'sheet-list-icon')}<span>Kategorie-Icon ändern</span></button>
-      <button data-action="color">${materialIcon('brightness_empty', 'sheet-list-icon')}<span>Farbe ändern</span></button>
+      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon & Farbe ändern</span></button>
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
@@ -198,8 +214,7 @@ function settingsSheet(route, onChange, actions = {}) {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (!action) return;
     closeSheet(backdrop);
-    if (action === 'icon') actions.onEditAppearance ? actions.onEditAppearance() : iconPicker(route, onChange);
-    if (action === 'color') actions.onEditAppearance ? actions.onEditAppearance() : colorPicker(route, onChange);
+    if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange);
     if (action === 'select') toast('Die Auswahl ist für diesen Dex vorbereitet.');
     if (action === 'rename') actions.onRename?.();
     if (action === 'sub') actions.onCreateSub?.();
