@@ -1,9 +1,13 @@
 import './styles.css';
-import '@fontsource/archivo/latin-500.css';
-import '@fontsource/archivo/latin-600.css';
-import '@fontsource/archivo/latin-700.css';
-import '@fontsource/archivo/latin-800.css';
-import '@fontsource/archivo/latin-900.css';
+// Plus Jakarta Sans (SIL Open Font License) — die freie Schrift, die Tuckiis
+// geometrisch-freundlicher Grotesk am naechsten kommt: doppelstoeckiges "a",
+// runde Punzen, gerader "y"-Abstrich. Fuenf Gewichte reichen fuer die ganze
+// Skala von Fliesstext (400) bis Ueberschrift (800).
+import '@fontsource/plus-jakarta-sans/latin-400.css';
+import '@fontsource/plus-jakarta-sans/latin-500.css';
+import '@fontsource/plus-jakarta-sans/latin-600.css';
+import '@fontsource/plus-jakarta-sans/latin-700.css';
+import '@fontsource/plus-jakarta-sans/latin-800.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
@@ -216,12 +220,16 @@ function avatarMarkup() {
   return `<span>${zeichen}</span>`;
 }
 
+// Eine Sammlung ist ein Bereich der App. Reihenfolge der Felder:
+// Route, Name, Kurzbeschreibung (nur fuer die Suche), Symbol, Ordnerfarbe,
+// Stand. Die Beschreibung steht bewusst nicht auf der Karte: Tuckii zeigt dort
+// nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
   ['body', 'Körperwerte', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'Erinnerungen', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Food-Log', 'Gute Mahlzeiten wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['recipes', 'Rezepte', 'Eigene Rezepte und schnelle Standards.', 'recipes', 'blue', 'Bald'],
-  ['habits', 'Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'habits', 'cream', 'Bald'],
+  ['habits', 'Gewohnheiten', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 
@@ -232,10 +240,10 @@ function renderChrome(route) {
         <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Sammlungen">${headerBrandMarkup()}</a>
         <nav class="kopf-aktionen" aria-label="App-Status und Profil">
           <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
-          <a class="kopf-quadrat kopf-suche${route === 'search' ? ' aktiv' : ''}" href="#search" aria-label="MUSCLEDEX durchsuchen">
+          <a class="tuck-quadrat${route === 'search' ? ' aktiv' : ''}" href="#search" aria-label="MUSCLE-DEX durchsuchen">
             ${iconMarkup('search')}
           </a>
-          <a class="nav-av nav-av-fb kopf-quadrat${route === 'profile' ? ' aktiv' : ''}" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+          <a class="nav-av nav-av-fb${route === 'profile' ? ' aktiv' : ''}" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
         </nav>
       </div>
     </header>
@@ -243,31 +251,33 @@ function renderChrome(route) {
   syncStatusAktualisieren();
 }
 
+// Der Aufbau folgt der Ordnerkarte aus Inspirationen/IMG_5109: ein farbiger
+// Reiter schaut hinter der Karte hervor, oben links die Symbolkachel in
+// derselben Farbe, rechts daneben die Kennzahl, und der Name steht unten in
+// Versalien.
 function sammlungsKarten(daten = sammlungen) {
-  return daten.map(([route, titel, text, icon, farbe, status]) => `
-    <a class="sammlungskarte ${farbe}" href="#${route}" data-sammlung="${route}">
-      <span class="sammlungs-tab" aria-hidden="true"></span>
-      <span class="sammlungs-icon" aria-hidden="true">${iconMarkup(icon)}</span>
-      <span class="sammlungs-status">${status}</span>
+  return daten.map(([route, titel, , icon, farbe, status]) => `
+    <a class="tuck-karte ${farbe}" href="#${route}" data-sammlung="${route}">
+      <span class="tuck-reiter" aria-hidden="true"></span>
+      <span class="tuck-karte-oben">
+        <span class="tuck-icon" aria-hidden="true">${iconMarkup(icon)}</span>
+        <span class="tuck-meta"><b>${status}</b></span>
+      </span>
       <h2>${titel}</h2>
-      <p>${text}</p>
     </a>`).join('');
 }
 
 function mountHome(container) {
   setSeite('home');
   container.innerHTML = `
-    <div class="wrap pad-bottom tuckii-home">
-      <header class="sammlungs-kopf">
-        <div>
-          <span>Bibliothek</span>
-          <h1>Meine Sammlungen</h1>
-        </div>
-        <button class="tuckii-quadrat neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
+    <div class="wrap pad-bottom tuck-home">
+      <header class="tuck-titelzeile">
+        <h1>Meine Sammlungen</h1>
+        <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
           ${iconMarkup('folderPlus')}
         </button>
       </header>
-      <section class="sammlungs-grid" aria-label="Meine Sammlungen">
+      <section class="tuck-grid" aria-label="Meine Sammlungen">
         ${sammlungsKarten()}
       </section>
     </div>`;
@@ -279,24 +289,27 @@ function mountHome(container) {
 
 function mountSearch(container) {
   setSeite('search');
+  const aktiv = sammlungen.filter(([, , , , , status]) => status === 'Aktiv').length;
   container.innerHTML = `
-    <div class="wrap pad-bottom tuckii-suche-seite">
-      <div class="tuckii-suchzeile">
-        <label class="tuckii-suchfeld" for="global-search">
+    <div class="wrap pad-bottom tuck-suche-seite">
+      <div class="tuck-suchzeile">
+        <label class="tuck-suchfeld" for="global-search">
           ${iconMarkup('search')}
           <input id="global-search" type="search" autocomplete="off" placeholder="Sammlungen durchsuchen …">
         </label>
         <a href="#home">Abbrechen</a>
       </div>
-      <section class="such-bibliothek">
+      <section class="tuck-bibliothek">
         <span>Deine Bibliothek</span>
-        <div><b>${sammlungen.length}</b><small>Sammlungen</small></div>
-        <div><b>3</b><small>Aktiv</small></div>
-        <div><b>2</b><small>Geplant</small></div>
+        <div class="tuck-bibliothek-werte">
+          <div><b>${sammlungen.length}</b><small>Sammlungen</small></div>
+          <div><b>${aktiv}</b><small>Aktiv</small></div>
+          <div><b>${sammlungen.length - aktiv}</b><small>Geplant</small></div>
+        </div>
       </section>
-      <h1 class="such-ergebnis-titel">Bereiche</h1>
-      <section class="such-ergebnisse" data-search-results>${sammlungsKarten()}</section>
-      <div class="such-leer" data-search-empty hidden>
+      <h2 class="tuck-abschnittstitel">Bereiche</h2>
+      <section class="tuck-grid" data-search-results>${sammlungsKarten()}</section>
+      <div class="tuck-leer" data-search-empty hidden>
         ${iconMarkup('search')}
         <b>Nichts gefunden</b>
         <span>Die Suche in einzelnen Einträgen ergänzen wir später.</span>

@@ -2,11 +2,16 @@
 // waehrend derselbe Account am Rechner Retro nutzt.
 const KEY = 'nutrition:theme';
 
-export const gueltig = (theme) => (theme === 'dark' ? 'dark' : 'retro');
+// Drei Darstellungen: der Feastables-Standard, das urspruengliche RetroMuscle
+// und Dark. "standard" ist der Ausgangswert und braucht deshalb kein
+// data-theme-Attribut – es ist der :root-Block im Stylesheet.
+export const THEMES = ['standard', 'retro', 'dark'];
+
+export const gueltig = (theme) => (THEMES.includes(theme) ? theme : 'standard');
 
 export function getTheme() {
   try { return gueltig(localStorage.getItem(KEY)); }
-  catch (e) { return 'retro'; }
+  catch (e) { return 'standard'; }
 }
 
 function metaFarbeSetzen(farbe) {

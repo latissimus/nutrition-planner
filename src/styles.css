@@ -1,8 +1,135 @@
 /* ============================================================
-   LOGMAN — RetroMuscle Design System (Light / Neo-Brutalismus)
+   MUSCLE-DEX — Design-Tokens
+
+   Drei Themes teilen sich einen Satz Variablen:
+     standard  Feastables-Palette auf Tuckii-Struktur (Vorgabe)
+     retro     das urspruengliche RetroMuscle-Hellblau
+     dark      die dunkle Umkehrung
+
+   Jede Flaeche, Kontur und Schrift der App liest aus diesen Tokens. Ein Theme
+   zu wechseln heisst deshalb: einen Block Werte austauschen, kein CSS
+   ueberschreiben. Deswegen kommt der Standard hier nach oben in :root und
+   nicht als angehaengter Block ans Dateiende – angehaengt muesste er sich
+   gegen die 2900 Zeilen darunter mit !important wehren.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Theme "Standard" — Feastables-Farben, Tuckii-Geometrie.
+   Die Hex-Werte stammen aus dem Stylesheet von de.feastables.com; die
+   Klassennamen dort sind als Kommentar mitgefuehrt, damit spaetere Aenderungen
+   nachvollziehbar bleiben. Konturen sind reines Schwarz: Sowohl Tuckii als
+   auch Feastables setzen ihre harten Versatzschatten in #000, ein brauner
+   Rand macht die Flaechen stumpf.
+   ------------------------------------------------------------ */
+:root{
+  /* Feastables-Vollton-Palette, unveraendert uebernommen */
+  --fe-yellow:#CEFC17;        /* yellow-neon  */
+  --fe-green:#5EFF1E;         /* green-neon   */
+  --fe-pink:#F54588;          /* pink         */
+  --fe-pink-rose:#F64974;     /* pink-rose    */
+  --fe-pink-peach:#FF6263;    /* pink-peach   */
+  --fe-blurple:#3300FF;       /* blurple      */
+  --fe-blue:#15CCFF;          /* blue-medium  */
+  --fe-blue-light:#58DCFF;    /* blue-light   */
+  --fe-blue-cloud:#72E2FF;    /* blue-cloud   */
+  --fe-blue-silver:#B1F1FF;   /* blue-silver  */
+  --fe-blue-dark:#00B3E3;     /* blue-medium-dark */
+  --fe-navy:#0069A6;          /* blue-navy    */
+  --fe-ocean:#003259;         /* ocean        */
+  --fe-brown:#492425;         /* brown        */
+  --fe-cream:#F2EBE0;         /* cream        */
+
+  --bg:var(--fe-cream);
+  --surface:#FFFFFF;
+  --surface2:#FBF7F0;   /* aufgehelltes Cream fuer eingelassene Flaechen */
+  --ink:#000000;
+  --line:#000000;
+  --text:#111111;
+  --accent-ink:#000000;
+  --muted:#6B5F55;      /* warmes Grau, sitzt lesbar auf Cream und Weiss */
+  --faint:#8C8075;
+  --link:var(--fe-blurple);
+
+  --navy:var(--fe-navy);
+  --navy-panel:var(--fe-ocean);
+  --pink:var(--fe-pink);
+  --pink-press:#EC1791;
+  --pump:var(--fe-pink);
+  --mr:var(--fe-yellow);
+  --load:var(--fe-blurple);
+  --middle:var(--fe-blue-dark);
+  --cluster:var(--fe-blue-dark);
+  --cluster-ink:#FFFFFF;
+  --lila:var(--fe-blue-silver);
+  --lila-ink:var(--fe-ocean);
+  --prio:var(--fe-blurple);
+  --prio-text:var(--fe-blurple);
+  --prio-soft:#DCD4FF;
+  --prio-wash:rgba(51,0,255,.12);
+  --green:var(--fe-ocean);
+  /* Die drei Statusfarben stehen als Text auf hellen Feldern (.d-up, .d-hold,
+     .d-down) und muessen dort lesbar bleiben. Die Neontoene der Marke sind
+     dafuer zu hell, deshalb hier abgedunkelte Varianten derselben Farbtoene. */
+  --up:#2F8B12;
+  --hold:#7C6A0A;
+  --down:#B3242B;
+
+  --mq-h:34px;
+  --brand-outline:#000000;
+  --sil-filter:none;
+
+  /* Tuckii misst auf dem iPhone 14 (390 pt Breite) rund 3 pt Rand, 4 pt harten
+     Versatzschatten und 14 pt Kartenradius. Bedienelemente sind mit 12 pt nur
+     wenig eckiger als die Karten – anders als bei RetroMuscle, wo Knoepfe
+     deutlich kantiger sind als Flaechen. */
+  --bw:3px;
+  --r-karte:14px;
+  --r:12px;
+  --hart:4px 4px 0 var(--ink);
+  --hart-klein:3px 3px 0 var(--ink);
+
+  /* Ueberschriften: Retro setzt kursive Versalien, der Standard nicht. Damit
+     die Basisregel weiter unten fuer beide Themes gilt, steckt der Unterschied
+     in Variablen statt in einer zweiten Regel. */
+  --h-style:normal;
+  --h-transform:none;
+  --h-weight:800;
+  --h-spacing:-.03em;
+
+  --muster-dreieck:none;
+  --muster-tropfen:none;
+
+  /* Aus frueheren Umbauten sind zwei parallele Variablennamen uebrig
+     (--app-* und --feast-*), die noch an einzelnen Stellen gelesen werden.
+     Statt jede Fundstelle anzufassen zeigen sie hier auf die kanonischen
+     Tokens. Wer sie nach und nach ersetzt, kann diesen Block ersatzlos
+     loeschen – neue Regeln benutzen sie nicht mehr. */
+  --app-bg:var(--bg);
+  --app-content-bg:var(--bg);
+  --app-chrome-bg:var(--bg);
+  --app-card:var(--surface);
+  --app-field:var(--surface);
+  --app-outline:var(--ink);
+  --app-divider:rgba(0,0,0,.16);
+  --app-hard-shadow:var(--ink);
+  --feast-brown:var(--text);
+  --feast-line:var(--ink);
+  --feast-pink:var(--pink);
+  --feast-blue:var(--fe-blue-cloud);
+  --feast-blue-strong:var(--fe-blue);
+  --feast-royal:var(--fe-blurple);
+  --feast-violet:var(--fe-blurple);
+
+  --mono:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --ui:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --display:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+}
+
+/* ============================================================
+   Theme "Retro" — das urspruengliche RetroMuscle Design System
    Hellblau · Navy · Pink-Akzent · harte schwarze Ränder, keine Schatten
    ============================================================ */
-:root{
+:root[data-theme="retro"]{
   --bg:#B1E7FF;      /* gemessen auf retromuscle.net */
   --surface:#FFFFFF;
   --surface2:#EAF4FC;
@@ -63,6 +190,14 @@
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   --display:"Helvetica Neue",Arial,system-ui,sans-serif;
+
+  /* Retro traegt seine Flaechen ohne Schatten – nur die Kontur. */
+  --hart:none;
+  --hart-klein:none;
+  --h-style:italic;
+  --h-transform:uppercase;
+  --h-weight:700;
+  --h-spacing:-.01em;
 }
 
 /* ============================================================
@@ -138,8 +273,8 @@ body{
 /* 700 statt 900: Das Vorbild setzt --heading-font-weight auf 700. Unsere
    kursiven Versalien waren spuerbar wuchtiger als dort. */
 h1,h2,h3,.display{
-  font-family:var(--display);font-style:italic;font-weight:700;
-  text-transform:uppercase;letter-spacing:-.01em;line-height:.95;margin:0;
+  font-family:var(--display);font-style:var(--h-style);font-weight:var(--h-weight);
+  text-transform:var(--h-transform);letter-spacing:var(--h-spacing);line-height:.95;margin:0;
 }
 button{font-family:inherit;cursor:pointer}
 a{color:var(--link)}
@@ -851,14 +986,8 @@ html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
 .seiten-einstieg b{font-family:var(--display);font-style:italic;font-size:13px;
   text-transform:uppercase;white-space:nowrap}
 .seiten-einstieg span{color:var(--muted);font-size:12px;line-height:1.35;text-align:left}
-.zurueck{position:absolute;top:calc(100% + 18px);
-  right:max(14px,calc((100vw - 580px) / 2 + 14px));z-index:-1;
-  display:inline-flex;align-items:center;text-decoration:none;
-  background:rgba(255,255,255,.41);border:var(--bw) solid var(--ink);border-radius:16px;
-  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);backdrop-filter:blur(6.65px) saturate(1.25);
-  color:var(--text);padding:8px 12px;
-  font-family:var(--display);font-style:italic;font-weight:700;font-size:13px;text-transform:uppercase}
-:root[data-theme="dark"] .zurueck{background:rgba(30,33,42,.41)}
+
+
 .zurueck .pf{font-family:var(--mono);font-style:normal;font-size:16px;margin-right:3px;line-height:1}
 
 /* ---------- Set-O-Meter ----------
@@ -1060,35 +1189,35 @@ html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
    grossen Flaechen davon ab, leer zu wirken. */
 /* Set-O bleibt bewusst im Kernsystem der App: derselbe hellblaue Grund und
    dieselben weissen Karten wie im Log, Pink markiert nur aktive Planung. */
-:root[data-seite="meter"]{--bg:#B1E7FF;--surface:#FFFFFF;--surface2:#EAF4FC}
-:root[data-seite="prog"]{--bg:#D9BBF7}
-:root[data-seite="feedback"]{--bg:#D9BBF7}
-:root[data-seite="faq"]{--bg:#FBE7A4}
-:root[data-seite="profile"]{--bg:#BFE7D2}
+
+
+
+
+
 /* Hellblauer Grund, weisse Flaechen. Anders als die uebrigen Seiten setzt diese
    auch --surface und --surface2 um: Damit werden Karte, Notizfeld UND der
    "+ Bild"-Chip von selbst weiss, statt jede Flaeche einzeln einzufaerben.
    (--surface2 traegt sonst einen Blaustich, den der Chip sichtbar machen wuerde.) */
 /* Kein eigenes --bg mehr: Die Seite nimmt das globale Hellblau. Frueher stand
    hier der alte Wert #AEDCF6 und blieb nach der Farbanpassung zurueck. */
-:root[data-seite="notizbuch"]{--surface:#FFFFFF;--surface2:#FFFFFF}
 
-:root[data-theme="dark"][data-seite="meter"]{--bg:#101A2B;--surface:#191C24;--surface2:#232733}
+
+
 /* Dunkel: ein gemeinsamer Navy-Grund, die individuellen Muster bleiben bestehen. */
-:root[data-theme="dark"][data-seite="notizbuch"]{--bg:#101A2B;--surface:#1C2637;--surface2:#1C2637}
-:root[data-theme="dark"][data-seite="prog"]{--bg:#101A2B}
-:root[data-theme="dark"][data-seite="feedback"]{--bg:#101A2B}
-:root[data-theme="dark"][data-seite="faq"]{--bg:#101A2B}
-:root[data-theme="dark"][data-seite="profile"]{--bg:#101A2B}
+
+
+
+
+
 
 /* Im Dark-Mode bleibt die Seitenidentitaet am kleinen Farbstempel erhalten.
    Der grosse Hintergrund bleibt dadurch ruhig und konsistent. */
-:root[data-seite="meter"] .seitenkopf-kicker{background:#EADDF3;color:#141414;border-color:#141414}
-:root[data-seite="prog"] .seitenkopf-kicker{background:#D9BBF7;color:#141414;border-color:#141414}
-:root[data-seite="feedback"] .seitenkopf-kicker{background:#FF69AE;color:#141414;border-color:#141414}
-:root[data-seite="faq"] .seitenkopf-kicker{background:#FBE7A4;color:#141414;border-color:#141414}
-:root[data-seite="profile"] .seitenkopf-kicker{background:#BFE7D2;color:#141414;border-color:#141414}
-:root[data-seite="notizbuch"] .seitenkopf-kicker{background:#AEDCF6;color:#141414;border-color:#141414}
+
+
+
+
+
+
 
 /* ---------- Seitenmuster ----------
    Zwei Muster, ueber Variablen waehlbar: die bisherigen Dreiecke und die
@@ -1101,24 +1230,13 @@ html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
    html traegt die Farbe des kompletten Scrollbereichs (siehe --bg oben).
    Stand das Muster nur auf body, endete es an dessen Unterkante – auf kurzen
    Seiten wie Progression war die untere Haelfte einfarbig statt gemustert. */
-:root[data-seite="meter"],:root[data-seite="prog"],:root[data-seite="feedback"],
-:root[data-seite="faq"],:root[data-seite="profile"],:root[data-seite="notizbuch"]{
-  background-image:var(--muster-dreieck);background-size:auto}
-:root[data-theme="dark"][data-seite="meter"],
-:root[data-theme="dark"][data-seite="prog"],
-:root[data-theme="dark"][data-seite="feedback"],
-:root[data-theme="dark"][data-seite="faq"],
-:root[data-theme="dark"][data-seite="profile"],
-:root[data-theme="dark"][data-seite="notizbuch"]{
-  background-image:var(--muster-dreieck-dunkel)}
-:root[data-theme="dark"][data-seite="log"]{background-image:none}
+
+
+
 
 /* Der bisherige Set-O-Hintergrund liegt jetzt auf Progression und Notizbuch. */
-:root[data-seite="prog"],:root[data-seite="notizbuch"]{
-  background-image:var(--muster-tropfen);background-size:112px}
-:root[data-theme="dark"][data-seite="prog"],
-:root[data-theme="dark"][data-seite="notizbuch"]{
-  background-image:var(--muster-tropfen-dunkel)}
+
+
 
 /* body traegt auf allen Seiten eine eigene, deckende --bg-Flaeche (siehe
    oben, "html,body"). Bekommt eine Seite ihr Muster vom html-Element, liegt
@@ -1126,9 +1244,7 @@ html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
    ersatzlos – sichtbar wird nur der schmale Rand, wo html unter body
    hervorschaut. Deshalb hier transparent: html scheint durch, inklusive
    Muster, und liefert exakt dieselbe --bg-Farbe. */
-body[data-seite="meter"],body[data-seite="prog"],body[data-seite="feedback"],
-body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
-  background:transparent}
+
 
 /* ---------- Feedback ---------- */
 .feedback-intro{margin:0;padding:12px 13px;background:var(--surface);
@@ -1324,11 +1440,7 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 :root[data-seite="reminders"] .seitenkopf,
 :root[data-seite="food-log"] .seitenkopf{
   align-items:flex-end;padding:28px 0 14px}
-:root[data-seite="body"] .zurueck,
-:root[data-seite="reminders"] .zurueck,
-:root[data-seite="food-log"] .zurueck{
-  position:static;z-index:auto;flex:0 0 auto;margin-left:auto;background:var(--surface);
-  -webkit-backdrop-filter:none;backdrop-filter:none}
+
 :root[data-seite="body"] #view,
 :root[data-seite="reminders"] #view,
 :root[data-seite="food-log"] #view{overflow-x:clip}
@@ -1356,40 +1468,34 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   border-radius:var(--r);overflow:hidden}
 .setup-theme .themebtn{border-radius:0}
 
-:root[data-seite="home"]{--bg:#B1E7FF}
-:root[data-seite="auth"],:root[data-seite="setup"]{--bg:#B1E7FF}
-:root[data-theme="dark"][data-seite="home"],
-:root[data-theme="dark"][data-seite="auth"],
-:root[data-theme="dark"][data-seite="setup"]{--bg:#101A2B}
 
-.dashboard-hero{padding:34px 3px 26px}
-.dashboard-hero h1{margin:7px 0 12px;color:var(--navy);font-size:clamp(34px,10vw,54px);
-  line-height:.94;letter-spacing:-.045em}
-:root[data-theme="dark"] .dashboard-hero h1{color:var(--text)}
-.dashboard-hero p{max-width:440px;margin:0;color:var(--muted);font-size:13px}
-.modulraster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.modulkarte{position:relative;display:block;min-height:174px;margin:0!important;padding:16px;overflow:hidden;text-decoration:none}
-.modulkarte.aktiv{background:var(--pink);color:var(--accent-ink)}
-.modulkarte h2{margin:38px 0 7px;font-size:20px}
-.modulkarte p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.45}
-.modulkarte.aktiv p{color:#352334}
-.modulkarte.disabled{opacity:.76}
-.modulstatus{position:absolute;top:14px;left:14px;padding:3px 7px;border:1.5px solid var(--ink);
-  border-radius:999px;background:var(--surface2);color:var(--text);font-size:8px;font-weight:800;
-  letter-spacing:.06em;text-transform:uppercase}
-.modulkarte.aktiv .modulstatus{background:var(--mr);color:var(--accent-ink)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .app-toast{position:fixed;z-index:100;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));
   max-width:min(90vw,430px);transform:translate(-50%,20px);padding:10px 14px;background:var(--navy);
   color:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r);font-size:12px;font-weight:800;
   opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
 .app-toast.sichtbar{opacity:1;transform:translate(-50%,0)}
 
-:root[data-seite="body"]{--bg:#B1E7FF}
-:root[data-seite="reminders"]{--bg:#B1E7FF}
-:root[data-seite="food-log"]{--bg:#FFE6A7}
-:root[data-theme="dark"][data-seite="body"],
-:root[data-theme="dark"][data-seite="reminders"]{--bg:#101A2B}
-:root[data-theme="dark"][data-seite="food-log"]{--bg:#101A2B}
+
+
+
+
+
 :root[data-seite="body"] .seitenkopf-kicker{background:#BFE7D2;color:#141414;border-color:#141414}
 :root[data-seite="reminders"] .seitenkopf-kicker{background:#FFDE59;color:#141414;border-color:#141414}
 :root[data-seite="food-log"] .seitenkopf-kicker{background:#FF69AE;color:#141414;border-color:#141414}
@@ -1486,9 +1592,7 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   :root[data-seite="body"] .seitenkopf,
   :root[data-seite="reminders"] .seitenkopf,
   :root[data-seite="food-log"] .seitenkopf{align-items:flex-start;flex-wrap:wrap;padding-top:22px}
-  :root[data-seite="body"] .zurueck,
-  :root[data-seite="reminders"] .zurueck,
-  :root[data-seite="food-log"] .zurueck{margin-left:0}
+  
   .seiten-einstieg b{white-space:normal}
   .card{padding:16px}
   .food-form-card form{padding-top:6px}
@@ -1496,10 +1600,7 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   .food-toolbar span{text-align:right;line-height:1.2}
 }
 
-@media(max-width:420px){
-  .modulraster{grid-template-columns:1fr}
-  .modulkarte{min-height:142px}
-}
+
 
 @media(prefers-reduced-motion:reduce){
   .auth-marquee span{animation:none}
@@ -1512,40 +1613,31 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
    ruhige Gruppen und kompakte Zeilen. Konturen, Farben und Display-Typografie
    halten die Oberflaeche klar im Retro-System.
    ============================================================ */
-.listen-titel{margin:2px 4px 10px;font-size:20px}
-.dashboard-hero{padding:30px 3px 22px}
-.dashboard-hero h1{margin:10px 0 8px;font-size:clamp(38px,11vw,54px);line-height:.9}
-.dashboard-hero p{font-size:12.5px;line-height:1.5}
-.modulraster{
-  display:block;overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);
-  border-radius:var(--r-karte)}
-.modulkarte{
-  display:grid;grid-template-columns:38px minmax(0,1fr) auto 12px;align-items:center;gap:10px;
-  min-height:72px;margin:0;padding:11px 12px;text-decoration:none;color:var(--text);
-  background:var(--surface);border:0;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 24%,transparent)}
-.modulkarte:last-child{border-bottom:0}
-.modulkarte.aktiv{background:var(--surface);color:var(--text)}
-.modulkarte.disabled{opacity:.58}
-.modul-icon{display:grid;place-items:center;width:36px;height:36px;border:1.5px solid var(--ink);
-  border-radius:50%;color:#141414;font-family:var(--display);font-style:italic;font-weight:800;font-size:17px}
-.modul-icon.pink{background:var(--pink)}
-.modul-icon.mint{background:#68D89B}
-.modul-icon.yellow{background:var(--mr)}
-.modul-icon.violet{background:var(--lila)}
-.modul-icon.blue{background:#79C8F2}
-.modul-icon.green{background:#9ADB76}
-.modul-inhalt{min-width:0}
-.modulkarte h2{margin:0 0 3px;font-size:15px;line-height:1.05}
-.modulkarte p,.modulkarte.aktiv p{margin:0;color:var(--muted);font-size:10.5px;line-height:1.35;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.modulstatus{position:static;padding:0;background:none!important;border:0!important;color:var(--muted)!important;
-  font-size:9px;white-space:nowrap}
-.modul-pfeil{color:var(--faint);font-size:23px;line-height:1}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Unterseiten: ein kompakter Navigationskopf wie in einer nativen Listen-App. */
-:root[data-seite="profile"] .seitenkopf{align-items:flex-end;padding:28px 0 14px}
-:root[data-seite="profile"] .zurueck{position:static;z-index:auto;flex:0 0 auto;margin-left:auto;
-  background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+
+
 .seitenkopf-text{gap:6px}
 .seiten-einstieg{margin-bottom:14px;padding:10px 12px;border-radius:12px}
 
@@ -1597,16 +1689,8 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 
 /* Milchglas-Navigation: sichtbar auf beiden Themes, aber leichter als eine
    weitere volle Karte. */
-:root[data-seite="body"] .zurueck,
-:root[data-seite="reminders"] .zurueck,
-:root[data-seite="food-log"] .zurueck,
-:root[data-seite="profile"] .zurueck{
-  background:rgba(255,255,255,.52);-webkit-backdrop-filter:blur(12px) saturate(1.35);
-  backdrop-filter:blur(12px) saturate(1.35)}
-:root[data-theme="dark"][data-seite="body"] .zurueck,
-:root[data-theme="dark"][data-seite="reminders"] .zurueck,
-:root[data-theme="dark"][data-seite="food-log"] .zurueck,
-:root[data-theme="dark"][data-seite="profile"] .zurueck{background:rgba(30,33,42,.62)}
+
+
 
 /* Food-Log: Eingabe als aufklappbare Aktion, gespeicherte Ideen als kompakte
    Medienliste. Damit ist die Sammlung der Hauptinhalt, nicht ein Dauerformular. */
@@ -1657,9 +1741,9 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
   .produktmarke{font-size:17px}
   .produktmarke-pixel{width:32px;height:32px}
   .seitenkopf .section-title{font-size:25px}
-  .seitenkopf .zurueck{padding:7px 10px;font-size:11px}
-  .modulkarte{grid-template-columns:36px minmax(0,1fr) 10px}
-  .modulstatus{display:none}
+  
+  
+  
   .reminder-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-left:0}
   .reminder-row>.fld-l{margin-left:0}
   .reminder-row>[data-label]{width:100%;margin-left:0}
@@ -1671,46 +1755,33 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 
 @media(max-width:350px){
   .seitenkopf{display:block!important}
-  .seitenkopf .zurueck{margin-top:10px!important}
+  
   .reminder-grid{grid-template-columns:minmax(0,1fr)}
   .food-card{grid-template-columns:72px minmax(0,1fr)}
   .food-image{width:72px}
 }
 
 /* ---------- Kachel-Uebersicht nach RetroMuscle-Raster ---------- */
-:root[data-seite="home"] .dashboard-hero{text-align:center;padding:34px 14px 24px}
-:root[data-seite="home"] .dashboard-hero .seitenkopf-kicker{margin-inline:auto}
-:root[data-seite="home"] .dashboard-hero p{max-width:430px;margin-inline:auto}
-:root[data-seite="home"] .listen-titel{text-align:center;margin-bottom:12px}
-:root[data-seite="home"] .modulraster{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
-  overflow:visible;background:none;border:0;border-radius:0}
-:root[data-seite="home"] .modulkarte{
-  display:flex;flex-direction:column;align-items:stretch;gap:0;min-height:0;padding:0;
-  overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);
-  border-radius:var(--r-karte);text-align:center}
-:root[data-seite="home"] .modul-icon{
-  position:relative;width:100%;height:auto;aspect-ratio:1.35;border:0;border-bottom:var(--bw) solid var(--ink);
-  border-radius:0;background:var(--surface2)}
-:root[data-seite="home"] .modul-icon::before{
-  content:"";position:absolute;inset:12%;border:1.5px dashed color-mix(in srgb,var(--ink) 30%,transparent);
-  border-radius:50%}
-:root[data-seite="home"] .modul-icon.pink{background:#F39AC2}
-:root[data-seite="home"] .modul-icon.mint{background:#9ADDB8}
-:root[data-seite="home"] .modul-icon.yellow{background:#F7DF78}
-:root[data-seite="home"] .modul-icon.violet{background:#D8B9F0}
-:root[data-seite="home"] .modul-icon.blue{background:#A8DAF4}
-:root[data-seite="home"] .modul-icon.green{background:#B9DF9E}
-:root[data-seite="home"] .modul-icon .app-icon{position:relative;z-index:1;width:42%;height:42%;
-  color:#141414;vector-effect:non-scaling-stroke}
-:root[data-seite="home"] .modul-inhalt{display:flex;flex:1;flex-direction:column;padding:11px 9px 9px}
-:root[data-seite="home"] .modulkarte h2{font-size:14px;line-height:1.08}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{margin-top:5px;white-space:normal;font-size:9.5px;line-height:1.35}
-:root[data-seite="home"] .modulstatus{display:inline-block;align-self:center;margin:0 0 10px;padding:3px 7px;
-  border:1.5px solid var(--ink)!important;border-radius:999px!important;background:var(--surface2)!important;
-  color:var(--text)!important;font-size:8px}
-:root[data-seite="home"] .modul-pfeil{display:none}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Einheitliche SVG-Masse: Das Bild sitzt geometrisch, nicht nur optisch,
    exakt in seinem Kreis. */
@@ -1731,16 +1802,9 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
 .input[type="date"]::-webkit-calendar-picker-indicator,
 .input[type="time"]::-webkit-calendar-picker-indicator{margin-left:4px}
 
-@media(max-width:520px){
-  :root[data-seite="home"] .dashboard-hero{padding-top:28px}
-  :root[data-seite="home"] .modulraster{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  :root[data-seite="home"] .modul-icon{aspect-ratio:1.25}
-}
 
-@media(max-width:330px){
-  :root[data-seite="home"] .modulraster{grid-template-columns:minmax(0,1fr)}
-  :root[data-seite="home"] .modul-icon{aspect-ratio:1.8}
-}
+
+
 
 /* ============================================================
    NUTRITION UI 2 — ruhige Listenoberflaeche
@@ -1749,39 +1813,11 @@ body[data-seite="faq"],body[data-seite="profile"],body[data-seite="notizbuch"]{
    modernen Reminder-App: keine schweren schwarzen Kartenrahmen, stattdessen
    weisse Gruppen, feine Trenner und wenige, klare Signalfarben.
    ============================================================ */
-:root{
-  --app-bg:#B1E7FF;
-  --app-card:#FFFFFF;
-  --app-field:#EAF4FC;
-  --app-divider:#C7DFEC;
-  --app-purple:#001454;
-  --app-purple-soft:#DCEBFF;
-  --app-secondary:#586274;
-  --app-fs-label:10px;
-  --app-fs-small:12px;
-  --app-fs-body:13px;
-  --app-fs-button:14px;
-  --app-control-h:44px;
-  --app-gap:12px;
-}
-:root[data-theme="dark"]{
-  --app-bg:#111218;
-  --app-card:#1C1D24;
-  --app-field:#272832;
-  --app-divider:#353640;
-  --app-purple:#9B96FF;
-  --app-purple-soft:#302D56;
-  --app-secondary:#9C9AA5;
-}
 
-:root[data-seite="home"],
-:root[data-seite="body"],
-:root[data-seite="reminders"],
-:root[data-seite="food-log"],
-:root[data-seite="profile"]{--bg:var(--app-bg)}
-:root[data-seite="auth"],:root[data-seite="setup"],
-:root[data-theme="dark"][data-seite="auth"],
-:root[data-theme="dark"][data-seite="setup"]{--bg:var(--app-bg)}
+
+
+
+
 body{font-family:var(--ui)}
 .wrap{max-width:560px;padding-inline:12px}
 .pad-bottom{padding-bottom:88px}
@@ -1799,15 +1835,8 @@ h1,h2,h3,.display,.section-title{font-style:normal;letter-spacing:-.025em}
 .seitenkopf .section-title{color:var(--app-purple);font-size:27px}
 .seitenkopf-kicker{padding:0;border:0!important;border-radius:0!important;background:none!important;
   color:var(--app-secondary)!important;font-family:var(--mono);font-size:var(--app-fs-label);letter-spacing:.08em}
-.zurueck,
-:root[data-seite="body"] .zurueck,
-:root[data-seite="reminders"] .zurueck,
-:root[data-seite="food-log"] .zurueck,
-:root[data-seite="profile"] .zurueck{
-  min-height:36px;padding:7px 11px;border:0;border-radius:18px;background:rgba(255,255,255,.68);
-  color:var(--text);box-shadow:0 5px 18px rgba(20,18,32,.09);
-  font-family:var(--ui);font-style:normal;font-size:12px}
-:root[data-theme="dark"] .zurueck{background:rgba(38,39,48,.78)}
+
+
 .seiten-einstieg{gap:3px;margin-bottom:16px;padding:0 2px;border:0;background:transparent}
 .seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:var(--app-fs-body)}
 .seiten-einstieg span{font-family:var(--mono);font-size:var(--app-fs-small);color:var(--app-secondary)}
@@ -1824,31 +1853,22 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .btn-danger{background:#F25F71;color:#fff}
 
 /* Start: pinke Tageskarte und darunter eine einzige, native Listenbox. */
-:root[data-seite="home"] .dashboard-hero{
-  margin:16px 0 24px;padding:15px 16px 16px;border-radius:16px;background:linear-gradient(135deg,#FF83BB,#F45C9D);
-  color:#fff;text-align:left;box-shadow:0 8px 24px rgba(213,70,135,.18)}
-:root[data-seite="home"] .dashboard-hero .seitenkopf-kicker{margin:0;color:#fff!important;opacity:.86}
-:root[data-seite="home"] .dashboard-hero h1{margin:8px 0 5px;color:#fff;font-size:28px}
-:root[data-seite="home"] .dashboard-hero p{margin:0;color:#fff;font-family:var(--mono);font-size:var(--app-fs-small);opacity:.94}
-:root[data-seite="home"] .listen-titel{margin:0 10px 9px;text-align:left;font-size:19px}
-:root[data-seite="home"] .modulraster{
-  display:block;overflow:hidden;background:var(--app-card);border:0;border-radius:20px;box-shadow:none}
-:root[data-seite="home"] .modulkarte{
-  display:grid;grid-template-columns:36px minmax(0,1fr) auto 10px;align-items:center;gap:10px;
-  min-height:64px;padding:9px 12px;border:0;border-bottom:1px solid var(--app-divider);
-  border-radius:0;background:transparent;text-align:left}
-:root[data-seite="home"] .modulkarte:last-child{border-bottom:0}
-:root[data-seite="home"] .modul-icon{
-  width:34px;height:34px;aspect-ratio:1;border:0;border-radius:50%}
-:root[data-seite="home"] .modul-icon::before{display:none}
-:root[data-seite="home"] .modul-icon .app-icon{width:18px;height:18px}
-:root[data-seite="home"] .modul-inhalt{display:block;padding:0}
-:root[data-seite="home"] .modulkarte h2{font-family:var(--display);font-style:italic;font-size:var(--app-fs-body);letter-spacing:0}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{margin-top:2px;font-family:var(--mono);font-size:10px;white-space:nowrap}
-:root[data-seite="home"] .modulstatus{display:block;margin:0;padding:0;border:0!important;background:none!important;
-  color:var(--app-secondary)!important;font-family:var(--ui);font-size:9px}
-:root[data-seite="home"] .modul-pfeil{display:block;color:#B7B4BD;font-size:20px}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Reminder-Gruppen und Profil-Dropdowns nutzen exakt dieselbe Formsprache. */
 [data-reminders-card]{background:transparent}
@@ -1907,9 +1927,9 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 @media(max-width:520px){
   .wrap{padding-inline:12px}
   .card{padding:15px}
-  :root[data-seite="home"] .modulraster{display:block}
-  :root[data-seite="home"] .modulkarte{grid-template-columns:34px minmax(0,1fr) auto 10px}
-  .seitenkopf .zurueck{margin-left:auto}
+  
+  
+  
 }
 
 /* Einmaliger Hinweis fuer Benachrichtigungen. Kein Dauergast: Nach dem Tippen
@@ -2080,16 +2100,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
    Diese Regeln stehen bewusst zuletzt: Der uebernommene LOGMAN-Bestand
    enthaelt weiter oben und unten Komponentenregeln mit eigenen Einzelwerten.
    ============================================================ */
-:root[data-seite="home"],
-:root[data-seite="body"],
-:root[data-seite="reminders"],
-:root[data-seite="food-log"],
-:root[data-seite="profile"]{
-  --bg:var(--app-bg);
-  --surface:var(--app-card);
-  --surface2:var(--app-field);
-  --link:var(--navy);
-}
+
 .btn,.pb-go,[data-save-reminders],.profile-datei-knopf{
   min-height:var(--app-control-h);font-size:var(--app-fs-button);line-height:1.15}
 .btn,.pb-go,[data-save-reminders]{
@@ -2125,13 +2136,13 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 @media(max-width:520px){
   .seitenkopf{padding-top:18px!important;padding-bottom:12px!important}
-  .dashboard-hero{margin-top:12px!important;margin-bottom:20px!important}
+  
   .card{padding:15px}
 }
 
 /* ---------- Letzter visueller Abgleich ---------- */
-:root{--app-outline:rgba(0,20,84,.24)}
-:root[data-theme="dark"]{--app-outline:rgba(237,240,246,.20)}
+
+
 
 /* Header: etwas mehr Praesenz und dieselbe feine Kontur wie die Inhalte. */
 .app-kopf{border-bottom:1px solid var(--app-outline)}
@@ -2176,33 +2187,27 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 [data-save-reminders]{height:46px;min-height:46px;padding-block:0}
 
 /* Auf der Startseite duerfen die neuen Listenmasse etwas grosszuegiger sein. */
-:root[data-seite="home"] .dashboard-hero{
-  display:block;padding:18px 18px 17px;text-decoration:none}
-:root[data-seite="home"] .dashboard-hero h1{font-size:32px}
-:root[data-seite="home"] .dashboard-hero p{font-size:13px;line-height:1.45}
-.dashboard-hero-link{display:flex;align-items:center;justify-content:space-between;margin-top:13px;
-  padding-top:11px;border-top:1px solid rgba(255,255,255,.42);color:#fff;
-  font-family:var(--display);font-size:13px;font-style:italic;font-weight:700;text-transform:uppercase}
-.dashboard-hero-link b{font-size:23px;line-height:.7}
-:root[data-seite="home"] .listen-titel{font-size:21px;margin-bottom:10px}
-:root[data-seite="home"] .modulkarte{min-height:70px;padding:10px 13px;
-  grid-template-columns:38px minmax(0,1fr) auto 11px}
-:root[data-seite="home"] .modul-icon{width:38px;height:38px}
-:root[data-seite="home"] .modul-icon .app-icon{width:20px;height:20px}
-:root[data-seite="home"] .modulkarte h2{font-size:14px}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{font-size:11px}
-:root[data-seite="home"] .modulstatus{font-size:10px}
+
+
+
+
+
+
+
+
+
+
+
+
 
 @media(max-width:520px){
   .app-kopf .wrap{min-height:66px}
-  :root[data-seite="home"] .modulkarte{
-    grid-template-columns:38px minmax(0,1fr) auto 11px}
+  
 }
 
 /* ---------- Retro-Boost ohne Layoutaenderung ---------- */
-:root{--app-outline:rgba(0,20,84,.58);--app-hard-shadow:rgba(0,20,84,.14)}
-:root[data-theme="dark"]{--app-outline:rgba(237,240,246,.30);--app-hard-shadow:rgba(0,0,0,.34)}
+
+
 :root:not([data-theme="dark"]) #view{
   background-image:var(--muster-dreieck);background-attachment:fixed}
 :root[data-theme="dark"] #view{
@@ -2216,7 +2221,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 .card,.modulraster,.reminder-group,.profile-abschnitt,.food-card,.food-form-card{
   border-width:2px!important;box-shadow:3px 3px 0 var(--app-hard-shadow)}
-:root[data-seite="home"] .modulraster{box-shadow:3px 3px 0 var(--app-hard-shadow)}
+
 .modulkarte:not(:last-child),.reminder-row{border-bottom-color:var(--app-outline)}
 .zurueck,.pushbar,.themeseg{border-width:2px!important}
 .btn,.profile-datei-knopf,.reminder-add span,.food-add-icon{
@@ -2225,11 +2230,8 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   border:2px solid var(--app-outline)}
 .input{border-color:var(--app-outline)}
 
-:root[data-seite="home"] .listen-titel{
-  margin-top:25px;margin-left:5px;font-size:22px;color:var(--navy)}
-:root[data-seite="home"] .modulstatus{
-  padding:2px 6px;border:1px solid var(--app-outline)!important;border-radius:999px!important;
-  background:var(--surface2)!important;font-family:var(--mono);font-weight:800}
+
+
 .reminder-group-head em{font-family:var(--mono)}
 .seitenkopf-kicker,label.fld-l,.falte span,.reminder-grid label span{
   font-family:var(--mono)}
@@ -2247,25 +2249,19 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   --muster-plus-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M14 10v8M10 14h8' fill='none' stroke='%23EDF0F6' stroke-width='1.5' stroke-linecap='round' stroke-opacity='.045'/%3E%3C/svg%3E");
   --muster-welle-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24'%3E%3Cpath d='M-2 12c5-6 10-6 15 0s10 6 15 0 10-6 15 0' fill='none' stroke='%23EDF0F6' stroke-width='1.4' stroke-opacity='.04'/%3E%3C/svg%3E");
 }
-:root[data-seite="home"]{--bg:#B1E7FF;--app-pattern:var(--muster-dreieck)}
-:root[data-seite="body"]{--bg:#CDEFD9;--app-pattern:var(--muster-punkte)}
-:root[data-seite="reminders"]{--bg:#FBE7A4;--app-pattern:var(--muster-plus)}
-:root[data-seite="food-log"]{--bg:#FFE6A7;--app-pattern:var(--muster-tropfen)}
-:root[data-seite="profile"]{--bg:#E3D7F3;--app-pattern:var(--muster-welle)}
-:root[data-seite="auth"],:root[data-seite="setup"]{--bg:#B1E7FF;--app-pattern:var(--muster-dreieck)}
 
-:root[data-theme="dark"][data-seite="home"],
-:root[data-theme="dark"][data-seite="body"],
-:root[data-theme="dark"][data-seite="reminders"],
-:root[data-theme="dark"][data-seite="food-log"],
-:root[data-theme="dark"][data-seite="profile"],
-:root[data-theme="dark"][data-seite="auth"],
-:root[data-theme="dark"][data-seite="setup"]{--bg:#101A2B}
-:root[data-theme="dark"][data-seite="home"]{--app-pattern:var(--muster-dreieck-dunkel)}
-:root[data-theme="dark"][data-seite="body"]{--app-pattern:var(--muster-punkte-dunkel)}
-:root[data-theme="dark"][data-seite="reminders"]{--app-pattern:var(--muster-plus-dunkel)}
-:root[data-theme="dark"][data-seite="food-log"]{--app-pattern:var(--muster-tropfen-dunkel)}
-:root[data-theme="dark"][data-seite="profile"]{--app-pattern:var(--muster-welle-dunkel)}
+
+
+
+
+
+
+
+
+
+
+
+
 
 html,body,#app{min-height:100%;background-color:var(--bg)}
 #app{min-height:100dvh}
@@ -2280,13 +2276,7 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 .app-kopf::before,.app-kopf::after{background:var(--bg)}
 
 /* Keine weichen oder harten Schlagschatten. Kontur und Farbe reichen. */
-:root[data-seite="home"] #app *,
-:root[data-seite="body"] #app *,
-:root[data-seite="reminders"] #app *,
-:root[data-seite="food-log"] #app *,
-:root[data-seite="profile"] #app *,
-:root[data-seite="auth"] #app *,
-:root[data-seite="setup"] #app *{box-shadow:none!important}
+
 
 /* ---------- Grosse, bewusst unregelmaessige Tapeten ---------- */
 :root{
@@ -2298,12 +2288,12 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
   --muster-wellen-gross:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='150' viewBox='0 0 240 150'%3E%3Cg fill='none' stroke='%2367318F' stroke-width='7' stroke-linecap='round' stroke-opacity='.075'%3E%3Cpath d='M-12 30c24-25 48-25 72 0s48 25 72 0 48-25 72 0 48 25 72 0'/%3E%3Cpath d='M-55 112c24-25 48-25 72 0s48 25 72 0 48-25 72 0 48 25 72 0'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-:root[data-seite="home"]{--bg:#CDEFD9;--app-pattern:var(--muster-dreiecke-gross)}
-:root[data-seite="body"]{--bg:#B1E7FF;--app-pattern:var(--muster-winkel-gross)}
-:root[data-seite="reminders"]{--bg:#E3D7F3;--app-pattern:var(--muster-knochen-gross)}
-:root[data-seite="food-log"]{--bg:#FFE6A7;--app-pattern:var(--muster-steak-gross)}
-:root[data-seite="profile"]{--bg:#F2D9E7;--app-pattern:var(--muster-wellen-gross)}
-:root[data-seite="auth"],:root[data-seite="setup"]{--bg:#DDB7F6;--app-pattern:var(--muster-tropfen-gross)}
+
+
+
+
+
+
 :root[data-seite] #view{background-image:var(--app-pattern)}
 
 /* Lesbarere Knochen- und Steak-Silhouetten. */
@@ -2348,20 +2338,10 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 :root{
   --muster-home-petrol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='230' height='155' viewBox='0 0 230 155'%3E%3Cg fill='%23F3C178' fill-opacity='.12'%3E%3Cpath d='M14 18h38L14 56z'/%3E%3Cpath d='M151 7h48l-48 48z' transform='rotate(13 175 31)'/%3E%3Cpath d='M72 99h43l-43 43z' transform='rotate(-10 93 120)'/%3E%3Cpath d='M194 111h29l-29 29z' transform='rotate(20 208 125)'/%3E%3C/g%3E%3C/svg%3E");
 }
-:root:not([data-theme="dark"])[data-seite="home"]{
-  --bg:#2491C4;
-  --app-pattern:var(--muster-home-petrol);
-}
-:root:not([data-theme="dark"])[data-seite="home"] .listen-titel{
-  color:#FFF0CE;
-}
-:root:not([data-theme="dark"])[data-seite="home"] .app-kopf{
-  border-bottom-color:rgba(255,240,206,.28);
-}
-:root[data-theme="dark"][data-seite="home"]{
-  --bg:#101A2B;
-  --app-pattern:var(--muster-dreieck-dunkel);
-}
+
+
+
+
 
 /* ============================================================
    Feastables-inspirierte Startseite
@@ -2397,72 +2377,31 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 .app-kopf .nav-av{width:44px;height:44px;border:2px solid var(--feast-brown)}
 #view{min-height:calc(100dvh - 66px)}
 
-:root:not([data-theme="dark"])[data-seite="home"]{
-  --bg:var(--feast-blue);
-  --app-pattern:var(--muster-home-feast);
-  --app-card:var(--feast-cream);
-  --app-divider:var(--feast-line);
-  --app-outline:var(--feast-brown);
-}
-:root:not([data-theme="dark"])[data-seite="home"] .app-kopf{
-  background:var(--feast-blue);border-bottom-color:var(--feast-line);
-}
-:root:not([data-theme="dark"])[data-seite="home"] .app-kopf::before,
-:root:not([data-theme="dark"])[data-seite="home"] .app-kopf::after{
-  background:var(--feast-blue);
-}
-:root:not([data-theme="dark"])[data-seite="home"] #view{
-  background-color:var(--feast-blue);
-}
 
-:root[data-seite="home"] .home-band{
-  position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;
-  gap:3px 14px;margin:18px 0 22px;padding:13px 64px 13px 15px;
-  overflow:hidden;background:var(--feast-violet);color:#fff;
-  border:2px solid var(--feast-brown);border-radius:14px;
-}
-:root[data-seite="home"] .home-band::after{
-  content:"";position:absolute;inset:0 0 0 auto;width:48px;background:var(--feast-pink);
-  border-left:2px solid var(--feast-brown);
-}
-:root[data-seite="home"] .home-band span{
-  grid-column:1;font:800 9px/1 var(--mono);letter-spacing:.14em;
-}
-:root[data-seite="home"] .home-band strong{
-  grid-column:1;font:700 14px/1.15 var(--display);font-style:italic;text-transform:uppercase;
-}
-:root[data-seite="home"] .home-band b{
-  position:absolute;z-index:1;right:16px;top:50%;transform:translateY(-50%);
-  font:800 23px/1 var(--display);font-style:italic;color:#fff;
-}
-:root[data-seite="home"] .listen-titel{
-  margin:0 8px 9px;color:var(--feast-brown);
-}
-:root[data-seite="home"] .modulraster{
-  background:var(--feast-cream);border:2px solid var(--feast-brown);border-radius:18px;
-}
-:root[data-seite="home"] .modulkarte{
-  min-height:70px;padding:10px 13px;
-  grid-template-columns:40px minmax(0,1fr) auto 11px;
-  border-bottom:2px solid var(--feast-line);color:var(--feast-brown);
-}
-:root[data-seite="home"] .modulkarte:last-child{border-bottom:0}
-:root[data-seite="home"] .modul-icon{
-  width:40px;height:40px;border:2px solid var(--feast-brown);color:var(--feast-brown);
-}
-:root[data-seite="home"] .modul-icon.mint{background:var(--feast-blue-strong)}
-:root[data-seite="home"] .modul-icon.yellow{background:var(--feast-pink)}
-:root[data-seite="home"] .modul-icon.violet{background:#CBA7EA}
-:root[data-seite="home"] .modul-icon.blue{background:var(--feast-royal);color:#fff}
-:root[data-seite="home"] .modul-icon.green{background:var(--feast-violet);color:#fff}
-:root[data-seite="home"] .modulkarte h2{font-size:15px;color:var(--feast-brown)}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{color:#6A5555;font-size:10.5px}
-:root[data-seite="home"] .modulstatus{
-  color:var(--feast-violet)!important;font-weight:800;
-}
-:root[data-seite="home"] .modulkarte.disabled .modulstatus{color:#8A7676!important}
-:root[data-seite="home"] .modul-pfeil{color:var(--feast-brown)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @media(max-width:520px){
   .app-kopf .wrap{min-height:44px}
@@ -2481,221 +2420,93 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 
 /* ---------- Startseite nach der Headspace-Informationshierarchie ---------- */
-:root[data-seite="home"] .wrap.pad-bottom{padding-top:18px}
-.home-suche{
-  display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:11px;
-  width:100%;min-height:54px;padding:0 16px;margin:0 0 14px;
-  border:2px solid var(--feast-brown);border-radius:17px;background:var(--feast-cream);
-  color:var(--feast-brown);text-align:left;
-}
-.home-suche svg{
-  width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;
-  stroke-linecap:round;
-}
-.home-suche span{font:700 14px/1 var(--ui)}
-.home-suche em{
-  padding:4px 7px;border-radius:999px;background:var(--feast-violet);color:#fff;
-  font:800 8px/1 var(--mono);font-style:normal;text-transform:uppercase;letter-spacing:.05em;
-}
+
+
+
+
+
 .home-schnell{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:25px;
 }
-.home-schnellkarte{
-  display:grid;grid-template-columns:34px minmax(0,1fr);grid-template-rows:auto auto;
-  align-items:center;column-gap:9px;min-height:70px;padding:10px 11px;
-  border:2px solid var(--feast-brown);border-radius:15px;background:var(--feast-cream);
-  color:var(--feast-brown);text-decoration:none;overflow:hidden;
-}
-.home-schnellkarte>span{
-  grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
-  border:2px solid var(--feast-brown);
-}
-.home-schnellkarte .app-icon{width:18px;height:18px}
-.home-schnellkarte b{
-  align-self:end;min-width:0;font:700 13px/1.05 var(--display);font-style:italic;
-  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.home-schnellkarte small{
-  align-self:start;margin-top:3px;color:#6A5555;font:700 8.5px/1.1 var(--mono);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.home-schnellkarte.pink>span{background:var(--feast-pink)}
-.home-schnellkarte.violet>span{background:#CBA7EA}
-.home-schnellkarte.blue>span{background:var(--feast-blue-strong)}
-.home-schnellkarte.royal>span{background:var(--feast-royal);color:#fff}
-.home-schnellkarte.disabled{opacity:.64}
 
-:root[data-seite="home"] .listen-titel{
-  margin:0 4px 11px;font-size:21px;
-}
-:root[data-seite="home"] .modulraster{
-  display:grid;grid-template-columns:1fr;gap:12px;
-  overflow:visible;background:transparent;border:0;border-radius:0;
-}
-:root[data-seite="home"] .modulkarte{
-  display:grid;grid-template-columns:minmax(0,1fr) 104px;
-  grid-template-rows:1fr auto;grid-template-areas:"inhalt bild" "status bild";
-  align-items:center;gap:4px 10px;min-height:124px;padding:15px 0 12px 16px;
-  overflow:hidden;border:2px solid var(--feast-brown);border-radius:17px;
-  background:var(--feast-cream);text-align:left;
-}
-:root[data-seite="home"] .modulkarte:last-child{border-bottom:2px solid var(--feast-brown)}
-:root[data-seite="home"] .modul-inhalt{
-  grid-area:inhalt;align-self:end;display:block;padding:0;min-width:0;
-}
-:root[data-seite="home"] .modulkarte h2{
-  margin:0 0 6px;font-size:19px;line-height:1;color:var(--feast-brown);
-}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{
-  margin:0;display:-webkit-box;overflow:hidden;color:#6A5555;font-size:11px;
-  line-height:1.38;white-space:normal;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-}
-:root[data-seite="home"] .modul-icon{
-  grid-area:bild;align-self:stretch;justify-self:stretch;position:relative;
-  width:auto;height:auto;min-height:94px;margin:-15px 0 -12px;
-  border:0;border-left:2px solid var(--feast-brown);border-radius:52% 0 0 42%;
-}
-:root[data-seite="home"] .modul-icon .app-icon{width:46px;height:46px}
-:root[data-seite="home"] .modul-icon::before{
-  content:"";display:block;position:absolute;right:-16px;bottom:-25px;width:72px;height:72px;
-  border:2px solid var(--feast-brown);border-radius:50%;background:rgba(255,255,255,.24);
-}
-:root[data-seite="home"] .modulstatus{
-  grid-area:status;align-self:end;justify-self:start;display:inline-block;
-  margin:8px 0 0;padding:4px 7px;border:1.5px solid var(--feast-brown)!important;
-  border-radius:999px!important;background:#fff!important;
-  color:var(--feast-violet)!important;font:800 8px/1 var(--mono);
-  text-transform:uppercase;
-}
-:root[data-seite="home"] .modul-pfeil{display:none}
 
-@media(max-width:360px){
-  .home-schnellkarte{grid-template-columns:30px minmax(0,1fr);padding-inline:8px}
-  .home-schnellkarte>span{width:30px;height:30px}
-  .home-schnellkarte b{font-size:11px}
-  :root[data-seite="home"] .modulkarte{grid-template-columns:minmax(0,1fr) 88px}
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ---------- Flacher Feastables-Pass ---------- */
-.home-suche{
-  position:sticky;top:calc(env(safe-area-inset-top) + 72px);z-index:15;
-  min-height:50px;margin:0 0 13px;border:1px solid rgba(73,36,37,.24);
-  border-radius:16px;background:rgba(242,235,224,.48);
-  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
-  backdrop-filter:blur(6.65px) saturate(1.25);
-}
-.home-suche em{background:var(--feast-violet)}
+
+
 
 .home-schnell{gap:8px;margin-bottom:22px}
-.home-schnellkarte{
-  min-height:58px;padding:8px 10px;border:1px solid rgba(73,36,37,.22);
-  border-radius:12px;background:rgba(242,235,224,.88);
-}
-.home-schnellkarte>span{
-  width:30px;height:30px;border:0;border-radius:9px;
-}
-.home-schnellkarte .app-icon{width:17px;height:17px}
-.home-schnellkarte b{font-size:12px}
-.home-schnellkarte small{font-size:8px}
-.home-schnellkarte.violet{background:rgba(103,49,143,.14)}
-.home-schnellkarte.violet>span{background:var(--feast-violet);color:#fff}
 
-:root[data-seite="home"] .modulraster{
-  display:grid!important;gap:9px!important;background:transparent!important;
-  border:0!important;outline:0!important;border-radius:0!important;
-}
-:root[data-seite="home"] .modulkarte{
-  grid-template-columns:minmax(0,1fr) 78px;min-height:94px;
-  padding:13px 0 11px 14px;border:1px solid rgba(73,36,37,.22)!important;
-  border-radius:14px;background:rgba(242,235,224,.94);
-}
-:root[data-seite="home"] .modulkarte:last-child{
-  border:1px solid rgba(73,36,37,.22)!important;
-}
-:root[data-seite="home"] .modulkarte h2{margin-bottom:4px;font-size:17px}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{font-size:10px}
-:root[data-seite="home"] .modul-icon{
-  min-height:72px;margin:-13px 0 -11px;border:0!important;border-radius:14px 0 0 14px;
-}
-:root[data-seite="home"] .modul-icon .app-icon{width:34px;height:34px}
-:root[data-seite="home"] .modul-icon::before{display:none}
-:root[data-seite="home"] .modul-icon.mint{background:var(--feast-blue-strong)}
-:root[data-seite="home"] .modul-icon.yellow{background:var(--feast-pink)}
-:root[data-seite="home"] .modul-icon.violet{background:var(--feast-violet);color:#fff}
-:root[data-seite="home"] .modul-icon.blue{background:var(--feast-royal);color:#fff}
-:root[data-seite="home"] .modul-icon.green{background:#CBA7EA;color:var(--feast-brown)}
-:root[data-seite="home"] .modulstatus{
-  margin-top:6px;padding:0;border:0!important;background:transparent!important;
-  color:var(--feast-violet)!important;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ---------- Ruhige, inhaltsorientierte Startkarten ---------- */
-.home-suche{
-  border:0;box-shadow:none;background:rgba(242,235,224,.52);
-  color:var(--feast-brown);
-}
-.home-schnellkarte{
-  border:0;box-shadow:none;background:rgba(242,235,224,.86);
-}
-.home-schnellkarte.violet{background:rgba(103,49,143,.16)}
 
-:root[data-seite="home"] .listen-titel{
-  position:relative;padding-left:12px;color:var(--feast-brown);
-}
-:root[data-seite="home"] .listen-titel::before{
-  content:"";position:absolute;left:0;top:2px;bottom:2px;width:4px;
-  border-radius:4px;background:var(--feast-brown);
-}
-:root[data-seite="home"] .modulkarte,
-:root[data-seite="home"] .modulkarte:last-child{
-  position:relative;display:grid;
-  grid-template-columns:minmax(0,1fr) 34px;
-  grid-template-rows:1fr auto;grid-template-areas:"inhalt bild" "status bild";
-  min-height:88px;padding:13px 14px 11px 17px;
-  border:0!important;border-radius:14px;background:rgba(242,235,224,.94);
-}
-:root[data-seite="home"] .modulkarte::before{
-  content:"";position:absolute;left:0;top:13px;bottom:13px;width:5px;
-  border-radius:0 5px 5px 0;background:var(--feast-violet);
-}
-:root[data-seite="home"] .modulkarte[data-icon="body"]::before{background:var(--feast-blue-strong)}
-:root[data-seite="home"] .modulkarte[data-icon="reminders"]::before{background:var(--feast-pink)}
-:root[data-seite="home"] .modulkarte[data-icon="food"]::before{background:var(--feast-violet)}
-:root[data-seite="home"] .modulkarte[data-icon="recipes"]::before{background:var(--feast-royal)}
-:root[data-seite="home"] .modulkarte[data-icon="habits"]::before{background:var(--feast-brown)}
-:root[data-seite="home"] .modul-icon,
-:root[data-seite="home"] .modul-icon.mint,
-:root[data-seite="home"] .modul-icon.yellow,
-:root[data-seite="home"] .modul-icon.violet,
-:root[data-seite="home"] .modul-icon.blue,
-:root[data-seite="home"] .modul-icon.green{
-  grid-area:bild;align-self:center;justify-self:end;
-  display:grid;place-items:center;width:30px;height:30px;min-height:0;margin:0;
-  border:0!important;border-radius:0;background:transparent;color:var(--feast-brown);
-  opacity:.72;
-}
-:root[data-seite="home"] .modul-icon .app-icon{width:25px;height:25px}
-:root[data-seite="home"] .modulkarte h2{
-  color:var(--feast-brown);font-size:17px;
-}
-:root[data-seite="home"] .modulkarte p,
-:root[data-seite="home"] .modulkarte.aktiv p{color:rgba(73,36,37,.72)}
-:root[data-seite="home"] .modulstatus{
-  color:var(--feast-brown)!important;opacity:.72;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* iOS ignoriert background-attachment:fixed bei scrollbaren Seitenelementen
    teilweise. Eine eigene feste Tapetenebene bleibt dagegen wirklich am
    Viewport stehen, waehrend nur die Inhalte darueber scrollen. */
-:root[data-seite="home"] #view{
-  position:relative;isolation:isolate;background:transparent;background-image:none;
-}
-:root[data-seite="home"] #view::before{
-  content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;
-  background-color:var(--bg);background-image:var(--app-pattern);background-repeat:repeat;
-}
+
+
 
 /* ---------- Nunito und echte Tagesstatus-Karten ---------- */
 :root{--display:"Nunito","Arial Rounded MT Bold","Helvetica Neue",Arial,system-ui,sans-serif}
@@ -2704,138 +2515,55 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 }
 
 .home-schnell{gap:9px;margin-bottom:24px}
-.home-schnellkarte,
-.home-schnellkarte.violet{
-  display:grid;grid-template-columns:29px minmax(0,1fr);
-  grid-template-rows:auto auto auto;column-gap:8px;align-content:center;
-  min-height:82px;padding:9px 10px;border:0;border-radius:13px;
-  color:#141414;background:var(--feast-cream);opacity:1;
-}
-.home-schnellkarte.pink{background:#F69EC5}
-.home-schnellkarte.violet{background:#CBA7EA}
-.home-schnellkarte.blue{background:#69C3D2}
-.home-schnellkarte.royal{background:#A2DEDA}
-.home-schnellkarte>span,
-.home-schnellkarte.violet>span{
-  grid-column:1;grid-row:1/4;align-self:center;
-  display:grid;place-items:center;width:27px;height:27px;
-  border:0;border-radius:0;background:transparent;color:#141414;
-}
-.home-schnellkarte .app-icon{width:22px;height:22px}
-.home-schnellkarte small{
-  grid-column:2;grid-row:1;align-self:end;margin:0;
-  color:rgba(20,20,20,.66);font-family:var(--display);font-size:9px;
-  font-weight:800;line-height:1.05;letter-spacing:.055em;text-transform:uppercase;
-}
-.home-schnellkarte strong{
-  grid-column:2;grid-row:2;display:block;min-width:0;margin:2px 0 1px;
-  overflow:hidden;color:#141414;font-family:var(--display);font-size:19px;
-  font-weight:900;line-height:1;letter-spacing:-.035em;white-space:nowrap;text-overflow:ellipsis;
-}
-.home-schnellkarte em{
-  grid-column:2;grid-row:3;display:block;min-width:0;
-  overflow:hidden;color:rgba(20,20,20,.72);font-family:var(--display);
-  font-size:8.5px;font-style:normal;font-weight:700;line-height:1.1;
-  white-space:nowrap;text-overflow:ellipsis;
-}
-.home-schnellkarte.disabled{opacity:.72}
 
-@media(max-width:360px){
-  .home-schnellkarte,
-  .home-schnellkarte.violet{
-    grid-template-columns:25px minmax(0,1fr);column-gap:6px;min-height:78px;padding-inline:8px;
-  }
-  .home-schnellkarte>span,.home-schnellkarte.violet>span{width:24px;height:24px}
-  .home-schnellkarte .app-icon{width:19px;height:19px}
-  .home-schnellkarte strong{font-size:17px}
-  .home-schnellkarte small{font-size:8px}
-  .home-schnellkarte em{font-size:7.75px}
-}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ============================================================
    Persistente Bereichsnavigation
    Header, Suche und Reiter bleiben stehen; nur #view wechselt.
    ============================================================ */
-:root{
-  --app-header-gesamt:calc(env(safe-area-inset-top) + 66px);
-}
 
-.app-navigation{
-  position:sticky;top:var(--app-header-gesamt);z-index:19;
-  padding-top:10px;background:var(--bg);color:var(--feast-brown);
-}
-.app-suche-wrap{padding-bottom:10px}
-.app-suche{
-  display:grid;grid-template-columns:27px minmax(0,1fr) auto;align-items:center;gap:12px;
-  width:100%;min-height:64px;margin:0;padding:0 18px;
-  border:0;border-radius:18px;background:rgba(242,235,224,.58);
-  color:var(--feast-brown);text-align:left;
-  -webkit-backdrop-filter:blur(9px) saturate(1.18);
-  backdrop-filter:blur(9px) saturate(1.18);
-}
-.app-suche svg{
-  width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2;
-  stroke-linecap:round;
-}
-.app-suche span{
-  overflow:hidden;font-family:var(--display);font-size:16px;font-weight:900;
-  letter-spacing:-.02em;white-space:nowrap;text-overflow:ellipsis;
-}
-.app-suche em{
-  padding:5px 9px;border-radius:999px;background:var(--feast-violet);color:#fff;
-  font:900 8px/1 var(--display);font-style:normal;letter-spacing:.08em;text-transform:uppercase;
-}
 
-.bereichsleiste{
-  width:100%;overflow:hidden;border-top:2px solid var(--feast-brown);
-  border-bottom:2px solid var(--feast-brown);background:var(--feast-cream);
-}
-.bereichsleiste-track{
-  display:flex;width:100%;overflow-x:auto;overscroll-behavior-x:contain;
-  scrollbar-width:none;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
-}
-.bereichsleiste-track::-webkit-scrollbar{display:none}
-.bereichsleiste a{
-  display:flex;flex:0 0 auto;align-items:center;justify-content:center;
-  min-height:42px;padding:0 16px;border-right:1px solid rgba(73,36,37,.32);
-  background:var(--feast-cream);color:var(--feast-brown);text-decoration:none;
-  font-family:var(--display);font-size:11px;font-style:italic;font-weight:900;
-  letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;scroll-snap-align:center;
-  touch-action:pan-x manipulation;
-}
-.bereichsleiste a:last-child{border-right:0}
-.bereichsleiste a.aktiv{
-  background:var(--feast-brown);color:#fff;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Die feste Bereichsleiste ersetzt den bisherigen Zurueck-zur-Uebersicht-Chip. */
-.app-navigation + #view .seitenkopf .zurueck{display:none}
-.app-navigation + #view .seitenkopf{
-  padding-top:18px!important;padding-bottom:11px!important;
-}
-.app-navigation + #view{min-height:calc(100dvh - var(--app-header-gesamt) - 118px)}
+
+
+
 
 .home-inhalt{padding-top:18px}
-.home-inhalt-kopf{margin:0 2px 13px;color:var(--feast-brown)}
-.home-inhalt-kopf span{
-  display:block;margin-bottom:3px;font-family:var(--display);font-size:9px;font-weight:900;
-  letter-spacing:.12em;text-transform:uppercase;
-}
-.home-inhalt-kopf h1{
-  color:var(--feast-brown);font-family:var(--display);font-size:27px;font-style:normal;
-  font-weight:900;letter-spacing:-.04em;text-transform:uppercase;
-}
 
-:root[data-seite="recipes"]{
-  --bg:#FFE6A7;--app-pattern:var(--muster-steak-gross);
-}
-:root[data-seite="habits"]{
-  --bg:#CDEFD9;--app-pattern:var(--muster-dreiecke-gross);
-}
+
+
+
+
+
 :root[data-seite="recipes"] #view,
 :root[data-seite="habits"] #view{background-image:var(--app-pattern)}
-:root[data-seite="recipes"] #app *,
-:root[data-seite="habits"] #app *{box-shadow:none!important}
+
 .bereich-vorschau .seitenkopf{padding-right:0}
 .vorschau-karte{
   display:grid;grid-template-columns:42px minmax(0,1fr);gap:5px 12px;align-items:center;
@@ -2846,326 +2574,284 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .vorschau-karte p{margin:0;color:var(--muted);font-size:12px}
 
 @media(max-width:520px){
-  .app-suche{min-height:62px;padding-inline:16px}
-  .app-suche span{font-size:15px}
-  .bereichsleiste a{min-height:40px;padding-inline:14px;font-size:10.5px}
+  
+  
+  
   .home-inhalt{padding-top:15px}
 }
 
-@media(max-width:360px){
-  .app-suche{grid-template-columns:24px minmax(0,1fr) auto;gap:9px;padding-inline:13px}
-  .app-suche svg{width:22px;height:22px}
-  .app-suche span{font-size:14px}
-  .app-suche em{padding-inline:7px}
-}
+
 
 /* ---------- Gemeinsamer Feastables-Untergrund ohne Uebersichtsseite ---------- */
-:root{
-  --app-chrome-bg:var(--feast-blue);
-  --app-content-bg:#F2EBE0;
-}
-:root:not([data-theme="dark"])[data-seite="body"],
-:root:not([data-theme="dark"])[data-seite="reminders"],
-:root:not([data-theme="dark"])[data-seite="food-log"],
-:root:not([data-theme="dark"])[data-seite="recipes"],
-:root:not([data-theme="dark"])[data-seite="habits"],
-:root:not([data-theme="dark"])[data-seite="profile"]{
-  --bg:var(--app-chrome-bg);--app-pattern:none;
-}
-:root[data-theme="dark"]{
-  --app-chrome-bg:#101A2B;
-  --app-content-bg:#191C24;
-}
 
-.app-navigation{background:var(--app-chrome-bg)}
+
+
+
+
 .app-kopf,.app-kopf::before,.app-kopf::after{background:var(--app-chrome-bg)}
 :root[data-seite] #view{
   background-color:var(--app-content-bg);background-image:none!important;
 }
-.app-navigation + #view > .wrap{padding-top:14px}
+
 
 /* Der aktive Reiter ist nun der Seitentitel. */
-.app-navigation + #view .seitenkopf{display:none!important}
 
-.bereichsleiste{background:var(--app-content-bg)}
-.bereichsleiste a{
-  min-height:50px;background:var(--app-content-bg);font-size:11.5px;
-}
-.bereichsleiste a.aktiv{background:var(--feast-brown);color:#fff}
-.app-navigation + #view{
-  min-height:calc(100dvh - var(--app-header-gesamt) - 126px);
-}
 
-@media(max-width:520px){
-  .bereichsleiste a{min-height:48px;padding-inline:15px;font-size:11px}
-  .app-navigation + #view > .wrap{padding-top:12px}
-}
+
+
+
+
+
+
+
 
 /* ============================================================
-   TUCKII-INSPIRIERTE APP-STRUKTUR · FEASTABLES-FARBPALETTE
+   APP-STRUKTUR NACH TUCKII
 
-   Archivo (OFL) ersetzt die bisherigen System-/Display-Schriften. Die
-   Bedienlogik folgt einer Bibliothek aus Sammlungen; die Marke und sämtliche
-   bestehenden Funktionsseiten bleiben MUSCLE-DEX.
+   Ab hier steht die Struktur, die aus den Screenshots in Inspirationen/
+   abgelesen ist: fester Markenkopf, darunter eine Bibliothek aus Ordner-
+   karten, und pro Funktionsseite ein zentrierter Titel mit quadratischem
+   Zurueck-Knopf.
+
+   Bewusst ohne !important und ohne eigene Farbwerte: Alles liest aus den
+   Tokens ganz oben. Dadurch traegt derselbe Aufbau alle drei Themes – im
+   Standard mit schwarzer Kontur und hartem Versatzschatten, in Retro mit
+   Kontur ohne Schatten (--hart:none), in Dark mit heller Kontur.
+
+   Masse stammen vom iPhone 14 (390 pt Breite): 3 pt Rand, 4 pt Versatz,
+   14 pt Kartenradius, 44 pt Tippziele.
    ============================================================ */
-:root{
-  --tuck-ink:#111111;
-  --tuck-brown:#492426;
-  --tuck-cyan:#72E2FF;
-  --tuck-cyan-strong:#58DCFF;
-  --tuck-cream:#F2EBE0;
-  --tuck-paper:#FFFDF9;
-  --tuck-pink:#F64974;
-  --tuck-purple:#67318F;
-  --tuck-blue:#729EFE;
-  --ui:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --display:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --mono:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --bg:var(--tuck-cream);
-  --surface:var(--tuck-paper);
-  --surface2:#E9E3DA;
-  --text:var(--tuck-ink);
-  --ink:var(--tuck-brown);
-  --line:var(--tuck-brown);
-  --muted:#715F5D;
-  --link:var(--tuck-purple);
-  --app-chrome-bg:var(--tuck-cyan);
-  --app-content-bg:var(--tuck-cream);
-  --app-card:var(--tuck-paper);
-  --app-field:#FFFDF9;
-  --app-outline:var(--tuck-brown);
-  --app-divider:rgba(73,36,38,.22);
-}
 
-body{font-family:var(--ui);font-weight:500;letter-spacing:-.012em}
-h1,h2,h3,.display,.section-title{
-  font-family:var(--display);font-style:normal;font-weight:900;
-  letter-spacing:-.045em;text-transform:none;
-}
-button,input,select,textarea{font-family:var(--ui)}
-
-:root:not([data-theme="dark"])[data-seite]{
-  --bg:var(--tuck-cream);--app-pattern:none;
-}
-:root:not([data-theme="dark"])[data-seite] #view{
-  min-height:calc(100dvh - 68px);background:var(--tuck-cream)!important;
-  background-image:none!important;
-}
-
-/* Fester Markenheader: Logo, Sync, Suche, Profil/Einstellungen. */
-.app-kopf,.app-kopf::before,.app-kopf::after{background:var(--app-chrome-bg)}
+/* ---------- Kopfzeile ---------- */
+/* Der Kopf bleibt wie bisher stehen; nur seine Bedienelemente werden zu den
+   quadratischen Tuckii-Knoepfen. Suchfeld und Profil sitzen nebeneinander. */
+/* Die Flaeche muss hier explizit stehen: Aus frueheren Umbauten liegen noch
+   Kopfzeilen-Regeln mit Milchglas und eigener Farbe darueber. */
+.app-kopf,.app-kopf::before,.app-kopf::after{background:var(--bg)}
 .app-kopf{
-  padding:calc(env(safe-area-inset-top) + 8px) 0 8px;
-  border-bottom:2px solid var(--tuck-brown);box-shadow:none;
+  padding:calc(env(safe-area-inset-top) + 8px) 0 10px;
+  border-bottom:var(--bw) solid var(--ink);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
 }
-.app-kopf .wrap{min-height:48px;gap:9px}
-.kopf-logo{width:clamp(100px,29vw,116px);max-height:46px}
+.app-kopf .wrap{min-height:48px;gap:10px}
+.kopf-logo{width:clamp(100px,29vw,118px);max-height:46px}
 .kopf-aktionen{gap:8px}
 .kopf-aktionen .save-dot{
-  width:23px;height:23px;padding:0;border:0;background:transparent;
-  color:var(--tuck-purple);font:900 18px/1 var(--ui);
+  width:22px;height:22px;padding:0;border:0;background:transparent;
+  font:800 17px/1 var(--ui);
 }
-.kopf-quadrat,.tuckii-quadrat{
-  display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;
-  border:2px solid var(--tuck-brown)!important;border-radius:11px!important;
-  background:var(--tuck-paper)!important;color:var(--tuck-brown)!important;
-  box-shadow:3px 3px 0 var(--tuck-brown)!important;text-decoration:none;
-}
-.kopf-quadrat .app-icon,.tuckii-quadrat .app-icon{width:23px;height:23px}
-.kopf-quadrat.aktiv{background:var(--tuck-pink)!important;color:#fff!important}
-.app-kopf .nav-av{width:44px;height:44px;border-radius:11px!important;overflow:hidden}
-.app-kopf .nav-av img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.app-kopf .nav-av span{font:900 14px/1 var(--ui);letter-spacing:.02em}
 
-/* Start: zweispaltige Ordnerbibliothek wie bei Tuckii. */
-.tuckii-home{padding-top:24px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
-.sammlungs-kopf{
-  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+/* Ein Quadrat fuer alle Kopf- und Seitenknoepfe: Suche, Profil, Zurueck,
+   Plus, Neuer Ordner. Tuckii setzt genau eine Form fuer alle davon. */
+.tuck-quadrat{
+  display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface);color:var(--text);
+  box-shadow:var(--hart-klein);text-decoration:none;
+}
+.tuck-quadrat .app-icon{width:22px;height:22px}
+.tuck-quadrat.aktiv{background:var(--mr);color:var(--accent-ink)}
+.tuck-quadrat.betont{background:var(--mr);color:var(--accent-ink)}
+/* Der Druckpunkt: Die Flaeche faehrt in ihren eigenen Schatten hinein. Ohne
+   Schatten (Retro) bleibt nur der Versatz – das genuegt als Rueckmeldung. */
+.tuck-quadrat:active{transform:translate(2px,2px);box-shadow:none}
+/* Das Profilbild ist derselbe Knopf, nur mit Bild statt Symbol. */
+.app-kopf .nav-av{
+  width:44px;height:44px;border-radius:var(--r);overflow:hidden;
+  border:var(--bw) solid var(--ink);box-shadow:var(--hart-klein);
+}
+.app-kopf .nav-av img{width:100%;height:100%;object-fit:cover}
+.app-kopf .nav-av span{font:800 15px/1 var(--ui);font-style:normal;letter-spacing:.01em}
+
+/* ---------- Start: Bibliothek ---------- */
+.tuck-home{padding-top:22px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+/* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
+.tuck-titelzeile{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
   margin:0 2px 18px;
 }
-.sammlungs-kopf>div{min-width:0}
-.sammlungs-kopf span{
-  display:block;margin-bottom:4px;color:var(--tuck-purple);
-  font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
+.tuck-titelzeile h1{
+  min-width:0;color:var(--text);font-size:clamp(24px,7vw,30px);line-height:1.05;
 }
-.sammlungs-kopf h1{
-  color:var(--tuck-brown);font-size:clamp(27px,8vw,34px);line-height:1;
-}
-.neu-sammlung{background:var(--tuck-pink)!important;color:#fff!important}
-.sammlungs-grid,.such-ergebnisse{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 14px;
-  padding:12px 3px 6px;
-}
-.sammlungskarte{
-  --ordnerfarbe:var(--tuck-cyan);position:relative;isolation:isolate;
-  display:flex;flex-direction:column;min-width:0;min-height:180px;padding:18px 14px 14px;
-  border:2px solid var(--tuck-brown);border-radius:14px;background:var(--tuck-paper);
-  color:var(--tuck-brown);text-decoration:none;
-}
-:root[data-seite="home"] #app .sammlungskarte,
-:root[data-seite="search"] #app .sammlungskarte{
-  box-shadow:4px 4px 0 var(--tuck-brown)!important;
-}
-.sammlungskarte::before{
-  content:"";position:absolute;z-index:-2;left:-2px;top:-15px;width:58%;height:30px;
-  border:2px solid var(--tuck-brown);border-bottom:0;border-radius:12px 12px 0 0;
-  background:var(--ordnerfarbe);
-}
-.sammlungskarte::after{
-  content:"";position:absolute;z-index:-1;inset:-2px;border:2px solid var(--tuck-brown);
-  border-radius:14px;background:var(--tuck-paper);pointer-events:none;
-}
-.sammlungs-tab{display:none}
-.sammlungskarte.cyan{--ordnerfarbe:var(--tuck-cyan)}
-.sammlungskarte.pink{--ordnerfarbe:var(--tuck-pink)}
-.sammlungskarte.violet{--ordnerfarbe:#CFA9E9}
-.sammlungskarte.blue{--ordnerfarbe:var(--tuck-blue)}
-.sammlungskarte.cream{--ordnerfarbe:#E0C8B5}
-.sammlungs-icon{
-  display:grid;place-items:center;width:46px;height:46px;margin-bottom:auto;
-  border:2px solid var(--tuck-brown);border-radius:11px;background:var(--ordnerfarbe);
-  color:var(--tuck-brown);
-}
-.sammlungs-icon .app-icon{width:25px;height:25px;stroke-width:2.2}
-.sammlungs-status{
-  position:absolute;top:14px;right:12px;color:var(--muted);
-  font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
-}
-.sammlungskarte h2{
-  margin:17px 0 5px;color:var(--tuck-brown);font-size:19px;line-height:1;
-  overflow-wrap:anywhere;
-}
-.sammlungskarte p{
-  margin:0;color:#715F5D;font-size:10.5px;font-weight:600;line-height:1.28;
-}
-.sammlungskarte:active,.kopf-quadrat:active,.tuckii-quadrat:active{
-  transform:translate(2px,2px);box-shadow:1px 1px 0 var(--tuck-brown)!important;
+.tuck-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:26px 14px;padding:14px 3px 6px;
 }
 
-/* Suche ist – wie in Tuckii – eine eigene, ruhige Bibliotheksansicht. */
-.tuckii-suche-seite{padding-top:22px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
-.tuckii-suchzeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
-.tuckii-suchzeile>a{color:var(--tuck-brown);font-size:12px;font-weight:800;text-decoration:none}
-.tuckii-suchfeld{
-  display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:center;
-  min-height:52px;padding:0 14px;border:2px solid var(--tuck-brown);border-radius:13px;
-  background:var(--tuck-paper);color:var(--tuck-brown);
-  box-shadow:3px 3px 0 var(--tuck-brown);
+/* Die Ordnerkarte: ein Reiter liegt hinter der Karte und schaut oben links
+   heraus, die Karte selbst deckt ihn ab. Der Reiter ist ein eigenes Element
+   und kein Pseudo-Element, damit er den Schatten der Karte nicht schneidet. */
+.tuck-karte{
+  --ordner:var(--fe-blue-cloud);
+  /* isolation: Der Reiter liegt auf z-index -1. Ohne eigenen Stapelkontext
+     rutscht er hinter den undurchsichtigen Grund von #view und verschwindet. */
+  position:relative;isolation:isolate;
+  display:flex;flex-direction:column;min-width:0;min-height:132px;
+  padding:14px 13px 13px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface);color:var(--text);text-decoration:none;
+  box-shadow:var(--hart);
 }
-.tuckii-suchfeld .app-icon{width:23px;height:23px}
-.tuckii-suchfeld input{
-  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--tuck-ink);
-  font-size:16px;font-weight:700;
+.tuck-reiter{
+  position:absolute;left:-3px;top:-19px;z-index:-1;width:54%;height:32px;
+  border:var(--bw) solid var(--ink);border-bottom:0;border-radius:11px 11px 0 0;
+  background:var(--ordner);
 }
-.tuckii-suchfeld input::placeholder{color:#8A7775;opacity:1}
-.such-bibliothek{
-  display:grid;grid-template-columns:minmax(0,1fr) repeat(3,auto);gap:12px;align-items:center;
-  margin:22px 0 24px;padding:15px;border:2px solid var(--tuck-brown);border-radius:14px;
-  background:var(--tuck-cyan);color:var(--tuck-brown);box-shadow:3px 3px 0 var(--tuck-brown);
-}
-.such-bibliothek>span{font-size:12px;font-weight:900}
-.such-bibliothek>div{display:flex;flex-direction:column;text-align:center}
-.such-bibliothek b{font-size:18px;line-height:1}
-.such-bibliothek small{margin-top:4px;font-size:7px;font-weight:800;text-transform:uppercase}
-.such-ergebnis-titel{margin:0 2px 10px;color:var(--tuck-brown);font-size:23px}
-.such-leer{display:grid;place-items:center;gap:8px;padding:50px 20px;text-align:center;color:var(--muted)}
-.such-leer .app-icon{width:30px;height:30px}
-.such-leer span{font-size:11px}
+.tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
+.tuck-karte.cyan{--ordner:var(--fe-blue-cloud)}
+.tuck-karte.pink{--ordner:var(--fe-pink)}
+.tuck-karte.violet{--ordner:var(--fe-blurple)}
+.tuck-karte.blue{--ordner:var(--fe-blue)}
+.tuck-karte.gelb{--ordner:var(--fe-yellow)}
+.tuck-karte.gruen{--ordner:var(--fe-green)}
 
-/* Funktionsseiten: zentrierter Titel und quadratischer Zurück-Knopf. */
-:root[data-seite] #view>.wrap{padding-top:0}
+.tuck-karte-oben{display:flex;align-items:flex-start;gap:11px;margin-bottom:auto}
+.tuck-icon{
+  display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;
+  border:var(--bw) solid var(--ink);border-radius:9px;
+  background:var(--ordner);color:var(--accent-ink);
+}
+.tuck-icon .app-icon{width:23px;height:23px}
+.tuck-meta{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:3px}
+.tuck-meta b{color:var(--text);font-size:12.5px;font-weight:700}
+.tuck-meta span{color:var(--muted);font-size:12.5px;font-weight:500}
+/* Der Name steht unten und in Versalien – bei Tuckii die einzige Stelle im
+   Kartenlayout, die Versalien traegt. */
+.tuck-karte h2{
+  margin:14px 0 0;color:var(--text);font-size:16px;line-height:1.05;
+  text-transform:uppercase;letter-spacing:-.01em;overflow-wrap:anywhere;
+}
+
+/* ---------- Suche ---------- */
+.tuck-suche-seite{padding-top:16px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+.tuck-suchzeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.tuck-suchzeile>a{
+  display:grid;place-items:center;min-height:52px;padding:0 16px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
+  font-size:15px;font-weight:700;text-decoration:none;
+}
+.tuck-suchfeld{
+  display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;
+  min-height:52px;padding:0 14px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
+}
+.tuck-suchfeld .app-icon{width:22px;height:22px}
+.tuck-suchfeld input{
+  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
+  font-family:var(--ui);font-size:16px;font-weight:600;
+}
+.tuck-suchfeld input::placeholder{color:var(--faint);opacity:1}
+
+/* Die Bibliotheks-Kachel ist bei Tuckii die einzige vollflaechig eingefaerbte
+   Flaeche der Suche – sie traegt deshalb den Markenakzent. */
+.tuck-bibliothek{
+  margin:20px 0 24px;padding:15px 16px;
+  border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--mr);color:var(--accent-ink);box-shadow:var(--hart);
+}
+.tuck-bibliothek>span{
+  display:block;margin-bottom:12px;font-size:12px;font-weight:800;
+  letter-spacing:.09em;text-transform:uppercase;
+}
+.tuck-bibliothek-werte{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.tuck-bibliothek-werte>div{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  border-left:1px solid rgba(0,0,0,.25);
+}
+.tuck-bibliothek-werte>div:first-child{border-left:0}
+.tuck-bibliothek-werte b{font-size:22px;font-weight:800;line-height:1}
+.tuck-bibliothek-werte small{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+
+.tuck-abschnittstitel{
+  margin:0 2px 12px;color:var(--text);font-size:15px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.tuck-leer{
+  display:grid;place-items:center;gap:10px;padding:48px 20px;text-align:center;color:var(--muted);
+}
+.tuck-leer .app-icon{width:32px;height:32px}
+.tuck-leer b{color:var(--text);font-size:15px}
+.tuck-leer span{font-size:13px}
+
+/* ---------- Funktionsseiten ---------- */
+/* Zurueck links, Titel mittig, optionale Aktion rechts – wie bei Tuckii auf
+   jeder Unterseite. Die 44 pt Spalten halten den Titel auch dann mittig, wenn
+   rechts kein Knopf steht. */
 :root[data-seite] .seitenkopf{
-  display:grid!important;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center!important;
-  gap:10px;padding:20px 0 14px!important;
+  display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;
+  gap:10px;padding:18px 0 14px;
 }
-:root[data-seite] .seitenkopf-text{
-  grid-column:2;grid-row:1;align-items:center;gap:0;text-align:center;
+:root[data-seite] .seitenkopf-text{grid-column:2;grid-row:1;gap:2px;text-align:center}
+:root[data-seite] .seitenkopf-kicker{
+  color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
 }
-:root[data-seite] .seitenkopf-kicker{display:none}
+/* Schriftschnitt hier ausdruecklich aus den Tokens: Eine aeltere Regel setzt
+   .seitenkopf .section-title auf kursiv, was im Standard-Theme nicht gilt. */
 :root[data-seite] .seitenkopf .section-title{
-  margin:0;color:var(--tuck-brown);font-size:25px;line-height:1;
-  font-family:var(--display)!important;font-style:normal!important;font-weight:900!important;
+  margin:0;color:var(--text);font-size:22px;line-height:1.1;
+  font-family:var(--display);font-style:var(--h-style);font-weight:var(--h-weight);
+  letter-spacing:var(--h-spacing);text-transform:uppercase;
 }
-:root[data-seite] .seitenkopf .zurueck{
+
+:root[data-seite] .seitenkopf a.zurueck{
   grid-column:1;grid-row:1;display:grid;place-items:center;width:44px;height:44px;
-  margin:0!important;padding:0!important;border:2px solid var(--tuck-brown);border-radius:11px;
-  background:var(--tuck-paper);color:var(--tuck-brown);box-shadow:3px 3px 0 var(--tuck-brown);
+  margin:0;padding:0;border:var(--bw) solid var(--ink);border-radius:var(--r);
+  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
   font-size:0;text-decoration:none;
 }
-:root[data-seite] .seitenkopf .zurueck .pf{font:900 24px/1 var(--ui)}
-.seiten-einstieg{margin-bottom:14px;padding:0 2px;background:transparent}
-.seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:13px;font-weight:800}
-.seiten-einstieg span{font-family:var(--ui);font-size:11px;font-weight:500}
+:root[data-seite] .seitenkopf .zurueck .pf{font:800 22px/1 var(--ui);font-style:normal}
+:root[data-seite] .seitenkopf .zurueck:active{transform:translate(2px,2px);box-shadow:none}
 
-/* Bestehende Module erhalten dieselbe Formsprache, ihre Logik bleibt unberührt. */
-.card,.reminder-group,.profile-abschnitt,.food-form-card,.food-card{
-  border:1.5px solid var(--tuck-brown);border-radius:15px;background:var(--tuck-paper);
-  box-shadow:3px 3px 0 var(--tuck-brown)!important;
+/* ---------- Einstellungen (Profil) ---------- */
+/* Tuckii gruppiert Einstellungen unter grauen Versalien-Labels und legt jede
+   Zeile als eigene Karte an. Genau das bekommt das Profil hier. */
+.tuck-gruppe{
+  margin:22px 2px 10px;color:var(--muted);font-size:12px;font-weight:800;
+  letter-spacing:.09em;text-transform:uppercase;
 }
-.card + .card{margin-top:18px}
-.input{
-  border:1.5px solid rgba(73,36,38,.55);border-radius:10px;background:#fff;
-  color:var(--tuck-ink);font-weight:600;box-shadow:none!important;
+.tuck-zeile{
+  display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:14px;align-items:center;
+  width:100%;margin-bottom:12px;padding:15px 16px;text-align:left;
+  border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
+  font-family:var(--ui);text-decoration:none;
 }
-.input:focus{border-color:var(--tuck-purple);box-shadow:0 0 0 3px rgba(103,49,143,.15)!important}
-.btn,.profile-datei-knopf,.pb-go{
-  border:1.5px solid var(--tuck-brown);border-radius:10px;background:var(--tuck-paper);
-  color:var(--tuck-brown);font-family:var(--ui);font-style:normal;font-weight:800;
-  box-shadow:2px 2px 0 var(--tuck-brown)!important;
-}
-.btn-primary,[data-save-reminders],.phase-reset{background:var(--tuck-pink);color:#fff}
-.reminder-group-head,.profile-abschnitt summary{font-family:var(--ui);font-style:normal}
-.mess-neu summary,.switchline,.food-form-card summary{
-  font-family:var(--ui);font-style:normal;font-weight:800;
-}
-.reminder-group-icon{border-color:var(--tuck-brown)}
-.reminder-row{border-color:rgba(73,36,38,.55);background:#F7F1E9}
-.food-image{border-bottom-color:var(--tuck-brown)}
-.profile-avatar{border-radius:12px!important;border-color:var(--tuck-brown)!important}
-.app-toast{background:var(--tuck-purple);border-color:var(--tuck-brown);font-family:var(--ui)}
+.tuck-zeile:active{transform:translate(2px,2px);box-shadow:none}
+.tuck-zeile .app-icon{width:26px;height:26px}
+.tuck-zeile-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tuck-zeile-text b{font-size:16px;font-weight:700}
+.tuck-zeile-text span{color:var(--muted);font-size:13px;font-weight:500;line-height:1.3}
+.tuck-zeile-pfeil{color:var(--muted);font:700 20px/1 var(--ui)}
 
-/* Dark bleibt ein eigenständiger Modus; nur Geometrie und Akzente werden geteilt. */
-:root[data-theme="dark"]{
-  --bg:#10131D;--surface:#1C202C;--surface2:#252A37;--text:#F7F1E9;
-  --ink:#D9C8C2;--line:#D9C8C2;--muted:#B6A8A4;--link:#CFA9E9;
-  --app-chrome-bg:#171B27;--app-content-bg:#10131D;--app-card:#1C202C;
-  --app-field:#252A37;--app-outline:#8B7774;--app-divider:#544643;
-}
-:root[data-theme="dark"][data-seite] #view{background:#10131D!important}
-:root[data-theme="dark"] .sammlungskarte,
-:root[data-theme="dark"] .sammlungskarte::after,
-:root[data-theme="dark"] .tuckii-suchfeld,
-:root[data-theme="dark"] .kopf-quadrat,
-:root[data-theme="dark"] .tuckii-quadrat,
-:root[data-theme="dark"] .seitenkopf .zurueck{background:#1C202C!important;color:#F7F1E9!important}
-:root[data-theme="dark"] .sammlungskarte h2,
-:root[data-theme="dark"] .sammlungs-kopf h1,
-:root[data-theme="dark"] .seitenkopf .section-title,
-:root[data-theme="dark"] .such-ergebnis-titel{color:#F7F1E9}
-:root[data-theme="dark"] .sammlungskarte p{color:#B6A8A4}
-:root[data-theme="dark"] .input{background:#252A37;color:#F7F1E9}
+/* Die Themewahl bleibt ein Segment, bekommt aber die neue Geometrie. */
+.themeseg{border:var(--bw) solid var(--ink);border-radius:var(--r);box-shadow:var(--hart-klein)}
+.themebtn{border-right:var(--bw) solid var(--ink)}
+.themebtn:last-child{border-right:0}
+.themebtn.on{background:var(--mr);color:var(--accent-ink)}
+
+/* ---------- Bestandsmodule ---------- */
+/* Koerperwerte, Erinnerungen, Food-Log und Profil lesen ihre Farben ohnehin
+   aus den Tokens. Hier kommt nur der harte Schatten dazu, damit sie dieselbe
+   Formsprache tragen wie die Bibliothek. */
+.card,.reminder-group,.profile-abschnitt,.food-form-card,.food-card{box-shadow:var(--hart-klein)}
+.btn{box-shadow:var(--hart-klein)}
+.btn:active{transform:translate(2px,2px);box-shadow:none}
+.input{box-shadow:none}
+.input:focus{border-color:var(--prio);box-shadow:0 0 0 3px var(--prio-wash)}
 
 @media(max-width:420px){
-  .wrap{padding-inline:14px}
-  .app-kopf .wrap{min-height:46px}
+  .wrap{padding-inline:16px}
   .kopf-logo{width:104px;max-height:43px}
   .kopf-aktionen{gap:7px}
-  .kopf-quadrat{width:42px;height:42px;flex-basis:42px}
-  .app-kopf .nav-av{width:42px;height:42px}
-  .tuckii-home{padding-top:22px}
-  .sammlungs-kopf{margin-bottom:16px}
-  .sammlungs-grid,.such-ergebnisse{gap:19px 12px;padding-inline:2px}
-  .sammlungskarte{min-height:172px;padding:17px 12px 12px}
-  .sammlungs-icon{width:43px;height:43px}
-  .sammlungskarte h2{font-size:17.5px}
-  .sammlungskarte p{font-size:9.8px}
-  .such-bibliothek{grid-template-columns:minmax(0,1fr) repeat(3,38px);gap:6px;padding-inline:12px}
-  :root[data-seite] .seitenkopf{display:grid!important;padding-top:18px!important}
-  :root[data-seite] .seitenkopf .zurueck{margin:0!important}
+  .tuck-grid{gap:24px 12px}
+  .tuck-karte{min-height:126px;padding:13px 12px 12px}
+  .tuck-karte h2{font-size:15px}
 }
 
 @media(max-width:350px){
   .kopf-aktionen .save-dot{display:none}
-  .sammlungs-grid,.such-ergebnisse{grid-template-columns:1fr}
-  .sammlungskarte{min-height:150px}
+  .tuck-grid{grid-template-columns:1fr}
+  .tuck-reiter{width:44%}
 }
