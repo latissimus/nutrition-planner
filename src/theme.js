@@ -1,6 +1,8 @@
 // Die Darstellung ist eine Geraete-Vorliebe: am Handy darf Dark aktiv sein,
 // waehrend derselbe Account am Rechner Retro nutzt.
 const KEY = 'nutrition:theme';
+const overlayQuellen = new Set();
+let overlayScrollY = 0;
 
 // Zwei Darstellungen. "retro" traegt die Feastables-Palette und ist der
 // Ausgangswert; im Stylesheet ist das der blanke :root-Block. data-theme wird
@@ -26,12 +28,55 @@ function metaFarbeSetzen(farbe) {
   alt.replaceWith(neu);
 }
 
+function abgedunkelt(farbe, anteil = 0.28) {
+  const hex = farbe.match(/^#([0-9a-f]{6})$/i)?.[1];
+  if (!hex) return farbe;
+  const faktor = 1 - anteil;
+  const kanal = (start) => Math.round(parseInt(hex.slice(start, start + 2), 16) * faktor);
+  return `rgb(${kanal(0)} ${kanal(2)} ${kanal(4)})`;
+}
+
+export function setStatusleistenOverlay(quelle, offen) {
+  if (!quelle) return;
+  const root = document.documentElement;
+  const warOffen = overlayQuellen.size > 0;
+  if (offen) overlayQuellen.add(quelle);
+  else overlayQuellen.delete(quelle);
+  const istOffen = overlayQuellen.size > 0;
+  root.classList.toggle('statusleiste-overlay', istOffen);
+
+  if (istOffen) {
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    const overlayBg = abgedunkelt(bg);
+    root.style.setProperty('--statusbar-bg', overlayBg);
+    metaFarbeSetzen(overlayBg);
+  } else {
+    root.style.removeProperty('--statusbar-bg');
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    if (bg) metaFarbeSetzen(bg);
+  }
+
+  if (!warOffen && istOffen) {
+    overlayScrollY = window.scrollY;
+    root.classList.add('overlay-scroll-gesperrt');
+    const scroller = document.querySelector('#view');
+    if (scroller) scroller.scrollTop = overlayScrollY;
+    window.scrollTo(0, 0);
+  } else if (warOffen && !istOffen) {
+    const scroller = document.querySelector('#view');
+    overlayScrollY = scroller?.scrollTop || overlayScrollY;
+    root.classList.remove('overlay-scroll-gesperrt');
+    if (scroller) scroller.scrollTop = 0;
+    window.scrollTo(0, overlayScrollY);
+  }
+}
+
 export function applyTheme(theme) {
   const wert = gueltig(theme);
   document.documentElement.dataset.theme = wert;
   requestAnimationFrame(() => {
     const farbe = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-    if (farbe) metaFarbeSetzen(farbe);
+    if (farbe && !overlayQuellen.size) metaFarbeSetzen(farbe);
   });
 }
 

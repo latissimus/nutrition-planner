@@ -1,4 +1,5 @@
 import { toast } from './toast.js';
+import { setStatusleistenOverlay } from './theme.js';
 
 const modules = import.meta.glob('../MUSCLEDEX-ICONS/*.svg', {
   query: '?raw', import: 'default', eager: true,
@@ -78,11 +79,18 @@ function sheet(markup) {
   backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true">${markup}</section>`;
   backdrop.addEventListener('click', (event) => {
-    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) backdrop.remove();
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeSheet(backdrop);
   });
   document.body.append(backdrop);
+  setStatusleistenOverlay('kategorie-sheet', true);
   requestAnimationFrame(() => backdrop.classList.add('offen'));
   return backdrop;
+}
+
+function closeSheet(backdrop) {
+  if (!backdrop?.isConnected) return;
+  backdrop.remove();
+  setStatusleistenOverlay('kategorie-sheet', false);
 }
 
 function iconPicker(route, onChange) {
@@ -107,7 +115,7 @@ function iconPicker(route, onChange) {
     if (!button) return;
     const value = button.dataset.iconId || `emoji:${button.dataset.emoji}`;
     localStorage.setItem(storageKey(route), value);
-    backdrop.remove();
+    closeSheet(backdrop);
     onChange?.();
     toast('Kategorie-Icon geändert.');
   };
@@ -116,7 +124,7 @@ function iconPicker(route, onChange) {
     const emoji = event.currentTarget.querySelector('input').value.trim();
     if (!emoji) return;
     localStorage.setItem(storageKey(route), `emoji:${emoji}`);
-    backdrop.remove();
+    closeSheet(backdrop);
     onChange?.();
     toast('Eigenes Emoji übernommen.');
   };
@@ -136,7 +144,7 @@ function colorPicker(route, onChange) {
     const button = event.target.closest('[data-color]');
     if (!button) return;
     localStorage.setItem(colorKey(route), button.dataset.color);
-    backdrop.remove();
+    closeSheet(backdrop);
     onChange?.();
     toast('Retrofarbe geändert.');
   };
@@ -154,7 +162,7 @@ function settingsSheet(route, onChange) {
   backdrop.querySelector('.sheet-menue').onclick = (event) => {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (!action) return;
-    backdrop.remove();
+    closeSheet(backdrop);
     if (action === 'icon') iconPicker(route, onChange);
     if (action === 'color') colorPicker(route, onChange);
     if (action === 'select') toast('Die Auswahl ist für diese Sammlung vorbereitet.');

@@ -201,13 +201,13 @@ html{background:var(--bg)}
 /* Safari zeigt beim Scroll-Gummiband die Leinwand von <html>. Waere sie trotz
    offenem Overlay noch weiss oder seitenfarben, blitzt genau der geschuetzte
    Bereich um Uhrzeit und Akku beim Scrollen um. */
-html.statusleiste-overlay{background:var(--bg)}
+html.statusleiste-overlay{background:var(--statusbar-bg,var(--bg))}
 /* Zweite Absicherung fuer den iOS-Web-App-Canvas: Je nach Scrollzustand nimmt
    WebKit fuer den transparenten Statusbereich den Body statt des html-Elements.
    Der eigentliche App-Inhalt behaelt separat seine Seitenfarbe und wird wie
    bisher vom Overlay abgedunkelt. */
-html.statusleiste-overlay body{background:var(--bg)}
-html.statusleiste-overlay #app{min-height:100dvh;background:var(--bg)}
+html.statusleiste-overlay body{background:var(--statusbar-bg,var(--bg))}
+html.statusleiste-overlay #app{min-height:100dvh;background:var(--statusbar-bg,var(--bg))}
 html.statusleiste-overlay #view{min-height:100dvh;background:var(--bg)}
 /* Nicht das iOS-Fenster und auch nicht der Body, sondern nur der eigentliche
    Seiteninhalt #view scrollt waehrend eines Overlays.
@@ -775,9 +775,9 @@ body.einstieg-fokus #app::after{content:"";position:fixed;top:0;left:0;width:100
    Uhrzeit und Akku. Sie scrollt nicht mit und liegt ueber Tutorialkarte (60)
    und Uebungswaehler (80), endet aber exakt vor deren Inhalt. So kann weder
    der hellblaue Header noch die weisse Tutorialkarte in die Safe Area rutschen. */
-html.statusleiste-overlay body::before{content:"";position:fixed;z-index:90;
+html.statusleiste-overlay body::before{content:"";position:fixed;z-index:1010;
   top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 3px);
-  background:var(--bg);pointer-events:none}
+  background:var(--statusbar-bg,var(--bg));pointer-events:none}
 .tutorial-ebene{position:fixed;z-index:60;inset:0;pointer-events:none}
 .tutorial-ebene[hidden]{display:none}
 .log-tutorial{position:absolute;top:calc(env(safe-area-inset-top) + 3px);left:50%;
