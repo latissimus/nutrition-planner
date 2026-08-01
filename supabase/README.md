@@ -1,5 +1,11 @@
 # Supabase
 
+## Sammlungen und Unter-Sammlungen
+
+Nach den bisherigen Migrationen zusätzlich
+`migrations/20260801000100_collections.sql` im SQL Editor ausführen. Die
+Migration legt private, verschachtelbare Sammlungen an und ergänzt das
+Food-Log um eine optionale Sammlungszuordnung.
 Für diese App ein neues Supabase-Projekt verwenden. Migrationen werden in
 Dateinamensreihenfolge angewendet und nach dem Ausrollen nicht mehr verändert.
 

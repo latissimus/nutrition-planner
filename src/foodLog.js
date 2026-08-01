@@ -31,13 +31,14 @@ function validateImage(file) {
   if (file.size > MAX_FILE_SIZE) throw new Error('Das Bild darf maximal 8 MB gross sein.');
 }
 
-async function loadEntries(userId, signal) {
+async function loadEntries(userId, signal, collectionId = null) {
   let query = supabase
     .from('food_logs')
-    .select('id, title, note, eaten_at, image_path, created_at')
+    .select('id, title, note, eaten_at, image_path, collection_id, created_at')
     .eq('user_id', userId)
     .order('eaten_at', { ascending: false })
     .order('created_at', { ascending: false });
+  if (collectionId) query = query.eq('collection_id', collectionId);
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
@@ -79,7 +80,7 @@ function entryMarkup(entry) {
   </article>`;
 }
 
-export async function mountFoodLog(container, { session, signal }) {
+export async function mountFoodLog(container, { session, signal, collectionId = null }) {
   const userId = session.user.id;
   let entries = [];
   let editingId = null;
@@ -149,7 +150,7 @@ export async function mountFoodLog(container, { session, signal }) {
   };
 
   const refresh = async () => {
-    entries = await loadEntries(userId, signal);
+    entries = await loadEntries(userId, signal, collectionId);
     if (signal?.aborted) return;
     renderEntries();
   };
@@ -204,6 +205,7 @@ export async function mountFoodLog(container, { session, signal }) {
         note: noteInput.value.trim(),
         eaten_at: dateInput.value || heute(),
         image_path: uploadedPath || current?.image_path || null,
+        collection_id: collectionId || current?.collection_id || null,
       };
       if (!payload.title) throw new Error('Bitte einen Namen eintragen.');
       const query = supabase.from('food_logs');

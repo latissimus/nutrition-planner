@@ -23,6 +23,9 @@ import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
+import {
+  collectionGridMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
+} from './collections.js';
 
 applyTheme(getTheme());
 applySchatten(getSchatten());
@@ -35,6 +38,9 @@ if ('serviceWorker' in navigator) {
 }
 
 const app = document.querySelector('#app');
+const escapeHtml = (value = '') => String(value)
+  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 let session = null;
 let profile = null;
 let profileLadePromise = null;
@@ -359,9 +365,27 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
   }).join('');
 }
 
-function mountHome(container, signal) {
+function eigeneSammlungsKarten(items) {
+  return items.map((item) => `
+    <div class="tuck-fach eigene-sammlung" style="--ordner:${item.color}">
+      <span class="tuck-reiter" aria-hidden="true"></span>
+      <a class="tuck-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
+        <span class="tuck-karte-oben">
+          <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${materialIconMarkup(item.icon_key)}</span>
+          <span class="tuck-meta"><b>Eigene</b><span>Sammlung</span></span>
+        </span>
+        <h2>${escapeHtml(item.name)}</h2>
+      </a>
+    </div>`).join('');
+}
+
+async function mountHome(container, signal) {
   setSeite('home');
   const sichtbar = sichtbareSammlungen();
+  let eigene = [];
+  try { eigene = await loadCollections(session.user.id, { rootKey: 'home', signal }); }
+  catch (error) { if (!signal?.aborted) toast('Eigene Sammlungen konnten nicht geladen werden.'); }
+  if (signal?.aborted) return;
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
       <div class="tuck-ablage">
@@ -382,13 +406,15 @@ function mountHome(container, signal) {
         </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Sammlungen">
-        ${sammlungsKarten(sichtbar, zaehlerStand)}
+        ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene)}
       </section>
     </div>`;
 
-  container.querySelector('.neu-sammlung').onclick = () => {
-    toast('Eigene Sammlungen ergänzen wir im nächsten Schritt.');
-  };
+  container.querySelector('.neu-sammlung').onclick = () => openCollectionEditor({
+    userId: session.user.id,
+    rootKey: 'home',
+    onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+  });
 
   // Feld und Knopf stehen, die Ablage dahinter fehlt noch: Fuer Links gibt es
   // bislang keine Tabelle (Roadmap 7 "Externe Rezeptmedien"). Bis dahin sagt
@@ -406,6 +432,75 @@ function mountHome(container, signal) {
     // Zwischenzeitlich kann eine andere Seite gemountet sein.
     if (container.isConnected) zaehlerEintragen(container, zaehler);
   });
+}
+
+function collectionEmptyMarkup(hasChildren) {
+  return `<section class="sammlung-alle">
+    <h2>Alle Einträge (0)</h2>
+    ${hasChildren ? '' : `<div class="sammlung-leer">
+      ${materialIconMarkup('create_new_folder')}
+      <strong>Noch keine Einträge</strong>
+      <span>Tippe auf +, um den ersten Eintrag zu speichern.</span>
+    </div>`}
+  </section>`;
+}
+
+async function mountCustomCollection(container, item, signal) {
+  setSeite('collection');
+  const children = await loadCollections(session.user.id, { rootKey: item.root_key, parentId: item.id, signal });
+  if (signal?.aborted) return;
+  if (item.root_key === 'food-log') {
+    await mountFoodLog(container, { session, profile, signal, collectionId: item.id });
+  } else {
+    container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
+      <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
+      ${collectionGridMarkup(children)}
+      ${collectionEmptyMarkup(children.length > 0)}
+    </div>`;
+  }
+  const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
+  const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+  const entryCount = Number.parseInt(container.querySelector('[data-food-count]')?.textContent || '0', 10) || 0;
+  mountCategoryChrome(container, `collection-${item.id}`, item.name, {
+    backHref,
+    color: item.color,
+    meta: `${entryCount} Einträge · ${children.length} Unter-Sammlungen`,
+    onPlus: item.root_key === 'food-log' ? () => {
+      const target = container.querySelector('[data-food-panel] > summary');
+      target?.click();
+      target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } : undefined,
+    onCreateSub: () => openCollectionEditor({
+      userId: session.user.id, rootKey: item.root_key, parentId: item.id, onSaved: refresh,
+    }),
+    onRename: () => openCollectionEditor({
+      userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
+    }),
+    onEditAppearance: () => openCollectionEditor({
+      userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
+    }),
+    onDelete: async () => {
+      if (!confirm(`„${item.name}“ samt Unter-Sammlungen wirklich löschen?`)) return;
+      try {
+        await deleteCollection(session.user.id, item);
+        toast('Sammlung gelöscht');
+        location.hash = backHref.slice(1);
+      } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
+    },
+  });
+  if (item.root_key === 'food-log' && children.length) {
+    container.querySelector('.kategorie-kopf')?.insertAdjacentHTML('afterend', collectionGridMarkup(children));
+  }
+}
+
+async function addFixedSubcollections(container, rootKey, signal) {
+  const children = await loadCollections(session.user.id, { rootKey, signal });
+  if (signal?.aborted) return [];
+  const wrap = container.querySelector(':scope > .wrap');
+  const chrome = wrap?.querySelector('.kategorie-kopf');
+  const anchor = chrome || wrap?.querySelector(':scope > .seitenkopf');
+  if (wrap && children.length) anchor?.insertAdjacentHTML('afterend', collectionGridMarkup(children));
+  return children;
 }
 
 function mountSearch(container, signal) {
@@ -530,6 +625,7 @@ async function render() {
   if (generation !== renderGeneration) return;
   const angefragt = (location.hash || '#home').slice(1);
   const route = ['home', 'search', 'profile'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
+    || angefragt.startsWith('collection/')
     ? angefragt
     : 'home';
   routeAbortController?.abort();
@@ -537,7 +633,7 @@ async function render() {
   const { signal } = routeAbortController;
   const view = renderChrome(route);
   if (route === 'home') {
-    mountHome(view, signal);
+    await mountHome(view, signal);
   } else if (route === 'search') {
     mountSearch(view, signal);
   } else if (route === 'profile') {
@@ -567,9 +663,27 @@ async function render() {
     mountCategoryChrome(view, route, 'MAHLZEITEN');
   } else if (route === 'food-log') {
     setSeite('food-log');
-    mountFoodLog(view, { session, profile, signal });
-    mountCategoryChrome(view, route, 'Food-Log');
-  } else if (route === 'recipes' || route === 'habits') {
+    await mountFoodLog(view, { session, profile, signal });
+    // Erst Inhalte und Unter-Sammlungen aufbauen, dann genau eine Kopfzeile.
+    const children = await addFixedSubcollections(view, 'food-log', signal);
+    const entryCount = Number.parseInt(view.querySelector('[data-food-count]')?.textContent || '0', 10) || 0;
+    mountCategoryChrome(view, route, 'Food-Log', {
+      meta: `${entryCount} Einträge · ${children.length} Unter-Sammlungen`,
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
+    });
+  } else if (route === 'recipes') {
+    setSeite('recipes');
+    const children = await loadCollections(session.user.id, { rootKey: 'recipes', signal });
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>REZEPTE</h1></div>${collectionGridMarkup(children)}${collectionEmptyMarkup(children.length > 0)}</div>`;
+    mountCategoryChrome(view, route, 'REZEPTE', {
+      meta: `0 Einträge · ${children.length} Unter-Sammlungen`,
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
+    });
+  } else if (route.startsWith('collection/')) {
+    const item = await getCollection(session.user.id, route.slice('collection/'.length), signal);
+    if (!item) { location.hash = 'home'; return; }
+    await mountCustomCollection(view, item, signal);
+  } else if (route === 'habits') {
     mountComingSoon(view, route);
     mountCategoryChrome(view, route, route === 'recipes' ? 'REZEPTE' : 'ROUTINEN');
   } else {

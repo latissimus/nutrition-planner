@@ -10,6 +10,9 @@ const icons = Object.entries(modules).map(([path, svg]) => {
   return { id, title, svg };
 }).sort((a, b) => a.title.localeCompare(b.title, 'de'));
 const iconById = (id) => icons.find((icon) => icon.id === id);
+const escapeHtml = (value = '') => String(value)
+  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const defaults = {
   body: 'body_fat', reminders: 'notifications', 'food-log': 'fork_spoon',
   recipes: 'menu_book', habits: 'bucket_check',
@@ -158,23 +161,27 @@ function colorPicker(route, onChange) {
   };
 }
 
-function settingsSheet(route, onChange) {
+function settingsSheet(route, onChange, actions = {}) {
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
     <div class="sheet-menue">
       <button data-action="icon">${materialIcon('edit', 'sheet-list-icon')}<span>Kategorie-Icon ändern</span></button>
       <button data-action="color">${materialIcon('brightness_empty', 'sheet-list-icon')}<span>Farbe ändern</span></button>
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
-      <button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Sammlung erstellen</span></button>
+      ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
+      ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Sammlung erstellen</span></button>` : ''}
+      ${actions.onDelete ? `<button class="sheet-gefahr" data-action="delete">${materialIcon('delete_forever', 'sheet-list-icon')}<span>Sammlung löschen</span></button>` : ''}
     </div>`);
   backdrop.querySelector('.sheet-menue').onclick = (event) => {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (!action) return;
     closeSheet(backdrop);
-    if (action === 'icon') iconPicker(route, onChange);
-    if (action === 'color') colorPicker(route, onChange);
+    if (action === 'icon') actions.onEditAppearance ? actions.onEditAppearance() : iconPicker(route, onChange);
+    if (action === 'color') actions.onEditAppearance ? actions.onEditAppearance() : colorPicker(route, onChange);
     if (action === 'select') toast('Die Auswahl ist für diese Sammlung vorbereitet.');
-    if (action === 'sub') toast('Unter-Sammlungen ergänzen wir im nächsten Datenschritt.');
+    if (action === 'rename') actions.onRename?.();
+    if (action === 'sub') actions.onCreateSub?.();
+    if (action === 'delete') actions.onDelete?.();
   };
 }
 
@@ -192,21 +199,30 @@ function plusAction(container, route) {
   } else toast('Hinzufügen wird mit den Inhalten dieser Sammlung aktiviert.');
 }
 
-export function mountCategoryChrome(container, route, title) {
+export function mountCategoryChrome(container, route, title, options = {}) {
   const wrap = container.querySelector(':scope > .wrap');
   if (!wrap) return;
   container.classList.add('hat-kategoriefarbe');
-  container.style.setProperty('--ordner', categoryColor(route));
+  container.style.setProperty('--ordner', options.color || categoryColor(route));
   wrap.querySelector(':scope > .seitenkopf')?.remove();
   const bar = document.createElement('nav');
   bar.className = 'kategorie-kopf';
   bar.setAttribute('aria-label', `${title} bedienen`);
+  const safeTitle = escapeHtml(title);
+  const safeMeta = escapeHtml(options.meta || '');
   bar.innerHTML = `
-    <a class="kategorie-kopfknopf" href="#home" aria-label="Zurück zur Übersicht">${materialIcon('arrow_back_ios')}</a>
-    <div class="kategorie-kopftitel"><strong>${title}</strong></div>
-    <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${title} hinzufügen">${materialIcon('add')}</button>
-    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${title}">${materialIcon('build')}</button>`;
+    <a class="kategorie-kopfknopf" href="${options.backHref || '#home'}" aria-label="Zurück">${materialIcon('arrow_back_ios')}</a>
+    <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
+    <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${safeTitle} hinzufügen">${materialIcon('add')}</button>
+    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>`;
   wrap.prepend(bar);
-  bar.querySelector('.kategorie-plus').onclick = () => plusAction(container, route);
-  bar.querySelector('[data-category-settings]').onclick = () => settingsSheet(route, () => window.dispatchEvent(new HashChangeEvent('hashchange')));
+  bar.querySelector('.kategorie-plus').onclick = () => {
+    if (options.onPlus) options.onPlus();
+    else plusAction(container, route);
+  };
+  bar.querySelector('[data-category-settings]').onclick = () => settingsSheet(
+    route,
+    () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    options,
+  );
 }
