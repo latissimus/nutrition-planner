@@ -2621,11 +2621,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
    quadratisch und so hoch wie das Feld. */
 .tuck-ablage{
   display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:10px;align-items:stretch;
-  margin:0 2px 36px;
+  margin:0 2px 46px;
 }
 .tuck-ablage-feld{
   display:grid;grid-template-columns:20px minmax(0,1fr) 22px;gap:10px;align-items:center;
-  min-height:56px;padding:0 14px;
+  min-height:62px;padding:0 14px;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
 }
@@ -2647,7 +2647,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Start: Bibliothek ---------- */
-.tuck-home{padding-top:30px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+.tuck-home{padding-top:38px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
 /* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
 .tuck-titelzeile{
   display:flex;align-items:center;justify-content:space-between;gap:14px;

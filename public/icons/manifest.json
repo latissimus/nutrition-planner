@@ -1,0 +1,74 @@
+{
+  "name": "MUSCLEDEX Slab Icons",
+  "version": 1,
+  "viewBox": "0 0 24 24",
+  "strokeWidth": 2.6,
+  "shadow": {
+    "x": 1.1,
+    "y": 1.25,
+    "blur": 0,
+    "color": "#492426"
+  },
+  "groups": {
+    "categories": [
+      "body",
+      "reminders",
+      "food-log",
+      "recipes",
+      "habits",
+      "sleep"
+    ],
+    "food": [
+      "meal",
+      "apple",
+      "water",
+      "supplement",
+      "shaker",
+      "recipe",
+      "shopping-basket",
+      "coffee"
+    ],
+    "health": [
+      "scale",
+      "caliper",
+      "heart",
+      "activity",
+      "bed",
+      "moon",
+      "sun",
+      "trend",
+      "timer",
+      "streak"
+    ],
+    "ui": [
+      "search",
+      "plus",
+      "minus",
+      "close",
+      "check",
+      "bell",
+      "chevron-left",
+      "chevron-right",
+      "chevron-up",
+      "chevron-down",
+      "folder",
+      "folder-plus",
+      "settings",
+      "user",
+      "edit",
+      "trash",
+      "download",
+      "upload",
+      "calendar",
+      "clock",
+      "link",
+      "camera",
+      "image",
+      "menu",
+      "more",
+      "sync",
+      "filter",
+      "tag"
+    ]
+  }
+}
