@@ -295,7 +295,7 @@ function zaehlerText(route, anzahl) {
 function zaehlerEintragen(container, zaehler) {
   container.querySelectorAll('[data-sammlung]').forEach((karte) => {
     const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
-    const meta = karte.querySelector('.dex-statuszeile, .dex-test-meta');
+    const meta = karte.querySelector('.dex-statuszeile, .dex-test-meta, .dex-vhs-meta');
     if (text && meta) meta.innerHTML = text;
   });
 }
@@ -356,6 +356,20 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
             <h2>${titel}</h2>
             <span class="dex-test-meta">${meta}</span>
           </span>
+        </a>
+      </div>`;
+    }
+    if (route === 'reminders') {
+      return `
+      <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
+        <a class="tuck-karte dex-vhs-karte" href="#${route}" data-sammlung="${route}">
+          <span class="dex-vhs-punkte" aria-hidden="true">${'<i></i>'.repeat(12)}</span>
+          <span class="dex-vhs-text">
+            <h2>${titel}</h2>
+            <span class="dex-vhs-meta">${meta}</span>
+          </span>
+          <span class="dex-vhs-baender" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="dex-vhs-einzug" aria-hidden="true"></span>
         </a>
       </div>`;
     }
