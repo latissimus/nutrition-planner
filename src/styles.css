@@ -2723,7 +2723,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .tuck-icon .muscledex-sammlungsicon,
 .tuck-icon .muscledex-sammlungsicon svg{
-  display:block;width:33px;height:33px;
+  display:block;width:29px;height:29px;
 }
 .tuck-fach .muscledex-sammlungsicon [data-part="face"],
 .tuck-fach .muscledex-sammlungsicon [data-part="clapper"]{
@@ -2733,12 +2733,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-fach .muscledex-sammlungsicon svg path{
   fill:var(--ordner);
 }
-.tuck-fach .muscledex-sammlungsicon svg path{
-  stroke:#000;stroke-width:28px;stroke-linejoin:round;
-  paint-order:stroke fill;
-}
 .material-svg{display:grid;place-items:center;color:inherit;line-height:0}
-.material-svg svg{display:block;width:24px;height:24px;fill:currentColor}
+.material-svg svg{display:block;width:22px;height:22px;fill:currentColor}
 
 /* ---------- Gemeinsamer Kopf und Sammlungsmenü ---------- */
 .kategorie-kopf{
@@ -2757,7 +2753,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   color:var(--ink);box-shadow:var(--hart-klein);text-decoration:none;
 }
 .kategorie-kopfknopf .material-svg,
-.kategorie-kopfknopf svg{display:block;width:29px;height:29px}
+.kategorie-kopfknopf svg{display:block;width:26px;height:26px}
 .kategorie-kopfknopf.kategorie-plus{background:var(--fe-pink)}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
@@ -2785,7 +2781,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   background:transparent;color:var(--text);text-align:left;font:inherit;font-size:17px;font-weight:700;
 }
 .sheet-menue>button:last-child{border-bottom:0}
-.sheet-list-icon,.sheet-list-icon svg{display:block;width:40px;height:40px;fill:currentColor}
+.sheet-list-icon,.sheet-list-icon svg{display:block;width:36px;height:36px;fill:currentColor}
 .sheet-zeichen{display:grid;place-items:center;width:34px;height:34px;font-size:27px;font-weight:800}
 .icon-auswahl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding-bottom:6px}
 .icon-option{
@@ -2794,7 +2790,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   background:var(--surface2);color:var(--text);font:inherit;
 }
 .icon-option.aktiv{border-color:var(--ink);background:var(--fe-pink)}
-.icon-option svg{display:block;width:48px;height:48px;fill:#000}
+.icon-option svg{display:block;width:44px;height:44px;fill:#000}
 .icon-option span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:700}
 @media(max-width:370px){
   .kategorie-kopf{grid-template-columns:48px minmax(0,1fr) 48px 48px;gap:6px}
