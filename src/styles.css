@@ -2753,11 +2753,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .kategorie-kopfknopf[href="#home"] .material-svg{transform:translateX(2px)}
 .kategorie-kopfknopf.kategorie-plus{background:var(--fe-pink)}
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus{background:var(--ordner)}
-.hat-kategoriefarbe .kategorie-kopfknopf .material-svg svg{fill:var(--ordner)}
+.hat-kategoriefarbe .kategorie-kopfknopf .material-svg svg{fill:#000}
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus .material-svg svg{fill:#000}
 .hat-kategoriefarbe .kategorie-kopfknopf[href="#home"] .material-svg svg,
 .hat-kategoriefarbe .kategorie-kopfknopf[data-category-settings] .material-svg svg{fill:#000}
-.hat-kategoriefarbe .app-icon{color:var(--ordner)}
+.hat-kategoriefarbe .app-icon{color:#000}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{
@@ -2783,7 +2783,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .sheet-griff{width:58px;height:6px;margin:3px auto 18px;border-radius:99px;background:var(--ink)}
 .kategorie-sheet>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .kategorie-sheet>header h2{margin:0;font-size:20px}
-.kategorie-sheet>header button{width:40px;height:40px;border:0;background:transparent;font-size:29px}
+.kategorie-sheet>header button{width:40px;height:40px;border:0;background:transparent;color:#000!important;
+  font-size:30px;font-weight:900;line-height:1;-webkit-text-stroke:.55px #000}
 .sheet-menue{display:grid}
 .sheet-menue>button{
   display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:13px;
@@ -3063,7 +3064,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
 .sammlung-editor-label span{color:var(--muted);font-weight:500;letter-spacing:0}
 .sammlung-editor .input{min-height:58px;font-size:17px}
-.sammlung-editor-farben,.sammlung-editor-icons{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}
+.sammlung-editor-farben{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}
+.sammlung-editor-icons,.sammlung-editor-emojis{
+  display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,52px);grid-auto-columns:52px;
+  gap:9px;max-width:100%;padding:2px 4px 7px 1px;overflow-x:auto;
+  overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+}
 .sammlung-editor-farben button,.sammlung-editor-icons button{position:relative;aspect-ratio:1;padding:0;
   border:1.5px solid var(--ink);border-radius:8px;background:var(--farbe,#fff);box-shadow:none}
 .sammlung-editor-farben button.aktiv,.sammlung-editor-icons button.aktiv{box-shadow:3px 3px 0 #000}
@@ -3071,10 +3077,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#000;font-size:22px;font-weight:900}
 .sammlung-editor-icons button{display:grid;place-items:center;background:var(--surface)}
 .sammlung-editor-icons .material-svg,.sammlung-editor-icons svg{width:24px;height:24px;fill:#000}
+.sammlung-editor-emojis{grid-template-rows:54px;grid-auto-columns:54px}
+.sammlung-editor-emojis button{display:grid;place-items:center;padding:0;border:1.5px solid var(--ink);
+  border-radius:8px;background:var(--surface);font-size:27px;scroll-snap-align:start}
+.sammlung-editor-emojis button.aktiv{box-shadow:3px 3px 0 #000;background:var(--prio-wash)}
+.dex-emoji{display:grid;place-items:center;font-size:25px;line-height:1}
+.hat-kategoriefarbe .material-svg,.hat-kategoriefarbe .material-svg svg,
+.hat-kategoriefarbe .muscledex-sammlungsicon,.hat-kategoriefarbe .muscledex-sammlungsicon svg{
+  color:#000!important;fill:#000!important;
+}
+.tuck-fach .muscledex-sammlungsicon,
+.tuck-fach .muscledex-sammlungsicon svg,
+.tuck-fach .muscledex-sammlungsicon svg *,
+.unter-sammlung-icon .material-svg,
+.unter-sammlung-icon .material-svg svg,
+.unter-sammlung-icon .material-svg svg *{color:#000!important;fill:#000!important}
 .sammlung-editor-speichern{min-height:58px;margin:24px 0 4px}
 .sheet-gefahr{color:#B42318!important}
 .sheet-gefahr .material-svg,.sheet-gefahr svg{fill:currentColor!important}
 
 @media(max-width:390px){
-  .sammlung-editor-farben,.sammlung-editor-icons{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .sammlung-editor-farben{grid-template-columns:repeat(6,minmax(0,1fr))}
 }

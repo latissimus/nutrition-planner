@@ -24,7 +24,7 @@ import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 import {
-  collectionGridMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
+  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 
 applyTheme(getTheme());
@@ -308,7 +308,7 @@ function renderChrome(route) {
     app.innerHTML = `
       <header class="topbar app-kopf">
         <div class="wrap">
-          <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Sammlungen">${headerBrandMarkup()}</a>
+          <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
           <nav class="kopf-aktionen" aria-label="App-Status und Profil">
             <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
             <a class="tuck-quadrat" href="#search" aria-label="MUSCLE-DEX durchsuchen">
@@ -371,8 +371,8 @@ function eigeneSammlungsKarten(items) {
       <span class="tuck-reiter" aria-hidden="true"></span>
       <a class="tuck-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
         <span class="tuck-karte-oben">
-          <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${materialIconMarkup(item.icon_key)}</span>
-          <span class="tuck-meta"><b>Eigene</b><span>Sammlung</span></span>
+          <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
+          <span class="tuck-meta"><b>Eigener</b><span>Dex</span></span>
         </span>
         <h2>${escapeHtml(item.name)}</h2>
       </a>
@@ -384,7 +384,7 @@ async function mountHome(container, signal) {
   const sichtbar = sichtbareSammlungen();
   let eigene = [];
   try { eigene = await loadCollections(session.user.id, { rootKey: 'home', signal }); }
-  catch (error) { if (!signal?.aborted) toast('Eigene Sammlungen konnten nicht geladen werden.'); }
+  catch (error) { if (!signal?.aborted) toast('Eigene Dex-Einträge konnten nicht geladen werden.'); }
   if (signal?.aborted) return;
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
@@ -400,12 +400,12 @@ async function mountHome(container, signal) {
         </button>
       </div>
       <header class="tuck-titelzeile">
-        <h1>Meine Sammlungen</h1>
-        <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neue Sammlung erstellen">
+        <h1>Meine Dex-Einträge</h1>
+        <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
           ${materialIconMarkup('create_new_folder')}
         </button>
       </header>
-      <section class="tuck-grid" aria-label="Meine Sammlungen">
+      <section class="tuck-grid" aria-label="Meine Dex-Einträge">
         ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene)}
       </section>
     </div>`;
@@ -464,7 +464,7 @@ async function mountCustomCollection(container, item, signal) {
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
     color: item.color,
-    meta: `${entryCount} Einträge · ${children.length} Unter-Sammlungen`,
+    meta: `${entryCount} Einträge · ${children.length} Unter-Dex`,
     onPlus: item.root_key === 'food-log' ? () => {
       const target = container.querySelector('[data-food-panel] > summary');
       target?.click();
@@ -480,10 +480,10 @@ async function mountCustomCollection(container, item, signal) {
       userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
     onDelete: async () => {
-      if (!confirm(`„${item.name}“ samt Unter-Sammlungen wirklich löschen?`)) return;
+      if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
       try {
         await deleteCollection(session.user.id, item);
-        toast('Sammlung gelöscht');
+        toast('Dex gelöscht');
         location.hash = backHref.slice(1);
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
@@ -512,14 +512,14 @@ function mountSearch(container, signal) {
       <div class="tuck-suchzeile">
         <label class="tuck-suchfeld" for="global-search">
           ${iconMarkup('search')}
-          <input id="global-search" type="search" autocomplete="off" placeholder="Sammlungen durchsuchen …">
+          <input id="global-search" type="search" autocomplete="off" placeholder="Dex-Einträge durchsuchen …">
         </label>
         <a href="#home">Abbrechen</a>
       </div>
       <section class="tuck-bibliothek">
         <span>Deine Bibliothek</span>
         <div class="tuck-bibliothek-werte">
-          <div><b>${sichtbar.length}</b><small>Sammlungen</small></div>
+          <div><b>${sichtbar.length}</b><small>Dex-Einträge</small></div>
           <div><b data-summe>…</b><small>Einträge</small></div>
           <div><b>${sichtbar.length - aktiv}</b><small>Geplant</small></div>
         </div>
@@ -668,7 +668,7 @@ async function render() {
     const children = await addFixedSubcollections(view, 'food-log', signal);
     const entryCount = Number.parseInt(view.querySelector('[data-food-count]')?.textContent || '0', 10) || 0;
     mountCategoryChrome(view, route, 'Food-Log', {
-      meta: `${entryCount} Einträge · ${children.length} Unter-Sammlungen`,
+      meta: `${entryCount} Einträge · ${children.length} Unter-Dex`,
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
     });
   } else if (route === 'recipes') {
@@ -676,7 +676,7 @@ async function render() {
     const children = await loadCollections(session.user.id, { rootKey: 'recipes', signal });
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>REZEPTE</h1></div>${collectionGridMarkup(children)}${collectionEmptyMarkup(children.length > 0)}</div>`;
     mountCategoryChrome(view, route, 'REZEPTE', {
-      meta: `0 Einträge · ${children.length} Unter-Sammlungen`,
+      meta: `0 Einträge · ${children.length} Unter-Dex`,
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
     });
   } else if (route.startsWith('collection/')) {

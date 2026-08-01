@@ -1,5 +1,7 @@
 import { supabase } from './supabase.js';
-import { materialIconMarkup } from './categoryIcons.js';
+import {
+  availableCategoryIcons, categoryEmojis, enableSheetSwipe, materialIconMarkup,
+} from './categoryIcons.js';
 import { toast } from './toast.js';
 
 export const COLLECTION_COLORS = [
@@ -7,11 +9,7 @@ export const COLLECTION_COLORS = [
   '#F1DCAA', '#C9C9C9', '#8CA1BD', '#BE80B9', '#B58A62', '#492426', '#E97777', '#6C5CF2',
 ];
 
-export const COLLECTION_ICONS = [
-  'create_new_folder', 'star', 'favorite', 'menu_book', 'photo_camera', 'dark_mode',
-  'local_cafe', 'language', 'fastfood', 'fitness_center', 'fork_spoon', 'tag',
-  'water_drop', 'pill', 'outdoor_grill', 'emoji_food_beverage', 'cookie', 'skillet',
-];
+export const COLLECTION_ICONS = availableCategoryIcons.map((icon) => icon.id);
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -41,11 +39,18 @@ export async function getCollection(userId, id, signal) {
   return data;
 }
 
+export function collectionIconMarkup(value) {
+  if (value?.startsWith('emoji:')) {
+    return `<span class="dex-emoji" aria-hidden="true">${escapeHtml(value.slice(6))}</span>`;
+  }
+  return materialIconMarkup(value || 'create_new_folder');
+}
+
 export function collectionCardMarkup(item, count = 0) {
   return `<a class="unter-sammlung" href="#collection/${item.id}" style="--ordner:${item.color}">
     <span class="unter-sammlung-reiter" aria-hidden="true"></span>
     <span class="unter-sammlung-kartenflaeche">
-      <span class="unter-sammlung-icon">${materialIconMarkup(item.icon_key)}</span>
+      <span class="unter-sammlung-icon">${collectionIconMarkup(item.icon_key)}</span>
       <strong>${escapeHtml(item.name)}</strong>
       <small>${count} ${count === 1 ? 'Eintrag' : 'Einträge'}</small>
     </span>
@@ -55,7 +60,7 @@ export function collectionCardMarkup(item, count = 0) {
 export function collectionGridMarkup(items) {
   if (!items.length) return '';
   return `<section class="unter-sammlungen-block">
-    <h2>Unter-Sammlungen (${items.length})</h2>
+    <h2>Unter-Dex (${items.length})</h2>
     <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item)).join('')}</div>
   </section>`;
 }
@@ -91,12 +96,14 @@ function closeEditor(backdrop) {
 
 export function openCollectionEditor({ userId, rootKey, parentId = null, existing = null, onSaved }) {
   const selectedColor = existing?.color || COLLECTION_COLORS[0];
-  const selectedIcon = existing?.icon_key || COLLECTION_ICONS[0];
+  const selectedIcon = existing?.icon_key || COLLECTION_ICONS.find((icon) => icon === 'create_new_folder') || COLLECTION_ICONS[0];
+  const isSubDex = Boolean(parentId || existing?.parent_id);
+  const editorTitle = existing ? 'Dex bearbeiten' : (isSubDex ? 'Neuer Unter-Dex' : 'Neuer Dex');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sammlung-editor-backdrop';
-  backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true" aria-label="${existing ? 'Sammlung bearbeiten' : 'Neue Sammlung'}">
+  backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true" aria-label="${editorTitle}">
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>${existing ? 'Sammlung bearbeiten' : 'Neue Sammlung'}</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>${editorTitle}</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
     <form data-collection-form>
       <div class="sammlung-editor-label"><label for="collection-name">Name</label><span data-name-count>${existing?.name?.length || 0}/40</span></div>
       <input class="input" id="collection-name" maxlength="40" required placeholder="z. B. Low Carb" value="${escapeHtml(existing?.name || '')}">
@@ -104,7 +111,9 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
       <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((color) => `<button type="button" data-pick-color="${color}" class="${color === selectedColor ? 'aktiv' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
-      <button class="btn btn-primary btn-block sammlung-editor-speichern" type="submit">${existing ? 'Änderungen speichern' : 'Sammlung erstellen'}</button>
+      <h3>Apple-Emojis</h3>
+      <div class="sammlung-editor-emojis">${categoryEmojis.map((emoji) => `<button type="button" data-pick-icon="emoji:${emoji}" class="${selectedIcon === `emoji:${emoji}` ? 'aktiv' : ''}" aria-label="Emoji ${emoji}">${emoji}</button>`).join('')}</div>
+      <button class="btn btn-primary btn-block sammlung-editor-speichern" type="submit">${existing ? 'Änderungen speichern' : (isSubDex ? 'Unter-Dex erstellen' : 'Dex erstellen')}</button>
     </form>
   </section>`;
   let color = selectedColor;
@@ -132,7 +141,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     try {
       const saved = await saveCollection(userId, { rootKey, parentId, name: input.value, color, iconKey }, existing);
       close();
-      toast(existing ? 'Sammlung aktualisiert' : 'Sammlung erstellt');
+      toast(existing ? 'Dex aktualisiert' : (isSubDex ? 'Unter-Dex erstellt' : 'Dex erstellt'));
       await onSaved?.(saved);
     } catch (error) {
       toast(error.message || 'Speichern fehlgeschlagen');
@@ -143,6 +152,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     if (!(event.target instanceof Element) || !event.target.closest('.sammlung-editor')) event.preventDefault();
   }, { passive: false });
   document.body.append(backdrop);
+  enableSheetSwipe(backdrop, close);
   requestAnimationFrame(() => {
     backdrop.classList.add('offen');
     input.focus({ preventScroll: true });

@@ -9,6 +9,7 @@ const icons = Object.entries(modules).map(([path, svg]) => {
   const title = id.replaceAll('_', ' ');
   return { id, title, svg };
 }).sort((a, b) => a.title.localeCompare(b.title, 'de'));
+export const availableCategoryIcons = icons;
 const iconById = (id) => icons.find((icon) => icon.id === id);
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -18,7 +19,7 @@ const defaults = {
   recipes: 'menu_book', habits: 'bucket_check',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
-const emojis = [
+export const categoryEmojis = [
   '💪','📐','🔔','🥩','🍗','🧀','🥤','💧','☕','🫖','🧠','🧘',
   '⭐','😴','🌙','🛏️','💊','⏰','📅','📷','🖼️','📖','📝','✅',
   '🔥','⚡','❤️','🏋️','🥚','🍳','🥗','🍎','🍌','🥑','🫐','🍚',
@@ -95,6 +96,7 @@ function sheet(markup) {
     }
   }, { passive: false });
   document.body.append(backdrop);
+  enableSheetSwipe(backdrop);
   requestAnimationFrame(() => backdrop.classList.add('offen'));
   return backdrop;
 }
@@ -102,6 +104,36 @@ function sheet(markup) {
 function closeSheet(backdrop) {
   if (!backdrop?.isConnected) return;
   backdrop.remove();
+}
+
+export function enableSheetSwipe(backdrop, close = () => closeSheet(backdrop)) {
+  const panel = backdrop.querySelector('.kategorie-sheet');
+  if (!panel) return;
+  let startY = null;
+  let distance = 0;
+  panel.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1 || panel.scrollTop > 0) return;
+    startY = event.touches[0].clientY;
+    distance = 0;
+  }, { passive: true });
+  panel.addEventListener('touchmove', (event) => {
+    if (startY === null) return;
+    distance = Math.max(0, event.touches[0].clientY - startY);
+    if (!distance) return;
+    event.preventDefault();
+    panel.style.transition = 'none';
+    panel.style.transform = `translateY(${distance}px)`;
+  }, { passive: false });
+  const finish = () => {
+    if (startY === null) return;
+    const dismiss = distance > 84;
+    startY = null;
+    panel.style.removeProperty('transition');
+    panel.style.removeProperty('transform');
+    if (dismiss) close();
+  };
+  panel.addEventListener('touchend', finish);
+  panel.addEventListener('touchcancel', finish);
 }
 
 function iconPicker(route, onChange) {
@@ -115,7 +147,7 @@ function iconPicker(route, onChange) {
     </div>
     <h3 class="icon-picker-titel">Emojis</h3>
     <div class="emoji-auswahl">
-      ${emojis.map((emoji) => `<button class="emoji-option${current === `emoji:${emoji}` ? ' aktiv' : ''}" data-emoji="${emoji}" aria-label="Emoji ${emoji}">${emoji}</button>`).join('')}
+      ${categoryEmojis.map((emoji) => `<button class="emoji-option${current === `emoji:${emoji}` ? ' aktiv' : ''}" data-emoji="${emoji}" aria-label="Emoji ${emoji}">${emoji}</button>`).join('')}
     </div>
     <form class="emoji-eigen" data-emoji-form>
       <label for="eigenes-emoji">Eigenes Emoji</label>
@@ -169,8 +201,8 @@ function settingsSheet(route, onChange, actions = {}) {
       <button data-action="color">${materialIcon('brightness_empty', 'sheet-list-icon')}<span>Farbe ändern</span></button>
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
-      ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Sammlung erstellen</span></button>` : ''}
-      ${actions.onDelete ? `<button class="sheet-gefahr" data-action="delete">${materialIcon('delete_forever', 'sheet-list-icon')}<span>Sammlung löschen</span></button>` : ''}
+      ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
+      ${actions.onDelete ? `<button class="sheet-gefahr" data-action="delete">${materialIcon('delete_forever', 'sheet-list-icon')}<span>Dex löschen</span></button>` : ''}
     </div>`);
   backdrop.querySelector('.sheet-menue').onclick = (event) => {
     const action = event.target.closest('[data-action]')?.dataset.action;
@@ -178,7 +210,7 @@ function settingsSheet(route, onChange, actions = {}) {
     closeSheet(backdrop);
     if (action === 'icon') actions.onEditAppearance ? actions.onEditAppearance() : iconPicker(route, onChange);
     if (action === 'color') actions.onEditAppearance ? actions.onEditAppearance() : colorPicker(route, onChange);
-    if (action === 'select') toast('Die Auswahl ist für diese Sammlung vorbereitet.');
+    if (action === 'select') toast('Die Auswahl ist für diesen Dex vorbereitet.');
     if (action === 'rename') actions.onRename?.();
     if (action === 'sub') actions.onCreateSub?.();
     if (action === 'delete') actions.onDelete?.();
@@ -196,7 +228,7 @@ function plusAction(container, route) {
   if (target) {
     target.click();
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } else toast('Hinzufügen wird mit den Inhalten dieser Sammlung aktiviert.');
+  } else toast('Hinzufügen wird mit den Inhalten dieses Dex aktiviert.');
 }
 
 export function mountCategoryChrome(container, route, title, options = {}) {
@@ -214,7 +246,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
     <a class="kategorie-kopfknopf" href="${options.backHref || '#home'}" aria-label="Zurück">${materialIcon('arrow_back_ios')}</a>
     <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${safeTitle} hinzufügen">${materialIcon('add')}</button>
-    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>`;
+    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('more_horiz')}</button>`;
   wrap.prepend(bar);
   bar.querySelector('.kategorie-plus').onclick = () => {
     if (options.onPlus) options.onPlus();

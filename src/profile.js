@@ -258,7 +258,7 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
   const startseite = abschnitt(wrap, 'Startseite anpassen');
   const startHinweis = document.createElement('p');
   startHinweis.className = 'profile-hinweis';
-  startHinweis.textContent = 'Lege fest, welche Sammlungen auf der Startseite und in der Suche erscheinen.';
+  startHinweis.textContent = 'Lege fest, welche Dex-Einträge auf der Startseite und in der Suche erscheinen.';
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
     ['body', 'KFA-LOG'], ['reminders', 'MAHLZEITEN'], ['food-log', 'FOOD-LOG'],
