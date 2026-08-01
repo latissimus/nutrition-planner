@@ -335,48 +335,39 @@ function renderChrome(route) {
   return view;
 }
 
-// Der Aufbau folgt der Ordnerkarte aus Inspirationen/IMG_5109: ein farbiger
-// Reiter schaut hinter der Karte hervor, oben links die Symbolkachel in
-// derselben Farbe, rechts daneben die Kennzahl, und der Name steht unten in
-// Versalien.
+// Kompakte Dex-Karten mit einem schmalen Farbstreifen innerhalb der Oberkante.
 function sammlungsKarten(daten = sammlungen, zaehler = {}) {
-  return daten.map(([route, titel, , icon, farbe, status], index) => {
+  return daten.map(([route, titel, , icon, farbe, status]) => {
     // Solange die Zahl laedt, steht der Stand da. So springt die Karte beim
     // Nachtragen nur um eine Zeile und nicht um ihre halbe Hoehe.
     const meta = zaehlerText(route, zaehler[route])
       || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
-    // Reiter und Karte sind Geschwister, nicht Kind und Elternteil: Nur so
-    // deckt die Karte den Reiter zuverlaessig ab (siehe Kommentar im CSS).
     const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
     const iconFeld = iconInhalt
       ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
       : '';
     return `
     <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
-      <span class="tuck-reiter" aria-hidden="true"></span>
       <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
         <span class="tuck-karte-oben">
           ${iconFeld}
           <span class="tuck-meta">${meta}</span>
         </span>
         <h2>${titel}</h2>
-        <span class="dex-index">DEX-${String(index + 1).padStart(2, '0')}</span>
       </a>
     </div>`;
   }).join('');
 }
 
 function eigeneSammlungsKarten(items) {
-  return items.map((item, index) => `
+  return items.map((item) => `
     <div class="tuck-fach eigene-sammlung" style="--ordner:${item.color}">
-      <span class="tuck-reiter" aria-hidden="true"></span>
       <a class="tuck-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
         <span class="tuck-karte-oben">
           <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
           <span class="tuck-meta"><b>Eigener</b><span>Dex</span></span>
         </span>
         <h2>${escapeHtml(item.name)}</h2>
-        <span class="dex-index">USR-${String(index + 1).padStart(2, '0')}</span>
       </a>
     </div>`).join('');
 }
@@ -440,9 +431,8 @@ function collectionEmptyMarkup(hasChildren) {
   return `<section class="sammlung-alle">
     <h2>Alle Einträge (0)</h2>
     ${hasChildren ? '' : `<div class="sammlung-leer">
-      <div class="dex-leer-scanner">${materialIconMarkup('create_new_folder')}<i></i></div>
-      <small>DEX // EMPTY SLOT</small>
-      <strong>Noch kein Datensatz</strong>
+      <div class="dex-leer-symbol">${materialIconMarkup('create_new_folder')}<i></i></div>
+      <strong>Leerer Dex</strong>
       <span>Dieser Dex wartet auf seinen ersten Eintrag.</span>
     </div>`}
   </section>`;
@@ -467,7 +457,6 @@ async function mountCustomCollection(container, item, signal) {
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
     color: item.color,
-    code: `USR-${item.id.slice(0, 4).toUpperCase()}`,
     meta: `${entryCount} Einträge · ${children.length} Unter-Dex`,
     onPlus: item.root_key === 'food-log' ? () => {
       const target = container.querySelector('[data-food-panel] > summary');
@@ -672,7 +661,6 @@ async function render() {
     const children = await addFixedSubcollections(view, 'food-log', signal);
     const entryCount = Number.parseInt(view.querySelector('[data-food-count]')?.textContent || '0', 10) || 0;
     mountCategoryChrome(view, route, 'Food-Log', {
-      code: 'DEX-03',
       meta: `${entryCount} Einträge · ${children.length} Unter-Dex`,
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
     });
@@ -681,7 +669,6 @@ async function render() {
     const children = await loadCollections(session.user.id, { rootKey: 'recipes', signal });
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>REZEPTE</h1></div>${collectionGridMarkup(children)}${collectionEmptyMarkup(children.length > 0)}</div>`;
     mountCategoryChrome(view, route, 'REZEPTE', {
-      code: 'DEX-04',
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
     });

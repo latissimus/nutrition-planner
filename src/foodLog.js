@@ -148,9 +148,8 @@ export async function mountFoodLog(container, { session, signal, collectionId = 
     list.innerHTML = entries.length
       ? entries.map(entryMarkup).join('')
       : `<div class="sammlung-leer food-empty">
-          <div class="dex-leer-scanner">${materialIconMarkup('fork_spoon')}<i></i></div>
-          <small>DEX // EMPTY SLOT</small>
-          <strong>Noch kein Datensatz</strong>
+          <div class="dex-leer-symbol">${materialIconMarkup('fork_spoon')}<i></i></div>
+          <strong>Leerer Dex</strong>
           <span>Dieser Food-Dex wartet auf seine erste Mahlzeit.</span>
         </div>`;
   };
