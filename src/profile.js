@@ -227,9 +227,7 @@ export function mountProfile(container, { session, profile, onProfileUpdated }) 
   const darstellung = abschnitt(wrap, 'Darstellung');
   const seg = document.createElement('div');
   seg.className = 'themeseg';
-  // Retro bleibt als eigener Modus erhalten: Es ist das urspruengliche
-  // RetroMuscle-Hellblau, nicht bloss eine hellere Variante des Standards.
-  [['standard', 'Standard'], ['retro', 'Retro'], ['dark', 'Dark']].forEach(([wert, label]) => {
+  [['retro', 'Retro'], ['dark', 'Dark']].forEach(([wert, label]) => {
     const button = document.createElement('button');
     button.className = `themebtn${getTheme() === wert ? ' on' : ''}`;
     button.textContent = label;
