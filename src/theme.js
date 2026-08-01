@@ -69,18 +69,17 @@ export function setStatusleistenOverlay(quelle, offen, { vollflaechig = false } 
   root.classList.toggle('statusleiste-overlay', istOffen);
   root.classList.toggle('overlay-vollflaechig', alleVollflaechig);
 
-  if (istOffen) {
+  // theme-color wird hier bewusst NICHT angefasst. Bei
+  // apple-mobile-web-app-status-bar-style=black-translucent liest iOS das
+  // Meta-Tag fuer die Symbolfarbe nicht – es schaut sich an, was die Seite in
+  // dem Bereich tatsaechlich zeichnet, und waehlt Schwarz oder Weiss danach.
+  // Ueber theme-color zu steuern hat deshalb nie gewirkt und nur verschleiert,
+  // dass die abdunkelnde Flaeche selbst bis dort oben reichen muss.
+  if (istOffen && !alleVollflaechig) {
     const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
-    const overlayBg = abgedunkelt(bg);
-    // Die Meta-Farbe wird in beiden Faellen gesetzt: Sie faerbt die
-    // Browser-Oberflaeche und soll zum abgedunkelten Bild passen.
-    if (alleVollflaechig) root.style.removeProperty('--statusbar-bg');
-    else root.style.setProperty('--statusbar-bg', overlayBg);
-    metaFarbeSetzen(overlayBg);
+    root.style.setProperty('--statusbar-bg', abgedunkelt(bg));
   } else {
     root.style.removeProperty('--statusbar-bg');
-    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
-    if (bg) metaFarbeSetzen(bg);
   }
 
   if (!warOffen && istOffen) {
@@ -102,8 +101,10 @@ export function applyTheme(theme) {
   const wert = gueltig(theme);
   document.documentElement.dataset.theme = wert;
   requestAnimationFrame(() => {
+    // theme-color folgt nur noch dem Theme. Der Vorbehalt gegen offene Overlays
+    // ist entfallen, weil kein Overlay die Farbe mehr ueberschreibt.
     const farbe = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-    if (farbe && !overlayQuellen.size) metaFarbeSetzen(farbe);
+    if (farbe) metaFarbeSetzen(farbe);
   });
 }
 
