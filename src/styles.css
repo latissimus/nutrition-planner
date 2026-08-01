@@ -2733,7 +2733,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 
 /* ---------- Gemeinsamer Kopf und Sammlungsmenü ---------- */
 .kategorie-kopf{
-  display:grid;grid-template-columns:minmax(0,1fr) 52px 52px 52px;
+  display:grid;grid-template-columns:minmax(0,1fr) 44px 44px 44px;
   align-items:center;gap:9px;margin:18px 0 24px;
 }
 .kategorie-kopftitel{min-width:0;text-align:left;padding-left:3px}
@@ -2743,13 +2743,16 @@ button,a,[role="button"],summary{touch-action:manipulation}
   text-transform:uppercase;letter-spacing:-.02em;
 }
 .kategorie-kopfknopf{
-  display:grid;place-items:center;width:52px;height:52px;padding:0;
-  border:var(--bw) solid var(--ink);border-radius:12px;background:var(--surface);
+  display:grid;place-items:center;width:44px;height:44px;padding:0;
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r);background:var(--surface);
   color:var(--ink);box-shadow:var(--hart-klein);text-decoration:none;
 }
 .kategorie-kopfknopf .material-svg,
-.kategorie-kopfknopf svg{display:block;width:26px;height:26px}
-.kategorie-kopfknopf[href="#home"] .material-svg{transform:translateX(2px)}
+.kategorie-kopfknopf svg{display:block;width:22px;height:22px}
+.kategorie-kopfknopf.kategorie-schliessen .material-svg{
+  display:grid;place-items:center;width:100%;height:100%;transform:none;
+}
+.kategorie-kopfknopf.kategorie-schliessen .material-svg svg{margin:auto}
 .kategorie-kopfknopf.kategorie-plus{background:var(--fe-pink)}
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus{background:var(--ordner)}
 .hat-kategoriefarbe .kategorie-kopfknopf .material-svg svg{fill:#000}
@@ -2759,11 +2762,12 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .hat-kategoriefarbe .app-icon{color:#000}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 .seiten-x{
-  display:grid!important;place-items:center;width:52px;min-width:52px;height:52px;padding:0!important;
-  border:var(--bw) solid var(--ink)!important;border-radius:12px!important;
+  display:grid!important;place-items:center;width:44px;min-width:44px;height:44px;padding:0!important;
+  border:var(--karten-bw) solid var(--ink)!important;border-radius:var(--r)!important;
   background:var(--surface)!important;color:#000!important;box-shadow:var(--hart-klein);
-  font:900 30px/1 var(--ui)!important;text-decoration:none!important;
+  font:0/1 var(--ui)!important;text-decoration:none!important;
 }
+.seiten-x::before{content:"×";display:block;font:900 29px/.8 Arial,sans-serif;transform:translateY(-1px)}
 .seiten-x:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{
@@ -2832,8 +2836,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .farb-option span{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:9px;font-weight:700;white-space:nowrap}
 .farb-option.aktiv i{box-shadow:3px 3px 0 #000}
 @media(max-width:370px){
-  .kategorie-kopf{grid-template-columns:minmax(0,1fr) 48px 48px 48px;gap:6px}
-  .kategorie-kopfknopf{width:48px;height:48px}
+  .kategorie-kopf{grid-template-columns:minmax(0,1fr) 44px 44px 44px;gap:6px}
 }
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
    uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei
