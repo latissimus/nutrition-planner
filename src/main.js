@@ -1,13 +1,15 @@
 import './styles.css';
-// Plus Jakarta Sans (SIL Open Font License) — die freie Schrift, die Tuckiis
-// geometrisch-freundlicher Grotesk am naechsten kommt: doppelstoeckiges "a",
-// runde Punzen, gerader "y"-Abstrich. Fuenf Gewichte reichen fuer die ganze
-// Skala von Fliesstext (400) bis Ueberschrift (800).
-import '@fontsource/plus-jakarta-sans/latin-400.css';
-import '@fontsource/plus-jakarta-sans/latin-500.css';
-import '@fontsource/plus-jakarta-sans/latin-600.css';
-import '@fontsource/plus-jakarta-sans/latin-700.css';
-import '@fontsource/plus-jakarta-sans/latin-800.css';
+// Figtree (SIL Open Font License). Ausgewaehlt im direkten Vergleich mit einem
+// vergroesserten Ausschnitt aus Inspirationen/IMG_5112: Tuckiis Schrift hat ein
+// doppelstoeckiges "a" mit Schwaenzchen, einen GERADEN "y"-Abstrich, runde
+// i-Punkte und einen kurzen "r"-Arm. Figtree trifft genau diese Merkmale.
+// Plus Jakarta Sans, vorher hier, hat einen gehakten "y" und eine engere
+// Laufweite und lag damit sichtbar daneben.
+import '@fontsource/figtree/latin-400.css';
+import '@fontsource/figtree/latin-500.css';
+import '@fontsource/figtree/latin-600.css';
+import '@fontsource/figtree/latin-700.css';
+import '@fontsource/figtree/latin-800.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme, getSchatten, applySchatten } from './theme.js';

@@ -132,9 +132,9 @@
   --feast-royal:var(--fe-blurple);
   --feast-violet:var(--fe-blurple);
 
-  --mono:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --ui:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --display:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --ui:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --display:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
 }
 
 /* ============================================================
@@ -2614,7 +2614,7 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
    quadratisch und so hoch wie das Feld. */
 .tuck-ablage{
   display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:10px;align-items:stretch;
-  margin:4px 2px 22px;
+  margin:0 2px 36px;
 }
 .tuck-ablage-feld{
   display:grid;grid-template-columns:20px minmax(0,1fr) 22px;gap:10px;align-items:center;
@@ -2640,11 +2640,11 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Start: Bibliothek ---------- */
-.tuck-home{padding-top:22px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+.tuck-home{padding-top:30px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
 /* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
 .tuck-titelzeile{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
-  margin:0 2px 18px;
+  margin:0 2px 4px;
 }
 .tuck-titelzeile h1{
   min-width:0;color:var(--text);font-size:clamp(19px,5.4vw,23px);line-height:1.1;
@@ -2655,7 +2655,7 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
    30,7 pt plus die 18 pt sichtbaren Reiter tragen, also rund 49 pt. */
 .tuck-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:49px 19px;padding:20px 3px 6px;
+  gap:49px 19px;padding:30px 3px 6px;
 }
 
 /* Die Ordnerkarte: ein Reiter liegt hinter der Karte und schaut oben links
