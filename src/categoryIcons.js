@@ -249,7 +249,6 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const safeTitle = escapeHtml(title);
   const safeMeta = escapeHtml(options.meta || '');
   bar.innerHTML = `
-    <a class="kategorie-kopfknopf" href="${options.backHref || '#home'}" aria-label="Zurück">${materialIcon('arrow_back_ios')}</a>
     <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${safeTitle} hinzufügen">${materialIcon('add')}</button>
     <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>`;

@@ -48,6 +48,7 @@ let recovery = false;
 let authMode = 'login';
 let renderGeneration = 0;
 let routeAbortController = null;
+let vorgemerkteSuche = '';
 
 function syncStatusAktualisieren() {
   const sync = document.querySelector('#app-sync');
@@ -311,10 +312,10 @@ function renderChrome(route) {
           <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
           <nav class="kopf-aktionen" aria-label="App-Status und Profil">
             <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
-            <a class="tuck-quadrat" href="#search" aria-label="MUSCLE-DEX durchsuchen">
-              ${materialIconMarkup('search')}
-            </a>
             <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+            <a class="tuck-quadrat header-schliessen" href="#home" aria-label="Unterseite schließen">
+              ${materialIconMarkup('close')}
+            </a>
           </nav>
         </div>
       </header>
@@ -322,8 +323,9 @@ function renderChrome(route) {
     header = app.querySelector(':scope > .app-kopf');
     view = app.querySelector(':scope > #view');
   }
-  header.querySelector('[href="#search"]')?.classList.toggle('aktiv', route === 'search');
   header.querySelector('[href="#profile"]')?.classList.toggle('aktiv', route === 'profile');
+  const schliessen = header.querySelector('.header-schliessen');
+  if (schliessen) schliessen.hidden = route === 'home';
   view.replaceChildren();
   view.className = '';
   view.removeAttribute('style');
@@ -385,14 +387,13 @@ async function mountHome(container, signal) {
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
       <div class="tuck-ablage">
-        <label class="tuck-ablage-feld" for="schnell-link">
-          <b aria-hidden="true">#</b>
-          <input id="schnell-link" type="url" inputmode="url" autocomplete="off"
-                 placeholder="Link einfügen" aria-label="Link einfügen und ablegen">
-          ${materialIconMarkup('bookmark_star')}
+        <label class="tuck-ablage-feld" for="schnell-suche">
+          ${materialIconMarkup('search')}
+          <input id="schnell-suche" type="search" autocomplete="off"
+                 placeholder="MUSCLE-DEX durchsuchen" aria-label="MUSCLE-DEX durchsuchen">
         </label>
-        <button class="tuck-ablage-knopf" type="button" aria-label="Abgelegten Link speichern">
-          ${materialIconMarkup('add')}
+        <button class="tuck-ablage-knopf" type="button" aria-label="Suche öffnen">
+          ${materialIconMarkup('search')}
         </button>
       </div>
       <header class="tuck-titelzeile">
@@ -412,14 +413,13 @@ async function mountHome(container, signal) {
     onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
   });
 
-  // Feld und Knopf stehen, die Ablage dahinter fehlt noch: Fuer Links gibt es
-  // bislang keine Tabelle (Roadmap 7 "Externe Rezeptmedien"). Bis dahin sagt
-  // die App das offen, statt eine Eingabe stillschweigend zu verschlucken.
-  container.querySelector('.tuck-ablage-knopf').onclick = () => {
-    const feld = container.querySelector('#schnell-link');
-    toast(feld.value.trim()
-      ? 'Links ablegen kommt mit den externen Rezeptmedien.'
-      : 'Erst einen Link einfügen.');
+  const sucheOeffnen = () => {
+    vorgemerkteSuche = container.querySelector('#schnell-suche').value.trim();
+    location.hash = 'search';
+  };
+  container.querySelector('.tuck-ablage-knopf').onclick = sucheOeffnen;
+  container.querySelector('#schnell-suche').onkeydown = (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); sucheOeffnen(); }
   };
 
   zaehlerLaden(signal).then((zaehler) => {
@@ -538,6 +538,11 @@ function mountSearch(container, signal) {
     results.innerHTML = sammlungsKarten(treffer, zaehlerStand);
     empty.hidden = treffer.length > 0;
   };
+  if (vorgemerkteSuche) {
+    input.value = vorgemerkteSuche;
+    vorgemerkteSuche = '';
+    input.dispatchEvent(new Event('input'));
+  }
   requestAnimationFrame(() => input.focus({ preventScroll: true }));
 
   zaehlerLaden(signal).then((zaehler) => {
