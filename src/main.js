@@ -15,7 +15,7 @@ import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './au
 import { getTheme, applyTheme, setTheme, getSchatten, applySchatten } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
-import { visibleCollectionRoutes } from './collectionPreferences.js';
+import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes } from './collectionPreferences.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
@@ -381,6 +381,7 @@ async function mountHome(container, signal) {
   try { eigene = await loadCollections(session.user.id, { rootKey: 'home', signal }); }
   catch (error) { if (!signal?.aborted) toast('Eigene Dex-Einträge konnten nicht geladen werden.'); }
   if (signal?.aborted) return;
+  eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
       <div class="tuck-ablage">

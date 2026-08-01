@@ -252,7 +252,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
     <a class="kategorie-kopfknopf" href="${options.backHref || '#home'}" aria-label="Zurück">${materialIcon('arrow_back_ios')}</a>
     <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Zu ${safeTitle} hinzufügen">${materialIcon('add')}</button>
-    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('more_horiz')}</button>`;
+    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>`;
   wrap.prepend(bar);
   bar.querySelector('.kategorie-plus').onclick = () => {
     if (options.onPlus) options.onPlus();

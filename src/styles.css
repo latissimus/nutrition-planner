@@ -1610,6 +1610,7 @@ html.overlay-vollflaechig body::before{display:none}
 .switchline input{flex:0 0 auto;width:21px;height:21px}
 .sammlung-sichtbarkeit{display:flex;align-items:center;gap:10px;min-height:52px;margin:0;border-bottom:1px solid rgba(0,0,0,.14)}
 .sammlung-sichtbarkeit:last-child{border-bottom:0}
+.profile-untertitel{margin:22px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.07em}
 .sammlung-sichtbarkeit>.switchline{flex:1 1 auto;margin:0;min-width:0}
 .sortier-tasten{display:flex;gap:6px}
 .sortier-tasten button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--ink);border-radius:9px;background:var(--surface);color:var(--text);font:800 18px/1 var(--ui)}
@@ -3090,3 +3091,29 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-speichern{min-height:58px;margin:24px 0 4px}
 .sheet-gefahr{color:#B42318!important}
 .sheet-gefahr .material-svg,.sheet-gefahr svg{fill:currentColor!important}
+
+/* ---------- Leichte, vollflächige LOGMAN-Tapeten ---------- */
+:root{
+  --muster-athlet:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='220' viewBox='0 0 280 220'%3E%3Cg fill='%23492426' fill-opacity='.045'%3E%3Crect x='22' y='48' width='58' height='38' rx='15'/%3E%3Crect x='200' y='48' width='58' height='38' rx='15'/%3E%3Crect x='16' y='63' width='248' height='8' rx='4'/%3E%3Ccircle cx='140' cy='72' r='18'/%3E%3Cpath d='M115 96c7-13 43-13 50 0l13 52-18 7-8-35v78h-24v-78l-8 35-18-7 13-52z'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-athlet-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='220' viewBox='0 0 280 220'%3E%3Cg fill='%23EDF0F6' fill-opacity='.035'%3E%3Crect x='22' y='48' width='58' height='38' rx='15'/%3E%3Crect x='200' y='48' width='58' height='38' rx='15'/%3E%3Crect x='16' y='63' width='248' height='8' rx='4'/%3E%3Ccircle cx='140' cy='72' r='18'/%3E%3Cpath d='M115 96c7-13 43-13 50 0l13 52-18 7-8-35v78h-24v-78l-8 35-18-7 13-52z'/%3E%3C/g%3E%3C/svg%3E");
+}
+:root[data-seite] #view{
+  background-repeat:repeat!important;background-attachment:fixed!important;
+}
+:root[data-seite="home"] #view{background-image:var(--muster-athlet)!important;background-size:280px 220px!important}
+:root[data-seite="body"] #view{background-image:var(--muster-winkel-gross)!important;background-size:230px 155px!important}
+:root[data-seite="reminders"] #view{background-image:var(--muster-knochen-gross)!important;background-size:220px 150px!important}
+:root[data-seite="food-log"] #view{background-image:var(--muster-steak-gross)!important;background-size:235px 160px!important}
+:root[data-seite="recipes"] #view,:root[data-seite="collection"] #view{background-image:var(--muster-wellen-gross)!important;background-size:240px 150px!important}
+:root[data-seite="habits"] #view{background-image:var(--muster-plus)!important;background-size:28px 28px!important}
+:root[data-seite="profile"] #view{background-image:var(--muster-tropfen-gross)!important;background-size:215px 145px!important}
+:root[data-seite="search"] #view{background-image:var(--muster-punkte)!important;background-size:22px 22px!important}
+:root[data-theme="dark"][data-seite="home"] #view{background-image:var(--muster-athlet-dunkel)!important}
+:root[data-theme="dark"][data-seite="body"] #view{background-image:var(--muster-plus-dunkel)!important}
+:root[data-theme="dark"][data-seite="reminders"] #view,
+:root[data-theme="dark"][data-seite="food-log"] #view,
+:root[data-theme="dark"][data-seite="recipes"] #view,
+:root[data-theme="dark"][data-seite="collection"] #view,
+:root[data-theme="dark"][data-seite="habits"] #view,
+:root[data-theme="dark"][data-seite="profile"] #view,
+:root[data-theme="dark"][data-seite="search"] #view{background-image:var(--muster-punkte-dunkel)!important}
