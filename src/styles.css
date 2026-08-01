@@ -2794,11 +2794,14 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .sheet-menue>button:last-child{border-bottom:0}
 .sheet-list-icon,.sheet-list-icon svg{display:block;width:29px;height:29px;fill:currentColor}
 .sheet-zeichen{display:grid;place-items:center;width:34px;height:34px;font-size:27px;font-weight:800}
-.icon-auswahl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding-bottom:6px}
+.icon-auswahl{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,86px);grid-auto-columns:76px;
+  gap:10px;max-width:100%;padding:2px 5px 8px 1px;overflow-x:auto;
+  overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
 .icon-option{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
-  min-width:0;min-height:94px;padding:8px 4px;border:1.5px solid transparent;border-radius:14px;
+  min-width:0;min-height:0;padding:7px 4px;border:1.5px solid transparent;border-radius:10px;
   background:var(--surface2);color:var(--text);font:inherit;
+  scroll-snap-align:start;
 }
 .icon-option.aktiv{border-color:var(--ink);background:var(--fe-pink)}
 .icon-option svg{display:block;width:44px;height:44px;fill:#000}
@@ -2806,13 +2809,6 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .icon-picker-titel{margin:18px 1px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.04em}
 .farbgruppe-titel{margin-top:22px;color:#492425}
 .farbgruppe-titel:first-of-type{margin-top:12px}
-.emoji-auswahl{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-.emoji-option{
-  display:grid;place-items:center;min-width:0;aspect-ratio:1;padding:3px;border:2px solid transparent;
-  border-radius:12px;background:var(--surface2);font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
-  font-size:27px;line-height:1;
-}
-.emoji-option.aktiv{border-color:#000;background:#fff}
 .emoji-eigen{display:grid;gap:7px;margin-top:16px;padding-bottom:4px}
 .emoji-eigen>label{font-size:13px;font-weight:700}
 .emoji-eigen>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
@@ -2821,23 +2817,21 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .emoji-eigen input{min-width:0;padding:0 13px;font-family:"Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:22px}
 .emoji-eigen button{padding:0 14px;background:var(--fe-pink);font-size:13px;font-weight:800}
-.farb-auswahl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;padding-bottom:8px}
+.farb-auswahl{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,78px);grid-auto-columns:68px;
+  gap:10px;max-width:100%;padding:2px 5px 10px 1px;overflow-x:auto;
+  overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
 .farb-option{
-  display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:8px 4px 10px;
-  border:2px solid transparent;border-radius:14px;background:var(--surface2);color:var(--text);font:inherit;
+  display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;padding:3px;
+  border:0;border-radius:10px;background:transparent;color:var(--text);font:inherit;scroll-snap-align:start;
 }
 .farb-option i{
-  display:block;width:46px;height:46px;border:1px solid rgba(0,0,0,.3);border-radius:50%;background:var(--farbe);
+  display:block;width:50px;height:50px;border:1.5px solid #000;border-radius:8px;background:var(--farbe);
 }
-.farb-option span{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:700;white-space:nowrap}
-.farb-option.aktiv{border-color:#000;background:#fff}
-.farb-option.aktiv i{box-shadow:0 0 0 3px #fff,0 0 0 5px #000}
+.farb-option span{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:9px;font-weight:700;white-space:nowrap}
+.farb-option.aktiv i{box-shadow:3px 3px 0 #000}
 @media(max-width:370px){
   .kategorie-kopf{grid-template-columns:48px minmax(0,1fr) 48px 48px;gap:6px}
   .kategorie-kopfknopf{width:48px;height:48px}
-  .icon-auswahl{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .emoji-auswahl{grid-template-columns:repeat(5,minmax(0,1fr))}
-  .farb-auswahl{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 /* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
    uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei
@@ -3064,8 +3058,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
 .sammlung-editor-label span{color:var(--muted);font-weight:500;letter-spacing:0}
 .sammlung-editor .input{min-height:58px;font-size:17px}
-.sammlung-editor-farben{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}
-.sammlung-editor-icons,.sammlung-editor-emojis{
+.sammlung-editor-farben{
+  display:grid;grid-auto-flow:column;grid-template-rows:54px;grid-auto-columns:54px;
+  gap:9px;max-width:100%;padding:2px 5px 7px 1px;overflow-x:auto;
+  overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+}
+.sammlung-editor-icons{
   display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,52px);grid-auto-columns:52px;
   gap:9px;max-width:100%;padding:2px 4px 7px 1px;overflow-x:auto;
   overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
@@ -3077,10 +3075,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#000;font-size:22px;font-weight:900}
 .sammlung-editor-icons button{display:grid;place-items:center;background:var(--surface)}
 .sammlung-editor-icons .material-svg,.sammlung-editor-icons svg{width:24px;height:24px;fill:#000}
-.sammlung-editor-emojis{grid-template-rows:54px;grid-auto-columns:54px}
-.sammlung-editor-emojis button{display:grid;place-items:center;padding:0;border:1.5px solid var(--ink);
-  border-radius:8px;background:var(--surface);font-size:27px;scroll-snap-align:start}
-.sammlung-editor-emojis button.aktiv{box-shadow:3px 3px 0 #000;background:var(--prio-wash)}
+.sammlung-emoji-eigen{display:grid;gap:7px;margin-top:20px;font-size:13px;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase}
+.sammlung-emoji-eigen input{width:100%;min-height:52px;padding:0 13px;border:1.5px solid #000;
+  border-radius:12px;background:#fff;color:var(--text);
+  font-family:"Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:23px}
 .dex-emoji{display:grid;place-items:center;font-size:25px;line-height:1}
 .hat-kategoriefarbe .material-svg,.hat-kategoriefarbe .material-svg svg,
 .hat-kategoriefarbe .muscledex-sammlungsicon,.hat-kategoriefarbe .muscledex-sammlungsicon svg{
@@ -3095,7 +3094,3 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-speichern{min-height:58px;margin:24px 0 4px}
 .sheet-gefahr{color:#B42318!important}
 .sheet-gefahr .material-svg,.sheet-gefahr svg{fill:currentColor!important}
-
-@media(max-width:390px){
-  .sammlung-editor-farben{grid-template-columns:repeat(6,minmax(0,1fr))}
-}

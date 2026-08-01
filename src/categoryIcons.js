@@ -19,12 +19,6 @@ const defaults = {
   recipes: 'menu_book', habits: 'bucket_check',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
-export const categoryEmojis = [
-  '💪','📐','🔔','🥩','🍗','🧀','🥤','💧','☕','🫖','🧠','🧘',
-  '⭐','😴','🌙','🛏️','💊','⏰','📅','📷','🖼️','📖','📝','✅',
-  '🔥','⚡','❤️','🏋️','🥚','🍳','🥗','🍎','🍌','🥑','🫐','🍚',
-  '🍝','🍔','🥪','🛒','🧴','🧃','🎯','🛠️','🔧','⚙️','🔍','🏷️','🔗','📁',
-];
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const defaultColors = {
   body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
@@ -145,18 +139,14 @@ function iconPicker(route, onChange) {
     <div class="icon-auswahl">
       ${icons.map((icon) => `<button class="icon-option${icon.id === current ? ' aktiv' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
     </div>
-    <h3 class="icon-picker-titel">Emojis</h3>
-    <div class="emoji-auswahl">
-      ${categoryEmojis.map((emoji) => `<button class="emoji-option${current === `emoji:${emoji}` ? ' aktiv' : ''}" data-emoji="${emoji}" aria-label="Emoji ${emoji}">${emoji}</button>`).join('')}
-    </div>
     <form class="emoji-eigen" data-emoji-form>
       <label for="eigenes-emoji">Eigenes Emoji</label>
       <div><input id="eigenes-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🦾" aria-label="Eigenes Emoji"><button type="submit">Übernehmen</button></div>
     </form>`);
   backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
-    const button = event.target.closest('[data-icon-id],[data-emoji]');
+    const button = event.target.closest('[data-icon-id]');
     if (!button) return;
-    const value = button.dataset.iconId || `emoji:${button.dataset.emoji}`;
+    const value = button.dataset.iconId;
     localStorage.setItem(storageKey(route), value);
     closeSheet(backdrop);
     onChange?.();

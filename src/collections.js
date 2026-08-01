@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, categoryEmojis, enableSheetSwipe, materialIconMarkup,
+  availableCategoryIcons, enableSheetSwipe, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -111,8 +111,9 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
       <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((color) => `<button type="button" data-pick-color="${color}" class="${color === selectedColor ? 'aktiv' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
-      <h3>Apple-Emojis</h3>
-      <div class="sammlung-editor-emojis">${categoryEmojis.map((emoji) => `<button type="button" data-pick-icon="emoji:${emoji}" class="${selectedIcon === `emoji:${emoji}` ? 'aktiv' : ''}" aria-label="Emoji ${emoji}">${emoji}</button>`).join('')}</div>
+      <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>
+        <input id="collection-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
+      </label>
       <button class="btn btn-primary btn-block sammlung-editor-speichern" type="submit">${existing ? 'Änderungen speichern' : (isSubDex ? 'Unter-Dex erstellen' : 'Dex erstellen')}</button>
     </form>
   </section>`;
@@ -129,11 +130,19 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     const iconButton = event.target.closest('[data-pick-icon]');
     if (iconButton) {
       iconKey = iconButton.dataset.pickIcon;
+      backdrop.querySelector('#collection-emoji').value = '';
       backdrop.querySelectorAll('[data-pick-icon]').forEach((button) => button.classList.toggle('aktiv', button === iconButton));
     }
   };
   const input = backdrop.querySelector('#collection-name');
+  const emojiInput = backdrop.querySelector('#collection-emoji');
   input.oninput = () => { backdrop.querySelector('[data-name-count]').textContent = `${input.value.length}/40`; };
+  emojiInput.oninput = () => {
+    const emoji = emojiInput.value.trim();
+    if (!emoji) return;
+    iconKey = `emoji:${emoji}`;
+    backdrop.querySelectorAll('[data-pick-icon]').forEach((button) => button.classList.remove('aktiv'));
+  };
   backdrop.querySelector('[data-collection-form]').onsubmit = async (event) => {
     event.preventDefault();
     const button = event.currentTarget.querySelector('[type="submit"]');
