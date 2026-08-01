@@ -95,6 +95,10 @@
      wenig eckiger als die Karten – anders als bei RetroMuscle, wo Knoepfe
      deutlich kantiger sind als Flaechen. */
   --bw:3px;
+  /* Karten besitzen appweit dieselbe ruhigere Kontur. Bedienelemente lesen
+     weiterhin --bw; Iconfelder und Eingabefelder haben eigene Werte. */
+  --karten-bw:2px;
+  --icon-bw:1.5px;
   --r-karte:14px;
   --r:12px;
   --hart:4px 4px 0 var(--ink);
@@ -2684,7 +2688,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   position:relative;z-index:1;flex:1 1 auto;
   display:flex;flex-direction:column;min-width:0;min-height:129px;
   padding:11px 13px 13px;
-  border:2px solid var(--ink);border-radius:var(--r-karte);
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
   background:var(--surface);color:var(--text);text-decoration:none;
   box-shadow:var(--hart);
 }
@@ -2696,7 +2700,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
    darf jetzt grosszuegig sein: Die Karte deckt zuverlaessig ab. */
 .tuck-reiter{
   position:absolute;left:8px;top:-18px;z-index:0;width:49%;height:30px;
-  border:2px solid var(--ink);border-bottom:0;border-radius:10px 10px 0 0;
+  border:var(--karten-bw) solid var(--ink);border-bottom:0;border-radius:10px 10px 0 0;
   background:var(--ordner);
 }
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
@@ -2710,7 +2714,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-karte-oben{display:flex;align-items:flex-start;gap:11px;margin-bottom:auto}
 .tuck-icon{
   display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;
-  border:1.5px solid var(--ink);border-radius:9px;
+  border:var(--icon-bw) solid var(--ink);border-radius:9px;
   background:var(--ordner);color:var(--accent-ink);
 }
 .tuck-icon .app-icon{width:23px;height:23px}
@@ -2848,6 +2852,15 @@ button,a,[role="button"],summary{touch-action:manipulation}
 /* Koerperwerte, Erinnerungen, Food-Log und Profil lesen ihre Farben ohnehin
    aus den Tokens. Hier kommt nur der harte Schatten dazu, damit sie dieselbe
    Formsprache tragen wie die Bibliothek. */
+.card,.block,.msg,.reminder-group,.reminder-row,.profile-abschnitt,
+.food-card,.food-form-card,.mess-kopf,.nb-k,.nb-leer,.som-muskel,.volbar,
+.faq,.tuck-bibliothek,.tuck-zeile{
+  border-width:var(--karten-bw);
+}
+.block .bhead,.faq[open]>summary,.profile-abschnitt[open]>summary,
+.reminder-group[open]>.reminder-group-head,.food-image{
+  border-bottom-width:var(--karten-bw);
+}
 .card,.reminder-group,.profile-abschnitt,.food-form-card,.food-card{box-shadow:var(--hart-klein)}
 .btn{box-shadow:var(--hart-klein)}
 .btn:active{transform:translate(2px,2px);box-shadow:none}
