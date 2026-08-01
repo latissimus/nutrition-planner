@@ -295,7 +295,7 @@ function zaehlerText(route, anzahl) {
 function zaehlerEintragen(container, zaehler) {
   container.querySelectorAll('[data-sammlung]').forEach((karte) => {
     const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
-    const meta = karte.querySelector('.tuck-meta');
+    const meta = karte.querySelector('.dex-statuszeile');
     if (text && meta) meta.innerHTML = text;
   });
 }
@@ -349,25 +349,38 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     return `
     <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
       <a class="tuck-karte" href="#${route}" data-sammlung="${route}">
-        <span class="tuck-karte-oben">
+        <span class="dex-kartenhauptzeile">
           ${iconFeld}
-          <span class="tuck-meta">${meta}</span>
+          <span class="dex-kartentext">
+            <h2>${titel}</h2>
+            <span>${status}</span>
+          </span>
         </span>
-        <h2>${titel}</h2>
+        <span class="dex-statuszeile">${meta}</span>
       </a>
     </div>`;
   }).join('');
+}
+
+function dexAnlagedatum(value) {
+  const datum = value ? new Date(value) : null;
+  return datum && !Number.isNaN(datum.getTime())
+    ? `angelegt ${new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' }).format(datum)}`
+    : 'bereit für Einträge';
 }
 
 function eigeneSammlungsKarten(items) {
   return items.map((item) => `
     <div class="tuck-fach eigene-sammlung" style="--ordner:${item.color}">
       <a class="tuck-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
-        <span class="tuck-karte-oben">
+        <span class="dex-kartenhauptzeile">
           <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
-          <span class="tuck-meta"><b>Eigener</b><span>Dex</span></span>
+          <span class="dex-kartentext">
+            <h2>${escapeHtml(item.name)}</h2>
+            <span>Eigener Dex</span>
+          </span>
         </span>
-        <h2>${escapeHtml(item.name)}</h2>
+        <span class="dex-statuszeile"><b>Dex</b><span>${dexAnlagedatum(item.created_at)}</span></span>
       </a>
     </div>`).join('');
 }

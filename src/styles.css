@@ -2664,8 +2664,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .tuck-karte{
   position:relative;z-index:1;flex:1 1 auto;
-  display:flex;flex-direction:column;min-width:0;min-height:129px;
-  padding:11px 13px 13px;
+  display:flex;flex-direction:column;min-width:0;min-height:126px;
+  padding:17px 13px 11px;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
   background:var(--surface);color:var(--text);text-decoration:none;
   box-shadow:var(--hart);
@@ -2673,6 +2673,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .tuck-karte::before{
   content:"";position:absolute;left:0;right:0;top:0;height:7px;background:var(--ordner);
+}
+.tuck-karte::after{
+  content:"";position:absolute;right:-8px;top:25px;width:15px;height:25px;
+  border:2px solid var(--ink);border-right:0;border-radius:12px 0 0 12px;
+  background:var(--bg);
 }
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
@@ -2682,7 +2687,13 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .tuck-fach.gelb{--ordner:var(--fe-yellow)}
 .tuck-fach.gruen{--ordner:var(--fe-green)}
 
-.tuck-karte-oben{display:flex;align-items:flex-start;gap:11px;margin-bottom:auto}
+.dex-kartenhauptzeile{display:flex;align-items:center;gap:10px;min-width:0}
+.dex-kartentext{display:flex;flex-direction:column;gap:5px;min-width:0;padding-right:5px}
+.dex-kartentext h2{
+  margin:0;color:var(--text);font-size:15px;line-height:1.05;text-transform:uppercase;
+  letter-spacing:-.01em;overflow-wrap:anywhere;
+}
+.dex-kartentext>span{color:var(--muted);font-size:11px;font-weight:600;line-height:1.1}
 .tuck-icon{
   display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;
   border:var(--icon-bw) solid var(--ink);border-radius:9px;
@@ -2820,18 +2831,13 @@ button,a,[role="button"],summary{touch-action:manipulation}
    bei 13 px schon 82,3 px – 1,2 px Reserve, und jedes laengere Wort bricht
    mitten durch. Deshalb hier gestapelt: Die Einheit bekommt die volle Breite
    und liegt bei 12 px mit 76 px komfortabel darunter. */
-.tuck-meta{
+.dex-statuszeile{
   display:flex;flex-direction:column;gap:1px;min-width:0;padding-top:2px;
-  line-height:1.2;overflow-wrap:break-word;
+  margin-top:auto;border-top:1px solid color-mix(in srgb,var(--ink) 22%,transparent);
+  padding-top:7px;line-height:1.15;overflow-wrap:break-word;
 }
-.tuck-meta b{color:var(--text);font-size:16px;font-weight:800}
-.tuck-meta span{color:var(--muted);font-size:12px;font-weight:500}
-/* Der Name steht unten und in Versalien – bei Tuckii die einzige Stelle im
-   Kartenlayout, die Versalien traegt. */
-.tuck-karte h2{
-  margin:14px 0 6px;color:var(--text);font-size:16px;line-height:1.05;
-  text-transform:uppercase;letter-spacing:-.01em;overflow-wrap:anywhere;
-}
+.dex-statuszeile b{color:var(--text);font-size:12px;font-weight:800}
+.dex-statuszeile span{color:var(--muted);font-size:10px;font-weight:600}
 
 /* ---------- Suche ---------- */
 .tuck-suche-seite{padding-top:16px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
@@ -2967,7 +2973,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   .tuck-karte{min-height:120px;padding:10px 11px 11px}
   .kopf-logo{width:104px;max-height:43px}
   .kopf-aktionen{gap:7px}
-  .tuck-karte h2{font-size:15px}
+  .dex-kartentext h2{font-size:14px}
 }
 
 @media(max-width:350px){
