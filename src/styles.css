@@ -55,6 +55,14 @@
   --pink:var(--fe-pink);
   --pink-press:#EC1791;
   --pump:var(--fe-pink);
+  /* Hauptakzent: alles, was primaer bedient wird – Neuer Ordner, aktives
+     Theme, Bibliothekskachel. Schwarz darauf kommt auf 6,1:1 und ist damit
+     auch in Kleinschrift lesbar; Weiss laege bei 3,5:1. */
+  --akzent:var(--fe-pink);
+  --akzent-ink:#000000;
+  /* Zweitakzent. --mr bleibt Gelb, weil die Speicher-Bestaetigung
+     (.btn-primary.flash) vom Pink der Taste weg blitzen muss – gleiche Farbe
+     waere keine Rueckmeldung. */
   --mr:var(--fe-yellow);
   --load:var(--fe-blurple);
   --middle:var(--fe-blue-dark);
@@ -194,6 +202,9 @@
   /* Retro traegt seine Flaechen ohne Schatten – nur die Kontur. */
   --hart:none;
   --hart-klein:none;
+  /* Eigener Hauptakzent: das RetroMuscle-Pink, nicht das von Feastables. */
+  --akzent:#FF69AE;
+  --akzent-ink:#141414;
   --h-style:italic;
   --h-transform:uppercase;
   --h-weight:700;
@@ -2650,8 +2661,8 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
   box-shadow:var(--hart-klein);text-decoration:none;
 }
 .tuck-quadrat .app-icon{width:22px;height:22px}
-.tuck-quadrat.aktiv{background:var(--mr);color:var(--accent-ink)}
-.tuck-quadrat.betont{background:var(--mr);color:var(--accent-ink)}
+.tuck-quadrat.aktiv{background:var(--akzent);color:var(--akzent-ink)}
+.tuck-quadrat.betont{background:var(--akzent);color:var(--akzent-ink)}
 /* Der Druckpunkt: Die Flaeche faehrt in ihren eigenen Schatten hinein. Ohne
    Schatten (Retro) bleibt nur der Versatz – das genuegt als Rueckmeldung. */
 .tuck-quadrat:active{transform:translate(2px,2px);box-shadow:none}
@@ -2712,9 +2723,15 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
   background:var(--ordner);color:var(--accent-ink);
 }
 .tuck-icon .app-icon{width:23px;height:23px}
-.tuck-meta{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:3px}
-.tuck-meta b{color:var(--text);font-size:12.5px;font-weight:700}
-.tuck-meta span{color:var(--muted);font-size:12.5px;font-weight:500}
+/* Zahl und Einheit stehen wie bei Tuckii ("0 links") in einer Zeile, nicht
+   uebereinander. Bricht der Text um, landet die Einheit unter der Zahl – bei
+   "Erinnerungen" auf schmalen Karten ist genau das gewollt. */
+/* "6 Erinnerungen" passt mit 2px Rest genau in die Spalte. Damit ein
+   dreistelliger Zaehler oder ein laengeres Wort nicht ueber die Kontur laeuft,
+   darf die Zeile umbrechen – die Karte hat die Hoehe dafuer. */
+.tuck-meta{min-width:0;padding-top:4px;line-height:1.25;overflow-wrap:anywhere}
+.tuck-meta b{color:var(--text);font-size:13px;font-weight:800}
+.tuck-meta span{margin-left:4px;color:var(--muted);font-size:13px;font-weight:500}
 /* Der Name steht unten und in Versalien – bei Tuckii die einzige Stelle im
    Kartenlayout, die Versalien traegt. */
 .tuck-karte h2{
@@ -2749,7 +2766,7 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .tuck-bibliothek{
   margin:20px 0 24px;padding:15px 16px;
   border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
-  background:var(--mr);color:var(--accent-ink);box-shadow:var(--hart);
+  background:var(--akzent);color:var(--akzent-ink);box-shadow:var(--hart);
 }
 .tuck-bibliothek>span{
   display:block;margin-bottom:12px;font-size:12px;font-weight:800;
@@ -2829,7 +2846,7 @@ h1,h2,h3,.display,.section-title,.listen-titel,.mini-title{
 .themeseg{border:var(--bw) solid var(--ink);border-radius:var(--r);box-shadow:var(--hart-klein)}
 .themebtn{border-right:var(--bw) solid var(--ink)}
 .themebtn:last-child{border-right:0}
-.themebtn.on{background:var(--mr);color:var(--accent-ink)}
+.themebtn.on{background:var(--akzent);color:var(--akzent-ink)}
 
 /* ---------- Bestandsmodule ---------- */
 /* Koerperwerte, Erinnerungen, Food-Log und Profil lesen ihre Farben ohnehin

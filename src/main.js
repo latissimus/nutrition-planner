@@ -233,6 +233,51 @@ const sammlungen = [
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 
+// Welche Tabelle den Zaehler einer Sammlung fuellt. Rezepte und Gewohnheiten
+// haben noch keine Tabelle – ihre Karten zeigen weiter "Bald".
+// Row Level Security ist auf allen Tabellen aktiv, die Zaehlung liefert also
+// von sich aus nur die eigenen Zeilen; ein Filter auf die user_id waere
+// doppelt gemoppelt.
+// Zuletzt geladene Zahlen. Beim Zurueckspringen auf die Startseite stehen sie
+// dadurch sofort da, statt erneut durch den Platzhalter zu laufen.
+let zaehlerStand = {};
+
+const ZAEHLQUELLEN = {
+  body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
+  reminders: { tabelle: 'reminders', eins: 'Erinnerung', viele: 'Erinnerungen' },
+  'food-log': { tabelle: 'food_logs', eins: 'Eintrag', viele: 'Einträge' },
+};
+
+// head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
+// leere Antworten statt der kompletten Tabellen.
+async function zaehlerLaden() {
+  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle }]) => {
+    try {
+      const { count, error } = await supabase.from(tabelle).select('*', { count: 'exact', head: true });
+      return [route, error ? null : (count ?? 0)];
+    } catch (e) {
+      return [route, null];   // offline: die Karte behaelt ihren Platzhalter
+    }
+  }));
+  return Object.fromEntries(paare);
+}
+
+function zaehlerText(route, anzahl) {
+  const quelle = ZAEHLQUELLEN[route];
+  if (!quelle || anzahl === null || anzahl === undefined) return null;
+  return `<b>${anzahl}</b><span>${anzahl === 1 ? quelle.eins : quelle.viele}</span>`;
+}
+
+// Traegt geladene Zahlen in bereits gezeichnete Karten nach. Die Karten
+// erscheinen dadurch sofort und fuellen sich, sobald die Antwort da ist.
+function zaehlerEintragen(container, zaehler) {
+  container.querySelectorAll('[data-sammlung]').forEach((karte) => {
+    const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
+    const meta = karte.querySelector('.tuck-meta');
+    if (text && meta) meta.innerHTML = text;
+  });
+}
+
 function renderChrome(route) {
   app.innerHTML = `
     <header class="topbar app-kopf">
@@ -255,16 +300,22 @@ function renderChrome(route) {
 // Reiter schaut hinter der Karte hervor, oben links die Symbolkachel in
 // derselben Farbe, rechts daneben die Kennzahl, und der Name steht unten in
 // Versalien.
-function sammlungsKarten(daten = sammlungen) {
-  return daten.map(([route, titel, , icon, farbe, status]) => `
+function sammlungsKarten(daten = sammlungen, zaehler = {}) {
+  return daten.map(([route, titel, , icon, farbe, status]) => {
+    // Solange die Zahl laedt, steht der Stand da. So springt die Karte beim
+    // Nachtragen nur um eine Zeile und nicht um ihre halbe Hoehe.
+    const meta = zaehlerText(route, zaehler[route])
+      || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
+    return `
     <a class="tuck-karte ${farbe}" href="#${route}" data-sammlung="${route}">
       <span class="tuck-reiter" aria-hidden="true"></span>
       <span class="tuck-karte-oben">
         <span class="tuck-icon" aria-hidden="true">${iconMarkup(icon)}</span>
-        <span class="tuck-meta"><b>${status}</b></span>
+        <span class="tuck-meta">${meta}</span>
       </span>
       <h2>${titel}</h2>
-    </a>`).join('');
+    </a>`;
+  }).join('');
 }
 
 function mountHome(container) {
@@ -278,13 +329,19 @@ function mountHome(container) {
         </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Sammlungen">
-        ${sammlungsKarten()}
+        ${sammlungsKarten(sammlungen, zaehlerStand)}
       </section>
     </div>`;
 
   container.querySelector('.neu-sammlung').onclick = () => {
     toast('Eigene Sammlungen ergänzen wir im nächsten Schritt.');
   };
+
+  zaehlerLaden().then((zaehler) => {
+    zaehlerStand = zaehler;
+    // Zwischenzeitlich kann eine andere Seite gemountet sein.
+    if (container.isConnected) zaehlerEintragen(container, zaehler);
+  });
 }
 
 function mountSearch(container) {
@@ -303,12 +360,12 @@ function mountSearch(container) {
         <span>Deine Bibliothek</span>
         <div class="tuck-bibliothek-werte">
           <div><b>${sammlungen.length}</b><small>Sammlungen</small></div>
-          <div><b>${aktiv}</b><small>Aktiv</small></div>
+          <div><b data-summe>…</b><small>Einträge</small></div>
           <div><b>${sammlungen.length - aktiv}</b><small>Geplant</small></div>
         </div>
       </section>
       <h2 class="tuck-abschnittstitel">Bereiche</h2>
-      <section class="tuck-grid" data-search-results>${sammlungsKarten()}</section>
+      <section class="tuck-grid" data-search-results>${sammlungsKarten(sammlungen, zaehlerStand)}</section>
       <div class="tuck-leer" data-search-empty hidden>
         ${iconMarkup('search')}
         <b>Nichts gefunden</b>
@@ -322,10 +379,22 @@ function mountSearch(container) {
   input.oninput = () => {
     const query = input.value.trim().toLocaleLowerCase('de');
     const treffer = sammlungen.filter(([, titel, text]) => `${titel} ${text}`.toLocaleLowerCase('de').includes(query));
-    results.innerHTML = sammlungsKarten(treffer);
+    results.innerHTML = sammlungsKarten(treffer, zaehlerStand);
     empty.hidden = treffer.length > 0;
   };
   requestAnimationFrame(() => input.focus({ preventScroll: true }));
+
+  zaehlerLaden().then((zaehler) => {
+    zaehlerStand = zaehler;
+    if (!container.isConnected) return;
+    zaehlerEintragen(container, zaehler);
+    const summe = Object.values(zaehler).filter((n) => typeof n === 'number');
+    const feld = container.querySelector('[data-summe]');
+    // Nur zeigen, wenn alle Zaehler da sind – eine Teilsumme waere schlicht falsch.
+    if (feld) feld.textContent = summe.length === Object.keys(ZAEHLQUELLEN).length
+      ? summe.reduce((a, b) => a + b, 0)
+      : '–';
+  });
 }
 
 function mountComingSoon(container, route) {
