@@ -2770,13 +2770,14 @@ button,a,[role="button"],summary{touch-action:manipulation}
      beginnt am physischen Displayrand und liegt damit auch hinter Uhrzeit,
      Empfang und Akku. Kein Safe-Area-Padding und kein theme-color-Trick. */
   position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;
-  width:100vw;height:100dvh;
   background:rgba(0,0,0,.28);opacity:0;transition:opacity .18s ease;
+  overscroll-behavior:contain;
 }
 .kategorie-sheet-backdrop.offen{opacity:1}
 .kategorie-sheet{
   width:min(100%,680px);max-height:min(76dvh,720px);margin:0 auto;
   padding:10px 18px calc(22px + env(safe-area-inset-bottom));overflow:auto;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   border:var(--bw) solid var(--ink);border-bottom:0;border-radius:32px 32px 0 0;
   background:var(--surface);color:var(--text);
   transform:translateY(18px);transition:transform .18s ease;

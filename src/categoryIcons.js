@@ -1,5 +1,4 @@
 import { toast } from './toast.js';
-import { setStatusleistenOverlay } from './theme.js';
 
 const modules = import.meta.glob('../MUSCLEDEX-ICONS/*.svg', {
   query: '?raw', import: 'default', eager: true,
@@ -81,10 +80,15 @@ function sheet(markup) {
   backdrop.addEventListener('click', (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeSheet(backdrop);
   });
+  // Entspricht dem funktionierenden LOGMAN-Uebungswaehler: Die Lage bleibt
+  // direkt am Viewport. Eine globale Body-Sperre wuerde ihren Bezugspunkt auf
+  // iOS unter die transparente Statusleiste verschieben.
+  backdrop.addEventListener('touchmove', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('.kategorie-sheet')) {
+      event.preventDefault();
+    }
+  }, { passive: false });
   document.body.append(backdrop);
-  // Der Backdrop deckt dank viewport-fit=cover den ganzen Viewport ab, auch
-  // die Safe Area. Vorgedunkelt werden darf deshalb nichts.
-  setStatusleistenOverlay('kategorie-sheet', true, { vollflaechig: true });
   requestAnimationFrame(() => backdrop.classList.add('offen'));
   return backdrop;
 }
@@ -92,7 +96,6 @@ function sheet(markup) {
 function closeSheet(backdrop) {
   if (!backdrop?.isConnected) return;
   backdrop.remove();
-  setStatusleistenOverlay('kategorie-sheet', false);
 }
 
 function iconPicker(route, onChange) {
