@@ -315,17 +315,188 @@ async function deleteItem(userId, id) {
   if (error) throw error;
 }
 
+async function updateItem(userId, id, patch) {
+  const { data, error } = await supabase.from('shopping_items').update(patch)
+    .eq('id', id).eq('user_id', userId).select(SELECT_COLUMNS).single();
+  if (error) throw error;
+  return data;
+}
+
 function itemRow(item) {
   const tags = (item.tags || []).map((tag) => `<span class="einkauf-tag">#${escapeHtml(tag)}</span>`).join('');
+  // .einkauf-row-inhalt ist die verschiebbare Innenschicht: nur sie bekommt den
+  // Wisch-Transform, die Zeile selbst bleibt am Platz und schneidet ueberstehende
+  // Teile ab. Das Loeschen ist nicht mehr inline – long-press oeffnet den
+  // Bearbeiten-Sheet, in dem auch der Loeschen-Knopf sitzt.
   return `<label class="einkauf-row${item.checked ? ' ist-ausgewaehlt' : ''}" data-item-id="${item.id}">
-    <input type="checkbox" data-item-check ${item.checked ? 'checked' : ''}>
-    <span class="einkauf-row-text">
-      <span class="einkauf-row-name">${escapeHtml(item.name)}</span>
-      ${item.note ? `<small class="einkauf-row-note">${escapeHtml(item.note)}</small>` : ''}
-      ${tags ? `<span class="einkauf-row-tags">${tags}</span>` : ''}
+    <span class="einkauf-row-inhalt">
+      <input type="checkbox" data-item-check ${item.checked ? 'checked' : ''}>
+      <span class="einkauf-row-text">
+        <span class="einkauf-row-name">${escapeHtml(item.name)}</span>
+        ${item.note ? `<small class="einkauf-row-note">${escapeHtml(item.note)}</small>` : ''}
+        ${tags ? `<span class="einkauf-row-tags">${tags}</span>` : ''}
+      </span>
     </span>
-    <button class="einkauf-row-loeschen" type="button" data-item-delete aria-label="${escapeHtml(item.name)} entfernen">${iconMarkup('trash')}</button>
   </label>`;
+}
+
+// Bottom-Sheet zum Bearbeiten einer Zeile. Enthaelt auch den Loeschen-Knopf –
+// er ist nicht mehr als Muelleimer neben jedem Artikel sichtbar, sondern hier
+// gebuendelt hinter der Long-Press-Geste.
+function itemEditSheet(item, sections, { onSave, onDelete }) {
+  const tagsWert = (item.tags || []).join(', ');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop einkauf-edit-backdrop';
+  backdrop.innerHTML = `
+    <section class="kategorie-sheet einkauf-edit-sheet" role="dialog" aria-modal="true" aria-label="Artikel bearbeiten">
+      <header><h2>Artikel bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+      <form class="einkauf-edit-form" data-edit-form>
+        <label class="dex-entry-field"><span>Name</span>
+          <input class="input" data-edit-name maxlength="120" value="${escapeHtml(item.name)}" required>
+        </label>
+        <label class="dex-entry-field"><span>Abteilung</span>
+          <select class="input" data-edit-section>
+            ${sections.map((s) => `<option value="${escapeHtml(s)}"${s === item.section ? ' selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+          </select>
+        </label>
+        <label class="dex-entry-field"><span>Menge / Notiz <small>optional</small></span>
+          <textarea class="input" data-edit-note maxlength="500" rows="2" placeholder="z. B. 2 Packungen, Bio, Ersatzmarke">${escapeHtml(item.note || '')}</textarea>
+        </label>
+        <label class="dex-entry-field"><span>Tags <small>mit Komma trennen, max. 12</small></span>
+          <input class="input" data-edit-tags maxlength="200" value="${escapeHtml(tagsWert)}" placeholder="z. B. Darm, Fermentiert">
+        </label>
+        <div class="einkauf-edit-aktionen">
+          <button class="btn btn-primary btn-block" type="submit">Speichern</button>
+          <button class="btn btn-danger btn-block" type="button" data-edit-delete>Artikel löschen</button>
+        </div>
+      </form>
+    </section>`;
+  const schließen = () => {
+    backdrop.classList.remove('offen');
+    setTimeout(() => backdrop.remove(), 160);
+  };
+  backdrop.addEventListener('click', (event) => {
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) schließen();
+  });
+  const form = backdrop.querySelector('[data-edit-form]');
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const name = form.querySelector('[data-edit-name]').value.trim();
+    if (!name) return;
+    const section = form.querySelector('[data-edit-section]').value.trim() || 'Sonstiges';
+    const note = form.querySelector('[data-edit-note]').value.trim();
+    const tags = form.querySelector('[data-edit-tags]').value.split(',')
+      .map((tag) => tag.trim()).filter(Boolean).slice(0, 12);
+    const speichern = form.querySelector('button[type="submit"]');
+    speichern.disabled = true;
+    try {
+      await onSave({ name, section, note: note || null, tags });
+      schließen();
+    } catch (error) {
+      toast('Speichern fehlgeschlagen.');
+      speichern.disabled = false;
+    }
+  };
+  form.querySelector('[data-edit-delete]').onclick = async () => {
+    if (!confirm(`„${item.name}“ von der Liste entfernen?`)) return;
+    try {
+      await onDelete();
+      schließen();
+    } catch (error) {
+      toast('Löschen fehlgeschlagen.');
+    }
+  };
+  document.body.append(backdrop);
+  requestAnimationFrame(() => backdrop.classList.add('offen'));
+  backdrop.querySelector('[data-edit-name]')?.focus({ preventScroll: true });
+}
+
+// Bindet Wisch- und Long-Press-Gesten an eine Zeile. Ein normaler Tap
+// laesst die native Label-Checkbox-Kopplung durch, ein Wisch >60 px in
+// beliebige Richtung toggelt den Haken, und ein 500-ms-Druck ohne Bewegung
+// oeffnet den Bearbeiten-Sheet.
+function bindeZeilenGesten(row, { onSwipeToggle, onLongPress }) {
+  const inhalt = row.querySelector('.einkauf-row-inhalt');
+  if (!inhalt) return;
+  const SWIPE_ANFANG = 10;   // Schwelle zwischen Tap und Wisch
+  const SWIPE_VERTIKAL_ABBRUCH = 12;
+  const SWIPE_MAX = 140;
+  const SWIPE_TOGGLE = 60;
+  const LONG_PRESS_MS = 500;
+  const state = {
+    aktiv: false, swiping: false, longPressed: false, blockClick: false,
+    startX: 0, startY: 0, dx: 0, timer: null,
+  };
+
+  const zuruecksetzen = () => {
+    state.aktiv = false; state.swiping = false; state.dx = 0;
+    inhalt.style.transform = '';
+    row.classList.remove('swipe-aktiv', 'swipe-commit');
+    if (state.timer) { clearTimeout(state.timer); state.timer = null; }
+  };
+
+  row.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    state.aktiv = true;
+    state.startX = event.clientX; state.startY = event.clientY;
+    state.dx = 0; state.swiping = false; state.longPressed = false;
+    state.timer = setTimeout(() => {
+      if (!state.aktiv || state.swiping) return;
+      state.longPressed = true;
+      state.blockClick = true;
+      row.classList.remove('swipe-aktiv', 'swipe-commit');
+      inhalt.style.transform = '';
+      onLongPress?.();
+    }, LONG_PRESS_MS);
+    try { row.setPointerCapture(event.pointerId); } catch { /* egal */ }
+  });
+
+  row.addEventListener('pointermove', (event) => {
+    if (!state.aktiv || state.longPressed) return;
+    const dx = event.clientX - state.startX;
+    const dy = event.clientY - state.startY;
+    if (!state.swiping) {
+      if (Math.abs(dy) > SWIPE_VERTIKAL_ABBRUCH && Math.abs(dy) > Math.abs(dx)) {
+        // vertikales Scrollen – Zeile aufgeben, Scroll durchlassen
+        if (state.timer) { clearTimeout(state.timer); state.timer = null; }
+        state.aktiv = false;
+        return;
+      }
+      if (Math.abs(dx) > SWIPE_ANFANG) {
+        state.swiping = true;
+        row.classList.add('swipe-aktiv');
+        if (state.timer) { clearTimeout(state.timer); state.timer = null; }
+      }
+    }
+    if (state.swiping) {
+      state.dx = Math.max(-SWIPE_MAX, Math.min(SWIPE_MAX, dx));
+      inhalt.style.transform = `translateX(${state.dx}px)`;
+      row.classList.toggle('swipe-commit', Math.abs(state.dx) >= SWIPE_TOGGLE);
+    }
+  });
+
+  const abschluss = () => {
+    if (!state.aktiv && !state.longPressed) { zuruecksetzen(); return; }
+    if (state.timer) { clearTimeout(state.timer); state.timer = null; }
+    const commit = state.swiping && Math.abs(state.dx) >= SWIPE_TOGGLE;
+    if (state.swiping) state.blockClick = true;   // egal ob commit oder Abbruch
+    inhalt.style.transform = '';
+    row.classList.remove('swipe-aktiv', 'swipe-commit');
+    if (commit) onSwipeToggle?.();
+    state.aktiv = false; state.swiping = false; state.dx = 0;
+  };
+  row.addEventListener('pointerup', abschluss);
+  row.addEventListener('pointercancel', abschluss);
+  row.addEventListener('lostpointercapture', abschluss);
+
+  row.addEventListener('click', (event) => {
+    if (state.blockClick || state.longPressed) {
+      event.preventDefault();
+      event.stopPropagation();
+      state.blockClick = false;
+      state.longPressed = false;
+    }
+  }, true);
 }
 
 function sectionGroup(section, items) {
@@ -409,6 +580,41 @@ export async function mountShoppingList(container, { session, signal }) {
       slot.innerHTML = `<div class="tuck-leer">${iconMarkup('folder')}<b>Nichts gefunden</b><span>Kein Artikel passt zum aktuellen Filter.</span></div>`;
     } else {
       slot.innerHTML = groupBySection(sichtbar).map(([section, gruppe]) => sectionGroup(section, gruppe)).join('');
+      // Wisch- und Long-Press-Gesten pro Zeile neu einhaengen – die Rows
+      // werden bei jedem Redraw komplett neu geschrieben, alte Listener
+      // verfallen mit dem DOM-Knoten von selbst.
+      slot.querySelectorAll('.einkauf-row[data-item-id]').forEach((row) => {
+        const id = row.dataset.itemId;
+        bindeZeilenGesten(row, {
+          onSwipeToggle: () => {
+            const checkbox = row.querySelector('[data-item-check]');
+            if (!checkbox) return;
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          },
+          onLongPress: () => {
+            const item = items.find((eintrag) => eintrag.id === id);
+            if (!item) return;
+            const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((eintrag) => eintrag.section)])];
+            itemEditSheet(item, sections, {
+              onSave: async (patch) => {
+                const aktualisiert = await updateItem(userId, id, patch);
+                Object.assign(item, aktualisiert);
+                redraw();
+                befuelleAbteilungen(container, items);
+                toast('Artikel gespeichert.');
+              },
+              onDelete: async () => {
+                await deleteItem(userId, id);
+                items = items.filter((eintrag) => eintrag.id !== id);
+                redraw();
+                befuelleAbteilungen(container, items);
+                toast(`„${item.name}“ entfernt.`);
+              },
+            });
+          },
+        });
+      });
     }
 
     const tagsSlot = container.querySelector('[data-einkauf-tags-slot]');
@@ -459,24 +665,6 @@ export async function mountShoppingList(container, { session, signal }) {
       item.checked = zuvor;
       redraw();
       toast('Änderung konnte nicht gespeichert werden.');
-    }
-  });
-
-  liste.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-item-delete]');
-    if (!button) return;
-    const row = button.closest('[data-item-id]');
-    const id = row.dataset.itemId;
-    const item = items.find((eintrag) => eintrag.id === id);
-    if (!item || !confirm(`„${item.name}“ von der Liste entfernen?`)) return;
-    try {
-      await deleteItem(userId, id);
-      items = items.filter((eintrag) => eintrag.id !== id);
-      redraw();
-      befuelleAbteilungen(container, items);
-      toast(`„${item.name}“ entfernt.`);
-    } catch (error) {
-      toast('Löschen fehlgeschlagen.');
     }
   });
 

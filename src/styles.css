@@ -3435,31 +3435,45 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 .einkauf-gruppe .reminder-group-list{padding:8px 10px 10px}
 
-.einkauf-row{position:relative;display:flex;align-items:flex-start;gap:10px;
-  padding:10px 4px 10px 10px;
+/* Zeile = Rahmen + Wisch-Hint-Flaeche, Inhalt = verschiebbare Innenschicht.
+   Nur der Inhalt bekommt den Translate, der Rahmen bleibt am Platz und
+   schneidet ueberstehende Kanten ab (overflow:hidden). */
+.einkauf-row{position:relative;display:block;overflow:hidden;
   border-bottom:1.5px solid color-mix(in srgb,var(--ink) 16%,transparent);cursor:pointer}
 .einkauf-row:last-child{border-bottom:0}
+.einkauf-row::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:color-mix(in srgb,var(--ordner) 22%,transparent);opacity:0;transition:opacity .12s ease}
+.einkauf-row.swipe-aktiv::after{opacity:1}
+.einkauf-row.swipe-commit::after{background:color-mix(in srgb,var(--ordner) 42%,transparent)}
+.einkauf-row-inhalt{position:relative;z-index:1;
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 4px 10px 10px;
+  background:var(--app-card);
+  transition:transform .18s cubic-bezier(.32,.72,0,1);will-change:transform;
+  touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.einkauf-row.swipe-aktiv .einkauf-row-inhalt{transition:none}
 .einkauf-row input[type="checkbox"]{flex:0 0 auto;width:21px;height:21px;
-  margin-top:1px;accent-color:var(--ordner)}
+  margin-top:1px;accent-color:var(--ordner);pointer-events:none}
 .einkauf-row-text{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
-.einkauf-row-name{font-size:14.5px;font-weight:600;color:var(--text);
-  overflow-wrap:anywhere}
+.einkauf-row-name{font-size:14.5px;font-weight:600;color:var(--text);overflow-wrap:anywhere}
 .einkauf-row-note{color:var(--muted);font-size:11.5px}
 .einkauf-row-tags{display:flex;flex-wrap:wrap;gap:5px}
 .einkauf-tag{padding:1px 7px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);
   border-radius:99px;color:var(--muted);font-size:10px;font-weight:600}
 /* Ausgewaehlt heisst "brauche ich" – hervorgehoben mit einem Farbstreifen
-   und fetterem Namen, nicht durchgestrichen. Durchgestrichen waere "erledigt",
-   aber ein einmal gestrichener Artikel bliebe fuer den naechsten Einkauf
-   unauffindbar in derselben optischen Ablage wie ein erledigter. Der Haken
-   geht im Laden beim Einpacken wieder raus, dann kehrt die Zeile in den
-   neutralen Zustand zurueck. */
-.einkauf-row.ist-ausgewaehlt{background:color-mix(in srgb,var(--ordner) 12%,transparent)}
-.einkauf-row.ist-ausgewaehlt::before{content:"";position:absolute;inset:0 auto 0 0;
-  width:4px;background:var(--ordner)}
+   und fetterem Namen, nicht durchgestrichen. Der Haken geht im Laden beim
+   Einpacken wieder raus, dann kehrt die Zeile in den neutralen Zustand
+   zurueck. Streifen und Tint sitzen im Inhalt, damit sie beim Wischen
+   mitgehen und die Zeile nicht doppelt eingefaerbt aussieht. */
+.einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt{
+  background:color-mix(in srgb,var(--ordner) 12%,var(--app-card))}
+.einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt::before{content:"";position:absolute;
+  inset:0 auto 0 0;width:4px;background:var(--ordner)}
 .einkauf-row.ist-ausgewaehlt .einkauf-row-name{font-weight:800}
-.einkauf-row-loeschen{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;
-  margin:-4px -4px -4px 0;padding:0;border:0;border-radius:99px;background:transparent;
-  color:var(--muted);opacity:.55}
-.einkauf-row-loeschen:active{opacity:1;background:color-mix(in srgb,var(--ink) 10%,transparent)}
-.einkauf-row-loeschen .app-icon{width:17px;height:17px}
+
+/* Bearbeiten-Sheet: uebernimmt die Grundform von .kategorie-sheet und
+   ergaenzt nur die Formularfeldgruppen und die Aktions-Reihe unten. */
+.einkauf-edit-form{display:flex;flex-direction:column;gap:14px}
+.einkauf-edit-form .dex-entry-field>span{font-size:12px;letter-spacing:.04em}
+.einkauf-edit-aktionen{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.einkauf-edit-aktionen .btn{min-height:52px;font-size:15px}
