@@ -271,9 +271,10 @@ const ZAEHLQUELLEN = {
   reminders: { tabelle: 'reminders', eins: 'Erinnerung', viele: 'Erinnerungen' },
   'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
   training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
-  // Gezaehlt wird, was noch offen ist – wie die Badge-Zahl "139" im
-  // urspruenglichen Reminders-Export, nicht die Gesamtzahl aller Artikel.
-  shopping: { tabelle: 'shopping_items', filter: ['checked', false], eins: 'Artikel offen', viele: 'Artikel offen' },
+  // Gezaehlt wird, was fuer den naechsten Einkauf ausgewaehlt (angehakt) ist –
+  // die Karte beantwortet damit direkt "Wie viele Lebensmittel muss ich noch
+  // besorgen?" statt "Wie viele koennte ich theoretisch besorgen?".
+  shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel einkaufen', viele: 'Lebensmittel einkaufen' },
 };
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
