@@ -2707,7 +2707,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
   filter:drop-shadow(4px 4px 0 #000);
 }
 .dex-ordner-form path{stroke:#000}
-.dex-ordner-rueckblatt{stroke-width:4.84px}
+.dex-ordner-rueckblatt{stroke-width:4.35px}
 .dex-ordner-farbblatt{stroke-width:6.68px}
 .dex-ordner-front{stroke-width:6.67px}
 .dex-ordner-rueckblatt,.dex-ordner-front{fill:var(--surface)}
