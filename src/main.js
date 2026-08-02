@@ -343,6 +343,20 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     const iconFeld = iconInhalt
       ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
       : '';
+    if (route === 'reminders') {
+      return `
+      <div class="tuck-fach ${farbe} dex-ordner-testfach" style="--ordner:${categoryColor(route)}">
+        <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#${route}" data-sammlung="${route}">
+          <span class="dex-ordner-blatt" aria-hidden="true">${iconInhalt}</span>
+          <span class="dex-ordner-vorderseite">
+            <span class="dex-datensatz-text">
+              <h2>${titel}</h2>
+              <span class="dex-datensatz-meta">${meta}</span>
+            </span>
+          </span>
+        </a>
+      </div>`;
+    }
     return `
     <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
       <a class="tuck-karte dex-datensatz-karte" href="#${route}" data-sammlung="${route}">
