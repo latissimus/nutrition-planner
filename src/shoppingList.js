@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import { materialIconMarkup } from './categoryIcons.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -357,10 +357,6 @@ function tagLeiste(items, activeTag) {
 
 export async function mountShoppingList(container, { session, signal }) {
   const userId = session.user.id;
-  // Icon-Hintergruende und Auswahl-Markierungen greifen auf --ordner zurueck
-  // (siehe mountCategoryChrome). Bei einer dunkel gewaehlten Ordnerfarbe
-  // braucht die Schrift/Icon-Farbe darauf Weiss statt der festen Tinte.
-  container.classList.toggle('einkauf-dunkle-ordnerfarbe', colorIsDark(categoryColor('shopping')));
   container.innerHTML = `
     <div class="wrap pad-bottom">
       <div class="seitenkopf">

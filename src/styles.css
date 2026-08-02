@@ -3416,16 +3416,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .einkauf-kopf-aktionen{display:flex;gap:8px}
 .einkauf-chip-btn,.einkauf-reset{padding:6px 10px;border:1.5px solid var(--ink);border-radius:99px;
   background:var(--surface);color:var(--text);font-size:11.5px;font-weight:700}
-.einkauf-chip-btn.aktiv{background:var(--ordner);color:var(--accent-ink);border-color:var(--ordner)}
+.einkauf-chip-btn.aktiv{background:var(--pink);color:var(--accent-ink);border-color:var(--pink)}
 .einkauf-chip-btn:active,.einkauf-reset:active{transform:translate(1px,1px)}
-
-/* Abteilungs-Icons und Auswahl-Markierungen folgen der Ordnerfarbe, die im
-   Dex-Editor fuer EINKAUF gewaehlt wurde (--ordner, gesetzt via
-   mountCategoryChrome), statt einer festen Farbe. .einkauf-dunkle-ordnerfarbe
-   kippt Icon-/Schrift-Kontrast auf Weiss, wenn diese Farbe dunkel ist. */
-.einkauf-gruppe .reminder-group-icon{background:var(--ordner);color:var(--accent-ink)}
-.einkauf-dunkle-ordnerfarbe .einkauf-gruppe .reminder-group-icon,
-.einkauf-dunkle-ordnerfarbe .einkauf-chip-btn.aktiv{color:#fff}
 
 .einkauf-gruppe .reminder-group-list{padding:8px 10px 10px}
 
@@ -3434,7 +3426,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom:1.5px solid color-mix(in srgb,var(--ink) 16%,transparent);cursor:pointer}
 .einkauf-row:last-child{border-bottom:0}
 .einkauf-row input[type="checkbox"]{flex:0 0 auto;width:21px;height:21px;
-  margin-top:1px;accent-color:var(--ordner)}
+  margin-top:1px;accent-color:var(--pink)}
 .einkauf-row-text{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
 .einkauf-row-name{font-size:14.5px;font-weight:600;color:var(--text);
   overflow-wrap:anywhere}
@@ -3448,9 +3440,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    unauffindbar in derselben optischen Ablage wie ein erledigter. Der Haken
    geht im Laden beim Einpacken wieder raus, dann kehrt die Zeile in den
    neutralen Zustand zurueck. */
-.einkauf-row.ist-ausgewaehlt{background:color-mix(in srgb,var(--ordner) 9%,transparent)}
+.einkauf-row.ist-ausgewaehlt{background:color-mix(in srgb,var(--pink) 9%,transparent)}
 .einkauf-row.ist-ausgewaehlt::before{content:"";position:absolute;inset:0 auto 0 0;
-  width:4px;background:var(--ordner)}
+  width:4px;background:var(--pink)}
 .einkauf-row.ist-ausgewaehlt .einkauf-row-name{font-weight:800}
 .einkauf-row-loeschen{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;
   margin:-4px -4px -4px 0;padding:0;border:0;border-radius:99px;background:transparent;
