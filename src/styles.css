@@ -43,9 +43,9 @@
   --fe-brown:#492425;         /* brown        */
   --fe-cream:#F2EBE0;         /* cream        */
 
-  --bg:#729EFE
+  --bg:#F2EBE0
   --surface:#FFFFFF;
-  --surface2:#FBF7F0;   /* aufgehelltes Cream fuer eingelassene Flaechen */
+  --surface2:#729EFE;   /* aufgehelltes Cream fuer eingelassene Flaechen */
   --ink:#000000;
   --line:#000000;
   --text:#111111;
