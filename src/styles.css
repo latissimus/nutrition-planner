@@ -2777,7 +2777,55 @@ button,a,[role="button"],summary{touch-action:manipulation}
   display:-webkit-box;overflow:hidden;color:var(--muted);font-size:12px;line-height:1.3;
   -webkit-box-orient:vertical;-webkit-line-clamp:2;
 }
+.dex-inhaltskarte-link{display:block;color:inherit;text-decoration:none}
+.dex-inhaltskarte-fuss{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+.dex-inhaltskarte-fuss button{
+  min-height:30px;padding:3px 9px;border:1px solid var(--ink);border-radius:7px;
+  background:var(--surface);color:var(--text);font:700 10px/1 var(--ui);text-transform:uppercase;
+}
 .dex-inhaltskarte:active{transform:translate(2px,2px);box-shadow:none}
+
+.dex-eintraege{margin:24px 2px 8px}
+.dex-eintrag-gruppe{margin:0 0 28px}
+.dex-eintrag-gruppe>h2{
+  margin:0 0 14px;font-family:var(--display);font-size:18px;line-height:1;text-transform:uppercase;
+}
+.dex-inhaltsgrid{display:grid;grid-template-columns:1fr;gap:16px}
+.dex-inhaltskarte-link strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.dex-inhaltskarte-link:focus-visible{outline:3px solid var(--eintrag-farbe);outline-offset:2px}
+.dex-inhaltskarte-link:not(:has(+ .dex-inhaltskarte-text)){min-height:35px}
+.dex-inhaltskarte-link .material-svg{width:20px;height:20px}
+.dex-inhaltskarte-link .material-svg svg{fill:currentColor}
+
+.dex-entry-editor{width:min(100%,520px);padding:21px 20px 22px}
+.dex-entry-editor form{display:grid;gap:18px}
+.dex-entry-field{display:grid;gap:8px}
+.dex-entry-field>span{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.dex-entry-field>span small{color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none}
+.dex-entry-field .input{width:100%;min-height:56px;font-size:16px;resize:vertical}
+.dex-entry-field textarea.input{padding-top:14px;line-height:1.35}
+.dex-entry-urlfeld{
+  display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:center;gap:8px;
+  min-height:66px;padding:0 14px;border:var(--karten-bw) solid var(--ink);border-radius:13px;
+  background:var(--surface);box-shadow:var(--hart-klein);
+}
+.dex-entry-urlfeld input{min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:600 16px/1.2 var(--ui)}
+.dex-entry-urlfeld input::placeholder{color:var(--muted);font-weight:500}
+.dex-entry-urlfeld .material-svg,.dex-entry-urlfeld svg{width:25px;height:25px;fill:#000}
+.dex-entry-file{
+  position:relative;display:grid;place-items:center;min-height:188px;padding:18px;
+  overflow:hidden;border:var(--karten-bw) dashed var(--ink);border-radius:14px;background:var(--surface2);text-align:center;
+}
+.dex-entry-file input{position:absolute;width:1px;height:1px;opacity:0}
+.dex-entry-file-icon,.dex-entry-file-icon .material-svg{display:grid;place-items:center}
+.dex-entry-file-icon svg{width:45px;height:45px;fill:#000}
+.dex-entry-file strong{margin-top:7px;font-size:17px}.dex-entry-file small{color:var(--muted);font-size:11px}
+.dex-entry-file img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.dex-entry-save{min-height:58px;margin-top:2px}
+
+@media(min-width:620px){
+  .dex-inhaltsgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
 .tuck-fach.violet{--ordner:var(--fe-blurple)}

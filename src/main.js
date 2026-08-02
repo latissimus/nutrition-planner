@@ -19,6 +19,7 @@ import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRou
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
+import { openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
@@ -452,16 +453,7 @@ async function mountHome(container, signal) {
   });
 }
 
-function collectionEmptyMarkup(hasChildren) {
-  return `<section class="sammlung-alle">
-    <h2>Alle Einträge (0)</h2>
-    ${hasChildren ? '' : `<div class="sammlung-leer">
-      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div>
-      <strong>Leerer Dex</strong>
-      <span>Dieser Dex wartet auf seinen ersten Eintrag.</span>
-    </div>`}
-  </section>`;
-}
+const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">DEX-Einträge werden geladen …</div></div>';
 
 async function mountCustomCollection(container, item, signal) {
   setSeite('collection');
@@ -469,25 +461,25 @@ async function mountCustomCollection(container, item, signal) {
   if (signal?.aborted) return;
   if (item.root_key === 'food-log') {
     await mountFoodLog(container, { session, profile, signal, collectionId: item.id });
+    container.querySelector(':scope > .wrap')?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
   } else {
     container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
       <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
       ${collectionGridMarkup(children)}
-      ${collectionEmptyMarkup(children.length > 0)}
+      ${dexEntriesSlotMarkup()}
     </div>`;
   }
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-  const entryCount = Number.parseInt(container.querySelector('[data-food-count]')?.textContent || '0', 10) || 0;
+  const openEntry = (type) => openDexEntryEditor({
+    type, userId: session.user.id, rootKey: item.root_key, collectionId: item.id, onSaved: refresh,
+  });
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
     color: item.color,
-    meta: `${entryCount} Einträge · ${children.length} Unter-Dex`,
-    onPlus: item.root_key === 'food-log' ? () => {
-      const target = container.querySelector('[data-food-panel] > summary');
-      target?.click();
-      target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } : undefined,
+    meta: `${children.length} Unter-Dex`,
+    onAddLink: () => openEntry('link'),
+    onAddImage: () => openEntry('image'),
     onCreateSub: () => openCollectionEditor({
       userId: session.user.id, rootKey: item.root_key, parentId: item.id, onSaved: refresh,
     }),
@@ -509,6 +501,15 @@ async function mountCustomCollection(container, item, signal) {
   if (item.root_key === 'food-log' && children.length) {
     container.querySelector('.kategorie-kopf')?.insertAdjacentHTML('afterend', collectionGridMarkup(children));
   }
+  await renderDexEntries(container, {
+    userId: session.user.id, rootKey: item.root_key, collectionId: item.id,
+    color: item.color, signal,
+    onChanged: (entries) => {
+      if (!Array.isArray(entries)) return;
+      const meta = container.querySelector('.kategorie-kopftitel small');
+      if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+    },
+  });
 }
 
 async function addFixedSubcollections(container, rootKey, signal) {
@@ -689,18 +690,44 @@ async function render() {
     await mountFoodLog(view, { session, profile, signal });
     // Erst Inhalte und Unter-Sammlungen aufbauen, dann genau eine Kopfzeile.
     const children = await addFixedSubcollections(view, 'food-log', signal);
-    const entryCount = Number.parseInt(view.querySelector('[data-food-count]')?.textContent || '0', 10) || 0;
+    view.querySelector(':scope > .wrap')?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const openEntry = (type) => openDexEntryEditor({
+      type, userId: session.user.id, rootKey: 'food-log', onSaved: refresh,
+    });
     mountCategoryChrome(view, route, 'Food-Log', {
-      meta: `${entryCount} Einträge · ${children.length} Unter-Dex`,
-      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
+      meta: `${children.length} Unter-Dex`,
+      onAddLink: () => openEntry('link'),
+      onAddImage: () => openEntry('image'),
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
+    });
+    await renderDexEntries(view, {
+      userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal,
+      onChanged: (entries) => {
+        if (!Array.isArray(entries)) return;
+        const meta = view.querySelector('.kategorie-kopftitel small');
+        if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+      },
     });
   } else if (route === 'recipes') {
     setSeite('recipes');
     const children = await loadCollections(session.user.id, { rootKey: 'recipes', signal });
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>REZEPTE</h1></div>${collectionGridMarkup(children)}${collectionEmptyMarkup(children.length > 0)}</div>`;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>REZEPTE</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'recipes', onSaved: refresh });
     mountCategoryChrome(view, route, 'REZEPTE', {
-      meta: `0 Einträge · ${children.length} Unter-Dex`,
-      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }),
+      meta: `${children.length} Unter-Dex`,
+      onAddLink: () => openEntry('link'),
+      onAddImage: () => openEntry('image'),
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: refresh }),
+    });
+    await renderDexEntries(view, {
+      userId: session.user.id, rootKey: 'recipes', color: categoryColor('recipes'), signal,
+      onChanged: (entries) => {
+        if (!Array.isArray(entries)) return;
+        const meta = view.querySelector('.kategorie-kopftitel small');
+        if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+      },
     });
   } else if (route.startsWith('collection/')) {
     const item = await getCollection(session.user.id, route.slice('collection/'.length), signal);

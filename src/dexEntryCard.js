@@ -10,10 +10,10 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
-const typeLabels = { image: 'Bild', note: 'Notiz', video: 'Video' };
+const typeLabels = { image: 'Bild', note: 'Notiz', link: 'Link', video: 'Video' };
 
 export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
-  const type = ['image', 'note', 'video'].includes(entry.type) ? entry.type : 'note';
+  const type = ['image', 'note', 'link', 'video'].includes(entry.type) ? entry.type : 'note';
   const title = escapeHtml(entry.title || typeLabels[type]);
   const excerpt = escapeHtml(entry.excerpt || entry.note || '');
   const source = escapeHtml(entry.source || 'MUSCLE-DEX');
@@ -21,10 +21,9 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
   const image = entry.previewUrl
     ? `<span class="dex-inhaltskarte-vorschau"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy"></span>`
     : '';
-  const href = entry.href ? ` href="${escapeHtml(entry.href)}"` : '';
-  const tag = href ? 'a' : 'article';
+  const href = entry.href ? escapeHtml(entry.href) : '';
 
-  return `<${tag} class="dex-inhaltskarte dex-inhaltskarte-${type}"${href} style="--eintrag-farbe:${color}">
+  return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>
     ${image}
     <span class="dex-inhaltskarte-body">
@@ -32,9 +31,9 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
         <span class="dex-inhaltskarte-icon" aria-hidden="true">${iconMarkup}</span>
         <small>${typeLabels[type]}</small>
       </span>
-      <strong>${title}</strong>
+      ${href ? `<a class="dex-inhaltskarte-link" href="${href}" target="_blank" rel="noopener noreferrer"><strong>${title}</strong></a>` : `<strong>${title}</strong>`}
       ${excerpt ? `<span class="dex-inhaltskarte-text">${excerpt}</span>` : ''}
-      <span class="dex-inhaltskarte-meta">${source}</span>
+      <span class="dex-inhaltskarte-fuss"><span class="dex-inhaltskarte-meta">${source}</span><button type="button" data-dex-entry-delete>Löschen</button></span>
     </span>
-  </${tag}>`;
+  </article>`;
 }
