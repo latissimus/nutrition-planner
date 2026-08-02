@@ -3419,6 +3419,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .einkauf-chip-btn.aktiv{background:var(--pink);color:var(--accent-ink);border-color:var(--pink)}
 .einkauf-chip-btn:active,.einkauf-reset:active{transform:translate(1px,1px)}
 
+/* Die Abteilungs-Icons (Obst, Fleisch, Haushalt, ...) faerben sich nach der
+   Ordnerfarbe, die im Dex-Editor fuer EINKAUF gewaehlt wurde (--ordner,
+   gesetzt via mountCategoryChrome), statt einer festen Farbe. Bei einer
+   dunkel gewaehlten Ordnerfarbe kippt .einkauf-dunkle-ordnerfarbe das Icon
+   auf Weiss fuer ausreichend Kontrast. */
+.einkauf-gruppe .reminder-group-icon{background:var(--ordner)}
+.einkauf-dunkle-ordnerfarbe .einkauf-gruppe .reminder-group-icon{color:#fff}
+
 .einkauf-gruppe .reminder-group-list{padding:8px 10px 10px}
 
 .einkauf-row{position:relative;display:flex;align-items:flex-start;gap:10px;
