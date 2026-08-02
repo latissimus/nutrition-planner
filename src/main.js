@@ -20,6 +20,7 @@ import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
 import { openDexEntryEditor, renderDexEntries } from './dexEntries.js';
+import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
@@ -649,7 +650,7 @@ async function render() {
   if (generation !== renderGeneration) return;
   const angefragt = (location.hash || '#home').slice(1);
   const route = ['home', 'search', 'profile'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
-    || angefragt.startsWith('collection/')
+    || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
     : 'home';
   routeAbortController?.abort();
@@ -733,6 +734,9 @@ async function render() {
     const item = await getCollection(session.user.id, route.slice('collection/'.length), signal);
     if (!item) { location.hash = 'home'; return; }
     await mountCustomCollection(view, item, signal);
+  } else if (route.startsWith('entry/')) {
+    setSeite('collection');
+    await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     mountComingSoon(view, route);
     mountCategoryChrome(view, route, route === 'recipes' ? 'REZEPTE' : 'ROUTINEN');

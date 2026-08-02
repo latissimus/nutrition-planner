@@ -21,9 +21,10 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
   const image = entry.previewUrl
     ? `<span class="dex-inhaltskarte-vorschau"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy"></span>`
     : '';
-  const href = entry.href ? escapeHtml(entry.href) : '';
+  const detailHref = escapeHtml(entry.detailHref || '#home');
 
   return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
+    <a class="dex-inhaltskarte-oeffnen" href="${detailHref}" aria-label="${title} öffnen"></a>
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>
     ${image}
     <span class="dex-inhaltskarte-body">
@@ -31,9 +32,9 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
         <span class="dex-inhaltskarte-icon" aria-hidden="true">${iconMarkup}</span>
         <small>${typeLabels[type]}</small>
       </span>
-      ${href ? `<a class="dex-inhaltskarte-link" href="${href}" target="_blank" rel="noopener noreferrer"><strong>${title}</strong></a>` : `<strong>${title}</strong>`}
+      <strong>${title}</strong>
       ${excerpt ? `<span class="dex-inhaltskarte-text">${excerpt}</span>` : ''}
-      <span class="dex-inhaltskarte-fuss"><span class="dex-inhaltskarte-meta">${source}</span><button type="button" data-dex-entry-delete>Löschen</button></span>
+      <span class="dex-inhaltskarte-fuss"><span class="dex-inhaltskarte-meta">${source}</span></span>
     </span>
   </article>`;
 }

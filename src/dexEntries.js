@@ -38,7 +38,7 @@ function queryScope(query, { collectionId }) {
 
 export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,tags,created_at,updated_at')
     .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (signal) query = query.abortSignal(signal);
@@ -69,6 +69,9 @@ function editorMarkup(type) {
         </label>`}
       <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>optional</small></span>
         <input id="dex-entry-title" class="input" maxlength="100" placeholder="z. B. Schnelles Protein-Frühstück">
+      </label>
+      <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
+        <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
       ${image ? `<label class="dex-entry-field" for="dex-entry-note"><span>Beschreibung <small>optional</small></span>
         <textarea id="dex-entry-note" class="input" maxlength="300" rows="3" placeholder="Warum möchtest du das Bild im Dex behalten?"></textarea>
@@ -129,6 +132,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         user_id: userId, collection_id: collectionId, root_key: rootKey,
         entry_type: type, title, note: form.querySelector('#dex-entry-note')?.value.trim() || '',
         url, image_path: imagePath,
+        tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
       }).select().single();
       if (error) throw error;
       close();
@@ -148,15 +152,41 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   return backdrop;
 }
 
+export function videoEmbedUrl(value) {
+  if (!value) return '';
+  try {
+    const url = new URL(value);
+    if (url.hostname.includes('youtu.be')) return `https://www.youtube-nocookie.com/embed/${url.pathname.split('/').filter(Boolean)[0] || ''}`;
+    if (url.hostname.includes('youtube.com')) {
+      const id = url.searchParams.get('v') || url.pathname.match(/\/(?:shorts|embed)\/([^/?]+)/)?.[1];
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : '';
+    }
+    if (url.hostname.includes('vimeo.com')) {
+      const id = url.pathname.match(/\/(\d+)/)?.[1];
+      return id ? `https://player.vimeo.com/video/${id}` : '';
+    }
+    if (url.hostname.includes('tiktok.com')) {
+      const id = url.pathname.match(/\/video\/(\d+)/)?.[1];
+      return id ? `https://www.tiktok.com/player/v1/${id}` : '';
+    }
+    if (url.hostname.includes('instagram.com')) {
+      const match = url.pathname.match(/^\/(reel|p)\/([^/]+)/);
+      return match ? `https://www.instagram.com/${match[1]}/${match[2]}/embed/` : '';
+    }
+  } catch { return ''; }
+  return '';
+}
+
 function groupMarkup(type, entries, color) {
-  const label = type === 'image' ? 'Bilder' : 'Links';
-  const icon = type === 'image' ? 'add_photo_alternate' : 'bookmark_star';
+  const label = type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
+  const icon = type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryCardMarkup({
       id: entry.id, type, title: entry.title, note: entry.note,
       previewUrl: entry.preview_url, href: entry.url,
-      source: type === 'link' ? sourceFromUrl(entry.url) : 'BILD', color,
+      detailHref: `#entry/${entry.id}`,
+      source: type === 'link' || type === 'video' ? sourceFromUrl(entry.url) : 'BILD', color,
     }, { iconMarkup: materialIconMarkup(icon) })).join('')}</div>
   </section>`;
 }
@@ -168,30 +198,16 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
     const entries = await loadDexEntries(userId, { rootKey, collectionId, signal });
     if (signal?.aborted) return [];
     const images = entries.filter((entry) => entry.entry_type === 'image');
-    const links = entries.filter((entry) => entry.entry_type === 'link');
+    const videos = entries.filter((entry) => entry.entry_type === 'link' && videoEmbedUrl(entry.url));
+    const links = entries.filter((entry) => entry.entry_type === 'link' && !videoEmbedUrl(entry.url));
     slot.innerHTML = entries.length
-      ? `${groupMarkup('image', images, color)}${groupMarkup('link', links, color)}`
+      ? `${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
       : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
           <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
           <span>Lege hier ein Bild oder einen Link ab.</span></div></section>`;
     slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
       if (!group.querySelector('.dex-inhaltskarte')) group.remove();
     });
-    slot.onclick = async (event) => {
-      const button = event.target.closest('[data-dex-entry-delete]');
-      if (!button) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const card = button.closest('[data-dex-entry-id]');
-      const entry = entries.find((item) => item.id === card?.dataset.dexEntryId);
-      if (!entry || !confirm(`„${entry.title}“ wirklich löschen?`)) return;
-      button.disabled = true;
-      const { error } = await supabase.from('dex_entries').delete().eq('id', entry.id).eq('user_id', userId);
-      if (error) { toast(error.message || 'Löschen fehlgeschlagen'); button.disabled = false; return; }
-      if (entry.image_path) await supabase.storage.from(BUCKET).remove([entry.image_path]);
-      toast('Dex-Eintrag gelöscht');
-      await renderDexEntries(container, { userId, rootKey, collectionId, color, signal, onChanged });
-    };
     onChanged?.(entries);
     return entries;
   } catch (error) {
