@@ -3152,10 +3152,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-repeat:repeat!important;background-attachment:fixed!important;
 }
 :root[data-seite="home"] #view{
-  background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 92%,transparent)),
-    url("../Flo ill Grafik .svg")!important;
-  background-size:auto,112px!important;
+  background-image:none!important;
 }
 :root[data-seite="body"] #view,:root[data-seite="food-log"] #view,
 :root[data-seite="habits"] #view,:root[data-seite="search"] #view{
@@ -3181,9 +3178,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen-dunkel)!important;
 }
 :root[data-theme="dark"][data-seite="home"] #view{
-  background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 92%,transparent)),
-    url("../Flo ill Grafik .svg")!important;
+  background-image:none!important;
 }
 :root[data-theme="dark"][data-seite="reminders"] #view{
   background-image:
