@@ -19,12 +19,11 @@ import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRou
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
-import { bindDexFavoriteButtons, dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
+import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import { isFresh } from './freshness.js';
 import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
@@ -265,7 +264,6 @@ const sichtbareSammlungen = () => {
 // Zuletzt geladene Zahlen. Beim Zurueckspringen auf die Startseite stehen sie
 // dadurch sofort da, statt erneut durch den Platzhalter zu laufen.
 let zaehlerStand = {};
-let neuStand = {};
 
 const ZAEHLQUELLEN = {
   body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
@@ -280,13 +278,9 @@ async function zaehlerLaden(signal) {
     try {
       const countQuery = supabase.from(tabelle)
         .select('*', { count: 'exact', head: true }).abortSignal(signal);
-      const latestQuery = supabase.from(tabelle)
-        .select('created_at').order('created_at', { ascending: false }).limit(1).abortSignal(signal);
-      const [{ count, error }, { data: latest }] = await Promise.all([countQuery, latestQuery]);
-      neuStand[route] = isFresh(latest?.[0]?.created_at);
+      const { count, error } = await countQuery;
       return [route, error ? null : (count ?? 0)];
     } catch (e) {
-      neuStand[route] = false;
       return [route, null];   // offline: die Karte behaelt ihren Platzhalter
     }
   }));
@@ -306,7 +300,6 @@ function zaehlerEintragen(container, zaehler) {
     const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
     const meta = karte.querySelector('.dex-datensatz-meta');
     if (text && meta) meta.innerHTML = text;
-    karte.querySelector('.dex-neu-stern')?.toggleAttribute('hidden', !neuStand[karte.dataset.sammlung]);
   });
 }
 
@@ -348,7 +341,7 @@ function istDunkleOrdnerfarbe(farbe) {
   return (r * 299 + g * 587 + b * 114) / 1000 < 135;
 }
 
-function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', neu = false, eigene = false }) {
+function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eigene = false }) {
   return `
   <div class="tuck-fach dex-ordner-testfach${istDunkleOrdnerfarbe(farbe) ? ' dex-ordner-dunkel' : ''}${route ? ` dex-ordner-${route}` : ''}${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
     <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}>
@@ -363,7 +356,6 @@ function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', neu 
           <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
         </g>
       </svg>
-      <span class="dex-neu-stern"${neu ? '' : ' hidden'} aria-label="Neuer Eintrag">★</span>
       <span class="dex-ordner-inhalt">
         <span class="dex-datensatz-meta">${meta}</span>
         <h2>${titel}</h2>
@@ -383,7 +375,7 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
     return dexOrdnerKarte({
       href: `#${route}`, route, titel, meta, iconInhalt,
-      farbe: categoryColor(route), neu: Boolean(neuStand[route]),
+      farbe: categoryColor(route),
     });
   }).join('');
 }
@@ -395,7 +387,6 @@ function eigeneSammlungsKarten(items) {
     meta: '<b>Eigener</b><span>Dex</span>',
     iconInhalt: collectionIconMarkup(item.icon_key),
     farbe: item.color,
-    neu: isFresh(item.created_at),
     eigene: true,
   })).join('');
 }
@@ -576,10 +567,6 @@ async function mountSearch(container, signal) {
   try {
     entries = await loadAllDexEntries(session.user.id, signal);
     if (signal?.aborted) return;
-    bindDexFavoriteButtons(results, session.user.id, (id, favorite) => {
-      const entry = entries.find((item) => item.id === id);
-      if (entry) entry.favorite = favorite;
-    });
     const tags = [...new Set(entries.flatMap((entry) => entry.tags || []).map((tag) => tag.trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, 'de'));
     if (tags.length) {

@@ -246,30 +246,8 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
 }
 
-export function bindDexFavoriteButtons(container, userId, onChanged) {
-  container.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-dex-favorite]');
-    if (!button || !container.contains(button)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const card = button.closest('[data-dex-entry-id]');
-    if (!card || button.disabled) return;
-    const favorite = button.getAttribute('aria-pressed') !== 'true';
-    button.disabled = true;
-    const { error } = await supabase.from('dex_entries').update({ favorite })
-      .eq('id', card.dataset.dexEntryId).eq('user_id', userId);
-    if (error) { toast(error.message || 'Favorit konnte nicht geändert werden.'); button.disabled = false; return; }
-    button.classList.toggle('aktiv', favorite);
-    button.textContent = favorite ? '★' : '☆';
-    button.setAttribute('aria-pressed', String(favorite));
-    button.setAttribute('aria-label', favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren');
-    button.disabled = false;
-    onChanged?.(card.dataset.dexEntryId, favorite);
-  });
-}
-
 function groupMarkup(type, entries, color) {
-  const label = type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
+  const label = type === 'favorite' ? 'Favoriten' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryOverviewMarkup(entry, color)).join('')}</div>
@@ -282,19 +260,20 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
   try {
     const entries = await loadDexEntries(userId, { rootKey, collectionId, signal });
     if (signal?.aborted) return [];
-    const notes = entries.filter((entry) => entry.entry_type === 'note');
-    const images = entries.filter((entry) => entry.entry_type === 'image');
-    const videos = entries.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
-    const links = entries.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
+    const favorites = entries.filter((entry) => entry.favorite);
+    const regular = entries.filter((entry) => !entry.favorite);
+    const notes = regular.filter((entry) => entry.entry_type === 'note');
+    const images = regular.filter((entry) => entry.entry_type === 'image');
+    const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
+    const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
     slot.innerHTML = entries.length
-      ? `${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
+      ? `${groupMarkup('favorite', favorites, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
       : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
           <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
           <span>Lege hier eine Notiz, ein Bild oder einen Link ab.</span></div></section>`;
     slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
       if (!group.querySelector('.dex-inhaltskarte')) group.remove();
     });
-    bindDexFavoriteButtons(slot, userId);
     onChanged?.(entries);
     return entries;
   } catch (error) {

@@ -10,7 +10,7 @@ const escapeHtml = (value = '') => String(value)
 
 async function loadEntry(userId, id, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,created_at,updated_at')
     .eq('id', id).eq('user_id', userId).maybeSingle();
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
@@ -108,6 +108,7 @@ function detailMarkup(entry) {
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
       <span></span>
+      <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${entry.favorite ? '★' : '☆'}</button>
       <button class="dex-detail-knopf" type="button" data-entry-edit aria-label="Eintrag bearbeiten">${materialIconMarkup('build')}</button>
       <button class="dex-detail-knopf" type="button" data-entry-share aria-label="Eintrag teilen">${materialIconMarkup('upload_file')}</button>
     </nav>
@@ -132,6 +133,15 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   if (signal?.aborted) return;
   if (!entry) { location.hash = 'home'; return; }
   container.innerHTML = detailMarkup(entry);
+  container.querySelector('[data-entry-favorite]').onclick = async (event) => {
+    const button = event.currentTarget;
+    const favorite = button.getAttribute('aria-pressed') !== 'true';
+    button.disabled = true;
+    const { error } = await supabase.from('dex_entries').update({ favorite }).eq('id', entry.id).eq('user_id', userId);
+    if (error) { toast(error.message || 'Favorit konnte nicht geändert werden.'); button.disabled = false; return; }
+    toast(favorite ? 'Zu Favoriten hinzugefügt' : 'Aus Favoriten entfernt');
+    await mountDexEntryDetail(container, { userId, id, signal });
+  };
   container.querySelector('[data-entry-edit]').onclick = () => editEntry(entry, () => mountDexEntryDetail(container, { userId, id, signal }));
   container.querySelector('[data-entry-share]').onclick = () => shareEntry(entry);
   container.querySelector('[data-fullscreen]')?.addEventListener('click', () => fullscreenImage(entry.preview_url, entry.title));

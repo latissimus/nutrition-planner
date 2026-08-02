@@ -2723,11 +2723,6 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-inhalt .dex-datensatz-meta{gap:4px;font-family:var(--ui)}
 .dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px}
 .dex-ordner-inhalt .dex-datensatz-meta span{font-size:10px}
-.dex-neu-stern{
-  position:absolute;z-index:2;left:18px;top:31px;color:var(--ordner);
-  -webkit-text-stroke:1px #492426;font-size:14px;line-height:1;
-}
-.dex-neu-stern[hidden]{display:none}
 .dex-ordner-kartenicon{
   position:absolute;z-index:2;left:52%;right:auto;top:16px;transform:translateX(-50%);
   display:grid;place-items:center;width:27px;height:27px;color:#000;
@@ -2761,13 +2756,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
   background:var(--surface);color:var(--text);box-shadow:var(--hart);text-decoration:none;
 }
 .dex-inhaltskarte-oeffnen{position:absolute;z-index:2;inset:0;border-radius:inherit}
-.dex-favorit{
-  position:absolute;z-index:4;top:12px;right:7px;display:grid;place-items:center;width:30px;height:30px;padding:0;
-  border:1.5px solid var(--ink);border-radius:50%;background:var(--surface);color:var(--fe-pink);
-  box-shadow:2px 2px 0 var(--ink);font:900 21px/1 Arial,sans-serif;
+.dex-favorit-marker{
+  position:absolute;z-index:4;top:12px;right:8px;color:var(--fe-pink);
+  -webkit-text-stroke:1.5px #fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font:900 25px/1 Arial,sans-serif;
 }
-.dex-favorit.aktiv{background:var(--fe-pink);color:#fff}
-.dex-favorit:active{transform:translate(2px,2px);box-shadow:none}
 .dex-inhaltskarte-body,.dex-inhaltskarte-vorschau,.dex-inhaltskarte-streifen{position:relative;z-index:1}
 .dex-inhaltskarte-streifen{height:7px;flex:0 0 7px;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
@@ -2862,13 +2854,15 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-entry-delete{min-height:50px;border-color:#B42318!important;color:#B42318!important;background:var(--surface)!important}
 
 .dex-detail-seite{padding-top:18px}
-.dex-detail-steuerung{display:grid;grid-template-columns:44px 1fr 44px 44px;gap:10px;align-items:center;margin-bottom:18px}
+.dex-detail-steuerung{display:grid;grid-template-columns:44px 1fr 44px 44px 44px;gap:9px;align-items:center;margin-bottom:18px}
 .dex-detail-knopf{
   display:grid;place-items:center;width:44px;height:44px;padding:0;border:var(--karten-bw) solid var(--ink);
   border-radius:var(--r);background:var(--surface);color:#000;box-shadow:var(--hart-klein);
 }
 .dex-detail-knopf .material-svg,.dex-detail-knopf svg{width:23px;height:23px;fill:#000}
 .dex-detail-knopf:active{transform:translate(2px,2px);box-shadow:none}
+.dex-detail-favorit{color:var(--fe-pink);font:900 24px/1 Arial,sans-serif;-webkit-text-stroke:1px #fff}
+.dex-detail-favorit.aktiv{background:var(--fe-pink);color:#fff}
 .dex-detail-karte{width:100%;max-width:100%;min-width:0;overflow:hidden;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart)}
 .dex-detail-streifen{display:block;height:8px;background:var(--eintrag-farbe)}
 .dex-detail-bild{display:block;width:100%;padding:0;border:0;background:#000}

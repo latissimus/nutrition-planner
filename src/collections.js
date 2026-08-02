@@ -3,7 +3,6 @@ import {
   availableCategoryIcons, colorIsDark, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
-import { isFresh } from './freshness.js';
 
 export const COLLECTION_COLORS = dexEditorColors;
 
@@ -52,7 +51,6 @@ function darkCollectionColor(color) {
 }
 
 export function collectionCardMarkup(item, count = 0) {
-  const isNew = isFresh(item.created_at);
   return `<div class="tuck-fach dex-ordner-testfach unter-sammlung${darkCollectionColor(item.color) ? ' dex-ordner-dunkel' : ''}" style="--ordner:${item.color}">
     <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}">
       <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
@@ -66,7 +64,6 @@ export function collectionCardMarkup(item, count = 0) {
           <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
         </g>
       </svg>
-      <span class="dex-neu-stern"${isNew ? '' : ' hidden'} aria-label="Neuer Eintrag">★</span>
       <span class="dex-ordner-inhalt">
         <span class="dex-datensatz-meta"><b>${count}</b><span>${count === 1 ? 'Eintrag' : 'Einträge'}</span></span>
         <h2>${escapeHtml(item.name)}</h2>
