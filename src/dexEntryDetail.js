@@ -44,7 +44,7 @@ function editEntry(entry, onSaved) {
       ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" value="${escapeHtml(entry.url)}" required></label>` : ''}
       <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>optional</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"></label>
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
-      <label class="dex-entry-field" for="edit-entry-note"><span>Notizen <small>optional</small></span><textarea id="edit-entry-note" class="input" maxlength="500" rows="5">${escapeHtml(entry.note || '')}</textarea></label>
+      <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${entry.entry_type === 'note' ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${entry.entry_type === 'note' ? '4000' : '500'}" rows="${entry.entry_type === 'note' ? '9' : '5'}"${entry.entry_type === 'note' ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
       <button class="btn btn-block dex-entry-delete" type="button" data-entry-delete>Eintrag löschen</button>
     </form>
@@ -115,7 +115,7 @@ function detailMarkup(entry) {
       <span class="dex-detail-streifen" aria-hidden="true"></span>
       ${media}
       <div class="dex-detail-inhalt">
-        <small>${entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
+        <small>${entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>`}

@@ -479,6 +479,7 @@ async function mountCustomCollection(container, item, signal) {
     backHref,
     color: item.color,
     meta: `${children.length} Unter-Dex`,
+    onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
     onCreateSub: () => openCollectionEditor({
@@ -738,6 +739,7 @@ async function render() {
     });
     mountCategoryChrome(view, route, 'Food-Log', {
       meta: `${children.length} Unter-Dex`,
+      onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
       onAddImage: () => openEntry('image'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
@@ -758,6 +760,7 @@ async function render() {
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'recipes', onSaved: refresh });
     mountCategoryChrome(view, route, 'REZEPTE', {
       meta: `${children.length} Unter-Dex`,
+      onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
       onAddImage: () => openEntry('image'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: refresh }),

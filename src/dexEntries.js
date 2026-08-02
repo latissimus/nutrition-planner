@@ -68,15 +68,17 @@ export async function loadAllDexEntries(userId, signal) {
 
 function editorMarkup(type) {
   const image = type === 'image';
-  return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${image ? 'Bild' : 'Link'} hinzufügen">
-    <header><h2>${image ? 'Bild hinzufügen' : 'Link hinzufügen'}</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+  const note = type === 'note';
+  const label = image ? 'Bild' : note ? 'Notiz' : 'Link';
+  return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
+    <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
     <form data-dex-entry-form>
       ${image ? `<label class="dex-entry-file" for="dex-entry-image">
           <span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>
           <strong>Bild auswählen</strong><small>JPG, PNG, WEBP, GIF oder HEIC · maximal 8 MB</small>
           <input id="dex-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" required>
           <img data-image-preview alt="Ausgewähltes Bild" hidden>
-        </label>` : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
+        </label>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
           <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="text" inputmode="url" autocomplete="url" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
         </label>`}
       <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>optional</small></span>
@@ -85,16 +87,16 @@ function editorMarkup(type) {
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
-      <label class="dex-entry-field" for="dex-entry-note"><span>${image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>optional</small></span>
-        <textarea id="dex-entry-note" class="input" maxlength="500" rows="3" placeholder="${image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"></textarea>
+      <label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
+        <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note ? ' required' : ''}></textarea>
       </label>
-      <button class="btn btn-primary btn-block dex-entry-save" type="submit">${image ? 'Bild speichern' : 'Link speichern'}</button>
+      <button class="btn btn-primary btn-block dex-entry-save" type="submit">${label} speichern</button>
     </form>
   </section>`;
 }
 
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, onSaved }) {
-  if (!['link', 'image'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
+  if (!['link', 'image', 'note'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
   backdrop.innerHTML = editorMarkup(type);
@@ -131,7 +133,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         const { data: previewData } = await supabase.functions.invoke('link-preview', { body: { url } });
         linkPreview = previewData && !previewData.error ? previewData : {};
         title ||= linkPreview.title || '';
-      } else {
+      } else if (type === 'image') {
         const file = fileInput.files?.[0];
         if (!file) throw new Error('Bitte ein Bild auswählen.');
         if (!IMAGE_TYPES.has(file.type)) throw new Error('Dieses Bildformat wird nicht unterstützt.');
@@ -142,6 +144,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         if (uploadError) throw uploadError;
         imagePath = uploadedPath;
         title ||= 'Gespeichertes Bild';
+      } else {
+        const noteText = form.querySelector('#dex-entry-note').value.trim();
+        if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
+        title ||= noteText.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 100) || 'Notiz';
       }
       const { data, error } = await supabase.from('dex_entries').insert({
         user_id: userId, collection_id: collectionId, root_key: rootKey,
@@ -153,7 +159,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       }).select().single();
       if (error) throw error;
       close();
-      toast(type === 'image' ? 'Bild im Dex gespeichert' : 'Link im Dex gespeichert');
+      toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'note' ? 'Notiz im Dex gespeichert' : 'Link im Dex gespeichert');
       await onSaved?.(data);
     } catch (error) {
       if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
@@ -225,20 +231,22 @@ function providerPreview(entry, provider, playable) {
 export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const provider = videoProvider(entry.url);
   const video = entry.entry_type === 'link' && Boolean(provider);
-  const type = entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
-  const icon = type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
+  const type = entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
+  const icon = type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   const playable = Boolean(videoEmbedUrl(entry.url));
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     previewUrl: entry.preview_url, href: entry.url,
-    previewMarkup: type === 'video' ? providerPreview(entry, provider, playable) : '',
+    previewMarkup: type === 'note'
+      ? '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
+      : type === 'video' ? providerPreview(entry, provider, playable) : '',
     playable, detailHref: `#entry/${entry.id}`,
     source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
   }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
 }
 
 function groupMarkup(type, entries, color) {
-  const label = type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
+  const label = type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryOverviewMarkup(entry, color)).join('')}</div>
@@ -251,14 +259,15 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
   try {
     const entries = await loadDexEntries(userId, { rootKey, collectionId, signal });
     if (signal?.aborted) return [];
+    const notes = entries.filter((entry) => entry.entry_type === 'note');
     const images = entries.filter((entry) => entry.entry_type === 'image');
     const videos = entries.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
     const links = entries.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
     slot.innerHTML = entries.length
-      ? `${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
+      ? `${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
       : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
           <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
-          <span>Lege hier ein Bild oder einen Link ab.</span></div></section>`;
+          <span>Lege hier eine Notiz, ein Bild oder einen Link ab.</span></div></section>`;
     slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
       if (!group.querySelector('.dex-inhaltskarte')) group.remove();
     });
