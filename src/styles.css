@@ -2723,25 +2723,27 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-inhalt .dex-datensatz-meta{gap:4px;font-family:var(--ui)}
 .dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px}
 .dex-ordner-inhalt .dex-datensatz-meta span{font-size:10px}
-/* Sitzt jetzt auf dem weissen Vorderblatt statt auf der farbigen Lasche
-   (vorher: top:16px, mitten in der Lasche, feste schwarze Fuellung). Ohne
-   eigenen farbigen Hintergrund traegt das Icon selbst die Ordnerfarbe – auf
-   Weiss (Retro) wie auf der dunklen Kartenflaeche (Dark) liest sich dieselbe
-   Farbe gleich gut, ein eigener Dark-Fall entfaellt deshalb ersatzlos. */
 .dex-ordner-kartenicon{
-  position:absolute;z-index:2;left:auto;right:12px;top:83px;transform:none;
-  display:grid;place-items:center;width:30px;height:30px;color:var(--ordner);
+  position:absolute;z-index:2;left:52%;right:auto;top:16px;transform:translateX(-50%);
+  display:grid;place-items:center;width:27px;height:27px;color:#000;
 }
 .dex-ordner-kartenicon .muscledex-sammlungsicon,
 .dex-ordner-kartenicon .muscledex-sammlungsicon svg{
-  display:block;width:28px;height:28px;fill:var(--ordner)!important;
+  display:block;width:25px;height:25px;fill:#000!important;
 }
-.dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:var(--ordner)!important}
+.dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:#000!important}
 .dex-ordner-kartenicon .dex-emoji,
 .dex-ordner-kartenicon .kategorie-emoji{
   width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
-  font-size:26px;line-height:1;
+  font-size:28px;line-height:1;
 }
+.dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
+.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg,
+.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg,
+.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg *,
+.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
+.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
+.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
 .dex-ordner-test:active{transform:translate(2px,2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
