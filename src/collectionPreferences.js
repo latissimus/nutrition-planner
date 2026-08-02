@@ -3,7 +3,7 @@ const ORDER_KEY = 'muscledex:sammlungs-reihenfolge';
 const CUSTOM_HIDDEN_KEY = 'muscledex:eigene-dex-ausgeblendet';
 const CUSTOM_ORDER_KEY = 'muscledex:eigene-dex-reihenfolge';
 
-export const collectionRoutes = ['body', 'reminders', 'food-log', 'training', 'habits'];
+export const collectionRoutes = ['body', 'reminders', 'food-log', 'training', 'shopping', 'habits'];
 
 export function collectionOrder() {
   try {

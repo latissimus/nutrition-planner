@@ -18,6 +18,7 @@ import { mountProfile } from './profile.js';
 import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes } from './collectionPreferences.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
+import { mountShoppingList } from './shoppingList.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -247,6 +248,7 @@ const sammlungen = [
   ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Food-Log', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
+  ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
@@ -269,6 +271,9 @@ const ZAEHLQUELLEN = {
   reminders: { tabelle: 'reminders', eins: 'Erinnerung', viele: 'Erinnerungen' },
   'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
   training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
+  // Gezaehlt wird, was noch offen ist – wie die Badge-Zahl "139" im
+  // urspruenglichen Reminders-Export, nicht die Gesamtzahl aller Artikel.
+  shopping: { tabelle: 'shopping_items', filter: ['checked', false], eins: 'Artikel offen', viele: 'Artikel offen' },
 };
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
@@ -734,6 +739,19 @@ async function render() {
     setSeite('reminders');
     mountReminders(view, { session, profile, signal });
     mountCategoryChrome(view, route, 'MAHLZEITEN');
+  } else if (route === 'shopping') {
+    setSeite('shopping');
+    mountShoppingList(view, { session, signal });
+    mountCategoryChrome(view, route, 'EINKAUF', {
+      // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
+      // eigene "Neuer Artikel"-Feld der Einkaufsliste.
+      onPlus: () => {
+        const feld = view.querySelector('[data-new-name]');
+        if (!feld) return;
+        feld.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        feld.focus({ preventScroll: true });
+      },
+    });
   } else if (route === 'food-log') {
     setSeite('food-log');
     const children = await loadCollections(session.user.id, { rootKey: 'food-log', signal });

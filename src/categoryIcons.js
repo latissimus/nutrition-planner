@@ -17,12 +17,14 @@ const escapeHtml = (value = '') => String(value)
 const defaults = {
   body: 'body_fat', reminders: 'notifications', 'food-log': 'fork_spoon',
   recipes: 'menu_book', training: 'fitness_center', habits: 'bucket_check',
+  shopping: 'shopping_cart',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const defaultColors = {
   body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
   recipes: '#83CFE0', training: '#F2A65A', habits: '#B7C98B',
+  shopping: '#A7B879',
 };
 const colorGroups = [
   ['Knallig-Retro', [
@@ -277,7 +279,6 @@ function eintragTypWaehlen(container, route, options = {}) {
     }
     if (type === 'image') {
       if (options.onAddImage) return options.onAddImage();
-      if (options.onPlus) return options.onPlus();
       if (route === 'food-log') return plusAction(container, route);
       return toast('Bilder sind für diesen Dex vorbereitet.');
     }
@@ -303,7 +304,12 @@ export function mountCategoryChrome(container, route, title, options = {}) {
     <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
   bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(options.color || categoryColor(route)));
   wrap.prepend(bar);
-  bar.querySelector('.kategorie-plus').onclick = () => eintragTypWaehlen(container, route, options);
+  // options.onPlus umgeht das Link/Notiz/Bild-Menue vollstaendig: Dex-Typen,
+  // die keine Bookmarks sammeln (z. B. die Einkaufsliste), oeffnen darueber
+  // ihr eigenes Formular direkt.
+  bar.querySelector('.kategorie-plus').onclick = () => (
+    options.onPlus ? options.onPlus() : eintragTypWaehlen(container, route, options)
+  );
   bar.querySelector('[data-category-settings]').onclick = () => settingsSheet(
     route,
     () => window.dispatchEvent(new HashChangeEvent('hashchange')),
