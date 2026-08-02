@@ -2804,7 +2804,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-inhaltsgrid .dex-inhaltskarte-icon svg{width:18px;height:18px}
 .dex-inhaltsgrid .dex-inhaltskarte strong{font-size:14px}
 .dex-inhaltsgrid .dex-inhaltskarte-vorschau{aspect-ratio:4/3}
-.dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:50%;flex:0 0 50%}
+.dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:54%;flex:0 0 54%}
 .dex-inhaltsgrid .dex-inhaltskarte-ohne-text{opacity:.7}
 .dex-video-vorschau,.dex-provider-vorschau{position:relative}
 .dex-video-vorschau>i,.dex-detail-linkvorschau>i{
