@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, dexEditorColors, materialIconMarkup,
+  availableCategoryIcons, colorIsDark, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 import { isFresh } from './freshness.js';
@@ -127,7 +127,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
       <div class="sammlung-editor-label"><label for="collection-name">Name</label><span data-name-count>${existing?.name?.length || 0}/40</span></div>
       <input class="input" id="collection-name" maxlength="40" required placeholder="z. B. Low Carb" value="${escapeHtml(existing?.name || '')}">
       <h3>Farbe</h3>
-      <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((color) => `<button type="button" data-pick-color="${color}" class="${color === selectedColor ? 'aktiv' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
+      <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((color) => `<button type="button" data-pick-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
       <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>

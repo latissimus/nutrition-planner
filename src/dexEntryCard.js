@@ -12,18 +12,18 @@ const escapeHtml = (value = '') => String(value)
 
 const typeLabels = { image: 'Bild', note: 'Notiz', link: 'Link', video: 'Video' };
 
-export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
+export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = false } = {}) {
   const type = ['image', 'note', 'link', 'video'].includes(entry.type) ? entry.type : 'note';
   const title = escapeHtml(entry.title || typeLabels[type]);
   const excerpt = escapeHtml(entry.excerpt || entry.note || '');
   const source = escapeHtml(entry.source || 'MUSCLE-DEX');
   const color = escapeHtml(entry.color || '#A9DCE8');
   const image = entry.previewUrl
-    ? `<span class="dex-inhaltskarte-vorschau"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy"></span>`
-    : '';
+    ? `<span class="dex-inhaltskarte-vorschau${type === 'video' ? ' dex-video-vorschau' : ''}"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy">${type === 'video' ? `<i>${iconMarkup}</i>` : ''}</span>`
+    : (entry.previewMarkup || '');
   const detailHref = escapeHtml(entry.detailHref || '#home');
 
-  return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
+  return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}${darkColor ? ' eintrag-farbe-dunkel' : ''}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
     <a class="dex-inhaltskarte-oeffnen" href="${detailHref}" aria-label="${title} öffnen"></a>
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>
     ${image}
@@ -33,7 +33,7 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '' } = {}) {
         <small>${typeLabels[type]}</small>
       </span>
       <strong>${title}</strong>
-      ${excerpt ? `<span class="dex-inhaltskarte-text">${excerpt}</span>` : ''}
+      ${excerpt ? `<span class="dex-inhaltskarte-text">${excerpt}</span>` : '<span class="dex-inhaltskarte-text dex-inhaltskarte-ohne-text">Keine Beschreibung hinterlegt.</span>'}
       <span class="dex-inhaltskarte-fuss"><span class="dex-inhaltskarte-meta">${source}</span></span>
     </span>
   </article>`;

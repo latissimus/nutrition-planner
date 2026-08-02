@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
-import { videoEmbedUrl } from './dexEntries.js';
+import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { toast } from './toast.js';
 
 const BUCKET = 'dex-entries';
@@ -10,16 +10,19 @@ const escapeHtml = (value = '') => String(value)
 
 async function loadEntry(userId, id, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,tags,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,created_at,updated_at')
     .eq('id', id).eq('user_id', userId).maybeSingle();
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
+  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Food-Log', recipes: 'Rezepte', reminders: 'Mahlzeiten', body: 'KFA-Log', habits: 'Routinen' };
+  data.dex_name = rootNames[data.root_key] || 'MUSCLE-DEX';
   if (data.collection_id) {
-    const { data: collection } = await supabase.from('collections').select('color').eq('id', data.collection_id).maybeSingle();
+    const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
     if (collection?.color) data.color = collection.color;
+    if (collection?.name) data.dex_name = collection.name;
   }
   if (data.image_path) {
     const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(data.image_path, 60 * 60);
@@ -39,7 +42,7 @@ function editEntry(entry, onSaved) {
     <header><h2>Eintrag bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
     <form data-entry-edit>
       ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" value="${escapeHtml(entry.url)}" required></label>` : ''}
-      <label class="dex-entry-field" for="edit-entry-title"><span>Titel</span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}" required></label>
+      <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>optional</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"></label>
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
       <label class="dex-entry-field" for="edit-entry-note"><span>Notizen <small>optional</small></span><textarea id="edit-entry-note" class="input" maxlength="500" rows="5">${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
@@ -93,10 +96,14 @@ async function shareEntry(entry) {
 
 function detailMarkup(entry) {
   const embed = videoEmbedUrl(entry.url);
-  const media = entry.preview_url
+  const provider = videoProvider(entry.url);
+  const media = entry.image_path && entry.preview_url
     ? `<button class="dex-detail-bild" type="button" data-fullscreen><img src="${escapeHtml(entry.preview_url)}" alt="${escapeHtml(entry.title)}"></button>`
-    : embed ? `<div class="dex-detail-video"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>` : '';
+    : embed ? `<div class="dex-detail-video"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
+      : entry.preview_url ? `<div class="dex-detail-linkvorschau"><img src="${escapeHtml(entry.preview_url)}" alt=""><i>${materialIconMarkup('play_arrow')}</i></div>`
+        : provider ? `<div class="dex-detail-provider"><i>${materialIconMarkup('play_arrow')}</i><strong>${escapeHtml(entry.provider || provider.name)}</strong><span>Vorschau dieses Videos</span></div>` : '';
   const tags = (entry.tags || []).map((tag) => `<span>#${escapeHtml(tag.replace(/^#/, ''))}</span>`).join('');
+  const savedAt = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.created_at));
   return `<div class="wrap pad-bottom dex-detail-seite">
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
@@ -109,11 +116,12 @@ function detailMarkup(entry) {
       ${media}
       <div class="dex-detail-inhalt">
         <small>${entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
-        <h1>${escapeHtml(entry.title)}</h1>
+        ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
+        ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>`}
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}
         <section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>
-        <footer>Gespeichert am ${new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.created_at))}</footer>
+        <footer>MUSCLE-DEX · ${escapeHtml(entry.dex_name)}</footer>
       </div>
     </article>
   </div>`;

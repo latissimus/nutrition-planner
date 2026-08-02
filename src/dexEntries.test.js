@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeDexUrl, videoEmbedUrl } from './dexEntries.js';
+import { normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
+import { colorIsDark } from './categoryIcons.js';
 
 describe('normalizeDexUrl', () => {
   it('ergänzt bei einer Domain das HTTPS-Protokoll', () => {
@@ -13,6 +14,18 @@ describe('normalizeDexUrl', () => {
   it('weist leere und nicht-webbasierte Links zurück', () => {
     expect(() => normalizeDexUrl('')).toThrow('Link');
     expect(() => normalizeDexUrl('javascript:alert(1)')).toThrow('Weblinks');
+  });
+});
+
+describe('Anbieter- und Farbkontrast', () => {
+  it('erkennt Videoanbieter auch ohne direkt einbettbare URL', () => {
+    expect(videoProvider('https://vm.tiktok.com/shortcode')?.name).toBe('TikTok');
+    expect(videoProvider('https://example.com/video')).toBeNull();
+  });
+
+  it('unterscheidet dunkle und helle Buttonfarben', () => {
+    expect(colorIsDark('#492426')).toBe(true);
+    expect(colorIsDark('#F2EBE0')).toBe(false);
   });
 });
 

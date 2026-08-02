@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { materialIconMarkup } from './categoryIcons.js';
+import { colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
 
@@ -21,15 +21,11 @@ export function normalizeDexUrl(value) {
   return parsed.href;
 }
 
-function sourceFromUrl(value) {
+export function sourceFromUrl(value) {
   if (!value) return 'MUSCLE-DEX';
   try {
     return new URL(value).hostname.replace(/^www\./, '').toUpperCase();
   } catch { return 'LINK'; }
-}
-
-function titleFromUrl(value) {
-  try { return new URL(value).hostname.replace(/^www\./, ''); } catch { return 'Gespeicherter Link'; }
 }
 
 function queryScope(query, { collectionId }) {
@@ -38,7 +34,7 @@ function queryScope(query, { collectionId }) {
 
 export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,tags,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,created_at,updated_at')
     .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (signal) query = query.abortSignal(signal);
@@ -73,9 +69,9 @@ function editorMarkup(type) {
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
-      ${image ? `<label class="dex-entry-field" for="dex-entry-note"><span>Beschreibung <small>optional</small></span>
-        <textarea id="dex-entry-note" class="input" maxlength="300" rows="3" placeholder="Warum möchtest du das Bild im Dex behalten?"></textarea>
-      </label>` : ''}
+      <label class="dex-entry-field" for="dex-entry-note"><span>${image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>optional</small></span>
+        <textarea id="dex-entry-note" class="input" maxlength="500" rows="3" placeholder="${image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"></textarea>
+      </label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">${image ? 'Bild speichern' : 'Link speichern'}</button>
     </form>
   </section>`;
@@ -112,10 +108,13 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       const titleInput = form.querySelector('#dex-entry-title');
       let url = null;
       let imagePath = null;
+      let linkPreview = {};
       let title = titleInput.value.trim();
       if (type === 'link') {
         url = normalizeDexUrl(form.querySelector('#dex-entry-url').value);
-        title ||= titleFromUrl(url);
+        const { data: previewData } = await supabase.functions.invoke('link-preview', { body: { url } });
+        linkPreview = previewData && !previewData.error ? previewData : {};
+        title ||= linkPreview.title || '';
       } else {
         const file = fileInput.files?.[0];
         if (!file) throw new Error('Bitte ein Bild auswählen.');
@@ -130,8 +129,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       }
       const { data, error } = await supabase.from('dex_entries').insert({
         user_id: userId, collection_id: collectionId, root_key: rootKey,
-        entry_type: type, title, note: form.querySelector('#dex-entry-note')?.value.trim() || '',
+        entry_type: type, title, note: form.querySelector('#dex-entry-note')?.value.trim() || linkPreview.description || '',
         url, image_path: imagePath,
+        preview_url: linkPreview.previewUrl || null,
+        provider: linkPreview.provider || null,
         tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
       }).select().single();
       if (error) throw error;
@@ -177,17 +178,49 @@ export function videoEmbedUrl(value) {
   return '';
 }
 
+export function videoProvider(value) {
+  if (!value) return null;
+  try {
+    const host = new URL(value).hostname.toLowerCase();
+    if (host.includes('youtube.com') || host.includes('youtu.be')) return { name: 'YouTube', key: 'youtube' };
+    if (host.includes('tiktok.com')) return { name: 'TikTok', key: 'tiktok' };
+    if (host.includes('instagram.com')) return { name: 'Instagram', key: 'instagram' };
+    if (host.includes('vimeo.com')) return { name: 'Vimeo', key: 'vimeo' };
+  } catch { return null; }
+  return null;
+}
+
+function youtubeThumbnail(value) {
+  try {
+    const url = new URL(value);
+    const id = url.hostname.includes('youtu.be')
+      ? url.pathname.split('/').filter(Boolean)[0]
+      : url.searchParams.get('v') || url.pathname.match(/\/(?:shorts|embed)\/([^/?]+)/)?.[1];
+    return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
+  } catch { return ''; }
+}
+
+function providerPreview(entry, provider) {
+  const thumbnail = provider?.key === 'youtube' ? youtubeThumbnail(entry.url) : '';
+  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy"><i>${materialIconMarkup('play_arrow')}</i></span>`;
+  return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}"><i>${materialIconMarkup('play_arrow')}</i><b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
+}
+
 function groupMarkup(type, entries, color) {
   const label = type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
   const icon = type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
-    <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryCardMarkup({
-      id: entry.id, type, title: entry.title, note: entry.note,
-      previewUrl: entry.preview_url, href: entry.url,
-      detailHref: `#entry/${entry.id}`,
-      source: type === 'link' || type === 'video' ? sourceFromUrl(entry.url) : 'BILD', color,
-    }, { iconMarkup: materialIconMarkup(icon) })).join('')}</div>
+    <div class="dex-inhaltsgrid">${entries.map((entry) => {
+      const provider = videoProvider(entry.url);
+      return dexEntryCardMarkup({
+        id: entry.id, type, title: entry.title, note: entry.note,
+        previewUrl: entry.preview_url, href: entry.url,
+        previewMarkup: type === 'video' ? providerPreview(entry, provider) : '',
+        detailHref: `#entry/${entry.id}`,
+        source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
+      }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
+    }).join('')}</div>
   </section>`;
 }
 
@@ -198,8 +231,8 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
     const entries = await loadDexEntries(userId, { rootKey, collectionId, signal });
     if (signal?.aborted) return [];
     const images = entries.filter((entry) => entry.entry_type === 'image');
-    const videos = entries.filter((entry) => entry.entry_type === 'link' && videoEmbedUrl(entry.url));
-    const links = entries.filter((entry) => entry.entry_type === 'link' && !videoEmbedUrl(entry.url));
+    const videos = entries.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
+    const links = entries.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
     slot.innerHTML = entries.length
       ? `${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
       : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">

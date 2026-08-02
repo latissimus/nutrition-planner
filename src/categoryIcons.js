@@ -56,6 +56,13 @@ const colorGroups = [
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
 export const dexEditorColors = [...new Set(retroColors.map(([, color]) => color))];
 
+export function colorIsDark(color) {
+  const hex = String(color || '').trim().replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return false;
+  const [r, g, b] = [0, 2, 4].map((start) => Number.parseInt(hex.slice(start, start + 2), 16));
+  return (r * 299 + g * 587 + b * 114) / 1000 < 145;
+}
+
 export function categoryColor(route) {
   const saved = localStorage.getItem(colorKey(route));
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
@@ -147,7 +154,7 @@ function appearancePicker(route, onChange) {
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="dex-appearance-form">
       <h3>Farbe</h3>
-      <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
+      <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>
       <label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
