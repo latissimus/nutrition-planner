@@ -2656,7 +2656,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
    30,7 pt plus die 18 pt sichtbaren Reiter tragen, also rund 49 pt. */
 .tuck-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:22px 19px;padding:30px 3px 6px;
+  gap:16px 19px;padding:30px 3px 6px;
 }
 
 /* Dex-Karten: Die Farbe sitzt als schmaler Streifen innerhalb der Oberkante. */
@@ -2724,7 +2724,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px}
 .dex-ordner-inhalt .dex-datensatz-meta span{font-size:10px}
 .dex-neu-stern{
-  position:absolute;z-index:2;left:18px;top:27px;color:var(--ordner);
+  position:absolute;z-index:2;left:18px;top:31px;color:var(--ordner);
   -webkit-text-stroke:1px #492426;font-size:14px;line-height:1;
 }
 .dex-neu-stern[hidden]{display:none}
@@ -2737,7 +2737,9 @@ button,a,[role="button"],summary{touch-action:manipulation}
   display:block;width:25px;height:25px;fill:#000!important;
 }
 .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:#000!important}
-.dex-ordner-reminders .dex-ordner-kartenicon{right:40px;top:16px}
+.dex-ordner-reminders .dex-ordner-kartenicon{
+  left:52%;right:auto;top:16px;transform:translateX(-50%);
+}
 .dex-ordner-test:active{transform:translate(2px,2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
@@ -3021,7 +3023,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 
 @media(max-width:370px){
   .wrap{padding-inline:14px}
-  .tuck-grid{gap:24px 14px}
+  .tuck-grid{gap:18px 14px}
   .tuck-karte{min-height:120px;padding:10px 11px 11px}
   .kopf-logo{width:104px;max-height:43px}
   .kopf-aktionen{gap:7px}
