@@ -262,6 +262,7 @@ const sichtbareSammlungen = () => {
 // Zuletzt geladene Zahlen. Beim Zurueckspringen auf die Startseite stehen sie
 // dadurch sofort da, statt erneut durch den Platzhalter zu laufen.
 let zaehlerStand = {};
+let neuStand = {};
 
 const ZAEHLQUELLEN = {
   body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
@@ -274,11 +275,16 @@ const ZAEHLQUELLEN = {
 async function zaehlerLaden(signal) {
   const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle }]) => {
     try {
-      const { count, error } = await supabase.from(tabelle)
-        .select('*', { count: 'exact', head: true })
-        .abortSignal(signal);
+      const countQuery = supabase.from(tabelle)
+        .select('*', { count: 'exact', head: true }).abortSignal(signal);
+      const latestQuery = supabase.from(tabelle)
+        .select('created_at').order('created_at', { ascending: false }).limit(1).abortSignal(signal);
+      const [{ count, error }, { data: latest }] = await Promise.all([countQuery, latestQuery]);
+      const zeit = latest?.[0]?.created_at ? new Date(latest[0].created_at).getTime() : 0;
+      neuStand[route] = zeit > 0 && Date.now() - zeit < 24 * 60 * 60 * 1000;
       return [route, error ? null : (count ?? 0)];
     } catch (e) {
+      neuStand[route] = false;
       return [route, null];   // offline: die Karte behaelt ihren Platzhalter
     }
   }));
@@ -298,6 +304,7 @@ function zaehlerEintragen(container, zaehler) {
     const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
     const meta = karte.querySelector('.dex-datensatz-meta');
     if (text && meta) meta.innerHTML = text;
+    karte.querySelector('.dex-neu-stern')?.toggleAttribute('hidden', !neuStand[karte.dataset.sammlung]);
   });
 }
 
@@ -347,13 +354,23 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
       return `
       <div class="tuck-fach ${farbe} dex-ordner-testfach" style="--ordner:${categoryColor(route)}">
         <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#${route}" data-sammlung="${route}">
-          <span class="dex-ordner-blatt" aria-hidden="true">${iconInhalt}</span>
-          <span class="dex-ordner-vorderseite">
-            <span class="dex-datensatz-text">
-              <h2>${titel}</h2>
-              <span class="dex-datensatz-meta">${meta}</span>
-            </span>
+          <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
+            <g transform="translate(.016 13.463)">
+              <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
+                <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
+              </g>
+              <g transform="matrix(.981481 0 0 1.01546 7.407 10)">
+                <path class="dex-ordner-farbblatt" d="M400 40.19C400 18.009 381.368 0 358.418 0H171.582C148.632 0 130 18.009 130 40.19v124.557c0 22.182 18.632 40.191 41.582 40.191h186.836c22.95 0 41.582-18.009 41.582-40.191V40.19Z"/>
+              </g>
+              <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
+            </g>
+          </svg>
+          <span class="dex-neu-stern"${neuStand[route] ? '' : ' hidden'} aria-label="Neuer Eintrag">★</span>
+          <span class="dex-ordner-inhalt">
+            <span class="dex-datensatz-meta">${meta}</span>
+            <h2>${titel}</h2>
           </span>
+          <span class="dex-ordner-kartenicon" aria-hidden="true">${iconInhalt}</span>
         </a>
       </div>`;
     }
