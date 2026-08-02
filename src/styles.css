@@ -43,7 +43,11 @@
   --fe-brown:#492425;         /* brown        */
   --fe-cream:#F2EBE0;         /* cream        */
 
+<<<<<<< HEAD
   --bg:#F2EBE0
+=======
+  --bg:#F2EBE0;
+>>>>>>> parent of 98988a4 (u)
   --surface:#FFFFFF;
   --surface2:#F2EBE0;   /* aufgehelltes Cream fuer eingelassene Flaechen */
   --ink:#000000;

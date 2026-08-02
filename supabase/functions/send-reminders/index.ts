@@ -128,24 +128,15 @@ async function testPush(userId: string) {
   if (!data?.length) return json({ ok: false, error: 'Für dieses Konto ist kein Gerät registriert.' }, 409);
 
   let sent = 0;
-  const failures: string[] = [];
   for (const subscription of data as Subscription[]) {
     try {
       await send(subscription, notification());
       sent += 1;
     } catch (error) {
-      const status = Number((error as { statusCode?: number })?.statusCode || 0);
-      const message = String((error as Error)?.message || error || 'Unbekannter Web-Push-Fehler');
-      failures.push(`${status ? `${status}: ` : ''}${message}`.slice(0, 300));
       await removeExpired(subscription, error);
     }
   }
-  return json({
-    ok: sent > 0,
-    sent,
-    failed: failures.length,
-    ...(sent ? {} : { error: failures[0] || 'Kein registriertes Gerät konnte erreicht werden.' }),
-  }, sent > 0 ? 200 : 502);
+  return json({ ok: sent > 0, sent }, sent > 0 ? 200 : 502);
 }
 
 async function dispatchDue() {
