@@ -246,8 +246,7 @@ function avatarMarkup() {
 const sammlungen = [
   ['body', 'KFA-LOG', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
-  ['food-log', 'Food-Log', 'Gute Mahlzeiten wiederfinden.', 'food', 'violet', 'Aktiv'],
-  ['recipes', 'Rezepte', 'Eigene Rezepte und schnelle Standards.', 'recipes', 'blue', 'Bald'],
+  ['food-log', 'Food-Log', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
@@ -256,8 +255,8 @@ const sichtbareSammlungen = () => {
   return visibleCollectionRoutes().map((route) => nachRoute.get(route)).filter(Boolean);
 };
 
-// Welche Tabelle den Zaehler einer Sammlung fuellt. Rezepte und Gewohnheiten
-// haben noch keine Tabelle – ihre Karten zeigen weiter "Bald".
+// Welche Tabelle den Zaehler einer Sammlung fuellt. Routinen haben noch keine
+// Tabelle – ihre Karte zeigt weiter "Bald".
 // Row Level Security ist auf allen Tabellen aktiv, die Zaehlung liefert also
 // von sich aus nur die eigenen Zeilen; ein Filter auf die user_id waere
 // doppelt gemoppelt.
@@ -268,16 +267,17 @@ let zaehlerStand = {};
 const ZAEHLQUELLEN = {
   body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
   reminders: { tabelle: 'reminders', eins: 'Erinnerung', viele: 'Erinnerungen' },
-  'food-log': { tabelle: 'food_logs', eins: 'Eintrag', viele: 'Einträge' },
+  'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
 };
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
 // leere Antworten statt der kompletten Tabellen.
 async function zaehlerLaden(signal) {
-  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle }]) => {
+  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter }]) => {
     try {
-      const countQuery = supabase.from(tabelle)
-        .select('*', { count: 'exact', head: true }).abortSignal(signal);
+      let countQuery = supabase.from(tabelle).select('*', { count: 'exact', head: true });
+      if (filter) countQuery = countQuery.eq(filter[0], filter[1]);
+      countQuery = countQuery.abortSignal(signal);
       const { count, error } = await countQuery;
       return [route, error ? null : (count ?? 0)];
     } catch (e) {
@@ -463,8 +463,8 @@ async function mountCustomCollection(container, item, signal) {
   }
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-  const openEntry = (type) => openDexEntryEditor({
-    type, userId: session.user.id, rootKey: item.root_key, collectionId: item.id, onSaved: refresh,
+  const openEntry = (type, foodKind = null) => openDexEntryEditor({
+    type, foodKind, userId: session.user.id, rootKey: item.root_key, collectionId: item.id, onSaved: refresh,
   });
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
@@ -473,6 +473,9 @@ async function mountCustomCollection(container, item, signal) {
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
+    onAddCheatMeal: item.root_key === 'food-log' ? () => openEntry('note', 'cheat_meal') : null,
+    onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
+    onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
     onCreateSub: () => openCollectionEditor({
       userId: session.user.id, rootKey: item.root_key, parentId: item.id, onSaved: refresh,
     }),
@@ -616,24 +619,21 @@ async function mountSearch(container, signal) {
 }
 
 function mountComingSoon(container, route) {
-  const recipes = route === 'recipes';
   setSeite(route);
   container.innerHTML = `
     <div class="wrap pad-bottom bereich-vorschau">
       <div class="seitenkopf">
         <div class="seitenkopf-text">
-          <span class="seitenkopf-kicker">${recipes ? 'Sammlung' : 'Routine'}</span>
-          <h1 class="section-title">${recipes ? 'REZEPTE' : 'ROUTINEN'}</h1>
+          <span class="seitenkopf-kicker">Routine</span>
+          <h1 class="section-title">ROUTINEN</h1>
         </div>
       </div>
       <section class="seiten-einstieg">
-        <b>${recipes ? 'Deine Standards an einem Ort' : 'Kleine Schritte, die bleiben'}</b>
-        <span>${recipes
-          ? 'Eigene Rezepte, Cheat-Code-Mahlzeiten und gespeicherte Videos folgen hier.'
-          : 'Tägliche Routinen, Serien und Fortschritt werden hier aufgebaut.'}</span>
+        <b>Kleine Schritte, die bleiben</b>
+        <span>Tägliche Routinen, Serien und Fortschritt werden hier aufgebaut.</span>
       </section>
       <section class="card vorschau-karte">
-        <span aria-hidden="true">${iconMarkup(recipes ? 'recipes' : 'habits')}</span>
+        <span aria-hidden="true">${iconMarkup('habits')}</span>
         <strong>Dieser Bereich kommt als Nächstes.</strong>
         <p>Die Navigation ist bereits aktiv, die Funktionen ergänzen wir im nächsten Schritt.</p>
       </section>
@@ -681,6 +681,7 @@ async function render() {
   }
   if (generation !== renderGeneration) return;
   const angefragt = (location.hash || '#home').slice(1);
+  if (angefragt === 'recipes') { location.replace('#food-log'); return; }
   const route = ['home', 'search', 'profile'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
@@ -725,39 +726,21 @@ async function render() {
     const children = await addFixedSubcollections(view, 'food-log', signal);
     view.querySelector(':scope > .wrap')?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-    const openEntry = (type) => openDexEntryEditor({
-      type, userId: session.user.id, rootKey: 'food-log', onSaved: refresh,
+    const openEntry = (type, foodKind = null) => openDexEntryEditor({
+      type, foodKind, userId: session.user.id, rootKey: 'food-log', onSaved: refresh,
     });
     mountCategoryChrome(view, route, 'Food-Log', {
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
       onAddImage: () => openEntry('image'),
+      onAddCheatMeal: () => openEntry('note', 'cheat_meal'),
+      onAddRecipeLink: () => openEntry('link', 'recipe'),
+      onAddOwnRecipe: () => openEntry('note', 'recipe'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
     });
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal,
-      onChanged: (entries) => {
-        if (!Array.isArray(entries)) return;
-        const meta = view.querySelector('.kategorie-kopftitel small');
-        if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
-      },
-    });
-  } else if (route === 'recipes') {
-    setSeite('recipes');
-    const children = await loadCollections(session.user.id, { rootKey: 'recipes', signal });
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>REZEPTE</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
-    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'recipes', onSaved: refresh });
-    mountCategoryChrome(view, route, 'REZEPTE', {
-      meta: `${children.length} Unter-Dex`,
-      onAddNote: () => openEntry('note'),
-      onAddLink: () => openEntry('link'),
-      onAddImage: () => openEntry('image'),
-      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'recipes', onSaved: refresh }),
-    });
-    await renderDexEntries(view, {
-      userId: session.user.id, rootKey: 'recipes', color: categoryColor('recipes'), signal,
       onChanged: (entries) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
@@ -773,7 +756,7 @@ async function render() {
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     mountComingSoon(view, route);
-    mountCategoryChrome(view, route, route === 'recipes' ? 'REZEPTE' : 'ROUTINEN');
+    mountCategoryChrome(view, route, 'ROUTINEN');
   } else {
     mountHome(view, signal);
   }

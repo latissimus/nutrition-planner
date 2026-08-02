@@ -248,17 +248,25 @@ function plusAction(container, route) {
 }
 
 function eintragTypWaehlen(container, route, options = {}) {
+  const food = route === 'food-log' || Boolean(options.onAddCheatMeal);
   const backdrop = sheet(`
     <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="sheet-menue eintrag-typ-menue">
-      <button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>
-      <button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>
-      <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>
+      ${food ? `<button data-entry-type="cheat">${materialIcon('bolt', 'sheet-list-icon')}<span>Cheat-Meal</span></button>
+        <button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>
+        <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>
+        <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Rezeptbild</span></button>`
+        : `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>
+        <button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>
+        <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>`}
     </div>`);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
     const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
     if (!type) return;
     closeSheet(backdrop);
+    if (type === 'cheat') return options.onAddCheatMeal?.();
+    if (type === 'recipe-link') return options.onAddRecipeLink?.();
+    if (type === 'own-recipe') return options.onAddOwnRecipe?.();
     if (type === 'note') {
       if (options.onAddNote) return options.onAddNote();
       return toast('Notizen sind für diesen Dex vorbereitet.');

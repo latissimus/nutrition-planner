@@ -2833,6 +2833,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-entry-field>span small{color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none}
 .dex-entry-field .input{width:100%;min-height:56px;font-size:16px;resize:vertical}
 .dex-entry-field textarea.input{padding-top:14px;line-height:1.35}
+.food-entry-meta{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:12px}
+.food-entry-meta select.input{appearance:auto;padding-inline:12px;background:var(--surface)}
 .dex-entry-urlfeld{
   display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:center;gap:8px;
   min-height:66px;padding:0 14px;border:var(--karten-bw) solid var(--ink);border-radius:13px;
@@ -2879,6 +2881,8 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-detail-inhalt>small{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em}
 .dex-detail-inhalt h1{margin:0;font-family:var(--display);font-size:clamp(24px,7vw,34px);line-height:1.03}
 .dex-detail-inhalt>p{margin:0;color:var(--muted);font-size:15px;line-height:1.45;white-space:pre-wrap}
+.dex-detail-foodmeta{display:flex;flex-wrap:wrap;gap:7px;margin-top:-3px}
+.dex-detail-foodmeta span{padding:7px 10px;border:1px solid var(--ink);border-radius:999px;background:color-mix(in srgb,var(--eintrag-farbe) 28%,var(--surface));font-size:11px;font-weight:800}
 .dex-detail-herkunft{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:11px;border:1px solid var(--ink);border-radius:10px;background:var(--surface2)}
 .dex-detail-herkunft span{min-width:0;color:var(--muted);font-size:10px;line-height:1.25;overflow-wrap:anywhere}
 .dex-detail-herkunft b{display:block;margin-bottom:3px;color:var(--text);font-size:9px;letter-spacing:.05em;text-transform:uppercase}
@@ -2899,6 +2903,20 @@ button,a,[role="button"],summary{touch-action:manipulation}
 button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!important}
 
 @media(max-width:360px){.dex-detail-herkunft{grid-template-columns:1fr}}
+
+/* FOOD-LOG: eine kompakte, horizontal scrollbare Klassifizierung. Die
+   freie Tag-Suche bleibt davon unabhaengig. */
+.food-dex-filter{
+  position:sticky;top:0;z-index:5;display:flex;gap:8px;margin:0 -2px 22px;padding:8px 2px 11px;
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:var(--page-bg,var(--bg));
+}
+.food-dex-filter::-webkit-scrollbar{display:none}
+.food-dex-filter button{
+  flex:0 0 auto;min-height:34px;padding:7px 12px;border:1px solid var(--ink);border-radius:999px;
+  background:var(--surface);color:var(--text);font:800 11px/1 var(--ui);white-space:nowrap;
+}
+.food-dex-filter button.aktiv{background:#492426;color:#fff}
+@media(max-width:380px){.food-entry-meta{grid-template-columns:1fr}}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
 .tuck-fach.violet{--ordner:var(--fe-blurple)}

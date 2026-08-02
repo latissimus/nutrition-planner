@@ -10,14 +10,14 @@ const escapeHtml = (value = '') => String(value)
 
 async function loadEntry(userId, id, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at')
     .eq('id', id).eq('user_id', userId).maybeSingle();
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Food-Log', recipes: 'Rezepte', reminders: 'Mahlzeiten', body: 'KFA-Log', habits: 'Routinen' };
+  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Food-Log', reminders: 'Mahlzeiten', body: 'KFA-Log', habits: 'Routinen' };
   data.dex_name = rootNames[data.root_key] || 'MUSCLE-DEX';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
@@ -43,6 +43,15 @@ function editEntry(entry, onSaved) {
     <form data-entry-edit>
       ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" value="${escapeHtml(entry.url)}" required></label>` : ''}
       <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>optional</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"></label>
+      ${entry.root_key === 'food-log' ? `<div class="food-entry-meta">
+        <label class="dex-entry-field" for="edit-entry-carb"><span>Carb-Klasse</span><select id="edit-entry-carb" class="input">
+          <option value="unset"${!entry.carb_class || entry.carb_class === 'unset' ? ' selected' : ''}>Nicht festgelegt</option>
+          <option value="low"${entry.carb_class === 'low' ? ' selected' : ''}>Low Carb</option>
+          <option value="balanced"${entry.carb_class === 'balanced' ? ' selected' : ''}>Ausgewogen</option>
+          <option value="high"${entry.carb_class === 'high' ? ' selected' : ''}>High Carb</option>
+        </select></label>
+        <label class="dex-entry-field" for="edit-entry-prep"><span>Zubereitung <small>Minuten</small></span><input id="edit-entry-prep" class="input" type="number" min="1" max="1440" value="${entry.prep_minutes || ''}" placeholder="z. B. 10"></label>
+      </div>` : ''}
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
       <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${entry.entry_type === 'note' ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${entry.entry_type === 'note' ? '4000' : '500'}" rows="${entry.entry_type === 'note' ? '9' : '5'}"${entry.entry_type === 'note' ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
@@ -60,6 +69,11 @@ function editEntry(entry, onSaved) {
       note: backdrop.querySelector('#edit-entry-note').value.trim(),
       tags: backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
     };
+    if (entry.root_key === 'food-log') {
+      payload.carb_class = backdrop.querySelector('#edit-entry-carb').value;
+      payload.prep_minutes = backdrop.querySelector('#edit-entry-prep').value
+        ? Number(backdrop.querySelector('#edit-entry-prep').value) : null;
+    }
     if (entry.url) payload.url = backdrop.querySelector('#edit-entry-url').value.trim();
     const { error } = await supabase.from('dex_entries').update(payload).eq('id', entry.id).eq('user_id', entry.user_id);
     if (error) { toast(error.message || 'Änderung fehlgeschlagen'); button.disabled = false; return; }
@@ -104,6 +118,13 @@ function detailMarkup(entry) {
         : provider ? `<div class="dex-detail-provider"><strong>${escapeHtml(entry.provider || provider.name)}</strong><span>Vorschau dieses Videos</span></div>` : '';
   const tags = (entry.tags || []).map((tag) => `<span>#${escapeHtml(tag.replace(/^#/, ''))}</span>`).join('');
   const savedAt = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.created_at));
+  const carbLabels = { low: 'Low Carb', high: 'High Carb', balanced: 'Ausgewogen' };
+  const foodMeta = entry.root_key === 'food-log' && (entry.food_kind === 'cheat_meal' || carbLabels[entry.carb_class] || entry.prep_minutes)
+    ? `<div class="dex-detail-foodmeta">
+        ${entry.food_kind === 'cheat_meal' ? '<span>Cheat-Meal</span>' : ''}
+        ${carbLabels[entry.carb_class] ? `<span>${carbLabels[entry.carb_class]}</span>` : ''}
+        ${entry.prep_minutes ? `<span>${entry.prep_minutes} Min.</span>` : ''}
+      </div>` : '';
   return `<div class="wrap pad-bottom dex-detail-seite">
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
@@ -118,6 +139,7 @@ function detailMarkup(entry) {
       <div class="dex-detail-inhalt">
         <small>${entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
+        ${foodMeta}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>`}
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}

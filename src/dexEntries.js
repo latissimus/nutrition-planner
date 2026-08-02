@@ -34,7 +34,7 @@ function queryScope(query, { collectionId }) {
 
 export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at')
     .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (signal) query = query.abortSignal(signal);
@@ -52,7 +52,7 @@ export async function loadDexEntries(userId, { rootKey, collectionId = null, sig
 
 export async function loadAllDexEntries(userId, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at')
     .eq('user_id', userId).order('created_at', { ascending: false });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
@@ -66,10 +66,11 @@ export async function loadAllDexEntries(userId, signal) {
   return entries;
 }
 
-function editorMarkup(type) {
+function editorMarkup(type, { foodKind = null, foodMode = false } = {}) {
   const image = type === 'image';
   const note = type === 'note';
-  const label = image ? 'Bild' : note ? 'Notiz' : 'Link';
+  const cheatMeal = foodMode && foodKind === 'cheat_meal';
+  const label = cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : image ? 'Bild' : note ? 'Notiz' : 'Link';
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
     <form data-dex-entry-form>
@@ -84,6 +85,17 @@ function editorMarkup(type) {
       <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>optional</small></span>
         <input id="dex-entry-title" class="input" maxlength="100" placeholder="z. B. Schnelles Protein-Frühstück">
       </label>
+      ${foodMode ? `<div class="food-entry-meta">
+        <label class="dex-entry-field" for="dex-entry-carb"><span>Carb-Klasse</span>
+          <select id="dex-entry-carb" class="input">
+            <option value="unset">Nicht festgelegt</option><option value="low">Low Carb</option>
+            <option value="balanced">Ausgewogen</option><option value="high">High Carb</option>
+          </select>
+        </label>
+        <label class="dex-entry-field" for="dex-entry-prep"><span>Zubereitung <small>Minuten</small></span>
+          <input id="dex-entry-prep" class="input" type="number" inputmode="numeric" min="1" max="1440" placeholder="z. B. 10">
+        </label>
+      </div>` : ''}
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
@@ -95,11 +107,12 @@ function editorMarkup(type) {
   </section>`;
 }
 
-export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, onSaved }) {
+export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, foodKind = null, onSaved }) {
   if (!['link', 'image', 'note'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
+  const foodMode = rootKey === 'food-log';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
-  backdrop.innerHTML = editorMarkup(type);
+  backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode });
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close();
@@ -156,6 +169,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         preview_url: linkPreview.previewUrl || null,
         provider: linkPreview.provider || null,
         tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
+        food_kind: foodMode ? (foodKind || 'recipe') : null,
+        carb_class: foodMode ? form.querySelector('#dex-entry-carb').value : null,
+        prep_minutes: foodMode && form.querySelector('#dex-entry-prep').value
+          ? Number(form.querySelector('#dex-entry-prep').value) : null,
       }).select().single();
       if (error) throw error;
       close();
@@ -254,26 +271,55 @@ function groupMarkup(type, entries, color) {
   </section>`;
 }
 
-export async function renderDexEntries(container, { userId, rootKey, collectionId = null, color, signal, onChanged } = {}) {
+const foodFilterDefinitions = [
+  ['all', 'Alle'], ['cheat', 'Cheat-Meals'], ['low', 'Low Carb'],
+  ['high', 'High Carb'], ['balanced', 'Ausgewogen'], ['favorite', 'Favoriten'],
+];
+
+function foodFiltersMarkup(active = 'all') {
+  return `<nav class="food-dex-filter" aria-label="Food-Log filtern">${foodFilterDefinitions.map(([key, label]) =>
+    `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
+}
+
+function filterFoodEntries(entries, filter) {
+  if (filter === 'cheat') return entries.filter((entry) => entry.food_kind === 'cheat_meal');
+  if (filter === 'favorite') return entries.filter((entry) => entry.favorite);
+  if (['low', 'high', 'balanced'].includes(filter)) return entries.filter((entry) => entry.carb_class === filter);
+  return entries;
+}
+
+function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.') {
+  const favorites = entries.filter((entry) => entry.favorite);
+  const regular = entries.filter((entry) => !entry.favorite);
+  const notes = regular.filter((entry) => entry.entry_type === 'note');
+  const images = regular.filter((entry) => entry.entry_type === 'image');
+  const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
+  const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
+  return entries.length
+    ? `${groupMarkup('favorite', favorites, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
+    : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
+        <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
+        <span>${emptyText}</span></div></section>`;
+}
+
+export async function renderDexEntries(container, { userId, rootKey, collectionId = null, color, signal, onChanged, foodFilters = rootKey === 'food-log' } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
   try {
     const entries = await loadDexEntries(userId, { rootKey, collectionId, signal });
     if (signal?.aborted) return [];
-    const favorites = entries.filter((entry) => entry.favorite);
-    const regular = entries.filter((entry) => !entry.favorite);
-    const notes = regular.filter((entry) => entry.entry_type === 'note');
-    const images = regular.filter((entry) => entry.entry_type === 'image');
-    const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
-    const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
-    slot.innerHTML = entries.length
-      ? `${groupMarkup('favorite', favorites, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
-      : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
-          <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
-          <span>Lege hier eine Notiz, ein Bild oder einen Link ab.</span></div></section>`;
-    slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
-      if (!group.querySelector('.dex-inhaltskarte')) group.remove();
-    });
+    let activeFilter = 'all';
+    const paint = () => {
+      const visibleEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined)}</div>`;
+      slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
+        if (!group.querySelector('.dex-inhaltskarte')) group.remove();
+      });
+      slot.querySelectorAll('[data-food-filter]').forEach((button) => {
+        button.onclick = () => { activeFilter = button.dataset.foodFilter; paint(); };
+      });
+    };
+    paint();
     onChanged?.(entries);
     return entries;
   } catch (error) {
