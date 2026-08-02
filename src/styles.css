@@ -2757,9 +2757,9 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .dex-inhaltskarte-oeffnen{position:absolute;z-index:2;inset:0;border-radius:inherit}
 .dex-favorit-marker{
-  position:absolute;z-index:4;top:12px;right:8px;color:var(--fe-pink);
-  -webkit-text-stroke:1.5px #fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font:900 25px/1 Arial,sans-serif;
+  position:absolute;z-index:4;top:12px;right:8px;display:grid;place-items:center;width:27px;height:27px;color:var(--fe-pink);
 }
+.dex-favorit-marker .material-svg,.dex-favorit-marker svg,.dex-favorit-marker svg *{width:25px;height:25px;color:var(--fe-pink)!important;fill:var(--fe-pink)!important}
 .dex-inhaltskarte-body,.dex-inhaltskarte-vorschau,.dex-inhaltskarte-streifen{position:relative;z-index:1}
 .dex-inhaltskarte-streifen{height:7px;flex:0 0 7px;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
@@ -2861,8 +2861,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .dex-detail-knopf .material-svg,.dex-detail-knopf svg{width:23px;height:23px;fill:#000}
 .dex-detail-knopf:active{transform:translate(2px,2px);box-shadow:none}
-.dex-detail-favorit{color:var(--fe-pink);font:900 24px/1 Arial,sans-serif;-webkit-text-stroke:1px #fff}
+.dex-detail-favorit{background:var(--surface);color:#000}
+.dex-detail-favorit .material-svg,.dex-detail-favorit svg,.dex-detail-favorit svg *{color:#000!important;fill:#000!important}
 .dex-detail-favorit.aktiv{background:var(--fe-pink);color:#fff}
+.dex-detail-favorit.aktiv .material-svg,.dex-detail-favorit.aktiv svg,.dex-detail-favorit.aktiv svg *{color:#fff!important;fill:#fff!important}
 .dex-detail-karte{width:100%;max-width:100%;min-width:0;overflow:hidden;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart)}
 .dex-detail-streifen{display:block;height:8px;background:var(--eintrag-farbe)}
 .dex-detail-bild{display:block;width:100%;padding:0;border:0;background:#000}
@@ -2889,7 +2891,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-detail-inhalt footer{padding-top:14px;border-top:1px solid var(--ink);color:var(--muted);font-size:11px;font-weight:600}
 .dex-bild-vollbild{position:fixed;inset:0;z-index:1500;display:grid;place-items:center;padding:0;background:#000}
 .dex-bild-vollbild img{display:block;width:100%;height:100%;object-fit:contain}
-.dex-bild-vollbild button{position:absolute;z-index:2;top:max(14px,env(safe-area-inset-top));right:14px;display:grid;place-items:center;width:44px;height:44px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font:900 29px/1 Arial,sans-serif}
+.dex-bild-vollbild .dex-bild-schliessen{position:absolute;z-index:2;top:max(14px,env(safe-area-inset-top));right:14px}
 
 /* Globale primäre Aktion: dasselbe Braun wie der Suchknopf. */
 .btn-primary{background:#492426!important;color:#fff!important}
@@ -2973,6 +2975,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   font:0/1 var(--ui)!important;text-decoration:none!important;
 }
 .seiten-x::before{content:"×";display:block;font:900 29px/.8 Arial,sans-serif;transform:translateY(-1px)}
+.seiten-x:has(.material-svg)::before{display:none}
+.seiten-x .material-svg{display:grid;place-items:center;width:100%;height:100%}
+.seiten-x .material-svg svg{display:block;width:22px;height:22px;margin:auto;fill:#000}
 .seiten-x:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{

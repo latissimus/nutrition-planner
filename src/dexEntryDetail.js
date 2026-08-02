@@ -79,7 +79,7 @@ function editEntry(entry, onSaved) {
 function fullscreenImage(url, title) {
   const overlay = document.createElement('div');
   overlay.className = 'dex-bild-vollbild';
-  overlay.innerHTML = `<button type="button" aria-label="Vollbild schließen">×</button><img src="${escapeHtml(url)}" alt="${escapeHtml(title)}">`;
+  overlay.innerHTML = `<button class="dex-detail-knopf dex-bild-schliessen" type="button" aria-label="Vollbild schließen">${materialIconMarkup('close')}</button><img src="${escapeHtml(url)}" alt="${escapeHtml(title)}">`;
   overlay.onclick = (event) => { if (event.target === overlay || event.target.closest('button')) overlay.remove(); };
   document.body.append(overlay);
 }
@@ -108,7 +108,7 @@ function detailMarkup(entry) {
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
       <span></span>
-      <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${entry.favorite ? '★' : '☆'}</button>
+      <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${materialIconMarkup('favorite')}</button>
       <button class="dex-detail-knopf" type="button" data-entry-edit aria-label="Eintrag bearbeiten">${materialIconMarkup('build')}</button>
       <button class="dex-detail-knopf" type="button" data-entry-share aria-label="Eintrag teilen">${materialIconMarkup('upload_file')}</button>
     </nav>

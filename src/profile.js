@@ -7,6 +7,7 @@ import {
   moveCustomCollection, orderCustomCollections, setCollectionVisible, setCustomCollectionVisible,
 } from './collectionPreferences.js';
 import { loadCollections } from './collections.js';
+import { materialIconMarkup } from './categoryIcons.js';
 
 const initials = (name, email) => {
   const quelle = (name || email || '?').trim();
@@ -85,7 +86,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
         <span class="seitenkopf-kicker">Konto</span>
         <h1 class="section-title">Mein Profil</h1>
       </div>
-      <a class="seiten-x" href="#home" aria-label="Profil schließen">×</a>
+      <a class="seiten-x" href="#home" aria-label="Profil schließen">${materialIconMarkup('close')}</a>
     </div>
     <section class="seiten-einstieg">
       <b>Alles zu deinem Konto</b>

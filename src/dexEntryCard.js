@@ -12,7 +12,7 @@ const escapeHtml = (value = '') => String(value)
 
 const typeLabels = { image: 'Bild', note: 'Notiz', link: 'Link', video: 'Video' };
 
-export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = false } = {}) {
+export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', favoriteMarkup = '', darkColor = false } = {}) {
   const type = ['image', 'note', 'link', 'video'].includes(entry.type) ? entry.type : 'note';
   const title = escapeHtml(entry.title || typeLabels[type]);
   const excerpt = escapeHtml(entry.excerpt || entry.note || '');
@@ -24,7 +24,7 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = fa
 
   return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}${darkColor ? ' eintrag-farbe-dunkel' : ''}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
     <a class="dex-inhaltskarte-oeffnen" href="${detailHref}" aria-label="${title} öffnen"></a>
-    ${entry.favorite ? '<span class="dex-favorit-marker" aria-label="Favorit">★</span>' : ''}
+    ${entry.favorite ? `<span class="dex-favorit-marker" aria-label="Favorit">${favoriteMarkup}</span>` : ''}
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>
     ${image}
     <span class="dex-inhaltskarte-body">

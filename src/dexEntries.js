@@ -243,7 +243,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
       : type === 'video' ? providerPreview(entry, provider, playable) : '',
     playable, detailHref: `#entry/${entry.id}`,
     source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
-  }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
+  }, { iconMarkup: materialIconMarkup(icon), favoriteMarkup: materialIconMarkup('favorite'), darkColor: colorIsDark(color) });
 }
 
 function groupMarkup(type, entries, color) {
