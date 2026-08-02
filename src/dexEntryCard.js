@@ -16,7 +16,6 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = fa
   const type = ['image', 'note', 'link', 'video'].includes(entry.type) ? entry.type : 'note';
   const title = escapeHtml(entry.title || typeLabels[type]);
   const excerpt = escapeHtml(entry.excerpt || entry.note || '');
-  const source = escapeHtml(entry.source || 'MUSCLE-DEX');
   const color = escapeHtml(entry.color || '#A9DCE8');
   const image = entry.previewUrl
     ? `<span class="dex-inhaltskarte-vorschau${type === 'video' ? ' dex-video-vorschau' : ''}"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy">${type === 'video' && entry.playable ? `<i>${iconMarkup}</i>` : ''}</span>`
@@ -30,7 +29,6 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = fa
     <span class="dex-inhaltskarte-body">
       <strong>${title}</strong>
       ${excerpt ? `<span class="dex-inhaltskarte-text">${excerpt}</span>` : '<span class="dex-inhaltskarte-text dex-inhaltskarte-ohne-text">Keine Beschreibung hinterlegt.</span>'}
-      <span class="dex-inhaltskarte-fuss"><span class="dex-inhaltskarte-meta">${source}</span></span>
     </span>
   </article>`;
 }
