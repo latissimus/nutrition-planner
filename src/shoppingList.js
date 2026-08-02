@@ -499,6 +499,149 @@ function bindeZeilenGesten(row, { onSwipeToggle, onLongPress }) {
   }, true);
 }
 
+// Zerlegt einen Rezept-Notiztext in einzelne Zutat-Kandidaten. Fuehrende
+// Bullets, Nummerierungen und Doppelpunkte werden entfernt, leere Zeilen
+// fliegen raus. Reine Reihenfolge zaehlt – keine Sortierung, damit die
+// Auswahl im Sheet in der gleichen Reihenfolge wie im Rezept steht.
+export function parseRecipeLines(text) {
+  return String(text || '').split(/\r?\n/)
+    .map((zeile) => zeile.replace(/^[\s]*(?:[-*•–—]|(?:\d+[.):]))\s+/, '').trim())
+    .filter(Boolean);
+}
+
+async function loadFoodLogRecipes(userId, signal) {
+  let query = supabase.from('dex_entries')
+    .select('id,title,note,entry_type,created_at')
+    .eq('user_id', userId).eq('root_key', 'food-log').eq('food_kind', 'recipe')
+    .not('note', 'is', null).order('created_at', { ascending: false }).limit(30);
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []).filter((eintrag) => (eintrag.note || '').trim().length > 0);
+}
+
+// Legt in einem Schwung mehrere Artikel an. Duplikate innerhalb derselben
+// Abteilung werden serverseitig durch onConflict weggefiltert – so kann der
+// Nutzer denselben Rezept-Import zweimal auslesen, ohne die Liste zu
+// verdoppeln.
+async function addItemsBulk(userId, section, namen) {
+  if (!namen.length) return [];
+  const payloads = namen.map((name) => ({
+    user_id: userId,
+    section: (section || '').trim() || 'Sonstiges',
+    name: name.trim(),
+    tags: [],
+    checked: true,
+  })).filter((row) => row.name.length > 0);
+  if (!payloads.length) return [];
+  const { data, error } = await supabase.from('shopping_items')
+    .upsert(payloads, { onConflict: 'user_id,section,name', ignoreDuplicates: true })
+    .select(SELECT_COLUMNS);
+  if (error) throw error;
+  return data || [];
+}
+
+// Sheet, das die Zutaten eines Food-Log-Rezepts vorschlaegt. Der Nutzer
+// haekelt ab, was auf die Liste soll, waehlt eine Abteilung und uebernimmt.
+function recipePickSheet(recipe, sections, { onImport }) {
+  const zeilen = parseRecipeLines(recipe.note);
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop einkauf-import-backdrop';
+  const titel = recipe.title?.trim() || 'Rezept';
+  backdrop.innerHTML = `
+    <section class="kategorie-sheet einkauf-import-sheet" role="dialog" aria-modal="true" aria-label="Rezept-Zutaten uebernehmen">
+      <header><h2>Aus »${escapeHtml(titel)}«</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+      ${zeilen.length ? `<form class="einkauf-import-form" data-import-form>
+        <label class="dex-entry-field"><span>Abteilung</span>
+          <select class="input" data-import-section>
+            ${sections.map((s) => `<option value="${escapeHtml(s)}"${s === 'Sonstiges' ? ' selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+          </select>
+        </label>
+        <p class="einkauf-import-hinweis">Alle Zutaten sind vorausgewählt. Nur Passendes stehen lassen.</p>
+        <div class="einkauf-import-zeilen" data-import-zeilen>
+          ${zeilen.map((zeile, i) => `
+            <label class="einkauf-import-zeile">
+              <input type="checkbox" data-import-zeile value="${i}" checked>
+              <span>${escapeHtml(zeile)}</span>
+            </label>`).join('')}
+        </div>
+        <div class="einkauf-edit-aktionen">
+          <button class="btn btn-primary btn-block" type="submit" data-import-submit>
+            <span data-import-count>${zeilen.length}</span> Zutaten übernehmen
+          </button>
+        </div>
+      </form>` : `<p class="einkauf-import-hinweis">Dieses Rezept hat keinen Notiztext, aus dem sich Zutaten herauslesen lassen.</p>`}
+    </section>`;
+  const schließen = () => {
+    backdrop.classList.remove('offen');
+    setTimeout(() => backdrop.remove(), 160);
+  };
+  backdrop.addEventListener('click', (event) => {
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) schließen();
+  });
+  const form = backdrop.querySelector('[data-import-form]');
+  if (form) {
+    const zeilenBox = form.querySelector('[data-import-zeilen]');
+    const zaehler = form.querySelector('[data-import-count]');
+    const submit = form.querySelector('[data-import-submit]');
+    const aktualisieren = () => {
+      const n = zeilenBox.querySelectorAll('[data-import-zeile]:checked').length;
+      zaehler.textContent = String(n);
+      submit.disabled = n === 0;
+    };
+    zeilenBox.addEventListener('change', aktualisieren);
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      const section = form.querySelector('[data-import-section]').value;
+      const auswahl = [...zeilenBox.querySelectorAll('[data-import-zeile]:checked')]
+        .map((cb) => zeilen[Number(cb.value)]);
+      submit.disabled = true;
+      try {
+        await onImport(section, auswahl);
+        schließen();
+      } catch (error) {
+        toast('Übernahme fehlgeschlagen.');
+        submit.disabled = false;
+      }
+    };
+  }
+  document.body.append(backdrop);
+  requestAnimationFrame(() => backdrop.classList.add('offen'));
+}
+
+// Sammelkasten unter der Liste: Rezepte aus dem Food-Log auf einen Blick,
+// per Tap zur Zutatenwahl. Standardmaessig zugeklappt, damit die Karte
+// niemanden erschreckt, der sie nicht braucht.
+function recipeListMarkup(recipes) {
+  if (!recipes.length) {
+    return `<details class="reminder-group einkauf-rezepte">
+      <summary class="reminder-group-head">
+        <span class="reminder-group-icon"><span class="material-svg">${iconMarkup('folder')}</span></span>
+        <span><b>Rezepte aus Food-Log</b></span>
+        <span class="reminder-group-chevron">⌄</span>
+      </summary>
+      <div class="reminder-group-list einkauf-rezepte-leer">Noch keine Rezepte im Food-Log. Ein eigenes Rezept oder Rezeptlink dort anlegen, dann taucht er hier auf.</div>
+    </details>`;
+  }
+  return `<details class="reminder-group einkauf-rezepte">
+    <summary class="reminder-group-head">
+      <span class="reminder-group-icon"><span class="material-svg">${iconMarkup('folder')}</span></span>
+      <span><b>Rezepte aus Food-Log</b></span>
+      <em>${recipes.length}</em>
+      <span class="reminder-group-chevron">⌄</span>
+    </summary>
+    <div class="reminder-group-list einkauf-rezepte-liste">
+      ${recipes.map((rezept) => {
+        const auszug = String(rezept.note || '').replace(/\s+/g, ' ').trim().slice(0, 90);
+        return `<button type="button" class="einkauf-rezept" data-recipe-id="${escapeHtml(rezept.id)}">
+          <span class="einkauf-rezept-titel">${escapeHtml(rezept.title || 'Ohne Titel')}</span>
+          <span class="einkauf-rezept-auszug">${escapeHtml(auszug)}${auszug.length === 90 ? '…' : ''}</span>
+        </button>`;
+      }).join('')}
+    </div>
+  </details>`;
+}
+
 function sectionGroup(section, items) {
   const ausgewaehlt = items.filter((item) => item.checked).length;
   return `<details class="reminder-group einkauf-gruppe" data-section="${escapeHtml(section)}" open>
@@ -562,6 +705,7 @@ export async function mountShoppingList(container, { session, signal }) {
         </div>
       </div>
       <div data-einkauf-liste><div class="daten-laden" role="status">Einkaufsliste wird geladen …</div></div>
+      <div data-einkauf-rezepte></div>
     </div>`;
 
   befuelleAbteilungen(container, []);
@@ -647,6 +791,38 @@ export async function mountShoppingList(container, { session, signal }) {
     if (slot) slot.innerHTML = `<div class="msg err">Einkaufsliste konnte nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
     return;
   }
+
+  // Rezepte parallel zur Liste nachladen – die Karte darf spaeter auftauchen,
+  // sie ist optional und blockiert den Rest nicht. Fehler nur stumm loggen:
+  // wenn das Food-Log nichts hergibt, bleibt die Karte einfach weg.
+  let rezepte = [];
+  const rezeptSlot = container.querySelector('[data-einkauf-rezepte]');
+  loadFoodLogRecipes(userId, signal).then((geladen) => {
+    if (signal?.aborted) return;
+    rezepte = geladen;
+    if (rezeptSlot) rezeptSlot.innerHTML = recipeListMarkup(rezepte);
+  }).catch(() => { /* Rezepte optional */ });
+
+  rezeptSlot?.addEventListener('click', (event) => {
+    const knopf = event.target.closest('[data-recipe-id]');
+    if (!knopf) return;
+    const rezept = rezepte.find((eintrag) => eintrag.id === knopf.dataset.recipeId);
+    if (!rezept) return;
+    const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((eintrag) => eintrag.section)])];
+    recipePickSheet(rezept, sections, {
+      onImport: async (section, namen) => {
+        const neu = await addItemsBulk(userId, section, namen);
+        if (!neu.length) {
+          toast('Diese Zutaten stehen schon auf der Liste.');
+          return;
+        }
+        items.push(...neu);
+        redraw();
+        befuelleAbteilungen(container, items);
+        toast(`${neu.length} ${neu.length === 1 ? 'Zutat' : 'Zutaten'} übernommen.`);
+      },
+    });
+  });
 
   const liste = container.querySelector('[data-einkauf-liste]');
   liste.addEventListener('change', async (event) => {
