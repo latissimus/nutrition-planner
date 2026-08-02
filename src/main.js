@@ -19,7 +19,7 @@ import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRou
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
-import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
+import { bindDexFavoriteButtons, dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
@@ -576,6 +576,10 @@ async function mountSearch(container, signal) {
   try {
     entries = await loadAllDexEntries(session.user.id, signal);
     if (signal?.aborted) return;
+    bindDexFavoriteButtons(results, session.user.id, (id, favorite) => {
+      const entry = entries.find((item) => item.id === id);
+      if (entry) entry.favorite = favorite;
+    });
     const tags = [...new Set(entries.flatMap((entry) => entry.tags || []).map((tag) => tag.trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, 'de'));
     if (tags.length) {

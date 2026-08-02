@@ -34,7 +34,7 @@ function queryScope(query, { collectionId }) {
 
 export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,created_at,updated_at')
     .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (signal) query = query.abortSignal(signal);
@@ -52,7 +52,7 @@ export async function loadDexEntries(userId, { rootKey, collectionId = null, sig
 
 export async function loadAllDexEntries(userId, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,created_at,updated_at')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,created_at,updated_at')
     .eq('user_id', userId).order('created_at', { ascending: false });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
@@ -236,6 +236,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const playable = Boolean(videoEmbedUrl(entry.url));
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
+    favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, href: entry.url,
     previewMarkup: type === 'note'
       ? '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
@@ -243,6 +244,28 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
     playable, detailHref: `#entry/${entry.id}`,
     source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
   }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
+}
+
+export function bindDexFavoriteButtons(container, userId, onChanged) {
+  container.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-dex-favorite]');
+    if (!button || !container.contains(button)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const card = button.closest('[data-dex-entry-id]');
+    if (!card || button.disabled) return;
+    const favorite = button.getAttribute('aria-pressed') !== 'true';
+    button.disabled = true;
+    const { error } = await supabase.from('dex_entries').update({ favorite })
+      .eq('id', card.dataset.dexEntryId).eq('user_id', userId);
+    if (error) { toast(error.message || 'Favorit konnte nicht geändert werden.'); button.disabled = false; return; }
+    button.classList.toggle('aktiv', favorite);
+    button.textContent = favorite ? '★' : '☆';
+    button.setAttribute('aria-pressed', String(favorite));
+    button.setAttribute('aria-label', favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren');
+    button.disabled = false;
+    onChanged?.(card.dataset.dexEntryId, favorite);
+  });
 }
 
 function groupMarkup(type, entries, color) {
@@ -271,6 +294,7 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
     slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
       if (!group.querySelector('.dex-inhaltskarte')) group.remove();
     });
+    bindDexFavoriteButtons(slot, userId);
     onChanged?.(entries);
     return entries;
   } catch (error) {

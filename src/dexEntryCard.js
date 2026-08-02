@@ -24,6 +24,7 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = fa
 
   return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}${darkColor ? ' eintrag-farbe-dunkel' : ''}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
     <a class="dex-inhaltskarte-oeffnen" href="${detailHref}" aria-label="${title} öffnen"></a>
+    <button class="dex-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-dex-favorite aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${entry.favorite ? '★' : '☆'}</button>
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>
     ${image}
     <span class="dex-inhaltskarte-body">
