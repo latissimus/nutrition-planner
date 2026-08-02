@@ -2737,6 +2737,11 @@ button,a,[role="button"],summary{touch-action:manipulation}
   display:block;width:25px;height:25px;fill:#000!important;
 }
 .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:#000!important}
+.dex-ordner-kartenicon .dex-emoji,
+.dex-ordner-kartenicon .kategorie-emoji{
+  width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  font-size:31px;line-height:1;
+}
 .dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
 .dex-ordner-dunkel .dex-ordner-kartenicon .material-svg,
 .dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg,

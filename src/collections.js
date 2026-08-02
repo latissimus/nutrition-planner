@@ -43,14 +43,36 @@ export function collectionIconMarkup(value) {
   return materialIconMarkup(value || 'create_new_folder');
 }
 
+function darkCollectionColor(color) {
+  const hex = String(color || '').trim().replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return false;
+  const [r, g, b] = [0, 2, 4].map((start) => Number.parseInt(hex.slice(start, start + 2), 16));
+  return (r * 299 + g * 587 + b * 114) / 1000 < 135;
+}
+
 export function collectionCardMarkup(item, count = 0) {
-  return `<a class="unter-sammlung" href="#collection/${item.id}" style="--ordner:${item.color}">
-    <span class="unter-sammlung-kartenflaeche">
-      <span class="unter-sammlung-icon">${collectionIconMarkup(item.icon_key)}</span>
-      <strong>${escapeHtml(item.name)}</strong>
-      <small>${count} ${count === 1 ? 'Eintrag' : 'Einträge'}</small>
-    </span>
-  </a>`;
+  const isNew = item.created_at && Date.now() - new Date(item.created_at).getTime() < 24 * 60 * 60 * 1000;
+  return `<div class="tuck-fach dex-ordner-testfach unter-sammlung${darkCollectionColor(item.color) ? ' dex-ordner-dunkel' : ''}" style="--ordner:${item.color}">
+    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}">
+      <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
+        <g transform="translate(.016 13.463)">
+          <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
+            <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
+          </g>
+          <g transform="matrix(.981481 0 0 1.01546 7.407 10)">
+            <path class="dex-ordner-farbblatt" d="M400 40.19C400 18.009 381.368 0 358.418 0H171.582C148.632 0 130 18.009 130 40.19v124.557c0 22.182 18.632 40.191 41.582 40.191h186.836c22.95 0 41.582-18.009 41.582-40.191V40.19Z"/>
+          </g>
+          <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
+        </g>
+      </svg>
+      <span class="dex-neu-stern"${isNew ? '' : ' hidden'} aria-label="Neuer Eintrag">★</span>
+      <span class="dex-ordner-inhalt">
+        <span class="dex-datensatz-meta"><b>${count}</b><span>${count === 1 ? 'Eintrag' : 'Einträge'}</span></span>
+        <h2>${escapeHtml(item.name)}</h2>
+      </span>
+      <span class="dex-ordner-kartenicon" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
+    </a>
+  </div>`;
 }
 
 export function collectionGridMarkup(items) {
