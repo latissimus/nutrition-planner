@@ -339,7 +339,32 @@ function renderChrome(route) {
   return view;
 }
 
-// Kompakte Dex-Karten mit einem schmalen Farbstreifen innerhalb der Oberkante.
+function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', neu = false, eigene = false }) {
+  return `
+  <div class="tuck-fach dex-ordner-testfach${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
+    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}>
+      <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
+        <g transform="translate(.016 13.463)">
+          <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
+            <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
+          </g>
+          <g transform="matrix(.981481 0 0 1.01546 7.407 10)">
+            <path class="dex-ordner-farbblatt" d="M400 40.19C400 18.009 381.368 0 358.418 0H171.582C148.632 0 130 18.009 130 40.19v124.557c0 22.182 18.632 40.191 41.582 40.191h186.836c22.95 0 41.582-18.009 41.582-40.191V40.19Z"/>
+          </g>
+          <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
+        </g>
+      </svg>
+      <span class="dex-neu-stern"${neu ? '' : ' hidden'} aria-label="Neuer Eintrag">★</span>
+      <span class="dex-ordner-inhalt">
+        <span class="dex-datensatz-meta">${meta}</span>
+        <h2>${titel}</h2>
+      </span>
+      <span class="dex-ordner-kartenicon" aria-hidden="true">${iconInhalt}</span>
+    </a>
+  </div>`;
+}
+
+// Alle DEX-Eintraege teilen dieselbe dreilagige Ordnerform.
 function sammlungsKarten(daten = sammlungen, zaehler = {}) {
   return daten.map(([route, titel, , icon, farbe, status]) => {
     // Solange die Zahl laedt, steht der Stand da. So springt die Karte beim
@@ -347,59 +372,23 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     const meta = zaehlerText(route, zaehler[route])
       || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
     const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
-    const iconFeld = iconInhalt
-      ? `<span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${iconInhalt}</span>`
-      : '';
-    if (route === 'reminders') {
-      return `
-      <div class="tuck-fach ${farbe} dex-ordner-testfach" style="--ordner:${categoryColor(route)}">
-        <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#${route}" data-sammlung="${route}">
-          <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
-            <g transform="translate(.016 13.463)">
-              <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
-                <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
-              </g>
-              <g transform="matrix(.981481 0 0 1.01546 7.407 10)">
-                <path class="dex-ordner-farbblatt" d="M400 40.19C400 18.009 381.368 0 358.418 0H171.582C148.632 0 130 18.009 130 40.19v124.557c0 22.182 18.632 40.191 41.582 40.191h186.836c22.95 0 41.582-18.009 41.582-40.191V40.19Z"/>
-              </g>
-              <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
-            </g>
-          </svg>
-          <span class="dex-neu-stern"${neuStand[route] ? '' : ' hidden'} aria-label="Neuer Eintrag">★</span>
-          <span class="dex-ordner-inhalt">
-            <span class="dex-datensatz-meta">${meta}</span>
-            <h2>${titel}</h2>
-          </span>
-          <span class="dex-ordner-kartenicon" aria-hidden="true">${iconInhalt}</span>
-        </a>
-      </div>`;
-    }
-    return `
-    <div class="tuck-fach ${farbe}" style="--ordner:${categoryColor(route)}">
-      <a class="tuck-karte dex-datensatz-karte" href="#${route}" data-sammlung="${route}">
-        <span class="dex-datensatz-streifen" aria-hidden="true"></span>
-        <span class="dex-datensatz-text">
-          <h2>${titel}</h2>
-          <span class="dex-datensatz-meta">${meta}</span>
-        </span>
-        ${iconFeld}
-      </a>
-    </div>`;
+    return dexOrdnerKarte({
+      href: `#${route}`, route, titel, meta, iconInhalt,
+      farbe: categoryColor(route), neu: Boolean(neuStand[route]),
+    });
   }).join('');
 }
 
 function eigeneSammlungsKarten(items) {
-  return items.map((item) => `
-    <div class="tuck-fach eigene-sammlung" style="--ordner:${item.color}">
-      <a class="tuck-karte dex-datensatz-karte" href="#collection/${item.id}" data-sammlung="collection/${item.id}">
-        <span class="dex-datensatz-streifen" aria-hidden="true"></span>
-        <span class="dex-datensatz-text">
-          <h2>${escapeHtml(item.name)}</h2>
-          <span class="dex-datensatz-meta"><b>Eigener</b><span>Dex</span></span>
-        </span>
-        <span class="tuck-icon muscledex-iconfeld" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
-      </a>
-    </div>`).join('');
+  return items.map((item) => dexOrdnerKarte({
+    href: `#collection/${item.id}`,
+    titel: escapeHtml(item.name),
+    meta: '<b>Eigener</b><span>Dex</span>',
+    iconInhalt: collectionIconMarkup(item.icon_key),
+    farbe: item.color,
+    neu: Boolean(item.created_at && Date.now() - new Date(item.created_at).getTime() < 24 * 60 * 60 * 1000),
+    eigene: true,
+  })).join('');
 }
 
 async function mountHome(container, signal) {
