@@ -22,6 +22,7 @@ import { mountFoodLog } from './foodLog.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
+import { isFresh } from './freshness.js';
 import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
@@ -280,8 +281,7 @@ async function zaehlerLaden(signal) {
       const latestQuery = supabase.from(tabelle)
         .select('created_at').order('created_at', { ascending: false }).limit(1).abortSignal(signal);
       const [{ count, error }, { data: latest }] = await Promise.all([countQuery, latestQuery]);
-      const zeit = latest?.[0]?.created_at ? new Date(latest[0].created_at).getTime() : 0;
-      neuStand[route] = zeit > 0 && Date.now() - zeit < 24 * 60 * 60 * 1000;
+      neuStand[route] = isFresh(latest?.[0]?.created_at);
       return [route, error ? null : (count ?? 0)];
     } catch (e) {
       neuStand[route] = false;
@@ -393,7 +393,7 @@ function eigeneSammlungsKarten(items) {
     meta: '<b>Eigener</b><span>Dex</span>',
     iconInhalt: collectionIconMarkup(item.icon_key),
     farbe: item.color,
-    neu: Boolean(item.created_at && Date.now() - new Date(item.created_at).getTime() < 24 * 60 * 60 * 1000),
+    neu: isFresh(item.created_at),
     eigene: true,
   })).join('');
 }

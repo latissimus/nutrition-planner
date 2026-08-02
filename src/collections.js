@@ -3,6 +3,7 @@ import {
   availableCategoryIcons, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
+import { isFresh } from './freshness.js';
 
 export const COLLECTION_COLORS = dexEditorColors;
 
@@ -51,7 +52,7 @@ function darkCollectionColor(color) {
 }
 
 export function collectionCardMarkup(item, count = 0) {
-  const isNew = item.created_at && Date.now() - new Date(item.created_at).getTime() < 24 * 60 * 60 * 1000;
+  const isNew = isFresh(item.created_at);
   return `<div class="tuck-fach dex-ordner-testfach unter-sammlung${darkCollectionColor(item.color) ? ' dex-ordner-dunkel' : ''}" style="--ordner:${item.color}">
     <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}">
       <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">

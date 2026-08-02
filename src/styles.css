@@ -2740,7 +2740,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-kartenicon .dex-emoji,
 .dex-ordner-kartenicon .kategorie-emoji{
   width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
-  font-size:31px;line-height:1;
+  font-size:28px;line-height:1;
 }
 .dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
 .dex-ordner-dunkel .dex-ordner-kartenicon .material-svg,
@@ -2752,6 +2752,32 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-test:active{transform:translate(2px,2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
+
+/* Reserviertes Inhaltskarten-Design fuer Bilder, Notizen und Videolinks. */
+.dex-inhaltskarte{
+  position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface);color:var(--text);box-shadow:var(--hart);text-decoration:none;
+}
+.dex-inhaltskarte-streifen{height:7px;flex:0 0 7px;background:var(--eintrag-farbe)}
+.dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
+.dex-inhaltskarte-vorschau img{display:block;width:100%;height:100%;object-fit:cover}
+.dex-inhaltskarte-body{display:flex;flex-direction:column;gap:7px;padding:11px 12px 13px}
+.dex-inhaltskarte-kopf{display:flex;align-items:center;gap:8px}
+.dex-inhaltskarte-icon{
+  display:grid;place-items:center;width:34px;height:34px;border:var(--icon-bw) solid var(--ink);
+  border-radius:8px;background:var(--eintrag-farbe);color:#000;
+}
+.dex-inhaltskarte-icon svg{width:20px;height:20px;fill:currentColor}
+.dex-inhaltskarte-kopf small,.dex-inhaltskarte-meta{
+  color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+}
+.dex-inhaltskarte strong{font-family:var(--display);font-size:15px;line-height:1.12}
+.dex-inhaltskarte-text{
+  display:-webkit-box;overflow:hidden;color:var(--muted);font-size:12px;line-height:1.3;
+  -webkit-box-orient:vertical;-webkit-line-clamp:2;
+}
+.dex-inhaltskarte:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
 .tuck-fach.violet{--ordner:var(--fe-blurple)}
