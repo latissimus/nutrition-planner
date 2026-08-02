@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
+import { materialIconMarkup } from './categoryIcons.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -189,6 +190,34 @@ export const DEFAULT_ITEMS = [
 // die Vorlage, unabhaengig davon, was der Nutzer inzwischen abgehakt hat.
 export const KNOWN_SECTIONS = [...new Set(DEFAULT_ITEMS.map((item) => item.section))];
 
+// Ein passendes Symbol je Abteilung aus MUSCLEDEX-ICONS/ (dieselbe Material-
+// Icon-Quelle wie categoryIconMarkup). Die Dateien lagen zum Zeitpunkt dieser
+// Aenderung noch nicht im Repo – materialIconMarkup() liefert dann '' zurueck
+// und iconMarkup('folder') greift als Platzhalter. Sobald die Dateien mit
+// genau diesen Namen committet sind, erscheinen die richtigen Symbole ohne
+// weitere Codeaenderung.
+export const SECTION_ICON_IDS = {
+  'Obst und Gemüse': 'orange_fruit_food_icon_175726',
+  'Kräuter und Gewürze': 'pepper_grinder_icon_150955',
+  'Soßen und Aufstriche': 'squeeze_sauce_bottle_icon_150878',
+  'Snacks, Nüsse, Kerne': '269776_donut-icon',
+  Fleisch: 'steak_food_meat_icon_141536',
+  Fisch: 'fish_icon_199175',
+  'Milchprodukte, Eier und Käse': '269807_milk-carton-icon',
+  'Öle und Dressings': 'oil_bottle_icon_150870',
+  Carbs: 'corn_icon_137722',
+  Tierbedarf: 'cat_icon_138789',
+  Haushalt: 'home_119047',
+  Sonstiges: 'more_icon_244655',
+  Supplements: 'medical_pill_icon_147371',
+};
+
+function sectionIconMarkup(section) {
+  const id = SECTION_ICON_IDS[section];
+  const gefunden = id && materialIconMarkup(id);
+  return gefunden || iconMarkup('folder');
+}
+
 const SELECT_COLUMNS = 'id,section,name,note,tags,checked,position';
 
 async function loadItems(userId, signal) {
@@ -233,6 +262,25 @@ export function groupBySection(items) {
   return [...groups.entries()];
 }
 
+// Alle Tags, die irgendein Artikel traegt – unabhaengig vom aktuellen Filter,
+// damit die Chip-Leiste immer vollstaendig bleibt und man jederzeit
+// umschalten kann.
+export function alleTags(items) {
+  return [...new Set(items.flatMap((item) => item.tags || []).map((tag) => tag.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'de'));
+}
+
+// nurAusgewaehlt: im Laden soll nur sehen, was noch zu besorgen ist.
+// activeTag: derselbe Tag-Filter wie in der globalen Suche, hier auf die
+// Einkaufsliste bezogen.
+export function sichtbareItems(items, { nurAusgewaehlt = false, activeTag = '' } = {}) {
+  return items.filter((item) => {
+    if (nurAusgewaehlt && !item.checked) return false;
+    if (activeTag && !(item.tags || []).some((tag) => tag.toLocaleLowerCase('de') === activeTag.toLocaleLowerCase('de'))) return false;
+    return true;
+  });
+}
+
 async function toggleItem(userId, id, checked) {
   const { error } = await supabase.from('shopping_items').update({ checked }).eq('id', id).eq('user_id', userId);
   if (error) throw error;
@@ -244,12 +292,14 @@ async function resetChecked(userId) {
   if (error) throw error;
 }
 
-async function addItem(userId, name, section) {
+async function addItem(userId, name, section, tagsInput) {
   const cleanName = name.trim();
   if (!cleanName) return null;
   const cleanSection = (section || '').trim() || 'Sonstiges';
+  // Gleiche Regel wie bei den Tags im Food-Log: mit Komma trennen, auf 12 begrenzt.
+  const tags = (tagsInput || '').split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12);
   const { data, error } = await supabase.from('shopping_items')
-    .insert({ user_id: userId, section: cleanSection, name: cleanName })
+    .insert({ user_id: userId, section: cleanSection, name: cleanName, tags })
     .select(SELECT_COLUMNS).single();
   if (error) {
     // 23505 = unique_violation: derselbe Artikel steht in derselben
@@ -267,7 +317,7 @@ async function deleteItem(userId, id) {
 
 function itemRow(item) {
   const tags = (item.tags || []).map((tag) => `<span class="einkauf-tag">#${escapeHtml(tag)}</span>`).join('');
-  return `<label class="einkauf-row${item.checked ? ' ist-abgehakt' : ''}" data-item-id="${item.id}">
+  return `<label class="einkauf-row${item.checked ? ' ist-ausgewaehlt' : ''}" data-item-id="${item.id}">
     <input type="checkbox" data-item-check ${item.checked ? 'checked' : ''}>
     <span class="einkauf-row-text">
       <span class="einkauf-row-name">${escapeHtml(item.name)}</span>
@@ -279,40 +329,30 @@ function itemRow(item) {
 }
 
 function sectionGroup(section, items) {
-  const offen = items.filter((item) => item.checked).length;
+  const ausgewaehlt = items.filter((item) => item.checked).length;
   return `<details class="reminder-group einkauf-gruppe" data-section="${escapeHtml(section)}" open>
     <summary class="reminder-group-head">
-      <span class="reminder-group-icon" aria-hidden="true">${iconMarkup('folder')}</span>
+      <span class="reminder-group-icon" aria-hidden="true">${sectionIconMarkup(section)}</span>
       <span><b>${escapeHtml(section)}</b></span>
-      <em>${offen}/${items.length}</em>
+      <em>${ausgewaehlt}/${items.length}</em>
       <span class="reminder-group-chevron" aria-hidden="true">⌄</span>
     </summary>
     <div class="reminder-group-list einkauf-liste">${items.map(itemRow).join('')}</div>
   </details>`;
 }
 
-function renderList(container, items) {
-  const slot = container.querySelector('[data-einkauf-liste]');
-  if (!slot) return;
-  if (!items.length) {
-    slot.innerHTML = `<div class="tuck-leer">${iconMarkup('folder')}<b>Noch nichts auf der Liste</b><span>Trag oben deinen ersten Artikel ein.</span></div>`;
-  } else {
-    slot.innerHTML = groupBySection(items).map(([section, gruppe]) => sectionGroup(section, gruppe)).join('');
-  }
-  const checkedCount = items.filter((item) => item.checked).length;
-  const status = container.querySelector('[data-einkauf-status]');
-  if (status) status.textContent = `${checkedCount} von ${items.length} abgehakt`;
-  const reset = container.querySelector('[data-reset-all]');
-  if (reset) reset.hidden = checkedCount === 0;
-}
-
-function befuelleAbteilungen(container, items) {
-  const select = container.querySelector('[data-new-section]');
-  if (!select) return;
-  const vorherigeWahl = select.value;
-  const bekannt = [...new Set([...KNOWN_SECTIONS, ...items.map((item) => item.section)])];
-  select.innerHTML = bekannt.map((section) => `<option value="${escapeHtml(section)}">${escapeHtml(section)}</option>`).join('');
-  select.value = bekannt.includes(vorherigeWahl) ? vorherigeWahl : 'Sonstiges';
+// Chip-Leiste ueber der Liste: dieselbe Filterlogik wie die Tag-Chips der
+// globalen Suche, hier aber als durchgehend scrollende Zeile statt als
+// umbrechende Liste – bei einer laengeren Einkaufsliste sind schnell mehr
+// Tags im Spiel, als eine feste Hoehe vertragen wuerde.
+function tagLeiste(items, activeTag) {
+  const tags = alleTags(items);
+  if (!tags.length) return '';
+  return `<div class="einkauf-tags" data-einkauf-tags>
+    <div class="einkauf-tag-scroll" data-tag-scroll>
+      ${tags.map((tag) => `<button type="button" class="einkauf-tag-chip${tag === activeTag ? ' aktiv' : ''}" data-filter-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join('')}
+    </div>
+  </div>`;
 }
 
 export async function mountShoppingList(container, { session, signal }) {
@@ -327,19 +367,24 @@ export async function mountShoppingList(container, { session, signal }) {
         <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
       </div>
       <section class="seiten-einstieg">
-        <b>Antippen zum Abhaken</b>
-        <span>Unten neue Artikel ergänzen, nach Abteilung sortiert.</span>
+        <b>Was du brauchst, bekommt einen Haken</b>
+        <span>Im Laden nimmst du ihn beim Einpacken wieder raus.</span>
       </section>
       <form class="einkauf-formular" data-add-form>
         <input class="input" type="text" data-new-name maxlength="120" placeholder="Neuer Artikel, z. B. Hafermilch" autocomplete="off" required>
+        <input class="input" type="text" data-new-tags maxlength="200" placeholder="Tags, mit Komma trennen (optional)" autocomplete="off">
         <div class="einkauf-formular-zeile">
           <select class="input" data-new-section aria-label="Abteilung"></select>
           <button class="btn btn-primary" type="submit">Hinzufügen</button>
         </div>
       </form>
+      <div data-einkauf-tags-slot></div>
       <div class="einkauf-kopfzeile">
         <span data-einkauf-status role="status" aria-live="polite">Wird geladen …</span>
-        <button class="einkauf-reset" type="button" data-reset-all hidden>Häkchen zurücksetzen</button>
+        <div class="einkauf-kopf-aktionen">
+          <button class="einkauf-chip-btn" type="button" data-only-selected aria-pressed="false" hidden>Nur Ausgewählte</button>
+          <button class="einkauf-reset" type="button" data-reset-all hidden>Auswahl leeren</button>
+        </div>
       </div>
       <div data-einkauf-liste><div class="daten-laden" role="status">Einkaufsliste wird geladen …</div></div>
     </div>`;
@@ -347,10 +392,44 @@ export async function mountShoppingList(container, { session, signal }) {
   befuelleAbteilungen(container, []);
 
   let items = [];
+  // nurAusgewaehlt: Filter auf das, was schon einen Haken hat (die aktuelle
+  // Einkaufsrunde). activeTag: derselbe Ein-Tag-Filter wie in der Suche.
+  const filter = { nurAusgewaehlt: false, activeTag: '' };
+
+  function redraw() {
+    const slot = container.querySelector('[data-einkauf-liste]');
+    const sichtbar = sichtbareItems(items, filter);
+    if (!items.length) {
+      slot.innerHTML = `<div class="tuck-leer">${iconMarkup('folder')}<b>Noch nichts auf der Liste</b><span>Trag oben deinen ersten Artikel ein.</span></div>`;
+    } else if (!sichtbar.length) {
+      slot.innerHTML = `<div class="tuck-leer">${iconMarkup('folder')}<b>Nichts gefunden</b><span>Kein Artikel passt zum aktuellen Filter.</span></div>`;
+    } else {
+      slot.innerHTML = groupBySection(sichtbar).map(([section, gruppe]) => sectionGroup(section, gruppe)).join('');
+    }
+
+    const tagsSlot = container.querySelector('[data-einkauf-tags-slot]');
+    if (tagsSlot) tagsSlot.innerHTML = tagLeiste(items, filter.activeTag);
+
+    const checkedCount = items.filter((item) => item.checked).length;
+    const status = container.querySelector('[data-einkauf-status]');
+    if (status) status.textContent = `${checkedCount} ausgewählt`;
+    const reset = container.querySelector('[data-reset-all]');
+    if (reset) reset.hidden = checkedCount === 0;
+    const nurButton = container.querySelector('[data-only-selected]');
+    if (nurButton) {
+      // Ohne jede Auswahl gaebe es nichts zu filtern – der Knopf verschwindet,
+      // statt eine leere Liste anzuzeigen, in der man sich verirrt.
+      nurButton.hidden = checkedCount === 0 && !filter.nurAusgewaehlt;
+      nurButton.classList.toggle('aktiv', filter.nurAusgewaehlt);
+      nurButton.setAttribute('aria-pressed', String(filter.nurAusgewaehlt));
+      nurButton.textContent = filter.nurAusgewaehlt ? 'Alle anzeigen' : 'Nur Ausgewählte';
+    }
+  }
+
   try {
     items = await ensureDefaults(userId, signal);
     if (signal?.aborted) return;
-    renderList(container, items);
+    redraw();
     befuelleAbteilungen(container, items);
   } catch (error) {
     if (signal?.aborted) return;
@@ -369,14 +448,12 @@ export async function mountShoppingList(container, { session, signal }) {
     if (!item) return;
     const zuvor = item.checked;
     item.checked = checkbox.checked;
-    row.classList.toggle('ist-abgehakt', item.checked);
     try {
       await toggleItem(userId, id, item.checked);
-      renderList(container, items);
+      redraw();
     } catch (error) {
       item.checked = zuvor;
-      checkbox.checked = zuvor;
-      row.classList.toggle('ist-abgehakt', zuvor);
+      redraw();
       toast('Änderung konnte nicht gespeichert werden.');
     }
   });
@@ -391,7 +468,7 @@ export async function mountShoppingList(container, { session, signal }) {
     try {
       await deleteItem(userId, id);
       items = items.filter((eintrag) => eintrag.id !== id);
-      renderList(container, items);
+      redraw();
       befuelleAbteilungen(container, items);
       toast(`„${item.name}“ entfernt.`);
     } catch (error) {
@@ -399,20 +476,34 @@ export async function mountShoppingList(container, { session, signal }) {
     }
   });
 
+  container.querySelector('[data-einkauf-tags-slot]').addEventListener('click', (event) => {
+    const chip = event.target.closest('[data-filter-tag]');
+    if (!chip) return;
+    filter.activeTag = filter.activeTag === chip.dataset.filterTag ? '' : chip.dataset.filterTag;
+    redraw();
+  });
+
+  container.querySelector('[data-only-selected]').onclick = () => {
+    filter.nurAusgewaehlt = !filter.nurAusgewaehlt;
+    redraw();
+  };
+
   container.querySelector('[data-add-form]').onsubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const nameFeld = form.querySelector('[data-new-name]');
     const sectionFeld = form.querySelector('[data-new-section]');
+    const tagsFeld = form.querySelector('[data-new-tags]');
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
     try {
-      const neu = await addItem(userId, nameFeld.value, sectionFeld.value);
+      const neu = await addItem(userId, nameFeld.value, sectionFeld.value, tagsFeld.value);
       if (neu) {
         items.push(neu);
-        renderList(container, items);
+        redraw();
         befuelleAbteilungen(container, items);
         nameFeld.value = '';
+        tagsFeld.value = '';
         toast(`„${neu.name}“ hinzugefügt.`);
       }
     } catch (error) {
@@ -429,12 +520,22 @@ export async function mountShoppingList(container, { session, signal }) {
     try {
       await resetChecked(userId);
       items.forEach((item) => { item.checked = false; });
-      renderList(container, items);
-      toast('Alle Häkchen zurückgesetzt.');
+      filter.nurAusgewaehlt = false;
+      redraw();
+      toast('Auswahl geleert.');
     } catch (error) {
       toast('Zurücksetzen fehlgeschlagen.');
     } finally {
       button.disabled = false;
     }
   };
+}
+
+function befuelleAbteilungen(container, items) {
+  const select = container.querySelector('[data-new-section]');
+  if (!select) return;
+  const vorherigeWahl = select.value;
+  const bekannt = [...new Set([...KNOWN_SECTIONS, ...items.map((item) => item.section)])];
+  select.innerHTML = bekannt.map((section) => `<option value="${escapeHtml(section)}">${escapeHtml(section)}</option>`).join('');
+  select.value = bekannt.includes(vorherigeWahl) ? vorherigeWahl : 'Sonstiges';
 }

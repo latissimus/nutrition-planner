@@ -2723,27 +2723,25 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-inhalt .dex-datensatz-meta{gap:4px;font-family:var(--ui)}
 .dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px}
 .dex-ordner-inhalt .dex-datensatz-meta span{font-size:10px}
+/* Sitzt jetzt auf dem weissen Vorderblatt statt auf der farbigen Lasche
+   (vorher: top:16px, mitten in der Lasche, feste schwarze Fuellung). Ohne
+   eigenen farbigen Hintergrund traegt das Icon selbst die Ordnerfarbe – auf
+   Weiss (Retro) wie auf der dunklen Kartenflaeche (Dark) liest sich dieselbe
+   Farbe gleich gut, ein eigener Dark-Fall entfaellt deshalb ersatzlos. */
 .dex-ordner-kartenicon{
-  position:absolute;z-index:2;left:52%;right:auto;top:16px;transform:translateX(-50%);
-  display:grid;place-items:center;width:27px;height:27px;color:#000;
+  position:absolute;z-index:2;left:auto;right:12px;top:83px;transform:none;
+  display:grid;place-items:center;width:30px;height:30px;color:var(--ordner);
 }
 .dex-ordner-kartenicon .muscledex-sammlungsicon,
 .dex-ordner-kartenicon .muscledex-sammlungsicon svg{
-  display:block;width:25px;height:25px;fill:#000!important;
+  display:block;width:28px;height:28px;fill:var(--ordner)!important;
 }
-.dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:#000!important}
+.dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:var(--ordner)!important}
 .dex-ordner-kartenicon .dex-emoji,
 .dex-ordner-kartenicon .kategorie-emoji{
   width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
-  font-size:28px;line-height:1;
+  font-size:26px;line-height:1;
 }
-.dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
-.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg,
-.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg,
-.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg *,
-.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
-.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
-.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
 .dex-ordner-test:active{transform:translate(2px,2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
@@ -3331,27 +3329,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:12px;background:#fff;color:var(--text);
   font-family:"Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:23px}
 .dex-emoji{display:grid;place-items:center;font-size:25px;line-height:1}
-.hat-kategoriefarbe .material-svg,.hat-kategoriefarbe .material-svg svg,
-.hat-kategoriefarbe .muscledex-sammlungsicon,.hat-kategoriefarbe .muscledex-sammlungsicon svg{
-  color:#000!important;fill:#000!important;
-}
-.tuck-fach .muscledex-sammlungsicon,
-.tuck-fach .muscledex-sammlungsicon svg,
-.tuck-fach .muscledex-sammlungsicon svg *,
+/* .muscledex-sammlungsicon kommt ausschliesslich innerhalb von
+   .dex-ordner-kartenicon vor (einziger Aufrufer: categoryIconMarkup() in
+   dexOrdnerKarte()). Frueher zwangen hier zwei weitere, gleich spezifische
+   !important-Regeln die Fuellung auf Schwarz bzw. – auf dunklen Ordnerfarben
+   – auf Weiss; das kollidierte mit der Ordnerfarben-Fuellung weiter oben
+   und haette sie per Quellreihenfolge wieder ueberschrieben. Da das Icon
+   nicht mehr auf der farbigen Lasche liegt, sondern auf der Kartenflaeche,
+   entfaellt der Kontrastfall – eine Farbe fuer beide Themes reicht. */
 .unter-sammlung-icon .material-svg,
 .unter-sammlung-icon .material-svg svg,
 .unter-sammlung-icon .material-svg svg *{color:#000!important;fill:#000!important}
-/* Muss nach der globalen schwarzen Iconregel stehen: Auf dunklen
-   Registerfarben sorgt die automatische Kontrastklasse fuer weisse Symbole. */
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon,
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg,
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg,
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg *,
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
-.tuck-fach.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{
-  color:#fff!important;fill:#fff!important;
-}
 .sammlung-editor-speichern{min-height:58px;margin:24px 0 4px}
 .sheet-gefahr{color:#B42318!important}
 .sheet-gefahr .material-svg,.sheet-gefahr svg{fill:currentColor!important}
@@ -3410,15 +3398,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .einkauf-formular-zeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
 .einkauf-formular-zeile .input{margin-bottom:0}
 
+/* Tag-Chips zum Filtern: eine durchgehend scrollende Zeile statt der
+   umbrechenden Chip-Liste der globalen Suche (.such-tag-liste) – bei vielen
+   Tags waechst eine umbrechende Liste unkontrolliert in die Hoehe, eine
+   scrollende Zeile bleibt immer genau eine Zeile hoch. */
+.einkauf-tags{margin:0 0 14px}
+.einkauf-tag-scroll{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:2px 2px 4px;scrollbar-width:none}
+.einkauf-tag-scroll::-webkit-scrollbar{display:none}
+.einkauf-tag-chip{flex:0 0 auto;min-height:27px;padding:4px 10px;border:1px solid var(--ink);
+  border-radius:999px;background:var(--surface);color:var(--text);font:700 11px/1 var(--ui);
+  white-space:nowrap}
+.einkauf-tag-chip.aktiv{background:#492426;color:#fff;border-color:#492426}
+
 .einkauf-kopfzeile{display:flex;align-items:center;justify-content:space-between;
   gap:10px;margin:0 2px 10px;color:var(--muted);font-size:12.5px;font-weight:700}
-.einkauf-reset{padding:6px 10px;border:1.5px solid var(--ink);border-radius:99px;
+.einkauf-kopf-aktionen{display:flex;gap:8px}
+.einkauf-chip-btn,.einkauf-reset{padding:6px 10px;border:1.5px solid var(--ink);border-radius:99px;
   background:var(--surface);color:var(--text);font-size:11.5px;font-weight:700}
-.einkauf-reset:active{transform:translate(1px,1px)}
+.einkauf-chip-btn.aktiv{background:var(--pink);color:var(--accent-ink);border-color:var(--pink)}
+.einkauf-chip-btn:active,.einkauf-reset:active{transform:translate(1px,1px)}
 
 .einkauf-gruppe .reminder-group-list{padding:8px 10px 10px}
 
-.einkauf-row{display:flex;align-items:flex-start;gap:10px;padding:10px 4px;
+.einkauf-row{position:relative;display:flex;align-items:flex-start;gap:10px;
+  padding:10px 4px 10px 10px;
   border-bottom:1.5px solid color-mix(in srgb,var(--ink) 16%,transparent);cursor:pointer}
 .einkauf-row:last-child{border-bottom:0}
 .einkauf-row input[type="checkbox"]{flex:0 0 auto;width:21px;height:21px;
@@ -3430,9 +3434,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .einkauf-row-tags{display:flex;flex-wrap:wrap;gap:5px}
 .einkauf-tag{padding:1px 7px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);
   border-radius:99px;color:var(--muted);font-size:10px;font-weight:600}
-/* Abgehakt: durchgestrichen und gedaempft statt entfernt – die Liste ist
-   eine wiederkehrende Vorlage, kein Einweg-Formular. */
-.einkauf-row.ist-abgehakt .einkauf-row-name{color:var(--muted);text-decoration:line-through}
+/* Ausgewaehlt heisst "brauche ich" – hervorgehoben mit einem Farbstreifen
+   und fetterem Namen, nicht durchgestrichen. Durchgestrichen waere "erledigt",
+   aber ein einmal gestrichener Artikel bliebe fuer den naechsten Einkauf
+   unauffindbar in derselben optischen Ablage wie ein erledigter. Der Haken
+   geht im Laden beim Einpacken wieder raus, dann kehrt die Zeile in den
+   neutralen Zustand zurueck. */
+.einkauf-row.ist-ausgewaehlt{background:color-mix(in srgb,var(--pink) 9%,transparent)}
+.einkauf-row.ist-ausgewaehlt::before{content:"";position:absolute;inset:0 auto 0 0;
+  width:4px;background:var(--pink)}
+.einkauf-row.ist-ausgewaehlt .einkauf-row-name{font-weight:800}
 .einkauf-row-loeschen{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;
   margin:-4px -4px -4px 0;padding:0;border:0;border-radius:99px;background:transparent;
   color:var(--muted);opacity:.55}
