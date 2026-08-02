@@ -16,13 +16,13 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const defaults = {
   body: 'body_fat', reminders: 'notifications', 'food-log': 'fork_spoon',
-  recipes: 'menu_book', habits: 'bucket_check',
+  recipes: 'menu_book', training: 'fitness_center', habits: 'bucket_check',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const defaultColors = {
   body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
-  recipes: '#83CFE0', habits: '#B7C98B',
+  recipes: '#83CFE0', training: '#F2A65A', habits: '#B7C98B',
 };
 const colorGroups = [
   ['Knallig-Retro', [

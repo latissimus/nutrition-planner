@@ -18,7 +18,6 @@ import { mountProfile } from './profile.js';
 import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes } from './collectionPreferences.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
-import { mountFoodLog } from './foodLog.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -247,6 +246,7 @@ const sammlungen = [
   ['body', 'KFA-LOG', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Food-Log', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
+  ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
@@ -268,6 +268,7 @@ const ZAEHLQUELLEN = {
   body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
   reminders: { tabelle: 'reminders', eins: 'Erinnerung', viele: 'Erinnerungen' },
   'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
+  training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
 };
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
@@ -380,25 +381,57 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
   }).join('');
 }
 
-function eigeneSammlungsKarten(items) {
+function eigeneSammlungsKarten(items, stats = new Map()) {
   return items.map((item) => dexOrdnerKarte({
     href: `#collection/${item.id}`,
     titel: escapeHtml(item.name),
-    meta: '<b>Eigener</b><span>Dex</span>',
+    meta: `<b>${stats.get(item.id)?.entries || 0}</b><span>Einträge · ${stats.get(item.id)?.children || 0} Unter-Dex</span>`,
     iconInhalt: collectionIconMarkup(item.icon_key),
     farbe: item.color,
     eigene: true,
   })).join('');
 }
 
+async function eigeneDexStatistik(userId, roots, signal) {
+  if (!roots.length) return new Map();
+  let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', 'home');
+  let entriesQuery = supabase.from('dex_entries').select('collection_id').eq('user_id', userId).eq('root_key', 'home');
+  if (signal) { collectionsQuery = collectionsQuery.abortSignal(signal); entriesQuery = entriesQuery.abortSignal(signal); }
+  const [{ data: collections, error: collectionError }, { data: entries, error: entryError }] = await Promise.all([collectionsQuery, entriesQuery]);
+  if (collectionError) throw collectionError;
+  if (entryError) throw entryError;
+  const childrenByParent = new Map();
+  (collections || []).forEach((item) => {
+    if (!item.parent_id) return;
+    const list = childrenByParent.get(item.parent_id) || [];
+    list.push(item.id); childrenByParent.set(item.parent_id, list);
+  });
+  const entryCount = new Map();
+  (entries || []).forEach(({ collection_id: id }) => { if (id) entryCount.set(id, (entryCount.get(id) || 0) + 1); });
+  const result = new Map();
+  roots.forEach((root) => {
+    const descendants = [];
+    const queue = [...(childrenByParent.get(root.id) || [])];
+    while (queue.length) {
+      const id = queue.shift(); descendants.push(id); queue.push(...(childrenByParent.get(id) || []));
+    }
+    const ids = [root.id, ...descendants];
+    result.set(root.id, { children: descendants.length, entries: ids.reduce((sum, id) => sum + (entryCount.get(id) || 0), 0) });
+  });
+  return result;
+}
+
 async function mountHome(container, signal) {
   setSeite('home');
   const sichtbar = sichtbareSammlungen();
   let eigene = [];
+  let eigeneStats = new Map();
   try { eigene = await loadCollections(session.user.id, { rootKey: 'home', signal }); }
   catch (error) { if (!signal?.aborted) toast('Eigene Dex-Einträge konnten nicht geladen werden.'); }
   if (signal?.aborted) return;
   eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
+  try { eigeneStats = await eigeneDexStatistik(session.user.id, eigene, signal); }
+  catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
       <div class="tuck-ablage">
@@ -418,7 +451,7 @@ async function mountHome(container, signal) {
         </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Dex-Einträge">
-        ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene)}
+        ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
       </section>
     </div>`;
 
@@ -451,16 +484,11 @@ async function mountCustomCollection(container, item, signal) {
   setSeite('collection');
   const children = await loadCollections(session.user.id, { rootKey: item.root_key, parentId: item.id, signal });
   if (signal?.aborted) return;
-  if (item.root_key === 'food-log') {
-    await mountFoodLog(container, { session, profile, signal, collectionId: item.id });
-    container.querySelector(':scope > .wrap')?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
-  } else {
-    container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
-      <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
-      ${collectionGridMarkup(children)}
-      ${dexEntriesSlotMarkup()}
-    </div>`;
-  }
+  container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
+    <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
+    ${collectionGridMarkup(children)}
+    ${dexEntriesSlotMarkup()}
+  </div>`;
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
   const openEntry = (type, foodKind = null) => openDexEntryEditor({
@@ -494,9 +522,6 @@ async function mountCustomCollection(container, item, signal) {
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
   });
-  if (item.root_key === 'food-log' && children.length) {
-    container.querySelector('.kategorie-kopf')?.insertAdjacentHTML('afterend', collectionGridMarkup(children));
-  }
   await renderDexEntries(container, {
     userId: session.user.id, rootKey: item.root_key, collectionId: item.id,
     color: item.color, signal,
@@ -506,16 +531,6 @@ async function mountCustomCollection(container, item, signal) {
       if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
     },
   });
-}
-
-async function addFixedSubcollections(container, rootKey, signal) {
-  const children = await loadCollections(session.user.id, { rootKey, signal });
-  if (signal?.aborted) return [];
-  const wrap = container.querySelector(':scope > .wrap');
-  const chrome = wrap?.querySelector('.kategorie-kopf');
-  const anchor = chrome || wrap?.querySelector(':scope > .seitenkopf');
-  if (wrap && children.length) anchor?.insertAdjacentHTML('afterend', collectionGridMarkup(children));
-  return children;
 }
 
 async function mountSearch(container, signal) {
@@ -721,10 +736,8 @@ async function render() {
     mountCategoryChrome(view, route, 'MAHLZEITEN');
   } else if (route === 'food-log') {
     setSeite('food-log');
-    await mountFoodLog(view, { session, profile, signal });
-    // Erst Inhalte und Unter-Sammlungen aufbauen, dann genau eine Kopfzeile.
-    const children = await addFixedSubcollections(view, 'food-log', signal);
-    view.querySelector(':scope > .wrap')?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
+    const children = await loadCollections(session.user.id, { rootKey: 'food-log', signal });
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-LOG</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: session.user.id, rootKey: 'food-log', onSaved: refresh,
@@ -745,6 +758,24 @@ async function render() {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+      },
+    });
+  } else if (route === 'training') {
+    setSeite('training');
+    const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
+    mountCategoryChrome(view, route, 'TRAINING', {
+      meta: `${children.length} Unter-Dex`,
+      onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
+    });
+    await renderDexEntries(view, {
+      userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal,
+      onChanged: (entries) => {
+        const meta = view.querySelector('.kategorie-kopftitel small');
+        if (meta && Array.isArray(entries)) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
   } else if (route.startsWith('collection/')) {

@@ -70,6 +70,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false } = {}) {
   const image = type === 'image';
   const note = type === 'note';
   const cheatMeal = foodMode && foodKind === 'cheat_meal';
+  const ownRecipe = foodMode && note && !cheatMeal;
   const label = cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : image ? 'Bild' : note ? 'Notiz' : 'Link';
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
@@ -82,6 +83,12 @@ function editorMarkup(type, { foodKind = null, foodMode = false } = {}) {
         </label>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
           <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="text" inputmode="url" autocomplete="url" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
         </label>`}
+      ${ownRecipe ? `<label class="dex-entry-file dex-recipe-file" for="dex-entry-image">
+          <span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>
+          <strong>Rezeptbild hinzufügen</strong><small>optional · maximal 8 MB</small>
+          <input id="dex-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif">
+          <img data-image-preview alt="Ausgewähltes Rezeptbild" hidden>
+        </label>` : ''}
       <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>optional</small></span>
         <input id="dex-entry-title" class="input" maxlength="100" placeholder="z. B. Schnelles Protein-Frühstück">
       </label>
@@ -161,6 +168,16 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         const noteText = form.querySelector('#dex-entry-note').value.trim();
         if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
         title ||= noteText.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 100) || 'Notiz';
+        const file = fileInput?.files?.[0];
+        if (file) {
+          if (!IMAGE_TYPES.has(file.type)) throw new Error('Dieses Bildformat wird nicht unterstützt.');
+          if (file.size > MAX_IMAGE_BYTES) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
+          const extension = (file.name.split('.').pop() || file.type.split('/').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+          uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
+          const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
+          if (uploadError) throw uploadError;
+          imagePath = uploadedPath;
+        }
       }
       const { data, error } = await supabase.from('dex_entries').insert({
         user_id: userId, collection_id: collectionId, root_key: rootKey,
@@ -256,7 +273,8 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
     favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, href: entry.url,
     previewMarkup: type === 'note'
-      ? '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
+      ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy"></span>`
+        : '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
       : type === 'video' ? providerPreview(entry, provider, playable) : '',
     playable, detailHref: `#entry/${entry.id}`,
     source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
