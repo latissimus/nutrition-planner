@@ -2710,7 +2710,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-ordner-rueckblatt,.dex-ordner-front{fill:var(--surface)}
 .dex-ordner-farbblatt{fill:var(--ordner)}
 .dex-ordner-inhalt{
-  position:absolute;z-index:2;left:18px;right:34px;bottom:14px;
+  position:absolute;z-index:2;left:18px;right:43px;bottom:28px;
   display:flex;flex-direction:column;gap:5px;color:var(--text);
 }
 .dex-ordner-inhalt h2{
@@ -2726,7 +2726,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .dex-neu-stern[hidden]{display:none}
 .dex-ordner-kartenicon{
-  position:absolute;z-index:2;right:17px;bottom:22px;
+  position:absolute;z-index:2;right:16px;top:57px;
   display:grid;place-items:center;width:27px;height:27px;color:#000;
 }
 .dex-ordner-kartenicon .muscledex-sammlungsicon,

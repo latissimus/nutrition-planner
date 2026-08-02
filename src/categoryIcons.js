@@ -28,30 +28,33 @@ const colorGroups = [
   ['Knallig-Retro', [
     ['Himmelblau', '#B1E7FF'], ['Cyan', '#72E2FF'],
     ['Eisblau', '#B1F1FF'], ['Hellblau', '#58DCFF'], ['Blau', '#15CCFF'],
+    ['Kobaltblau', '#3567C8'], ['Royalblau', '#4459D4'], ['Ultramarin', '#3F51B5'],
     ['Pink', '#F54588'], ['Hot Pink', '#FF69AE'], ['Rose', '#F64974'],
-    ['Orange', '#FF7B42'], ['Chartreuse', '#CEFC17'], ['Acid', '#F3FF00'],
+    ['Himbeere', '#D93672'], ['Magenta', '#D94AA7'], ['Kirschrot', '#D94C5C'],
+    ['Orange', '#FF7B42'], ['Mandarine', '#F2943D'], ['Rostrot', '#B95E43'],
+    ['Sonnengelb', '#F3C84B'], ['Chartreuse', '#CEFC17'], ['Acid', '#F3FF00'],
     ['Navy', '#001454'], ['Nachtblau', '#1A1A2E'], ['Braun', '#492425'],
-    ['Indigo', '#443199'], ['Purpur', '#723EC3'],
-    ['Petrol', '#077A7D'], ['Türkis', '#03A6A1'], ['Jade', '#64E2B7'],
+    ['Indigo', '#443199'], ['Purpur', '#723EC3'], ['Electric Violet', '#8755D9'],
+    ['Petrol', '#077A7D'], ['Türkis', '#03A6A1'], ['Jade', '#64E2B7'], ['Smaragd', '#35A66F'],
     ['Vanille', '#FFF58A'],
     ['Off-White', '#F4F3EF'], ['Creme', '#F2EBE0'],
   ]],
   ['Pastell-Retro', [
-    ['Bubblegum', '#E99ABF'], ['Koralle', '#F3A09A'], ['Tomatenrot', '#D9796F'],
-    ['Burnt Orange', '#D99067'], ['Senf', '#D6B45F'], ['Buttergelb', '#F1D889'],
+    ['Bubblegum', '#E99ABF'], ['Altrosa', '#D7A0B2'], ['Dusty Rose', '#C98FA2'],
+    ['Koralle', '#F3A09A'], ['Pfirsich', '#F5B69C'], ['Aprikose', '#E9A777'], ['Tomatenrot', '#D9796F'],
+    ['Burnt Orange', '#D99067'], ['Karamell', '#C49367'], ['Senf', '#D6B45F'], ['Ocker', '#C6A15B'], ['Buttergelb', '#F1D889'],
     ['Avocado', '#A7B879'], ['Pistazie', '#B7C98B'], ['Salbei', '#A8BFA0'],
-    ['Moos', '#91A77A'], ['Mint', '#9FD5C0'], ['Seafoam', '#8FCBB9'],
-    ['Pastell-Petrol', '#76B7B2'], ['Aqua', '#83CFE0'], ['Puderblau', '#A9DCE8'],
-    ['Periwinkle', '#9FAFE0'], ['Lavendel', '#C0A9D8'], ['Violett', '#9B83BD'],
-    ['Pflaume', '#9C708E'], ['Navy', '#647C96'], ['Schokobraun', '#A9826C'],
-    ['Creme', '#F2EBE0'],
+    ['Moos', '#91A77A'], ['Olive', '#9F9D68'], ['Farn', '#7FA27D'], ['Eukalyptus', '#83AA9A'],
+    ['Mint', '#9FD5C0'], ['Seafoam', '#8FCBB9'], ['Enteneisblau', '#9CC9C7'],
+    ['Pastell-Petrol', '#76B7B2'], ['Aqua', '#83CFE0'], ['Puderblau', '#A9DCE8'], ['Denim', '#7896BE'],
+    ['Periwinkle', '#9FAFE0'], ['Schieferblau', '#8293B1'], ['Lavendel', '#C0A9D8'], ['Flieder', '#C6AED9'], ['Violett', '#9B83BD'],
+    ['Mauve', '#AD84A7'], ['Pflaume', '#9C708E'], ['Navy', '#647C96'],
+    ['Taupe', '#A89282'], ['Schokobraun', '#A9826C'], ['Sand', '#D7C3A6'],
+    ['Creme', '#F2EBE0'], ['Warmweiß', '#FAF5EA'],
   ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
-export const dexEditorColors = [
-  '#F3C84B', '#F54588', '#9D78E8', '#5C8ED8', '#64C5AE', '#72B957', '#B9DC59', '#FF7B42',
-  '#F1DCAA', '#C9C9C9', '#8CA1BD', '#BE80B9', '#B58A62', '#492426', '#E97777', '#6C5CF2',
-];
+export const dexEditorColors = [...new Set(retroColors.map(([, color]) => color))];
 
 export function categoryColor(route) {
   const saved = localStorage.getItem(colorKey(route));
