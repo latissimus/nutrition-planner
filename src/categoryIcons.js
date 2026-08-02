@@ -287,11 +287,12 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   bar.setAttribute('aria-label', `${title} bedienen`);
   const safeTitle = escapeHtml(title);
   const safeMeta = escapeHtml(options.meta || '');
+  const closeHref = escapeHtml(options.backHref || '#home');
   bar.innerHTML = `
     <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Eintrag in ${safeTitle} ablegen">${materialIcon('place_item')}</button>
     <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
-    <a class="kategorie-kopfknopf kategorie-schliessen" href="#home" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
+    <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
   bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(options.color || categoryColor(route)));
   wrap.prepend(bar);
   bar.querySelector('.kategorie-plus').onclick = () => eintragTypWaehlen(container, route, options);

@@ -50,6 +50,22 @@ export async function loadDexEntries(userId, { rootKey, collectionId = null, sig
   return entries;
 }
 
+export async function loadAllDexEntries(userId, signal) {
+  let query = supabase.from('dex_entries')
+    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,created_at,updated_at')
+    .eq('user_id', userId).order('created_at', { ascending: false });
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
+  if (error) throw error;
+  const entries = data || [];
+  await Promise.all(entries.map(async (entry) => {
+    if (!entry.image_path) return;
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(entry.image_path, 60 * 60);
+    entry.preview_url = signed?.signedUrl || '';
+  }));
+  return entries;
+}
+
 function editorMarkup(type) {
   const image = type === 'image';
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${image ? 'Bild' : 'Link'} hinzufügen">
@@ -170,10 +186,10 @@ export function videoEmbedUrl(value) {
       const id = url.pathname.match(/\/video\/(\d+)/)?.[1];
       return id ? `https://www.tiktok.com/player/v1/${id}` : '';
     }
-    if (url.hostname.includes('instagram.com')) {
-      const match = url.pathname.match(/^\/(reel|p)\/([^/]+)/);
-      return match ? `https://www.instagram.com/${match[1]}/${match[2]}/embed/` : '';
-    }
+    // Instagram-Embeds veraendern auf iOS ihre Breite dynamisch und reagieren
+    // im PWA-iframe unzuverlaessig auf Play. Die App zeigt dafuer bewusst die
+    // gespeicherte Vorschau und den externen Aufruf.
+    if (url.hostname.includes('instagram.com')) return '';
   } catch { return ''; }
   return '';
 }
@@ -206,23 +222,26 @@ function providerPreview(entry, provider, playable) {
   return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}<b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
 }
 
+export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
+  const provider = videoProvider(entry.url);
+  const video = entry.entry_type === 'link' && Boolean(provider);
+  const type = entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
+  const icon = type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
+  const playable = Boolean(videoEmbedUrl(entry.url));
+  return dexEntryCardMarkup({
+    id: entry.id, type, title: entry.title, note: entry.note,
+    previewUrl: entry.preview_url, href: entry.url,
+    previewMarkup: type === 'video' ? providerPreview(entry, provider, playable) : '',
+    playable, detailHref: `#entry/${entry.id}`,
+    source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
+  }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
+}
+
 function groupMarkup(type, entries, color) {
   const label = type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
-  const icon = type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
-    <div class="dex-inhaltsgrid">${entries.map((entry) => {
-      const provider = videoProvider(entry.url);
-      const playable = Boolean(videoEmbedUrl(entry.url));
-      return dexEntryCardMarkup({
-        id: entry.id, type, title: entry.title, note: entry.note,
-        previewUrl: entry.preview_url, href: entry.url,
-        previewMarkup: type === 'video' ? providerPreview(entry, provider, playable) : '',
-        playable,
-        detailHref: `#entry/${entry.id}`,
-        source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
-      }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });
-    }).join('')}</div>
+    <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryOverviewMarkup(entry, color)).join('')}</div>
   </section>`;
 }
 

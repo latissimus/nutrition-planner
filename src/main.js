@@ -19,7 +19,7 @@ import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRou
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountFoodLog } from './foodLog.js';
-import { openDexEntryEditor, renderDexEntries } from './dexEntries.js';
+import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
@@ -523,7 +523,7 @@ async function addFixedSubcollections(container, rootKey, signal) {
   return children;
 }
 
-function mountSearch(container, signal) {
+async function mountSearch(container, signal) {
   setSeite('search');
   const sichtbar = sichtbareSammlungen();
   const aktiv = sichtbar.filter(([, , , , , status]) => status === 'Aktiv').length;
@@ -536,6 +536,7 @@ function mountSearch(container, signal) {
         </label>
         <a class="seiten-x" href="#home" aria-label="Suche schließen">×</a>
       </div>
+      <section class="such-tags" data-search-tags hidden></section>
       <section class="tuck-bibliothek">
         <span>Deine Bibliothek</span>
         <div class="tuck-bibliothek-werte">
@@ -545,27 +546,66 @@ function mountSearch(container, signal) {
         </div>
       </section>
       <h2 class="tuck-abschnittstitel">Dex-Treffer</h2>
-      <section class="tuck-grid" data-search-results>${sammlungsKarten(sichtbar, zaehlerStand)}</section>
+      <section class="dex-inhaltsgrid such-eintraege" data-search-results><div class="daten-laden">DEX-Einträge werden geladen …</div></section>
       <div class="tuck-leer" data-search-empty hidden>
         ${iconMarkup('search')}
         <b>Nichts gefunden</b>
-        <span>Die Suche in einzelnen Einträgen ergänzen wir später.</span>
+        <span>Kein Titel, keine Beschreibung und kein Tag passen zu deiner Suche.</span>
       </div>
     </div>`;
 
   const input = container.querySelector('#global-search');
   const results = container.querySelector('[data-search-results]');
   const empty = container.querySelector('[data-search-empty]');
-  input.oninput = () => {
+  const tagsSlot = container.querySelector('[data-search-tags]');
+  let entries = [];
+  let activeTag = '';
+  const renderResults = () => {
     const query = input.value.trim().toLocaleLowerCase('de');
-    const treffer = sichtbar.filter(([, titel, text]) => `${titel} ${text}`.toLocaleLowerCase('de').includes(query));
-    results.innerHTML = sammlungsKarten(treffer, zaehlerStand);
+    const treffer = entries.filter((entry) => {
+      const tags = entry.tags || [];
+      const haystack = `${entry.title || ''} ${entry.note || ''} ${tags.join(' ')}`.toLocaleLowerCase('de');
+      const tagMatch = !activeTag || tags.some((tag) => tag.toLocaleLowerCase('de') === activeTag.toLocaleLowerCase('de'));
+      return tagMatch && (!query || haystack.includes(query));
+    });
+    results.innerHTML = treffer.map((entry) => dexEntryOverviewMarkup(entry, categoryColor(entry.root_key))).join('');
     empty.hidden = treffer.length > 0;
   };
+  input.oninput = renderResults;
+  try {
+    entries = await loadAllDexEntries(session.user.id, signal);
+    if (signal?.aborted) return;
+    const tags = [...new Set(entries.flatMap((entry) => entry.tags || []).map((tag) => tag.trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'de'));
+    if (tags.length) {
+      const limit = 8;
+      tagsSlot.hidden = false;
+      tagsSlot.innerHTML = `<div class="such-tag-liste" data-tag-list>${tags.map((tag, index) => `<button type="button" data-search-tag="${escapeHtml(tag)}"${index >= limit ? ' hidden' : ''}>#${escapeHtml(tag)}</button>`).join('')}</div>
+        ${tags.length > limit ? `<button class="such-tags-mehr" type="button" data-tags-toggle aria-expanded="false" aria-label="Weitere Tags anzeigen">⌄</button>` : ''}`;
+      tagsSlot.onclick = (event) => {
+        const tagButton = event.target.closest('[data-search-tag]');
+        if (tagButton) {
+          activeTag = activeTag === tagButton.dataset.searchTag ? '' : tagButton.dataset.searchTag;
+          tagsSlot.querySelectorAll('[data-search-tag]').forEach((button) => button.classList.toggle('aktiv', button === tagButton && Boolean(activeTag)));
+          renderResults();
+          return;
+        }
+        const toggle = event.target.closest('[data-tags-toggle]');
+        if (!toggle) return;
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        toggle.textContent = expanded ? '⌄' : '⌃';
+        tagsSlot.querySelectorAll('[data-search-tag]').forEach((button, index) => { button.hidden = expanded && index >= limit; });
+      };
+    }
+    renderResults();
+  } catch (error) {
+    if (!signal?.aborted) results.innerHTML = `<div class="msg err">Suche konnte nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
+  }
   if (vorgemerkteSuche) {
     input.value = vorgemerkteSuche;
     vorgemerkteSuche = '';
-    input.dispatchEvent(new Event('input'));
+    renderResults();
   }
   requestAnimationFrame(() => input.focus({ preventScroll: true }));
 
@@ -660,7 +700,7 @@ async function render() {
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
-    mountSearch(view, signal);
+    await mountSearch(view, signal);
   } else if (route === 'profile') {
     setSeite('profile');
     mountProfile(view, {
