@@ -200,10 +200,10 @@ function youtubeThumbnail(value) {
   } catch { return ''; }
 }
 
-function providerPreview(entry, provider) {
+function providerPreview(entry, provider, playable) {
   const thumbnail = provider?.key === 'youtube' ? youtubeThumbnail(entry.url) : '';
-  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy"><i>${materialIconMarkup('play_arrow')}</i></span>`;
-  return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}"><i>${materialIconMarkup('play_arrow')}</i><b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
+  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}</span>`;
+  return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}<b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
 }
 
 function groupMarkup(type, entries, color) {
@@ -213,10 +213,12 @@ function groupMarkup(type, entries, color) {
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => {
       const provider = videoProvider(entry.url);
+      const playable = Boolean(videoEmbedUrl(entry.url));
       return dexEntryCardMarkup({
         id: entry.id, type, title: entry.title, note: entry.note,
         previewUrl: entry.preview_url, href: entry.url,
-        previewMarkup: type === 'video' ? providerPreview(entry, provider) : '',
+        previewMarkup: type === 'video' ? providerPreview(entry, provider, playable) : '',
+        playable,
         detailHref: `#entry/${entry.id}`,
         source: type === 'link' || type === 'video' ? (entry.provider || sourceFromUrl(entry.url)) : 'BILD', color,
       }, { iconMarkup: materialIconMarkup(icon), darkColor: colorIsDark(color) });

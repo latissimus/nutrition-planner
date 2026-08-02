@@ -19,7 +19,7 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = fa
   const source = escapeHtml(entry.source || 'MUSCLE-DEX');
   const color = escapeHtml(entry.color || '#A9DCE8');
   const image = entry.previewUrl
-    ? `<span class="dex-inhaltskarte-vorschau${type === 'video' ? ' dex-video-vorschau' : ''}"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy">${type === 'video' ? `<i>${iconMarkup}</i>` : ''}</span>`
+    ? `<span class="dex-inhaltskarte-vorschau${type === 'video' ? ' dex-video-vorschau' : ''}"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy">${type === 'video' && entry.playable ? `<i>${iconMarkup}</i>` : ''}</span>`
     : (entry.previewMarkup || '');
   const detailHref = escapeHtml(entry.detailHref || '#home');
 
@@ -28,10 +28,6 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', darkColor = fa
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>
     ${image}
     <span class="dex-inhaltskarte-body">
-      <span class="dex-inhaltskarte-kopf">
-        <span class="dex-inhaltskarte-icon" aria-hidden="true">${iconMarkup}</span>
-        <small>${typeLabels[type]}</small>
-      </span>
       <strong>${title}</strong>
       ${excerpt ? `<span class="dex-inhaltskarte-text">${excerpt}</span>` : '<span class="dex-inhaltskarte-text dex-inhaltskarte-ohne-text">Keine Beschreibung hinterlegt.</span>'}
       <span class="dex-inhaltskarte-fuss"><span class="dex-inhaltskarte-meta">${source}</span></span>

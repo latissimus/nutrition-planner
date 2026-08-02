@@ -292,6 +292,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Eintrag in ${safeTitle} ablegen">${materialIcon('place_item')}</button>
     <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
     <a class="kategorie-kopfknopf kategorie-schliessen" href="#home" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
+  bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(options.color || categoryColor(route)));
   wrap.prepend(bar);
   bar.querySelector('.kategorie-plus').onclick = () => eintragTypWaehlen(container, route, options);
   bar.querySelector('[data-category-settings]').onclick = () => settingsSheet(

@@ -2764,8 +2764,9 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-inhaltskarte-body,.dex-inhaltskarte-vorschau,.dex-inhaltskarte-streifen{position:relative;z-index:1}
 .dex-inhaltskarte-streifen{height:7px;flex:0 0 7px;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
+.dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
 .dex-inhaltskarte-vorschau img{display:block;width:100%;height:100%;object-fit:cover}
-.dex-inhaltskarte-body{display:flex;flex:1;min-height:0;flex-direction:column;gap:7px;padding:11px 12px 13px;overflow:hidden}
+.dex-inhaltskarte-body{display:flex;flex:1;min-height:0;flex-direction:column;gap:6px;padding:10px 10px 12px;overflow:hidden}
 .dex-inhaltskarte-kopf{display:flex;align-items:center;gap:8px}
 .dex-inhaltskarte-icon{
   display:grid;place-items:center;width:34px;height:34px;border:var(--icon-bw) solid var(--ink);
@@ -2782,7 +2783,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 .dex-inhaltskarte strong{font-family:var(--display);font-size:15px;line-height:1.12}
 .dex-inhaltskarte-text{
   display:-webkit-box;overflow:hidden;color:var(--muted);font-size:12px;line-height:1.3;
-  -webkit-box-orient:vertical;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;-webkit-line-clamp:1;margin-bottom:4px;
 }
 .dex-inhaltskarte-link{display:block;color:inherit;text-decoration:none}
 .dex-inhaltskarte-fuss{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
@@ -2795,13 +2796,12 @@ button,a,[role="button"],summary{touch-action:manipulation}
   margin:0 0 14px;font-family:var(--display);font-size:18px;line-height:1;text-transform:uppercase;
 }
 .dex-inhaltsgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-.dex-inhaltsgrid .dex-inhaltskarte-body{gap:6px;padding:9px 10px 11px}
+.dex-inhaltsgrid .dex-inhaltskarte-body{gap:6px;padding:9px 10px 12px}
 .dex-inhaltsgrid .dex-inhaltskarte-icon{width:30px;height:30px}
 .dex-inhaltsgrid .dex-inhaltskarte-icon svg{width:18px;height:18px}
 .dex-inhaltsgrid .dex-inhaltskarte strong{font-size:14px}
 .dex-inhaltsgrid .dex-inhaltskarte-vorschau{aspect-ratio:4/3}
-.dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:46%;flex:0 0 46%}
-.dex-inhaltsgrid .dex-inhaltskarte-kopf{min-height:30px}
+.dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:54%;flex:0 0 54%}
 .dex-inhaltsgrid .dex-inhaltskarte-ohne-text{opacity:.7}
 .dex-video-vorschau,.dex-provider-vorschau{position:relative}
 .dex-video-vorschau>i,.dex-detail-linkvorschau>i{
@@ -2948,6 +2948,10 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus{background:var(--ordner)}
 .hat-kategoriefarbe .kategorie-kopfknopf .material-svg svg{fill:#000}
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus .material-svg svg{fill:#000}
+.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss,
+.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss .material-svg,
+.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss .material-svg svg,
+.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss .material-svg svg *{color:#fff!important;fill:#fff!important}
 .hat-kategoriefarbe .kategorie-kopfknopf[href="#home"] .material-svg svg,
 .hat-kategoriefarbe .kategorie-kopfknopf[data-category-settings] .material-svg svg{fill:#000}
 .hat-kategoriefarbe .app-icon{color:#000}
