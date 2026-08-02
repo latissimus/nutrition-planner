@@ -1,5 +1,6 @@
 alter table public.dex_entries drop constraint if exists dex_entries_entry_type_check;
 alter table public.dex_entries drop constraint if exists dex_entries_check;
+alter table public.dex_entries drop constraint if exists dex_entries_content_check;
 
 alter table public.dex_entries
   add constraint dex_entries_entry_type_check
