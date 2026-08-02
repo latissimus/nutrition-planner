@@ -124,7 +124,17 @@ export async function sendTestPush() {
   const { data, error } = await supabase.functions.invoke('send-reminders', {
     body: { action: 'test' },
   });
-  if (error) throw error;
+  if (error) {
+    let detail = '';
+    try {
+      const response = error.context;
+      if (response?.clone) {
+        const body = await response.clone().json();
+        detail = body?.error || '';
+      }
+    } catch { /* Der urspruengliche Functions-Fehler bleibt erhalten. */ }
+    throw new Error(detail || error.message || 'Testnachricht konnte nicht gesendet werden.');
+  }
   if (!data?.ok) throw new Error(data?.error || 'Testnachricht konnte nicht gesendet werden.');
   return data;
 }

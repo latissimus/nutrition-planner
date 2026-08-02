@@ -39,7 +39,8 @@ Im GitHub-Repository müssen `VITE_SUPABASE_URL` und
 2. Ein VAPID-Schlüsselpaar erzeugen.
 3. Public Key als `VITE_VAPID_PUBLIC_KEY` lokal und in GitHub hinterlegen.
 4. Public/Private Key und Absender als Supabase Function-Secrets speichern.
-5. `send-reminders` deployen (JWT-Prüfung eingeschaltet lassen).
+5. `send-reminders` mit `--no-verify-jwt` deployen. Die Function prüft
+   Testaufrufe selbst gegen das Nutzer-JWT und Cron-Aufrufe gegen `CRON_SECRET`.
 6. Supabase Cron jede Minute einen POST auf
    `/functions/v1/send-reminders` senden lassen.
 
