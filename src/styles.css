@@ -2706,7 +2706,10 @@ button,a,[role="button"],summary{touch-action:manipulation}
   position:absolute;inset:0;width:100%;height:100%;overflow:visible;
   filter:drop-shadow(4px 4px 0 #000);
 }
-.dex-ordner-form path{stroke:#000;stroke-width:6.67px}
+.dex-ordner-form path{stroke:#000}
+.dex-ordner-rueckblatt{stroke-width:4.84px}
+.dex-ordner-farbblatt{stroke-width:6.68px}
+.dex-ordner-front{stroke-width:6.67px}
 .dex-ordner-rueckblatt,.dex-ordner-front{fill:var(--surface)}
 .dex-ordner-farbblatt{fill:var(--ordner)}
 .dex-ordner-inhalt{
@@ -2726,7 +2729,7 @@ button,a,[role="button"],summary{touch-action:manipulation}
 }
 .dex-neu-stern[hidden]{display:none}
 .dex-ordner-kartenicon{
-  position:absolute;z-index:2;right:16px;top:57px;
+  position:absolute;z-index:2;right:22px;top:52px;
   display:grid;place-items:center;width:27px;height:27px;color:#000;
 }
 .dex-ordner-kartenicon .muscledex-sammlungsicon,
