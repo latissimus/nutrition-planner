@@ -341,7 +341,7 @@ function renderChrome(route) {
 
 function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', neu = false, eigene = false }) {
   return `
-  <div class="tuck-fach dex-ordner-testfach${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
+  <div class="tuck-fach dex-ordner-testfach${route ? ` dex-ordner-${route}` : ''}${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
     <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}>
       <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
         <g transform="translate(.016 13.463)">
