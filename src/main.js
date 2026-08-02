@@ -339,9 +339,16 @@ function renderChrome(route) {
   return view;
 }
 
+function istDunkleOrdnerfarbe(farbe) {
+  const hex = String(farbe || '').trim().replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return false;
+  const [r, g, b] = [0, 2, 4].map((start) => Number.parseInt(hex.slice(start, start + 2), 16));
+  return (r * 299 + g * 587 + b * 114) / 1000 < 135;
+}
+
 function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', neu = false, eigene = false }) {
   return `
-  <div class="tuck-fach dex-ordner-testfach${route ? ` dex-ordner-${route}` : ''}${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
+  <div class="tuck-fach dex-ordner-testfach${istDunkleOrdnerfarbe(farbe) ? ' dex-ordner-dunkel' : ''}${route ? ` dex-ordner-${route}` : ''}${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
     <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}>
       <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
         <g transform="translate(.016 13.463)">
