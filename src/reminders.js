@@ -11,6 +11,7 @@ import {
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
+const AUTOSAVE_MS = 700;
 let reminderTimer = null;
 let reminderUserId = null;
 let reminderStartPromise = null;
@@ -37,7 +38,7 @@ const TYPE_LABEL = {
   body: 'Körperwerte',
 };
 
-// Gemeinsam mit der Notification-Body-Formatierung in send-reminders/index.ts.
+// Analog zur Notification-Body-Formatierung in send-reminders/index.ts.
 const EINHEITEN = ['', 'mg', 'µg', 'g', 'IE', 'ml', 'Tropfen', 'Kapsel', 'Tablette', 'TL', 'EL'];
 const HINWEISE = [
   ['', 'ohne Hinweis'],
@@ -68,6 +69,11 @@ function nextDrinkSlot(reminder, now) {
   return (current - start) % interval === 0 ? minuteKey(now) : null;
 }
 
+function hinweisLabel(value) {
+  const paar = HINWEISE.find(([wert]) => wert === (value || ''));
+  return paar && paar[0] ? paar[1] : '';
+}
+
 function notificationText(reminder) {
   if (reminder.type === 'meal') return { title: reminder.label, body: 'Zeit fuer deine geplante Mahlzeit.' };
   if (reminder.type === 'supplement') {
@@ -79,11 +85,6 @@ function notificationText(reminder) {
   }
   if (reminder.type === 'drink') return { title: reminder.label, body: 'Ein Glas Wasser einplanen.' };
   return { title: reminder.label, body: 'Geplante Erinnerung.' };
-}
-
-function hinweisLabel(value) {
-  const paar = HINWEISE.find(([wert]) => wert === (value || ''));
-  return paar && paar[0] ? paar[1] : '';
 }
 
 async function loadReminders(userId, signal) {
@@ -160,7 +161,7 @@ function reminderPayload(userId, reminder) {
   return {
     user_id: userId,
     type: reminder.type,
-    label: reminder.label.trim(),
+    label: (reminder.label || '').trim() || TYPE_LABEL[reminder.type] || 'Erinnerung',
     time: reminder.time || '08:00',
     weekdays: reminder.weekdays?.length ? reminder.weekdays : WEEKDAYS,
     active: Boolean(reminder.active),
@@ -180,6 +181,11 @@ async function saveReminder(userId, reminder) {
     .single();
   if (error) throw error;
   return data;
+}
+
+async function deleteReminder(userId, reminderId) {
+  const { error } = await supabase.from('reminders').delete().eq('id', reminderId).eq('user_id', userId);
+  if (error) throw error;
 }
 
 async function ensureDefaults(userId, signal) {
@@ -246,26 +252,28 @@ export async function startReminderLoop(userId) {
 
 function permissionMarkup(state) {
   if (!state) {
-    return '<div class="msg">Push-Status wird geprüft …</div>';
+    return '<div class="rem-push-status rem-push-loading">Push-Status wird geprüft …</div>';
   }
   if (!state.ready) {
-    return `<div class="msg err">${state.reason}</div>`;
+    return `<div class="rem-push-status rem-push-warn">${escapeHtml(state.reason)}</div>`;
   }
   if (state.permission === 'denied') {
-    return '<div class="msg err">Benachrichtigungen sind blockiert. Bitte in den System­einstellungen für diese App erlauben.</div>';
+    return '<div class="rem-push-status rem-push-warn">Benachrichtigungen sind blockiert. Bitte in den System­einstellungen für diese App erlauben.</div>';
   }
   if (state.subscribed) {
-    return `<div class="push-status">
-      <div class="msg ok"><b>Push ist aktiv</b><span>Dieses Gerät empfängt Erinnerungen auch bei geschlossener App.</span></div>
-      <div class="push-actions">
-        <button class="btn btn-primary" type="button" data-test-push>Test senden</button>
-        <button class="btn" type="button" data-disable-push>Auf diesem Gerät ausschalten</button>
+    return `<div class="rem-push-status rem-push-ok">
+      <div class="rem-push-titel"><span class="rem-push-haken" aria-hidden="true">✓</span><b>Push ist aktiv</b></div>
+      <span class="rem-push-untertitel">Dieses Gerät empfängt Erinnerungen auch bei geschlossener App.</span>
+      <div class="rem-push-aktionen">
+        <button class="btn rem-push-test" type="button" data-test-push>Test senden</button>
+        <button class="btn rem-push-refresh" type="button" data-refresh-push aria-label="Status aktualisieren">↻</button>
+        <button class="btn rem-push-off" type="button" data-disable-push>Ausschalten</button>
       </div>
     </div>`;
   }
-  return `<div class="pushbar">
+  return `<div class="rem-push-status rem-push-off-state">
     <span>Dieses Gerät ist noch nicht für Push registriert.</span>
-    <button class="pb-go" type="button" data-activate-push>Benachrichtigungen aktivieren</button>
+    <button class="btn btn-primary rem-push-activate" type="button" data-activate-push>Benachrichtigungen aktivieren</button>
   </div>`;
 }
 
@@ -278,7 +286,7 @@ async function renderPushControls(container, userId) {
   try {
     state = await getPushState();
   } catch (error) {
-    slot.innerHTML = `<div class="msg err">${error.message}</div>`;
+    slot.innerHTML = `<div class="rem-push-status rem-push-warn">${escapeHtml(error.message)}</div>`;
     return;
   }
   slot.innerHTML = permissionMarkup(state);
@@ -314,6 +322,14 @@ async function renderPushControls(container, userId) {
     };
   }
 
+  const refresh = slot.querySelector('[data-refresh-push]');
+  if (refresh) {
+    refresh.onclick = async () => {
+      refresh.disabled = true;
+      await renderPushControls(container, userId);
+    };
+  }
+
   const disable = slot.querySelector('[data-disable-push]');
   if (disable) {
     disable.onclick = async () => {
@@ -332,7 +348,7 @@ async function renderPushControls(container, userId) {
   }
 }
 
-// Fasst den Reminder in ein paar Zeichen zusammen fuer die geschlossene Zeile.
+// Zusammenfassung der Zeile im geschlossenen Zustand.
 function summaryFor(reminder) {
   const time = String(reminder.time || '').slice(0, 5);
   if (reminder.type === 'drink') {
@@ -351,19 +367,12 @@ function summaryFor(reminder) {
   return { time, detail: '' };
 }
 
-function statusBadge(completion, now = new Date()) {
-  if (completion?.completed_at) return '<span class="rem-row-status ist-erledigt">✓ erledigt</span>';
-  if (completion?.snoozed_until) {
-    const bis = new Date(completion.snoozed_until);
-    if (bis > now) {
-      const uhr = `${pad(bis.getHours())}:${pad(bis.getMinutes())}`;
-      return `<span class="rem-row-status ist-snoozed">⏱ bis ${uhr}</span>`;
-    }
-  }
+function statusBadge(completion) {
+  if (completion?.completed_at) return '<span class="rem-row-status ist-erledigt">Heute erledigt</span>';
   return '';
 }
 
-function reminderBodyMarkup(reminder) {
+function reminderBodyMarkup(reminder, completion) {
   const isDrink = reminder.type === 'drink';
   const isSupplement = reminder.type === 'supplement';
   const zeit = (reminder.time || '08:00').slice(0, 5);
@@ -401,14 +410,18 @@ function reminderBodyMarkup(reminder) {
       </select>
     </label>` : ''}
     <div class="rem-row-body-aktionen">
-      <label class="switchline rem-row-aktivierung">
+      <label class="rem-switch">
         <input type="checkbox" data-active${reminder.active ? ' checked' : ''}>
-        <span>Aktiv</span>
+        <span class="rem-switch-thumb"></span>
+        <span class="rem-switch-label">Aktiv</span>
       </label>
-      ${reminder.id && (reminder.type === 'meal' || reminder.type === 'supplement') ? `
-        <button type="button" class="btn btn-danger rem-row-loeschen" data-remove-reminder>Löschen</button>
-      ` : ''}
+      ${reminder.id ? `<button type="button" class="rem-erledigt-btn${completion?.completed_at ? ' ist-aktiv' : ''}" data-done>
+        ${completion?.completed_at ? 'Heute erledigt ✓' : 'Für heute erledigt'}
+      </button>` : ''}
     </div>
+    ${reminder.id && (reminder.type === 'meal' || reminder.type === 'supplement') ? `
+      <button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>
+    ` : ''}
   </div>`;
 }
 
@@ -417,7 +430,8 @@ function reminderRowMarkup(reminder, completion) {
   const zusammenfassung = summaryFor(reminder);
   const badge = statusBadge(completion);
   const dimmed = completion?.completed_at ? ' ist-erledigt' : '';
-  return `<details class="rem-row${dimmed}" data-reminder-key="${key}" data-type="${reminder.type}">
+  const inaktiv = reminder.active ? '' : ' ist-inaktiv';
+  return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}">
     <summary class="rem-row-head">
       <span class="rem-row-dot" data-type="${reminder.type}" aria-hidden="true"></span>
       <span class="rem-row-titel">
@@ -426,13 +440,9 @@ function reminderRowMarkup(reminder, completion) {
         ${badge}
       </span>
       <span class="rem-row-zeit">${escapeHtml(zusammenfassung.time)}</span>
-      ${reminder.id ? `<span class="rem-row-aktionen" data-actions>
-        <button type="button" class="rem-row-icon${completion?.completed_at ? ' ist-aktiv' : ''}" data-done aria-label="Heute erledigt">✓</button>
-        <button type="button" class="rem-row-icon${completion?.snoozed_until && new Date(completion.snoozed_until) > new Date() ? ' ist-aktiv' : ''}" data-snooze aria-label="Später erinnern">⏱</button>
-      </span>` : ''}
       <span class="rem-row-chevron" aria-hidden="true">⌄</span>
     </summary>
-    ${reminderBodyMarkup(reminder)}
+    ${reminderBodyMarkup(reminder, completion)}
   </details>`;
 }
 
@@ -462,37 +472,6 @@ function reminderGroups(reminders, completions) {
   }).join('');
 }
 
-// Kleines Snooze-Popover, das an der Position der Snooze-Taste erscheint.
-function snoozePopover(anchor, onChoose) {
-  const previous = document.querySelector('.rem-snooze-menu');
-  if (previous) previous.remove();
-  const menu = document.createElement('div');
-  menu.className = 'rem-snooze-menu';
-  menu.innerHTML = `
-    <button type="button" data-choice="15">+15 Min</button>
-    <button type="button" data-choice="60">+1 Std</button>
-    <button type="button" data-choice="tomorrow">Morgen früh</button>
-    <button type="button" data-choice="clear">Snooze aufheben</button>`;
-  const rect = anchor.getBoundingClientRect();
-  menu.style.top = `${rect.bottom + window.scrollY + 6}px`;
-  menu.style.left = `${Math.max(8, rect.right + window.scrollX - 180)}px`;
-  document.body.append(menu);
-  const closeAndPick = (event) => {
-    const button = event.target.closest('[data-choice]');
-    if (!button) return;
-    onChoose(button.dataset.choice);
-    menu.remove();
-    document.removeEventListener('click', clickOutside, true);
-  };
-  const clickOutside = (event) => {
-    if (menu.contains(event.target)) return;
-    menu.remove();
-    document.removeEventListener('click', clickOutside, true);
-  };
-  menu.addEventListener('click', closeAndPick);
-  setTimeout(() => document.addEventListener('click', clickOutside, true), 0);
-}
-
 export async function mountReminders(container, { session, signal }) {
   const userId = session.user.id;
   container.innerHTML = `
@@ -506,24 +485,32 @@ export async function mountReminders(container, { session, signal }) {
       </div>
       <section class="seiten-einstieg">
         <b>Mahlzeiten, Supplements, Wasser</b>
-        <span>Tippen für Details, Häkchen für erledigt, Uhr für später.</span>
+        <span>Tippen zum Aufklappen, Änderungen speichern sich automatisch.</span>
       </section>
       <section class="card" data-reminders-card>
         <div data-permission>${permissionMarkup()}</div>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
-        <button class="btn btn-primary btn-block" type="button" data-save-reminders>Änderungen speichern</button>
       </section>
     </div>`;
 
   const list = container.querySelector('[data-reminder-list]');
-  const card = container.querySelector('[data-reminders-card]');
   renderPushControls(container, userId);
 
   let reminders = [];
   let completions = [];
-  const relist = () => {
-    list.innerHTML = reminderGroups(reminders, completions);
+  const rerender = () => { list.innerHTML = reminderGroups(reminders, completions); };
+  const rerenderRow = (key) => {
+    const row = list.querySelector(`[data-reminder-key="${key}"]`);
+    if (!row) return;
+    const reminder = reminders.find((r) => (r._key || r.id) === key);
+    const completion = completions.find((c) => c.reminder_id === reminder?.id);
+    if (!reminder) return;
+    const open = row.open;
+    row.outerHTML = reminderRowMarkup(reminder, completion);
+    const wieder = list.querySelector(`[data-reminder-key="${key}"]`);
+    if (wieder && open) wieder.open = true;
   };
+
   try {
     const [reminderListe, completionListe] = await Promise.all([
       ensureDefaults(userId, signal),
@@ -532,54 +519,109 @@ export async function mountReminders(container, { session, signal }) {
     if (signal?.aborted) return;
     reminders = reminderListe;
     completions = completionListe;
-    relist();
+    rerender();
   } catch (error) {
-    list.innerHTML = `<div class="msg err">${error.message}</div>`;
+    list.innerHTML = `<div class="msg err">${escapeHtml(error.message)}</div>`;
     return;
   }
 
-  // Werte aus dem DOM in die Reminder-Objekte spiegeln (nur die ausgeklappten
-  // Zeilen ueberschreiben; geschlossene Zeilen behalten ihre Werte).
-  const readFromDom = () => [...list.querySelectorAll('[data-reminder-key]')].map((row) => {
-    const reminder = reminders.find((item) => (item._key || item.id) === row.dataset.reminderKey);
-    if (!reminder) return null;
+  // Autosave-Registry pro Reminder-Key mit Debounce, damit Tippen im Namen
+  // nicht bei jedem Tastenanschlag ein Roundtrip macht.
+  const saveTimers = new Map();
+  const dirtyPatches = new Map();
+  const scheduleSave = (key) => {
+    if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+    saveTimers.set(key, setTimeout(() => flushSave(key), AUTOSAVE_MS));
+  };
+  const flushSave = async (key) => {
+    saveTimers.delete(key);
+    const patch = dirtyPatches.get(key);
+    if (!patch) return;
+    dirtyPatches.delete(key);
+    const bisher = reminders.find((r) => (r._key || r.id) === key);
+    if (!bisher) return;
+    const zusammen = {
+      ...bisher,
+      ...patch,
+      metadata: { ...(bisher.metadata || {}), ...(patch.metadata || {}) },
+    };
+    try {
+      const gespeichert = await saveReminder(userId, zusammen);
+      // ID kann sich aendern (neuer Eintrag), key im DOM darf aber gleich bleiben
+      const index = reminders.findIndex((r) => (r._key || r.id) === key);
+      if (index >= 0) reminders[index] = { ...gespeichert, _key: bisher._key };
+      startReminderLoop(userId);
+    } catch (error) {
+      toast('Speichern fehlgeschlagen');
+    }
+  };
+
+  const patchFromBody = (row) => {
     const body = row.querySelector('.rem-row-body');
-    if (!body) return reminder;
-    const active = body.querySelector('[data-active]')?.checked;
-    const label = body.querySelector('[data-label]')?.value || reminder.label;
-    const time = body.querySelector('[data-time]')?.value || reminder.time;
-    let metadata = reminder.metadata || {};
+    if (!body) return null;
+    const patch = {
+      label: body.querySelector('[data-label]')?.value.trim(),
+      time: body.querySelector('[data-time]')?.value,
+      active: body.querySelector('[data-active]')?.checked,
+    };
     if (row.dataset.type === 'drink') {
-      metadata = {
+      patch.metadata = {
         bis: body.querySelector('[data-end]')?.value || '21:00',
         intervall_minuten: Number(body.querySelector('[data-interval]')?.value || 120),
       };
     } else if (row.dataset.type === 'supplement') {
-      metadata = {
-        ...(metadata || {}),
+      patch.metadata = {
         dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
         einheit: body.querySelector('[data-einheit]')?.value || '',
         hinweis: body.querySelector('[data-hinweis]')?.value || '',
       };
     }
-    return { ...reminder, active: Boolean(active), label, time, metadata };
-  }).filter(Boolean);
+    return patch;
+  };
 
-  // Ein einziger Klick-Handler auf der Liste bedient alle Zeilen-Interaktionen.
+  // Autosave beim Verlassen eines Feldes und beim Aendern (Toggle sofort speichern).
+  list.addEventListener('change', (event) => {
+    const row = event.target.closest('[data-reminder-key]');
+    if (!row) return;
+    const key = row.dataset.reminderKey;
+    const patch = patchFromBody(row);
+    if (!patch) return;
+    dirtyPatches.set(key, patch);
+    // Aktiv-Toggle und Selects sofort speichern; Text-Inputs sind ohnehin change=blur.
+    flushSave(key);
+    rerenderRow(key);
+  });
+  list.addEventListener('input', (event) => {
+    if (event.target.matches('input[type="text"], input[type="time"], input:not([type])')) {
+      const row = event.target.closest('[data-reminder-key]');
+      if (!row) return;
+      const key = row.dataset.reminderKey;
+      const patch = patchFromBody(row);
+      if (!patch) return;
+      dirtyPatches.set(key, patch);
+      scheduleSave(key);
+    }
+  });
+
   list.addEventListener('click', async (event) => {
     // Neue Zeile anlegen
     const addButton = event.target.closest('[data-add-reminder]');
     if (addButton) {
       const type = addButton.dataset.addReminder;
-      reminders = readFromDom();
-      reminders.push({
+      const neu = {
         id: null, _key: `new:${crypto.randomUUID()}`, type,
         label: type === 'meal' ? 'Neue Mahlzeit' : 'Neues Supplement',
         time: type === 'meal' ? '12:00' : '08:00',
         weekdays: WEEKDAYS, active: false, metadata: {}, route: '#reminders',
-      });
-      relist();
-      const details = list.querySelector(`[data-reminder-key="${reminders.at(-1)._key}"]`);
+      };
+      reminders.push(neu);
+      // Sofort persistieren, damit die neue Zeile eine echte ID hat
+      try {
+        const gespeichert = await saveReminder(userId, neu);
+        Object.assign(neu, gespeichert);
+      } catch { /* Speichert beim naechsten Autosave nach */ }
+      rerender();
+      const details = list.querySelector(`[data-reminder-key="${neu._key}"]`);
       if (details) {
         details.open = true;
         const input = details.querySelector('[data-label]');
@@ -588,7 +630,7 @@ export async function mountReminders(container, { session, signal }) {
       return;
     }
 
-    // Zeile aus dem Server loeschen
+    // Loeschen
     const remove = event.target.closest('[data-remove-reminder]');
     if (remove) {
       const row = remove.closest('[data-reminder-key]');
@@ -597,20 +639,20 @@ export async function mountReminders(container, { session, signal }) {
       if (!reminder) return;
       if (!confirm(`„${reminder.label}“ wirklich löschen?`)) return;
       if (reminder.id) {
-        const { error } = await supabase.from('reminders').delete().eq('id', reminder.id).eq('user_id', userId);
-        if (error) { toast('Löschen fehlgeschlagen'); return; }
+        try { await deleteReminder(userId, reminder.id); }
+        catch { toast('Löschen fehlgeschlagen'); return; }
       }
       reminders = reminders.filter((r) => (r._key || r.id) !== key);
       completions = completions.filter((c) => c.reminder_id !== reminder.id);
-      relist();
+      rerender();
       toast('Erinnerung gelöscht');
       return;
     }
 
-    // Erledigt-Toggle (nur wenn Reminder schon persistiert ist)
+    // Erledigt-Toggle (nur wenn Reminder schon eine ID hat)
     const done = event.target.closest('[data-done]');
     if (done) {
-      event.preventDefault(); event.stopPropagation();
+      event.preventDefault();
       const row = done.closest('[data-reminder-key]');
       const key = row.dataset.reminderKey;
       const reminder = reminders.find((r) => (r._key || r.id) === key);
@@ -622,61 +664,11 @@ export async function mountReminders(container, { session, signal }) {
           snoozed_until: null,
         });
         completions = completions.filter((c) => c.reminder_id !== reminder.id).concat(neu);
-        relist();
+        rerenderRow(key);
         toast(bereits?.completed_at ? 'Erledigt-Markierung entfernt' : 'Für heute erledigt');
       } catch (error) {
         toast('Konnte Status nicht speichern');
       }
-      return;
-    }
-
-    // Snooze
-    const snooze = event.target.closest('[data-snooze]');
-    if (snooze) {
-      event.preventDefault(); event.stopPropagation();
-      const row = snooze.closest('[data-reminder-key]');
-      const key = row.dataset.reminderKey;
-      const reminder = reminders.find((r) => (r._key || r.id) === key);
-      if (!reminder?.id) return;
-      snoozePopover(snooze, async (choice) => {
-        try {
-          let snoozedUntil = null;
-          if (choice === '15' || choice === '60') {
-            const delta = Number(choice) * 60 * 1000;
-            snoozedUntil = new Date(Date.now() + delta).toISOString();
-          } else if (choice === 'tomorrow') {
-            const morgen = new Date();
-            morgen.setDate(morgen.getDate() + 1);
-            morgen.setHours(8, 0, 0, 0);
-            snoozedUntil = morgen.toISOString();
-          }
-          const neu = await upsertCompletion(userId, reminder.id, {
-            snoozed_until: snoozedUntil,
-            completed_at: null,
-          });
-          completions = completions.filter((c) => c.reminder_id !== reminder.id).concat(neu);
-          relist();
-          toast(snoozedUntil ? 'Später erinnern gesetzt' : 'Snooze aufgehoben');
-        } catch (error) {
-          toast('Konnte Snooze nicht speichern');
-        }
-      });
     }
   });
-
-  card.querySelector('[data-save-reminders]').onclick = async (event) => {
-    const button = event.currentTarget;
-    button.disabled = true;
-    const rows = readFromDom();
-    try {
-      reminders = [];
-      for (const reminder of rows) reminders.push(await saveReminder(userId, reminder));
-      relist();
-      startReminderLoop(userId);
-      toast('Erinnerungen gespeichert');
-    } catch (error) {
-      toast('Speichern fehlgeschlagen');
-    }
-    if (button.isConnected) button.disabled = false;
-  };
 }
