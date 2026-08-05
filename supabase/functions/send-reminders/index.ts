@@ -36,6 +36,13 @@ type Subscription = {
   auth: string;
 };
 
+type Completion = {
+  reminder_id: string;
+  date: string;
+  completed_at: string | null;
+  snoozed_until: string | null;
+};
+
 function json(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -63,6 +70,19 @@ function localParts(now: Date, timeZone: string) {
     };
   } catch {
     return localParts(now, 'UTC');
+  }
+}
+
+function localDate(now: Date, timeZone: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(now);
+    const value = (type: string) => parts.find((part) => part.type === type)?.value || '';
+    return `${value('year')}-${value('month')}-${value('day')}`;
+  } catch {
+    return now.toISOString().slice(0, 10);
   }
 }
 
@@ -97,6 +117,19 @@ function notification(reminder?: Reminder) {
     drink: 'Ein Glas Wasser einplanen.',
     body: 'Zeit für deine geplanten Körperwerte.',
   };
+  // Bei Supplements Dosierung + Einheit + Hinweis in die Notification-Body ziehen
+  if (reminder.type === 'supplement') {
+    const dosis = String(reminder.metadata?.dosis || '').trim();
+    const einheit = String(reminder.metadata?.einheit || '').trim();
+    const hinweis = String(reminder.metadata?.hinweis || '').trim();
+    const parts = [dosis && einheit ? `${dosis} ${einheit}` : dosis || einheit, hinweis].filter(Boolean);
+    return {
+      title: reminder.label,
+      body: parts.length ? parts.join(' · ') : bodies.supplement,
+      tag: `nutrition-${reminder.id}`,
+      url: reminder.route || '#reminders',
+    };
+  }
   return {
     title: reminder.label,
     body: bodies[reminder.type] || 'Geplante Erinnerung.',
@@ -128,15 +161,24 @@ async function testPush(userId: string) {
   if (!data?.length) return json({ ok: false, error: 'Für dieses Konto ist kein Gerät registriert.' }, 409);
 
   let sent = 0;
+  const failures: string[] = [];
   for (const subscription of data as Subscription[]) {
     try {
       await send(subscription, notification());
       sent += 1;
     } catch (error) {
+      const status = Number((error as { statusCode?: number })?.statusCode || 0);
+      const message = String((error as Error)?.message || error || 'Unbekannter Web-Push-Fehler');
+      failures.push(`${status ? `${status}: ` : ''}${message}`.slice(0, 300));
       await removeExpired(subscription, error);
     }
   }
-  return json({ ok: sent > 0, sent }, sent > 0 ? 200 : 502);
+  return json({
+    ok: sent > 0,
+    sent,
+    failed: failures.length,
+    ...(sent ? {} : { error: failures[0] || 'Kein registriertes Gerät konnte erreicht werden.' }),
+  }, sent > 0 ? 200 : 502);
 }
 
 async function dispatchDue() {
@@ -154,11 +196,47 @@ async function dispatchDue() {
   if (profileError) throw profileError;
 
   const zones = new Map((profiles || []).map((profile) => [profile.id, profile.zeitzone || 'UTC']));
-  const due = ((reminders || []) as Reminder[])
+  const remindersById = new Map<string, Reminder>((reminders || []).map((r: Reminder) => [r.id, r]));
+
+  // 1. Regulär zeitplan-fällige Reminders
+  const scheduled = ((reminders || []) as Reminder[])
     .filter((reminder) => isDue(reminder, zones.get(reminder.user_id) || 'UTC', now));
+
+  // 2. Reminders deren Snooze in dieser Minute abgelaufen ist (unabhängig von reminder.time)
+  const { data: expiredSnoozes, error: snoozeError } = await admin
+    .from('reminder_completions')
+    .select('reminder_id, user_id, date')
+    .not('snoozed_until', 'is', null)
+    .is('completed_at', null)
+    .lte('snoozed_until', now.toISOString());
+  if (snoozeError) throw snoozeError;
+  const dueFromSnooze: Reminder[] = [];
+  for (const row of (expiredSnoozes || []) as { reminder_id: string; user_id: string; date: string }[]) {
+    const reminder = remindersById.get(row.reminder_id);
+    if (reminder) dueFromSnooze.push(reminder);
+  }
+
+  const dueMap = new Map<string, Reminder>();
+  for (const r of scheduled) dueMap.set(r.id, r);
+  for (const r of dueFromSnooze) dueMap.set(r.id, r);
+  const due = [...dueMap.values()];
   if (!due.length) return json({ ok: true, due: 0, sent: 0 });
 
   const userIds = [...new Set(due.map((reminder) => reminder.user_id))];
+
+  // Alle heutigen Completions dieser User laden (verhindert doppeltes Feuern und Snooze-Skip)
+  const dueDateList = [...new Set(due.map((r) => localDate(now, zones.get(r.user_id) || 'UTC')))];
+  const { data: completionsData, error: completionsError } = await admin
+    .from('reminder_completions')
+    .select('reminder_id, date, completed_at, snoozed_until, id')
+    .in('user_id', userIds)
+    .in('date', dueDateList);
+  if (completionsError) throw completionsError;
+  const completionByKey = new Map<string, Completion & { id: string }>();
+  for (const row of (completionsData || []) as (Completion & { id: string })[]) {
+    completionByKey.set(`${row.reminder_id}:${row.date}`, row);
+  }
+
   const { data: subscriptions, error: subscriptionError } = await admin
     .from('push_subscriptions')
     .select('id,user_id,endpoint,p256dh,auth')
@@ -172,6 +250,15 @@ async function dispatchDue() {
 
   let sent = 0;
   for (const reminder of due) {
+    const zone = zones.get(reminder.user_id) || 'UTC';
+    const date = localDate(now, zone);
+    const completion = completionByKey.get(`${reminder.id}:${date}`);
+
+    // Bereits heute erledigt → skip
+    if (completion?.completed_at) continue;
+    // Noch snoozed → skip (isDue kann true sein, Snooze zieht vor)
+    if (completion?.snoozed_until && new Date(completion.snoozed_until) > now) continue;
+
     for (const subscription of byUser.get(reminder.user_id) || []) {
       const { data: delivery, error: claimError } = await admin
         .from('push_deliveries')
@@ -199,6 +286,14 @@ async function dispatchDue() {
           .eq('id', delivery.id);
         await removeExpired(subscription, error);
       }
+    }
+
+    // Snooze-Feld leeren, sobald verbraucht – sonst feuert der Snooze in jeder folgenden Minute erneut.
+    if (completion?.snoozed_until && new Date(completion.snoozed_until) <= now) {
+      await admin
+        .from('reminder_completions')
+        .update({ snoozed_until: null })
+        .eq('id', completion.id);
     }
   }
   return json({ ok: true, due: due.length, sent });
