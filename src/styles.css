@@ -3607,3 +3607,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:flex;flex-direction:column;gap:8px}
 .rem-push-activate{background:#492425!important;color:#fff!important;min-height:44px;
   border-radius:10px!important;font-size:14px!important}
+
+/* Refresh-Knopf in der Eintragsdetail-Kopfleiste: Icon dreht sich waehrend
+   der neue Vorschau-Fetch laeuft. */
+@keyframes dex-detail-rotiert{to{transform:rotate(360deg)}}
+.dex-detail-knopf.rotiert svg,.dex-detail-knopf.rotiert .material-svg svg{
+  animation:dex-detail-rotiert .8s linear infinite;transform-origin:center}

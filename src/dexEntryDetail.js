@@ -130,6 +130,7 @@ function detailMarkup(entry) {
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
       <span></span>
       <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${materialIconMarkup('favorite')}</button>
+      ${entry.url ? `<button class="dex-detail-knopf" type="button" data-entry-refresh aria-label="Vorschau neu laden">${materialIconMarkup('refresh')}</button>` : ''}
       <button class="dex-detail-knopf" type="button" data-entry-edit aria-label="Eintrag bearbeiten">${materialIconMarkup('build')}</button>
       <button class="dex-detail-knopf" type="button" data-entry-share aria-label="Eintrag teilen">${materialIconMarkup('upload_file')}</button>
     </nav>
@@ -164,6 +165,31 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
     toast(favorite ? 'Zu Favoriten hinzugefügt' : 'Aus Favoriten entfernt');
     await mountDexEntryDetail(container, { userId, id, signal });
   };
+  const refreshButton = container.querySelector('[data-entry-refresh]');
+  if (refreshButton) {
+    refreshButton.onclick = async () => {
+      if (!entry.url) return;
+      refreshButton.disabled = true;
+      refreshButton.classList.add('rotiert');
+      try {
+        const { data: previewData, error: previewError } = await supabase.functions.invoke('link-preview', { body: { url: entry.url } });
+        if (previewError) throw previewError;
+        if (!previewData || previewData.error) throw new Error(previewData?.error || 'Vorschau konnte nicht geladen werden.');
+        const patch = {
+          preview_url: previewData.previewUrl || null,
+          provider: previewData.provider || entry.provider || null,
+        };
+        const { error: updateError } = await supabase.from('dex_entries').update(patch).eq('id', entry.id).eq('user_id', userId);
+        if (updateError) throw updateError;
+        toast('Vorschau aktualisiert');
+        await mountDexEntryDetail(container, { userId, id, signal });
+      } catch (error) {
+        toast(error.message || 'Vorschau konnte nicht aktualisiert werden.');
+        refreshButton.classList.remove('rotiert');
+        refreshButton.disabled = false;
+      }
+    };
+  }
   container.querySelector('[data-entry-edit]').onclick = () => editEntry(entry, () => mountDexEntryDetail(container, { userId, id, signal }));
   container.querySelector('[data-entry-share]').onclick = () => shareEntry(entry);
   container.querySelector('[data-fullscreen]')?.addEventListener('click', () => fullscreenImage(entry.preview_url, entry.title));
