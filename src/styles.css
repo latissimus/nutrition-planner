@@ -267,6 +267,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 .nav-av img{width:100%;height:100%;object-fit:cover;display:block}
 .nav-av-fb{font-family:var(--display);font-style:italic;font-weight:700;font-size:16px;color:var(--link)}
 .nav-av.active{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink)}
+.nav-av:active{transform:translate(2px,2px)}
 
 /* ---------- Generic card / buttons ---------- */
 .card{background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte);padding:18px}
@@ -3212,6 +3213,10 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .card,.reminder-group,.profile-abschnitt,.food-form-card,.food-card{box-shadow:var(--hart-klein)}
 .btn{box-shadow:var(--hart-klein)}
 .btn:active{transform:translate(2px,2px);box-shadow:none}
+/* Einheitlicher Drückeffekt (wie .kategorie-kopfknopf) als Fallback fuer
+   alle <button>-Elemente ohne eigene :active-Regel. Eingabe- und Suchfelder
+   sind nie betroffen, da hier ausschliesslich der button-Tag greift. */
+button:active{transform:translate(2px,2px);box-shadow:none}
 .input{box-shadow:none}
 .input:focus{border-color:var(--prio);box-shadow:0 0 0 3px var(--prio-wash)}
 
