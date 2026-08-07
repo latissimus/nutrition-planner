@@ -760,6 +760,12 @@ async function render() {
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
   const view = renderChrome(route);
+  // Beim Oeffnen eines Dex bleibt die neue Seite unsichtbar (schon
+  // rechts positioniert), bis wirklich ALLES gemountet ist – sonst blitzt
+  // der fertige Inhalt kurz an seiner Endposition auf, bevor die
+  // Animation ihn zurueck an den Start reisst.
+  const istDexSeite = !['home', 'search', 'profile'].includes(route) && !route.startsWith('entry/');
+  if (istDexSeite) view.classList.add('dex-einschub-warten');
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -867,7 +873,8 @@ async function render() {
   }
   // Seitliche Einschub-Animation nur beim Oeffnen eines Dex (eingebaute
   // Kategorie oder eigener Dex), nicht fuer Home/Suche/Profil/Eintrag.
-  if (!['home', 'search', 'profile'].includes(route) && !route.startsWith('entry/')) {
+  if (istDexSeite) {
+    view.classList.remove('dex-einschub-warten');
     view.classList.add('dex-einschub');
   }
 }

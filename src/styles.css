@@ -3271,13 +3271,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Seitliche Einschub-Animation: neue Seite kommt beim Oeffnen eines Dex von
    rechts hereingeschoben. #view hat bereits overflow-x:hidden, dadurch
-   erzeugt der Startzustand ausserhalb des Viewports keinen Scrollbalken. */
+   erzeugt der Startzustand ausserhalb des Viewports keinen Scrollbalken.
+   dex-einschub-warten haelt die Seite VOR dem Mounten schon an der
+   Start-Position fest (unsichtbar) – ohne das wuerde der fertig geladene
+   Inhalt kurz an seiner Endposition aufblitzen, bevor die Animation ihn
+   zurueck an den Start reisst und neu reinschiebt. */
+.dex-einschub-warten{transform:translateX(100%);opacity:0}
 @keyframes dexEinschub{
-  from{transform:translateX(100%);opacity:.4}
+  from{transform:translateX(100%);opacity:0}
   to{transform:translateX(0);opacity:1}
 }
 .dex-einschub{animation:dexEinschub .32s cubic-bezier(.16,.84,.32,1) both}
 @media(prefers-reduced-motion:reduce){
+  .dex-einschub-warten{transform:none;opacity:1}
   .dex-einschub{animation:none}
 }
 
