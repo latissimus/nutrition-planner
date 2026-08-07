@@ -262,7 +262,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 :root[data-theme="dark"] .nav-btn.faq-on{background:var(--pink);color:#0B1B44}
 /* 44px = Apples Mindestmass fuer Tippziele. Groesser waere es nicht wert:
    Der Kopf richtet sich an der Logo-Hoehe aus, darueber schiebt der Knopf ihn auf. */
-.nav-av{width:44px;height:44px;padding:0;border:var(--bw) solid var(--ink);border-radius:50%;overflow:hidden;
+.nav-av{width:44px;height:44px;padding:0;border:var(--bw) solid var(--ink);border-radius:var(--r);overflow:hidden;
   background:var(--surface2);flex:0 0 auto;display:flex;align-items:center;justify-content:center}
 .nav-av img{width:100%;height:100%;object-fit:cover;display:block}
 .nav-av-fb{font-family:var(--display);font-style:italic;font-weight:700;font-size:16px;color:var(--link)}
@@ -2601,7 +2601,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .tuck-quadrat .app-icon{width:22px;height:22px}
 .tuck-quadrat.aktiv{background:var(--akzent);color:var(--akzent-ink)}
 .tuck-quadrat.betont{background:var(--akzent);color:var(--akzent-ink)}
-.tuck-titelzeile .neu-sammlung{background:var(--surface);color:var(--text)}
 /* Der Druckpunkt: Die Flaeche faehrt in ihren eigenen Schatten hinein. Ohne
    Schatten (Retro) bleibt nur der Versatz – das genuegt als Rueckmeldung. */
 .tuck-quadrat:active{transform:translate(2px,2px);box-shadow:none}
@@ -2648,9 +2647,13 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Start: Bibliothek ---------- */
-.tuck-home{padding-top:38px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+/* Gleicher Abstand nach oben wie beim Oeffnen eines Dex (.kategorie-kopf
+   margin-top:18px). */
+.tuck-home{padding-top:18px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
 /* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt. */
 .tuck-kopfzeile{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 2px 32px}
+.tuck-kopf-aktionen{display:flex;align-items:center;gap:10px}
+.tuck-kopf-aktionen .neu-sammlung{background:var(--surface);color:var(--text)}
 /* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
 .tuck-titelzeile{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -2865,7 +2868,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-entry-delete{min-height:50px;border-color:#B42318!important;color:#B42318!important;background:var(--surface)!important}
 
 .dex-detail-seite{padding-top:18px}
-.dex-detail-steuerung{display:grid;grid-template-columns:44px 1fr 44px 44px 44px;gap:9px;align-items:center;margin-bottom:18px}
+/* Flex statt Grid: die Zahl der Knoepfe schwankt (Refresh nur bei Link-
+   Eintraegen), ein fester Spaltensatz liess den Teilen-Knopf dann in eine
+   zweite Zeile rutschen. */
+.dex-detail-steuerung{display:flex;align-items:center;gap:9px;margin-bottom:18px}
+.dex-detail-steuerung>span{flex:1}
 .dex-detail-knopf{
   display:grid;place-items:center;width:44px;height:44px;padding:0;border:var(--karten-bw) solid var(--ink);
   border-radius:var(--r);background:var(--surface);color:#000;box-shadow:var(--hart-klein);
