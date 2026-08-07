@@ -2210,10 +2210,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 html,body,#app{min-height:100%;background-color:var(--bg)}
 #app{min-height:100dvh}
-#view{
-  min-height:calc(100dvh - 68px);background-color:var(--bg);
-  background-image:var(--app-pattern);background-repeat:repeat;background-attachment:fixed}
-:root[data-seite] #view{background-image:var(--app-pattern)}
+#view{min-height:calc(100dvh - 68px)}
 
 /* Deckender, musterfreier Kopf in exakt derselben Unterseitenfarbe. */
 .app-kopf{
@@ -2539,9 +2536,10 @@ button,a,[role="button"],summary{touch-action:manipulation;
 
 
 .app-kopf,.app-kopf::before,.app-kopf::after{background:var(--app-chrome-bg)}
-:root[data-seite] #view{
-  background-color:var(--app-content-bg);background-image:none!important;
-}
+/* #view selbst bleibt durchsichtig: Das Tapeten-Muster faerbt jetzt html
+   (siehe weiter unten), damit es unter der Statusleiste/Notch und dem
+   Home-Indicator hindurchreicht statt an #view's Scrollbereich zu enden. */
+:root[data-seite] #view{background:transparent!important}
 
 
 /* Der aktive Reiter ist nun der Seitentitel. */
@@ -2651,13 +2649,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 /* Gleicher Abstand nach oben wie beim Oeffnen eines Dex (.kategorie-kopf
    margin-top:18px). */
 .tuck-home{padding-top:18px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
-/* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt –
-   bleiben aber beim Hochscrollen oben stehen (sticky), deshalb eigener,
-   deckender Hintergrund gegen darunter wegscrollende Dex-Kacheln. */
+/* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt,
+   der ganz normal mitscrollt. */
 .tuck-kopfzeile{
-  position:sticky;top:0;z-index:2;
   display:flex;align-items:center;justify-content:space-between;gap:14px;
-  margin:0 -2px;padding:0 2px 42px;background:var(--bg);
+  margin:0 2px 56px;
 }
 .tuck-kopf-aktionen{display:flex;align-items:center;gap:10px}
 .tuck-kopf-aktionen .neu-sammlung{background:var(--surface);color:var(--text)}
@@ -3398,40 +3394,44 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sheet-gefahr{color:#B42318!important}
 .sheet-gefahr .material-svg,.sheet-gefahr svg{fill:currentColor!important}
 
-/* ---------- Exakt dieselben Dreieck-/Tropfen-Tapeten wie LOGMAN ---------- */
-:root[data-seite] #view{
+/* ---------- Exakt dieselben Dreieck-/Tropfen-Tapeten wie LOGMAN ----------
+   Auf html statt #view: html scrollt nie, dadurch reicht das fixe Muster
+   zuverlaessig bis unter Statusleiste/Notch und Home-Indicator (auf iOS
+   ist background-attachment:fixed in einem verschachtelten Scroll-
+   Container wie #view nicht zuverlaessig). ---------- */
+:root[data-seite]{
   background-repeat:repeat!important;background-attachment:fixed!important;
 }
-:root[data-seite="home"] #view{
+:root[data-seite="home"]{
   background-image:none!important;
 }
-:root[data-seite="body"] #view,:root[data-seite="food-log"] #view,
-:root[data-seite="habits"] #view,:root[data-seite="search"] #view{
+:root[data-seite="body"],:root[data-seite="food-log"],
+:root[data-seite="habits"],:root[data-seite="search"]{
   background-image:var(--muster-dreieck)!important;background-size:auto!important;
 }
-:root[data-seite="recipes"] #view,
-:root[data-seite="collection"] #view,:root[data-seite="profile"] #view{
+:root[data-seite="recipes"],
+:root[data-seite="collection"],:root[data-seite="profile"]{
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen)!important;
   background-size:auto,112px!important;
 }
-:root[data-seite="reminders"] #view{
+:root[data-seite="reminders"]{
   background-image:
     linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),
     url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
   background-size:auto,112px!important;
 }
-:root[data-theme="dark"][data-seite="body"] #view,:root[data-theme="dark"][data-seite="food-log"] #view,
-:root[data-theme="dark"][data-seite="habits"] #view,:root[data-theme="dark"][data-seite="search"] #view{
+:root[data-theme="dark"][data-seite="body"],:root[data-theme="dark"][data-seite="food-log"],
+:root[data-theme="dark"][data-seite="habits"],:root[data-theme="dark"][data-seite="search"]{
   background-image:var(--muster-dreieck-dunkel)!important;
 }
-:root[data-theme="dark"][data-seite="recipes"] #view,
-:root[data-theme="dark"][data-seite="collection"] #view,:root[data-theme="dark"][data-seite="profile"] #view{
+:root[data-theme="dark"][data-seite="recipes"],
+:root[data-theme="dark"][data-seite="collection"],:root[data-theme="dark"][data-seite="profile"]{
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),var(--muster-tropfen-dunkel)!important;
 }
-:root[data-theme="dark"][data-seite="home"] #view{
+:root[data-theme="dark"][data-seite="home"]{
   background-image:none!important;
 }
-:root[data-theme="dark"][data-seite="reminders"] #view{
+:root[data-theme="dark"][data-seite="reminders"]{
   background-image:
     linear-gradient(color-mix(in srgb,var(--bg) 55%,transparent),color-mix(in srgb,var(--bg) 55%,transparent)),
     url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
