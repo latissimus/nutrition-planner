@@ -760,12 +760,16 @@ async function render() {
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
   const view = renderChrome(route);
-  // Beim Oeffnen eines Dex bleibt die neue Seite unsichtbar (schon
-  // rechts positioniert), bis wirklich ALLES gemountet ist – sonst blitzt
-  // der fertige Inhalt kurz an seiner Endposition auf, bevor die
-  // Animation ihn zurueck an den Start reisst.
-  const istDexSeite = !['home', 'search', 'profile'].includes(route) && !route.startsWith('entry/');
+  // Beim Oeffnen von Dex, Profil und Suche bleibt die neue Seite unsichtbar
+  // (schon rechts positioniert), bis wirklich ALLES gemountet ist – sonst
+  // blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor die
+  // Animation ihn zurueck an den Start reisst. Home ist die Rueckseite
+  // (u. a. Ziel der iOS-Zurueck-Wischgeste): dort waere ein Reinschieben von
+  // rechts der Wischrichtung entgegengesetzt, daher nur ein reines Einblenden
+  // gegen das Flackern beim Neuladen.
+  const istDexSeite = route !== 'home' && !route.startsWith('entry/');
   if (istDexSeite) view.classList.add('dex-einschub-warten');
+  else if (route === 'home') view.classList.add('seite-warten');
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -871,11 +875,14 @@ async function render() {
   } else {
     mountHome(view, signal);
   }
-  // Seitliche Einschub-Animation nur beim Oeffnen eines Dex (eingebaute
-  // Kategorie oder eigener Dex), nicht fuer Home/Suche/Profil/Eintrag.
+  // Seitliche Einschub-Animation beim Oeffnen von Dex/Profil/Suche; Home
+  // (Rueckseite) bekommt stattdessen ein reines Einblenden.
   if (istDexSeite) {
     view.classList.remove('dex-einschub-warten');
     view.classList.add('dex-einschub');
+  } else if (route === 'home') {
+    view.classList.remove('seite-warten');
+    view.classList.add('seite-einblenden');
   }
 }
 

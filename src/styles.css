@@ -3282,9 +3282,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   to{transform:translateX(0);opacity:1}
 }
 .dex-einschub{animation:dexEinschub .32s cubic-bezier(.16,.84,.32,1) both}
+
+/* Home ist die Rueckseite (Ziel der iOS-Zurueck-Wischgeste): kein seitlicher
+   Schub, nur ein reines Einblenden gegen das Flackern beim Neuladen. */
+.seite-warten{opacity:0}
+@keyframes seiteEinblenden{from{opacity:0}to{opacity:1}}
+.seite-einblenden{animation:seiteEinblenden .28s ease both}
+
 @media(prefers-reduced-motion:reduce){
-  .dex-einschub-warten{transform:none;opacity:1}
-  .dex-einschub{animation:none}
+  .dex-einschub-warten,.seite-warten{transform:none;opacity:1}
+  .dex-einschub,.seite-einblenden{animation:none}
 }
 
 /* ---------- Sammlungen und Unter-Sammlungen ---------- */
