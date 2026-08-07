@@ -791,10 +791,14 @@ async function render() {
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
   const slide = richtung === 'vor' && route !== 'home' && !istEintrag;
   const view = renderChrome(route);
+  const header = app.querySelector(':scope > .app-kopf');
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
-  // die Animation ihn zurueck an den Start reisst.
+  // die Animation ihn zurueck an den Start reisst. Auf Home blendet die
+  // App-Leiste im selben Rhythmus mit ein statt hart aufzupoppen.
   view.classList.add(slide ? 'dex-einschub-warten' : 'seite-warten');
+  if (route === 'home') header.classList.add('seite-warten');
+  const mountStart = performance.now();
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -900,12 +904,18 @@ async function render() {
   } else {
     mountHome(view, signal);
   }
-  if (slide) {
-    view.classList.remove('dex-einschub-warten');
-    view.classList.add('dex-einschub');
-  } else {
-    view.classList.remove('seite-warten');
-    view.classList.add('seite-einblenden');
+  // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.
+  // Supabase-Roundtrip). War alles praktisch sofort da – etwa nach der
+  // iOS-Zurueck-Wischgeste, die den Inhalt oft schon zeigt, bevor unser
+  // eigener Reload durch ist –, wirkt eine erzwungene Animation haerter als
+  // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
+  // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
+  const spuerbareLuecke = performance.now() - mountStart > 100;
+  view.classList.remove(slide ? 'dex-einschub-warten' : 'seite-warten');
+  if (spuerbareLuecke) view.classList.add(slide ? 'dex-einschub' : 'seite-einblenden');
+  if (route === 'home') {
+    header.classList.remove('seite-warten');
+    if (spuerbareLuecke) header.classList.add('seite-einblenden');
   }
 }
 
