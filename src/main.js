@@ -33,6 +33,13 @@ applyTheme(getTheme());
 applySchatten(getSchatten());
 registriereServiceWorker().catch(() => {});
 
+// iOS berechnet :hover/:active fuer Buttons und Links nur, wenn irgendwo im
+// Dokument ein touchstart-Listener haengt – sonst ueberspringt WebKit das
+// komplett (besonders ausgepraegt im Home-Bildschirm-Standalone-Modus).
+// Formular-Submit-Buttons sind davon ausgenommen, alle anderen Buttons/Links
+// nicht. Leerer Listener reicht, er muss nur existieren.
+document.addEventListener('touchstart', () => {}, { passive: true });
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.typ === 'gehe-zu' && event.data.url) location.hash = event.data.url.replace(/^#/, '');
