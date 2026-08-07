@@ -79,18 +79,6 @@ function navRichtung(ziel) {
   return 'vor';
 }
 
-function syncStatusAktualisieren() {
-  const sync = document.querySelector('#app-sync');
-  if (!sync) return;
-  const online = navigator.onLine;
-  sync.className = `save-dot ${online ? 'ok' : 'wait'}`;
-  sync.textContent = online ? '✓' : '↑';
-  sync.title = online ? 'Online – Synchronisierung aktiv' : 'Offline – Synchronisierung wartet';
-  sync.setAttribute('aria-label', sync.title);
-}
-
-window.addEventListener('online', syncStatusAktualisieren);
-window.addEventListener('offline', syncStatusAktualisieren);
 
 function fehlertext(error) {
   const text = (error?.message || '').toLowerCase();
@@ -337,32 +325,15 @@ function zaehlerEintragen(container, zaehler) {
   });
 }
 
-function renderChrome(route) {
+function renderChrome() {
   app.classList.add('app-shell');
-  let header = app.querySelector(':scope > .app-kopf');
+  // Kein globaler Kopf mehr: jede Seite ist Vollbild, Home traegt Logo und
+  // Avatar als normalen Seiteninhalt (siehe mountHome).
   let view = app.querySelector(':scope > #view');
-  if (!header || !view) {
-    app.innerHTML = `
-      <header class="topbar app-kopf">
-        <div class="wrap">
-          <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
-          <nav class="kopf-aktionen" aria-label="App-Status und Profil">
-            <span class="save-dot ok" id="app-sync" role="status" aria-live="polite" title="Synchronisiert">✓</span>
-            <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
-          </nav>
-        </div>
-      </header>
-      <main id="view"></main>`;
-    header = app.querySelector(':scope > .app-kopf');
+  if (!view) {
+    app.innerHTML = '<main id="view"></main>';
     view = app.querySelector(':scope > #view');
   }
-  header.querySelector('[href="#profile"]')?.classList.toggle('aktiv', route === 'profile');
-  // Vollbild ueberall ausser auf der Startseite: jede andere Seite hat ihren
-  // eigenen Kopf (Zurueck-Pfeil/Titel) und braucht die globale App-Leiste
-  // nicht mehr. #view uebernimmt dafuer synchron (kein Warten auf setSeite,
-  // das teils erst nach einem Await im jeweiligen Mount passiert) das
-  // Safe-Area-Polster, das sonst die App-Leiste getragen hat.
-  app.classList.toggle('vollbild', route !== 'home');
   view.replaceChildren();
   view.className = '';
   view.removeAttribute('style');
@@ -370,7 +341,6 @@ function renderChrome(route) {
   // Dokument selbst bewegt sich nie; dadurch muss iOS keinen Sticky-Header
   // gegen eine alte Dokument-Scrollposition neu zusammensetzen.
   view.scrollTop = 0;
-  syncStatusAktualisieren();
   return view;
 }
 
@@ -501,6 +471,10 @@ async function mountHome(container, signal) {
   catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home">
+      <div class="tuck-kopfzeile">
+        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
+        <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+      </div>
       <div class="tuck-ablage">
         <label class="tuck-ablage-feld" for="schnell-suche">
           ${materialIconMarkup('search')}
@@ -790,14 +764,11 @@ async function render() {
   // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
   const slide = richtung === 'vor' && route !== 'home' && !istEintrag;
-  const view = renderChrome(route);
-  const header = app.querySelector(':scope > .app-kopf');
+  const view = renderChrome();
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
-  // die Animation ihn zurueck an den Start reisst. Auf Home blendet die
-  // App-Leiste im selben Rhythmus mit ein statt hart aufzupoppen.
+  // die Animation ihn zurueck an den Start reisst.
   view.classList.add(slide ? 'dex-einschub-warten' : 'seite-warten');
-  if (route === 'home') header.classList.add('seite-warten');
   const mountStart = performance.now();
   if (route === 'home') {
     await mountHome(view, signal);
@@ -913,10 +884,6 @@ async function render() {
   const spuerbareLuecke = performance.now() - mountStart > 100;
   view.classList.remove(slide ? 'dex-einschub-warten' : 'seite-warten');
   if (spuerbareLuecke) view.classList.add(slide ? 'dex-einschub' : 'seite-einblenden');
-  if (route === 'home') {
-    header.classList.remove('seite-warten');
-    if (spuerbareLuecke) header.classList.add('seite-einblenden');
-  }
 }
 
 // Zwei rAF, damit der Browser den :active-Druckeffekt eines getippten Links
