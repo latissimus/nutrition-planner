@@ -3269,6 +3269,18 @@ body{overscroll-behavior:none}
 }
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
+/* Seitliche Einschub-Animation: neue Seite kommt beim Oeffnen eines Dex von
+   rechts hereingeschoben. #view hat bereits overflow-x:hidden, dadurch
+   erzeugt der Startzustand ausserhalb des Viewports keinen Scrollbalken. */
+@keyframes dexEinschub{
+  from{transform:translateX(100%)}
+  to{transform:translateX(0)}
+}
+.dex-einschub{animation:dexEinschub .32s cubic-bezier(.16,.84,.32,1) both}
+@media(prefers-reduced-motion:reduce){
+  .dex-einschub{animation:none}
+}
+
 /* ---------- Sammlungen und Unter-Sammlungen ---------- */
 .kategorie-kopftitel small{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:600}
 .unter-sammlungen-block{margin:24px 2px 28px}
@@ -3310,7 +3322,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .dex-leer-symbol i{animation:none;transform:translateY(25px)}
 }
 
-.sammlung-editor{max-height:min(91dvh,850px);padding-inline:22px}
+.sammlung-editor{width:min(100%,640px);max-height:min(91dvh,850px);padding-inline:22px;box-shadow:none}
 .sammlung-editor form>h3,.dex-appearance-form>h3{
   margin:22px 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.07em
 }
@@ -3319,8 +3331,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-label span{color:var(--muted);font-weight:500;letter-spacing:0}
 .sammlung-editor .input{min-height:58px;font-size:17px}
 .sammlung-editor-farben{
-  display:grid;grid-auto-flow:column;grid-template-rows:54px;grid-auto-columns:54px;
-  gap:9px;max-width:100%;padding:2px 5px 7px 1px;overflow-x:auto;
+  display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,44px);grid-auto-columns:44px;
+  gap:8px;max-width:100%;padding:2px 5px 7px 1px;overflow-x:auto;
   overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
 }
 .sammlung-editor-icons{

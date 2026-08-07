@@ -865,6 +865,11 @@ async function render() {
   } else {
     mountHome(view, signal);
   }
+  // Seitliche Einschub-Animation nur beim Oeffnen eines Dex (eingebaute
+  // Kategorie oder eigener Dex), nicht fuer Home/Suche/Profil/Eintrag.
+  if (!['home', 'search', 'profile'].includes(route) && !route.startsWith('entry/')) {
+    view.classList.add('dex-einschub');
+  }
 }
 
 // Zwei rAF, damit der Browser den :active-Druckeffekt eines getippten Links
