@@ -812,7 +812,12 @@ async function render() {
   }
 }
 
-window.addEventListener('hashchange', () => render());
+// Zwei rAF, damit der Browser den :active-Druckeffekt eines getippten Links
+// noch zeichnet, bevor render() den kompletten Seiteninhalt ersetzt – ohne
+// Verzoegerung verschwindet das gedrueckte Element vor dem ersten Paint.
+window.addEventListener('hashchange', () => {
+  requestAnimationFrame(() => requestAnimationFrame(() => render()));
+});
 
 if (!supabaseKonfiguriert) {
   renderSetup();
