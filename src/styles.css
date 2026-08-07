@@ -3018,7 +3018,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   padding:20px 20px 22px;overflow:auto;
   overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   border:var(--bw) solid var(--ink);border-radius:22px;
-  background:var(--surface);color:var(--text);box-shadow:7px 7px 0 rgba(0,0,0,.7);
+  background:var(--surface);color:var(--text);box-shadow:none;
   transform:none;transition:none;
 }
 .sheet-griff{display:none}
@@ -3322,7 +3322,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .dex-leer-symbol i{animation:none;transform:translateY(25px)}
 }
 
-.sammlung-editor{width:min(100%,640px);max-height:min(91dvh,850px);padding-inline:22px;box-shadow:none}
+.sammlung-editor{width:min(100%,640px);max-height:min(91dvh,850px);padding-inline:12px}
 .sammlung-editor form>h3,.dex-appearance-form>h3{
   margin:22px 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.07em
 }
