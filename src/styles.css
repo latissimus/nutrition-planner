@@ -263,11 +263,12 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 /* 44px = Apples Mindestmass fuer Tippziele. Groesser waere es nicht wert:
    Der Kopf richtet sich an der Logo-Hoehe aus, darueber schiebt der Knopf ihn auf. */
 .nav-av{width:44px;height:44px;padding:0;border:var(--bw) solid var(--ink);border-radius:var(--r);overflow:hidden;
-  background:var(--surface2);flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+  background:var(--surface2);flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--hart-klein)}
 .nav-av img{width:100%;height:100%;object-fit:cover;display:block}
 .nav-av-fb{font-family:var(--display);font-style:italic;font-weight:700;font-size:16px;color:var(--link)}
 .nav-av.active{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink)}
-.nav-av:active{transform:translate(2px,2px)}
+.nav-av:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Generic card / buttons ---------- */
 .card{background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte);padding:18px}
@@ -2618,7 +2619,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
    quadratisch und so hoch wie das Feld. */
 .tuck-ablage{
   display:grid;grid-template-columns:minmax(0,1fr) 62px;gap:10px;align-items:stretch;
-  margin:0 2px 56px;
+  margin:0 2px 28px;
 }
 .tuck-ablage-feld{
   display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;
@@ -2650,8 +2651,14 @@ button,a,[role="button"],summary{touch-action:manipulation;
 /* Gleicher Abstand nach oben wie beim Oeffnen eines Dex (.kategorie-kopf
    margin-top:18px). */
 .tuck-home{padding-top:18px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
-/* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt. */
-.tuck-kopfzeile{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 2px 32px}
+/* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt –
+   bleiben aber beim Hochscrollen oben stehen (sticky), deshalb eigener,
+   deckender Hintergrund gegen darunter wegscrollende Dex-Kacheln. */
+.tuck-kopfzeile{
+  position:sticky;top:0;z-index:2;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  margin:0 -2px;padding:0 2px 42px;background:var(--bg);
+}
 .tuck-kopf-aktionen{display:flex;align-items:center;gap:10px}
 .tuck-kopf-aktionen .neu-sammlung{background:var(--surface);color:var(--text)}
 /* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
