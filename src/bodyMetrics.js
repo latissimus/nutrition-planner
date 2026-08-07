@@ -260,6 +260,5 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
     if (button.isConnected) button.disabled = false;
   };
 
-  renderSkinfolds();
-  renderWeights();
+  return Promise.all([renderSkinfolds(), renderWeights()]);
 }

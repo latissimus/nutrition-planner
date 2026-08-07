@@ -3273,8 +3273,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    rechts hereingeschoben. #view hat bereits overflow-x:hidden, dadurch
    erzeugt der Startzustand ausserhalb des Viewports keinen Scrollbalken. */
 @keyframes dexEinschub{
-  from{transform:translateX(100%)}
-  to{transform:translateX(0)}
+  from{transform:translateX(100%);opacity:.4}
+  to{transform:translateX(0);opacity:1}
 }
 .dex-einschub{animation:dexEinschub .32s cubic-bezier(.16,.84,.32,1) both}
 @media(prefers-reduced-motion:reduce){

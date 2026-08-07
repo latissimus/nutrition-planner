@@ -778,7 +778,7 @@ async function render() {
     });
   } else if (route === 'body') {
     setSeite('body');
-    mountBodyMetrics(view, {
+    await mountBodyMetrics(view, {
       session,
       profile,
       signal,
@@ -787,11 +787,11 @@ async function render() {
     mountCategoryChrome(view, route, 'KFA-LOG');
   } else if (route === 'reminders') {
     setSeite('reminders');
-    mountReminders(view, { session, profile, signal });
+    await mountReminders(view, { session, profile, signal });
     mountCategoryChrome(view, route, 'MAHLZEITEN');
   } else if (route === 'shopping') {
     setSeite('shopping');
-    mountShoppingList(view, { session, signal });
+    await mountShoppingList(view, { session, signal });
     mountCategoryChrome(view, route, 'EINKAUF', {
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
