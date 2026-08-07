@@ -2,6 +2,8 @@ import { supabase } from './supabase.js';
 import { colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
+import { editEntry } from './dexEntryDetail.js';
+import { bindLongPress } from './longPress.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -306,21 +308,28 @@ function filterFoodEntries(entries, filter) {
   return entries;
 }
 
-function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.') {
+function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.', hasChildren = false) {
   const favorites = entries.filter((entry) => entry.favorite);
   const regular = entries.filter((entry) => !entry.favorite);
   const notes = regular.filter((entry) => entry.entry_type === 'note');
   const images = regular.filter((entry) => entry.entry_type === 'image');
   const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
   const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
-  return entries.length
-    ? `${groupMarkup('favorite', favorites, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`
-    : `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
-        <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
-        <span>${emptyText}</span></div></section>`;
+  if (entries.length) {
+    return `${groupMarkup('favorite', favorites, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`;
+  }
+  // Ein Dex mit Unter-Dex, aber (noch) ohne eigene Eintraege, ist nicht
+  // "leer" – die Animation wuerde sonst faelschlich unter einem gut
+  // gefuellten Unter-Dex-Raster stehen.
+  if (hasChildren) return '';
+  return `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
+      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
+      <span>${emptyText}</span></div></section>`;
 }
 
-export async function renderDexEntries(container, { userId, rootKey, collectionId = null, color, signal, onChanged, foodFilters = rootKey === 'food-log' } = {}) {
+export async function renderDexEntries(container, {
+  userId, rootKey, collectionId = null, color, signal, onChanged, foodFilters = rootKey === 'food-log', hasChildren = false,
+} = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
   try {
@@ -329,7 +338,7 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
     let activeFilter = 'all';
     const paint = () => {
       const visibleEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined)}</div>`;
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined, hasChildren)}</div>`;
       slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
         if (!group.querySelector('.dex-inhaltskarte')) group.remove();
       });
@@ -338,6 +347,16 @@ export async function renderDexEntries(container, { userId, rootKey, collectionI
       });
     };
     paint();
+    // Long-Press auf eine Eintragskarte oeffnet direkt "Eintrag bearbeiten"
+    // (Notiz, Video, Bild, Rezept – alle teilen dieselbe Karte). slot bleibt
+    // beim Neuzeichnen erhalten, die Delegation ueberlebt jedes paint().
+    const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
+    const refreshAlles = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    bindLongPress(slot, '.dex-inhaltskarte', (el) => {
+      const entry = entriesById.get(el.dataset.dexEntryId);
+      if (!entry) return null;
+      return () => editEntry(entry, refreshAlles, { onDeleted: refreshAlles });
+    });
     onChanged?.(entries);
     return entries;
   } catch (error) {

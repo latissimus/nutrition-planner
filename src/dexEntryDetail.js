@@ -35,7 +35,7 @@ function backHref(entry) {
   return entry.collection_id ? `#collection/${entry.collection_id}` : `#${entry.root_key}`;
 }
 
-function editEntry(entry, onSaved) {
+export function editEntry(entry, onSaved, { onDeleted } = {}) {
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="Eintrag bearbeiten">
@@ -84,7 +84,9 @@ function editEntry(entry, onSaved) {
     const { error } = await supabase.from('dex_entries').delete().eq('id', entry.id).eq('user_id', entry.user_id);
     if (error) { toast(error.message || 'Löschen fehlgeschlagen'); return; }
     if (entry.image_path) await supabase.storage.from(BUCKET).remove([entry.image_path]);
-    close(); toast('Dex-Eintrag gelöscht'); location.hash = backHref(entry).slice(1);
+    close(); toast('Dex-Eintrag gelöscht');
+    if (onDeleted) onDeleted();
+    else location.hash = backHref(entry).slice(1);
   };
   document.body.append(backdrop);
   requestAnimationFrame(() => backdrop.classList.add('offen'));

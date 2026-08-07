@@ -1,4 +1,5 @@
 import './styles.css';
+import { bindLongPress } from './longPress.js';
 // Figtree (SIL Open Font License). Ausgewaehlt im direkten Vergleich mit einem
 // vergroesserten Ausschnitt aus Inspirationen/IMG_5112: Tuckiis Schrift hat ein
 // doppelstoeckiges "a" mit Schwaenzchen, einen GERADEN "y"-Abstrich, runde
@@ -381,46 +382,6 @@ function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eige
   </div>`;
 }
 
-// Long-Press auf eine Dex-Kachel oeffnet direkt "Dex bearbeiten" (dasselbe
-// Menue wie der Einstellungen-Knopf im Dex-Kopf) statt zu navigieren. Per
-// Pointer Events, damit Touch und Maus gleich behandelt werden; ein kurzer
-// Tap bleibt eine normale Navigation, da preventDefault nur beim Long-Press
-// greift.
-function bindDexLongPress(root, resolveOpen) {
-  if (!root) return;
-  const SCHWELLE_MS = 550;
-  const TOLERANZ_PX = 10;
-  let timer = null;
-  let start = null;
-  let ausgeloest = false;
-  const abbrechen = () => { clearTimeout(timer); timer = null; start = null; };
-  root.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
-    const el = event.target.closest('.dex-ordner-test');
-    if (!el) return;
-    ausgeloest = false;
-    start = { x: event.clientX, y: event.clientY };
-    timer = setTimeout(() => {
-      const open = resolveOpen(el);
-      if (!open) return;
-      ausgeloest = true;
-      navigator.vibrate?.(10);
-      open();
-    }, SCHWELLE_MS);
-  });
-  root.addEventListener('pointermove', (event) => {
-    if (!timer || !start) return;
-    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > TOLERANZ_PX) abbrechen();
-  });
-  ['pointerup', 'pointercancel', 'pointerleave'].forEach((typ) => root.addEventListener(typ, abbrechen));
-  root.addEventListener('click', (event) => {
-    if (!ausgeloest) return;
-    ausgeloest = false;
-    event.preventDefault();
-    event.stopPropagation();
-  }, true);
-}
-
 // Baut fuer eine Kachel (eingebaute Kategorie ueber data-sammlung oder
 // eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
 function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
@@ -429,8 +390,10 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
     if (collectionId) {
       const item = itemsById?.get(collectionId);
       if (!item) return null;
+      // Kein onCreateSub hier: "Unter-Dex erstellen" gibt es bewusst nur im
+      // Dex selbst (ueber dessen eigenen "+"-Knopf), nicht per Long-Press von
+      // aussen auf die Kachel des uebergeordneten Dex.
       return () => settingsSheet(`collection-${item.id}`, refresh, {
-        onCreateSub: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.id, onSaved: refresh }),
         onRename: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
         onEditAppearance: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
         onDelete: async () => {
@@ -542,7 +505,7 @@ async function mountHome(container, signal) {
     onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
   });
 
-  bindDexLongPress(container.querySelector('.tuck-grid'), dexEinstellungenOeffner({
+  bindLongPress(container.querySelector('.tuck-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
     userId: session.user.id,
     refresh: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
     itemsById: new Map(eigene.map((item) => [item.id, item])),
@@ -609,14 +572,14 @@ async function mountCustomCollection(container, item, signal) {
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
   });
-  bindDexLongPress(container.querySelector('.unter-sammlungen-grid'), dexEinstellungenOeffner({
+  bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
     userId: session.user.id,
     refresh,
     itemsById: new Map(children.map((kind) => [kind.id, kind])),
   }));
   await renderDexEntries(container, {
     userId: session.user.id, rootKey: item.root_key, collectionId: item.id,
-    color: item.color, signal,
+    color: item.color, signal, hasChildren: children.length > 0,
     onChanged: (entries) => {
       if (!Array.isArray(entries)) return;
       const meta = container.querySelector('.kategorie-kopftitel small');
@@ -857,11 +820,11 @@ async function render() {
       onAddOwnRecipe: () => openEntry('note', 'recipe'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
     });
-    bindDexLongPress(view.querySelector('.unter-sammlungen-grid'), dexEinstellungenOeffner({
+    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
     await renderDexEntries(view, {
-      userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal,
+      userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
       onChanged: (entries) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
@@ -879,11 +842,11 @@ async function render() {
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
     });
-    bindDexLongPress(view.querySelector('.unter-sammlungen-grid'), dexEinstellungenOeffner({
+    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
     await renderDexEntries(view, {
-      userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal,
+      userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal, hasChildren: children.length > 0,
       onChanged: (entries) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta && Array.isArray(entries)) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
