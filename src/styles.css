@@ -3267,6 +3267,11 @@ body{overscroll-behavior:none}
   -webkit-overflow-scrolling:touch;scroll-behavior:auto;
   background-attachment:scroll!important;
 }
+/* Vollbild: ueberall ausser Home traegt #view (statt der App-Leiste) das
+   Safe-Area-Polster. Der Grid-Track der App-Leiste wird 0, #view fuellt
+   automatisch nach (grid-template-rows:auto minmax(0,1fr)). */
+.app-shell.vollbild>.app-kopf{display:none}
+.app-shell.vollbild>#view{padding-top:env(safe-area-inset-top)}
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Seitliche Einschub-Animation: neue Seite kommt beim Oeffnen eines Dex von
@@ -3283,11 +3288,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .dex-einschub{animation:dexEinschub .32s cubic-bezier(.16,.84,.32,1) both}
 
-/* Home ist die Rueckseite (Ziel der iOS-Zurueck-Wischgeste): kein seitlicher
-   Schub, nur ein reines Einblenden gegen das Flackern beim Neuladen. */
+/* Rueckwaerts (Schliessen/Zurueck-Wischgeste), Home und Eintraege: kein
+   seitlicher Schub, nur ein reines, bewusst langsameres Einblenden. */
 .seite-warten{opacity:0}
 @keyframes seiteEinblenden{from{opacity:0}to{opacity:1}}
-.seite-einblenden{animation:seiteEinblenden .28s ease both}
+.seite-einblenden{animation:seiteEinblenden .55s cubic-bezier(.16,.84,.32,1) both}
 
 @media(prefers-reduced-motion:reduce){
   .dex-einschub-warten,.seite-warten{transform:none;opacity:1}

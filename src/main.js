@@ -62,6 +62,23 @@ let renderGeneration = 0;
 let routeAbortController = null;
 let vorgemerkteSuche = '';
 
+// Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
+// (zurueck/schliessen) zu unterscheiden: location.hash pusht bei jeder
+// Navigation einen Browser-Verlaufseintrag, egal ob per Tap oder per
+// iOS-Zurueck-Wischgeste – der Stack bleibt dadurch synchron zum echten
+// Verlauf. "gleich" faengt reine Refresh-Faelle ab (z. B. nach einer
+// Umbenennung per Long-Press bleibt man auf derselben Route).
+let navStack = ['home'];
+function navRichtung(ziel) {
+  if (navStack[navStack.length - 1] === ziel) return 'gleich';
+  if (navStack.length > 1 && navStack[navStack.length - 2] === ziel) {
+    navStack.pop();
+    return 'zurueck';
+  }
+  navStack.push(ziel);
+  return 'vor';
+}
+
 function syncStatusAktualisieren() {
   const sync = document.querySelector('#app-sync');
   if (!sync) return;
@@ -340,6 +357,12 @@ function renderChrome(route) {
     view = app.querySelector(':scope > #view');
   }
   header.querySelector('[href="#profile"]')?.classList.toggle('aktiv', route === 'profile');
+  // Vollbild ueberall ausser auf der Startseite: jede andere Seite hat ihren
+  // eigenen Kopf (Zurueck-Pfeil/Titel) und braucht die globale App-Leiste
+  // nicht mehr. #view uebernimmt dafuer synchron (kein Warten auf setSeite,
+  // das teils erst nach einem Await im jeweiligen Mount passiert) das
+  // Safe-Area-Polster, das sonst die App-Leiste getragen hat.
+  app.classList.toggle('vollbild', route !== 'home');
   view.replaceChildren();
   view.className = '';
   view.removeAttribute('style');
@@ -759,17 +782,19 @@ async function render() {
   routeAbortController?.abort();
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
+  const richtung = navRichtung(angefragt);
+  const istEintrag = route.startsWith('entry/');
+  // Reinschieben von rechts nur beim Vorwaertsgehen in einen Dex/Profil/
+  // Suche (von Home oder von einem Dex aus). Rueckwaerts (Schliessen,
+  // iOS-Zurueck-Wischgeste), Home selbst und Eintraege bekommen stattdessen
+  // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
+  // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
+  const slide = richtung === 'vor' && route !== 'home' && !istEintrag;
   const view = renderChrome(route);
-  // Beim Oeffnen von Dex, Profil und Suche bleibt die neue Seite unsichtbar
-  // (schon rechts positioniert), bis wirklich ALLES gemountet ist – sonst
-  // blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor die
-  // Animation ihn zurueck an den Start reisst. Home ist die Rueckseite
-  // (u. a. Ziel der iOS-Zurueck-Wischgeste): dort waere ein Reinschieben von
-  // rechts der Wischrichtung entgegengesetzt, daher nur ein reines Einblenden
-  // gegen das Flackern beim Neuladen.
-  const istDexSeite = route !== 'home' && !route.startsWith('entry/');
-  if (istDexSeite) view.classList.add('dex-einschub-warten');
-  else if (route === 'home') view.classList.add('seite-warten');
+  // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
+  // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
+  // die Animation ihn zurueck an den Start reisst.
+  view.classList.add(slide ? 'dex-einschub-warten' : 'seite-warten');
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -875,12 +900,10 @@ async function render() {
   } else {
     mountHome(view, signal);
   }
-  // Seitliche Einschub-Animation beim Oeffnen von Dex/Profil/Suche; Home
-  // (Rueckseite) bekommt stattdessen ein reines Einblenden.
-  if (istDexSeite) {
+  if (slide) {
     view.classList.remove('dex-einschub-warten');
     view.classList.add('dex-einschub');
-  } else if (route === 'home') {
+  } else {
     view.classList.remove('seite-warten');
     view.classList.add('seite-einblenden');
   }
