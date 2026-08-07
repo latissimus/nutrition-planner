@@ -52,7 +52,7 @@ function darkCollectionColor(color) {
 
 export function collectionCardMarkup(item, count = 0) {
   return `<div class="tuck-fach dex-ordner-testfach unter-sammlung${darkCollectionColor(item.color) ? ' dex-ordner-dunkel' : ''}" style="--ordner:${item.color}">
-    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}">
+    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}" data-collection-id="${item.id}">
       <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
         <g transform="translate(.016 13.463)">
           <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">

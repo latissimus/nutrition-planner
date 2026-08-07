@@ -212,7 +212,7 @@ function colorPicker(route, onChange) {
   };
 }
 
-function settingsSheet(route, onChange, actions = {}) {
+export function settingsSheet(route, onChange, actions = {}) {
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>

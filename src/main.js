@@ -24,7 +24,9 @@ import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import { categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome } from './categoryIcons.js';
+import {
+  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
+} from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
@@ -355,10 +357,10 @@ function istDunkleOrdnerfarbe(farbe) {
   return (r * 299 + g * 587 + b * 114) / 1000 < 135;
 }
 
-function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eigene = false }) {
+function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eigene = false, collectionId = '' }) {
   return `
   <div class="tuck-fach dex-ordner-testfach${istDunkleOrdnerfarbe(farbe) ? ' dex-ordner-dunkel' : ''}${route ? ` dex-ordner-${route}` : ''}${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
-    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}>
+    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}${collectionId ? ` data-collection-id="${collectionId}"` : ''}>
       <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
         <g transform="translate(.016 13.463)">
           <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
@@ -377,6 +379,71 @@ function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eige
       <span class="dex-ordner-kartenicon" aria-hidden="true">${iconInhalt}</span>
     </a>
   </div>`;
+}
+
+// Long-Press auf eine Dex-Kachel oeffnet direkt "Dex bearbeiten" (dasselbe
+// Menue wie der Einstellungen-Knopf im Dex-Kopf) statt zu navigieren. Per
+// Pointer Events, damit Touch und Maus gleich behandelt werden; ein kurzer
+// Tap bleibt eine normale Navigation, da preventDefault nur beim Long-Press
+// greift.
+function bindDexLongPress(root, resolveOpen) {
+  if (!root) return;
+  const SCHWELLE_MS = 550;
+  const TOLERANZ_PX = 10;
+  let timer = null;
+  let start = null;
+  let ausgeloest = false;
+  const abbrechen = () => { clearTimeout(timer); timer = null; start = null; };
+  root.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    const el = event.target.closest('.dex-ordner-test');
+    if (!el) return;
+    ausgeloest = false;
+    start = { x: event.clientX, y: event.clientY };
+    timer = setTimeout(() => {
+      const open = resolveOpen(el);
+      if (!open) return;
+      ausgeloest = true;
+      navigator.vibrate?.(10);
+      open();
+    }, SCHWELLE_MS);
+  });
+  root.addEventListener('pointermove', (event) => {
+    if (!timer || !start) return;
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > TOLERANZ_PX) abbrechen();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((typ) => root.addEventListener(typ, abbrechen));
+  root.addEventListener('click', (event) => {
+    if (!ausgeloest) return;
+    ausgeloest = false;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+}
+
+// Baut fuer eine Kachel (eingebaute Kategorie ueber data-sammlung oder
+// eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
+function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
+  return (el) => {
+    const collectionId = el.dataset.collectionId;
+    if (collectionId) {
+      const item = itemsById?.get(collectionId);
+      if (!item) return null;
+      return () => settingsSheet(`collection-${item.id}`, refresh, {
+        onCreateSub: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.id, onSaved: refresh }),
+        onRename: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
+        onEditAppearance: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
+        onDelete: async () => {
+          if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
+          try { await deleteCollection(userId, item); toast('Dex gelöscht'); refresh(); }
+          catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
+        },
+      });
+    }
+    const route = el.dataset.sammlung;
+    if (route) return () => settingsSheet(route, refresh);
+    return null;
+  };
 }
 
 // Alle DEX-Eintraege teilen dieselbe dreilagige Ordnerform.
@@ -402,6 +469,7 @@ function eigeneSammlungsKarten(items, stats = new Map()) {
     iconInhalt: collectionIconMarkup(item.icon_key),
     farbe: item.color,
     eigene: true,
+    collectionId: item.id,
   })).join('');
 }
 
@@ -474,6 +542,12 @@ async function mountHome(container, signal) {
     onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
   });
 
+  bindDexLongPress(container.querySelector('.tuck-grid'), dexEinstellungenOeffner({
+    userId: session.user.id,
+    refresh: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    itemsById: new Map(eigene.map((item) => [item.id, item])),
+  }));
+
   const sucheOeffnen = () => {
     vorgemerkteSuche = container.querySelector('#schnell-suche').value.trim();
     location.hash = 'search';
@@ -535,6 +609,11 @@ async function mountCustomCollection(container, item, signal) {
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
   });
+  bindDexLongPress(container.querySelector('.unter-sammlungen-grid'), dexEinstellungenOeffner({
+    userId: session.user.id,
+    refresh,
+    itemsById: new Map(children.map((kind) => [kind.id, kind])),
+  }));
   await renderDexEntries(container, {
     userId: session.user.id, rootKey: item.root_key, collectionId: item.id,
     color: item.color, signal,
@@ -778,6 +857,9 @@ async function render() {
       onAddOwnRecipe: () => openEntry('note', 'recipe'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
     });
+    bindDexLongPress(view.querySelector('.unter-sammlungen-grid'), dexEinstellungenOeffner({
+      userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
+    }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal,
       onChanged: (entries) => {
@@ -797,6 +879,9 @@ async function render() {
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
     });
+    bindDexLongPress(view.querySelector('.unter-sammlungen-grid'), dexEinstellungenOeffner({
+      userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
+    }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal,
       onChanged: (entries) => {
