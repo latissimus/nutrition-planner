@@ -913,11 +913,17 @@ async function render() {
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
   const neuerHintergrund = getComputedStyle(document.body);
-  view.style.backgroundColor = neuerHintergrund.backgroundColor;
-  view.style.backgroundImage = neuerHintergrund.backgroundImage;
-  view.style.backgroundSize = neuerHintergrund.backgroundSize;
-  view.style.backgroundPosition = neuerHintergrund.backgroundPosition;
-  view.style.backgroundRepeat = neuerHintergrund.backgroundRepeat;
+  // Die normale Seite ist absichtlich transparent, damit die Tapete auf
+  // html/body bis unter die iOS-Statusleiste reicht. Während des Slides muss
+  // die neue Seite aber eine EIGENE, deckende Kopie dieser Tapete tragen.
+  // `important` ist hier nötig, weil die Transparenzregel für #view selbst
+  // ebenfalls important ist.
+  view.style.setProperty('background-color', neuerHintergrund.backgroundColor, 'important');
+  view.style.setProperty('background-image', neuerHintergrund.backgroundImage, 'important');
+  view.style.setProperty('background-size', neuerHintergrund.backgroundSize, 'important');
+  view.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
+  view.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
+  view.style.setProperty('background-attachment', 'scroll', 'important');
   // Zwei Frames: erst die komplett gemountete neue Seite samt Tapete
   // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
   // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
