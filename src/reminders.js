@@ -436,6 +436,7 @@ function reminderRowMarkup(reminder, completion) {
       <span class="rem-row-dot" data-type="${reminder.type}" aria-hidden="true"></span>
       <span class="rem-row-titel">
         <b>${escapeHtml(reminder.label)}</b>
+        <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
         ${zusammenfassung.detail ? `<small>${escapeHtml(zusammenfassung.detail)}</small>` : ''}
         ${badge}
       </span>
@@ -448,34 +449,31 @@ function reminderRowMarkup(reminder, completion) {
 
 function reminderGroups(reminders, completions) {
   const completionByReminder = new Map(completions.map((c) => [c.reminder_id, c]));
-  const active = reminders.filter((item) => item.active);
-  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
-  const next = (type) => active.filter((item) => item.type === type && minutesFromTime(item.time) >= nowMinutes)
-    .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time))[0];
   const drink = reminders.find((item) => item.type === 'drink');
   const interval = Number(drink?.metadata?.intervall_minuten || 120);
-  const status = `<section class="mahl-status" aria-label="Tagesstatus">
-    <div><small>NÄCHSTE MAHLZEIT</small><b>${next('meal') ? `${escapeHtml(next('meal').time.slice(0, 5))} · ${escapeHtml(next('meal').label)}` : 'Heute erledigt'}</b></div>
-    <div><small>SUPPLEMENT</small><b>${next('supplement') ? `${escapeHtml(next('supplement').time.slice(0, 5))} · ${escapeHtml(next('supplement').label)}` : 'Nichts offen'}</b></div>
-    <div><small>WASSER</small><b>${drink?.active ? `alle ${interval % 60 === 0 ? `${interval / 60} h` : `${interval} min`}` : 'Pausiert'}</b></div>
-  </section>`;
   const periods = [
-    ['MORGEN', 0, 11 * 60], ['MITTAG', 11 * 60, 15 * 60],
-    ['NACHMITTAG', 15 * 60, 18 * 60], ['ABEND', 18 * 60, 24 * 60],
+    ['MORGENS', 0, 11 * 60],
+    ['MITTAGS', 11 * 60, 17 * 60],
+    ['ABENDS', 17 * 60, 24 * 60],
   ];
   const timed = reminders.filter((item) => item.type !== 'drink')
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
   const timeline = periods.map(([title, start, end]) => {
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
-    if (!rows.length) return '';
-    return `<section class="mahl-zeitblock"><h2>${title}</h2><div class="mahl-timeline">${rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')}</div></section>`;
+    return `<section class="mahl-zeitblock">
+      <header><h2>${title}</h2><span>${rows.length}</span></header>
+      <div class="mahl-timeline">${rows.length
+        ? rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')
+        : '<p class="mahl-leerzeile">Keine Erinnerungen</p>'}</div>
+    </section>`;
   }).join('');
-  const water = drink ? `<section class="mahl-wasserkarte">
-    <span class="mahl-wasser-icon">${iconMarkup('drink')}</span>
-    <div><small>TRINKPLAN</small><b>${escapeHtml(drink.label)}</b><span>${escapeHtml(drink.time.slice(0, 5))}–${escapeHtml((drink.metadata?.bis || '21:00').slice(0, 5))} · alle ${interval} Minuten</span></div>
-    <details class="rem-row mahl-wasser-editor" data-reminder-key="${drink._key || drink.id}" data-type="drink"><summary aria-label="Trinkplan bearbeiten">Bearbeiten</summary>${reminderBodyMarkup(drink, completionByReminder.get(drink.id))}</details>
-  </section>` : '';
-  return `${status}<div class="mahl-tagesplan">${timeline || '<div class="tuck-leer"><b>Dein Tag ist noch leer</b><span>Lege über + eine Mahlzeit oder ein Supplement an.</span></div>'}</div>${water}
+  const water = `<section class="mahl-zeitblock mahl-trinken">
+    <header><h2>TRINKEN</h2><span>${drink ? '1' : '0'}</span></header>
+    <div class="mahl-timeline">${drink
+      ? reminderRowMarkup(drink, completionByReminder.get(drink.id))
+      : '<p class="mahl-leerzeile">Noch kein Trinkintervall</p>'}</div>
+  </section>`;
+  return `<div class="mahl-tagesplan">${timeline}${water}</div>
     <button hidden data-add-reminder="meal"></button><button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
 }
 
@@ -491,8 +489,8 @@ export async function mountReminders(container, { session, signal }) {
         <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
       </div>
       <section class="mahl-intro">
-        <b>DEIN TAGESPLAN</b>
-        <span>Mahlzeiten, Supplements und Wasser in einer Chronologie.</span>
+        <b>ERINNERUNGEN</b>
+        <span>Mahlzeiten, Supplements und Trinkintervalle einfach planen.</span>
       </section>
       <section data-reminders-card>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>

@@ -3475,9 +3475,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-status small{display:block;margin-bottom:5px;font:800 8.5px/1 var(--ui);letter-spacing:.05em;color:var(--muted)}
 .mahl-status b{display:block;font:800 12px/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis}
 .mahl-tagesplan{display:flex;flex-direction:column;gap:16px}
-.mahl-zeitblock>h2{margin:0 0 7px;font:800 15px/1 var(--ui);letter-spacing:.05em}
-.mahl-timeline{overflow:hidden;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
+.mahl-zeitblock{position:relative;overflow:hidden;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart-klein)}
+.mahl-zeitblock::before{content:"";display:block;height:7px;background:var(--ordner)}
+.mahl-zeitblock>header{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:10px 13px;border-bottom:1px solid var(--app-divider)}
+.mahl-zeitblock>header h2{margin:0;font:800 16px/1 var(--ui);letter-spacing:.045em}
+.mahl-zeitblock>header span{display:grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:8px;background:color-mix(in srgb,var(--ordner) 30%,var(--surface));font:800 13px/1 var(--ui)}
+.mahl-timeline{overflow:hidden;background:var(--surface)}
 .mahl-timeline .rem-row-head{padding-inline:12px}
+.mahl-leerzeile{margin:0;padding:15px 13px;color:var(--muted);font:600 13px/1.2 var(--ui)}
+.mahl-trinken::before{background:#83CFE0}
+.rem-row-art{color:var(--muted)!important;font:800 8.5px/1 var(--ui)!important;letter-spacing:.08em!important}
+.mahl-zeitblock .rem-row-zeit{display:grid;place-items:center;min-width:54px;height:30px;padding:0 7px;border-radius:8px;background:color-mix(in srgb,var(--ordner) 18%,var(--surface));color:var(--ink);font-weight:700;text-align:center}
+.mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{text-align:center;text-align-last:center}
+.mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{text-align:center}
 .mahl-wasserkarte{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;margin-top:18px;padding:13px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
 .mahl-wasser-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:#83CFE0}
 .mahl-wasser-icon svg{width:23px;height:23px;fill:#000}
@@ -3489,7 +3499,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-wasser-editor>summary{padding:8px;border:1px solid var(--ink);border-radius:9px;font:700 11px/1 var(--ui);list-style:none;cursor:pointer}
 .mahl-wasser-editor[open]{grid-column:1/-1;border-top:1px solid var(--app-divider)}
 .mahl-add-sheet .sheet-menue .app-icon,.mahl-add-sheet .sheet-menue svg{width:21px;height:21px;fill:#000}
-@media(max-width:390px){.mahl-status small{font-size:7.5px}.mahl-status b{font-size:10.5px}.mahl-status>div{padding-inline:7px}}
+@media(max-width:390px){.mahl-zeitblock>header{min-height:44px}.mahl-zeitblock>header h2{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.seite-vor-warten,.seite-zurueck-warten,.seite-detail-warten,.seite-fade-warten{transform:none;opacity:1}.seite-vor,.seite-zurueck,.seite-detail,.seite-fade{animation:none}}
 
 /* ============================================================
