@@ -26,7 +26,8 @@ import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import {
-  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
+  categoryColor, categoryIconMarkup, commitPendingPageLook, deferNextPageLook,
+  materialIconMarkup, mountCategoryChrome, pendingPageLook, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
@@ -92,6 +93,7 @@ function fehlertext(error) {
 
 function setSeite(name) {
   document.documentElement.dataset.seite = name;
+  if (document.documentElement.dataset.seitenlookAufschub === '1') return;
   delete document.documentElement.dataset.dexMuster;
   document.documentElement.style.removeProperty('--dex-seitenfarbe');
 }
@@ -790,6 +792,11 @@ async function render() {
   // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
   const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
+  const schiebeSeitenlook = transition === 'vor' && !['search', 'profile'].includes(route);
+  if (schiebeSeitenlook) {
+    deferNextPageLook(true);
+    document.documentElement.dataset.seitenlookAufschub = '1';
+  }
   const view = renderChrome(transition);
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
@@ -913,14 +920,24 @@ async function render() {
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
   const neuerHintergrund = getComputedStyle(document.body);
+  const neuerLook = pendingPageLook();
+  const rootStyle = getComputedStyle(document.documentElement);
+  const lookFarbe = neuerLook?.color || neuerHintergrund.backgroundColor;
+  const musterBild = neuerLook?.pattern === 'triangles'
+    ? rootStyle.getPropertyValue('--muster-dreieck')
+    : neuerLook?.pattern === 'drops'
+      ? `linear-gradient(color-mix(in srgb,${lookFarbe} 38%,transparent),color-mix(in srgb,${lookFarbe} 38%,transparent)),${rootStyle.getPropertyValue('--muster-tropfen')}`
+      : neuerLook?.pattern === 'bones'
+        ? `linear-gradient(color-mix(in srgb,${lookFarbe} 38%,transparent),color-mix(in srgb,${lookFarbe} 38%,transparent)),url("/MUSCLEDEX-ICONS/pet_supplies-pattern.svg")`
+        : neuerLook?.pattern === 'none' ? 'none' : neuerHintergrund.backgroundImage;
   // Die normale Seite ist absichtlich transparent, damit die Tapete auf
   // html/body bis unter die iOS-Statusleiste reicht. Während des Slides muss
   // die neue Seite aber eine EIGENE, deckende Kopie dieser Tapete tragen.
   // `important` ist hier nötig, weil die Transparenzregel für #view selbst
   // ebenfalls important ist.
-  view.style.setProperty('background-color', neuerHintergrund.backgroundColor, 'important');
-  view.style.setProperty('background-image', neuerHintergrund.backgroundImage, 'important');
-  view.style.setProperty('background-size', neuerHintergrund.backgroundSize, 'important');
+  view.style.setProperty('background-color', lookFarbe, 'important');
+  view.style.setProperty('background-image', musterBild, 'important');
+  view.style.setProperty('background-size', neuerLook?.pattern === 'drops' || neuerLook?.pattern === 'bones' ? 'auto,112px' : neuerHintergrund.backgroundSize, 'important');
   view.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
   view.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
   view.style.setProperty('background-attachment', 'scroll', 'important');
@@ -932,7 +949,12 @@ async function render() {
     view.classList.remove('seite-vor-warten');
     view.classList.add('seite-vor');
     const alteSeite = app.querySelector(':scope > .view-alt');
+    let abgeschlossen = false;
     const aufraeumen = () => {
+      if (abgeschlossen) return;
+      abgeschlossen = true;
+      commitPendingPageLook();
+      delete document.documentElement.dataset.seitenlookAufschub;
       alteSeite?.remove();
       view.classList.remove('view-neu', 'seite-vor');
       view.removeAttribute('style');
@@ -940,6 +962,8 @@ async function render() {
     view.addEventListener('animationend', aufraeumen, { once: true });
     setTimeout(aufraeumen, 520);
   } else {
+    deferNextPageLook(false);
+    delete document.documentElement.dataset.seitenlookAufschub;
     app.querySelector(':scope > .view-alt')?.remove();
     view.classList.remove('view-neu');
     view.removeAttribute('style');

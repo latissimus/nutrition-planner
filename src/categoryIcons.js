@@ -23,6 +23,8 @@ const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
+let deferredPageLook = null;
+let deferPageLook = false;
 const defaultColors = {
   body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
   recipes: '#83CFE0', training: '#F2A65A', habits: '#B7C98B',
@@ -89,10 +91,33 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
 
 export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   const look = pageLook(scope, fallbackColor, fallbackPattern);
+  if (deferPageLook) {
+    deferredPageLook = look;
+    return look;
+  }
   const root = document.documentElement;
   root.style.setProperty('--dex-seitenfarbe', look.color);
   root.dataset.dexMuster = look.pattern;
   return look;
+}
+
+export function deferNextPageLook(value = true) {
+  deferPageLook = value;
+  if (value) deferredPageLook = null;
+}
+
+export function pendingPageLook() {
+  return deferredPageLook;
+}
+
+export function commitPendingPageLook() {
+  const look = deferredPageLook;
+  deferPageLook = false;
+  deferredPageLook = null;
+  if (!look) return;
+  const root = document.documentElement;
+  root.style.setProperty('--dex-seitenfarbe', look.color);
+  root.dataset.dexMuster = look.pattern;
 }
 
 function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
