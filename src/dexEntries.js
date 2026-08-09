@@ -293,7 +293,11 @@ function groupMarkup(type, entries, color) {
 
 function vorschaubilderEinblenden(container) {
   container.querySelectorAll('.dex-inhaltskarte-vorschau img').forEach((bild) => {
-    const anzeigen = () => requestAnimationFrame(() => bild.classList.add('ist-geladen'));
+    bild.closest('.dex-inhaltskarte-vorschau')?.classList.add('hat-vorschaubild');
+    const anzeigen = () => requestAnimationFrame(() => {
+      bild.classList.add('ist-geladen');
+      bild.closest('.dex-inhaltskarte-vorschau')?.classList.add('vorschau-geladen');
+    });
     if (bild.complete && bild.naturalWidth > 0) anzeigen();
     else bild.addEventListener('load', anzeigen, { once: true });
   });

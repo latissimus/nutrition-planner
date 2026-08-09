@@ -480,8 +480,8 @@ async function eigeneDexStatistik(userId, roots, signal) {
   return result;
 }
 
-async function mountHome(container, signal) {
-  setSeite('home');
+async function mountHome(container, signal, { setzeSeite = true } = {}) {
+  if (setzeSeite) setSeite('home');
   const sichtbar = sichtbareSammlungen();
   let eigene = [];
   let eigeneStats = new Map();
@@ -797,12 +797,17 @@ async function render() {
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
   const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
   const view = renderChrome(transition);
+  // Beim Schliessen eines Vollbild-DEX bleibt dessen alte Ansicht bis zum
+  // fertigen Home-Mount sichtbar. `data-seite="home"` darf deshalb erst im
+  // selben Takt wie das Entfernen dieser Ansicht gesetzt werden; andernfalls
+  // verliert sie vorher kurz ihre seitenspezifische Typografie.
+  const homeStilBeimTauschSetzen = route === 'home' && Boolean(app.querySelector(':scope > .view-alt'));
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
   if (transition === 'vor') view.classList.add('seite-vor-warten');
   if (route === 'home') {
-    await mountHome(view, signal);
+    await mountHome(view, signal, { setzeSeite: !homeStilBeimTauschSetzen });
   } else if (route === 'search') {
     await mountSearch(view, signal);
   } else if (route === 'profile') {
@@ -955,6 +960,7 @@ async function render() {
     view.addEventListener('animationend', aufraeumen, { once: true });
     setTimeout(aufraeumen, 520);
   } else {
+    if (homeStilBeimTauschSetzen) setSeite('home');
     app.querySelector(':scope > .view-alt')?.remove();
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();

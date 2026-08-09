@@ -2780,10 +2780,22 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
 .dex-inhaltskarte-vorschau img{
-  display:block;width:100%;height:100%;object-fit:cover;opacity:0;
-  transition:opacity .24s ease-out;
+  position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;opacity:0;
+  transition:opacity .72s cubic-bezier(.2,.65,.3,1);
 }
 .dex-inhaltskarte-vorschau img.ist-geladen{opacity:1}
+.dex-inhaltskarte-vorschau.hat-vorschaubild::after{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 24%,rgba(255,255,255,.28) 45%,transparent 66%);
+  background-size:220% 100%;opacity:.72;animation:vorschauLaedt 1.35s ease-in-out infinite;
+  transition:opacity .3s ease;
+}
+.dex-inhaltskarte-vorschau.vorschau-geladen::after{opacity:0;animation:none}
+@keyframes vorschauLaedt{from{background-position:110% 0}to{background-position:-110% 0}}
+@media(prefers-reduced-motion:reduce){
+  .dex-inhaltskarte-vorschau img{transition:none}
+  .dex-inhaltskarte-vorschau.hat-vorschaubild::after{animation:none}
+}
 
 /* ============================================================
    SYSTEM-DEX — gemeinsamer Look fuer MAHLZEITEN, EINKAUF und KFA-LOG

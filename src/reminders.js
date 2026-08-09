@@ -508,12 +508,7 @@ function reminderGroups(reminders, completions) {
       ? reminderRowMarkup(drink, completionByReminder.get(drink.id))
       : '<p class="mahl-leerzeile">Noch kein Trinkintervall</p>'}</div>
   </section>`;
-  return `<div class="mahl-hinzufuegen" aria-label="Erinnerung hinzufügen">
-      <button type="button" data-add-reminder="meal"><b>+</b><span>Mahlzeit</span></button>
-      <button type="button" data-add-reminder="supplement"><b>+</b><span>Supplement</span></button>
-      ${drink ? '' : '<button class="mahl-trinken-add" type="button" data-add-reminder="drink"><b>+</b><span>Trinkintervall</span></button>'}
-    </div>
-    <div class="mahl-tagesplan">${timeline}${water}</div>
+  return `<div class="mahl-tagesplan">${timeline}${water}</div>
     <button hidden data-add-reminder="meal"></button><button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
 }
 
