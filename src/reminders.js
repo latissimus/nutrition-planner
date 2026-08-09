@@ -18,17 +18,17 @@ let reminderUserId = null;
 let reminderStartPromise = null;
 
 const DEFAULT_REMINDERS = [
-  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders' },
-  { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders' },
-  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders' },
-  { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders' },
-  { type: 'supplement', label: 'Supplement PM', time: '20:00', route: '#reminders' },
+  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'fastfood' } },
+  { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'fastfood' } },
+  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'fastfood' } },
+  { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders', metadata: { icon: 'pill' } },
+  { type: 'supplement', label: 'Supplement PM', time: '20:00', route: '#reminders', metadata: { icon: 'pill' } },
   {
     type: 'drink',
     label: 'Trinken',
     time: '09:00',
     route: '#reminders',
-    metadata: { bis: '21:00', intervall_minuten: 120 },
+    metadata: { bis: '21:00', intervall_minuten: 120, icon: 'water_drop' },
   },
 ];
 
@@ -56,7 +56,13 @@ const escapeHtml = (value = '') => String(value)
 function reminderIconValue(reminder) {
   if (reminder.metadata?.icon) return reminder.metadata.icon;
   if (reminder.metadata?.emoji) return `emoji:${reminder.metadata.emoji}`;
-  return `emoji:${reminder.type === 'supplement' ? '💊' : reminder.type === 'drink' ? '💧' : '🍽️'}`;
+  return reminder.type === 'supplement' ? 'pill' : reminder.type === 'drink' ? 'water_drop' : 'fastfood';
+}
+
+function notificationSymbol(reminder) {
+  const value = reminderIconValue(reminder);
+  if (value.startsWith('emoji:')) return value.slice(6);
+  return ({ fastfood: '🍔', pill: '💊', water_drop: '💧' })[value] || '◆';
 }
 
 function reminderIconMarkup(value, className = '') {
@@ -90,15 +96,15 @@ function hinweisLabel(value) {
 }
 
 function notificationText(reminder) {
-  if (reminder.type === 'meal') return { title: reminder.label, body: 'Zeit für deine geplante Mahlzeit.' };
+  if (reminder.type === 'meal') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Zeit für deine geplante Mahlzeit.' };
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();
     const einheit = String(reminder.metadata?.einheit || '').trim();
     const hinweis = String(reminder.metadata?.hinweis || '').trim();
     const parts = [dosis && einheit ? `${dosis} ${einheit}` : dosis || einheit, hinweisLabel(hinweis)].filter(Boolean);
-    return { title: reminder.label, body: parts.join(' · ') || 'Supplement-Stack checken.' };
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: parts.join(' · ') || 'Supplement-Stack checken.' };
   }
-  if (reminder.type === 'drink') return { title: reminder.label, body: 'Ein Glas Wasser einplanen.' };
+  if (reminder.type === 'drink') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Ein Glas Wasser einplanen.' };
   return { title: reminder.label, body: 'Geplante Erinnerung.' };
 }
 
@@ -718,7 +724,7 @@ export async function mountReminders(container, { session, signal }) {
       label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
       time: type === 'drink' ? '09:00' : (times[period] || '08:00'),
       weekdays: WEEKDAYS, active: false,
-      metadata: { icon: `emoji:${type === 'supplement' ? '💊' : type === 'drink' ? '💧' : '🍽️'}` }, route: '#reminders',
+      metadata: { icon: type === 'supplement' ? 'pill' : type === 'drink' ? 'water_drop' : 'fastfood' }, route: '#reminders',
     };
     reminders.push(neu);
     try {

@@ -102,6 +102,15 @@ function isDue(reminder: Reminder, timeZone: string, now: Date) {
   return current >= start && current <= end && (current - start) % interval === 0;
 }
 
+function notificationSymbol(reminder: Reminder) {
+  const icon = String(reminder.metadata?.icon || '');
+  if (icon.startsWith('emoji:')) return icon.slice(6);
+  if (icon === 'fastfood' || reminder.type === 'meal') return '🍔';
+  if (icon === 'pill' || reminder.type === 'supplement') return '💊';
+  if (icon === 'water_drop' || reminder.type === 'drink') return '💧';
+  return '◆';
+}
+
 function notification(reminder?: Reminder) {
   if (!reminder) {
     return {
@@ -124,14 +133,14 @@ function notification(reminder?: Reminder) {
     const hinweis = String(reminder.metadata?.hinweis || '').trim();
     const parts = [dosis && einheit ? `${dosis} ${einheit}` : dosis || einheit, hinweis].filter(Boolean);
     return {
-      title: reminder.label,
+      title: `${notificationSymbol(reminder)} ${reminder.label}`,
       body: parts.length ? parts.join(' · ') : bodies.supplement,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#reminders',
     };
   }
   return {
-    title: reminder.label,
+    title: `${notificationSymbol(reminder)} ${reminder.label}`,
     body: bodies[reminder.type] || 'Geplante Erinnerung.',
     tag: `nutrition-${reminder.id}`,
     url: reminder.route || '#reminders',
