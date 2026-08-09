@@ -328,16 +328,16 @@ function zaehlerEintragen(container, zaehler) {
   });
 }
 
-function renderChrome(ueberAlteSeite = false) {
+function renderChrome(transition = 'hart') {
   app.classList.add('app-shell');
   // Kein globaler Kopf mehr: jede Seite ist Vollbild, Home traegt Logo und
   // Avatar als normalen Seiteninhalt (siehe mountHome).
   const bisher = app.querySelector(':scope > #view');
   let view;
-  if (ueberAlteSeite && bisher?.hasChildNodes()) {
+  if (bisher?.hasChildNodes()) {
     const hintergrund = getComputedStyle(document.body);
     bisher.removeAttribute('id');
-    bisher.className = 'view-alt';
+    bisher.className = `view-alt${transition === 'hart' ? ' view-alt-hart' : ''}`;
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
     bisher.style.backgroundSize = hintergrund.backgroundSize;
@@ -345,7 +345,7 @@ function renderChrome(ueberAlteSeite = false) {
     bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
     view = document.createElement('main');
     view.id = 'view';
-    view.className = 'view-neu seite-vor-warten';
+    view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : ''}`;
     app.append(view);
   } else {
     app.replaceChildren();
@@ -790,7 +790,7 @@ async function render() {
   // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
   const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
-  const view = renderChrome(transition === 'vor');
+  const view = renderChrome(transition);
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
@@ -912,13 +912,17 @@ async function render() {
   // eigener Reload durch ist –, wirkt eine erzwungene Animation haerter als
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
+  const neuerHintergrund = getComputedStyle(document.body);
+  view.style.backgroundColor = neuerHintergrund.backgroundColor;
+  view.style.backgroundImage = neuerHintergrund.backgroundImage;
+  view.style.backgroundSize = neuerHintergrund.backgroundSize;
+  view.style.backgroundPosition = neuerHintergrund.backgroundPosition;
+  view.style.backgroundRepeat = neuerHintergrund.backgroundRepeat;
+  // Zwei Frames: erst die komplett gemountete neue Seite samt Tapete
+  // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
+  // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   if (transition === 'vor') {
-    const neuerHintergrund = getComputedStyle(document.body);
-    view.style.backgroundColor = neuerHintergrund.backgroundColor;
-    view.style.backgroundImage = neuerHintergrund.backgroundImage;
-    view.style.backgroundSize = neuerHintergrund.backgroundSize;
-    view.style.backgroundPosition = neuerHintergrund.backgroundPosition;
-    view.style.backgroundRepeat = neuerHintergrund.backgroundRepeat;
     view.classList.remove('seite-vor-warten');
     view.classList.add('seite-vor');
     const alteSeite = app.querySelector(':scope > .view-alt');
@@ -929,6 +933,10 @@ async function render() {
     };
     view.addEventListener('animationend', aufraeumen, { once: true });
     setTimeout(aufraeumen, 520);
+  } else {
+    app.querySelector(':scope > .view-alt')?.remove();
+    view.classList.remove('view-neu');
+    view.removeAttribute('style');
   }
 }
 
