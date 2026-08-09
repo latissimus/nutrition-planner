@@ -448,28 +448,35 @@ function reminderRowMarkup(reminder, completion) {
 
 function reminderGroups(reminders, completions) {
   const completionByReminder = new Map(completions.map((c) => [c.reminder_id, c]));
-  const groups = [
-    ['meal', 'Mahlzeiten', 'Frühstück, Snacks und Hauptmahlzeiten'],
-    ['supplement', 'Supplemente', 'Dein Stack zur richtigen Zeit'],
-    ['drink', 'Trinken', 'Regelmäßig über den Tag verteilt'],
+  const active = reminders.filter((item) => item.active);
+  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  const next = (type) => active.filter((item) => item.type === type && minutesFromTime(item.time) >= nowMinutes)
+    .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time))[0];
+  const drink = reminders.find((item) => item.type === 'drink');
+  const interval = Number(drink?.metadata?.intervall_minuten || 120);
+  const status = `<section class="mahl-status" aria-label="Tagesstatus">
+    <div><small>NÄCHSTE MAHLZEIT</small><b>${next('meal') ? `${escapeHtml(next('meal').time.slice(0, 5))} · ${escapeHtml(next('meal').label)}` : 'Heute erledigt'}</b></div>
+    <div><small>SUPPLEMENT</small><b>${next('supplement') ? `${escapeHtml(next('supplement').time.slice(0, 5))} · ${escapeHtml(next('supplement').label)}` : 'Nichts offen'}</b></div>
+    <div><small>WASSER</small><b>${drink?.active ? `alle ${interval % 60 === 0 ? `${interval / 60} h` : `${interval} min`}` : 'Pausiert'}</b></div>
+  </section>`;
+  const periods = [
+    ['MORGEN', 0, 11 * 60], ['MITTAG', 11 * 60, 15 * 60],
+    ['NACHMITTAG', 15 * 60, 18 * 60], ['ABEND', 18 * 60, 24 * 60],
   ];
-  return groups.map(([type, title, subtitle]) => {
-    const rows = reminders
-      .filter((reminder) => reminder.type === type)
-      .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
+  const timed = reminders.filter((item) => item.type !== 'drink')
+    .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
+  const timeline = periods.map(([title, start, end]) => {
+    const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     if (!rows.length) return '';
-    const canAdd = type === 'meal' || type === 'supplement';
-    return `<details class="reminder-group" data-reminder-group="${type}" open>
-      <summary class="reminder-group-head">
-        <span class="reminder-group-icon" aria-hidden="true">${iconMarkup(type)}</span>
-        <span><b>${title}</b><small>${subtitle}</small></span>
-        <em>${rows.length}</em>
-        <span class="reminder-group-chevron" aria-hidden="true">⌄</span>
-      </summary>
-      <div class="reminder-group-list rem-liste">${rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')}</div>
-      ${canAdd ? `<button class="reminder-add" type="button" data-add-reminder="${type}"><span>+</span> ${type === 'meal' ? 'Mahlzeit' : 'Supplement'} hinzufügen</button>` : ''}
-    </details>`;
+    return `<section class="mahl-zeitblock"><h2>${title}</h2><div class="mahl-timeline">${rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')}</div></section>`;
   }).join('');
+  const water = drink ? `<section class="mahl-wasserkarte">
+    <span class="mahl-wasser-icon">${iconMarkup('drink')}</span>
+    <div><small>TRINKPLAN</small><b>${escapeHtml(drink.label)}</b><span>${escapeHtml(drink.time.slice(0, 5))}–${escapeHtml((drink.metadata?.bis || '21:00').slice(0, 5))} · alle ${interval} Minuten</span></div>
+    <details class="rem-row mahl-wasser-editor" data-reminder-key="${drink._key || drink.id}" data-type="drink"><summary aria-label="Trinkplan bearbeiten">Bearbeiten</summary>${reminderBodyMarkup(drink, completionByReminder.get(drink.id))}</details>
+  </section>` : '';
+  return `${status}<div class="mahl-tagesplan">${timeline || '<div class="tuck-leer"><b>Dein Tag ist noch leer</b><span>Lege über + eine Mahlzeit oder ein Supplement an.</span></div>'}</div>${water}
+    <button hidden data-add-reminder="meal"></button><button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
 }
 
 export async function mountReminders(container, { session, signal }) {
@@ -483,18 +490,16 @@ export async function mountReminders(container, { session, signal }) {
         </div>
         <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
       </div>
-      <section class="seiten-einstieg">
-        <b>Mahlzeiten, Supplements, Wasser</b>
-        <span>Tippen zum Aufklappen, Änderungen speichern sich automatisch.</span>
+      <section class="mahl-intro">
+        <b>DEIN TAGESPLAN</b>
+        <span>Mahlzeiten, Supplements und Wasser in einer Chronologie.</span>
       </section>
-      <section class="card" data-reminders-card>
-        <div data-permission>${permissionMarkup()}</div>
+      <section data-reminders-card>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
       </section>
     </div>`;
 
   const list = container.querySelector('[data-reminder-list]');
-  renderPushControls(container, userId);
 
   let reminders = [];
   let completions = [];
@@ -610,7 +615,7 @@ export async function mountReminders(container, { session, signal }) {
       const type = addButton.dataset.addReminder;
       const neu = {
         id: null, _key: `new:${crypto.randomUUID()}`, type,
-        label: type === 'meal' ? 'Neue Mahlzeit' : 'Neues Supplement',
+        label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
         time: type === 'meal' ? '12:00' : '08:00',
         weekdays: WEEKDAYS, active: false, metadata: {}, route: '#reminders',
       };
@@ -671,4 +676,33 @@ export async function mountReminders(container, { session, signal }) {
       }
     }
   });
+
+  return {
+    openAddMenu() {
+      document.querySelector('.mahl-add-backdrop')?.remove();
+      const backdrop = document.createElement('div');
+      backdrop.className = 'kategorie-sheet-backdrop mahl-add-backdrop offen';
+      backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
+        <header><h2>Zum Tagesplan</h2><button type="button" data-close aria-label="Schließen">×</button></header>
+        <div class="sheet-menue">
+          <button type="button" data-add-type="meal">${iconMarkup('meal')}<span>Mahlzeit</span></button>
+          <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
+          <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>
+        </div>
+      </section>`;
+      backdrop.onclick = (event) => {
+        if (event.target === backdrop || event.target.closest('[data-close]')) return backdrop.remove();
+        const type = event.target.closest('[data-add-type]')?.dataset.addType;
+        if (!type) return;
+        backdrop.remove();
+        if (type === 'drink' && reminders.some((item) => item.type === 'drink')) {
+          list.querySelector('[data-type="drink"] > summary')?.click();
+          list.querySelector('[data-type="drink"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        list.querySelector(`[data-add-reminder="${type}"]`)?.click();
+      };
+      document.body.append(backdrop);
+    },
+  };
 }

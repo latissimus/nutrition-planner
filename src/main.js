@@ -71,8 +71,9 @@ let vorgemerkteSuche = '';
 let navStack = ['home'];
 function navRichtung(ziel) {
   if (navStack[navStack.length - 1] === ziel) return 'gleich';
-  if (navStack.length > 1 && navStack[navStack.length - 2] === ziel) {
-    navStack.pop();
+  const vorhandenerIndex = navStack.lastIndexOf(ziel);
+  if (vorhandenerIndex >= 0) {
+    navStack = navStack.slice(0, vorhandenerIndex + 1);
     return 'zurueck';
   }
   navStack.push(ziel);
@@ -91,6 +92,8 @@ function fehlertext(error) {
 
 function setSeite(name) {
   document.documentElement.dataset.seite = name;
+  delete document.documentElement.dataset.dexMuster;
+  document.documentElement.style.removeProperty('--dex-seitenfarbe');
 }
 
 function meldung(slot, text, art) {
@@ -531,6 +534,12 @@ const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries>
 
 async function mountCustomCollection(container, item, signal) {
   setSeite('collection');
+  let lookRoot = item;
+  while (lookRoot.parent_id) {
+    const parent = await getCollection(session.user.id, lookRoot.parent_id, signal);
+    if (!parent || signal?.aborted) break;
+    lookRoot = parent;
+  }
   const children = await loadCollections(session.user.id, { rootKey: item.root_key, parentId: item.id, signal });
   if (signal?.aborted) return;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
@@ -546,6 +555,9 @@ async function mountCustomCollection(container, item, signal) {
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
     color: item.color,
+    pageLookScope: lookRoot.id === item.id ? `collection-${lookRoot.id}` : null,
+    inheritedPageLookScope: `collection-${lookRoot.id}`,
+    pageLookColor: lookRoot.color,
     meta: `${children.length} Unter-Dex`,
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
@@ -765,13 +777,12 @@ async function render() {
   // iOS-Zurueck-Wischgeste), Home selbst und Eintraege bekommen stattdessen
   // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
-  const slide = richtung === 'vor' && route !== 'home' && !istEintrag;
+  const transition = istEintrag ? 'detail' : richtung === 'vor' && route !== 'home' ? 'vor' : richtung === 'zurueck' ? 'zurueck' : 'fade';
   const view = renderChrome();
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
-  view.classList.add(slide ? 'dex-einschub-warten' : 'seite-warten');
-  const mountStart = performance.now();
+  view.classList.add(`seite-${transition}-warten`);
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -796,15 +807,19 @@ async function render() {
       signal,
       onProfileUpdated: (aktuell) => { profile = aktuell; },
     });
-    mountCategoryChrome(view, route, 'KFA-LOG');
+    mountCategoryChrome(view, route, 'KFA-LOG', { pageLookScope: route, pageLookPattern: 'triangles' });
   } else if (route === 'reminders') {
     setSeite('reminders');
-    await mountReminders(view, { session, profile, signal });
-    mountCategoryChrome(view, route, 'MAHLZEITEN');
+    const reminderActions = await mountReminders(view, { session, profile, signal });
+    mountCategoryChrome(view, route, 'MAHLZEITEN', {
+      pageLookScope: route, pageLookPattern: 'bones',
+      onPlus: () => reminderActions?.openAddMenu?.(),
+    });
   } else if (route === 'shopping') {
     setSeite('shopping');
     await mountShoppingList(view, { session, signal });
     mountCategoryChrome(view, route, 'EINKAUF', {
+      pageLookScope: route, pageLookPattern: 'drops',
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
       onPlus: () => {
@@ -823,6 +838,7 @@ async function render() {
       type, foodKind, userId: session.user.id, rootKey: 'food-log', onSaved: refresh,
     });
     mountCategoryChrome(view, route, 'Food-Log', {
+      pageLookScope: route, pageLookPattern: 'triangles',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
@@ -850,6 +866,7 @@ async function render() {
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
     mountCategoryChrome(view, route, 'TRAINING', {
+      pageLookScope: route, pageLookPattern: 'drops',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
@@ -873,7 +890,7 @@ async function render() {
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     mountComingSoon(view, route);
-    mountCategoryChrome(view, route, 'ROUTINEN');
+    mountCategoryChrome(view, route, 'ROUTINEN', { pageLookScope: route, pageLookPattern: 'triangles' });
   } else {
     mountHome(view, signal);
   }
@@ -883,9 +900,8 @@ async function render() {
   // eigener Reload durch ist –, wirkt eine erzwungene Animation haerter als
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
-  const spuerbareLuecke = performance.now() - mountStart > 100;
-  view.classList.remove(slide ? 'dex-einschub-warten' : 'seite-warten');
-  if (spuerbareLuecke) view.classList.add(slide ? 'dex-einschub' : 'seite-einblenden');
+  view.classList.remove(`seite-${transition}-warten`);
+  view.classList.add(`seite-${transition}`);
 }
 
 // Zwei rAF, damit der Browser den :active-Druckeffekt eines getippten Links

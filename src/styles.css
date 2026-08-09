@@ -3437,6 +3437,61 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
     url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
 }
 
+/* ---------- Einstellbarer DEX-Seitenlook ---------- */
+:root[data-dex-muster]{background-color:var(--dex-seitenfarbe)!important}
+:root[data-dex-muster="none"]{background-image:none!important}
+:root[data-dex-muster="triangles"]{background-image:var(--muster-dreieck)!important;background-size:auto!important}
+:root[data-dex-muster="drops"]{background-image:linear-gradient(color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent),color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent)),var(--muster-tropfen)!important;background-size:auto,112px!important}
+:root[data-dex-muster="bones"]{background-image:linear-gradient(color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent),color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;background-size:auto,112px!important}
+.seitenmuster-auswahl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.seitenmuster-auswahl button{display:flex;align-items:center;gap:9px;min-height:54px;padding:8px;border:2px solid var(--ink);border-radius:12px;background:var(--surface);font:800 13px/1 var(--ui)}
+.seitenmuster-auswahl button.aktiv{background:color-mix(in srgb,var(--ordner) 28%,var(--surface))}
+.seitenmuster-auswahl i{width:36px;height:36px;border-radius:8px;background-color:var(--dex-seitenfarbe);background-size:34px}
+.seitenmuster-auswahl i[data-muster="triangles"]{background-image:var(--muster-dreieck)}
+.seitenmuster-auswahl i[data-muster="drops"]{background-image:var(--muster-tropfen)}
+.seitenmuster-auswahl i[data-muster="bones"]{background-image:url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")}
+
+/* ---------- Deterministische Navigation ---------- */
+.seite-vor-warten{transform:translateX(20px);opacity:0}
+.seite-zurueck-warten{transform:translateX(-20px);opacity:0}
+.seite-detail-warten{transform:scale(.985);opacity:0}
+.seite-fade-warten{opacity:0}
+.seite-vor{animation:seiteVor .24s cubic-bezier(.2,.8,.3,1) both}
+.seite-zurueck{animation:seiteZurueck .22s cubic-bezier(.2,.8,.3,1) both}
+.seite-detail{animation:seiteDetail .2s ease-out both}
+.seite-fade{animation:seiteFade .16s ease-out both}
+@keyframes seiteVor{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+@keyframes seiteZurueck{from{transform:translateX(-20px);opacity:0}to{transform:none;opacity:1}}
+@keyframes seiteDetail{from{transform:scale(.985);opacity:0}to{transform:none;opacity:1}}
+@keyframes seiteFade{from{opacity:0}to{opacity:1}}
+
+/* ---------- MAHLZEITEN: Tagesplan statt Push-Verwaltung ---------- */
+.mahl-intro{margin:2px 2px 14px;display:flex;flex-direction:column;gap:2px}
+.mahl-intro b{font:800 17px/1 var(--ui);letter-spacing:.04em}
+.mahl-intro span{font-size:13px;color:var(--muted)}
+.mahl-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:hidden;margin-bottom:18px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
+.mahl-status>div{min-width:0;padding:11px 9px;border-right:1px solid color-mix(in srgb,var(--ink) 20%,transparent)}
+.mahl-status>div:last-child{border-right:0}
+.mahl-status small{display:block;margin-bottom:5px;font:800 8.5px/1 var(--ui);letter-spacing:.05em;color:var(--muted)}
+.mahl-status b{display:block;font:800 12px/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis}
+.mahl-tagesplan{display:flex;flex-direction:column;gap:16px}
+.mahl-zeitblock>h2{margin:0 0 7px;font:800 15px/1 var(--ui);letter-spacing:.05em}
+.mahl-timeline{overflow:hidden;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
+.mahl-timeline .rem-row-head{padding-inline:12px}
+.mahl-wasserkarte{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;margin-top:18px;padding:13px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
+.mahl-wasser-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:#83CFE0}
+.mahl-wasser-icon svg{width:23px;height:23px;fill:#000}
+.mahl-wasserkarte>div{display:flex;min-width:0;flex-direction:column;gap:2px}
+.mahl-wasserkarte small{font:800 9px/1 var(--ui);letter-spacing:.08em;color:var(--muted)}
+.mahl-wasserkarte b{font:800 15px/1.15 var(--ui)}
+.mahl-wasserkarte span{font-size:11px;color:var(--muted)}
+.mahl-wasser-editor{border:0}
+.mahl-wasser-editor>summary{padding:8px;border:1px solid var(--ink);border-radius:9px;font:700 11px/1 var(--ui);list-style:none;cursor:pointer}
+.mahl-wasser-editor[open]{grid-column:1/-1;border-top:1px solid var(--app-divider)}
+.mahl-add-sheet .sheet-menue .app-icon,.mahl-add-sheet .sheet-menue svg{width:21px;height:21px;fill:#000}
+@media(max-width:390px){.mahl-status small{font-size:7.5px}.mahl-status b{font-size:10.5px}.mahl-status>div{padding-inline:7px}}
+@media(prefers-reduced-motion:reduce){.seite-vor-warten,.seite-zurueck-warten,.seite-detail-warten,.seite-fade-warten{transform:none;opacity:1}.seite-vor,.seite-zurueck,.seite-detail,.seite-fade{animation:none}}
+
 /* ============================================================
    EINKAUFSLISTE
 

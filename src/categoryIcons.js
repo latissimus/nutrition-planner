@@ -21,6 +21,8 @@ const defaults = {
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
+const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
+const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
   recipes: '#83CFE0', training: '#F2A65A', habits: '#B7C98B',
@@ -69,6 +71,62 @@ export function categoryColor(route) {
   const saved = localStorage.getItem(colorKey(route));
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
+}
+
+const pagePatterns = [
+  ['drops', 'Tropfen'],
+  ['triangles', 'Dreiecke'],
+  ['bones', 'Knochen'],
+  ['none', 'Ohne Muster'],
+];
+
+export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
+  return {
+    color: localStorage.getItem(pageColorKey(scope)) || fallbackColor || '#F2EBE0',
+    pattern: localStorage.getItem(pagePatternKey(scope)) || fallbackPattern,
+  };
+}
+
+export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
+  const look = pageLook(scope, fallbackColor, fallbackPattern);
+  const root = document.documentElement;
+  root.style.setProperty('--dex-seitenfarbe', look.color);
+  root.dataset.dexMuster = look.pattern;
+  return look;
+}
+
+function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
+  let selected = pageLook(scope, fallbackColor, fallbackPattern);
+  const backdrop = sheet(`
+    <header><h2>Seitenlook</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <div class="dex-appearance-form seitenlook-form">
+      <h3>Seitenfarbe</h3>
+      <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-page-color="${color}" class="${color === selected.color.toUpperCase() ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
+      <h3>Muster</h3>
+      <div class="seitenmuster-auswahl">${pagePatterns.map(([id, label]) => `<button type="button" data-page-pattern="${id}" class="${id === selected.pattern ? 'aktiv' : ''}"><i data-muster="${id}"></i><span>${label}</span></button>`).join('')}</div>
+      <button class="btn btn-primary btn-block sammlung-editor-speichern" type="button" data-page-look-save>Seitenlook speichern</button>
+    </div>`);
+  const panel = backdrop.querySelector('.kategorie-sheet');
+  panel.classList.add('sammlung-editor');
+  panel.onclick = (event) => {
+    const color = event.target.closest('[data-page-color]');
+    if (color) {
+      selected = { ...selected, color: color.dataset.pageColor };
+      panel.querySelectorAll('[data-page-color]').forEach((button) => button.classList.toggle('aktiv', button === color));
+    }
+    const pattern = event.target.closest('[data-page-pattern]');
+    if (pattern) {
+      selected = { ...selected, pattern: pattern.dataset.pagePattern };
+      panel.querySelectorAll('[data-page-pattern]').forEach((button) => button.classList.toggle('aktiv', button === pattern));
+    }
+    if (!event.target.closest('[data-page-look-save]')) return;
+    localStorage.setItem(pageColorKey(scope), selected.color);
+    localStorage.setItem(pagePatternKey(scope), selected.pattern);
+    applyPageLook(scope, fallbackColor, fallbackPattern);
+    closeSheet(backdrop);
+    onChange?.();
+    toast('Seitenlook geändert.');
+  };
 }
 
 function materialIcon(id, className = '') {
@@ -218,6 +276,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="sheet-menue">
       <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe ändern</span></button>
+      ${actions.pageLookScope ? `<button data-action="page-look">${materialIcon('palette', 'sheet-list-icon')}<span>Seitenlook ändern</span></button>` : ''}
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
@@ -228,6 +287,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     if (!action) return;
     closeSheet(backdrop);
     if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange);
+    if (action === 'page-look') pageLookPicker(actions.pageLookScope, actions.pageLookColor, actions.pageLookPattern, onChange);
     if (action === 'select') toast('Die Auswahl ist für diesen Dex vorbereitet.');
     if (action === 'rename') actions.onRename?.();
     if (action === 'sub') actions.onCreateSub?.();
@@ -290,6 +350,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   if (!wrap) return;
   container.classList.add('hat-kategoriefarbe');
   container.style.setProperty('--ordner', options.color || categoryColor(route));
+  applyPageLook(options.inheritedPageLookScope || options.pageLookScope || route, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
   wrap.querySelector(':scope > .seitenkopf')?.remove();
   const bar = document.createElement('nav');
   bar.className = 'kategorie-kopf';
