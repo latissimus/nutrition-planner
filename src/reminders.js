@@ -80,6 +80,7 @@ const minutesFromTime = (time) => {
   const [hours, minutes] = String(time || '00:00').split(':').map((part) => Number(part));
   return (Number.isFinite(hours) ? hours : 0) * 60 + (Number.isFinite(minutes) ? minutes : 0);
 };
+const einheitLabel = (value) => ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' })[value] || value;
 
 function nextDrinkSlot(reminder, now) {
   const start = minutesFromTime(reminder.time);
@@ -101,7 +102,7 @@ function notificationText(reminder) {
     const dosis = String(reminder.metadata?.dosis || '').trim();
     const einheit = String(reminder.metadata?.einheit || '').trim();
     const hinweis = String(reminder.metadata?.hinweis || '').trim();
-    const parts = [dosis && einheit ? `${dosis} ${einheit}` : dosis || einheit, hinweisLabel(hinweis)].filter(Boolean);
+    const parts = [dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit), hinweisLabel(hinweis)].filter(Boolean);
     return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: parts.join(' · ') || 'Supplement-Stack checken.' };
   }
   if (reminder.type === 'drink') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Ein Glas Wasser einplanen.' };
@@ -382,7 +383,7 @@ function summaryFor(reminder) {
     const dosis = String(reminder.metadata?.dosis || '').trim();
     const einheit = String(reminder.metadata?.einheit || '').trim();
     const hinweis = hinweisLabel(reminder.metadata?.hinweis);
-    const teile = [dosis && einheit ? `${dosis} ${einheit}` : dosis || einheit, hinweis].filter(Boolean);
+    const teile = [dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit), hinweis].filter(Boolean);
     return { time, detail: teile.join(' · ') };
   }
   return { time, detail: '' };
@@ -427,7 +428,7 @@ function reminderBodyMarkup(reminder, completion) {
       </label>
       <label class="rem-field"><span>Einheit</span>
         <select class="input" data-einheit>
-          ${EINHEITEN.map((einheit) => `<option value="${escapeHtml(einheit)}"${(reminder.metadata?.einheit || '') === einheit ? ' selected' : ''}>${einheit || '—'}</option>`).join('')}
+          ${EINHEITEN.map((einheit) => `<option value="${escapeHtml(einheit)}"${(reminder.metadata?.einheit || '') === einheit ? ' selected' : ''}>${einheit ? einheitLabel(einheit) : '—'}</option>`).join('')}
         </select>
       </label>
     </div>

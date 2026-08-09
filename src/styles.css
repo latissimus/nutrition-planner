@@ -3447,6 +3447,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-dex-muster="triangles"]{background-image:var(--muster-dreieck)!important;background-size:auto!important}
 :root[data-dex-muster="drops"]{background-image:linear-gradient(color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent),color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent)),var(--muster-tropfen)!important;background-size:auto,112px!important}
 :root[data-dex-muster="bones"]{background-image:linear-gradient(color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent),color-mix(in srgb,var(--dex-seitenfarbe) 38%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;background-size:auto,112px!important}
+:root[data-dex-muster] body{background-color:var(--dex-seitenfarbe)!important;background-image:inherit!important;background-size:inherit!important;background-repeat:inherit!important;background-position:inherit!important;background-attachment:fixed!important}
 .seitenmuster-auswahl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .seitenmuster-auswahl button{display:flex;align-items:center;gap:9px;min-height:54px;padding:8px;border:2px solid var(--ink);border-radius:12px;background:var(--surface);font:800 13px/1 var(--ui)}
 .seitenmuster-auswahl button.aktiv{background:color-mix(in srgb,var(--ordner) 28%,var(--surface))}

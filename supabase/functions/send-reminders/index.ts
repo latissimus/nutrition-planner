@@ -111,6 +111,10 @@ function notificationSymbol(reminder: Reminder) {
   return '◆';
 }
 
+function unitLabel(value: string) {
+  return ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' } as Record<string, string>)[value] || value;
+}
+
 function notification(reminder?: Reminder) {
   if (!reminder) {
     return {
@@ -131,7 +135,7 @@ function notification(reminder?: Reminder) {
     const dosis = String(reminder.metadata?.dosis || '').trim();
     const einheit = String(reminder.metadata?.einheit || '').trim();
     const hinweis = String(reminder.metadata?.hinweis || '').trim();
-    const parts = [dosis && einheit ? `${dosis} ${einheit}` : dosis || einheit, hinweis].filter(Boolean);
+    const parts = [dosis && einheit ? `${dosis} ${unitLabel(einheit)}` : dosis || unitLabel(einheit), hinweis].filter(Boolean);
     return {
       title: `${notificationSymbol(reminder)} ${reminder.label}`,
       body: parts.length ? parts.join(' · ') : bodies.supplement,
