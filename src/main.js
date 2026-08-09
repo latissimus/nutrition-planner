@@ -960,8 +960,8 @@ async function render() {
     view.addEventListener('animationend', aufraeumen, { once: true });
     setTimeout(aufraeumen, 520);
   } else {
-    if (homeStilBeimTauschSetzen) setSeite('home');
     app.querySelector(':scope > .view-alt')?.remove();
+    if (homeStilBeimTauschSetzen) setSeite('home');
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();
   }
