@@ -341,9 +341,10 @@ function renderChrome(transition = 'hart') {
     // der ausgehenden Ansicht erhalten bleiben. Wird die Klassenliste hier
     // komplett ersetzt, faellt ihr Plus-Knopf waehrend eines Ruecksprungs
     // fuer einen Frame auf das pinke Standarddesign zurueck.
-    bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
+    bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor', 'seite-fade-warten', 'seite-fade');
     bisher.classList.add('view-alt');
     bisher.classList.toggle('view-alt-hart', transition === 'hart');
+    bisher.classList.toggle('view-alt-zurueck', transition === 'zurueck');
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
     bisher.style.backgroundSize = hintergrund.backgroundSize;
@@ -351,7 +352,7 @@ function renderChrome(transition = 'hart') {
     bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
     view = document.createElement('main');
     view.id = 'view';
-    view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : ''}`;
+    view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : transition === 'fade' ? ' seite-fade-warten' : ''}`;
     app.append(view);
   } else {
     app.replaceChildren();
@@ -795,12 +796,19 @@ async function render() {
   // iOS-Zurueck-Wischgeste), Home selbst und Eintraege bekommen stattdessen
   // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
-  const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
+  const transition = richtung === 'zurueck'
+    ? 'zurueck'
+    : richtung === 'vor' && route.startsWith('entry/')
+      ? 'fade'
+      : richtung === 'vor' && route !== 'home'
+        ? 'vor'
+        : 'hart';
   const view = renderChrome(transition);
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
   if (transition === 'vor') view.classList.add('seite-vor-warten');
+  if (transition === 'fade') view.classList.add('seite-fade-warten');
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -953,7 +961,34 @@ async function render() {
       entferneUebergangshintergrund();
     };
     view.addEventListener('animationend', aufraeumen, { once: true });
-    setTimeout(aufraeumen, 520);
+    setTimeout(aufraeumen, 460);
+  } else if (transition === 'zurueck') {
+    const alteSeite = app.querySelector(':scope > .view-alt');
+    let abgeschlossen = false;
+    const aufraeumen = () => {
+      if (abgeschlossen) return;
+      abgeschlossen = true;
+      alteSeite?.remove();
+      view.classList.remove('view-neu');
+      entferneUebergangshintergrund();
+    };
+    alteSeite?.classList.add('seite-zurueck');
+    alteSeite?.addEventListener('animationend', aufraeumen, { once: true });
+    setTimeout(aufraeumen, 420);
+  } else if (transition === 'fade') {
+    view.classList.remove('seite-fade-warten');
+    view.classList.add('seite-fade');
+    const alteSeite = app.querySelector(':scope > .view-alt');
+    let abgeschlossen = false;
+    const aufraeumen = () => {
+      if (abgeschlossen) return;
+      abgeschlossen = true;
+      alteSeite?.remove();
+      view.classList.remove('view-neu', 'seite-fade');
+      entferneUebergangshintergrund();
+    };
+    view.addEventListener('animationend', aufraeumen, { once: true });
+    setTimeout(aufraeumen, 320);
   } else {
     app.querySelector(':scope > .view-alt')?.remove();
     view.classList.remove('view-neu');
