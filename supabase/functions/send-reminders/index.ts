@@ -129,6 +129,7 @@ function notification(reminder?: Reminder) {
     supplement: 'Supplement-Stack checken.',
     drink: 'Ein Glas Wasser einplanen.',
     body: 'Zeit für deine geplanten Körperwerte.',
+    habit: 'Zeit für deine geplante Routine.',
   };
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
@@ -150,6 +151,15 @@ function notification(reminder?: Reminder) {
       body: parts.length ? parts.join(' · ') : bodies.supplement,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#reminders',
+    };
+  }
+  if (reminder.type === 'habit') {
+    const note = String(reminder.metadata?.notiz || '').trim();
+    return {
+      title: `${notificationSymbol(reminder)} ${reminder.label}`,
+      body: note || bodies.habit,
+      tag: `nutrition-${reminder.id}`,
+      url: reminder.route || '#habits',
     };
   }
   return {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dexEntryOverviewMarkup, normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
+import { dexEntryOverviewMarkup, isTikTokPhotoPost, normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { colorIsDark } from './categoryIcons.js';
 
 describe('normalizeDexUrl', () => {
@@ -44,13 +44,16 @@ describe('videoEmbedUrl', () => {
 });
 
 describe('Vorschaubilder', () => {
-  it('richtet TikTok-Fotostrecken am oberen Bildrand aus', () => {
+  it('behandelt TikTok-Fotostrecken als zentrierte Bildkarten', () => {
     const markup = dexEntryOverviewMarkup({
       id: 'foto-1', entry_type: 'link', title: 'Fotostrecke',
       url: 'https://www.tiktok.com/@creator/photo/123456789',
       preview_url: 'https://example.com/preview.jpg',
     });
+    expect(isTikTokPhotoPost('https://www.tiktok.com/@creator/photo/123456789')).toBe(true);
     expect(markup).toContain('dex-foto-post-vorschau');
+    expect(markup).toContain('dex-inhaltskarte-image');
+    expect(markup).toContain('tiktok-foto-post');
   });
 
   it('verändert normale Link-Vorschaubilder nicht', () => {

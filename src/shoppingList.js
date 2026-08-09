@@ -511,13 +511,13 @@ export function parseRecipeLines(text) {
 
 async function loadFoodLogRecipes(userId, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,title,note,entry_type,created_at')
+    .select('id,title,note,ingredients,entry_type,created_at')
     .eq('root_key', 'food-log').eq('food_kind', 'recipe')
-    .not('note', 'is', null).order('created_at', { ascending: false }).limit(30);
+    .order('created_at', { ascending: false }).limit(30);
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
-  return (data || []).filter((eintrag) => (eintrag.note || '').trim().length > 0);
+  return (data || []).filter((eintrag) => eintrag.ingredients?.length || (eintrag.note || '').trim().length > 0);
 }
 
 // Legt in einem Schwung mehrere Artikel an. Duplikate innerhalb derselben
@@ -544,7 +544,7 @@ async function addItemsBulk(userId, section, namen) {
 // Sheet, das die Zutaten eines Food-Log-Rezepts vorschlaegt. Der Nutzer
 // haekelt ab, was auf die Liste soll, waehlt eine Abteilung und uebernimmt.
 function recipePickSheet(recipe, sections, { onImport }) {
-  const zeilen = parseRecipeLines(recipe.note);
+  const zeilen = recipe.ingredients?.length ? recipe.ingredients : parseRecipeLines(recipe.note);
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop einkauf-import-backdrop';
   const titel = recipe.title?.trim() || 'Rezept';
@@ -570,7 +570,7 @@ function recipePickSheet(recipe, sections, { onImport }) {
             <span data-import-count>${zeilen.length}</span> Zutaten übernehmen
           </button>
         </div>
-      </form>` : `<p class="einkauf-import-hinweis">Dieses Rezept hat keinen Notiztext, aus dem sich Zutaten herauslesen lassen.</p>`}
+      </form>` : `<p class="einkauf-import-hinweis">Dieses Rezept enthält noch keine separat erfassten Zutaten.</p>`}
     </section>`;
   const schließen = () => {
     backdrop.classList.remove('offen');

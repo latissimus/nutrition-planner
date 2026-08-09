@@ -10,7 +10,7 @@ const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
 const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
-const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -125,6 +125,9 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
           <input id="dex-entry-prep" class="input" type="number" inputmode="numeric" min="1" max="1440" placeholder="z. B. 10">
         </label>
       </div>` : ''}
+      ${foodMode && foodKind !== 'cheat_meal' ? `<label class="dex-entry-field" for="dex-entry-ingredients"><span>Zutaten <small>eine Zutat pro Zeile</small></span>
+        <textarea id="dex-entry-ingredients" class="input" maxlength="4000" rows="6" placeholder="z. B.&#10;250 g Skyr&#10;30 g Haferflocken&#10;1 Banane"></textarea>
+      </label>` : ''}
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
@@ -284,6 +287,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         carb_class: foodMode ? form.querySelector('#dex-entry-carb').value : null,
         prep_minutes: foodMode && form.querySelector('#dex-entry-prep').value
           ? Number(form.querySelector('#dex-entry-prep').value) : null,
+        ingredients: foodMode
+          ? String(form.querySelector('#dex-entry-ingredients')?.value || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 100)
+          : [],
       }).select().single();
       if (error) throw error;
       close();
@@ -353,6 +359,14 @@ export function videoProvider(value) {
   return null;
 }
 
+export function isTikTokPhotoPost(value) {
+  if (!value) return false;
+  try {
+    const parsed = new URL(value);
+    return parsed.hostname.toLowerCase().includes('tiktok.com') && /\/photo\//i.test(parsed.pathname);
+  } catch { return false; }
+}
+
 function youtubeThumbnail(value) {
   try {
     const url = new URL(value);
@@ -371,20 +385,19 @@ function providerPreview(entry, provider, playable) {
 
 export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const provider = videoProvider(entry.url);
-  let isTikTokPhoto = false;
-  try {
-    const entryUrl = new URL(entry.url || '');
-    isTikTokPhoto = entryUrl.hostname.toLowerCase().includes('tiktok.com') && /\/photo\//i.test(entryUrl.pathname);
-  } catch { /* Kein Linkeintrag. */ }
+  const isTikTokPhoto = isTikTokPhotoPost(entry.url);
   const video = entry.entry_type === 'link' && Boolean(provider);
-  const type = entry.entry_type === 'routine' ? 'routine' : entry.entry_type === 'audio' ? 'audio' : entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
+  const type = entry.entry_type === 'routine' ? 'routine' : entry.entry_type === 'audio' ? 'audio' : entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' || isTikTokPhoto ? 'image' : video ? 'video' : 'link';
   const icon = type === 'routine' ? 'bucket_check' : type === 'audio' ? 'mic' : type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   const playable = Boolean(videoEmbedUrl(entry.url));
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, previewClass: isTikTokPhoto ? 'dex-foto-post-vorschau' : '',
-    cardClass: entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe' ? 'eigenes-rezept' : '', href: entry.url,
+    cardClass: [
+      entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe' ? 'eigenes-rezept' : '',
+      isTikTokPhoto ? 'tiktok-foto-post' : '',
+    ].filter(Boolean).join(' '), href: entry.url,
     previewMarkup: type === 'routine'
       ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('bucket_check')}<small>Routine</small></span>`
       : type === 'audio'
@@ -442,10 +455,10 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
   const cheatMeals = regular.filter((entry) => entry.entry_type === 'note' && entry.root_key === 'food-log' && entry.food_kind === 'cheat_meal');
   const notes = regular.filter((entry) => entry.entry_type === 'note' && !ownRecipes.includes(entry) && !cheatMeals.includes(entry));
   const routines = regular.filter((entry) => entry.entry_type === 'routine');
-  const images = regular.filter((entry) => entry.entry_type === 'image');
+  const images = regular.filter((entry) => entry.entry_type === 'image' || (entry.entry_type === 'link' && isTikTokPhotoPost(entry.url)));
   const audio = regular.filter((entry) => entry.entry_type === 'audio');
   const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
-  const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
+  const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url) && !isTikTokPhotoPost(entry.url));
   if (entries.length) {
     return `${groupMarkup('favorite', favorites, color)}${groupMarkup('routine', routines, color)}${groupMarkup('cheat-meal', cheatMeals, color)}${groupMarkup('own-recipe', ownRecipes, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('audio', audio, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`;
   }

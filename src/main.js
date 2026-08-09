@@ -943,7 +943,7 @@ async function render() {
       onAddAudio: () => openEntry('audio'),
       onAddRoutine: () => routineActions?.openRoutineEditor?.(),
     });
-    await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', color: categoryColor('habits'), signal });
+    await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', color: categoryColor('habits'), signal, hideEmpty: true });
   } else {
     mountHome(view, signal);
   }

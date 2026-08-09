@@ -133,6 +133,18 @@ export async function mountRoutines(container, { session, signal }) {
       : supabase.from('routine_completions').insert({ routine_id: item.id, user_id: userId, completed_on: today() });
     const { error } = await query;
     if (error) return toast('Status konnte nicht gespeichert werden.');
+    // Die Push-Erinnerung teilt sich nach der Migration die ID der Routine.
+    // Der Zusatzschritt bleibt absichtlich best effort, damit das Abhaken auch
+    // vor dem Einspielen der Migration weiterhin funktioniert.
+    if (completed) {
+      await supabase.from('reminder_completions').delete()
+        .eq('reminder_id', item.id).eq('date', today()).eq('user_id', userId);
+    } else {
+      await supabase.from('reminder_completions').upsert({
+        reminder_id: item.id, user_id: userId, date: today(),
+        completed_at: new Date().toISOString(), snoozed_until: null,
+      }, { onConflict: 'user_id,reminder_id,date' });
+    }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
     paint();
   };

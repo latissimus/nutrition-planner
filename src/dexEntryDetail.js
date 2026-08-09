@@ -4,7 +4,7 @@ import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { toast } from './toast.js';
 
 const BUCKET = 'dex-entries';
-const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -60,6 +60,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         </select></label>
         <label class="dex-entry-field" for="edit-entry-prep"><span>Zubereitung <small>Minuten</small></span><input id="edit-entry-prep" class="input" type="number" min="1" max="1440" value="${entry.prep_minutes || ''}" placeholder="z. B. 10"></label>
       </div>` : ''}
+      ${entry.root_key === 'food-log' && entry.food_kind === 'recipe' ? `<label class="dex-entry-field" for="edit-entry-ingredients"><span>Zutaten <small>eine Zutat pro Zeile</small></span><textarea id="edit-entry-ingredients" class="input" maxlength="4000" rows="6" placeholder="Eine Zutat pro Zeile">${escapeHtml((entry.ingredients || []).join('\n'))}</textarea></label>` : ''}
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
       <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${['note', 'routine'].includes(entry.entry_type) ? '4000' : '500'}" rows="${['note', 'routine'].includes(entry.entry_type) ? '9' : '5'}"${['note', 'routine'].includes(entry.entry_type) ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
@@ -97,6 +98,10 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         payload.carb_class = backdrop.querySelector('#edit-entry-carb').value;
         payload.prep_minutes = backdrop.querySelector('#edit-entry-prep').value
           ? Number(backdrop.querySelector('#edit-entry-prep').value) : null;
+        if (entry.food_kind === 'recipe') {
+          payload.ingredients = String(backdrop.querySelector('#edit-entry-ingredients')?.value || '')
+            .split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 100);
+        }
       }
       if (entry.url) payload.url = backdrop.querySelector('#edit-entry-url').value.trim();
       const file = replacementInput?.files?.[0];
@@ -169,6 +174,8 @@ function detailMarkup(entry) {
         ${carbLabels[entry.carb_class] ? `<span>${carbLabels[entry.carb_class]}</span>` : ''}
         ${entry.prep_minutes ? `<span>${entry.prep_minutes} Min.</span>` : ''}
       </div>` : '';
+  const ingredients = entry.root_key === 'food-log' && entry.food_kind === 'recipe' && entry.ingredients?.length
+    ? `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul>${entry.ingredients.map((ingredient) => `<li>${escapeHtml(ingredient)}</li>`).join('')}</ul></section>` : '';
   return `<div class="wrap pad-bottom dex-detail-seite">
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
@@ -185,6 +192,7 @@ function detailMarkup(entry) {
         <small>${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'TONAUFNAHME' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
+        ${ingredients}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span></div>`}
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}
