@@ -305,7 +305,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
       <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe ändern</span></button>
-      <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
+      ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
       ${actions.onShare ? `<button data-action="share">${materialIcon('upload_file', 'sheet-list-icon')}<span>Mit Partner teilen</span></button>` : ''}
@@ -339,7 +339,7 @@ function plusAction(container, route) {
 }
 
 function eintragTypWaehlen(container, route, options = {}) {
-  const food = route === 'food-log' || Boolean(options.onAddCheatMeal);
+  const food = route === 'food-log' || Boolean(options.onAddRecipeLink || options.onAddOwnRecipe);
   const standardEntries = [
     options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : '',
     options.onAddLink ? `<button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>` : '',
@@ -350,8 +350,7 @@ function eintragTypWaehlen(container, route, options = {}) {
   const backdrop = sheet(`
     <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue eintrag-typ-menue">
-      ${food ? `<button data-entry-type="cheat">${materialIcon('bolt', 'sheet-list-icon')}<span>Cheat-Meal</span></button>
-        <button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>
+      ${food ? `<button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>
         <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>`
         : standardEntries}
     </div>`);
@@ -359,7 +358,6 @@ function eintragTypWaehlen(container, route, options = {}) {
     const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
     if (!type) return;
     closeSheet(backdrop);
-    if (type === 'cheat') return options.onAddCheatMeal?.();
     if (type === 'recipe-link') return options.onAddRecipeLink?.();
     if (type === 'own-recipe') return options.onAddOwnRecipe?.();
     if (type === 'audio') return options.onAddAudio?.();

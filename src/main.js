@@ -589,7 +589,6 @@ async function mountCustomCollection(container, item, signal) {
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
     onAddAudio: ['home', 'training'].includes(item.root_key) ? () => openEntry('audio') : null,
-    onAddCheatMeal: item.root_key === 'food-log' ? () => openEntry('note', 'cheat_meal') : null,
     onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
     onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
     onCreateSub: () => openCollectionEditor({
@@ -882,7 +881,6 @@ async function render() {
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
       onAddImage: () => openEntry('image'),
-      onAddCheatMeal: () => openEntry('note', 'cheat_meal'),
       onAddRecipeLink: () => openEntry('link', 'recipe'),
       onAddOwnRecipe: () => openEntry('note', 'recipe'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
