@@ -946,6 +946,19 @@ async function render() {
   // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   if (transition === 'vor') {
+    const statusSlide = document.createElement('div');
+    statusSlide.className = 'statusleisten-slide';
+    statusSlide.setAttribute('aria-hidden', 'true');
+    statusSlide.style.setProperty('background-color', lookFarbe, 'important');
+    statusSlide.style.setProperty('background-image', musterBild, 'important');
+    statusSlide.style.setProperty('background-size', neuerLook?.pattern === 'drops' || neuerLook?.pattern === 'bones' ? 'auto,112px' : neuerHintergrund.backgroundSize, 'important');
+    statusSlide.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
+    statusSlide.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
+    document.body.append(statusSlide);
+    // Ausgangszustand einmal festschreiben; danach starten Safe Area und
+    // eigentliche Seite garantiert im selben Animationsframe.
+    void statusSlide.offsetWidth;
+    statusSlide.classList.add('ist-aktiv');
     view.classList.remove('seite-vor-warten');
     view.classList.add('seite-vor');
     const alteSeite = app.querySelector(':scope > .view-alt');
@@ -955,6 +968,7 @@ async function render() {
       abgeschlossen = true;
       commitPendingPageLook();
       delete document.documentElement.dataset.seitenlookAufschub;
+      statusSlide.remove();
       alteSeite?.remove();
       view.classList.remove('view-neu', 'seite-vor');
       view.removeAttribute('style');
