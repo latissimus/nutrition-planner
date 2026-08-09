@@ -349,7 +349,7 @@ function itemEditSheet(item, sections, { onSave, onDelete }) {
   backdrop.className = 'kategorie-sheet-backdrop einkauf-edit-backdrop';
   backdrop.innerHTML = `
     <section class="kategorie-sheet einkauf-edit-sheet" role="dialog" aria-modal="true" aria-label="Artikel bearbeiten">
-      <header><h2>Artikel bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+      <header><h2>Artikel bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
       <form class="einkauf-edit-form" data-edit-form>
         <label class="dex-entry-field"><span>Name</span>
           <input class="input" data-edit-name maxlength="120" value="${escapeHtml(item.name)}" required>
@@ -550,7 +550,7 @@ function recipePickSheet(recipe, sections, { onImport }) {
   const titel = recipe.title?.trim() || 'Rezept';
   backdrop.innerHTML = `
     <section class="kategorie-sheet einkauf-import-sheet" role="dialog" aria-modal="true" aria-label="Rezept-Zutaten uebernehmen">
-      <header><h2>Aus »${escapeHtml(titel)}«</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+      <header><h2>Aus »${escapeHtml(titel)}«</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
       ${zeilen.length ? `<form class="einkauf-import-form" data-import-form>
         <label class="dex-entry-field"><span>Abteilung</span>
           <select class="input" data-import-section>
@@ -870,7 +870,7 @@ export async function mountShoppingList(container, { session, signal }) {
       const backdrop = document.createElement('div');
       backdrop.className = 'kategorie-sheet-backdrop einkauf-add-backdrop';
       backdrop.innerHTML = `<section class="kategorie-sheet einkauf-add-sheet" role="dialog" aria-modal="true" aria-label="Lebensmittel hinzufügen">
-        <header><h2>Lebensmittel hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+        <header><h2>Lebensmittel hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         <form class="einkauf-add-form" data-add-overlay-form>
           <label class="dex-entry-field"><span>Lebensmittel</span><input class="input" type="text" data-new-name maxlength="120" placeholder="z. B. Hafermilch" autocomplete="off" required></label>
           <label class="dex-entry-field"><span>Tags <small>optional</small></span><input class="input" type="text" data-new-tags maxlength="200" placeholder="Mit Komma trennen" autocomplete="off"></label>

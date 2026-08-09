@@ -635,7 +635,7 @@ async function mountSearch(container, signal) {
           ${iconMarkup('search')}
           <input id="global-search" type="search" autocomplete="off" placeholder="Dex-Einträge durchsuchen …">
         </label>
-        <a class="seiten-x" href="#home" aria-label="Suche schließen">×</a>
+        <a class="seiten-x" href="#home" aria-label="Suche schließen">${materialIconMarkup('close')}</a>
       </div>
       <section class="such-tags" data-search-tags hidden></section>
       <section class="tuck-bibliothek">

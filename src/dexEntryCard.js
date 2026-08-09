@@ -17,8 +17,9 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', favoriteMarkup
   const title = escapeHtml(entry.title || typeLabels[type]);
   const excerpt = escapeHtml(entry.excerpt || entry.note || '');
   const color = escapeHtml(entry.color || '#A9DCE8');
+  const previewClass = escapeHtml(entry.previewClass || '');
   const image = entry.previewUrl
-    ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild${type === 'video' ? ' dex-video-vorschau' : ''}"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy">${type === 'video' && entry.playable ? `<i>${iconMarkup}</i>` : ''}</span>`
+    ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild${type === 'video' ? ' dex-video-vorschau' : ''}${previewClass ? ` ${previewClass}` : ''}"><img src="${escapeHtml(entry.previewUrl)}" alt="" loading="lazy">${type === 'video' && entry.playable ? `<i>${iconMarkup}</i>` : ''}</span>`
     : (entry.previewMarkup || '');
   const detailHref = escapeHtml(entry.detailHref || '#home');
 

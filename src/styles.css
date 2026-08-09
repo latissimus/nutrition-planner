@@ -2783,6 +2783,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
   position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;opacity:0;
   transition:opacity .72s cubic-bezier(.2,.65,.3,1);
 }
+.dex-foto-post-vorschau img{object-position:center top}
 .dex-inhaltskarte-vorschau img.ist-geladen{opacity:1}
 .dex-inhaltskarte-vorschau.hat-vorschaubild::after{
   content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
@@ -3192,10 +3193,8 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   display:grid!important;place-items:center;width:44px;min-width:44px;height:44px;padding:0!important;
   border:var(--karten-bw) solid var(--ink)!important;border-radius:var(--r)!important;
   background:var(--surface)!important;color:#000!important;box-shadow:var(--hart-klein);
-  font:0/1 var(--ui)!important;text-decoration:none!important;
+  font:0/1 var(--ui)!important;line-height:0!important;text-decoration:none!important;
 }
-.seiten-x::before{content:"×";display:block;font:900 29px/.8 Arial,sans-serif;transform:translateY(-1px)}
-.seiten-x:has(.material-svg)::before{display:none}
 .seiten-x .material-svg{display:grid;place-items:center;width:100%;height:100%}
 .seiten-x .material-svg svg{display:block;width:22px;height:22px;margin:auto;fill:#000}
 .seiten-x:active{transform:translate(2px,2px);box-shadow:none}
@@ -3219,8 +3218,16 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .sheet-griff{display:none}
 .kategorie-sheet>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .kategorie-sheet>header h2{margin:0;font-size:20px}
-.kategorie-sheet>header button{width:40px;height:40px;border:0;background:transparent;color:#000!important;
-  font-size:30px;font-weight:900;line-height:1;-webkit-text-stroke:.55px #000}
+.kategorie-sheet>header button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;background:transparent;color:#000!important;line-height:0}
+.kategorie-sheet>header button .material-svg,
+.kategorie-sheet>header button .material-svg svg{display:block;width:24px;height:24px;margin:auto;fill:#000}
+
+/* Quadratische Bedienelemente teilen dieselbe optische Mitte. So verrutschen
+   weder SVGs noch ihre Klickflaechen durch Schrift-Grundlinien. */
+:is(.tuck-quadrat,.tuck-ablage-knopf,.kategorie-kopfknopf,.seiten-x,.dex-detail-knopf){
+  align-items:center;justify-items:center;line-height:0;
+}
+:is(.tuck-quadrat,.tuck-ablage-knopf,.kategorie-kopfknopf,.seiten-x,.dex-detail-knopf) > :is(.material-svg,svg){margin:auto}
 .sheet-menue{display:grid}
 .sheet-menue>button{
   display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:13px;

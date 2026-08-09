@@ -119,7 +119,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   backdrop.className = 'kategorie-sheet-backdrop sammlung-editor-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true" aria-label="${editorTitle}">
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>${editorTitle}</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>${editorTitle}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-collection-form>
       <div class="sammlung-editor-label"><label for="collection-name">Name</label><span data-name-count>${existing?.name?.length || 0}/40</span></div>
       <input class="input" id="collection-name" maxlength="40" required placeholder="z. B. Low Carb" value="${escapeHtml(existing?.name || '')}">

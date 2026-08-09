@@ -127,7 +127,7 @@ export function commitPendingPageLook() {
 function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
   let selected = pageLook(scope, fallbackColor, fallbackPattern);
   const backdrop = sheet(`
-    <header><h2>Seitenlook</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Seitenlook</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="dex-appearance-form seitenlook-form">
       <h3>Seitenfarbe</h3>
       <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-page-color="${color}" class="${color === selected.color.toUpperCase() ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
@@ -206,7 +206,7 @@ function iconPicker(route, onChange) {
   const current = getPreference(storageKey(route), defaults[route]);
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Kategorie-Icon ändern</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Kategorie-Icon ändern</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <h3 class="icon-picker-titel">Icons</h3>
     <div class="icon-auswahl">
       ${icons.map((icon) => `<button class="icon-option${icon.id === current ? ' aktiv' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
@@ -240,7 +240,7 @@ function appearancePicker(route, onChange) {
   let selectedColor = categoryColor(route).toUpperCase();
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="dex-appearance-form">
       <h3>Farbe</h3>
       <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
@@ -283,7 +283,7 @@ function colorPicker(route, onChange) {
   const current = categoryColor(route).toUpperCase();
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Farbe wählen</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Farbe wählen</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     ${colorGroups.map(([group, colors]) => `
       <h3 class="icon-picker-titel farbgruppe-titel">${group}</h3>
       <div class="farb-auswahl">
@@ -302,7 +302,7 @@ function colorPicker(route, onChange) {
 export function settingsSheet(route, onChange, actions = {}) {
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
       <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe ändern</span></button>
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
@@ -346,7 +346,7 @@ function eintragTypWaehlen(container, route, options = {}) {
     options.onAddRoutine ? `<button data-entry-type="routine">${materialIcon('bucket_check', 'sheet-list-icon')}<span>Neue Routine</span></button>` : '',
   ].join('');
   const backdrop = sheet(`
-    <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue eintrag-typ-menue">
       ${food ? `<button data-entry-type="cheat">${materialIcon('bolt', 'sheet-list-icon')}<span>Cheat-Meal</span></button>
         <button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>

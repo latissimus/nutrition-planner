@@ -84,7 +84,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
   const ownRecipe = foodMode && note && !cheatMeal;
   const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
-    <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-dex-entry-form>
       ${image ? `<label class="dex-entry-file" for="dex-entry-image">
           <span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>
@@ -372,6 +372,11 @@ function providerPreview(entry, provider, playable) {
 
 export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const provider = videoProvider(entry.url);
+  let isTikTokPhoto = false;
+  try {
+    const entryUrl = new URL(entry.url || '');
+    isTikTokPhoto = entryUrl.hostname.toLowerCase().includes('tiktok.com') && /\/photo\//i.test(entryUrl.pathname);
+  } catch { /* Kein Linkeintrag. */ }
   const video = entry.entry_type === 'link' && Boolean(provider);
   const type = entry.entry_type === 'routine' ? 'routine' : entry.entry_type === 'audio' ? 'audio' : entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
   const icon = type === 'routine' ? 'bucket_check' : type === 'audio' ? 'mic' : type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
@@ -379,7 +384,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     favorite: Boolean(entry.favorite),
-    previewUrl: entry.preview_url, href: entry.url,
+    previewUrl: entry.preview_url, previewClass: isTikTokPhoto ? 'dex-foto-post-vorschau' : '', href: entry.url,
     previewMarkup: type === 'routine'
       ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('bucket_check')}<small>Routine</small></span>`
       : type === 'audio'

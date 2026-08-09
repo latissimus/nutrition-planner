@@ -41,7 +41,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="Eintrag bearbeiten">
-    <header><h2>Eintrag bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+    <header><h2>Eintrag bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-entry-edit>
       ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" value="${escapeHtml(entry.url)}" required></label>` : ''}
       <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>optional</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"></label>

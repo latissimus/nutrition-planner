@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
+import { dexEntryOverviewMarkup, normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { colorIsDark } from './categoryIcons.js';
 
 describe('normalizeDexUrl', () => {
@@ -40,5 +40,24 @@ describe('videoEmbedUrl', () => {
 
   it('bettet gewöhnliche Links nicht ein', () => {
     expect(videoEmbedUrl('https://example.com/rezept')).toBe('');
+  });
+});
+
+describe('Vorschaubilder', () => {
+  it('richtet TikTok-Fotostrecken am oberen Bildrand aus', () => {
+    const markup = dexEntryOverviewMarkup({
+      id: 'foto-1', entry_type: 'link', title: 'Fotostrecke',
+      url: 'https://www.tiktok.com/@creator/photo/123456789',
+      preview_url: 'https://example.com/preview.jpg',
+    });
+    expect(markup).toContain('dex-foto-post-vorschau');
+  });
+
+  it('verändert normale Link-Vorschaubilder nicht', () => {
+    const markup = dexEntryOverviewMarkup({
+      id: 'link-1', entry_type: 'link', title: 'Rezept',
+      url: 'https://example.com/rezept', preview_url: 'https://example.com/preview.jpg',
+    });
+    expect(markup).not.toContain('dex-foto-post-vorschau');
   });
 });
