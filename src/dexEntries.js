@@ -291,6 +291,14 @@ function groupMarkup(type, entries, color) {
   </section>`;
 }
 
+function vorschaubilderEinblenden(container) {
+  container.querySelectorAll('.dex-inhaltskarte-vorschau img').forEach((bild) => {
+    const anzeigen = () => requestAnimationFrame(() => bild.classList.add('ist-geladen'));
+    if (bild.complete && bild.naturalWidth > 0) anzeigen();
+    else bild.addEventListener('load', anzeigen, { once: true });
+  });
+}
+
 const foodFilterDefinitions = [
   ['all', 'Alle'], ['cheat', 'Cheat-Meals'], ['low', 'Low Carb'],
   ['high', 'High Carb'], ['balanced', 'Ausgewogen'], ['favorite', 'Favoriten'],
@@ -339,6 +347,7 @@ export async function renderDexEntries(container, {
     const paint = () => {
       const visibleEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
       slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined, hasChildren)}</div>`;
+      vorschaubilderEinblenden(slot);
       slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
         if (!group.querySelector('.dex-inhaltskarte')) group.remove();
       });

@@ -2779,7 +2779,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltskarte-streifen{height:7px;flex:0 0 7px;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
-.dex-inhaltskarte-vorschau img{display:block;width:100%;height:100%;object-fit:cover}
+.dex-inhaltskarte-vorschau img{
+  display:block;width:100%;height:100%;object-fit:cover;opacity:0;
+  transition:opacity .24s ease-out;
+}
+.dex-inhaltskarte-vorschau img.ist-geladen{opacity:1}
 .dex-inhaltskarte-body{display:flex;flex:1;min-height:0;flex-direction:column;gap:6px;padding:10px 10px 12px;overflow:hidden}
 .dex-inhaltskarte-kopf{display:flex;align-items:center;gap:8px}
 .dex-inhaltskarte-icon{
