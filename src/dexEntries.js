@@ -129,9 +129,9 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
-      <label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
+      ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
         <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note ? ' required' : ''}></textarea>
-      </label>
+      </label>`}
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">${label} speichern</button>
     </form>
   </section>`;

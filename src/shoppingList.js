@@ -871,7 +871,7 @@ export async function mountShoppingList(container, { session, signal }) {
       backdrop.className = 'kategorie-sheet-backdrop einkauf-add-backdrop';
       backdrop.innerHTML = `<section class="kategorie-sheet einkauf-add-sheet" role="dialog" aria-modal="true" aria-label="Lebensmittel hinzufügen">
         <header><h2>Lebensmittel hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
-        <form class="einkauf-formular" data-add-overlay-form>
+        <form class="einkauf-add-form" data-add-overlay-form>
           <label class="dex-entry-field"><span>Lebensmittel</span><input class="input" type="text" data-new-name maxlength="120" placeholder="z. B. Hafermilch" autocomplete="off" required></label>
           <label class="dex-entry-field"><span>Tags <small>optional</small></span><input class="input" type="text" data-new-tags maxlength="200" placeholder="Mit Komma trennen" autocomplete="off"></label>
           <label class="dex-entry-field"><span>Abteilung</span><select class="input" data-new-section>${sections.map((section) => `<option value="${escapeHtml(section)}"${section === 'Sonstiges' ? ' selected' : ''}>${escapeHtml(section)}</option>`).join('')}</select></label>

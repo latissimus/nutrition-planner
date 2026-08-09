@@ -2881,6 +2881,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-audio-aktionen .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
 .dex-audio-aktionen .material-svg{width:19px;height:19px}
 .dex-audio-status{margin-top:10px;color:#B42318;font-size:13px}
+.einkauf-add-form{display:grid;gap:14px}
+.einkauf-add-form>.btn{min-height:54px;margin-top:2px}
 :root[data-seite="shopping"] .einkauf-formular .input{margin:0}
 :root[data-seite="shopping"] .einkauf-formular-zeile{gap:9px}
 :root[data-seite="shopping"] .einkauf-gruppe{overflow:hidden;margin:0}
