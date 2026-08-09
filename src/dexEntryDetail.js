@@ -116,7 +116,7 @@ function detailMarkup(entry) {
   const embed = videoEmbedUrl(entry.url);
   const provider = videoProvider(entry.url);
   const media = entry.entry_type === 'audio' && entry.audio_url
-    ? `<div class="dex-detail-audio">${materialIconMarkup('graphic_eq')}<audio controls preload="metadata" src="${escapeHtml(entry.audio_url)}"></audio></div>`
+    ? `<div class="dex-detail-audio">${materialIconMarkup('mic')}<audio controls preload="metadata" src="${escapeHtml(entry.audio_url)}"></audio></div>`
     : entry.image_path && entry.preview_url
     ? `<button class="dex-detail-bild" type="button" data-fullscreen><img src="${escapeHtml(entry.preview_url)}" alt="${escapeHtml(entry.title)}"></button>`
     : embed ? `<div class="dex-detail-video"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
@@ -144,7 +144,7 @@ function detailMarkup(entry) {
       <span class="dex-detail-streifen" aria-hidden="true"></span>
       ${media}
       <div class="dex-detail-inhalt">
-        <small>${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'AUDIO' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
+        <small>${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'TONAUFNAHME' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}

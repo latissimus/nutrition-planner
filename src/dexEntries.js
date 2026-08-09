@@ -82,7 +82,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
   const note = type === 'note' || routine;
   const cheatMeal = foodMode && foodKind === 'cheat_meal';
   const ownRecipe = foodMode && note && !cheatMeal;
-  const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Audioaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
+  const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
     <form data-dex-entry-form>
@@ -246,7 +246,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
         if (uploadError) throw uploadError;
         audioPath = uploadedPath;
-        title ||= 'Audioaufnahme';
+        title ||= 'Tonaufnahme';
       } else {
         const noteText = form.querySelector('#dex-entry-note').value.trim();
         if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
@@ -276,7 +276,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       }).select().single();
       if (error) throw error;
       close();
-      toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'audio' ? 'Audioaufnahme im Dex gespeichert' : type === 'routine' ? 'Routine im Dex gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} im Dex gespeichert` : 'Link im Dex gespeichert');
+      toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'audio' ? 'Tonaufnahme im Dex gespeichert' : type === 'routine' ? 'Routine im Dex gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} im Dex gespeichert` : 'Link im Dex gespeichert');
       await onSaved?.(data);
     } catch (error) {
       if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
@@ -371,7 +371,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
     previewMarkup: type === 'routine'
       ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('task_alt')}<small>Routine</small></span>`
       : type === 'audio'
-      ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('graphic_eq')}<small>Audio</small></span>`
+      ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('mic')}<small>Tonaufnahme</small></span>`
       : type === 'note'
       ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy"></span>`
         : '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
@@ -382,7 +382,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
 }
 
 function groupMarkup(type, entries, color) {
-  const label = type === 'favorite' ? 'Favoriten' : type === 'routine' ? 'Routinen' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'audio' ? 'Audio' : type === 'video' ? 'Videos' : 'Links';
+  const label = type === 'favorite' ? 'Favoriten' : type === 'routine' ? 'Routinen' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'audio' ? 'Tonaufnahmen' : type === 'video' ? 'Videos' : 'Links';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryOverviewMarkup(entry, color)).join('')}</div>
