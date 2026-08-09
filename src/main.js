@@ -20,7 +20,7 @@ import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRou
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountShoppingList } from './shoppingList.js';
-import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
+import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
@@ -664,6 +664,7 @@ async function mountSearch(container, signal) {
       return tagMatch && (!query || haystack.includes(query));
     });
     results.innerHTML = treffer.map((entry) => dexEntryOverviewMarkup(entry, categoryColor(entry.root_key))).join('');
+    vorschaubilderEinblenden(results);
     empty.hidden = treffer.length > 0;
   };
   input.oninput = renderResults;

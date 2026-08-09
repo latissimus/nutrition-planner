@@ -260,7 +260,7 @@ function youtubeThumbnail(value) {
 
 function providerPreview(entry, provider, playable) {
   const thumbnail = provider?.key === 'youtube' ? youtubeThumbnail(entry.url) : '';
-  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}</span>`;
+  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau hat-vorschaubild dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}</span>`;
   return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}<b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
 }
 
@@ -275,7 +275,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
     favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, href: entry.url,
     previewMarkup: type === 'note'
-      ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy"></span>`
+      ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy"></span>`
         : '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
       : type === 'video' ? providerPreview(entry, provider, playable) : '',
     playable, detailHref: `#entry/${entry.id}`,
@@ -291,7 +291,7 @@ function groupMarkup(type, entries, color) {
   </section>`;
 }
 
-function vorschaubilderEinblenden(container) {
+export function vorschaubilderEinblenden(container) {
   container.querySelectorAll('.dex-inhaltskarte-vorschau img').forEach((bild) => {
     bild.closest('.dex-inhaltskarte-vorschau')?.classList.add('hat-vorschaubild');
     const anzeigen = () => requestAnimationFrame(() => {
