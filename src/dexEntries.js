@@ -7,7 +7,10 @@ import { bindLongPress } from './longPress.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
+const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
+const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -36,7 +39,7 @@ function queryScope(query, { collectionId }) {
 
 export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at')
+    .select(ENTRY_COLUMNS)
     .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (signal) query = query.abortSignal(signal);
@@ -45,35 +48,41 @@ export async function loadDexEntries(userId, { rootKey, collectionId = null, sig
 
   const entries = data || [];
   await Promise.all(entries.map(async (entry) => {
-    if (!entry.image_path) return;
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(entry.image_path, 60 * 60);
-    entry.preview_url = signed?.signedUrl || '';
+    const path = entry.image_path || entry.audio_path;
+    if (!path) return;
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
+    if (entry.audio_path) entry.audio_url = signed?.signedUrl || '';
+    else entry.preview_url = signed?.signedUrl || '';
   }));
   return entries;
 }
 
 export async function loadAllDexEntries(userId, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at')
+    .select(ENTRY_COLUMNS)
     .eq('user_id', userId).order('created_at', { ascending: false });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
   const entries = data || [];
   await Promise.all(entries.map(async (entry) => {
-    if (!entry.image_path) return;
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(entry.image_path, 60 * 60);
-    entry.preview_url = signed?.signedUrl || '';
+    const path = entry.image_path || entry.audio_path;
+    if (!path) return;
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
+    if (entry.audio_path) entry.audio_url = signed?.signedUrl || '';
+    else entry.preview_url = signed?.signedUrl || '';
   }));
   return entries;
 }
 
-function editorMarkup(type, { foodKind = null, foodMode = false } = {}) {
+function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = '' } = {}) {
   const image = type === 'image';
-  const note = type === 'note';
+  const audio = type === 'audio';
+  const routine = type === 'routine';
+  const note = type === 'note' || routine;
   const cheatMeal = foodMode && foodKind === 'cheat_meal';
   const ownRecipe = foodMode && note && !cheatMeal;
-  const label = cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : image ? 'Bild' : note ? 'Notiz' : 'Link';
+  const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Audioaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
     <form data-dex-entry-form>
@@ -82,6 +91,15 @@ function editorMarkup(type, { foodKind = null, foodMode = false } = {}) {
           <strong>Bild auswählen</strong><small>JPG, PNG, WEBP, GIF oder HEIC · maximal 8 MB</small>
           <input id="dex-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" required>
           <img data-image-preview alt="Ausgewähltes Bild" hidden>
+        </label>` : audio ? `<label class="dex-entry-file" for="dex-entry-audio">
+          <span class="dex-entry-file-icon">${materialIconMarkup('mic')}</span>
+          <strong>Audio auswählen oder aufnehmen</strong><small>MP3, M4A, WAV, WEBM oder OGG · maximal 25 MB</small>
+          <input id="dex-entry-audio" type="file" accept="audio/*" capture>
+          <span class="dex-audio-aktionen">
+            <button class="btn" type="button" data-audio-record>${materialIconMarkup('mic')} Aufnahme starten</button>
+            <button class="btn" type="button" data-audio-stop hidden>Aufnahme beenden</button>
+          </span>
+          <audio data-audio-preview controls hidden></audio>
         </label>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
           <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="text" inputmode="url" autocomplete="url" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
         </label>`}
@@ -116,13 +134,19 @@ function editorMarkup(type, { foodKind = null, foodMode = false } = {}) {
   </section>`;
 }
 
-export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, foodKind = null, onSaved }) {
-  if (!['link', 'image', 'note'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
+export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, foodKind = null, entryLabel = '', onSaved }) {
+  if (!['link', 'image', 'note', 'audio', 'routine'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
   const foodMode = rootKey === 'food-log';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
-  backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode });
-  const close = () => backdrop.remove();
+  backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode, entryLabel });
+  let audioRecorder = null;
+  let audioStream = null;
+  let recordedAudioFile = null;
+  const close = () => {
+    audioStream?.getTracks().forEach((track) => track.stop());
+    backdrop.remove();
+  };
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close();
   };
@@ -130,15 +154,55 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     if (!(event.target instanceof Element) || !event.target.closest('.dex-entry-editor')) event.preventDefault();
   }, { passive: false });
   const form = backdrop.querySelector('[data-dex-entry-form]');
-  const fileInput = backdrop.querySelector('#dex-entry-image');
+  const fileInput = backdrop.querySelector('#dex-entry-image, #dex-entry-audio');
   if (fileInput) fileInput.onchange = () => {
     const file = fileInput.files?.[0];
+    const audioPreview = backdrop.querySelector('[data-audio-preview]');
+    if (audioPreview && file) {
+      audioPreview.src = URL.createObjectURL(file);
+      audioPreview.hidden = false;
+      backdrop.querySelector('.dex-entry-file-icon')?.setAttribute('hidden', '');
+      return;
+    }
     const preview = backdrop.querySelector('[data-image-preview]');
     if (!file || !preview) return;
     preview.src = URL.createObjectURL(file);
     preview.hidden = false;
     backdrop.querySelector('.dex-entry-file-icon')?.setAttribute('hidden', '');
   };
+  const recordButton = backdrop.querySelector('[data-audio-record]');
+  const stopButton = backdrop.querySelector('[data-audio-stop]');
+  if (recordButton && stopButton) {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) recordButton.hidden = true;
+    recordButton.onclick = async () => {
+      try {
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const chunks = [];
+        audioRecorder = new MediaRecorder(audioStream);
+        audioRecorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+        audioRecorder.onstop = () => {
+          const mime = (audioRecorder.mimeType || chunks[0]?.type || 'audio/webm').split(';')[0];
+          const blob = new Blob(chunks, { type: mime });
+          const extension = mime.includes('mp4') ? 'm4a' : mime.includes('ogg') ? 'ogg' : 'webm';
+          recordedAudioFile = new File([blob], `aufnahme-${Date.now()}.${extension}`, { type: mime });
+          const preview = backdrop.querySelector('[data-audio-preview]');
+          preview.src = URL.createObjectURL(recordedAudioFile);
+          preview.hidden = false;
+          backdrop.querySelector('.dex-entry-file-icon')?.setAttribute('hidden', '');
+          audioStream?.getTracks().forEach((track) => track.stop());
+          audioStream = null;
+        };
+        audioRecorder.start();
+        recordButton.hidden = true;
+        stopButton.hidden = false;
+      } catch { toast('Mikrofon konnte nicht geöffnet werden.'); }
+    };
+    stopButton.onclick = () => {
+      if (audioRecorder?.state === 'recording') audioRecorder.stop();
+      stopButton.hidden = true;
+      recordButton.hidden = false;
+    };
+  }
   form.onsubmit = async (event) => {
     event.preventDefault();
     const button = form.querySelector('[type="submit"]');
@@ -148,6 +212,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       const titleInput = form.querySelector('#dex-entry-title');
       let url = null;
       let imagePath = null;
+      let audioPath = null;
       let linkPreview = {};
       let title = titleInput.value.trim();
       if (type === 'link') {
@@ -167,6 +232,17 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         if (uploadError) throw uploadError;
         imagePath = uploadedPath;
         title ||= 'Gespeichertes Bild';
+      } else if (type === 'audio') {
+        const file = recordedAudioFile || fileInput.files?.[0];
+        if (!file) throw new Error('Bitte eine Audioaufnahme auswählen.');
+        if (!AUDIO_TYPES.has(file.type)) throw new Error('Dieses Audioformat wird nicht unterstützt.');
+        if (file.size > MAX_AUDIO_BYTES) throw new Error('Die Audioaufnahme darf höchstens 25 MB groß sein.');
+        const extension = (file.name.split('.').pop() || file.type.split('/').pop() || 'm4a').toLowerCase().replace(/[^a-z0-9]/g, '');
+        uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
+        if (uploadError) throw uploadError;
+        audioPath = uploadedPath;
+        title ||= 'Audioaufnahme';
       } else {
         const noteText = form.querySelector('#dex-entry-note').value.trim();
         if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
@@ -185,7 +261,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       const { data, error } = await supabase.from('dex_entries').insert({
         user_id: userId, collection_id: collectionId, root_key: rootKey,
         entry_type: type, title, note: form.querySelector('#dex-entry-note')?.value.trim() || linkPreview.description || '',
-        url, image_path: imagePath,
+        url, image_path: imagePath, audio_path: audioPath,
         preview_url: linkPreview.previewUrl || null,
         provider: linkPreview.provider || null,
         tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
@@ -196,7 +272,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       }).select().single();
       if (error) throw error;
       close();
-      toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'note' ? 'Notiz im Dex gespeichert' : 'Link im Dex gespeichert');
+      toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'audio' ? 'Audioaufnahme im Dex gespeichert' : type === 'routine' ? 'Routine im Dex gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} im Dex gespeichert` : 'Link im Dex gespeichert');
       await onSaved?.(data);
     } catch (error) {
       if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
@@ -207,7 +283,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   document.body.append(backdrop);
   requestAnimationFrame(() => {
     backdrop.classList.add('offen');
-    backdrop.querySelector(type === 'link' ? '#dex-entry-url' : '#dex-entry-image')?.focus({ preventScroll: true });
+    backdrop.querySelector(type === 'link' ? '#dex-entry-url' : type === 'audio' ? '#dex-entry-audio' : '#dex-entry-image')?.focus({ preventScroll: true });
   });
   return backdrop;
 }
@@ -279,14 +355,18 @@ function providerPreview(entry, provider, playable) {
 export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const provider = videoProvider(entry.url);
   const video = entry.entry_type === 'link' && Boolean(provider);
-  const type = entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
-  const icon = type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
+  const type = entry.entry_type === 'routine' ? 'routine' : entry.entry_type === 'audio' ? 'audio' : entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
+  const icon = type === 'routine' ? 'task_alt' : type === 'audio' ? 'mic' : type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   const playable = Boolean(videoEmbedUrl(entry.url));
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, href: entry.url,
-    previewMarkup: type === 'note'
+    previewMarkup: type === 'routine'
+      ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('task_alt')}<small>Routine</small></span>`
+      : type === 'audio'
+      ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('graphic_eq')}<small>Audio</small></span>`
+      : type === 'note'
       ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy"></span>`
         : '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
       : type === 'video' ? providerPreview(entry, provider, playable) : '',
@@ -296,7 +376,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
 }
 
 function groupMarkup(type, entries, color) {
-  const label = type === 'favorite' ? 'Favoriten' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'video' ? 'Videos' : 'Links';
+  const label = type === 'favorite' ? 'Favoriten' : type === 'routine' ? 'Routinen' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'audio' ? 'Audio' : type === 'video' ? 'Videos' : 'Links';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryOverviewMarkup(entry, color)).join('')}</div>
@@ -336,11 +416,13 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
   const favorites = entries.filter((entry) => entry.favorite);
   const regular = entries.filter((entry) => !entry.favorite);
   const notes = regular.filter((entry) => entry.entry_type === 'note');
+  const routines = regular.filter((entry) => entry.entry_type === 'routine');
   const images = regular.filter((entry) => entry.entry_type === 'image');
+  const audio = regular.filter((entry) => entry.entry_type === 'audio');
   const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
   const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
   if (entries.length) {
-    return `${groupMarkup('favorite', favorites, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`;
+    return `${groupMarkup('favorite', favorites, color)}${groupMarkup('routine', routines, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('audio', audio, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`;
   }
   // Ein Dex mit Unter-Dex, aber (noch) ohne eigene Eintraege, ist nicht
   // "leer" – die Animation wuerde sonst faelschlich unter einem gut

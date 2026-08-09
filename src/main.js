@@ -584,6 +584,7 @@ async function mountCustomCollection(container, item, signal) {
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
+    onAddAudio: ['home', 'training'].includes(item.root_key) ? () => openEntry('audio') : null,
     onAddCheatMeal: item.root_key === 'food-log' ? () => openEntry('note', 'cheat_meal') : null,
     onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
     onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
@@ -834,7 +835,15 @@ async function render() {
       signal,
       onProfileUpdated: (aktuell) => { profile = aktuell; },
     });
-    mountCategoryChrome(view, route, 'KFA-LOG', { pageLookScope: route, pageLookPattern: 'triangles' });
+    const bodyWrap = view.querySelector(':scope > .wrap');
+    bodyWrap?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
+    mountCategoryChrome(view, route, 'KFA-LOG', {
+      pageLookScope: route, pageLookPattern: 'triangles',
+      onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
+    });
+    await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal });
   } else if (route === 'reminders') {
     setSeite('reminders');
     const reminderActions = await mountReminders(view, { session, profile, signal });
@@ -844,17 +853,12 @@ async function render() {
     });
   } else if (route === 'shopping') {
     setSeite('shopping');
-    await mountShoppingList(view, { session, signal });
+    const shoppingActions = await mountShoppingList(view, { session, signal });
     mountCategoryChrome(view, route, 'EINKAUF', {
       pageLookScope: route, pageLookPattern: 'drops',
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
-      onPlus: () => {
-        const feld = view.querySelector('[data-new-name]');
-        if (!feld) return;
-        feld.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        feld.focus({ preventScroll: true });
-      },
+      onPlus: () => shoppingActions?.openAddMenu?.(),
     });
   } else if (route === 'food-log') {
     setSeite('food-log');
@@ -896,6 +900,7 @@ async function render() {
       pageLookScope: route, pageLookPattern: 'drops',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
+      onAddAudio: () => openEntry('audio'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
@@ -916,8 +921,18 @@ async function render() {
     setSeite('collection');
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
-    mountComingSoon(view, route);
-    mountCategoryChrome(view, route, 'ROUTINEN', { pageLookScope: route, pageLookPattern: 'triangles' });
+    setSeite('habits');
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>ROUTINEN</h1></div>${dexEntriesSlotMarkup()}</div>`;
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const openEntry = (type, entryLabel = '') => openDexEntryEditor({ type, entryLabel, userId: session.user.id, rootKey: 'habits', onSaved: refresh });
+    mountCategoryChrome(view, route, 'ROUTINEN', {
+      pageLookScope: route, pageLookPattern: 'triangles',
+      onAddNote: () => openEntry('note'),
+      onAddImage: () => openEntry('image'),
+      onAddAudio: () => openEntry('audio'),
+      onAddRoutine: () => openEntry('routine', 'Routine'),
+    });
+    await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', color: categoryColor('habits'), signal });
   } else {
     mountHome(view, signal);
   }

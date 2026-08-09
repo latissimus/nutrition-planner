@@ -335,6 +335,13 @@ function plusAction(container, route) {
 
 function eintragTypWaehlen(container, route, options = {}) {
   const food = route === 'food-log' || Boolean(options.onAddCheatMeal);
+  const standardEntries = [
+    options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : '',
+    options.onAddLink ? `<button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>` : '',
+    options.onAddImage ? `<button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>` : '',
+    options.onAddAudio ? `<button data-entry-type="audio">${materialIcon('mic', 'sheet-list-icon')}<span>Audioaufnahme</span></button>` : '',
+    options.onAddRoutine ? `<button data-entry-type="routine">${materialIcon('task_alt', 'sheet-list-icon')}<span>Neue Routine</span></button>` : '',
+  ].join('');
   const backdrop = sheet(`
     <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="sheet-menue eintrag-typ-menue">
@@ -342,9 +349,7 @@ function eintragTypWaehlen(container, route, options = {}) {
         <button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>
         <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>
         <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Rezeptbild</span></button>`
-        : `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>
-        <button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>
-        <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>`}
+        : standardEntries}
     </div>`);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
     const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
@@ -353,6 +358,8 @@ function eintragTypWaehlen(container, route, options = {}) {
     if (type === 'cheat') return options.onAddCheatMeal?.();
     if (type === 'recipe-link') return options.onAddRecipeLink?.();
     if (type === 'own-recipe') return options.onAddOwnRecipe?.();
+    if (type === 'audio') return options.onAddAudio?.();
+    if (type === 'routine') return options.onAddRoutine?.();
     if (type === 'note') {
       if (options.onAddNote) return options.onAddNote();
       return toast('Notizen sind für diesen Dex vorbereitet.');

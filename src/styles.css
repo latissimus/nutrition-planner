@@ -2861,6 +2861,24 @@ button,a,[role="button"],summary{touch-action:manipulation;
 
 /* EINKAUF: Formular und Abteilungslisten auf das kompakte Mahlzeitenraster. */
 :root[data-seite="shopping"] .einkauf-formular{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;padding:15px}
+:root[data-seite="shopping"] .einkauf-formular[hidden]{display:none}
+
+.dex-audio-vorschau{
+  display:flex;min-height:112px;align-items:center;justify-content:center;gap:7px;
+  background:color-mix(in srgb,var(--eintrag-farbe) 30%,#fff);color:#111;
+}
+.dex-audio-vorschau .material-svg{width:32px;height:32px}
+.dex-audio-vorschau small{font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.dex-detail-audio{
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px 18px;
+  border-bottom:var(--rahmen-breite,2px) solid #000;background:color-mix(in srgb,var(--eintrag-farbe) 26%,#fff);
+}
+.dex-detail-audio>.material-svg{width:42px;height:42px}
+.dex-detail-audio audio{display:block;width:100%;max-width:520px}
+.dex-entry-file audio{width:100%;margin-top:12px}
+.dex-audio-aktionen{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+.dex-audio-aktionen .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.dex-audio-aktionen .material-svg{width:19px;height:19px}
 :root[data-seite="shopping"] .einkauf-formular .input{margin:0}
 :root[data-seite="shopping"] .einkauf-formular-zeile{gap:9px}
 :root[data-seite="shopping"] .einkauf-gruppe{overflow:hidden;margin:0}

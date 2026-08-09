@@ -688,7 +688,7 @@ export async function mountShoppingList(container, { session, signal }) {
         <b>Was du brauchst, bekommt einen Haken</b>
         <span>Im Laden nimmst du ihn beim Einpacken wieder raus.</span>
       </section>
-      <form class="einkauf-formular" data-add-form>
+      <form class="einkauf-formular" data-add-form hidden>
         <input class="input" type="text" data-new-name maxlength="120" placeholder="Neuer Artikel, z. B. Hafermilch" autocomplete="off" required>
         <input class="input" type="text" data-new-tags maxlength="200" placeholder="Tags, mit Komma trennen (optional)" autocomplete="off">
         <div class="einkauf-formular-zeile">
@@ -896,6 +896,16 @@ export async function mountShoppingList(container, { session, signal }) {
     } finally {
       button.disabled = false;
     }
+  };
+
+  return {
+    openAddMenu() {
+      const form = container.querySelector('[data-add-form]');
+      if (!form) return;
+      form.hidden = false;
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      requestAnimationFrame(() => form.querySelector('[data-new-name]')?.focus({ preventScroll: true }));
+    },
   };
 }
 

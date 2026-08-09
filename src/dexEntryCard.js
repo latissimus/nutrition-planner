@@ -10,10 +10,10 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
-const typeLabels = { image: 'Bild', note: 'Notiz', link: 'Link', video: 'Video' };
+const typeLabels = { image: 'Bild', note: 'Notiz', routine: 'Routine', link: 'Link', video: 'Video', audio: 'Audioaufnahme' };
 
 export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', favoriteMarkup = '', darkColor = false } = {}) {
-  const type = ['image', 'note', 'link', 'video'].includes(entry.type) ? entry.type : 'note';
+  const type = ['image', 'note', 'routine', 'link', 'video', 'audio'].includes(entry.type) ? entry.type : 'note';
   const title = escapeHtml(entry.title || typeLabels[type]);
   const excerpt = escapeHtml(entry.excerpt || entry.note || '');
   const color = escapeHtml(entry.color || '#A9DCE8');

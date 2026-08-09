@@ -4,29 +4,31 @@ import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { toast } from './toast.js';
 
 const BUCKET = 'dex-entries';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at';
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
 async function loadEntry(userId, id, signal) {
   let query = supabase.from('dex_entries')
-    .select('id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,created_at,updated_at')
+    .select(ENTRY_COLUMNS)
     .eq('id', id).eq('user_id', userId).maybeSingle();
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Food-Log', reminders: 'Mahlzeiten', body: 'KFA-Log', habits: 'Routinen' };
+  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Food-Log', training: 'Training', reminders: 'Mahlzeiten', body: 'KFA-Log', habits: 'Routinen' };
   data.dex_name = rootNames[data.root_key] || 'MUSCLE-DEX';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
     if (collection?.color) data.color = collection.color;
     if (collection?.name) data.dex_name = collection.name;
   }
-  if (data.image_path) {
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(data.image_path, 60 * 60);
-    data.preview_url = signed?.signedUrl || '';
+  if (data.image_path || data.audio_path) {
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(data.image_path || data.audio_path, 60 * 60);
+    if (data.audio_path) data.audio_url = signed?.signedUrl || '';
+    else data.preview_url = signed?.signedUrl || '';
   }
   return data;
 }
@@ -53,7 +55,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         <label class="dex-entry-field" for="edit-entry-prep"><span>Zubereitung <small>Minuten</small></span><input id="edit-entry-prep" class="input" type="number" min="1" max="1440" value="${entry.prep_minutes || ''}" placeholder="z. B. 10"></label>
       </div>` : ''}
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
-      <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${entry.entry_type === 'note' ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${entry.entry_type === 'note' ? '4000' : '500'}" rows="${entry.entry_type === 'note' ? '9' : '5'}"${entry.entry_type === 'note' ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
+      <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${['note', 'routine'].includes(entry.entry_type) ? '4000' : '500'}" rows="${['note', 'routine'].includes(entry.entry_type) ? '9' : '5'}"${['note', 'routine'].includes(entry.entry_type) ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
       <button class="btn btn-block dex-entry-delete" type="button" data-entry-delete>Eintrag löschen</button>
     </form>
@@ -83,7 +85,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
     if (!confirm(`„${entry.title}“ wirklich löschen?`)) return;
     const { error } = await supabase.from('dex_entries').delete().eq('id', entry.id).eq('user_id', entry.user_id);
     if (error) { toast(error.message || 'Löschen fehlgeschlagen'); return; }
-    if (entry.image_path) await supabase.storage.from(BUCKET).remove([entry.image_path]);
+    if (entry.image_path || entry.audio_path) await supabase.storage.from(BUCKET).remove([entry.image_path || entry.audio_path]);
     close(); toast('Dex-Eintrag gelöscht');
     if (onDeleted) onDeleted();
     else location.hash = backHref(entry).slice(1);
@@ -113,7 +115,9 @@ async function shareEntry(entry) {
 function detailMarkup(entry) {
   const embed = videoEmbedUrl(entry.url);
   const provider = videoProvider(entry.url);
-  const media = entry.image_path && entry.preview_url
+  const media = entry.entry_type === 'audio' && entry.audio_url
+    ? `<div class="dex-detail-audio">${materialIconMarkup('graphic_eq')}<audio controls preload="metadata" src="${escapeHtml(entry.audio_url)}"></audio></div>`
+    : entry.image_path && entry.preview_url
     ? `<button class="dex-detail-bild" type="button" data-fullscreen><img src="${escapeHtml(entry.preview_url)}" alt="${escapeHtml(entry.title)}"></button>`
     : embed ? `<div class="dex-detail-video"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
       : entry.preview_url ? `<div class="dex-detail-linkvorschau"><img src="${escapeHtml(entry.preview_url)}" alt=""></div>`
@@ -140,7 +144,7 @@ function detailMarkup(entry) {
       <span class="dex-detail-streifen" aria-hidden="true"></span>
       ${media}
       <div class="dex-detail-inhalt">
-        <small>${entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
+        <small>${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'AUDIO' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
@@ -182,6 +186,11 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
           preview_url: previewData.previewUrl || null,
           provider: previewData.provider || entry.provider || null,
         };
+        // Beim ersten Speichern konnten Plattformen wie TikTok bei Foto-Posts
+        // noch leere Metadaten liefern. Ein Refresh fuellt fehlende Werte nach,
+        // laesst aber vom Nutzer bearbeitete Titel und Notizen unangetastet.
+        if (!entry.title?.trim() && previewData.title) patch.title = previewData.title;
+        if (!entry.note?.trim() && previewData.description) patch.note = previewData.description;
         const { error: updateError } = await supabase.from('dex_entries').update(patch).eq('id', entry.id).eq('user_id', userId);
         if (updateError) throw updateError;
         toast('Vorschau aktualisiert');
