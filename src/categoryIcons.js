@@ -301,7 +301,6 @@ export function settingsSheet(route, onChange, actions = {}) {
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">×</button></header>
     <div class="sheet-menue">
       <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe ändern</span></button>
-      ${actions.pageLookScope ? `<button data-action="page-look">${materialIcon('palette', 'sheet-list-icon')}<span>Seitenlook ändern</span></button>` : ''}
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
@@ -312,7 +311,6 @@ export function settingsSheet(route, onChange, actions = {}) {
     if (!action) return;
     closeSheet(backdrop);
     if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange);
-    if (action === 'page-look') pageLookPicker(actions.pageLookScope, actions.pageLookColor, actions.pageLookPattern, onChange);
     if (action === 'select') toast('Die Auswahl ist für diesen Dex vorbereitet.');
     if (action === 'rename') actions.onRename?.();
     if (action === 'sub') actions.onCreateSub?.();
@@ -375,7 +373,6 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   if (!wrap) return;
   container.classList.add('hat-kategoriefarbe');
   container.style.setProperty('--ordner', options.color || categoryColor(route));
-  applyPageLook(options.inheritedPageLookScope || options.pageLookScope || route, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
   wrap.querySelector(':scope > .seitenkopf')?.remove();
   const bar = document.createElement('nav');
   bar.className = 'kategorie-kopf';

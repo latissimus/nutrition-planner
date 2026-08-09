@@ -3467,8 +3467,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .seite-detail-warten{transform:scale(.985);opacity:0}
 .seite-fade-warten{opacity:0}
 .seite-vor{animation:seiteVor .34s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
-.statusleisten-slide{position:fixed;z-index:900;top:0;left:0;width:100%;height:calc(env(safe-area-inset-top) + 1px);pointer-events:none;transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);will-change:transform}
-.statusleisten-slide.ist-aktiv{transform:translateX(0)}
 .seite-zurueck{animation:seiteZurueck .22s cubic-bezier(.2,.8,.3,1) both}
 .seite-detail{animation:seiteDetail .2s ease-out both}
 .seite-fade{animation:seiteFade .16s ease-out both}
@@ -3540,7 +3538,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-wasser-editor[open]{grid-column:1/-1;border-top:1px solid var(--app-divider)}
 .mahl-add-sheet .sheet-menue .app-icon,.mahl-add-sheet .sheet-menue svg{width:21px;height:21px;fill:#000}
 @media(max-width:390px){.mahl-zeitblock>header{min-height:44px}.mahl-zeitblock>header h2{font-size:15px}}
-@media(prefers-reduced-motion:reduce){.seite-vor-warten,.seite-zurueck-warten,.seite-detail-warten,.seite-fade-warten{transform:none;opacity:1}.seite-vor,.seite-zurueck,.seite-detail,.seite-fade{animation:none}.statusleisten-slide{transform:none;transition:none}}
+@media(prefers-reduced-motion:reduce){.seite-vor-warten,.seite-zurueck-warten,.seite-detail-warten,.seite-fade-warten{transform:none;opacity:1}.seite-vor,.seite-zurueck,.seite-detail,.seite-fade{animation:none}}
+
+/* Ein globaler, musterfreier App-Hintergrund. Die Safe Area hinter den
+   iOS-Systemsymbolen wechselt dadurch beim Navigieren weder Farbe noch
+   Tapete; nur die deckende Inhaltsseite bewegt sich. */
+:root[data-seite],
+:root[data-seite] body,
+:root[data-seite] #app{background-color:var(--bg)!important;background-image:none!important}
+:root[data-seite] #view{background-image:none!important}
 
 /* ============================================================
    EINKAUFSLISTE
