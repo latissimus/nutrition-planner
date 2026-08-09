@@ -377,9 +377,14 @@ function reminderBodyMarkup(reminder, completion) {
   const isSupplement = reminder.type === 'supplement';
   const zeit = (reminder.time || '08:00').slice(0, 5);
   return `<div class="rem-row-body">
-    <label class="rem-field"><span>Name</span>
-      <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
-    </label>
+    <div class="rem-name-reihe">
+      <label class="rem-field rem-emoji-field"><span>Emoji</span>
+        <input class="input" data-emoji inputmode="text" maxlength="8" aria-label="Emoji" value="${escapeHtml(reminder.metadata?.emoji || (reminder.type === 'supplement' ? '●' : reminder.type === 'drink' ? '●' : '●'))}">
+      </label>
+      <label class="rem-field"><span>Name</span>
+        <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
+      </label>
+    </div>
     <div class="rem-field-reihe">
       <label class="rem-field"><span>Start</span>
         <input class="input" data-time type="time" value="${zeit}">
@@ -433,7 +438,7 @@ function reminderRowMarkup(reminder, completion) {
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
   return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}">
     <summary class="rem-row-head">
-      <span class="rem-row-dot" data-type="${reminder.type}" aria-hidden="true"></span>
+      <span class="rem-row-emoji" aria-hidden="true">${escapeHtml(reminder.metadata?.emoji || '●')}</span>
       <span class="rem-row-titel">
         <b>${escapeHtml(reminder.label)}</b>
         <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
@@ -473,7 +478,12 @@ function reminderGroups(reminders, completions) {
       ? reminderRowMarkup(drink, completionByReminder.get(drink.id))
       : '<p class="mahl-leerzeile">Noch kein Trinkintervall</p>'}</div>
   </section>`;
-  return `<div class="mahl-tagesplan">${timeline}${water}</div>
+  return `<div class="mahl-hinzufuegen" aria-label="Erinnerung hinzufügen">
+      <button type="button" data-add-reminder="meal"><b>+</b><span>Mahlzeit</span></button>
+      <button type="button" data-add-reminder="supplement"><b>+</b><span>Supplement</span></button>
+      ${drink ? '' : '<button class="mahl-trinken-add" type="button" data-add-reminder="drink"><b>+</b><span>Trinkintervall</span></button>'}
+    </div>
+    <div class="mahl-tagesplan">${timeline}${water}</div>
     <button hidden data-add-reminder="meal"></button><button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
 }
 
@@ -569,15 +579,19 @@ export async function mountReminders(container, { session, signal }) {
     };
     if (row.dataset.type === 'drink') {
       patch.metadata = {
+        emoji: body.querySelector('[data-emoji]')?.value.trim() || '●',
         bis: body.querySelector('[data-end]')?.value || '21:00',
         intervall_minuten: Number(body.querySelector('[data-interval]')?.value || 120),
       };
     } else if (row.dataset.type === 'supplement') {
       patch.metadata = {
+        emoji: body.querySelector('[data-emoji]')?.value.trim() || '●',
         dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
         einheit: body.querySelector('[data-einheit]')?.value || '',
         hinweis: body.querySelector('[data-hinweis]')?.value || '',
       };
+    } else {
+      patch.metadata = { emoji: body.querySelector('[data-emoji]')?.value.trim() || '●' };
     }
     return patch;
   };
@@ -615,7 +629,8 @@ export async function mountReminders(container, { session, signal }) {
         id: null, _key: `new:${crypto.randomUUID()}`, type,
         label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
         time: type === 'meal' ? '12:00' : '08:00',
-        weekdays: WEEKDAYS, active: false, metadata: {}, route: '#reminders',
+        weekdays: WEEKDAYS, active: false,
+        metadata: { emoji: type === 'supplement' ? '💊' : type === 'drink' ? '💧' : '🍽️' }, route: '#reminders',
       };
       reminders.push(neu);
       // Sofort persistieren, damit die neue Zeile eine echte ID hat

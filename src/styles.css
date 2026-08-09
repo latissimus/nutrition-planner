@@ -3474,20 +3474,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-status>div:last-child{border-right:0}
 .mahl-status small{display:block;margin-bottom:5px;font:800 8.5px/1 var(--ui);letter-spacing:.05em;color:var(--muted)}
 .mahl-status b{display:block;font:800 12px/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis}
-.mahl-tagesplan{display:flex;flex-direction:column;gap:16px}
+.mahl-hinzufuegen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.mahl-hinzufuegen button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:9px 12px;border:var(--karten-bw) solid var(--ink);border-radius:12px;background:var(--surface);box-shadow:var(--hart-klein);color:var(--ink);font:800 13px/1 var(--ui)}
+.mahl-hinzufuegen button b{font-size:22px;line-height:1}
+.mahl-hinzufuegen .mahl-trinken-add{grid-column:1/-1}
+.mahl-hinzufuegen button:active{transform:translate(2px,2px);box-shadow:none}
+.mahl-tagesplan{display:flex;flex-direction:column;gap:14px}
 .mahl-zeitblock{position:relative;overflow:hidden;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart-klein)}
 .mahl-zeitblock::before{content:"";display:block;height:7px;background:var(--ordner)}
-.mahl-zeitblock>header{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:10px 13px;border-bottom:1px solid var(--app-divider)}
+.mahl-zeitblock>header{display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:11px 17px;border-bottom:1px solid var(--app-divider)}
 .mahl-zeitblock>header h2{margin:0;font:800 16px/1 var(--ui);letter-spacing:.045em}
 .mahl-zeitblock>header span{display:grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:8px;background:color-mix(in srgb,var(--ordner) 30%,var(--surface));font:800 13px/1 var(--ui)}
 .mahl-timeline{overflow:hidden;background:var(--surface)}
-.mahl-timeline .rem-row-head{padding-inline:12px}
-.mahl-leerzeile{margin:0;padding:15px 13px;color:var(--muted);font:600 13px/1.2 var(--ui)}
+.mahl-timeline .rem-row-head{position:relative;grid-template-columns:24px minmax(0,1fr) 58px 22px;min-height:68px;padding:12px 16px;column-gap:11px}
+.mahl-leerzeile{margin:0;padding:17px;color:var(--muted);font:600 13px/1.2 var(--ui)}
 .mahl-trinken::before{background:#83CFE0}
 .rem-row-art{color:var(--muted)!important;font:800 8.5px/1 var(--ui)!important;letter-spacing:.08em!important}
+.rem-row-emoji{display:grid;place-items:center;width:24px;height:24px;font-size:19px;line-height:1;filter:grayscale(1) brightness(0)}
 .mahl-zeitblock .rem-row-zeit{display:grid;place-items:center;min-width:54px;height:30px;padding:0 7px;border-radius:8px;background:color-mix(in srgb,var(--ordner) 18%,var(--surface));color:var(--ink);font-weight:700;text-align:center}
-.mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{text-align:center;text-align-last:center}
-.mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{text-align:center}
+.mahl-zeitblock .rem-row-chevron{font-size:0;width:20px;height:20px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E") center/20px no-repeat;transition:transform .18s}
+.mahl-zeitblock .rem-row[open] .rem-row-chevron{transform:rotate(180deg)}
+.mahl-zeitblock .rem-row-body{padding:16px 17px 18px;gap:14px}
+.rem-name-reihe{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px}
+.rem-emoji-field .input{font-size:21px;text-align:center;filter:grayscale(1) brightness(0)}
+.mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{height:48px;min-height:48px;padding-top:0;padding-bottom:0;line-height:48px;text-align:center;text-align-last:center}
+.mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{height:48px;line-height:48px;text-align:center}
 .mahl-wasserkarte{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;margin-top:18px;padding:13px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
 .mahl-wasser-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:#83CFE0}
 .mahl-wasser-icon svg{width:23px;height:23px;fill:#000}
