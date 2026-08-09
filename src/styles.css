@@ -2900,6 +2900,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-row:last-child{border-bottom:0}
 .routine-check{display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check .material-svg,.routine-check svg{width:18px;height:18px;fill:#000}
+.routine-check .material-svg svg *{fill:#000}
+.routine-check.kontrast-weiss,
+.routine-check.kontrast-weiss .material-svg,
+.routine-check.kontrast-weiss .material-svg svg,
+.routine-check.kontrast-weiss .material-svg svg *{color:#fff!important;fill:#fff!important}
 .routine-icon{display:grid;place-items:center;width:34px;height:34px;font-size:22px;line-height:1}
 .routine-copy{display:flex;min-width:0;flex-direction:column;gap:3px}
 .routine-copy b,.routine-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2910,7 +2915,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-notizen{margin-top:18px}
 .routine-editor form{display:grid;gap:16px}
 .routine-name-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:10px}
-.routine-plan-row{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:10px}
+.routine-plan-row{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:10px}
+.routine-plan-row>label:last-child{width:100px;justify-self:end}
+.routine-plan-row input[type="time"]{width:100px;max-width:100px;padding-inline:8px;font-variant-numeric:tabular-nums}
 .routine-icon-field .input{text-align:center;font-size:23px}
 .routine-days{min-width:0;margin:0;padding:0;border:0}
 .routine-days legend{margin-bottom:8px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}

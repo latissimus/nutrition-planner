@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { categoryColor, materialIconMarkup } from './categoryIcons.js';
+import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
 
 const escapeHtml = (value = '') => String(value)
@@ -84,10 +84,10 @@ function editor(userId, { existing = null, onSaved }) {
   requestAnimationFrame(() => { backdrop.classList.add('offen'); backdrop.querySelector('[data-routine-name]')?.focus({ preventScroll: true }); });
 }
 
-function routineRow(item, completed) {
+function routineRow(item, completed, darkColor = false) {
   const dayNames = item.weekdays?.length === 7 ? 'Täglich' : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label).join(' · ');
   return `<article class="routine-row${completed ? ' erledigt' : ''}" data-routine-id="${item.id}">
-    <button class="routine-check" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('bucket_check') : ''}</button>
+    <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
     <span class="routine-icon" aria-hidden="true">${escapeHtml(item.icon || '✓')}</span>
     <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
     <button class="routine-edit" type="button" data-routine-edit aria-label="${escapeHtml(item.name)} bearbeiten">${materialIconMarkup('build')}</button>
@@ -111,11 +111,12 @@ export async function mountRoutines(container, { session, signal }) {
   const paint = () => {
     const scheduled = state.routines.filter((item) => item.active && item.weekdays?.includes(weekday()));
     const done = scheduled.filter((item) => state.completed.has(item.id)).length;
+    const darkColor = colorIsDark(categoryColor('habits'));
     container.querySelector('[data-routine-progress]').textContent = scheduled.length ? `${done} von ${scheduled.length} für heute erledigt` : 'Heute ist keine Routine geplant.';
     container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
       const items = state.routines.filter((item) => item.period === key);
       if (!items.length) return '';
-      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.map((item) => routineRow(item, state.completed.has(item.id))).join('')}</div></section>`;
+      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.map((item) => routineRow(item, state.completed.has(item.id), darkColor)).join('')}</div></section>`;
     }).join('') || '';
   };
   paint();
