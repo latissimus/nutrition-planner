@@ -1,4 +1,5 @@
 import { toast } from './toast.js';
+import { getPreference, setPreference } from './userPreferences.js';
 
 const modules = import.meta.glob('../MUSCLEDEX-ICONS/*.svg', {
   query: '?raw', import: 'default', eager: true,
@@ -70,7 +71,7 @@ export function colorIsDark(color) {
 }
 
 export function categoryColor(route) {
-  const saved = localStorage.getItem(colorKey(route));
+  const saved = getPreference(colorKey(route));
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
 }
@@ -84,8 +85,8 @@ const pagePatterns = [
 
 export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   return {
-    color: localStorage.getItem(pageColorKey(scope)) || fallbackColor || '#F2EBE0',
-    pattern: localStorage.getItem(pagePatternKey(scope)) || fallbackPattern,
+    color: getPreference(pageColorKey(scope), fallbackColor || '#F2EBE0'),
+    pattern: getPreference(pagePatternKey(scope), fallbackPattern),
   };
 }
 
@@ -145,8 +146,8 @@ function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
       panel.querySelectorAll('[data-page-pattern]').forEach((button) => button.classList.toggle('aktiv', button === pattern));
     }
     if (!event.target.closest('[data-page-look-save]')) return;
-    localStorage.setItem(pageColorKey(scope), selected.color);
-    localStorage.setItem(pagePatternKey(scope), selected.pattern);
+    setPreference(pageColorKey(scope), selected.color);
+    setPreference(pagePatternKey(scope), selected.pattern);
     applyPageLook(scope, fallbackColor, fallbackPattern);
     closeSheet(backdrop);
     onChange?.();
@@ -162,7 +163,7 @@ function materialIcon(id, className = '') {
 export const materialIconMarkup = materialIcon;
 
 export function categoryIconMarkup(route, className = 'kategorie-svg') {
-  const saved = localStorage.getItem(storageKey(route));
+  const saved = getPreference(storageKey(route));
   if (saved?.startsWith('emoji:')) {
     const emoji = saved.slice(6).replace(/[<>&"']/g, '');
     return `<span class="${className} kategorie-emoji" data-category-icon="${route}" title="Emoji">${emoji}</span>`;
@@ -199,7 +200,7 @@ function closeSheet(backdrop) {
 }
 
 function iconPicker(route, onChange) {
-  const current = localStorage.getItem(storageKey(route)) || defaults[route];
+  const current = getPreference(storageKey(route), defaults[route]);
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Kategorie-Icon ändern</h2><button data-sheet-close aria-label="Schließen">×</button></header>
@@ -215,7 +216,7 @@ function iconPicker(route, onChange) {
     const button = event.target.closest('[data-icon-id]');
     if (!button) return;
     const value = button.dataset.iconId;
-    localStorage.setItem(storageKey(route), value);
+    setPreference(storageKey(route), value);
     closeSheet(backdrop);
     onChange?.();
     toast('Kategorie-Icon geändert.');
@@ -224,7 +225,7 @@ function iconPicker(route, onChange) {
     event.preventDefault();
     const emoji = event.currentTarget.querySelector('input').value.trim();
     if (!emoji) return;
-    localStorage.setItem(storageKey(route), `emoji:${emoji}`);
+    setPreference(storageKey(route), `emoji:${emoji}`);
     closeSheet(backdrop);
     onChange?.();
     toast('Eigenes Emoji übernommen.');
@@ -232,7 +233,7 @@ function iconPicker(route, onChange) {
 }
 
 function appearancePicker(route, onChange) {
-  let selectedIcon = localStorage.getItem(storageKey(route)) || defaults[route];
+  let selectedIcon = getPreference(storageKey(route), defaults[route]);
   let selectedColor = categoryColor(route).toUpperCase();
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
@@ -263,8 +264,8 @@ function appearancePicker(route, onChange) {
     }
     if (!event.target.closest('.appearance-save')) return;
     const emoji = emojiInput.value.trim();
-    localStorage.setItem(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
-    localStorage.setItem(colorKey(route), selectedColor);
+    setPreference(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
+    setPreference(colorKey(route), selectedColor);
     closeSheet(backdrop);
     onChange?.();
     toast('Icon und Farbe geändert.');
@@ -288,7 +289,7 @@ function colorPicker(route, onChange) {
   backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
     const button = event.target.closest('[data-color]');
     if (!button) return;
-    localStorage.setItem(colorKey(route), button.dataset.color);
+    setPreference(colorKey(route), button.dataset.color);
     closeSheet(backdrop);
     onChange?.();
     toast('Retrofarbe geändert.');

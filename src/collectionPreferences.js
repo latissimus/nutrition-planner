@@ -1,3 +1,5 @@
+import { getPreference, setPreference } from './userPreferences.js';
+
 const STORAGE_KEY = 'muscledex:sichtbare-sammlungen';
 const ORDER_KEY = 'muscledex:sammlungs-reihenfolge';
 const CUSTOM_HIDDEN_KEY = 'muscledex:eigene-dex-ausgeblendet';
@@ -7,7 +9,7 @@ export const collectionRoutes = ['body', 'reminders', 'food-log', 'training', 's
 
 export function collectionOrder() {
   try {
-    const saved = JSON.parse(localStorage.getItem(ORDER_KEY));
+    const saved = getPreference(ORDER_KEY);
     if (!Array.isArray(saved)) return [...collectionRoutes];
     const valid = saved.filter((route, index) => collectionRoutes.includes(route) && saved.indexOf(route) === index);
     return [...valid, ...collectionRoutes.filter((route) => !valid.includes(route))];
@@ -18,7 +20,7 @@ export function collectionOrder() {
 
 export function visibleCollectionRoutes() {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const saved = getPreference(STORAGE_KEY);
     if (!Array.isArray(saved)) return collectionOrder();
     return collectionOrder().filter((route) => saved.includes(route));
   } catch {
@@ -36,7 +38,7 @@ export function setCollectionVisible(route, visible) {
   if (visible) selected.add(route);
   else selected.delete(route);
   const ordered = collectionOrder().filter((item) => selected.has(item));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(ordered));
+  setPreference(STORAGE_KEY, ordered);
 }
 
 export function moveCollection(route, direction) {
@@ -45,12 +47,12 @@ export function moveCollection(route, direction) {
   const to = from + direction;
   if (from < 0 || to < 0 || to >= order.length) return false;
   [order[from], order[to]] = [order[to], order[from]];
-  localStorage.setItem(ORDER_KEY, JSON.stringify(order));
+  setPreference(ORDER_KEY, order);
   return true;
 }
 
 const gespeicherteListe = (key) => {
-  try { const value = JSON.parse(localStorage.getItem(key)); return Array.isArray(value) ? value : []; }
+  try { const value = getPreference(key); return Array.isArray(value) ? value : []; }
   catch { return []; }
 };
 
@@ -67,7 +69,7 @@ export const customCollectionIsVisible = (id) => !gespeicherteListe(CUSTOM_HIDDE
 export function setCustomCollectionVisible(id, visible) {
   const hidden = new Set(gespeicherteListe(CUSTOM_HIDDEN_KEY));
   if (visible) hidden.delete(id); else hidden.add(id);
-  localStorage.setItem(CUSTOM_HIDDEN_KEY, JSON.stringify([...hidden]));
+  setPreference(CUSTOM_HIDDEN_KEY, [...hidden]);
 }
 
 export function moveCustomCollection(items, id, direction) {
@@ -76,6 +78,6 @@ export function moveCustomCollection(items, id, direction) {
   const to = from + direction;
   if (from < 0 || to < 0 || to >= order.length) return false;
   [order[from], order[to]] = [order[to], order[from]];
-  localStorage.setItem(CUSTOM_ORDER_KEY, JSON.stringify(order));
+  setPreference(CUSTOM_ORDER_KEY, order);
   return true;
 }

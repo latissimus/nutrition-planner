@@ -25,6 +25,7 @@ import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
+import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
 } from './categoryIcons.js';
@@ -987,17 +988,26 @@ if (!supabaseKonfiguriert) {
     if (event === 'SIGNED_OUT') {
       profile = null;
       profileLadePromise = null;
+      setPreferenceUser('');
     }
     if (event === 'SIGNED_IN' && bisherigeUserId && bisherigeUserId !== session?.user?.id) {
       profile = null;
       profileLadePromise = null;
     }
-    if (session?.user?.id) startReminderLoop(session.user.id);
+    if (session?.user?.id) {
+      setPreferenceUser(session.user.id);
+      startReminderLoop(session.user.id);
+    }
     // Ein still erneuertes Zugriffstoken darf die gerade benutzte Unterseite
     // nicht neu aufbauen. Auch wiederholte SIGNED_IN-Ereignisse desselben
     // Nutzers (z. B. nach Rueckkehr in die PWA) aktualisieren nur die Session.
     if (event === 'TOKEN_REFRESHED') return;
     if (event === 'SIGNED_IN' && bisherigeUserId === session?.user?.id && profile) return;
-    setTimeout(() => render(), 0);
+    const preferenceUserId = session?.user?.id || '';
+    setTimeout(async () => {
+      if (preferenceUserId) await loadUserPreferences(preferenceUserId);
+      if ((session?.user?.id || '') !== preferenceUserId) return;
+      render();
+    }, 0);
   });
 }

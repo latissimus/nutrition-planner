@@ -32,6 +32,41 @@ async function oembed(endpoint: string) {
   return await response.json();
 }
 
+async function stablePreviewUrl(value: string) {
+  if (!value) return '';
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+  if (!supabaseUrl || !serviceKey) return value;
+  try {
+    const response = await fetch(safeUrl(value), {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+      redirect: 'follow', signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) return value;
+    const contentType = (response.headers.get('content-type') || '').split(';')[0].toLowerCase();
+    const extensions: Record<string, string> = {
+      'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif',
+    };
+    const extension = extensions[contentType];
+    if (!extension) return value;
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (!bytes.length || bytes.byteLength > 5 * 1024 * 1024) return value;
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+    const hash = [...new Uint8Array(digest)].map((part) => part.toString(16).padStart(2, '0')).join('');
+    const path = `${hash}.${extension}`;
+    const upload = await fetch(`${supabaseUrl}/storage/v1/object/link-previews/${path}`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${serviceKey}`, apikey: serviceKey,
+        'content-type': contentType, 'x-upsert': 'true',
+      },
+      body: bytes,
+    });
+    if (!upload.ok) return value;
+    return `${supabaseUrl}/storage/v1/object/public/link-previews/${path}`;
+  } catch { return value; }
+}
+
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
@@ -55,10 +90,11 @@ Deno.serve(async (request) => {
     const rawPreview = String(data.thumbnail_url || '');
     let previewUrl = '';
     try { previewUrl = rawPreview ? new URL(rawPreview, url).href : ''; } catch { previewUrl = ''; }
+    const stablePreview = await stablePreviewUrl(previewUrl);
     return json({
       title: String(data.title || '').slice(0, 100),
       description: String(data.description || data.author_name || '').slice(0, 500),
-      previewUrl: previewUrl.slice(0, 2000),
+      previewUrl: stablePreview.slice(0, 2000),
       provider: String(data.provider_name || url.hostname.replace(/^www\./, '')).slice(0, 80),
     });
   } catch (error) {
