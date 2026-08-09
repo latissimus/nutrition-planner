@@ -2802,7 +2802,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
    Die Funktionen bleiben bewusst verschieden; Geometrie, Typografie,
    Abstaende und Bedienflaechen folgen aber demselben Raster.
    ============================================================ */
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) #view>.wrap{
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) .app-shell>:is(#view,.view-alt,.view-neu)>.wrap{
   padding-inline:14px;
 }
 
