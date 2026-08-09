@@ -2811,8 +2811,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
   border:0;background:transparent;color:var(--text);
 }
 :root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.mahl-intro,.seiten-einstieg)>b{
-  font-family:var(--ui);font-size:15px;font-style:normal;font-weight:800;line-height:1.15;
-  letter-spacing:.045em;text-transform:uppercase;
+  font-family:var(--display);font-size:18px;font-style:normal;font-weight:800;line-height:1;
+  letter-spacing:0;text-transform:uppercase;
 }
 :root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.mahl-intro,.seiten-einstieg)>span{
   color:var(--muted);font-size:12.5px;line-height:1.4;
@@ -2833,12 +2833,29 @@ button,a,[role="button"],summary{touch-action:manipulation;
 :root[data-seite="reminders"] .mahl-zeitblock>header h2,
 :root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head b,
 :root[data-seite="body"] :is([data-skinfold-card],[data-weight-card])>.mini-title{
-  margin:0;font-family:var(--ui);font-size:16px;font-style:normal;font-weight:800;
-  line-height:1;letter-spacing:.045em;text-transform:uppercase;
+  margin:0;font-family:var(--display);font-size:18px;font-style:normal;font-weight:800;
+  line-height:1;letter-spacing:0;text-transform:uppercase;
 }
 :root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head,
 :root[data-seite="body"] .mess-neu>summary{
   font-family:var(--ui);font-style:normal!important;font-weight:700;
+}
+
+/* Gemeinsame Text-Hierarchie: Titel, Sekundaertext und technische Labels. */
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.rem-row-titel b,.einkauf-row-name,.mess-neu>summary){
+  font-family:var(--ui);font-size:14.5px;font-style:normal;font-weight:700;line-height:1.25;
+}
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(
+  .mahl-intro>span,.seiten-einstieg>span,.rem-row-titel small,.einkauf-row-note,
+  .mess-hinweis,.mess-datum,.mess-leer,.kurve-leer
+){
+  color:var(--muted);font-family:var(--ui);font-size:12px;font-style:normal;font-weight:500;line-height:1.4;
+}
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(
+  .rem-row-art,.einkauf-tag,.falte span,label.fld-l,.mess-label
+){
+  font-family:var(--ui);font-size:10px;font-style:normal;font-weight:800;line-height:1.15;
+  letter-spacing:.07em;text-transform:uppercase;
 }
 
 /* EINKAUF: Formular und Abteilungslisten auf das kompakte Mahlzeitenraster. */
@@ -3390,7 +3407,11 @@ body{overscroll-behavior:none}
 }
 .app-shell{position:relative}
 .app-shell>.view-alt,.app-shell>.view-neu{position:absolute;inset:0;width:100%;height:100%;min-height:0}
-.app-shell>.view-alt{z-index:1;overflow:hidden;pointer-events:none}
+.app-shell>.view-alt{
+  z-index:1;overflow-x:hidden;overflow-y:auto;pointer-events:none;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top);
+}
 .app-shell>.view-alt-hart{z-index:3}
 .app-shell>.view-neu{z-index:2;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);background-color:var(--dex-seitenfarbe,var(--bg))}
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
