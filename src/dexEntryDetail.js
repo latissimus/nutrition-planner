@@ -178,6 +178,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
         if (previewError) throw previewError;
         if (!previewData || previewData.error) throw new Error(previewData?.error || 'Vorschau konnte nicht geladen werden.');
         const patch = {
+          url: previewData.resolvedUrl || entry.url,
           preview_url: previewData.previewUrl || null,
           provider: previewData.provider || entry.provider || null,
         };

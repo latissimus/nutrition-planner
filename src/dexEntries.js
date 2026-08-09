@@ -154,6 +154,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         url = normalizeDexUrl(form.querySelector('#dex-entry-url').value);
         const { data: previewData } = await supabase.functions.invoke('link-preview', { body: { url } });
         linkPreview = previewData && !previewData.error ? previewData : {};
+        if (linkPreview.resolvedUrl) url = normalizeDexUrl(linkPreview.resolvedUrl);
         title ||= linkPreview.title || '';
       } else if (type === 'image') {
         const file = fileInput.files?.[0];
@@ -239,10 +240,21 @@ export function videoEmbedUrl(value) {
 export function videoProvider(value) {
   if (!value) return null;
   try {
-    const host = new URL(value).hostname.toLowerCase();
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase();
     if (host.includes('youtube.com') || host.includes('youtu.be')) return { name: 'YouTube', key: 'youtube' };
-    if (host.includes('tiktok.com')) return { name: 'TikTok', key: 'tiktok' };
-    if (host.includes('instagram.com')) return { name: 'Instagram', key: 'instagram' };
+    if (host.includes('tiktok.com')) {
+      if (/\/photo\//i.test(parsed.pathname)) return null;
+      return { name: 'TikTok', key: 'tiktok' };
+    }
+    if (host.includes('instagram.com')) {
+      // Instagram verwendet /p/ sowohl für Bilder als auch für Karussells und
+      // teilweise für Videos. Ohne Graph-API lässt sich der Medientyp dort nicht
+      // zuverlässig erkennen. Nur eindeutige Video-Pfade werden daher als Video
+      // einsortiert; /p/-Beiträge bleiben bei den normalen Links.
+      if (/\/(?:reel|reels|tv)\//i.test(parsed.pathname)) return { name: 'Instagram', key: 'instagram' };
+      return null;
+    }
     if (host.includes('vimeo.com')) return { name: 'Vimeo', key: 'vimeo' };
   } catch { return null; }
   return null;
