@@ -2798,42 +2798,45 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 
 /* ============================================================
-   SYSTEM-DEX — gemeinsamer Look fuer MAHLZEITEN, EINKAUF und KFA-LOG
+   SYSTEM-DEX — gemeinsamer Look fuer MAHLZEITEN, EINKAUF, KFA-LOG und ROUTINEN
    Die Funktionen bleiben bewusst verschieden; Geometrie, Typografie,
    Abstaende und Bedienflaechen folgen aber demselben Raster.
    ============================================================ */
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) .app-shell>:is(#view,.view-neu)>.wrap,
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) .app-shell>:is(#view,.view-neu)>.wrap,
 .app-shell>.view-alt.system-dex-view>.wrap{
   padding-inline:14px;
 }
 
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.mahl-intro,.seiten-einstieg){
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) :is(.mahl-intro,.seiten-einstieg){
   display:flex;flex-direction:column;gap:4px;margin:3px 2px 16px;padding:0;
   border:0;background:transparent;color:var(--text);
 }
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.mahl-intro,.seiten-einstieg)>b{
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) :is(.mahl-intro,.seiten-einstieg)>b{
   font-family:var(--display);font-size:18px;font-style:normal;font-weight:800;line-height:1;
   letter-spacing:0;text-transform:uppercase;
 }
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.mahl-intro,.seiten-einstieg)>span{
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) :is(.mahl-intro,.seiten-einstieg)>span{
   color:var(--muted);font-size:12.5px;line-height:1.4;
 }
 
 /* Alle grossen Module besitzen dieselbe ruhige, kompakte Kartenhuelle. */
 :root[data-seite="reminders"] .mahl-zeitblock,
 :root[data-seite="shopping"] :is(.einkauf-formular,.einkauf-gruppe),
-:root[data-seite="body"] :is([data-skinfold-card],[data-weight-card]){
+:root[data-seite="body"] :is([data-skinfold-card],[data-weight-card]),
+:root[data-seite="habits"] .routine-zeitblock{
   border:var(--karten-bw) solid var(--ink)!important;border-radius:var(--r-karte)!important;
   background:var(--surface)!important;box-shadow:var(--hart-klein)!important;
 }
 :root[data-seite="reminders"] .mahl-tagesplan,
-:root[data-seite="shopping"] [data-einkauf-liste]{display:flex;flex-direction:column;gap:12px}
+:root[data-seite="shopping"] [data-einkauf-liste],
+:root[data-seite="habits"] .routine-plan{display:flex;flex-direction:column;gap:12px}
 :root[data-seite="body"] [data-skinfold-card]+[data-weight-card]{margin-top:12px}
 
 /* Ueberschriften: Figtree, nicht kursiv, gleiche Groesse und Grundlinie. */
 :root[data-seite="reminders"] .mahl-zeitblock>header h2,
 :root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head b,
-:root[data-seite="body"] :is([data-skinfold-card],[data-weight-card])>.mini-title{
+:root[data-seite="body"] :is([data-skinfold-card],[data-weight-card])>.mini-title,
+:root[data-seite="habits"] .routine-zeitblock>header h2{
   margin:0;font-family:var(--display);font-size:18px;font-style:normal;font-weight:800;
   line-height:1;letter-spacing:0;text-transform:uppercase;
 }
@@ -2843,12 +2846,12 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 
 /* Gemeinsame Text-Hierarchie: Titel, Sekundaertext und technische Labels. */
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.rem-row-titel b,.einkauf-row-name,.mess-neu>summary){
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) :is(.rem-row-titel b,.einkauf-row-name,.mess-neu>summary,.routine-copy b){
   font-family:var(--ui);font-size:14.5px;font-style:normal;font-weight:700;line-height:1.25;
 }
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) :is(
   .mahl-intro>span,.seiten-einstieg>span,.rem-row-titel small,.einkauf-row-note,
-  .mess-hinweis,.mess-datum,.mess-leer,.kurve-leer
+  .mess-hinweis,.mess-datum,.mess-leer,.kurve-leer,.routine-copy small
 ){
   color:var(--muted);font-family:var(--ui);font-size:12px;font-style:normal;font-weight:500;line-height:1.4;
 }
@@ -2883,6 +2886,37 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-audio-status{margin-top:10px;color:#B42318;font-size:13px}
 .einkauf-add-form{display:grid;gap:14px}
 .einkauf-add-form>.btn{min-height:54px;margin-top:2px}
+
+/* ROUTINEN: gleiche Kartenhuelle und Textstaffelung wie die anderen
+   System-DEX, mit einer klaren Heute-Aktion pro Zeile. */
+:root[data-seite="habits"] .routine-zeitblock{overflow:hidden;margin:0}
+:root[data-seite="habits"] .routine-zeitblock>header{
+  display:flex;align-items:center;justify-content:space-between;min-height:55px;
+  padding:12px 15px;border-bottom:1px solid var(--app-divider);
+}
+:root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
+.routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 34px;align-items:center;gap:10px;min-height:64px;padding:9px 11px;border-bottom:1px solid var(--app-divider)}
+.routine-row:last-child{border-bottom:0}
+.routine-check{display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
+.routine-check .material-svg,.routine-check svg{width:18px;height:18px;fill:#000}
+.routine-icon{display:grid;place-items:center;width:34px;height:34px;font-size:22px;line-height:1}
+.routine-copy{display:flex;min-width:0;flex-direction:column;gap:3px}
+.routine-copy b,.routine-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.routine-row.erledigt .routine-copy{opacity:.48}.routine-row.erledigt .routine-copy b{text-decoration:line-through}
+.routine-row.erledigt .routine-check{background:var(--ordner)}
+.routine-edit{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent;color:#000}
+.routine-edit .material-svg,.routine-edit svg{width:19px;height:19px;fill:#000}
+.routine-notizen{margin-top:18px}
+.routine-editor form{display:grid;gap:16px}
+.routine-name-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:10px}
+.routine-plan-row{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:10px}
+.routine-icon-field .input{text-align:center;font-size:23px}
+.routine-days{min-width:0;margin:0;padding:0;border:0}
+.routine-days legend{margin-bottom:8px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.routine-days>div{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.routine-days button{min-width:0;height:38px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);font:800 11px/1 var(--ui)}
+.routine-days button.aktiv{border-color:#000;background:var(--ordner);color:#000}
+.routine-delete{border-color:#B42318!important;color:#B42318!important;background:#fff!important}
 :root[data-seite="shopping"] .einkauf-formular .input{margin:0}
 :root[data-seite="shopping"] .einkauf-formular-zeile{gap:9px}
 :root[data-seite="shopping"] .einkauf-gruppe{overflow:hidden;margin:0}
@@ -2916,11 +2950,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 :root[data-seite="body"] .gew-eingabe{gap:9px;margin-top:14px}
 
 /* Einheitliche Felder und Hauptaktionen in allen drei System-DEX. */
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) .input{
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) .input{
   min-height:46px;border:1px solid var(--app-outline);border-radius:10px;background:var(--app-field);
   font-family:var(--ui);font-size:14px;
 }
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"]) :is(.btn-primary,.rem-speichern){
+:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="body"],[data-seite="habits"]) :is(.btn-primary,.rem-speichern){
   min-height:48px;border:0!important;border-radius:11px;background:#492426!important;
   color:#fff!important;box-shadow:none;font-family:var(--ui);font-style:normal;font-weight:800;
 }

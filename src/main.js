@@ -20,6 +20,7 @@ import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRou
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountShoppingList } from './shoppingList.js';
+import { mountRoutines } from './routines.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -268,7 +269,7 @@ const sammlungen = [
   ['food-log', 'Food-Log', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
-  ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Bald'],
+  ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 const sichtbareSammlungen = () => {
@@ -294,6 +295,7 @@ const ZAEHLQUELLEN = {
   // die Karte beantwortet damit direkt "Wie viele Lebensmittel muss ich noch
   // besorgen?" statt "Wie viele koennte ich theoretisch besorgen?".
   shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel einkaufen', viele: 'Lebensmittel einkaufen' },
+  habits: { tabelle: 'routines', eins: 'Routine', viele: 'Routinen' },
 };
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
@@ -345,7 +347,7 @@ function renderChrome(transition = 'hart') {
     // fuer einen Frame auf das pinke Standarddesign zurueck.
     bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
     bisher.classList.add('view-alt');
-    bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping'].includes(bisherigeSeite));
+    bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping', 'habits'].includes(bisherigeSeite));
     bisher.classList.toggle('view-alt-hart', transition === 'hart');
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
@@ -922,7 +924,7 @@ async function render() {
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     setSeite('habits');
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>ROUTINEN</h1></div>${dexEntriesSlotMarkup()}</div>`;
+    const routineActions = await mountRoutines(view, { session, signal });
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, entryLabel = '') => openDexEntryEditor({ type, entryLabel, userId: session.user.id, rootKey: 'habits', onSaved: refresh });
     mountCategoryChrome(view, route, 'ROUTINEN', {
@@ -930,7 +932,7 @@ async function render() {
       onAddNote: () => openEntry('note'),
       onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
-      onAddRoutine: () => openEntry('routine', 'Routine'),
+      onAddRoutine: () => routineActions?.openRoutineEditor?.(),
     });
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', color: categoryColor('habits'), signal });
   } else {
