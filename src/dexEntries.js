@@ -94,7 +94,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
         </label>` : audio ? `<label class="dex-entry-file" for="dex-entry-audio">
           <span class="dex-entry-file-icon">${materialIconMarkup('mic')}</span>
           <strong>Audio auswählen oder aufnehmen</strong><small>MP3, M4A, WAV, WEBM oder OGG · maximal 25 MB</small>
-          <input id="dex-entry-audio" type="file" accept="audio/*" capture>
+          <input id="dex-entry-audio" type="file" accept="audio/*">
           <span class="dex-audio-aktionen">
             <button class="btn" type="button" data-audio-record>${materialIconMarkup('mic')} Aufnahme starten</button>
             <button class="btn" type="button" data-audio-stop hidden>Aufnahme beenden</button>
@@ -174,7 +174,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   const stopButton = backdrop.querySelector('[data-audio-stop]');
   if (recordButton && stopButton) {
     if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) recordButton.hidden = true;
-    recordButton.onclick = async () => {
+    recordButton.onclick = async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       try {
         audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const chunks = [];
@@ -197,7 +199,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         stopButton.hidden = false;
       } catch { toast('Mikrofon konnte nicht geöffnet werden.'); }
     };
-    stopButton.onclick = () => {
+    stopButton.onclick = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (audioRecorder?.state === 'recording') audioRecorder.stop();
       stopButton.hidden = true;
       recordButton.hidden = false;
@@ -283,7 +287,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   document.body.append(backdrop);
   requestAnimationFrame(() => {
     backdrop.classList.add('offen');
-    backdrop.querySelector(type === 'link' ? '#dex-entry-url' : type === 'audio' ? '#dex-entry-audio' : '#dex-entry-image')?.focus({ preventScroll: true });
+    // Audio-Dateifelder nicht automatisch fokussieren: iOS kann einen Fokus
+    // auf <input type=file> faelschlich als Kamera-Capture interpretieren.
+    if (type !== 'audio') backdrop.querySelector(type === 'link' ? '#dex-entry-url' : '#dex-entry-image')?.focus({ preventScroll: true });
   });
   return backdrop;
 }
