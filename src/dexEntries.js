@@ -91,16 +91,19 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
           <strong>Bild auswählen</strong><small>JPG, PNG, WEBP, GIF oder HEIC · maximal 8 MB</small>
           <input id="dex-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" required>
           <img data-image-preview alt="Ausgewähltes Bild" hidden>
-        </label>` : audio ? `<label class="dex-entry-file" for="dex-entry-audio">
-          <span class="dex-entry-file-icon">${materialIconMarkup('mic')}</span>
-          <strong>Audio auswählen oder aufnehmen</strong><small>MP3, M4A, WAV, WEBM oder OGG · maximal 25 MB</small>
-          <input id="dex-entry-audio" type="file" accept="audio/*">
+        </label>` : audio ? `<div class="dex-entry-file dex-entry-audio-file">
+          <label for="dex-entry-audio">
+            <span class="dex-entry-file-icon">${materialIconMarkup('mic')}</span>
+            <strong>Vorhandene Tonaufnahme auswählen</strong><small>MP3, M4A, WAV, WEBM oder OGG · maximal 25 MB</small>
+            <input id="dex-entry-audio" type="file" accept="audio/*">
+          </label>
           <span class="dex-audio-aktionen">
             <button class="btn" type="button" data-audio-record>${materialIconMarkup('mic')} Aufnahme starten</button>
             <button class="btn" type="button" data-audio-stop hidden>Aufnahme beenden</button>
           </span>
+          <strong class="dex-audio-status" data-audio-status hidden role="status">Aufnahme läuft …</strong>
           <audio data-audio-preview controls hidden></audio>
-        </label>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
+        </div>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
           <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="text" inputmode="url" autocomplete="url" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
         </label>`}
       ${ownRecipe ? `<label class="dex-entry-file dex-recipe-file" for="dex-entry-image">
@@ -173,10 +176,17 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   const recordButton = backdrop.querySelector('[data-audio-record]');
   const stopButton = backdrop.querySelector('[data-audio-stop]');
   if (recordButton && stopButton) {
-    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) recordButton.hidden = true;
     recordButton.onclick = async (event) => {
       event.preventDefault();
       event.stopPropagation();
+      if (!window.isSecureContext) {
+        toast('Tonaufnahmen benötigen eine sichere HTTPS-Verbindung.');
+        return;
+      }
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        toast('Direkte Tonaufnahmen werden auf diesem Gerät nicht unterstützt.');
+        return;
+      }
       try {
         audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const chunks = [];
@@ -197,6 +207,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         audioRecorder.start();
         recordButton.hidden = true;
         stopButton.hidden = false;
+        backdrop.querySelector('[data-audio-status]').hidden = false;
       } catch { toast('Mikrofon konnte nicht geöffnet werden.'); }
     };
     stopButton.onclick = (event) => {
@@ -205,6 +216,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       if (audioRecorder?.state === 'recording') audioRecorder.stop();
       stopButton.hidden = true;
       recordButton.hidden = false;
+      backdrop.querySelector('[data-audio-status]').hidden = true;
     };
   }
   form.onsubmit = async (event) => {
@@ -362,14 +374,14 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const provider = videoProvider(entry.url);
   const video = entry.entry_type === 'link' && Boolean(provider);
   const type = entry.entry_type === 'routine' ? 'routine' : entry.entry_type === 'audio' ? 'audio' : entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' ? 'image' : video ? 'video' : 'link';
-  const icon = type === 'routine' ? 'task_alt' : type === 'audio' ? 'mic' : type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
+  const icon = type === 'routine' ? 'bucket_check' : type === 'audio' ? 'mic' : type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   const playable = Boolean(videoEmbedUrl(entry.url));
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, href: entry.url,
     previewMarkup: type === 'routine'
-      ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('task_alt')}<small>Routine</small></span>`
+      ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('bucket_check')}<small>Routine</small></span>`
       : type === 'audio'
       ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('mic')}<small>Tonaufnahme</small></span>`
       : type === 'note'
@@ -418,7 +430,7 @@ function filterFoodEntries(entries, filter) {
   return entries;
 }
 
-function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.', hasChildren = false) {
+function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.', hasChildren = false, hideEmpty = false) {
   const favorites = entries.filter((entry) => entry.favorite);
   const regular = entries.filter((entry) => !entry.favorite);
   const notes = regular.filter((entry) => entry.entry_type === 'note');
@@ -434,13 +446,14 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
   // "leer" – die Animation wuerde sonst faelschlich unter einem gut
   // gefuellten Unter-Dex-Raster stehen.
   if (hasChildren) return '';
+  if (hideEmpty) return '';
   return `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
       <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
       <span>${emptyText}</span></div></section>`;
 }
 
 export async function renderDexEntries(container, {
-  userId, rootKey, collectionId = null, color, signal, onChanged, foodFilters = rootKey === 'food-log', hasChildren = false,
+  userId, rootKey, collectionId = null, color, signal, onChanged, foodFilters = rootKey === 'food-log', hasChildren = false, hideEmpty = false,
 } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
@@ -450,7 +463,7 @@ export async function renderDexEntries(container, {
     let activeFilter = 'all';
     const paint = () => {
       const visibleEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined, hasChildren)}</div>`;
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined, hasChildren, hideEmpty)}</div>`;
       vorschaubilderEinblenden(slot);
       slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
         if (!group.querySelector('.dex-inhaltskarte')) group.remove();

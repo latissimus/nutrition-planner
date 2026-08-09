@@ -2876,9 +2876,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-detail-audio>.material-svg{width:42px;height:42px}
 .dex-detail-audio audio{display:block;width:100%;max-width:520px}
 .dex-entry-file audio{width:100%;margin-top:12px}
+.dex-entry-audio-file>label{display:grid;place-items:center;cursor:pointer}
 .dex-audio-aktionen{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
 .dex-audio-aktionen .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
 .dex-audio-aktionen .material-svg{width:19px;height:19px}
+.dex-audio-status{margin-top:10px;color:#B42318;font-size:13px}
 :root[data-seite="shopping"] .einkauf-formular .input{margin:0}
 :root[data-seite="shopping"] .einkauf-formular-zeile{gap:9px}
 :root[data-seite="shopping"] .einkauf-gruppe{overflow:hidden;margin:0}

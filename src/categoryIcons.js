@@ -343,7 +343,7 @@ function eintragTypWaehlen(container, route, options = {}) {
     options.onAddLink ? `<button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>` : '',
     options.onAddImage ? `<button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>` : '',
     options.onAddAudio ? `<button data-entry-type="audio">${materialIcon('mic', 'sheet-list-icon')}<span>Tonaufnahme</span></button>` : '',
-    options.onAddRoutine ? `<button data-entry-type="routine">${materialIcon('task_alt', 'sheet-list-icon')}<span>Neue Routine</span></button>` : '',
+    options.onAddRoutine ? `<button data-entry-type="routine">${materialIcon('bucket_check', 'sheet-list-icon')}<span>Neue Routine</span></button>` : '',
   ].join('');
   const backdrop = sheet(`
     <header><h2>Neuer Eintrag</h2><button data-sheet-close aria-label="Schließen">×</button></header>

@@ -688,14 +688,6 @@ export async function mountShoppingList(container, { session, signal }) {
         <b>Was du brauchst, bekommt einen Haken</b>
         <span>Im Laden nimmst du ihn beim Einpacken wieder raus.</span>
       </section>
-      <form class="einkauf-formular" data-add-form hidden>
-        <input class="input" type="text" data-new-name maxlength="120" placeholder="Neuer Artikel, z. B. Hafermilch" autocomplete="off" required>
-        <input class="input" type="text" data-new-tags maxlength="200" placeholder="Tags, mit Komma trennen (optional)" autocomplete="off">
-        <div class="einkauf-formular-zeile">
-          <select class="input" data-new-section aria-label="Abteilung"></select>
-          <button class="btn btn-primary" type="submit">Hinzufügen</button>
-        </div>
-      </form>
       <div data-einkauf-tags-slot></div>
       <div class="einkauf-kopfzeile">
         <span data-einkauf-status role="status" aria-live="polite">Wird geladen …</span>
@@ -856,32 +848,6 @@ export async function mountShoppingList(container, { session, signal }) {
     redraw();
   };
 
-  container.querySelector('[data-add-form]').onsubmit = async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const nameFeld = form.querySelector('[data-new-name]');
-    const sectionFeld = form.querySelector('[data-new-section]');
-    const tagsFeld = form.querySelector('[data-new-tags]');
-    const submit = form.querySelector('button[type="submit"]');
-    submit.disabled = true;
-    try {
-      const neu = await addItem(userId, nameFeld.value, sectionFeld.value, tagsFeld.value);
-      if (neu) {
-        items.push(neu);
-        redraw();
-        befuelleAbteilungen(container, items);
-        nameFeld.value = '';
-        tagsFeld.value = '';
-        toast(`„${neu.name}“ hinzugefügt.`);
-      }
-    } catch (error) {
-      toast('Artikel konnte nicht gespeichert werden.');
-    } finally {
-      submit.disabled = false;
-      nameFeld.focus();
-    }
-  };
-
   container.querySelector('[data-reset-all]').onclick = async () => {
     const button = container.querySelector('[data-reset-all]');
     button.disabled = true;
@@ -900,11 +866,41 @@ export async function mountShoppingList(container, { session, signal }) {
 
   return {
     openAddMenu() {
-      const form = container.querySelector('[data-add-form]');
-      if (!form) return;
-      form.hidden = false;
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      requestAnimationFrame(() => form.querySelector('[data-new-name]')?.focus({ preventScroll: true }));
+      const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((item) => item.section)])];
+      const backdrop = document.createElement('div');
+      backdrop.className = 'kategorie-sheet-backdrop einkauf-add-backdrop';
+      backdrop.innerHTML = `<section class="kategorie-sheet einkauf-add-sheet" role="dialog" aria-modal="true" aria-label="Lebensmittel hinzufügen">
+        <header><h2>Lebensmittel hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">×</button></header>
+        <form class="einkauf-formular" data-add-overlay-form>
+          <label class="dex-entry-field"><span>Lebensmittel</span><input class="input" type="text" data-new-name maxlength="120" placeholder="z. B. Hafermilch" autocomplete="off" required></label>
+          <label class="dex-entry-field"><span>Tags <small>optional</small></span><input class="input" type="text" data-new-tags maxlength="200" placeholder="Mit Komma trennen" autocomplete="off"></label>
+          <label class="dex-entry-field"><span>Abteilung</span><select class="input" data-new-section>${sections.map((section) => `<option value="${escapeHtml(section)}"${section === 'Sonstiges' ? ' selected' : ''}>${escapeHtml(section)}</option>`).join('')}</select></label>
+          <button class="btn btn-primary btn-block" type="submit">Lebensmittel hinzufügen</button>
+        </form>
+      </section>`;
+      const close = () => backdrop.remove();
+      backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+      backdrop.querySelector('[data-add-overlay-form]').onsubmit = async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const submit = form.querySelector('[type="submit"]');
+        submit.disabled = true;
+        try {
+          const neu = await addItem(userId, form.querySelector('[data-new-name]').value, form.querySelector('[data-new-section]').value, form.querySelector('[data-new-tags]').value);
+          if (neu) {
+            items.push(neu);
+            redraw();
+            toast(`„${neu.name}“ hinzugefügt.`);
+            close();
+          }
+        } catch { toast('Artikel konnte nicht gespeichert werden.'); }
+        finally { submit.disabled = false; }
+      };
+      document.body.append(backdrop);
+      requestAnimationFrame(() => {
+        backdrop.classList.add('offen');
+        backdrop.querySelector('[data-new-name]')?.focus({ preventScroll: true });
+      });
     },
   };
 }

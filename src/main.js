@@ -843,7 +843,7 @@ async function render() {
       pageLookScope: route, pageLookPattern: 'triangles',
       onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
     });
-    await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal });
+    await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
   } else if (route === 'reminders') {
     setSeite('reminders');
     const reminderActions = await mountReminders(view, { session, profile, signal });
