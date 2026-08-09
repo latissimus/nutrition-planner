@@ -336,6 +336,7 @@ function renderChrome(transition = 'hart') {
   let view;
   if (bisher?.hasChildNodes()) {
     const hintergrund = getComputedStyle(document.body);
+    const bisherigeSeite = document.documentElement.dataset.seite || '';
     bisher.removeAttribute('id');
     // Seitenbezogene Klassen (vor allem `hat-kategoriefarbe`) muessen auf
     // der ausgehenden Ansicht erhalten bleiben. Wird die Klassenliste hier
@@ -343,6 +344,7 @@ function renderChrome(transition = 'hart') {
     // fuer einen Frame auf das pinke Standarddesign zurueck.
     bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
     bisher.classList.add('view-alt');
+    bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping'].includes(bisherigeSeite));
     bisher.classList.toggle('view-alt-hart', transition === 'hart');
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
