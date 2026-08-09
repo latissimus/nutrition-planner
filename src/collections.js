@@ -15,7 +15,6 @@ const escapeHtml = (value = '') => String(value)
 export async function loadCollections(userId, { rootKey, parentId = null, signal } = {}) {
   let query = supabase.from('collections')
     .select('id,user_id,parent_id,root_key,name,color,icon_key,position,created_at')
-    .eq('user_id', userId)
     .eq('root_key', rootKey)
     .order('position', { ascending: true })
     .order('created_at', { ascending: true });
@@ -29,7 +28,7 @@ export async function loadCollections(userId, { rootKey, parentId = null, signal
 export async function getCollection(userId, id, signal) {
   let query = supabase.from('collections')
     .select('id,user_id,parent_id,root_key,name,color,icon_key,position,created_at')
-    .eq('user_id', userId).eq('id', id).maybeSingle();
+    .eq('id', id).maybeSingle();
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
@@ -94,7 +93,7 @@ export async function saveCollection(userId, values, existing = null) {
   const query = supabase.from('collections');
   const { data, error } = existing
     ? await query.update({ name: payload.name, color: payload.color, icon_key: payload.icon_key })
-      .eq('id', existing.id).eq('user_id', userId).select().single()
+      .eq('id', existing.id).select().single()
     : await query.insert(payload).select().single();
   if (error) throw error;
   return data;
@@ -102,7 +101,7 @@ export async function saveCollection(userId, values, existing = null) {
 
 export async function deleteCollection(userId, item) {
   const { error } = await supabase.from('collections').delete()
-    .eq('id', item.id).eq('user_id', userId);
+    .eq('id', item.id);
   if (error) throw error;
 }
 

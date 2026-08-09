@@ -16,6 +16,8 @@ import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './au
 import { getTheme, applyTheme, setTheme, getSchatten, applySchatten } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
+import { startDexSelection } from './dexSelection.js';
+import { openShareSheet } from './sharing.js';
 import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes } from './collectionPreferences.js';
 import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
@@ -574,7 +576,7 @@ async function mountCustomCollection(container, item, signal) {
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
   const openEntry = (type, foodKind = null) => openDexEntryEditor({
-    type, foodKind, userId: session.user.id, rootKey: item.root_key, collectionId: item.id, onSaved: refresh,
+    type, foodKind, userId: item.user_id || session.user.id, rootKey: item.root_key, collectionId: item.id, onSaved: refresh,
   });
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
@@ -591,13 +593,16 @@ async function mountCustomCollection(container, item, signal) {
     onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
     onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
     onCreateSub: () => openCollectionEditor({
-      userId: session.user.id, rootKey: item.root_key, parentId: item.id, onSaved: refresh,
+      userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.id, onSaved: refresh,
     }),
     onRename: () => openCollectionEditor({
-      userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
+      userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
     onEditAppearance: () => openCollectionEditor({
-      userId: session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
+      userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
+    }),
+    onSelect: () => startDexSelection(container, {
+      rootKey: item.root_key, currentCollectionId: item.id, onChanged: refresh,
     }),
     onDelete: async () => {
       if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
@@ -861,6 +866,7 @@ async function render() {
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
       onPlus: () => shoppingActions?.openAddMenu?.(),
+      onShare: () => openShareSheet('shopping'),
     });
   } else if (route === 'food-log') {
     setSeite('food-log');
@@ -880,6 +886,8 @@ async function render() {
       onAddRecipeLink: () => openEntry('link', 'recipe'),
       onAddOwnRecipe: () => openEntry('note', 'recipe'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
+      onSelect: () => startDexSelection(view, { rootKey: 'food-log', onChanged: refresh }),
+      onShare: () => openShareSheet('food-log'),
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
@@ -904,6 +912,7 @@ async function render() {
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
+      onSelect: () => startDexSelection(view, { rootKey: 'training', onChanged: refresh }),
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),

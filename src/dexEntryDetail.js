@@ -12,7 +12,7 @@ const escapeHtml = (value = '') => String(value)
 async function loadEntry(userId, id, signal) {
   let query = supabase.from('dex_entries')
     .select(ENTRY_COLUMNS)
-    .eq('id', id).eq('user_id', userId).maybeSingle();
+    .eq('id', id).maybeSingle();
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
@@ -38,12 +38,18 @@ function backHref(entry) {
 }
 
 export function editEntry(entry, onSaved, { onDeleted } = {}) {
+  const ownRecipe = entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="Eintrag bearbeiten">
     <header><h2>Eintrag bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-entry-edit>
       ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" value="${escapeHtml(entry.url)}" required></label>` : ''}
+      ${ownRecipe ? `<label class="dex-entry-file dex-recipe-file" for="edit-entry-image">
+        ${entry.preview_url ? `<img data-edit-image-preview src="${escapeHtml(entry.preview_url)}" alt="Aktuelles Rezeptbild">` : `<span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>`}
+        <strong>${entry.image_path ? 'Rezeptbild wechseln' : 'Rezeptbild hinzufügen'}</strong><small>optional · maximal 8 MB</small>
+        <input id="edit-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif">
+      </label>` : ''}
       <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>optional</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"></label>
       ${entry.root_key === 'food-log' ? `<div class="food-entry-meta">
         <label class="dex-entry-field" for="edit-entry-carb"><span>Carb-Klasse</span><select id="edit-entry-carb" class="input">
@@ -62,24 +68,56 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
   </section>`;
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+  const replacementInput = backdrop.querySelector('#edit-entry-image');
+  replacementInput?.addEventListener('change', () => {
+    const file = replacementInput.files?.[0];
+    if (!file) return;
+    let preview = backdrop.querySelector('[data-edit-image-preview]');
+    if (!preview) {
+      preview = document.createElement('img');
+      preview.dataset.editImagePreview = '';
+      preview.alt = 'Neues Rezeptbild';
+      replacementInput.closest('.dex-entry-file').prepend(preview);
+    }
+    preview.src = URL.createObjectURL(file);
+    backdrop.querySelector('.dex-entry-file-icon')?.remove();
+  });
   backdrop.querySelector('[data-entry-edit]').onsubmit = async (event) => {
     event.preventDefault();
     const button = event.currentTarget.querySelector('[type="submit"]');
     button.disabled = true;
-    const payload = {
-      title: backdrop.querySelector('#edit-entry-title').value.trim(),
-      note: backdrop.querySelector('#edit-entry-note').value.trim(),
-      tags: backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
-    };
-    if (entry.root_key === 'food-log') {
-      payload.carb_class = backdrop.querySelector('#edit-entry-carb').value;
-      payload.prep_minutes = backdrop.querySelector('#edit-entry-prep').value
-        ? Number(backdrop.querySelector('#edit-entry-prep').value) : null;
+    let replacementPath = '';
+    try {
+      const payload = {
+        title: backdrop.querySelector('#edit-entry-title').value.trim(),
+        note: backdrop.querySelector('#edit-entry-note').value.trim(),
+        tags: backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
+      };
+      if (entry.root_key === 'food-log') {
+        payload.carb_class = backdrop.querySelector('#edit-entry-carb').value;
+        payload.prep_minutes = backdrop.querySelector('#edit-entry-prep').value
+          ? Number(backdrop.querySelector('#edit-entry-prep').value) : null;
+      }
+      if (entry.url) payload.url = backdrop.querySelector('#edit-entry-url').value.trim();
+      const file = replacementInput?.files?.[0];
+      if (file) {
+        const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
+        if (!allowed.has(file.type)) throw new Error('Dieses Bildformat wird nicht unterstützt.');
+        if (file.size > 8 * 1024 * 1024) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
+        const extension = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+        replacementPath = `${entry.user_id}/${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await supabase.storage.from(BUCKET).upload(replacementPath, file, { contentType: file.type });
+        if (uploadError) throw uploadError;
+        payload.image_path = replacementPath;
+      }
+      const { error } = await supabase.from('dex_entries').update(payload).eq('id', entry.id).eq('user_id', entry.user_id);
+      if (error) throw error;
+      if (replacementPath && entry.image_path) await supabase.storage.from(BUCKET).remove([entry.image_path]);
+      close(); toast('Eintrag aktualisiert'); await onSaved?.();
+    } catch (error) {
+      if (replacementPath) await supabase.storage.from(BUCKET).remove([replacementPath]);
+      toast(error.message || 'Änderung fehlgeschlagen'); button.disabled = false;
     }
-    if (entry.url) payload.url = backdrop.querySelector('#edit-entry-url').value.trim();
-    const { error } = await supabase.from('dex_entries').update(payload).eq('id', entry.id).eq('user_id', entry.user_id);
-    if (error) { toast(error.message || 'Änderung fehlgeschlagen'); button.disabled = false; return; }
-    close(); toast('Eintrag aktualisiert'); await onSaved?.();
   };
   backdrop.querySelector('[data-entry-delete]').onclick = async () => {
     if (!confirm(`„${entry.title}“ wirklich löschen?`)) return;
@@ -148,10 +186,10 @@ function detailMarkup(entry) {
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
-        ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span><span><b>Dex</b>${escapeHtml(entry.dex_name)}</span></div>`}
+        ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span></div>`}
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}
         <section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>
-        <footer>MUSCLE-DEX · ${escapeHtml(entry.dex_name)}</footer>
+        <footer>MUSCLE-DEX</footer>
       </div>
     </article>
   </div>`;

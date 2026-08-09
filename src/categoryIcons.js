@@ -308,6 +308,7 @@ export function settingsSheet(route, onChange, actions = {}) {
       <button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
+      ${actions.onShare ? `<button data-action="share">${materialIcon('upload_file', 'sheet-list-icon')}<span>Mit Partner teilen</span></button>` : ''}
       ${actions.onDelete ? `<button class="sheet-gefahr" data-action="delete">${materialIcon('delete_forever', 'sheet-list-icon')}<span>Dex löschen</span></button>` : ''}
     </div>`);
   backdrop.querySelector('.sheet-menue').onclick = (event) => {
@@ -315,9 +316,10 @@ export function settingsSheet(route, onChange, actions = {}) {
     if (!action) return;
     closeSheet(backdrop);
     if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange);
-    if (action === 'select') toast('Die Auswahl ist für diesen Dex vorbereitet.');
+    if (action === 'select') actions.onSelect?.();
     if (action === 'rename') actions.onRename?.();
     if (action === 'sub') actions.onCreateSub?.();
+    if (action === 'share') actions.onShare?.();
     if (action === 'delete') actions.onDelete?.();
   };
 }
@@ -350,8 +352,7 @@ function eintragTypWaehlen(container, route, options = {}) {
     <div class="sheet-menue eintrag-typ-menue">
       ${food ? `<button data-entry-type="cheat">${materialIcon('bolt', 'sheet-list-icon')}<span>Cheat-Meal</span></button>
         <button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>
-        <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>
-        <button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Rezeptbild</span></button>`
+        <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>`
         : standardEntries}
     </div>`);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {

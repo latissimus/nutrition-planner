@@ -2783,7 +2783,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
   position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;opacity:0;
   transition:opacity .72s cubic-bezier(.2,.65,.3,1);
 }
-.dex-foto-post-vorschau img{object-position:center top}
+.dex-foto-post-vorschau img{object-position:50% 0!important;transform:none!important}
 .dex-inhaltskarte-vorschau img.ist-geladen{opacity:1}
 .dex-inhaltskarte-vorschau.hat-vorschaubild::after{
   content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
@@ -2998,6 +2998,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltskarte-fuss{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
 .dex-inhaltskarte-fuss{flex:0 0 auto;margin-top:auto;justify-content:flex-end;text-align:right}
 .dex-inhaltskarte:active{transform:translate(2px,2px);box-shadow:none}
+.dex-inhaltskarte.eigenes-rezept:active{transform:none;box-shadow:var(--hart)}
 
 .dex-eintraege{margin:24px 2px 8px}
 .dex-eintrag-gruppe{margin:0 0 28px}
@@ -3086,6 +3087,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-detail-video iframe{position:absolute;inset:0;width:100%!important;max-width:100%!important;height:100%;border:0}
 .dex-detail-linkvorschau{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
 .dex-detail-linkvorschau img{display:block;width:100%;height:100%;object-fit:cover}
+.dex-detail-linkvorschau img{object-position:50% 50%}
 .dex-detail-provider{display:grid;place-items:center;gap:7px;min-height:220px;background:#492426;color:#fff;text-align:center}
 .dex-detail-provider i svg{width:48px;height:48px;fill:#fff!important}.dex-detail-provider span{font-size:12px;opacity:.8}
 .dex-detail-inhalt{display:grid;gap:15px;padding:18px}
@@ -3094,7 +3096,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-detail-inhalt>p{margin:0;color:var(--muted);font-size:15px;line-height:1.45;white-space:pre-wrap}
 .dex-detail-foodmeta{display:flex;flex-wrap:wrap;gap:7px;margin-top:-3px}
 .dex-detail-foodmeta span{padding:7px 10px;border:1px solid var(--ink);border-radius:999px;background:color-mix(in srgb,var(--eintrag-farbe) 28%,var(--surface));font-size:11px;font-weight:800}
-.dex-detail-herkunft{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:11px;border:1px solid var(--ink);border-radius:10px;background:var(--surface2)}
+.dex-detail-herkunft{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;padding:11px;border:1px solid var(--ink);border-radius:10px;background:var(--surface2)}
 .dex-detail-herkunft span{min-width:0;color:var(--muted);font-size:10px;line-height:1.25;overflow-wrap:anywhere}
 .dex-detail-herkunft b{display:block;margin-bottom:3px;color:var(--text);font-size:9px;letter-spacing:.05em;text-transform:uppercase}
 .dex-detail-link{display:flex;box-sizing:border-box;align-items:center;justify-content:center;gap:10px;width:100%;max-width:100%;min-width:0;min-height:58px;overflow:hidden;text-decoration:none}
@@ -3236,6 +3238,12 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   align-items:center;justify-items:center;line-height:0;
 }
 :is(.tuck-quadrat,.tuck-ablage-knopf,.kategorie-kopfknopf,.seiten-x,.dex-detail-knopf) > :is(.material-svg,svg){margin:auto}
+.profil-kopf{grid-template-columns:minmax(0,1fr) 44px}
+.profil-kopf .kategorie-schliessen{grid-column:2}
+:root[data-seite="profile"]{--akzent:#492426;--akzent-ink:#fff}
+:root[data-seite="profile"] :is(.themebtn.on,.profile-datei-knopf,.role-tag,.btn-primary){background:#492426!important;color:#fff!important}
+:root[data-seite="profile"] :is(.profile-abschnitt input[type="checkbox"],.schattenschalter input){accent-color:#492426}
+:root[data-seite="profile"] .themeseg + .schattenschalter{margin-top:24px}
 .sheet-menue{display:grid}
 .sheet-menue>button{
   display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:13px;
@@ -3580,6 +3588,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-farben button.aktiv.farbe-dunkel::after{color:#fff}
 .sammlung-editor-icons button{display:grid;place-items:center;background:var(--surface)}
 .sammlung-editor-icons .material-svg,.sammlung-editor-icons svg{width:24px;height:24px;fill:#000}
+.sammlung-editor-icons .material-svg svg *,
+.icon-auswahl .material-svg svg *,
+.icon-auswahl button svg *{fill:#000!important;color:#000!important}
+.sammlung-editor-icons .material-svg svg [stroke],
+.icon-auswahl .material-svg svg [stroke],
+.icon-auswahl button svg [stroke]{stroke:#000!important}
 .sammlung-emoji-eigen{display:grid;gap:7px;margin-top:20px;font-size:13px;font-weight:800;
   letter-spacing:.07em;text-transform:uppercase}
 .sammlung-emoji-eigen input{width:100%;min-height:52px;padding:0 13px;border:1.5px solid #000;
@@ -3978,6 +3992,27 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes dex-detail-rotiert{to{transform:rotate(360deg)}}
 .dex-detail-knopf.rotiert svg,.dex-detail-knopf.rotiert .material-svg svg{
   animation:dex-detail-rotiert .8s linear infinite;transform-origin:center}
+
+/* Mehrfachauswahl fuer Dex und Eintraege. */
+.dex-auswahlmodus :is(.dex-ordner-test,.dex-inhaltskarte){cursor:pointer}
+.dex-auswahl-marker{position:absolute;z-index:8;top:9px;left:9px;display:grid;place-items:center;width:28px;height:28px;border:2px solid #000;border-radius:50%;background:#fff;pointer-events:none}
+.dex-auswahl-marker .material-svg,.dex-auswahl-marker svg,.dex-auswahl-marker svg *{width:19px;height:19px;fill:#fff!important}
+:is(.dex-ordner-test,.dex-inhaltskarte).ausgewaehlt .dex-auswahl-marker{background:#492426}
+:is(.dex-ordner-test,.dex-inhaltskarte).ausgewaehlt{outline:4px solid #492426;outline-offset:2px}
+.dex-auswahlleiste{position:fixed;z-index:900;left:50%;bottom:max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:auto 1fr repeat(3,58px);align-items:center;gap:7px;width:min(calc(100% - 24px),560px);padding:10px 11px;border:2px solid #000;border-radius:16px;background:var(--surface);box-shadow:var(--hart);transform:translateX(-50%)}
+.dex-auswahlleiste>strong{font-size:12px;white-space:nowrap}
+.dex-auswahlleiste button{display:grid;place-items:center;gap:2px;min-height:48px;padding:3px;border:0;border-radius:9px;background:transparent;color:#000}
+.dex-auswahlleiste button:disabled{opacity:.3}
+.dex-auswahlleiste button .material-svg,.dex-auswahlleiste button svg{width:21px;height:21px;fill:#000}
+.dex-auswahlleiste button small{font-size:8px;font-weight:800}
+.dex-ziel-liste{max-height:56dvh;overflow:auto}
+.teilen-sheet>h3{margin:22px 0 9px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.teilen-sheet form{display:grid;gap:10px}
+.teilen-liste{display:grid;gap:7px}
+.teilen-liste>div{display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center;gap:8px;min-height:48px;padding:6px 7px 6px 12px;border:1px solid var(--app-outline);border-radius:10px;background:var(--app-field)}
+.teilen-liste>div span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700}
+.teilen-liste button{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;background:transparent}
+.teilen-liste button .material-svg,.teilen-liste button svg{width:20px;height:20px;fill:#B42318}
 
 /* KFA-Datum und Routinen-Uhrzeit: Safari/iOS reserviert normalerweise rechts
    Platz fuer seinen Picker-Indikator. Der native Picker bleibt als unsichtbare

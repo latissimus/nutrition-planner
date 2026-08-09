@@ -81,13 +81,10 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   const wrap = document.createElement('div');
   wrap.className = 'wrap pad-bottom';
   wrap.innerHTML = `
-    <div class="seitenkopf">
-      <div class="seitenkopf-text">
-        <span class="seitenkopf-kicker">Konto</span>
-        <h1 class="section-title">Mein Profil</h1>
-      </div>
-      <a class="seiten-x" href="#home" aria-label="Profil schließen">${materialIconMarkup('close')}</a>
-    </div>
+    <nav class="kategorie-kopf profil-kopf" aria-label="Mein Konto bedienen">
+      <div class="kategorie-kopftitel"><strong>MEIN KONTO</strong></div>
+      <a class="kategorie-kopfknopf kategorie-schliessen" href="#home" aria-label="Mein Konto schließen">${materialIconMarkup('close')}</a>
+    </nav>
     <section class="seiten-einstieg">
       <b>Alles zu deinem Konto</b>
       <span>Profil, Darstellung und Daten übersichtlich verwalten.</span>

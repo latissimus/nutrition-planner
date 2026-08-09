@@ -23,7 +23,8 @@ export function dexEntryCardMarkup(entry = {}, { iconMarkup = '', favoriteMarkup
     : (entry.previewMarkup || '');
   const detailHref = escapeHtml(entry.detailHref || '#home');
 
-  return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}${darkColor ? ' eintrag-farbe-dunkel' : ''}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
+  const cardClass = escapeHtml(entry.cardClass || '');
+  return `<article class="dex-inhaltskarte dex-inhaltskarte-${type}${darkColor ? ' eintrag-farbe-dunkel' : ''}${cardClass ? ` ${cardClass}` : ''}" data-dex-entry-id="${escapeHtml(entry.id || '')}" style="--eintrag-farbe:${color}">
     <a class="dex-inhaltskarte-oeffnen" href="${detailHref}" aria-label="${title} öffnen"></a>
     ${entry.favorite ? `<span class="dex-favorit-marker" aria-label="Favorit">${favoriteMarkup}</span>` : ''}
     <span class="dex-inhaltskarte-streifen" aria-hidden="true"></span>

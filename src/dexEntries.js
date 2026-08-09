@@ -40,7 +40,7 @@ function queryScope(query, { collectionId }) {
 export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
   let query = supabase.from('dex_entries')
     .select(ENTRY_COLUMNS)
-    .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
+    .eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
@@ -59,8 +59,7 @@ export async function loadDexEntries(userId, { rootKey, collectionId = null, sig
 
 export async function loadAllDexEntries(userId, signal) {
   let query = supabase.from('dex_entries')
-    .select(ENTRY_COLUMNS)
-    .eq('user_id', userId).order('created_at', { ascending: false });
+    .select(ENTRY_COLUMNS).order('created_at', { ascending: false });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
@@ -384,7 +383,8 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     favorite: Boolean(entry.favorite),
-    previewUrl: entry.preview_url, previewClass: isTikTokPhoto ? 'dex-foto-post-vorschau' : '', href: entry.url,
+    previewUrl: entry.preview_url, previewClass: isTikTokPhoto ? 'dex-foto-post-vorschau' : '',
+    cardClass: entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe' ? 'eigenes-rezept' : '', href: entry.url,
     previewMarkup: type === 'routine'
       ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('bucket_check')}<small>Routine</small></span>`
       : type === 'audio'
@@ -399,7 +399,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
 }
 
 function groupMarkup(type, entries, color) {
-  const label = type === 'favorite' ? 'Favoriten' : type === 'routine' ? 'Routinen' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'audio' ? 'Tonaufnahmen' : type === 'video' ? 'Videos' : 'Links';
+  const label = type === 'favorite' ? 'Favoriten' : type === 'routine' ? 'Routinen' : type === 'own-recipe' ? 'Eigene Rezepte' : type === 'cheat-meal' ? 'Cheat-Meals' : type === 'note' ? 'Notizen' : type === 'image' ? 'Bilder' : type === 'audio' ? 'Tonaufnahmen' : type === 'video' ? 'Videos' : 'Links';
   return `<section class="dex-eintrag-gruppe dex-eintrag-gruppe-${type}">
     <h2>${label} (${entries.length})</h2>
     <div class="dex-inhaltsgrid">${entries.map((entry) => dexEntryOverviewMarkup(entry, color)).join('')}</div>
@@ -438,14 +438,16 @@ function filterFoodEntries(entries, filter) {
 function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.', hasChildren = false, hideEmpty = false) {
   const favorites = entries.filter((entry) => entry.favorite);
   const regular = entries.filter((entry) => !entry.favorite);
-  const notes = regular.filter((entry) => entry.entry_type === 'note');
+  const ownRecipes = regular.filter((entry) => entry.entry_type === 'note' && entry.root_key === 'food-log' && entry.food_kind === 'recipe');
+  const cheatMeals = regular.filter((entry) => entry.entry_type === 'note' && entry.root_key === 'food-log' && entry.food_kind === 'cheat_meal');
+  const notes = regular.filter((entry) => entry.entry_type === 'note' && !ownRecipes.includes(entry) && !cheatMeals.includes(entry));
   const routines = regular.filter((entry) => entry.entry_type === 'routine');
   const images = regular.filter((entry) => entry.entry_type === 'image');
   const audio = regular.filter((entry) => entry.entry_type === 'audio');
   const videos = regular.filter((entry) => entry.entry_type === 'link' && videoProvider(entry.url));
   const links = regular.filter((entry) => entry.entry_type === 'link' && !videoProvider(entry.url));
   if (entries.length) {
-    return `${groupMarkup('favorite', favorites, color)}${groupMarkup('routine', routines, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('audio', audio, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`;
+    return `${groupMarkup('favorite', favorites, color)}${groupMarkup('routine', routines, color)}${groupMarkup('cheat-meal', cheatMeals, color)}${groupMarkup('own-recipe', ownRecipes, color)}${groupMarkup('note', notes, color)}${groupMarkup('image', images, color)}${groupMarkup('audio', audio, color)}${groupMarkup('video', videos, color)}${groupMarkup('link', links, color)}`;
   }
   // Ein Dex mit Unter-Dex, aber (noch) ohne eigene Eintraege, ist nicht
   // "leer" – die Animation wuerde sonst faelschlich unter einem gut

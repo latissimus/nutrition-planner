@@ -218,11 +218,11 @@ function sectionIconMarkup(section) {
   return gefunden || iconMarkup('folder');
 }
 
-const SELECT_COLUMNS = 'id,section,name,note,tags,checked,position';
+const SELECT_COLUMNS = 'id,user_id,section,name,note,tags,checked,position';
 
 async function loadItems(userId, signal) {
   let query = supabase.from('shopping_items').select(SELECT_COLUMNS)
-    .eq('user_id', userId).order('position', { ascending: true });
+    .order('position', { ascending: true });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
@@ -282,13 +282,13 @@ export function sichtbareItems(items, { nurAusgewaehlt = false, activeTag = '' }
 }
 
 async function toggleItem(userId, id, checked) {
-  const { error } = await supabase.from('shopping_items').update({ checked }).eq('id', id).eq('user_id', userId);
+  const { error } = await supabase.from('shopping_items').update({ checked }).eq('id', id);
   if (error) throw error;
 }
 
 async function resetChecked(userId) {
   const { error } = await supabase.from('shopping_items').update({ checked: false })
-    .eq('user_id', userId).eq('checked', true);
+    .eq('checked', true);
   if (error) throw error;
 }
 
@@ -311,13 +311,13 @@ async function addItem(userId, name, section, tagsInput) {
 }
 
 async function deleteItem(userId, id) {
-  const { error } = await supabase.from('shopping_items').delete().eq('id', id).eq('user_id', userId);
+  const { error } = await supabase.from('shopping_items').delete().eq('id', id);
   if (error) throw error;
 }
 
 async function updateItem(userId, id, patch) {
   const { data, error } = await supabase.from('shopping_items').update(patch)
-    .eq('id', id).eq('user_id', userId).select(SELECT_COLUMNS).single();
+    .eq('id', id).select(SELECT_COLUMNS).single();
   if (error) throw error;
   return data;
 }
@@ -512,7 +512,7 @@ export function parseRecipeLines(text) {
 async function loadFoodLogRecipes(userId, signal) {
   let query = supabase.from('dex_entries')
     .select('id,title,note,entry_type,created_at')
-    .eq('user_id', userId).eq('root_key', 'food-log').eq('food_kind', 'recipe')
+    .eq('root_key', 'food-log').eq('food_kind', 'recipe')
     .not('note', 'is', null).order('created_at', { ascending: false }).limit(30);
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
