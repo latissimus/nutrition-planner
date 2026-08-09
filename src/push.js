@@ -1,6 +1,17 @@
 import { supabase } from './supabase.js';
 
 const VAPID_PUBLIC_KEY = (import.meta.env.VITE_VAPID_PUBLIC_KEY || '').trim();
+let resolvedVapidPublicKey = VAPID_PUBLIC_KEY;
+
+async function vapidPublicKey() {
+  if (resolvedVapidPublicKey) return resolvedVapidPublicKey;
+  const { data, error } = await supabase.functions.invoke('send-reminders', {
+    body: { action: 'config' },
+  });
+  if (error || !data?.publicKey) throw new Error('Der Push-Dienst ist noch nicht vollständig eingerichtet.');
+  resolvedVapidPublicKey = data.publicKey;
+  return resolvedVapidPublicKey;
+}
 
 function base64UrlToBytes(value) {
   const padding = '='.repeat((4 - (value.length % 4)) % 4);
@@ -28,9 +39,6 @@ export function pushSupport() {
   }
   if (isIos() && !isStandalone()) {
     return { ready: false, reason: 'Auf dem iPhone zuerst „Zum Home-Bildschirm“ wählen und die App dort öffnen.' };
-  }
-  if (!VAPID_PUBLIC_KEY) {
-    return { ready: false, reason: 'Der Push-Dienst ist noch nicht vollständig eingerichtet.' };
   }
   return { ready: true, reason: '' };
 }
@@ -85,11 +93,12 @@ export async function activatePush(userId) {
   }
 
   const current = await registration();
+  const publicKey = await vapidPublicKey();
   let subscription = await current.pushManager.getSubscription();
   if (!subscription) {
     subscription = await current.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: base64UrlToBytes(VAPID_PUBLIC_KEY),
+      applicationServerKey: base64UrlToBytes(publicKey),
     });
   }
   await saveSubscription(userId, subscription);

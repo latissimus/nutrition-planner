@@ -18,7 +18,7 @@ let reminderUserId = null;
 let reminderStartPromise = null;
 
 const DEFAULT_REMINDERS = [
-  { type: 'meal', label: 'Fruehstueck', time: '08:00', route: '#reminders' },
+  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders' },
   { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders' },
   { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders' },
   { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders' },
@@ -90,7 +90,7 @@ function hinweisLabel(value) {
 }
 
 function notificationText(reminder) {
-  if (reminder.type === 'meal') return { title: reminder.label, body: 'Zeit fuer deine geplante Mahlzeit.' };
+  if (reminder.type === 'meal') return { title: reminder.label, body: 'Zeit für deine geplante Mahlzeit.' };
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();
     const einheit = String(reminder.metadata?.einheit || '').trim();
@@ -417,7 +417,7 @@ function reminderBodyMarkup(reminder, completion) {
     </div>
     ${isSupplement ? `<div class="rem-field-reihe">
       <label class="rem-field"><span>Dosis</span>
-        <input class="input" data-dosis maxlength="30" placeholder="z. B. 5000" value="${escapeHtml(reminder.metadata?.dosis || '')}">
+        <input class="input" data-dosis type="number" inputmode="decimal" min="0" step="any" placeholder="z. B. 5000" value="${escapeHtml(reminder.metadata?.dosis || '')}">
       </label>
       <label class="rem-field"><span>Einheit</span>
         <select class="input" data-einheit>
@@ -521,9 +521,9 @@ function choosePeriod(type, onSelected) {
     <header><h2>${type === 'meal' ? 'Mahlzeit' : 'Supplement'} eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">×</button></header>
     <p class="rem-overlay-hinweis">Wann soll die Erinnerung erscheinen?</p>
     <div class="sheet-menue rem-period-menu">
-      <button type="button" data-period="morning"><span>Morgens</span><small>08:00 Uhr</small></button>
-      <button type="button" data-period="midday"><span>Mittags</span><small>13:00 Uhr</small></button>
-      <button type="button" data-period="evening"><span>Abends</span><small>19:00 Uhr</small></button>
+      <button type="button" data-period="morning"><span>Morgens</span></button>
+      <button type="button" data-period="midday"><span>Mittags</span></button>
+      <button type="button" data-period="evening"><span>Abends</span></button>
     </div>`);
   backdrop.querySelector('.rem-period-menu').onclick = (event) => {
     const period = event.target.closest('[data-period]')?.dataset.period;
@@ -669,6 +669,24 @@ export async function mountReminders(container, { session, signal }) {
     return patch;
   };
 
+  const ensureReminderPush = async () => {
+    try {
+      const state = await getPushState();
+      if (state.subscribed) return true;
+      if (!state.ready) {
+        toast(state.reason);
+        return false;
+      }
+      await activatePush(userId);
+      await startReminderLoop(userId);
+      toast('Benachrichtigungen auf diesem Gerät aktiviert');
+      return true;
+    } catch (error) {
+      toast(error.message || 'Benachrichtigungen konnten nicht aktiviert werden');
+      return false;
+    }
+  };
+
   // Autosave beim Verlassen eines Feldes und beim Aendern (Toggle sofort speichern).
   list.addEventListener('change', async (event) => {
     const row = event.target.closest('[data-reminder-key]');
@@ -676,10 +694,10 @@ export async function mountReminders(container, { session, signal }) {
     const key = row.dataset.reminderKey;
     const patch = patchFromBody(row);
     if (!patch) return;
+    if (event.target.matches('[data-active]') && event.target.checked) await ensureReminderPush();
     dirtyPatches.set(key, patch);
     // Aktiv-Toggle und Selects sofort speichern; Text-Inputs sind ohnehin change=blur.
     await flushSave(key);
-    rerenderRow(key);
   });
   list.addEventListener('input', (event) => {
     if (event.target.matches('input[type="text"], input[type="time"], input:not([type])')) {
@@ -743,7 +761,9 @@ export async function mountReminders(container, { session, signal }) {
       const row = saveButton.closest('[data-reminder-key]');
       const key = row?.dataset.reminderKey;
       if (!row || !key) return;
-      dirtyPatches.set(key, patchFromBody(row));
+      const patch = patchFromBody(row);
+      if (patch.active) await ensureReminderPush();
+      dirtyPatches.set(key, patch);
       saveButton.disabled = true;
       const saved = await flushSave(key);
       if (saved) {

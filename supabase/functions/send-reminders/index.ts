@@ -309,6 +309,12 @@ Deno.serve(async (request) => {
 
   try {
     const body = await request.json().catch(() => ({}));
+    if (body.action === 'config') {
+      const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') || '';
+      const { data, error } = await admin.auth.getUser(token);
+      if (error || !data.user) return json({ ok: false, error: 'Nicht angemeldet.' }, 401);
+      return json({ ok: true, publicKey: vapidPublicKey });
+    }
     if (body.action === 'test') {
       const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') || '';
       const { data, error } = await admin.auth.getUser(token);
