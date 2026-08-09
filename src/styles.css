@@ -2898,8 +2898,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 :root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
 .routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 34px;align-items:center;gap:10px;min-height:64px;padding:9px 11px;border-bottom:1px solid var(--app-divider)}
 .routine-row:last-child{border-bottom:0}
-.routine-check{display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
-.routine-check .material-svg,.routine-check svg{width:18px;height:18px;fill:#000}
+.routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
+.routine-check>.material-svg{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:18px;height:18px;transform:translate(-50%,-50%);line-height:0}
+.routine-check>.material-svg>svg{display:block;width:18px;height:18px;margin:0;fill:#000}
 .routine-check .material-svg svg *{fill:#000}
 .routine-check.kontrast-weiss,
 .routine-check.kontrast-weiss .material-svg,
@@ -3977,3 +3978,35 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes dex-detail-rotiert{to{transform:rotate(360deg)}}
 .dex-detail-knopf.rotiert svg,.dex-detail-knopf.rotiert .material-svg svg{
   animation:dex-detail-rotiert .8s linear infinite;transform-origin:center}
+
+/* KFA-Datum und Routinen-Uhrzeit: Safari/iOS reserviert normalerweise rechts
+   Platz fuer seinen Picker-Indikator. Der native Picker bleibt als unsichtbare
+   Klickflaeche erhalten; der sichtbare Wert sitzt dadurch wirklich in der
+   geometrischen Feldmitte. */
+:is(#skinfold-date,#weight-date,[data-routine-time]){
+  position:relative;height:46px;min-height:46px;padding-block:0!important;
+  text-align:center!important;text-align-last:center!important;
+  font-variant-numeric:tabular-nums;
+}
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-date-and-time-value{
+  display:flex;align-items:center;justify-content:center;width:100%;height:44px;
+  min-height:44px;margin:0;padding:0;text-align:center;
+}
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit{
+  display:flex;align-items:center;justify-content:center;width:100%;height:44px;
+  margin:0;padding:0;text-align:center;
+}
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-fields-wrapper{
+  display:flex;align-items:center;justify-content:center;margin:0 auto;padding:0;
+}
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-text,
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-day-field,
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-month-field,
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-year-field,
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-hour-field,
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-minute-field{
+  margin:0;padding-block:0;
+}
+:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-calendar-picker-indicator{
+  position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer;
+}
