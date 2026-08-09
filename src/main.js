@@ -337,7 +337,13 @@ function renderChrome(transition = 'hart') {
   if (bisher?.hasChildNodes()) {
     const hintergrund = getComputedStyle(document.body);
     bisher.removeAttribute('id');
-    bisher.className = `view-alt${transition === 'hart' ? ' view-alt-hart' : ''}`;
+    // Seitenbezogene Klassen (vor allem `hat-kategoriefarbe`) muessen auf
+    // der ausgehenden Ansicht erhalten bleiben. Wird die Klassenliste hier
+    // komplett ersetzt, faellt ihr Plus-Knopf waehrend eines Ruecksprungs
+    // fuer einen Frame auf das pinke Standarddesign zurueck.
+    bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
+    bisher.classList.add('view-alt');
+    bisher.classList.toggle('view-alt-hart', transition === 'hart');
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
     bisher.style.backgroundSize = hintergrund.backgroundSize;
