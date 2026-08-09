@@ -97,7 +97,10 @@ function hinweisLabel(value) {
 }
 
 function notificationText(reminder) {
-  if (reminder.type === 'meal') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Zeit für deine geplante Mahlzeit.' };
+  if (reminder.type === 'meal') {
+    const note = String(reminder.metadata?.notiz || '').trim();
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
+  }
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();
     const einheit = String(reminder.metadata?.einheit || '').trim();
@@ -386,7 +389,7 @@ function summaryFor(reminder) {
     const teile = [dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit), hinweis].filter(Boolean);
     return { time, detail: teile.join(' · ') };
   }
-  return { time, detail: '' };
+  return { time, detail: String(reminder.metadata?.notiz || '').trim() };
 }
 
 function statusBadge(completion) {
@@ -436,6 +439,9 @@ function reminderBodyMarkup(reminder, completion) {
       <select class="input" data-hinweis>
         ${HINWEISE.map(([wert, name]) => `<option value="${escapeHtml(wert)}"${(reminder.metadata?.hinweis || '') === wert ? ' selected' : ''}>${name}</option>`).join('')}
       </select>
+    </label>` : ''}
+    ${!isDrink && !isSupplement ? `<label class="rem-field"><span>Notiz</span>
+      <textarea class="input rem-mahlzeit-notiz" data-meal-note maxlength="240" rows="3" placeholder="z. B. 40 g Haferflocken, Banane und Protein">${escapeHtml(reminder.metadata?.notiz || '')}</textarea>
     </label>` : ''}
     <div class="rem-row-body-aktionen">
       <label class="rem-switch">
@@ -671,7 +677,10 @@ export async function mountReminders(container, { session, signal }) {
         hinweis: body.querySelector('[data-hinweis]')?.value || '',
       };
     } else {
-      patch.metadata = { icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'meal', metadata: {} }) };
+      patch.metadata = {
+        icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'meal', metadata: {} }),
+        notiz: body.querySelector('[data-meal-note]')?.value.trim() || '',
+      };
     }
     return patch;
   };
@@ -707,7 +716,7 @@ export async function mountReminders(container, { session, signal }) {
     await flushSave(key);
   });
   list.addEventListener('input', (event) => {
-    if (event.target.matches('input[type="text"], input[type="time"], input:not([type])')) {
+    if (event.target.matches('input[type="text"], input[type="time"], input:not([type]), textarea')) {
       const row = event.target.closest('[data-reminder-key]');
       if (!row) return;
       const key = row.dataset.reminderKey;

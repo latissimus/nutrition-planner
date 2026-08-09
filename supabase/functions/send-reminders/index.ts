@@ -130,6 +130,15 @@ function notification(reminder?: Reminder) {
     drink: 'Ein Glas Wasser einplanen.',
     body: 'Zeit für deine geplanten Körperwerte.',
   };
+  if (reminder.type === 'meal') {
+    const note = String(reminder.metadata?.notiz || '').trim();
+    return {
+      title: `${notificationSymbol(reminder)} ${reminder.label}`,
+      body: note || bodies.meal,
+      tag: `nutrition-${reminder.id}`,
+      url: reminder.route || '#reminders',
+    };
+  }
   // Bei Supplements Dosierung + Einheit + Hinweis in die Notification-Body ziehen
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();

@@ -3279,6 +3279,10 @@ body{overscroll-behavior:none}
      Leiste/Notch) selbst, auf jeder Seite. */
   padding-top:env(safe-area-inset-top);
 }
+.app-shell{position:relative}
+.app-shell>.view-alt,.app-shell>.view-neu{position:absolute;inset:0;width:100%;height:100%;min-height:0}
+.app-shell>.view-alt{z-index:1;overflow:hidden;pointer-events:none}
+.app-shell>.view-neu{z-index:2;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);background-color:var(--dex-seitenfarbe,var(--bg))}
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Seitliche Einschub-Animation: neue Seite kommt beim Oeffnen eines Dex von
@@ -3457,15 +3461,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .seitenmuster-auswahl i[data-muster="bones"]{background-image:url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")}
 
 /* ---------- Deterministische Navigation ---------- */
-.seite-vor-warten{transform:translateX(20px);opacity:0}
+.seite-vor-warten{transform:translateX(100%);opacity:1}
 .seite-zurueck-warten{transform:translateX(-20px);opacity:0}
 .seite-detail-warten{transform:scale(.985);opacity:0}
 .seite-fade-warten{opacity:0}
-.seite-vor{animation:seiteVor .24s cubic-bezier(.2,.8,.3,1) both}
+.seite-vor{animation:seiteVor .34s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
 .seite-zurueck{animation:seiteZurueck .22s cubic-bezier(.2,.8,.3,1) both}
 .seite-detail{animation:seiteDetail .2s ease-out both}
 .seite-fade{animation:seiteFade .16s ease-out both}
-@keyframes seiteVor{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+@keyframes seiteVor{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes seiteZurueck{from{transform:translateX(-20px);opacity:0}to{transform:none;opacity:1}}
 @keyframes seiteDetail{from{transform:scale(.985);opacity:0}to{transform:none;opacity:1}}
 @keyframes seiteFade{from{opacity:0}to{opacity:1}}
@@ -3518,6 +3522,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-eigenes-emoji label{display:grid;gap:7px;font-weight:800}
 .rem-eigenes-emoji input{width:100%;min-height:48px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:10px;background:var(--app-field);font-size:20px}
 .rem-eigenes-emoji .btn{min-height:48px;background:#492426!important;color:#fff!important}
+.rem-mahlzeit-notiz{min-height:88px;padding:12px 13px;line-height:1.4;resize:vertical}
 .mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{height:48px;min-height:48px;padding-top:0;padding-bottom:0;line-height:48px;text-align:center;text-align-last:center}
 .mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{height:48px;line-height:48px;text-align:center}
 .mahl-wasserkarte{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;margin-top:18px;padding:13px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}

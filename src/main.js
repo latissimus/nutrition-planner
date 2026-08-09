@@ -328,18 +328,31 @@ function zaehlerEintragen(container, zaehler) {
   });
 }
 
-function renderChrome() {
+function renderChrome(ueberAlteSeite = false) {
   app.classList.add('app-shell');
   // Kein globaler Kopf mehr: jede Seite ist Vollbild, Home traegt Logo und
   // Avatar als normalen Seiteninhalt (siehe mountHome).
-  let view = app.querySelector(':scope > #view');
-  if (!view) {
-    app.innerHTML = '<main id="view"></main>';
-    view = app.querySelector(':scope > #view');
+  const bisher = app.querySelector(':scope > #view');
+  let view;
+  if (ueberAlteSeite && bisher?.hasChildNodes()) {
+    const hintergrund = getComputedStyle(document.body);
+    bisher.removeAttribute('id');
+    bisher.className = 'view-alt';
+    bisher.style.backgroundColor = hintergrund.backgroundColor;
+    bisher.style.backgroundImage = hintergrund.backgroundImage;
+    bisher.style.backgroundSize = hintergrund.backgroundSize;
+    bisher.style.backgroundPosition = hintergrund.backgroundPosition;
+    bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
+    view = document.createElement('main');
+    view.id = 'view';
+    view.className = 'view-neu seite-vor-warten';
+    app.append(view);
+  } else {
+    app.replaceChildren();
+    view = document.createElement('main');
+    view.id = 'view';
+    app.append(view);
   }
-  view.replaceChildren();
-  view.className = '';
-  view.removeAttribute('style');
   // Jede Route beginnt in ihrem eigenen, einzigen Scrollcontainer oben. Das
   // Dokument selbst bewegt sich nie; dadurch muss iOS keinen Sticky-Header
   // gegen eine alte Dokument-Scrollposition neu zusammensetzen.
@@ -771,18 +784,17 @@ async function render() {
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
   const richtung = navRichtung(angefragt);
-  const istEintrag = route.startsWith('entry/');
   // Reinschieben von rechts nur beim Vorwaertsgehen in einen Dex/Profil/
   // Suche (von Home oder von einem Dex aus). Rueckwaerts (Schliessen,
   // iOS-Zurueck-Wischgeste), Home selbst und Eintraege bekommen stattdessen
   // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
-  const transition = istEintrag ? 'detail' : richtung === 'vor' && route !== 'home' ? 'vor' : richtung === 'zurueck' ? 'zurueck' : 'fade';
-  const view = renderChrome();
+  const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
+  const view = renderChrome(transition === 'vor');
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
-  view.classList.add(`seite-${transition}-warten`);
+  if (transition === 'vor') view.classList.add('seite-vor-warten');
   if (route === 'home') {
     await mountHome(view, signal);
   } else if (route === 'search') {
@@ -900,8 +912,24 @@ async function render() {
   // eigener Reload durch ist –, wirkt eine erzwungene Animation haerter als
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
-  view.classList.remove(`seite-${transition}-warten`);
-  view.classList.add(`seite-${transition}`);
+  if (transition === 'vor') {
+    const neuerHintergrund = getComputedStyle(document.body);
+    view.style.backgroundColor = neuerHintergrund.backgroundColor;
+    view.style.backgroundImage = neuerHintergrund.backgroundImage;
+    view.style.backgroundSize = neuerHintergrund.backgroundSize;
+    view.style.backgroundPosition = neuerHintergrund.backgroundPosition;
+    view.style.backgroundRepeat = neuerHintergrund.backgroundRepeat;
+    view.classList.remove('seite-vor-warten');
+    view.classList.add('seite-vor');
+    const alteSeite = app.querySelector(':scope > .view-alt');
+    const aufraeumen = () => {
+      alteSeite?.remove();
+      view.classList.remove('view-neu', 'seite-vor');
+      view.removeAttribute('style');
+    };
+    view.addEventListener('animationend', aufraeumen, { once: true });
+    setTimeout(aufraeumen, 520);
+  }
 }
 
 // Zwei rAF, damit der Browser den :active-Druckeffekt eines getippten Links
