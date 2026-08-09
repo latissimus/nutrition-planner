@@ -926,6 +926,10 @@ async function render() {
   view.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
   view.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
   view.style.setProperty('background-attachment', 'scroll', 'important');
+  const entferneUebergangshintergrund = () => {
+    ['background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'background-attachment']
+      .forEach((property) => view.style.removeProperty(property));
+  };
   // Zwei Frames: erst die komplett gemountete neue Seite samt Tapete
   // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
   // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
@@ -940,14 +944,14 @@ async function render() {
       abgeschlossen = true;
       alteSeite?.remove();
       view.classList.remove('view-neu', 'seite-vor');
-      view.removeAttribute('style');
+      entferneUebergangshintergrund();
     };
     view.addEventListener('animationend', aufraeumen, { once: true });
     setTimeout(aufraeumen, 520);
   } else {
     app.querySelector(':scope > .view-alt')?.remove();
     view.classList.remove('view-neu');
-    view.removeAttribute('style');
+    entferneUebergangshintergrund();
   }
 }
 
