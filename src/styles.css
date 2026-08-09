@@ -3490,13 +3490,29 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-leerzeile{margin:0;padding:17px;color:var(--muted);font:600 13px/1.2 var(--ui)}
 .mahl-trinken::before{background:#83CFE0}
 .rem-row-art{color:var(--muted)!important;font:800 8.5px/1 var(--ui)!important;letter-spacing:.08em!important}
-.rem-row-emoji{display:grid;place-items:center;width:24px;height:24px;font-size:19px;line-height:1;filter:grayscale(1) brightness(0)}
+.rem-row-emoji{display:grid;place-items:center;width:24px;height:24px;font-size:19px;line-height:1}
+.rem-row-emoji .reminder-emoji{filter:none;color:#000}
+.rem-row-emoji .reminder-svg,.rem-row-emoji svg{display:block;width:22px;height:22px;color:#000;fill:#000}
 .mahl-zeitblock .rem-row-zeit{display:grid;place-items:center;min-width:54px;height:30px;padding:0 7px;border-radius:8px;background:color-mix(in srgb,var(--ordner) 18%,var(--surface));color:var(--ink);font-weight:700;text-align:center}
 .mahl-zeitblock .rem-row-chevron{font-size:0;width:20px;height:20px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E") center/20px no-repeat;transition:transform .18s}
 .mahl-zeitblock .rem-row[open] .rem-row-chevron{transform:rotate(180deg)}
 .mahl-zeitblock .rem-row-body{padding:16px 17px 18px;gap:14px}
 .rem-name-reihe{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px}
-.rem-emoji-field .input{font-size:21px;text-align:center;filter:grayscale(1) brightness(0)}
+.rem-icon-field{align-items:flex-start}
+.rem-icon-waehler{display:grid;place-items:center;width:52px;height:48px;padding:0;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:var(--app-field);color:#000;box-shadow:none}
+.rem-icon-waehler .reminder-svg,.rem-icon-waehler svg{display:block;width:24px;height:24px;color:#000;fill:#000}
+.rem-icon-waehler .reminder-emoji{font-size:22px;line-height:1}
+.rem-speichern{width:100%;min-height:48px;background:#492426!important;color:#fff!important}
+.rem-overlay-hinweis{margin:0 0 10px;color:var(--muted);font-size:13px}
+.rem-period-menu button{justify-content:space-between}
+.rem-period-menu button span{font-weight:800}
+.rem-period-menu button small{color:var(--muted);font-size:12px}
+.rem-icon-grid{max-height:min(42dvh,360px);overflow-y:auto}
+.rem-icon-grid button svg{color:#000!important;fill:#000!important}
+.rem-eigenes-emoji{display:grid;gap:10px;margin-top:16px}
+.rem-eigenes-emoji label{display:grid;gap:7px;font-weight:800}
+.rem-eigenes-emoji input{width:100%;min-height:48px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:10px;background:var(--app-field);font-size:20px}
+.rem-eigenes-emoji .btn{min-height:48px;background:#492426!important;color:#fff!important}
 .mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{height:48px;min-height:48px;padding-top:0;padding-bottom:0;line-height:48px;text-align:center;text-align-last:center}
 .mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{height:48px;line-height:48px;text-align:center}
 .mahl-wasserkarte{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;margin-top:18px;padding:13px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}

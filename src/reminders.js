@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
+import { availableCategoryIcons } from './categoryIcons.js';
 import {
   activatePush,
   disablePush,
@@ -51,6 +52,20 @@ const HINWEISE = [
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+
+function reminderIconValue(reminder) {
+  if (reminder.metadata?.icon) return reminder.metadata.icon;
+  if (reminder.metadata?.emoji) return `emoji:${reminder.metadata.emoji}`;
+  return `emoji:${reminder.type === 'supplement' ? '💊' : reminder.type === 'drink' ? '💧' : '🍽️'}`;
+}
+
+function reminderIconMarkup(value, className = '') {
+  if (String(value).startsWith('emoji:')) {
+    return `<span class="reminder-emoji ${className}">${escapeHtml(String(value).slice(6))}</span>`;
+  }
+  const icon = availableCategoryIcons.find((item) => item.id === value);
+  return icon ? `<span class="reminder-svg ${className}">${icon.svg}</span>` : '<span class="reminder-emoji">●</span>';
+}
 
 const pad = (value) => String(value).padStart(2, '0');
 const dateKey = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -378,9 +393,10 @@ function reminderBodyMarkup(reminder, completion) {
   const zeit = (reminder.time || '08:00').slice(0, 5);
   return `<div class="rem-row-body">
     <div class="rem-name-reihe">
-      <label class="rem-field rem-emoji-field"><span>Emoji</span>
-        <input class="input" data-emoji inputmode="text" maxlength="8" aria-label="Emoji" value="${escapeHtml(reminder.metadata?.emoji || (reminder.type === 'supplement' ? '●' : reminder.type === 'drink' ? '●' : '●'))}">
-      </label>
+      <div class="rem-field rem-icon-field"><span>Icon</span>
+        <button type="button" class="rem-icon-waehler" data-reminder-icon-open aria-label="Icon auswählen">${reminderIconMarkup(reminderIconValue(reminder))}</button>
+        <input type="hidden" data-icon-value value="${escapeHtml(reminderIconValue(reminder))}">
+      </div>
       <label class="rem-field"><span>Name</span>
         <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
       </label>
@@ -424,6 +440,7 @@ function reminderBodyMarkup(reminder, completion) {
         ${completion?.completed_at ? 'Heute erledigt ✓' : 'Für heute erledigt'}
       </button>` : ''}
     </div>
+    <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
     ${reminder.id && (reminder.type === 'meal' || reminder.type === 'supplement') ? `
       <button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>
     ` : ''}
@@ -438,7 +455,7 @@ function reminderRowMarkup(reminder, completion) {
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
   return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}">
     <summary class="rem-row-head">
-      <span class="rem-row-emoji" aria-hidden="true">${escapeHtml(reminder.metadata?.emoji || '●')}</span>
+      <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminderIconValue(reminder))}</span>
       <span class="rem-row-titel">
         <b>${escapeHtml(reminder.label)}</b>
         <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
@@ -485,6 +502,60 @@ function reminderGroups(reminders, completions) {
     </div>
     <div class="mahl-tagesplan">${timeline}${water}</div>
     <button hidden data-add-reminder="meal"></button><button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
+}
+
+function reminderOverlay(markup) {
+  document.querySelector('.reminder-overlay')?.remove();
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop reminder-overlay offen';
+  backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true">${markup}</section>`;
+  backdrop.onclick = (event) => {
+    if (event.target === backdrop || event.target.closest('[data-reminder-overlay-close]')) backdrop.remove();
+  };
+  document.body.append(backdrop);
+  return backdrop;
+}
+
+function choosePeriod(type, onSelected) {
+  const backdrop = reminderOverlay(`
+    <header><h2>${type === 'meal' ? 'Mahlzeit' : 'Supplement'} eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">×</button></header>
+    <p class="rem-overlay-hinweis">Wann soll die Erinnerung erscheinen?</p>
+    <div class="sheet-menue rem-period-menu">
+      <button type="button" data-period="morning"><span>Morgens</span><small>08:00 Uhr</small></button>
+      <button type="button" data-period="midday"><span>Mittags</span><small>13:00 Uhr</small></button>
+      <button type="button" data-period="evening"><span>Abends</span><small>19:00 Uhr</small></button>
+    </div>`);
+  backdrop.querySelector('.rem-period-menu').onclick = (event) => {
+    const period = event.target.closest('[data-period]')?.dataset.period;
+    if (!period) return;
+    backdrop.remove();
+    onSelected(period);
+  };
+}
+
+function chooseReminderIcon(current, onSelected) {
+  const backdrop = reminderOverlay(`
+    <header><h2>Icon auswählen</h2><button data-reminder-overlay-close aria-label="Schließen">×</button></header>
+    <div class="sammlung-editor-icons rem-icon-grid">${availableCategoryIcons.map((icon) => `<button type="button" data-rem-icon="${icon.id}" class="${current === icon.id ? 'aktiv' : ''}" aria-label="${escapeHtml(icon.title)}">${icon.svg}</button>`).join('')}</div>
+    <form class="sammlung-emoji-eigen rem-eigenes-emoji" data-rem-emoji-form>
+      <label for="rem-eigenes-emoji"><span>Eigenes Emoji</span>
+        <input id="rem-eigenes-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🍳" value="${current.startsWith('emoji:') ? escapeHtml(current.slice(6)) : ''}">
+      </label>
+      <button class="btn btn-primary" type="submit">Emoji übernehmen</button>
+    </form>`);
+  backdrop.querySelector('.rem-icon-grid').onclick = (event) => {
+    const value = event.target.closest('[data-rem-icon]')?.dataset.remIcon;
+    if (!value) return;
+    backdrop.remove();
+    onSelected(value);
+  };
+  backdrop.querySelector('[data-rem-emoji-form]').onsubmit = (event) => {
+    event.preventDefault();
+    const emoji = event.currentTarget.querySelector('input').value.trim();
+    if (!emoji) return;
+    backdrop.remove();
+    onSelected(`emoji:${emoji}`);
+  };
 }
 
 export async function mountReminders(container, { session, signal }) {
@@ -564,8 +635,10 @@ export async function mountReminders(container, { session, signal }) {
       const index = reminders.findIndex((r) => (r._key || r.id) === key);
       if (index >= 0) reminders[index] = { ...gespeichert, _key: bisher._key };
       startReminderLoop(userId);
+      return true;
     } catch (error) {
       toast('Speichern fehlgeschlagen');
+      return false;
     }
   };
 
@@ -579,25 +652,25 @@ export async function mountReminders(container, { session, signal }) {
     };
     if (row.dataset.type === 'drink') {
       patch.metadata = {
-        emoji: body.querySelector('[data-emoji]')?.value.trim() || '●',
+        icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'drink', metadata: {} }),
         bis: body.querySelector('[data-end]')?.value || '21:00',
         intervall_minuten: Number(body.querySelector('[data-interval]')?.value || 120),
       };
     } else if (row.dataset.type === 'supplement') {
       patch.metadata = {
-        emoji: body.querySelector('[data-emoji]')?.value.trim() || '●',
+        icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'supplement', metadata: {} }),
         dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
         einheit: body.querySelector('[data-einheit]')?.value || '',
         hinweis: body.querySelector('[data-hinweis]')?.value || '',
       };
     } else {
-      patch.metadata = { emoji: body.querySelector('[data-emoji]')?.value.trim() || '●' };
+      patch.metadata = { icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'meal', metadata: {} }) };
     }
     return patch;
   };
 
   // Autosave beim Verlassen eines Feldes und beim Aendern (Toggle sofort speichern).
-  list.addEventListener('change', (event) => {
+  list.addEventListener('change', async (event) => {
     const row = event.target.closest('[data-reminder-key]');
     if (!row) return;
     const key = row.dataset.reminderKey;
@@ -605,7 +678,7 @@ export async function mountReminders(container, { session, signal }) {
     if (!patch) return;
     dirtyPatches.set(key, patch);
     // Aktiv-Toggle und Selects sofort speichern; Text-Inputs sind ohnehin change=blur.
-    flushSave(key);
+    await flushSave(key);
     rerenderRow(key);
   });
   list.addEventListener('input', (event) => {
@@ -620,31 +693,72 @@ export async function mountReminders(container, { session, signal }) {
     }
   });
 
+  const createReminder = async (type, period = '') => {
+    const times = { morning: '08:00', midday: '13:00', evening: '19:00' };
+    const neu = {
+      id: null, _key: `new:${crypto.randomUUID()}`, type,
+      label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
+      time: type === 'drink' ? '09:00' : (times[period] || '08:00'),
+      weekdays: WEEKDAYS, active: false,
+      metadata: { icon: `emoji:${type === 'supplement' ? '💊' : type === 'drink' ? '💧' : '🍽️'}` }, route: '#reminders',
+    };
+    reminders.push(neu);
+    try {
+      const gespeichert = await saveReminder(userId, neu);
+      Object.assign(neu, gespeichert);
+    } catch (error) {
+      reminders = reminders.filter((item) => item !== neu);
+      rerender();
+      toast(error.message || 'Erinnerung konnte nicht angelegt werden');
+      return;
+    }
+    rerender();
+    const details = list.querySelector(`[data-reminder-key="${neu._key}"]`);
+    if (details) {
+      details.open = true;
+      details.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = details.querySelector('[data-label]');
+      input?.focus(); input?.select();
+    }
+    toast('Erinnerung angelegt');
+  };
+
   list.addEventListener('click', async (event) => {
+    const iconButton = event.target.closest('[data-reminder-icon-open]');
+    if (iconButton) {
+      const row = iconButton.closest('[data-reminder-key]');
+      const valueInput = row?.querySelector('[data-icon-value]');
+      if (!row || !valueInput) return;
+      chooseReminderIcon(valueInput.value, (value) => {
+        valueInput.value = value;
+        iconButton.innerHTML = reminderIconMarkup(value);
+        const key = row.dataset.reminderKey;
+        dirtyPatches.set(key, patchFromBody(row));
+      });
+      return;
+    }
+
+    const saveButton = event.target.closest('[data-save-reminder]');
+    if (saveButton) {
+      const row = saveButton.closest('[data-reminder-key]');
+      const key = row?.dataset.reminderKey;
+      if (!row || !key) return;
+      dirtyPatches.set(key, patchFromBody(row));
+      saveButton.disabled = true;
+      const saved = await flushSave(key);
+      if (saved) {
+        rerender();
+        toast('Erinnerung gespeichert');
+      } else if (saveButton.isConnected) saveButton.disabled = false;
+      return;
+    }
+
     // Neue Zeile anlegen
     const addButton = event.target.closest('[data-add-reminder]');
     if (addButton) {
       const type = addButton.dataset.addReminder;
-      const neu = {
-        id: null, _key: `new:${crypto.randomUUID()}`, type,
-        label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
-        time: type === 'meal' ? '12:00' : '08:00',
-        weekdays: WEEKDAYS, active: false,
-        metadata: { emoji: type === 'supplement' ? '💊' : type === 'drink' ? '💧' : '🍽️' }, route: '#reminders',
-      };
-      reminders.push(neu);
-      // Sofort persistieren, damit die neue Zeile eine echte ID hat
-      try {
-        const gespeichert = await saveReminder(userId, neu);
-        Object.assign(neu, gespeichert);
-      } catch { /* Speichert beim naechsten Autosave nach */ }
-      rerender();
-      const details = list.querySelector(`[data-reminder-key="${neu._key}"]`);
-      if (details) {
-        details.open = true;
-        const input = details.querySelector('[data-label]');
-        input?.focus(); input?.select();
-      }
+      if (type === 'meal' || type === 'supplement') choosePeriod(type, (period) => createReminder(type, period));
+      else await createReminder(type);
       return;
     }
 
