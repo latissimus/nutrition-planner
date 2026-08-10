@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, colorIsDark, dexEditorColors, materialIconMarkup, pageLook, pagePatterns, setPageLookPattern,
+  availableCategoryIcons, bindWallpaperLongPress, colorIsDark, dexEditorColors, materialIconMarkup, pageLook, pagePatterns, setPageLookPattern,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -138,6 +138,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   let color = selectedColor;
   let iconKey = selectedIcon;
   let pattern = selectedPattern;
+  bindWallpaperLongPress(backdrop);
   const close = () => closeEditor(backdrop);
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();

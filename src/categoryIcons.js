@@ -101,6 +101,62 @@ const wallpaperStyle = (url) => url
   ? ` class="tapete-datei" style="--tapeten-vorschau:url(&quot;${escapeHtml(url)}&quot;)"`
   : '';
 
+export function bindWallpaperLongPress(root) {
+  if (!root || root.dataset.tapetenLangdruck === 'aktiv') return;
+  root.dataset.tapetenLangdruck = 'aktiv';
+  let timer = null;
+  let target = null;
+  let preview = null;
+  let startX = 0;
+  let startY = 0;
+  const selector = '[data-pattern],[data-page-pattern],[data-pick-pattern]';
+  const clear = () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    preview?.remove();
+    preview = null;
+    target = null;
+  };
+  root.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    target = event.target.closest(selector);
+    if (!target) return;
+    startX = event.clientX;
+    startY = event.clientY;
+    timer = setTimeout(() => {
+      const tile = target?.querySelector('i');
+      if (!tile) return;
+      preview = document.createElement('div');
+      preview.className = 'tapeten-langvorschau';
+      preview.appendChild(tile.cloneNode(true));
+      document.body.appendChild(preview);
+      target.dataset.langdruckVorschau = 'ja';
+      navigator.vibrate?.(12);
+    }, 430);
+  }, { passive: true });
+  root.addEventListener('pointermove', (event) => {
+    if (!target || Math.hypot(event.clientX - startX, event.clientY - startY) <= 9) return;
+    clear();
+  }, { passive: true });
+  ['pointerup', 'pointercancel'].forEach((type) => root.addEventListener(type, () => {
+    if (!target) return;
+    const pressed = target;
+    const wasPreview = Boolean(preview);
+    clear();
+    if (wasPreview) pressed.dataset.langdruckVorschau = 'ja';
+  }, { passive: true }));
+  root.addEventListener('click', (event) => {
+    const button = event.target.closest(selector);
+    if (!button || button.dataset.langdruckVorschau !== 'ja') return;
+    delete button.dataset.langdruckVorschau;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
+  root.addEventListener('contextmenu', (event) => {
+    if (event.target.closest(selector)) event.preventDefault();
+  });
+}
+
 export function setPageLookPattern(scope, pattern) {
   const valid = normalizePagePattern(pattern);
   setPreference(pagePatternKey(scope), valid);
@@ -163,6 +219,7 @@ function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
     </div>`);
   const panel = backdrop.querySelector('.kategorie-sheet');
   panel.classList.add('sammlung-editor');
+  bindWallpaperLongPress(panel);
   panel.onclick = (event) => {
     const color = event.target.closest('[data-page-color]');
     if (color) {
@@ -281,6 +338,7 @@ function appearancePicker(route, onChange) {
       <button class="btn btn-primary btn-block sammlung-editor-speichern appearance-save" type="button">Änderungen speichern</button>
     </div>`);
   backdrop.querySelector('.kategorie-sheet').classList.add('sammlung-editor');
+  bindWallpaperLongPress(backdrop.querySelector('.kategorie-sheet'));
   const emojiInput = backdrop.querySelector('#eigenes-emoji-appearance');
   backdrop.querySelector('.kategorie-sheet').onclick = (event) => {
     const iconButton = event.target.closest('[data-icon-id]');
