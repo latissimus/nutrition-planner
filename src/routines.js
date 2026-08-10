@@ -277,8 +277,8 @@ function chooseAttachment(item, userId, onSaved) {
   backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Anhang hinzufügen">
     <header><h2>Anhang hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue">
-      <button type="button" data-routine-attachment="image">${materialIconMarkup('add_photo_alternate')}<span>Bild</span></button>
       <button type="button" data-routine-attachment="link">${materialIconMarkup('place_item')}<span>Link</span></button>
+      <button type="button" data-routine-attachment="image">${materialIconMarkup('add_photo_alternate')}<span>Bild</span></button>
     </div>
   </section>`;
   const close = () => backdrop.remove();

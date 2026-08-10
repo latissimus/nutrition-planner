@@ -2794,7 +2794,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
 .dex-inhaltskarte-vorschau img{
-  position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;opacity:0;
+  position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:0;
   transition:opacity .72s cubic-bezier(.2,.65,.3,1);
 }
 .dex-foto-post-vorschau{background:#111!important}

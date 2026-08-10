@@ -435,8 +435,8 @@ function plusAction(container, route) {
 function eintragTypWaehlen(container, route, options = {}) {
   const food = route === 'food-log' || Boolean(options.onAddRecipeLink || options.onAddOwnRecipe);
   const standardEntries = [
-    options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : '',
     options.onAddLink ? `<button data-entry-type="link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Link</span></button>` : '',
+    options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : '',
     options.onAddImage ? `<button data-entry-type="image">${materialIcon('add_photo_alternate', 'sheet-list-icon')}<span>Bild</span></button>` : '',
     options.onAddAudio ? `<button data-entry-type="audio">${materialIcon('mic', 'sheet-list-icon')}<span>Tonaufnahme</span></button>` : '',
     options.onAddRoutine ? `<button data-entry-type="routine">${materialIcon('bucket_check', 'sheet-list-icon')}<span>Neue Routine</span></button>` : '',
