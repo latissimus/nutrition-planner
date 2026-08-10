@@ -103,7 +103,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
           <strong class="dex-audio-status" data-audio-status hidden role="status">Aufnahme läuft …</strong>
           <audio data-audio-preview controls hidden></audio>
         </div>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
-          <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="text" inputmode="url" autocomplete="url" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
+          <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="url" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
         </label>`}
       ${ownRecipe ? `<label class="dex-entry-file dex-recipe-file" for="dex-entry-image">
           <span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>

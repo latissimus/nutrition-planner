@@ -44,7 +44,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
   backdrop.innerHTML = `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="Eintrag bearbeiten">
     <header><h2>Eintrag bearbeiten</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-entry-edit>
-      ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" value="${escapeHtml(entry.url)}" required></label>` : ''}
+      ${entry.url ? `<label class="dex-entry-field" for="edit-entry-url"><span>Link URL</span><input id="edit-entry-url" class="input" type="url" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" value="${escapeHtml(entry.url)}" required></label>` : ''}
       ${ownRecipe ? `<label class="dex-entry-file dex-recipe-file" for="edit-entry-image">
         ${entry.preview_url ? `<img data-edit-image-preview src="${escapeHtml(entry.preview_url)}" alt="Aktuelles Rezeptbild">` : `<span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>`}
         <strong>${entry.image_path ? 'Rezeptbild wechseln' : 'Rezeptbild hinzufügen'}</strong><small>optional · maximal 8 MB</small>
