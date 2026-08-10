@@ -237,7 +237,8 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
         // Beim ersten Speichern konnten Plattformen wie TikTok bei Foto-Posts
         // noch leere Metadaten liefern. Ein Refresh fuellt fehlende Werte nach,
         // laesst aber vom Nutzer bearbeitete Titel und Notizen unangetastet.
-        if (!entry.title?.trim() && previewData.title) patch.title = previewData.title;
+        const genericTitle = /^(video|instagram|instagram[- ]?video|reel)$/i.test(entry.title?.trim() || '');
+        if ((!entry.title?.trim() || genericTitle) && previewData.title) patch.title = previewData.title;
         if (!entry.note?.trim() && previewData.description) patch.note = previewData.description;
         const { error: updateError } = await supabase.from('dex_entries').update(patch).eq('id', entry.id).eq('user_id', userId);
         if (updateError) throw updateError;

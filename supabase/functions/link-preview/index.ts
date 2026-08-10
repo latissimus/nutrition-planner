@@ -26,6 +26,38 @@ function content(html: string, property: string) {
   return patterns.map((pattern) => html.match(pattern)?.[1]).find(Boolean) || '';
 }
 
+function embeddedJsonString(html: string, key: string) {
+  const match = html.match(new RegExp(`"${key}"\\s*:\\s*"((?:\\\\.|[^"\\\\])*)"`, 'i'));
+  if (!match?.[1]) return '';
+  try { return JSON.parse(`"${match[1]}"`); } catch { return ''; }
+}
+
+function structuredMetadata(html: string) {
+  const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+  for (const script of scripts) {
+    try {
+      const parsed = JSON.parse(script[1]);
+      const queue = Array.isArray(parsed) ? [...parsed] : [parsed];
+      while (queue.length) {
+        const item = queue.shift();
+        if (!item || typeof item !== 'object') continue;
+        if (Array.isArray(item)) { queue.push(...item); continue; }
+        const thumbnail = Array.isArray(item.thumbnailUrl) ? item.thumbnailUrl[0] : item.thumbnailUrl || item.image?.url || item.image;
+        if (item.name || item.caption || item.description || thumbnail) {
+          return {
+            title: String(item.name || item.headline || '').trim(),
+            description: String(item.caption || item.description || '').trim(),
+            thumbnail_url: typeof thumbnail === 'string' ? thumbnail : '',
+            provider_name: 'Instagram',
+          };
+        }
+        queue.push(...Object.values(item));
+      }
+    } catch { /* Die naechste JSON-LD-Struktur versuchen. */ }
+  }
+  return {};
+}
+
 async function oembed(endpoint: string) {
   const response = await fetch(endpoint, { headers: { 'User-Agent': 'MUSCLE-DEX/1.0' }, signal: AbortSignal.timeout(6500) });
   if (!response.ok) throw new Error('oEmbed nicht verfügbar');
@@ -43,6 +75,51 @@ async function pageMetadata(url: URL, existingResponse?: Response) {
     description: content(html, 'og:description') || content(html, 'description'),
     thumbnail_url: content(html, 'og:image') || content(html, 'twitter:image'),
     provider_name: url.hostname.replace(/^www\./, ''),
+  };
+}
+
+async function instagramMetadata(url: URL) {
+  const match = url.pathname.match(/\/(reel|reels|tv|p)\/([^/?#]+)/i);
+  if (!match) return await pageMetadata(url);
+  const type = match[1].toLowerCase() === 'reels' ? 'reel' : match[1].toLowerCase();
+  const canonical = new URL(`https://www.instagram.com/${type}/${match[2]}/`);
+  let api: Record<string, unknown> = {};
+  try {
+    api = await oembed(`https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(canonical.href)}&omitscript=true`);
+  } catch { /* Instagram kann den anonymen oEmbed-Endpunkt sperren. */ }
+  let html = '';
+  let embed: Record<string, unknown> = {};
+  try {
+    const response = await fetch(`${canonical.href}embed/captioned/`, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (response.ok) {
+      html = (await response.text()).slice(0, 2_000_000);
+      const structured = structuredMetadata(html) as Record<string, unknown>;
+      embed = {
+        ...structured,
+        title: content(html, 'og:title') || content(html, 'twitter:title') || structured.title || '',
+        description: content(html, 'og:description') || content(html, 'description') || structured.description || '',
+        thumbnail_url: content(html, 'og:image') || content(html, 'twitter:image') || structured.thumbnail_url || '',
+        provider_name: 'Instagram',
+      };
+    }
+  } catch { /* Danach bleiben API- oder Originalseiten-Daten. */ }
+  let page: Record<string, unknown> = {};
+  try { page = await pageMetadata(canonical); } catch { /* Embed-Daten verwenden. */ }
+  const fallbackDescription = embeddedJsonString(html, 'accessibility_caption')
+    || embeddedJsonString(html, 'text');
+  const fallbackImage = embeddedJsonString(html, 'display_url')
+    || embeddedJsonString(html, 'thumbnail_src');
+  return {
+    ...page,
+    ...embed,
+    ...api,
+    title: String(api.title || embed.title || page.title || '').trim(),
+    description: String(api.description || api.title || embed.description || page.description || fallbackDescription || '').trim(),
+    thumbnail_url: String(api.thumbnail_url || embed.thumbnail_url || page.thumbnail_url || fallbackImage || '').trim(),
+    provider_name: 'Instagram',
   };
 }
 
@@ -95,7 +172,11 @@ async function stablePreviewUrl(value: string) {
   if (!supabaseUrl || !serviceKey) return value;
   try {
     const response = await fetch(safeUrl(value), {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)',
+        Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        Referer: value.includes('cdninstagram.com') || value.includes('fbcdn.net') ? 'https://www.instagram.com/' : '',
+      },
       redirect: 'follow', signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) return value;
@@ -146,6 +227,7 @@ Deno.serve(async (request) => {
         catch { data = await pageMetadata(url, resolvedResponse); }
       }
     }
+    else if (url.hostname.includes('instagram.com')) data = await instagramMetadata(url);
     else if (url.hostname.includes('vimeo.com')) data = await oembed(`https://vimeo.com/api/oembed.json?url=${encoded}`);
     else data = await pageMetadata(url);
     const rawPreview = String(data.thumbnail_url || '');
