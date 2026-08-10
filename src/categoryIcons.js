@@ -79,12 +79,18 @@ export function categoryColor(route) {
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
 }
 
-const pagePatterns = [
+export const pagePatterns = [
   ['drops', 'Tropfen'],
   ['triangles', 'Dreiecke'],
   ['bones', 'Knochen'],
   ['none', 'Ohne Muster'],
 ];
+
+export function setPageLookPattern(scope, pattern) {
+  const valid = pagePatterns.some(([id]) => id === pattern) ? pattern : 'drops';
+  setPreference(pagePatternKey(scope), valid);
+  return valid;
+}
 
 export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   return {
@@ -238,6 +244,7 @@ function iconPicker(route, onChange) {
 function appearancePicker(route, onChange) {
   let selectedIcon = getPreference(storageKey(route), defaults[route]);
   let selectedColor = categoryColor(route).toUpperCase();
+  let selectedPattern = pageLook(route, selectedColor, 'drops').pattern;
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
@@ -246,6 +253,8 @@ function appearancePicker(route, onChange) {
       <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>
+      <h3>Tapete</h3>
+      <div class="sammlung-editor-tapeten">${pagePatterns.map(([id, label]) => `<button type="button" data-pattern="${id}" class="${id === selectedPattern ? 'aktiv' : ''}" aria-label="Tapete ${label}"><i data-muster="${id}"></i></button>`).join('')}</div>
       <label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
         <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
       </label>
@@ -265,10 +274,18 @@ function appearancePicker(route, onChange) {
       selectedColor = colorButton.dataset.color;
       backdrop.querySelectorAll('[data-color]').forEach((button) => button.classList.toggle('aktiv', button === colorButton));
     }
+    const patternButton = event.target.closest('[data-pattern]');
+    if (patternButton) {
+      selectedPattern = patternButton.dataset.pattern;
+      backdrop.querySelectorAll('[data-pattern]').forEach((button) => button.classList.toggle('aktiv', button === patternButton));
+    }
     if (!event.target.closest('.appearance-save')) return;
     const emoji = emojiInput.value.trim();
     setPreference(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
     setPreference(colorKey(route), selectedColor);
+    setPreference(pageColorKey(route), selectedColor);
+    setPageLookPattern(route, selectedPattern);
+    applyPageLook(route, selectedColor, selectedPattern);
     closeSheet(backdrop);
     onChange?.();
     toast('Icon und Farbe geändert.');
@@ -383,6 +400,8 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   if (!wrap) return;
   container.classList.add('hat-kategoriefarbe', 'dex-fixkopf');
   container.style.setProperty('--ordner', options.color || categoryColor(route));
+  const lookScope = options.pageLookScope || options.inheritedPageLookScope || route;
+  applyPageLook(lookScope, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
   wrap.querySelector(':scope > .seitenkopf')?.remove();
   let content = wrap.querySelector(':scope > .kategorie-scrollinhalt');
   if (!content) {

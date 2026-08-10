@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, colorIsDark, dexEditorColors, materialIconMarkup,
+  availableCategoryIcons, colorIsDark, dexEditorColors, materialIconMarkup, pageLook, pagePatterns, setPageLookPattern,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -113,6 +113,8 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   const selectedColor = existing?.color || COLLECTION_COLORS[0];
   const selectedIcon = existing?.icon_key || COLLECTION_ICONS.find((icon) => icon === 'create_new_folder') || COLLECTION_ICONS[0];
   const isSubDex = Boolean(parentId || existing?.parent_id);
+  const patternScope = existing?.id ? `collection-${existing.id}` : null;
+  const selectedPattern = patternScope ? pageLook(patternScope, selectedColor, 'drops').pattern : 'drops';
   const editorTitle = existing ? 'Dex bearbeiten' : (isSubDex ? 'Neuer Unter-Dex' : 'Neuer Dex');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sammlung-editor-backdrop';
@@ -124,6 +126,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
       <input class="input" id="collection-name" maxlength="40" required placeholder="z. B. Low Carb" value="${escapeHtml(existing?.name || '')}">
       <h3>Farbe</h3>
       <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((color) => `<button type="button" data-pick-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
+      ${!isSubDex ? `<h3>Tapete</h3><div class="sammlung-editor-tapeten">${pagePatterns.map(([id, label]) => `<button type="button" data-pick-pattern="${id}" class="${id === selectedPattern ? 'aktiv' : ''}" aria-label="Tapete ${label}"><i data-muster="${id}"></i></button>`).join('')}</div>` : ''}
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
       <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>
@@ -134,6 +137,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   </section>`;
   let color = selectedColor;
   let iconKey = selectedIcon;
+  let pattern = selectedPattern;
   const close = () => closeEditor(backdrop);
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
@@ -141,6 +145,11 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     if (colorButton) {
       color = colorButton.dataset.pickColor;
       backdrop.querySelectorAll('[data-pick-color]').forEach((button) => button.classList.toggle('aktiv', button === colorButton));
+    }
+    const patternButton = event.target.closest('[data-pick-pattern]');
+    if (patternButton) {
+      pattern = patternButton.dataset.pickPattern;
+      backdrop.querySelectorAll('[data-pick-pattern]').forEach((button) => button.classList.toggle('aktiv', button === patternButton));
     }
     const iconButton = event.target.closest('[data-pick-icon]');
     if (iconButton) {
@@ -164,6 +173,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     button.disabled = true;
     try {
       const saved = await saveCollection(userId, { rootKey, parentId, name: input.value, color, iconKey }, existing);
+      if (!isSubDex && saved?.id) setPageLookPattern(`collection-${saved.id}`, pattern);
       close();
       toast(existing ? 'Dex aktualisiert' : (isSubDex ? 'Unter-Dex erstellt' : 'Dex erstellt'));
       await onSaved?.(saved);
