@@ -3664,9 +3664,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-icons button svg{width:28px;height:28px;fill:#000}
 .sammlung-editor-tapeten button i{display:block;width:100%;height:100%;border-radius:6px;background-color:var(--dex-seitenfarbe,var(--surface));background-size:34px;opacity:1;filter:none}
 .sammlung-editor-tapeten button.aktiv{background:var(--surface);box-shadow:3px 3px 0 #000}
-.sammlung-editor-tapeten button i[data-muster="triangles"]{background-image:var(--muster-dreieck)}
-.sammlung-editor-tapeten button i[data-muster="drops"]{background-image:var(--muster-tropfen)}
-.sammlung-editor-tapeten button i[data-muster="bones"]{background-image:url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")}
 .sammlung-editor-tapeten button i.tapete-datei,
 .seitenmuster-auswahl i.tapete-datei{background-image:var(--tapeten-vorschau);background-size:cover;background-position:center;opacity:1;filter:none}
 .sammlung-editor-farben button.aktiv,.sammlung-editor-icons button.aktiv{box-shadow:3px 3px 0 #000}
@@ -3767,9 +3764,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .seitenmuster-auswahl button{display:flex;align-items:center;gap:9px;min-height:54px;padding:8px;border:2px solid var(--ink);border-radius:12px;background:var(--surface);font:800 13px/1 var(--ui)}
 .seitenmuster-auswahl button.aktiv{background:color-mix(in srgb,var(--ordner) 28%,var(--surface))}
 .seitenmuster-auswahl i{width:36px;height:36px;border-radius:8px;background-color:var(--dex-seitenfarbe);background-size:34px;opacity:1;filter:none}
-.seitenmuster-auswahl i[data-muster="triangles"]{background-image:var(--muster-dreieck)}
-.seitenmuster-auswahl i[data-muster="drops"]{background-image:var(--muster-tropfen)}
-.seitenmuster-auswahl i[data-muster="bones"]{background-image:url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")}
 
 /* ---------- Deterministische Navigation ---------- */
 .seite-vor-warten{transform:translateX(100%);opacity:1}
@@ -3891,18 +3885,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-position:center top!important;background-attachment:scroll!important;
 }
 .dex-fixkopf[data-dex-muster="none"] .kategorie-scrollinhalt{background-image:none!important}
-.dex-fixkopf[data-dex-muster="triangles"] .kategorie-scrollinhalt{
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 50%,transparent),color-mix(in srgb,var(--bg) 50%,transparent)),var(--muster-dreieck)!important;
-  background-size:auto!important;
-}
-.dex-fixkopf[data-dex-muster="drops"] .kategorie-scrollinhalt{
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 50%,transparent),color-mix(in srgb,var(--bg) 50%,transparent)),var(--muster-tropfen)!important;
-  background-size:auto,112px!important;
-}
-.dex-fixkopf[data-dex-muster="bones"] .kategorie-scrollinhalt{
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 50%,transparent),color-mix(in srgb,var(--bg) 50%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
-  background-size:auto,112px!important;
-}
 .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
   /* Externe SVG-Tapeten haben oft eine sehr grosse Zeichenflaeche. Eine feste
      Kachelbreite macht sie auf Smartphones sichtbar und konsistent mit den

@@ -89,19 +89,20 @@ const wallpaperPatterns = Object.entries(wallpaperModules).map(([path, url]) => 
 }).sort((a, b) => a[1].localeCompare(b[1], 'de'));
 
 export const pagePatterns = [
-  ['drops', 'Tropfen'],
-  ['triangles', 'Dreiecke'],
-  ['bones', 'Knochen'],
-  ['none', 'Ohne Muster'],
   ...wallpaperPatterns,
+  ['none', 'Ohne Muster'],
 ];
+const defaultPagePattern = wallpaperPatterns[0]?.[0] || 'none';
+const normalizePagePattern = (pattern) => (
+  pagePatterns.some(([id]) => id === pattern) ? pattern : defaultPagePattern
+);
 
 const wallpaperStyle = (url) => url
   ? ` class="tapete-datei" style="--tapeten-vorschau:url(&quot;${escapeHtml(url)}&quot;)"`
   : '';
 
 export function setPageLookPattern(scope, pattern) {
-  const valid = pagePatterns.some(([id]) => id === pattern) ? pattern : 'drops';
+  const valid = normalizePagePattern(pattern);
   setPreference(pagePatternKey(scope), valid);
   return valid;
 }
@@ -109,7 +110,9 @@ export function setPageLookPattern(scope, pattern) {
 export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   return {
     color: getPreference(pageColorKey(scope), fallbackColor || '#F2EBE0'),
-    pattern: getPreference(pagePatternKey(scope), fallbackPattern),
+    // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
+    // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.
+    pattern: normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
   };
 }
 
