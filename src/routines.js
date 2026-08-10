@@ -17,7 +17,6 @@ const periods = [
 ];
 const days = [['1', 'Mo'], ['2', 'Di'], ['3', 'Mi'], ['4', 'Do'], ['5', 'Fr'], ['6', 'Sa'], ['7', 'So']];
 const today = () => new Date().toLocaleDateString('sv-SE');
-const weekday = () => new Date().getDay() || 7;
 const defaultMobilityExercises = [
   { name: 'Cat-Cow', prescription: '8–10 Wiederholungen' },
   { name: '90/90 Hip Switches', prescription: '8 pro Seite' },
@@ -217,7 +216,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
   requestAnimationFrame(() => { backdrop.classList.add('offen'); backdrop.querySelector('[data-routine-name]')?.focus({ preventScroll: true }); });
 }
 
-function openMobilityOverview(item) {
+function openMobilityOverview(item, { userId, onCompleted } = {}) {
   const exercises = normalizeMobilityExercises(item.mobility_exercises);
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop mobility-overview-backdrop';
@@ -227,21 +226,26 @@ function openMobilityOverview(item) {
     <header><span><h2>${escapeHtml(item.name)}</h2><small>${Number(item.duration_minutes || 5)} Minuten · ${exercises.length} Übungen</small></span><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <ol>${exercises.map((exercise, index) => `<li><span>${index + 1}</span><p><b>${escapeHtml(exercise.name)}</b>${exercise.prescription ? `<small>${escapeHtml(exercise.prescription)}</small>` : ''}</p></li>`).join('')}</ol>
     ${item.note ? `<div class="mobility-overview-note"><b>Notiz</b><p>${escapeHtml(item.note)}</p></div>` : ''}
+    <button class="btn btn-primary btn-block mobility-timer-start" type="button" data-mobility-timer>${materialIconMarkup('timer')}<span>${Number(item.duration_minutes || 5)}-Minuten-Timer starten</span></button>
   </section>`;
   backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) backdrop.remove(); };
+  backdrop.querySelector('[data-mobility-timer]')?.addEventListener('click', () => {
+    backdrop.remove();
+    openMeditationTimer({ userId, routine: item, onCompleted });
+  });
   document.body.append(backdrop);
 }
 
 function routineRow(item, completed, attachments = [], darkColor = false) {
   const dayNames = item.weekdays?.length === 7 ? 'Täglich' : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label).join(' · ');
-  const meditation = item.template_type === 'meditation';
   const mobility = item.template_type === 'mobility';
+  const timed = ['meditation', 'mobility', 'walk'].includes(item.template_type);
   const exerciseCount = mobility ? normalizeMobilityExercises(item.mobility_exercises).length : 0;
-  return `<article class="routine-row${completed ? ' erledigt' : ''}${meditation ? ' hat-timer' : ''}${mobility ? ' hat-ablauf' : ''}" data-routine-id="${item.id}">
+  return `<article class="routine-row${completed ? ' erledigt' : ''}${timed ? ' hat-timer' : ''}${mobility ? ' hat-ablauf' : ''}" data-routine-id="${item.id}">
     <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
     <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
     <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${mobility ? `${exerciseCount} Übungen · ${Number(item.duration_minutes || 5)} min · ` : ''}${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
-    ${meditation ? `<button class="routine-start" type="button" data-routine-start aria-label="Meditation starten">${materialIconMarkup('play_arrow')}</button>` : ''}
+    ${timed ? `<button class="routine-start" type="button" data-routine-start aria-label="${escapeHtml(item.name)}-Timer starten">${materialIconMarkup('play_arrow')}</button>` : ''}
     ${mobility ? `<button class="routine-open" type="button" data-routine-mobility-open aria-label="Übungsablauf anzeigen">${materialIconMarkup('chevron_right')}</button>` : ''}
     <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
     <button class="routine-edit" type="button" data-routine-edit aria-label="${escapeHtml(item.name)} bearbeiten">${materialIconMarkup('build')}</button>
@@ -299,7 +303,6 @@ export async function mountRoutines(container, { session, signal }) {
   const userId = session.user.id;
   container.innerHTML = `<div class="wrap pad-bottom routinen-seite">
     <div class="seitenkopf"><h1>ROUTINEN</h1></div>
-    <section class="seiten-einstieg routine-intro"><b>Heute dranbleiben</b><span data-routine-progress>Routinen werden geladen …</span></section>
     <div class="routine-plan" data-routine-plan><div class="daten-laden">Routinen werden geladen …</div></div>
     <div class="dex-eintraege routine-notizen" data-dex-entries></div>
   </div>`;
@@ -310,10 +313,7 @@ export async function mountRoutines(container, { session, signal }) {
     paint();
   };
   const paint = () => {
-    const scheduled = state.routines.filter((item) => item.active && item.weekdays?.includes(weekday()));
-    const done = scheduled.filter((item) => state.completed.has(item.id)).length;
     const darkColor = colorIsDark(categoryColor('habits'));
-    container.querySelector('[data-routine-progress]').textContent = scheduled.length ? `${done} von ${scheduled.length} für heute erledigt` : 'Heute ist keine Routine geplant.';
     container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
       const items = state.routines.filter((item) => item.period === key);
       return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
@@ -330,12 +330,12 @@ export async function mountRoutines(container, { session, signal }) {
     const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
     if (!item) return;
     if (event.target.closest('[data-routine-start]')) return openMeditationTimer({ userId, routine: item, onCompleted: refresh });
-    if (event.target.closest('[data-routine-mobility-open]')) return openMobilityOverview(item);
+    if (event.target.closest('[data-routine-mobility-open]')) return openMobilityOverview(item, { userId, onCompleted: refresh });
     if (event.target.closest('[data-routine-attach]')) return chooseAttachment(item, userId, refresh);
     if (event.target.closest('[data-routine-edit]')) return editor(userId, { existing: item, onSaved: refresh });
     if (event.target.closest('.routine-anhaenge')) return;
     if (!event.target.closest('[data-routine-check]')) {
-      if (item.template_type === 'mobility') return openMobilityOverview(item);
+      if (item.template_type === 'mobility') return openMobilityOverview(item, { userId, onCompleted: refresh });
       return;
     }
     const completed = state.completed.has(item.id);

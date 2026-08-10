@@ -37,7 +37,7 @@ export async function completeRoutine(userId, routineId) {
   ]);
   if (routineError || reminderError) throw routineError || reminderError;
   try { await syncRoutineCoins(routineId, date, true); }
-  catch { toast('Meditation gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
+  catch { toast('Routine gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
 }
 
 function audioContext() {
@@ -284,6 +284,10 @@ export function maybePromptExternalMeditation({ userId, routines, onCompleted })
 }
 
 export function openMeditationTimer({ userId, routine, onCompleted }) {
+  const isMeditation = routine.template_type === 'meditation';
+  const timerLabel = routine.template_type === 'mobility' ? 'MOBILITY'
+    : routine.template_type === 'walk' ? 'SPAZIERGANG' : 'MEDITATION';
+  const timerEmoji = routine.template_type === 'mobility' ? '🤸' : '🚶';
   const duration = Number(routine.duration_minutes || 5) * 60;
   let remaining = duration;
   let running = false;
@@ -294,19 +298,19 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
   let stopAmbient = () => {};
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop meditation-timer-backdrop';
-  backdrop.innerHTML = `<section class="kategorie-sheet meditation-timer" role="dialog" aria-modal="true" aria-label="Meditationstimer">
-    <header><div><small>MEDITATION</small><h2>${escapeHtml(routine.name)}</h2></div><button type="button" data-meditation-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="meditation-atmung" aria-hidden="true">
-      <span class="meditation-face">😌</span>
-      <i class="meditation-stern stern-eins">✦</i><i class="meditation-stern stern-zwei">✧</i><i class="meditation-stern stern-drei">✦</i>
+  backdrop.innerHTML = `<section class="kategorie-sheet meditation-timer${isMeditation ? '' : ' routine-countdown'}" role="dialog" aria-modal="true" aria-label="${escapeHtml(timerLabel)}-Timer">
+    <header><div><small>${timerLabel}</small><h2>${escapeHtml(routine.name)}</h2></div><button type="button" data-meditation-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="meditation-atmung${isMeditation ? '' : ' routine-timer-symbol'}" aria-hidden="true">
+      <span class="meditation-face">${isMeditation ? '😌' : timerEmoji}</span>
+      ${isMeditation ? '<i class="meditation-stern stern-eins">✦</i><i class="meditation-stern stern-zwei">✧</i><i class="meditation-stern stern-drei">✦</i>' : ''}
     </div>
     <strong class="meditation-time" data-meditation-time>${formatTime(remaining)}</strong>
-    <small class="meditation-sound-label">${escapeHtml(soundNames[routine.ambient_sound] || soundNames.off)}</small>
+    <small class="meditation-sound-label">${isMeditation ? escapeHtml(soundNames[routine.ambient_sound] || soundNames.off) : 'Automatischer Check nach Ablauf'}</small>
     <div class="meditation-controls">
       <button class="btn btn-primary" type="button" data-meditation-toggle>${materialIconMarkup('play_arrow')}<span>Start</span></button>
       <button class="btn" type="button" data-meditation-stop>Beenden</button>
     </div>
-    ${routine.external_url ? `<button class="btn meditation-external" type="button" data-meditation-external>${materialIconMarkup('arrow_forward')} Mit externer App starten</button>` : ''}
+    ${isMeditation && routine.external_url ? `<button class="btn meditation-external" type="button" data-meditation-external>${materialIconMarkup('arrow_forward')} Mit externer App starten</button>` : ''}
   </section>`;
   const timeNode = backdrop.querySelector('[data-meditation-time]');
   const toggle = backdrop.querySelector('[data-meditation-toggle]');
@@ -333,8 +337,9 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
       await completeRoutine(userId, routine.id);
       backdrop.querySelector('.meditation-timer').classList.add('abgeschlossen');
       breath.classList.add('fertig');
-      backdrop.querySelector('.meditation-controls').innerHTML = `<button class="btn btn-primary" type="button" data-meditation-finished>${materialIconMarkup('check_small')} Meditation erledigt</button>`;
-      backdrop.querySelector('[data-meditation-finished]').onclick = async () => { await close(); await onCompleted?.(); };
+      backdrop.querySelector('.meditation-controls').innerHTML = `<button class="btn btn-primary" type="button" data-meditation-finished>${materialIconMarkup('check_small')} ${escapeHtml(routine.name)} erledigt</button>`;
+      await onCompleted?.();
+      backdrop.querySelector('[data-meditation-finished]').onclick = close;
     } catch (error) { toast(error.message || 'Abschluss konnte nicht gespeichert werden.'); }
   };
   const update = () => {
@@ -345,7 +350,7 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
   const start = async () => {
     context ||= audioContext(); await context?.resume();
     if (remaining >= duration - 0.5) playGong(context, Number(routine.gong_volume ?? 0.7));
-    stopAmbient = startAmbient(context, routine.ambient_sound || 'off', Number(routine.ambient_volume ?? 0.35));
+    stopAmbient = isMeditation ? startAmbient(context, routine.ambient_sound || 'off', Number(routine.ambient_volume ?? 0.35)) : () => {};
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
     endAt = performance.now() + remaining * 1000; running = true; breath.classList.add('laeuft');
     toggle.innerHTML = `${materialIconMarkup('pause')}<span>Pause</span>`;

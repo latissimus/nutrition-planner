@@ -318,7 +318,7 @@ function iconPicker(route, onChange) {
   };
 }
 
-function appearancePicker(route, onChange) {
+function appearancePicker(route, onChange, { hideIcon = false } = {}) {
   let selectedIcon = getPreference(storageKey(route), defaults[route]);
   let selectedColor = categoryColor(route).toUpperCase();
   let selectedPattern = pageLook(route, selectedColor, 'drops').pattern;
@@ -328,13 +328,13 @@ function appearancePicker(route, onChange) {
     <div class="dex-appearance-form">
       <h3>Farbe</h3>
       <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
-      <h3>Icon</h3>
-      <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>
+      ${hideIcon ? '' : `<h3>Icon</h3>
+      <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>`}
       <h3>Tapete</h3>
       <div class="sammlung-editor-tapeten">${pagePatterns.map(([id, label, url]) => `<button type="button" data-pattern="${id}" class="${id === selectedPattern ? 'aktiv' : ''}" aria-label="Tapete ${label}"><i data-muster="${id}"${wallpaperStyle(url)}></i></button>`).join('')}</div>
-      <label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
+      ${hideIcon ? '' : `<label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
         <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
-      </label>
+      </label>`}
       <button class="btn btn-primary btn-block sammlung-editor-speichern appearance-save" type="button">Änderungen speichern</button>
     </div>`);
   backdrop.querySelector('.kategorie-sheet').classList.add('sammlung-editor');
@@ -344,7 +344,7 @@ function appearancePicker(route, onChange) {
     const iconButton = event.target.closest('[data-icon-id]');
     if (iconButton) {
       selectedIcon = iconButton.dataset.iconId;
-      emojiInput.value = '';
+      if (emojiInput) emojiInput.value = '';
       backdrop.querySelectorAll('[data-icon-id]').forEach((button) => button.classList.toggle('aktiv', button === iconButton));
     }
     const colorButton = event.target.closest('[data-color]');
@@ -358,16 +358,16 @@ function appearancePicker(route, onChange) {
       backdrop.querySelectorAll('[data-pattern]').forEach((button) => button.classList.toggle('aktiv', button === patternButton));
     }
     if (!event.target.closest('.appearance-save')) return;
-    const emoji = emojiInput.value.trim();
-    setPreference(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
+    const emoji = emojiInput?.value.trim() || '';
+    if (!hideIcon) setPreference(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
     setPreference(colorKey(route), selectedColor);
     setPageLookPattern(route, selectedPattern);
     applyPageLook(route, selectedColor, selectedPattern);
     closeSheet(backdrop);
     onChange?.();
-    toast('Icon und Farbe geändert.');
+    toast(hideIcon ? 'Farbe und Tapete geändert.' : 'Icon und Farbe geändert.');
   };
-  emojiInput.oninput = () => {
+  if (emojiInput) emojiInput.oninput = () => {
     if (!emojiInput.value.trim()) return;
     backdrop.querySelectorAll('[data-icon-id]').forEach((button) => button.classList.remove('aktiv'));
   };
@@ -398,7 +398,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
-      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon &amp; Farbe ändern</span></button>
+      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${actions.hideAppearanceIcon ? 'Farbe &amp; Tapete ändern' : 'Icon &amp; Farbe ändern'}</span></button>
       ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
@@ -409,7 +409,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (!action) return;
     closeSheet(backdrop);
-    if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange);
+    if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange, { hideIcon: Boolean(actions.hideAppearanceIcon) });
     if (action === 'select') actions.onSelect?.();
     if (action === 'rename') actions.onRename?.();
     if (action === 'sub') actions.onCreateSub?.();

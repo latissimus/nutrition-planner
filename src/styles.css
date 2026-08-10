@@ -104,8 +104,8 @@
   --hart:4px 4px 0 var(--ink);
   --hart-klein:3px 3px 0 var(--ink);
   /* Anteil des deckenden Seitenfarb-Schleiers ueber externen SVG-Tapeten.
-     Im hellen Theme genuegen sieben Prozent sichtbares Schwarz. */
-  --tapeten-schleier:93%;
+     Im hellen Theme bleiben neun Prozent des Musters sichtbar. */
+  --tapeten-schleier:91%;
 
   /* Ueberschriften: Retro setzt kursive Versalien, der Standard nicht. Damit
      die Basisregel weiter unten fuer beide Themes gilt, steckt der Unterschied
@@ -179,7 +179,7 @@
   /* Die SVG-Tapeten sind ueberwiegend schwarz gezeichnet. Auf tiefem Navy
      brauchen sie deutlich mehr Eigenanteil, um optisch so praesent zu sein
      wie dieselben Motive auf dem hellen Hintergrund. */
-  --tapeten-schleier:45%;
+  --tapeten-schleier:43%;
 
   /* Logo: Das gedeckte Navy verschwindet auf dunklem Grund, die Kontur waere
      weg. Dunkles Blau bleibt als Kontur, ist aber vom Hintergrund abgesetzt. */
@@ -2942,6 +2942,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;border-bottom:1px solid var(--app-divider)}
 .routine-row.hat-timer{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px}
 .routine-row.hat-ablauf{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px;cursor:pointer}
+.routine-row.hat-timer.hat-ablauf{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px 32px}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check:active{transform:none!important;box-shadow:none!important}
@@ -2992,7 +2993,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .mobility-editor-settings>header button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:6px 10px;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);font:800 11px/1 var(--ui);white-space:nowrap}.mobility-editor-settings>header button>b{font-size:18px;line-height:1}
 .mobility-exercise-list{display:grid;gap:8px}.mobility-exercise-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.7fr) 34px;gap:7px;align-items:center}.mobility-exercise-row .input{min-width:0;height:44px;min-height:44px;padding:8px 10px;font-size:12px}.mobility-exercise-row>button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent}.mobility-exercise-row>button .material-svg,.mobility-exercise-row>button svg{width:18px;height:18px;fill:#000}
 .mobility-overview>header>span{display:grid;gap:3px}.mobility-overview>header h2{margin:0}.mobility-overview>header small{color:var(--muted);font-size:11px;font-weight:700}.mobility-overview ol{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--app-divider)}
-.mobility-overview li{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--app-divider)}.mobility-overview li>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#000);font-size:12px;font-weight:800}.mobility-overview li p{display:grid;gap:3px;margin:0}.mobility-overview li b{font-size:15px}.mobility-overview li small{color:var(--muted);font-size:12px;font-weight:600}.mobility-overview-note{display:grid;gap:5px;margin-top:15px;padding:12px;border-radius:10px;background:var(--surface2)}.mobility-overview-note b{font-size:11px;text-transform:uppercase}.mobility-overview-note p{margin:0;font-size:13px;line-height:1.4}
+.mobility-overview li{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--app-divider)}.mobility-overview li>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#000);font-size:12px;font-weight:800}.mobility-overview li p{display:grid;gap:3px;margin:0}.mobility-overview li b{font-size:15px}.mobility-overview li small{color:var(--muted);font-size:12px;font-weight:600}.mobility-overview-note{display:grid;gap:5px;margin-top:15px;padding:12px;border-radius:10px;background:var(--surface2)}.mobility-overview-note b{font-size:11px;text-transform:uppercase}.mobility-overview-note p{margin:0;font-size:13px;line-height:1.4}.mobility-timer-start{margin-top:15px}
 .routine-duration{min-width:0;margin:0;padding:0;border:0}
 .routine-duration legend{margin-bottom:8px;font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
 .routine-duration>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
@@ -3016,6 +3017,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .meditation-atmung::before{content:"";position:absolute;left:50%;top:55%;width:142px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--ordner) 24%,transparent),transparent 68%);transform:translate(-50%,-50%)}
 .meditation-face{position:relative;z-index:2;display:block;font-size:92px;line-height:1;transform-origin:50% 72%;filter:saturate(.82)}
 .meditation-atmung.laeuft .meditation-face{animation:meditation-atmen 10s ease-in-out infinite}
+.routine-timer-symbol .meditation-face{font-size:86px;filter:none}
+.routine-timer-symbol.laeuft .meditation-face{animation:routine-timer-puls 2.4s ease-in-out infinite}
+@keyframes routine-timer-puls{0%,100%{transform:scale(.96)}50%{transform:scale(1.045)}}
 .meditation-stern{position:absolute;z-index:3;color:var(--ordner);font-style:normal;line-height:1;text-shadow:1px 1px 0 color-mix(in srgb,var(--ink) 45%,transparent)}
 .stern-eins{left:31%;top:11%;font-size:25px;transform:rotate(-14deg)}
 .stern-zwei{left:55%;top:2%;font-size:34px;transform:rotate(12deg)}
@@ -3386,24 +3390,23 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- COIN-DEX ---------- */
-.coin-dex-seite{--ordner:#05bde8}
 .coin-dex-inhalt{display:grid;gap:18px;padding:2px 2px 24px}
 .coin-balance-card{
   display:flex;align-items:center;gap:17px;padding:18px;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
-  background:var(--surface);box-shadow:var(--hart)
+  background:color-mix(in srgb,var(--ordner) 12%,var(--surface));box-shadow:var(--hart)
 }
 .coin-balance-card .coin-balance-symbol{width:64px;height:64px;flex:0 0 64px}
 .coin-balance-card>span{display:grid;min-width:0}
 .coin-balance-card small{font-size:11px;font-weight:800;letter-spacing:.08em}
 .coin-balance-card strong{font-size:clamp(34px,11vw,48px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
 .coin-balance-card b{font-size:13px;letter-spacing:.035em}
-.coin-next{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px 15px;border-radius:14px;background:color-mix(in srgb,#05bde8 17%,var(--surface))}
+.coin-next{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px 15px;border-radius:14px;background:color-mix(in srgb,var(--ordner) 17%,var(--surface))}
 .coin-next>span{display:grid;gap:2px}.coin-next small{color:var(--muted);font-size:12px;font-weight:600}.coin-next>strong{align-self:center;font-size:12px}
 .coin-progress{grid-column:1/-1;height:7px;overflow:hidden;border-radius:10px;background:color-mix(in srgb,var(--ink) 12%,transparent)}
-.coin-progress i{display:block;height:100%;border-radius:inherit;background:#05bde8}
+.coin-progress i{display:block;height:100%;border-radius:inherit;background:var(--ordner)}
 .coin-verdienst{display:block;padding:0;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface);overflow:hidden}
-.coin-verdienst>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer;list-style:none}.coin-verdienst>summary::-webkit-details-marker{display:none}
+.coin-verdienst>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer;list-style:none;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}.coin-verdienst>summary::-webkit-details-marker{display:none}
 .coin-verdienst>summary>span{display:grid;gap:2px}.coin-verdienst>summary b{font-size:16px;text-transform:uppercase}.coin-verdienst>summary small{color:var(--muted);font-size:11px;font-weight:600}
 .coin-verdienst>summary .material-svg,.coin-verdienst>summary svg{width:19px;height:19px;fill:var(--ink);transition:transform .18s ease}.coin-verdienst[open]>summary .material-svg{transform:rotate(90deg)}
 .coin-verdienst-inhalt{display:grid;gap:13px;padding:0 15px 15px}.coin-verdienst-hinweis{color:var(--muted);font-size:11px;font-weight:600}
@@ -3415,10 +3418,10 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-verdienst-frei{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;background:color-mix(in srgb,#9772fb 14%,var(--surface))}.coin-verdienst-frei>span{font-size:22px}.coin-verdienst-frei p{display:grid;margin:0}.coin-verdienst-frei b{font-size:13px}.coin-verdienst-frei small{color:var(--muted);font-size:11px;line-height:1.25}
 .coin-section-title{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
 .coin-section-title h2,.coin-history-title{margin:0;font-size:19px;text-transform:uppercase}
-.coin-section-title button{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:var(--surface);font:800 12px/1 var(--ui)}
+.coin-section-title button{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:color-mix(in srgb,var(--ordner) 15%,var(--surface));font:800 12px/1 var(--ui)}
 .coin-section-title button .material-svg,.coin-section-title button svg{width:16px;height:16px}
 .coin-reward-list{display:grid;gap:12px}
-.coin-reward{display:grid;gap:10px;padding:14px;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface)}
+.coin-reward{display:grid;gap:10px;padding:14px;border:1.5px solid var(--ink);border-top:7px solid var(--ordner);border-radius:15px;background:var(--surface)}
 .coin-reward-kopf{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px}
 .coin-reward-kopf .coin-reward-symbol{width:38px;height:38px;transform:translateX(-2px)}
 .coin-reward-kopf>span{display:grid}.coin-reward-kopf b{font-size:15px}.coin-reward-kopf small{color:var(--muted);font-size:12px}.coin-reward-kopf>strong{font-size:12px}
@@ -3546,9 +3549,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   display:flex;flex-direction:column;
   width:100%;height:100%;max-height:100%;min-height:0;padding-top:8px;padding-bottom:0;overflow:hidden;isolation:isolate
 }
-.such-fixkopf .tuck-suchzeile{position:relative;z-index:20;min-height:44px;padding-bottom:8px}
+.such-fixkopf .tuck-suchzeile{position:relative;z-index:20;min-height:52px;padding-bottom:8px}
 .such-fixkopf .tuck-suchfeld,
-.such-fixkopf .seiten-x{height:44px;min-height:44px}
+.such-fixkopf .seiten-x{height:52px;min-height:52px}
 .such-scrollinhalt{
   position:relative;z-index:0;flex:1 1 0;width:100%;height:0;min-height:0;align-self:stretch;overflow-x:hidden;overflow-y:scroll;padding-top:10px;
   padding-bottom:calc(42px + env(safe-area-inset-bottom));
@@ -4336,31 +4339,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Platz fuer seinen Picker-Indikator. Der native Picker bleibt als unsichtbare
    Klickflaeche erhalten; der sichtbare Wert sitzt dadurch wirklich in der
    geometrischen Feldmitte. */
-:is(#skinfold-date,#weight-date,[data-routine-time]){
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time]){
   position:relative;height:46px;min-height:46px;padding-block:0!important;
   text-align:center!important;text-align-last:center!important;
   font-variant-numeric:tabular-nums;
 }
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-date-and-time-value{
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-date-and-time-value{
   display:flex;align-items:center;justify-content:center;width:100%;height:44px;
   min-height:44px;margin:0;padding:0;text-align:center;
 }
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit{
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit{
   display:flex;align-items:center;justify-content:center;width:100%;height:44px;
   margin:0;padding:0;text-align:center;
 }
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-fields-wrapper{
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-fields-wrapper{
   display:flex;align-items:center;justify-content:center;margin:0 auto;padding:0;
 }
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-text,
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-day-field,
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-month-field,
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-year-field,
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-hour-field,
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-datetime-edit-minute-field{
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-text,
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-day-field,
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-month-field,
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-year-field,
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-hour-field,
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-datetime-edit-minute-field{
   margin:0;padding-block:0;
 }
-:is(#skinfold-date,#weight-date,[data-routine-time])::-webkit-calendar-picker-indicator{
+:is(#skinfold-date,#skinfold-time,#weight-date,[data-routine-time])::-webkit-calendar-picker-indicator{
   position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer;
 }
 

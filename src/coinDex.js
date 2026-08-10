@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { materialIconMarkup } from './categoryIcons.js';
+import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
 import muscleCoinUrl from './assets/muscle-coin.png';
 import muscleCoinBackUrl from './assets/muscle-coin-back.png';
@@ -141,9 +141,10 @@ function historyText(item) {
 }
 
 export async function mountCoinDex(container, { userId, signal, mountChrome }) {
+  const color = categoryColor('coins');
   container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="seitenkopf"><h1>COIN-DEX</h1></div><div class="coin-dex-inhalt"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-  mountChrome(container, 'coins', 'COIN-DEX', { color: '#05BDE8', meta: 'Belohnungen', onPlus: () => rewardEditor({ userId, onSaved: refresh }) });
+  mountChrome(container, 'coins', 'COIN-DEX', { color, meta: 'Belohnungen', hideAppearanceIcon: true, onPlus: () => rewardEditor({ userId, onSaved: refresh }) });
   let ledgerQuery = supabase.from('muscle_coin_ledger').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30);
   let rewardsQuery = supabase.from('muscle_rewards').select('*').eq('user_id', userId).eq('active', true).order('cost');
   if (signal) { ledgerQuery = ledgerQuery.abortSignal(signal); rewardsQuery = rewardsQuery.abortSignal(signal); }

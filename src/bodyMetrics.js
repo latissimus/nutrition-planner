@@ -87,10 +87,6 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
           <div data-skinfold-form></div>
         </details>
         <details class="mess-neu">
-          <summary>Worauf achten?</summary>
-          <p class="mess-hinweis">Vergleichbar wird die Messung bei gleicher Person, gleicher Tageszeit und gleichem Zustand.</p>
-        </details>
-        <details class="mess-neu">
           <summary>Erinnerung</summary>
           <div data-skinfold-settings></div>
         </details>

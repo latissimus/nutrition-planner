@@ -697,7 +697,6 @@ export async function mountShoppingList(container, { session, signal }) {
         </div>
       </div>
       <div data-einkauf-liste><div class="daten-laden" role="status">Einkaufsliste wird geladen …</div></div>
-      <div data-einkauf-rezepte></div>
     </div>`;
 
   befuelleAbteilungen(container, []);
@@ -783,38 +782,6 @@ export async function mountShoppingList(container, { session, signal }) {
     if (slot) slot.innerHTML = `<div class="msg err">Einkaufsliste konnte nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
     return;
   }
-
-  // Rezepte parallel zur Liste nachladen – die Karte darf spaeter auftauchen,
-  // sie ist optional und blockiert den Rest nicht. Fehler nur stumm loggen:
-  // wenn das Food-Log nichts hergibt, bleibt die Karte einfach weg.
-  let rezepte = [];
-  const rezeptSlot = container.querySelector('[data-einkauf-rezepte]');
-  loadFoodLogRecipes(userId, signal).then((geladen) => {
-    if (signal?.aborted) return;
-    rezepte = geladen;
-    if (rezeptSlot) rezeptSlot.innerHTML = recipeListMarkup(rezepte);
-  }).catch(() => { /* Rezepte optional */ });
-
-  rezeptSlot?.addEventListener('click', (event) => {
-    const knopf = event.target.closest('[data-recipe-id]');
-    if (!knopf) return;
-    const rezept = rezepte.find((eintrag) => eintrag.id === knopf.dataset.recipeId);
-    if (!rezept) return;
-    const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((eintrag) => eintrag.section)])];
-    recipePickSheet(rezept, sections, {
-      onImport: async (section, namen) => {
-        const neu = await addItemsBulk(userId, section, namen);
-        if (!neu.length) {
-          toast('Diese Zutaten stehen schon auf der Liste.');
-          return;
-        }
-        items.push(...neu);
-        redraw();
-        befuelleAbteilungen(container, items);
-        toast(`${neu.length} ${neu.length === 1 ? 'Zutat' : 'Zutaten'} übernommen.`);
-      },
-    });
-  });
 
   const liste = container.querySelector('[data-einkauf-liste]');
   liste.addEventListener('change', async (event) => {
