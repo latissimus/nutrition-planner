@@ -195,7 +195,7 @@ function chooseRoutineTemplate(userId, onSaved) {
       <button type="button" data-routine-template="meditation"><span class="routine-template-icon">🧘</span><span><b>Meditation</b><small>Timer, Atemhilfe und Sounds</small></span></button>
       <button type="button" data-routine-template="mobility"><span class="routine-template-icon">🤸</span><span><b>Mobility</b><small>Grundlage – Übungen folgen separat</small></span></button>
       <button type="button" data-routine-template="walk"><span class="routine-template-icon">🚶</span><span><b>Spaziergang</b><small>15, 30, 45 oder 60 Minuten</small></span></button>
-      <button type="button" data-routine-template="custom">${materialIconMarkup('add')}<span><b>Leere Routine</b><small>Alles selbst festlegen</small></span></button>
+      <button type="button" data-routine-template="custom">${materialIconMarkup('add')}<span><b>Neue Routine</b><small>Alles selbst festlegen</small></span></button>
     </div>
   </section>`;
   const close = () => backdrop.remove();

@@ -2,6 +2,7 @@ import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
 import muscleCoinUrl from './assets/muscle-coin.png';
+import muscleCoinBackUrl from './assets/muscle-coin-back.png';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -9,6 +10,8 @@ const escapeHtml = (value = '') => String(value)
 
 export const muscleCoinMarkup = (className = '') => `
   <span class="muscle-coin ${className}" aria-hidden="true"><img src="${muscleCoinUrl}" alt=""></span>`;
+export const muscleCoinBackMarkup = (className = '') => `
+  <span class="muscle-coin muscle-coin-back ${className}" aria-hidden="true"><img src="${muscleCoinBackUrl}" alt=""></span>`;
 
 export function routineCoinValue(templateType, durationMinutes, customValue = 5) {
   const duration = Number(durationMinutes || 0);
@@ -58,14 +61,17 @@ export function coinHeaderMarkup(summary) {
 }
 
 function coinEarningOverview() {
-  const group = (title, icon, values) => `<div class="coin-verdienst-gruppe"><span class="coin-verdienst-titel"><i>${icon}</i><b>${title}</b></span><div>${values.map(([label, coins]) => `<span><small>${label}</small><strong>${coins}</strong></span>`).join('')}</div></div>`;
-  return `<section class="coin-verdienst">
-    <header><h2>So verdienst du Coins</h2><small>Je Routine und geplantem Tag einmal</small></header>
-    ${group('Meditation', '🧘', [['2 min', 2], ['5 min', 4], ['10 min', 7], ['15 min', 10], ['20 min', 12]])}
-    ${group('Mobility', '🤸', [['5–10 min', 6], ['15–20 min', 10]])}
-    ${group('Spaziergang', '🚶', [['15 min', 8], ['30 min', 12], ['45 min', 16], ['60 min', 20]])}
-    <div class="coin-verdienst-frei"><span>✨</span><p><b>Freie Routine</b><small>Beim Anlegen selbst zwischen 0 und 50 Coins festlegen. Standard: 5 Coins.</small></p></div>
-  </section>`;
+  const group = (title, icon, values) => `<div class="coin-verdienst-gruppe"><span class="coin-verdienst-titel"><i>${icon}</i><b>${title}</b></span><div>${values.map(([label, coins]) => `<span><small>${label}</small><strong>${coins}${muscleCoinBackMarkup('coin-wert-symbol')}</strong></span>`).join('')}</div></div>`;
+  return `<details class="coin-verdienst">
+    <summary><span><b>So verdienst du Coins</b><small>Vergütung anzeigen</small></span>${materialIconMarkup('chevron_right')}</summary>
+    <div class="coin-verdienst-inhalt">
+      <small class="coin-verdienst-hinweis">Je Routine und geplantem Tag einmal</small>
+      ${group('Meditation', '🧘', [['2 min', 2], ['5 min', 4], ['10 min', 7], ['15 min', 10], ['20 min', 12]])}
+      ${group('Mobility', '🤸', [['5–10 min', 6], ['15–20 min', 10]])}
+      ${group('Spaziergang', '🚶', [['15 min', 8], ['30 min', 12], ['45 min', 16], ['60 min', 20]])}
+      <div class="coin-verdienst-frei"><span>✨</span><p><b>Freie Routine</b><small>Beim Anlegen selbst zwischen 0 und 50 Coins festlegen. Standard: 5 Coins.</small></p></div>
+    </div>
+  </details>`;
 }
 
 function closeOverlay(backdrop) {
@@ -118,7 +124,7 @@ function rewardEditor({ userId, existing = null, onSaved }) {
 function rewardMarkup(item, balance) {
   const percent = Math.min(100, Math.round((balance / item.cost) * 100));
   return `<article class="coin-reward" data-reward-id="${item.id}">
-    <div class="coin-reward-kopf">${muscleCoinMarkup()}<span><b>${escapeHtml(item.name)}</b><small>${item.cost} Coins</small></span><strong>${percent}%</strong></div>
+    <div class="coin-reward-kopf">${muscleCoinBackMarkup('coin-reward-symbol')}<span><b>${escapeHtml(item.name)}</b><small>${item.cost} Coins</small></span><strong>${percent}%</strong></div>
     <div class="coin-progress"><i style="width:${percent}%"></i></div>
     ${item.note ? `<p>${escapeHtml(item.note)}</p>` : ''}
     <div class="coin-reward-actions">

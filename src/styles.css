@@ -2684,7 +2684,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
   display:flex;align-items:center;justify-content:center;gap:3px;height:44px;padding:3px 0;
   border:0;background:transparent;color:var(--text);text-decoration:none
 }
-.coin-kopfstand .coin-kopf-symbol{width:35px;height:35px;flex-basis:35px}
+.coin-kopfstand .coin-kopf-symbol{width:41px;height:41px;flex-basis:41px}
 .coin-kopfstand strong{min-width:13px;font-size:12px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
 .coin-kopfstand:active{transform:translateY(1px)}
 
@@ -3368,13 +3368,16 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-next>span{display:grid;gap:2px}.coin-next small{color:var(--muted);font-size:12px;font-weight:600}.coin-next>strong{align-self:center;font-size:12px}
 .coin-progress{grid-column:1/-1;height:7px;overflow:hidden;border-radius:10px;background:color-mix(in srgb,var(--ink) 12%,transparent)}
 .coin-progress i{display:block;height:100%;border-radius:inherit;background:#05bde8}
-.coin-verdienst{display:grid;gap:13px;padding:15px;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface)}
-.coin-verdienst>header{display:grid;gap:2px}.coin-verdienst>header h2{margin:0;font-size:18px;text-transform:uppercase}.coin-verdienst>header small{color:var(--muted);font-size:11px;font-weight:600}
+.coin-verdienst{display:block;padding:0;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface);overflow:hidden}
+.coin-verdienst>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer;list-style:none}.coin-verdienst>summary::-webkit-details-marker{display:none}
+.coin-verdienst>summary>span{display:grid;gap:2px}.coin-verdienst>summary b{font-size:16px;text-transform:uppercase}.coin-verdienst>summary small{color:var(--muted);font-size:11px;font-weight:600}
+.coin-verdienst>summary .material-svg,.coin-verdienst>summary svg{width:19px;height:19px;fill:var(--ink);transition:transform .18s ease}.coin-verdienst[open]>summary .material-svg{transform:rotate(90deg)}
+.coin-verdienst-inhalt{display:grid;gap:13px;padding:0 15px 15px}.coin-verdienst-hinweis{color:var(--muted);font-size:11px;font-weight:600}
 .coin-verdienst-gruppe{display:grid;gap:7px;padding-top:11px;border-top:1px solid color-mix(in srgb,var(--ink) 20%,transparent)}
 .coin-verdienst-titel{display:flex;align-items:center;gap:8px}.coin-verdienst-titel i{font-style:normal;font-size:21px}.coin-verdienst-titel b{font-size:14px}
 .coin-verdienst-gruppe>div{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.coin-verdienst-gruppe>div::-webkit-scrollbar{display:none}
 .coin-verdienst-gruppe>div>span{display:grid;min-width:54px;place-items:center;padding:7px 6px;border-radius:9px;background:var(--surface2)}
-.coin-verdienst-gruppe small{font-size:10px;white-space:nowrap}.coin-verdienst-gruppe strong{font-size:15px}.coin-verdienst-gruppe strong::after{content:" C";font-size:9px;color:var(--muted)}
+.coin-verdienst-gruppe small{font-size:10px;white-space:nowrap}.coin-verdienst-gruppe strong{display:flex;align-items:center;gap:2px;font-size:15px}.coin-verdienst-gruppe .coin-wert-symbol{width:17px;height:17px;flex-basis:17px}
 .coin-verdienst-frei{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;background:color-mix(in srgb,#9772fb 14%,var(--surface))}.coin-verdienst-frei>span{font-size:22px}.coin-verdienst-frei p{display:grid;margin:0}.coin-verdienst-frei b{font-size:13px}.coin-verdienst-frei small{color:var(--muted);font-size:11px;line-height:1.25}
 .coin-section-title{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
 .coin-section-title h2,.coin-history-title{margin:0;font-size:19px;text-transform:uppercase}
@@ -3382,8 +3385,8 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-section-title button .material-svg,.coin-section-title button svg{width:16px;height:16px}
 .coin-reward-list{display:grid;gap:12px}
 .coin-reward{display:grid;gap:10px;padding:14px;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface)}
-.coin-reward-kopf{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px}
-.coin-reward-kopf .muscle-coin{width:30px;height:30px}
+.coin-reward-kopf{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px}
+.coin-reward-kopf .coin-reward-symbol{width:38px;height:38px;transform:translateX(-2px)}
 .coin-reward-kopf>span{display:grid}.coin-reward-kopf b{font-size:15px}.coin-reward-kopf small{color:var(--muted);font-size:12px}.coin-reward-kopf>strong{font-size:12px}
 .coin-reward p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
 .coin-reward-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -4035,7 +4038,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   /* Externe SVG-Tapeten haben oft eine sehr grosse Zeichenflaeche. Eine feste
      Kachelbreite macht sie auf Smartphones sichtbar und konsistent mit den
      eingebauten Mustern. Der stärkere Schleier hält die Tapete dezent. */
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 78%,transparent),color-mix(in srgb,var(--bg) 78%,transparent)),var(--dex-tapete)!important;
+  background-image:linear-gradient(color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 88%,transparent)),var(--dex-tapete)!important;
   background-size:auto,360px auto!important;background-repeat:repeat!important;
 }
 
