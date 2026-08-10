@@ -4,6 +4,9 @@ import { getPreference, setPreference } from './userPreferences.js';
 const modules = import.meta.glob('../MUSCLEDEX-ICONS/*.svg', {
   query: '?raw', import: 'default', eager: true,
 });
+const wallpaperModules = import.meta.glob('../MUSCLEDEX-TAPETEN/*.svg', {
+  query: '?url', import: 'default', eager: true,
+});
 // Reine Hintergrundmuster und zwei alte, bereits farbig gestaltete Fremdicons
 // gehoeren nicht in den Wähler. Die schwarzen UI-Varianten (z. B. more_horiz)
 // bleiben weiterhin verfügbar.
@@ -79,12 +82,23 @@ export function categoryColor(route) {
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
 }
 
+const wallpaperPatterns = Object.entries(wallpaperModules).map(([path, url]) => {
+  const file = path.split('/').at(-1).replace(/\.svg$/i, '');
+  const id = `wallpaper-${file.toLocaleLowerCase('de').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')}`;
+  return [id, file.replaceAll('_', ' '), url];
+}).sort((a, b) => a[1].localeCompare(b[1], 'de'));
+
 export const pagePatterns = [
   ['drops', 'Tropfen'],
   ['triangles', 'Dreiecke'],
   ['bones', 'Knochen'],
   ['none', 'Ohne Muster'],
+  ...wallpaperPatterns,
 ];
+
+const wallpaperStyle = (url) => url
+  ? ` class="tapete-datei" style="--tapeten-vorschau:url(&quot;${escapeHtml(url)}&quot;)"`
+  : '';
 
 export function setPageLookPattern(scope, pattern) {
   const valid = pagePatterns.some(([id]) => id === pattern) ? pattern : 'drops';
@@ -141,7 +155,7 @@ function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
       <h3>Seitenfarbe</h3>
       <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-page-color="${color}" class="${color === selected.color.toUpperCase() ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       <h3>Muster</h3>
-      <div class="seitenmuster-auswahl">${pagePatterns.map(([id, label]) => `<button type="button" data-page-pattern="${id}" class="${id === selected.pattern ? 'aktiv' : ''}"><i data-muster="${id}"></i><span>${label}</span></button>`).join('')}</div>
+      <div class="seitenmuster-auswahl">${pagePatterns.map(([id, label, url]) => `<button type="button" data-page-pattern="${id}" class="${id === selected.pattern ? 'aktiv' : ''}"><i data-muster="${id}"${wallpaperStyle(url)}></i><span>${label}</span></button>`).join('')}</div>
       <button class="btn btn-primary btn-block sammlung-editor-speichern" type="button" data-page-look-save>Seitenlook speichern</button>
     </div>`);
   const panel = backdrop.querySelector('.kategorie-sheet');
@@ -257,7 +271,7 @@ function appearancePicker(route, onChange) {
       <h3>Icon</h3>
       <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>
       <h3>Tapete</h3>
-      <div class="sammlung-editor-tapeten">${pagePatterns.map(([id, label]) => `<button type="button" data-pattern="${id}" class="${id === selectedPattern ? 'aktiv' : ''}" aria-label="Tapete ${label}"><i data-muster="${id}"></i></button>`).join('')}</div>
+      <div class="sammlung-editor-tapeten">${pagePatterns.map(([id, label, url]) => `<button type="button" data-pattern="${id}" class="${id === selectedPattern ? 'aktiv' : ''}" aria-label="Tapete ${label}"><i data-muster="${id}"${wallpaperStyle(url)}></i></button>`).join('')}</div>
       <label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
         <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
       </label>
@@ -405,6 +419,9 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const lookScope = options.pageLookScope || options.inheritedPageLookScope || route;
   const look = pageLook(lookScope, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
   container.dataset.dexMuster = look.pattern;
+  const wallpaper = pagePatterns.find(([id]) => id === look.pattern)?.[2];
+  container.classList.toggle('dex-tapete-datei', Boolean(wallpaper));
+  if (wallpaper) container.style.setProperty('--dex-tapete', `url("${String(wallpaper).replaceAll('"', '\\"')}")`);
   wrap.querySelector(':scope > .seitenkopf')?.remove();
   let content = wrap.querySelector(':scope > .kategorie-scrollinhalt');
   if (!content) {

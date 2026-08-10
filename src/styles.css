@@ -3666,6 +3666,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-tapeten button i[data-muster="triangles"]{background-image:var(--muster-dreieck)}
 .sammlung-editor-tapeten button i[data-muster="drops"]{background-image:var(--muster-tropfen)}
 .sammlung-editor-tapeten button i[data-muster="bones"]{background-image:url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")}
+.sammlung-editor-tapeten button i.tapete-datei,
+.seitenmuster-auswahl i.tapete-datei{background-image:var(--tapeten-vorschau);background-size:cover;background-position:center}
 .sammlung-editor-farben button.aktiv,.sammlung-editor-icons button.aktiv{box-shadow:3px 3px 0 #000}
 .sammlung-editor-farben button.aktiv::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;
   color:#000;font-size:22px;font-weight:900}
@@ -3899,6 +3901,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-fixkopf[data-dex-muster="bones"] .kategorie-scrollinhalt{
   background-image:linear-gradient(color-mix(in srgb,var(--bg) 50%,transparent),color-mix(in srgb,var(--bg) 50%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
   background-size:auto,112px!important;
+}
+.dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
+  /* Importierte SVGs koennen volle schwarze Formen enthalten. Der 94%-ige
+     Grundschleier bringt sie auf dieselbe dezente Tapetenstaerke wie die
+     eingebauten, bereits transparent gezeichneten Muster. */
+  background-image:linear-gradient(color-mix(in srgb,var(--bg) 94%,transparent),color-mix(in srgb,var(--bg) 94%,transparent)),var(--dex-tapete)!important;
+  background-size:auto,auto!important;background-repeat:repeat!important;
 }
 
 /* ============================================================
