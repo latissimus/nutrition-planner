@@ -2941,8 +2941,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 :root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
 .routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;border-bottom:1px solid var(--app-divider)}
 .routine-row.hat-timer{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px}
-.routine-row.hat-ablauf{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px;cursor:pointer}
-.routine-row.hat-timer.hat-ablauf{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px 32px}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check:active{transform:none!important;box-shadow:none!important}
@@ -2989,6 +2987,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-template-list .material-svg,.routine-template-list svg{width:27px;height:27px;fill:#000}
 .meditation-editor-settings{display:grid;gap:15px;padding:15px;border:1px solid var(--app-divider);border-radius:13px;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}
 .mobility-editor-settings{display:grid;gap:11px;padding:14px;border:1px solid var(--app-divider);border-radius:13px;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}
+.custom-timer-settings{display:grid;gap:12px;padding:14px;border:1px solid var(--app-divider);border-radius:13px;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}
+.custom-timer-settings>.mess-zeile{min-height:34px;padding:0;border:0;background:transparent}
+.custom-timer-settings>.mess-zeile>span{font-size:14px;font-weight:800}
 .mobility-editor-settings>header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.mobility-editor-settings>header>span{display:grid;gap:3px}.mobility-editor-settings>header b{font-size:14px}.mobility-editor-settings>header small{color:var(--muted);font-size:11px;line-height:1.25}
 .mobility-editor-settings>header button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:6px 10px;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);font:800 11px/1 var(--ui);white-space:nowrap}.mobility-editor-settings>header button>b{font-size:18px;line-height:1}
 .mobility-exercise-list{display:grid;gap:8px}.mobility-exercise-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.7fr) 34px;gap:7px;align-items:center}.mobility-exercise-row .input{min-width:0;height:44px;min-height:44px;padding:8px 10px;font-size:12px}.mobility-exercise-row>button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent}.mobility-exercise-row>button .material-svg,.mobility-exercise-row>button svg{width:18px;height:18px;fill:#000}
@@ -2996,7 +2997,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .mobility-overview li{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--app-divider)}.mobility-overview li>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#000);font-size:12px;font-weight:800}.mobility-overview li p{display:grid;gap:3px;margin:0}.mobility-overview li b{font-size:15px}.mobility-overview li small{color:var(--muted);font-size:12px;font-weight:600}.mobility-overview-note{display:grid;gap:5px;margin-top:15px;padding:12px;border-radius:10px;background:var(--surface2)}.mobility-overview-note b{font-size:11px;text-transform:uppercase}.mobility-overview-note p{margin:0;font-size:13px;line-height:1.4}.mobility-timer-start{margin-top:15px}
 .routine-duration{min-width:0;margin:0;padding:0;border:0}
 .routine-duration legend{margin-bottom:8px;font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
-.routine-duration>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.routine-duration>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(54px,1fr));gap:5px}
 .routine-duration button{min-width:0;height:39px;padding:0 3px;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);font:800 11px/1 var(--ui)}
 .routine-duration button.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
 .meditation-volume{display:grid;gap:7px}
@@ -3020,6 +3021,14 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-timer-symbol .meditation-face{font-size:86px;filter:none}
 .routine-timer-symbol.laeuft .meditation-face{animation:routine-timer-puls 2.4s ease-in-out infinite}
 @keyframes routine-timer-puls{0%,100%{transform:scale(.96)}50%{transform:scale(1.045)}}
+.routine-timer-exercises{
+  display:grid;max-height:min(34dvh,270px);margin:2px 0 16px;padding:0;
+  overflow:auto;list-style:none;border-top:1px solid var(--app-divider);text-align:left
+}
+.routine-timer-exercises li{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--app-divider)}
+.routine-timer-exercises li>span{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#000);font-size:11px;font-weight:800}
+.routine-timer-exercises li p{display:grid;gap:2px;margin:0}.routine-timer-exercises li b{font-size:14px}.routine-timer-exercises li small{color:var(--muted);font-size:11px;font-weight:600}
+.routine-timer-exercises.fertig{opacity:.58}
 .meditation-stern{position:absolute;z-index:3;color:var(--ordner);font-style:normal;line-height:1;text-shadow:1px 1px 0 color-mix(in srgb,var(--ink) 45%,transparent)}
 .stern-eins{left:31%;top:11%;font-size:25px;transform:rotate(-14deg)}
 .stern-zwei{left:55%;top:2%;font-size:34px;transform:rotate(12deg)}
