@@ -499,7 +499,7 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
   try { eigeneStats = await eigeneDexStatistik(session.user.id, eigene, signal); }
   catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
   container.innerHTML = `
-    <div class="wrap pad-bottom tuck-home">
+    <div class="wrap pad-bottom tuck-home home-fixkopf">
       <div class="tuck-kopfzeile">
         <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
         <div class="tuck-kopf-aktionen">
@@ -509,6 +509,7 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
           <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
         </div>
       </div>
+      <div class="home-scrollinhalt">
       <div class="tuck-ablage">
         <label class="tuck-ablage-feld" for="schnell-suche">
           ${materialIconMarkup('search')}
@@ -525,6 +526,7 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
       <section class="tuck-grid" aria-label="Meine Dex-Einträge">
         ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
       </section>
+      </div>
     </div>`;
 
   container.querySelector('.neu-sammlung').onclick = () => openCollectionEditor({

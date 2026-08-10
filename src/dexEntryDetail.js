@@ -176,7 +176,7 @@ function detailMarkup(entry) {
       </div>` : '';
   const ingredients = entry.root_key === 'food-log' && entry.food_kind === 'recipe' && entry.ingredients?.length
     ? `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul>${entry.ingredients.map((ingredient) => `<li>${escapeHtml(ingredient)}</li>`).join('')}</ul></section>` : '';
-  return `<div class="wrap pad-bottom dex-detail-seite">
+  return `<div class="wrap pad-bottom dex-detail-seite dex-detail-fixkopf">
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
       <span></span>
@@ -185,6 +185,7 @@ function detailMarkup(entry) {
       <button class="dex-detail-knopf" type="button" data-entry-edit aria-label="Eintrag bearbeiten">${materialIconMarkup('build')}</button>
       <button class="dex-detail-knopf" type="button" data-entry-share aria-label="Eintrag teilen">${materialIconMarkup('upload_file')}</button>
     </nav>
+    <div class="dex-detail-scrollinhalt">
     <article class="dex-detail-karte" style="--eintrag-farbe:${escapeHtml(entry.color)}">
       <span class="dex-detail-streifen" aria-hidden="true"></span>
       ${media}
@@ -200,6 +201,7 @@ function detailMarkup(entry) {
         <footer>MUSCLE-DEX</footer>
       </div>
     </article>
+    </div>
   </div>`;
 }
 

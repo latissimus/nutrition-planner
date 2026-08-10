@@ -3196,8 +3196,16 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   width:100%;height:100%;min-height:0;padding-bottom:0;
 }
 .dex-fixkopf .kategorie-kopf{
-  position:relative;z-index:10;min-height:46px;margin:18px 0 22px;
+  position:relative;z-index:10;min-height:42px;margin:12px 0 16px;
 }
+
+/* Home und Eintragsdetail verwenden denselben festen Kopf wie ein Dex:
+   nur der Bereich unter den Bedienelementen scrollt. */
+.home-fixkopf,.dex-detail-fixkopf{display:grid!important;grid-template-rows:auto minmax(0,1fr);height:100%;min-height:0;overflow:hidden}
+.home-fixkopf>.tuck-kopfzeile,.dex-detail-fixkopf>.dex-detail-steuerung{min-height:0}
+.home-scrollinhalt,.dex-detail-scrollinhalt{min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+.home-fixkopf .tuck-kopfzeile{margin-top:0;margin-bottom:18px;padding-top:0}
+.dex-detail-fixkopf .dex-detail-steuerung{margin-top:0;margin-bottom:14px}
 .kategorie-scrollinhalt{
   min-height:0;overflow-x:hidden;overflow-y:auto;padding-bottom:calc(42px + env(safe-area-inset-bottom));
   overscroll-behavior-x:none;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
