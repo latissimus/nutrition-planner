@@ -61,7 +61,7 @@ function reminderIconValue(reminder) {
 
 function notificationSymbol(reminder) {
   const value = reminderIconValue(reminder);
-  if (value.startsWith('emoji:')) return value.slice(6);
+  if (value.startsWith('emoji:')) return value.replace(/^(emoji:)+/, '');
   return ({ fastfood: '🍔', pill: '💊', water_drop: '💧' })[value] || '◆';
 }
 

@@ -104,7 +104,7 @@ function isDue(reminder: Reminder, timeZone: string, now: Date) {
 
 function notificationSymbol(reminder: Reminder) {
   const icon = String(reminder.metadata?.icon || '');
-  if (icon.startsWith('emoji:')) return icon.slice(6);
+  if (icon.startsWith('emoji:')) return icon.replace(/^(emoji:)+/, '');
   if (icon === 'fastfood' || reminder.type === 'meal') return '🍔';
   if (icon === 'pill' || reminder.type === 'supplement') return '💊';
   if (icon === 'water_drop' || reminder.type === 'drink') return '💧';
