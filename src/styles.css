@@ -2808,12 +2808,15 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-foto-post-vorschau{background:#111!important}
 .dex-foto-post-vorschau img{object-fit:contain!important;object-position:center center!important;transform:none!important}
 .dex-artikel-vorschau{
-  display:flex!important;align-items:center;justify-content:center;
+  position:relative!important;display:block!important;
+  width:100%!important;min-width:100%!important;align-self:stretch!important;
   background:var(--surface)!important;
 }
 .dex-artikel-vorschau img{
+  position:absolute!important;inset:0!important;
   display:block!important;width:100%!important;height:100%!important;
   min-width:100%;min-height:100%;
+  max-width:none!important;max-height:none!important;
   object-fit:cover!important;object-position:50% 50%!important;
   margin:0!important;transform:none!important;
 }
