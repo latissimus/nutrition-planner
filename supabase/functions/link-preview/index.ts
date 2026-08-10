@@ -32,7 +32,7 @@ function embeddedJsonString(html: string, key: string) {
   try { return JSON.parse(`"${match[1]}"`); } catch { return ''; }
 }
 
-function structuredMetadata(html: string) {
+function structuredMetadata(html: string, fallbackProvider = '') {
   const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   for (const script of scripts) {
     try {
@@ -42,13 +42,16 @@ function structuredMetadata(html: string) {
         const item = queue.shift();
         if (!item || typeof item !== 'object') continue;
         if (Array.isArray(item)) { queue.push(...item); continue; }
-        const thumbnail = Array.isArray(item.thumbnailUrl) ? item.thumbnailUrl[0] : item.thumbnailUrl || item.image?.url || item.image;
+        const imageValue = item.thumbnailUrl || item.image;
+        const thumbnail = Array.isArray(imageValue)
+          ? imageValue.map((value) => typeof value === 'string' ? value : value?.url).find(Boolean) || ''
+          : typeof imageValue === 'object' ? imageValue?.url || '' : imageValue || '';
         if (item.name || item.caption || item.description || thumbnail) {
           return {
             title: String(item.name || item.headline || '').trim(),
             description: String(item.caption || item.description || '').trim(),
             thumbnail_url: typeof thumbnail === 'string' ? thumbnail : '',
-            provider_name: 'Instagram',
+            provider_name: fallbackProvider,
           };
         }
         queue.push(...Object.values(item));
@@ -66,14 +69,19 @@ async function oembed(endpoint: string) {
 
 async function pageMetadata(url: URL, existingResponse?: Response) {
   const response = existingResponse || await fetch(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+    },
     redirect: 'follow', signal: AbortSignal.timeout(6500),
   });
   const html = (await response.text()).slice(0, 1_000_000);
+  const structured = structuredMetadata(html, url.hostname.replace(/^www\./, '')) as Record<string, unknown>;
   return {
-    title: content(html, 'og:title') || content(html, 'twitter:title'),
-    description: content(html, 'og:description') || content(html, 'description'),
-    thumbnail_url: content(html, 'og:image') || content(html, 'twitter:image'),
+    title: content(html, 'og:title') || content(html, 'twitter:title') || String(structured.title || ''),
+    description: content(html, 'og:description') || content(html, 'twitter:description') || content(html, 'description') || String(structured.description || ''),
+    thumbnail_url: content(html, 'og:image') || content(html, 'og:image:url') || content(html, 'twitter:image') || String(structured.thumbnail_url || ''),
     provider_name: url.hostname.replace(/^www\./, ''),
   };
 }
