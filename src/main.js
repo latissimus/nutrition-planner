@@ -632,10 +632,9 @@ async function mountCustomCollection(container, item, signal) {
 
 async function mountSearch(container, signal) {
   setSeite('search');
-  const sichtbar = sichtbareSammlungen();
-  const aktiv = sichtbar.filter(([, , , , , status]) => status === 'Aktiv').length;
+  container.classList.add('such-fixkopf-view');
   container.innerHTML = `
-    <div class="wrap pad-bottom tuck-suche-seite">
+    <div class="wrap pad-bottom tuck-suche-seite such-fixkopf">
       <div class="tuck-suchzeile">
         <label class="tuck-suchfeld" for="global-search">
           ${iconMarkup('search')}
@@ -643,21 +642,15 @@ async function mountSearch(container, signal) {
         </label>
         <a class="seiten-x" href="#home" aria-label="Suche schließen">${materialIconMarkup('close')}</a>
       </div>
+      <div class="such-scrollinhalt">
       <section class="such-tags" data-search-tags hidden></section>
-      <section class="tuck-bibliothek">
-        <span>Deine Bibliothek</span>
-        <div class="tuck-bibliothek-werte">
-          <div><b>${sichtbar.length}</b><small>Dex-Einträge</small></div>
-          <div><b data-summe>…</b><small>Einträge</small></div>
-          <div><b>${sichtbar.length - aktiv}</b><small>Geplant</small></div>
-        </div>
-      </section>
       <h2 class="tuck-abschnittstitel">Dex-Treffer</h2>
       <section class="dex-inhaltsgrid such-eintraege" data-search-results><div class="daten-laden">DEX-Einträge werden geladen …</div></section>
       <div class="tuck-leer" data-search-empty hidden>
         ${iconMarkup('search')}
         <b>Nichts gefunden</b>
         <span>Kein Titel, keine Beschreibung und kein Tag passen zu deiner Suche.</span>
+      </div>
       </div>
     </div>`;
 
@@ -717,18 +710,6 @@ async function mountSearch(container, signal) {
   }
   requestAnimationFrame(() => input.focus({ preventScroll: true }));
 
-  zaehlerLaden(signal).then((zaehler) => {
-    if (signal?.aborted) return;
-    zaehlerStand = zaehler;
-    if (!container.isConnected) return;
-    zaehlerEintragen(container, zaehler);
-    const summe = Object.values(zaehler).filter((n) => typeof n === 'number');
-    const feld = container.querySelector('[data-summe]');
-    // Nur zeigen, wenn alle Zaehler da sind – eine Teilsumme waere schlicht falsch.
-    if (feld) feld.textContent = summe.length === Object.keys(ZAEHLQUELLEN).length
-      ? summe.reduce((a, b) => a + b, 0)
-      : '–';
-  });
 }
 
 function mountComingSoon(container, route) {
