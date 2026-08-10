@@ -561,6 +561,9 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
         <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
         <div class="tuck-kopf-aktionen">
           ${coinHeaderMarkup(coinSummary)}
+          <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
+            ${materialIconMarkup('create_new_folder')}
+          </button>
           <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
         </div>
       </div>
@@ -577,9 +580,6 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
       </div>
       <header class="tuck-titelzeile">
         <h1>Meine Dex-Einträge</h1>
-        <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
-          ${materialIconMarkup('create_new_folder')}
-        </button>
       </header>
       <section class="tuck-grid" aria-label="Meine Dex-Einträge">
         ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
