@@ -2647,6 +2647,14 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .tuck-ablage-knopf .material-svg svg{stroke:#fff;stroke-width:14px;stroke-linejoin:round}
 .tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
 
+/* Auf schmalen Geräten braucht der Suchknopf etwas Luft für Kontur und
+   Versatzschatten. Die Eingabe wird dadurch minimal kürzer, der Button bleibt
+   aber vollständig innerhalb des sichtbaren Seitenrasters. */
+@media (max-width:520px){
+  .tuck-ablage{grid-template-columns:minmax(0,1fr) 58px;margin-right:8px}
+  .tuck-ablage-knopf{width:58px}
+}
+
 /* ---------- Start: Bibliothek ---------- */
 /* Gleicher Abstand nach oben wie beim Oeffnen eines Dex (.kategorie-kopf
    margin-top:18px). */
@@ -2799,8 +2807,16 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-foto-post-vorschau{background:#111!important}
 .dex-foto-post-vorschau img{object-fit:contain!important;object-position:center center!important;transform:none!important}
-.dex-artikel-vorschau img{object-fit:cover!important;object-position:center center!important}
-.dex-artikel-vorschau{background:var(--surface)!important}
+.dex-artikel-vorschau{
+  display:flex!important;align-items:center;justify-content:center;
+  background:var(--surface)!important;
+}
+.dex-artikel-vorschau img{
+  display:block!important;width:100%!important;height:100%!important;
+  min-width:100%;min-height:100%;
+  object-fit:cover!important;object-position:50% 50%!important;
+  margin:0!important;transform:none!important;
+}
 .dex-inhaltskarte.tiktok-foto-post .dex-inhaltskarte-streifen{display:block!important;position:relative;z-index:5}
 .dex-inhaltskarte-vorschau img.ist-geladen{opacity:1}
 .dex-inhaltskarte-vorschau.hat-vorschaubild::after{
