@@ -2658,7 +2658,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
   margin:0 2px 56px;
 }
 .tuck-kopf-aktionen{display:flex;align-items:center;gap:10px}
-.tuck-kopf-aktionen .neu-sammlung{background:var(--surface);color:var(--text)}
+.tuck-titelzeile .neu-sammlung{background:var(--surface);color:var(--text)}
 /* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
 .tuck-titelzeile{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -2681,12 +2681,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .muscle-coin img{display:block;width:100%;height:100%;object-fit:contain}
 .coin-kopfstand{
-  display:flex;align-items:center;justify-content:center;gap:3px;height:44px;min-width:58px;padding:3px 8px 3px 4px;
-  border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:12px;
-  background:color-mix(in srgb,var(--surface) 76%,transparent);color:var(--text);text-decoration:none
+  display:flex;align-items:center;justify-content:center;gap:3px;height:44px;padding:3px 0;
+  border:0;background:transparent;color:var(--text);text-decoration:none
 }
-.coin-kopfstand .coin-kopf-symbol{width:31px;height:31px;flex-basis:31px}
-.coin-kopfstand strong{min-width:15px;font-size:14px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:center}
+.coin-kopfstand .coin-kopf-symbol{width:35px;height:35px;flex-basis:35px}
+.coin-kopfstand strong{min-width:13px;font-size:12px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
 .coin-kopfstand:active{transform:translateY(1px)}
 
 /* Dex-Karten: Die Farbe sitzt als schmaler Streifen innerhalb der Oberkante. */
@@ -3369,6 +3368,14 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-next>span{display:grid;gap:2px}.coin-next small{color:var(--muted);font-size:12px;font-weight:600}.coin-next>strong{align-self:center;font-size:12px}
 .coin-progress{grid-column:1/-1;height:7px;overflow:hidden;border-radius:10px;background:color-mix(in srgb,var(--ink) 12%,transparent)}
 .coin-progress i{display:block;height:100%;border-radius:inherit;background:#05bde8}
+.coin-verdienst{display:grid;gap:13px;padding:15px;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface)}
+.coin-verdienst>header{display:grid;gap:2px}.coin-verdienst>header h2{margin:0;font-size:18px;text-transform:uppercase}.coin-verdienst>header small{color:var(--muted);font-size:11px;font-weight:600}
+.coin-verdienst-gruppe{display:grid;gap:7px;padding-top:11px;border-top:1px solid color-mix(in srgb,var(--ink) 20%,transparent)}
+.coin-verdienst-titel{display:flex;align-items:center;gap:8px}.coin-verdienst-titel i{font-style:normal;font-size:21px}.coin-verdienst-titel b{font-size:14px}
+.coin-verdienst-gruppe>div{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.coin-verdienst-gruppe>div::-webkit-scrollbar{display:none}
+.coin-verdienst-gruppe>div>span{display:grid;min-width:54px;place-items:center;padding:7px 6px;border-radius:9px;background:var(--surface2)}
+.coin-verdienst-gruppe small{font-size:10px;white-space:nowrap}.coin-verdienst-gruppe strong{font-size:15px}.coin-verdienst-gruppe strong::after{content:" C";font-size:9px;color:var(--muted)}
+.coin-verdienst-frei{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;background:color-mix(in srgb,#9772fb 14%,var(--surface))}.coin-verdienst-frei>span{font-size:22px}.coin-verdienst-frei p{display:grid;margin:0}.coin-verdienst-frei b{font-size:13px}.coin-verdienst-frei small{color:var(--muted);font-size:11px;line-height:1.25}
 .coin-section-title{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
 .coin-section-title h2,.coin-history-title{margin:0;font-size:19px;text-transform:uppercase}
 .coin-section-title button{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:var(--surface);font:800 12px/1 var(--ui)}
@@ -3387,6 +3394,8 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-history>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
 .coin-history span{display:grid;font-size:13px;font-weight:700}.coin-history small{color:var(--muted);font-size:11px;font-weight:500}.coin-history b{font-variant-numeric:tabular-nums}.coin-history .plus{color:#08794c}.coin-history .minus{color:#b51f55}
 .coin-editor form{display:grid;gap:14px}.coin-zahlenfeld{text-align:center;font-variant-numeric:tabular-nums}.coin-reward-delete{color:#b51f55}
+.routine-coin-fest{padding:11px 13px;border-radius:10px;background:color-mix(in srgb,#05bde8 16%,var(--surface));font-size:13px;font-weight:800;text-align:center}
+.routine-coin-info{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:600}
 .seiten-x{
   display:grid!important;place-items:center;width:44px;min-width:44px;height:44px;padding:0!important;
   border:var(--karten-bw) solid var(--ink)!important;border-radius:var(--r)!important;

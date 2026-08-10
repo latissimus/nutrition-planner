@@ -6,7 +6,7 @@ import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
 import { maybePromptExternalMeditation, meditationSounds, openMeditationTimer, previewMeditationSound } from './meditationTimer.js';
 import { toast } from './toast.js';
-import { syncRoutineCoins } from './coinDex.js';
+import { routineCoinValue, syncRoutineCoins } from './coinDex.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -37,8 +37,14 @@ async function load(userId, signal) {
 function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
   const selectedTemplate = existing?.template_type || templateType;
   const meditation = selectedTemplate === 'meditation';
-  const defaultName = meditation ? 'Meditation' : selectedTemplate === 'mobility' ? 'Mobility' : '';
-  const defaultIcon = meditation ? 'emoji:🧘' : selectedTemplate === 'mobility' ? 'emoji:🤸' : 'emoji:✓';
+  const timedTemplate = ['meditation', 'mobility', 'walk'].includes(selectedTemplate);
+  const durationOptions = selectedTemplate === 'meditation' ? [2, 5, 10, 15, 20]
+    : selectedTemplate === 'mobility' ? [5, 10, 15, 20]
+      : selectedTemplate === 'walk' ? [15, 30, 45, 60] : [];
+  const defaultDuration = selectedTemplate === 'walk' ? 15 : 5;
+  const selectedDuration = Number(existing?.duration_minutes || defaultDuration);
+  const defaultName = meditation ? 'Meditation' : selectedTemplate === 'mobility' ? 'Mobility' : selectedTemplate === 'walk' ? 'Spaziergang' : '';
+  const defaultIcon = meditation ? 'emoji:🧘' : selectedTemplate === 'mobility' ? 'emoji:🤸' : selectedTemplate === 'walk' ? 'emoji:🚶' : 'emoji:✓';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop routine-editor-backdrop';
   backdrop.style.setProperty('--ordner', categoryColor('habits'));
@@ -54,8 +60,8 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
         </div>
         <label class="dex-entry-field"><span>Name</span><input class="input" data-routine-name maxlength="100" value="${escapeHtml(existing?.name || defaultName)}" placeholder="z. B. 10 Minuten Mobility" required></label>
       </div>
+      ${timedTemplate ? `<fieldset class="routine-duration"><legend>Dauer</legend><div>${durationOptions.map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${selectedDuration === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div></fieldset>` : ''}
       ${meditation ? `<section class="meditation-editor-settings">
-        <fieldset class="routine-duration"><legend>Dauer</legend><div>${[2, 5, 10, 15, 20].map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${Number(existing?.duration_minutes || 5) === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div></fieldset>
         <label class="dex-entry-field"><span>Externer Meditationslink <small>optional</small></span><input class="input" type="text" inputmode="url" data-routine-external-url value="${escapeHtml(existing?.external_url || '')}" placeholder="Headspace, Calm, YouTube …"></label>
         <div class="dex-entry-field"><span>Hintergrundsound</span><div class="meditation-sound-picker"><select class="input" data-routine-ambient>
           ${meditationSounds.map(([value, label]) => `<option value="${value}"${(existing?.ambient_sound || 'off') === value ? ' selected' : ''}>${label}</option>`).join('')}
@@ -68,7 +74,9 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
         <label class="dex-entry-field"><span>Uhrzeit</span><input class="input" type="time" data-routine-time value="${escapeHtml(existing?.time?.slice(0, 5) || '')}"></label>
       </div>
       <fieldset class="routine-days"><legend>Wiederholen</legend><div>${days.map(([value, label]) => `<button type="button" data-routine-day="${value}" class="${selectedDays.has(value) ? 'aktiv' : ''}" aria-pressed="${selectedDays.has(value)}">${label}</button>`).join('')}</div></fieldset>
-      <label class="dex-entry-field"><span>MUSCLE-COINS <small>optional</small></span><input class="input coin-zahlenfeld" data-routine-coins type="number" inputmode="numeric" min="0" max="50" value="${existing?.coin_reward ?? ''}" placeholder="Automatisch"></label>
+      ${selectedTemplate === 'custom'
+        ? `<label class="dex-entry-field"><span>Coins pro Abschluss</span><input class="input coin-zahlenfeld" data-routine-coins type="number" inputmode="numeric" min="0" max="50" value="${existing?.coin_reward ?? 5}" required><small class="routine-coin-info">Für diese freie Routine selbst festlegen: 0–50 Coins.</small></label>`
+        : `<div class="routine-coin-fest" data-routine-coin-hint>${routineCoinValue(selectedTemplate, selectedDuration)} MUSCLE-COINS pro Abschluss</div>`}
       <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" data-routine-note maxlength="500" rows="3" placeholder="Kurzer Hinweis zur Durchführung …">${escapeHtml(existing?.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block" type="submit">Routine speichern</button>
       ${existing ? '<button class="btn btn-block routine-delete" type="button" data-routine-delete>Routine löschen</button>' : ''}
@@ -104,6 +112,8 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
     const button = event.target.closest('[data-routine-duration]');
     if (!button) return;
     backdrop.querySelectorAll('[data-routine-duration]').forEach((item) => item.classList.toggle('aktiv', item === button));
+    const hint = backdrop.querySelector('[data-routine-coin-hint]');
+    if (hint) hint.textContent = `${routineCoinValue(selectedTemplate, Number(button.dataset.routineDuration))} MUSCLE-COINS pro Abschluss`;
   });
   [['[data-routine-ambient-volume]','[data-ambient-output]'],['[data-routine-gong-volume]','[data-gong-output]']].forEach(([inputSelector, outputSelector]) => {
     const input = backdrop.querySelector(inputSelector); const output = backdrop.querySelector(outputSelector);
@@ -138,12 +148,12 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       time: form.querySelector('[data-routine-time]').value || null,
       note: form.querySelector('[data-routine-note]').value.trim(), weekdays,
       template_type: selectedTemplate,
-      duration_minutes: meditation ? Number(form.querySelector('[data-routine-duration].aktiv')?.dataset.routineDuration || 5) : null,
+      duration_minutes: timedTemplate ? Number(form.querySelector('[data-routine-duration].aktiv')?.dataset.routineDuration || defaultDuration) : null,
       external_url: meditation ? externalUrl : null,
       ambient_sound: meditation ? form.querySelector('[data-routine-ambient]').value : 'off',
       ambient_volume: meditation ? Number(form.querySelector('[data-routine-ambient-volume]').value) : 0.35,
       gong_volume: meditation ? Number(form.querySelector('[data-routine-gong-volume]').value) : 0.7,
-      coin_reward: form.querySelector('[data-routine-coins]').value === '' ? null : Number(form.querySelector('[data-routine-coins]').value),
+      coin_reward: selectedTemplate === 'custom' ? Number(form.querySelector('[data-routine-coins]').value) : null,
     };
     const query = existing
       ? supabase.from('routines').update(payload).eq('id', existing.id).eq('user_id', userId)
@@ -184,6 +194,7 @@ function chooseRoutineTemplate(userId, onSaved) {
     <div class="sheet-menue routine-template-list">
       <button type="button" data-routine-template="meditation"><span class="routine-template-icon">🧘</span><span><b>Meditation</b><small>Timer, Atemhilfe und Sounds</small></span></button>
       <button type="button" data-routine-template="mobility"><span class="routine-template-icon">🤸</span><span><b>Mobility</b><small>Grundlage – Übungen folgen separat</small></span></button>
+      <button type="button" data-routine-template="walk"><span class="routine-template-icon">🚶</span><span><b>Spaziergang</b><small>15, 30, 45 oder 60 Minuten</small></span></button>
       <button type="button" data-routine-template="custom">${materialIconMarkup('add')}<span><b>Leere Routine</b><small>Alles selbst festlegen</small></span></button>
     </div>
   </section>`;

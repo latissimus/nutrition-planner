@@ -1,13 +1,22 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
+import muscleCoinUrl from './assets/muscle-coin.png';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
 export const muscleCoinMarkup = (className = '') => `
-  <span class="muscle-coin ${className}" aria-hidden="true"><img src="/muscle-coin.png" alt=""></span>`;
+  <span class="muscle-coin ${className}" aria-hidden="true"><img src="${muscleCoinUrl}" alt=""></span>`;
+
+export function routineCoinValue(templateType, durationMinutes, customValue = 5) {
+  const duration = Number(durationMinutes || 0);
+  if (templateType === 'meditation') return ({ 2: 2, 5: 4, 10: 7, 15: 10, 20: 12 })[duration] || 4;
+  if (templateType === 'mobility') return duration >= 15 ? 10 : 6;
+  if (templateType === 'walk') return ({ 15: 8, 30: 12, 45: 16, 60: 20 })[duration] || 8;
+  return Math.max(0, Math.min(50, Number(customValue ?? 5)));
+}
 
 function nextReward(rewards, balance) {
   const active = rewards.filter((item) => item.active).sort((a, b) => a.cost - b.cost);
@@ -43,9 +52,20 @@ export async function syncRoutineCoins(routineId, completionDate, completed) {
 
 export function coinHeaderMarkup(summary) {
   return `<a class="coin-kopfstand" href="#coins" aria-label="MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}">
-    ${muscleCoinMarkup('coin-kopf-symbol')}
     <strong>${summary.balance}</strong>
+    ${muscleCoinMarkup('coin-kopf-symbol')}
   </a>`;
+}
+
+function coinEarningOverview() {
+  const group = (title, icon, values) => `<div class="coin-verdienst-gruppe"><span class="coin-verdienst-titel"><i>${icon}</i><b>${title}</b></span><div>${values.map(([label, coins]) => `<span><small>${label}</small><strong>${coins}</strong></span>`).join('')}</div></div>`;
+  return `<section class="coin-verdienst">
+    <header><h2>So verdienst du Coins</h2><small>Je Routine und geplantem Tag einmal</small></header>
+    ${group('Meditation', '🧘', [['2 min', 2], ['5 min', 4], ['10 min', 7], ['15 min', 10], ['20 min', 12]])}
+    ${group('Mobility', '🤸', [['5–10 min', 6], ['15–20 min', 10]])}
+    ${group('Spaziergang', '🚶', [['15 min', 8], ['30 min', 12], ['45 min', 16], ['60 min', 20]])}
+    <div class="coin-verdienst-frei"><span>✨</span><p><b>Freie Routine</b><small>Beim Anlegen selbst zwischen 0 und 50 Coins festlegen. Standard: 5 Coins.</small></p></div>
+  </section>`;
 }
 
 function closeOverlay(backdrop) {
@@ -134,8 +154,9 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
       ${muscleCoinMarkup('coin-balance-symbol')}
       <span><small>DEIN KONTOSTAND</small><strong>${balance}</strong><b>MUSCLE-COINS</b></span>
     </section>
+    ${coinEarningOverview()}
     ${next ? `<section class="coin-next"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} Coins</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
-    <header class="coin-section-title"><h2>Belohnungen</h2><button type="button" data-new-reward>${materialIconMarkup('add')}<span>Neu</span></button></header>
+    <header class="coin-section-title"><h2>Deine Belohnungen</h2><button type="button" data-new-reward>${materialIconMarkup('add')}<span>Neu</span></button></header>
     <section class="coin-reward-list">${(rewards || []).length ? rewards.map((item) => rewardMarkup(item, balance)).join('') : '<div class="coin-empty"><b>Noch keine Belohnung</b><span>Lege etwas fest, auf das du dich wirklich freust.</span></div>'}</section>
     ${(ledger || []).length ? `<h2 class="coin-history-title">Zuletzt</h2><section class="coin-history">${ledger.slice(0, 8).map((item) => `<div><span>${escapeHtml(historyText(item))}<small>${new Date(item.created_at).toLocaleDateString('de-DE')}</small></span><b class="${item.amount > 0 ? 'plus' : 'minus'}">${item.amount > 0 ? '+' : ''}${item.amount}</b></div>`).join('')}</section>` : ''}`;
   container.querySelector('[data-new-reward]').onclick = () => rewardEditor({ userId, onSaved: refresh });
