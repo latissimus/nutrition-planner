@@ -78,8 +78,9 @@ function downloadJson(dateiname, daten) {
 export function mountProfile(container, { session, profile, signal, onProfileUpdated }) {
   const email = session.user.email || '';
   container.innerHTML = '';
+  container.classList.add('profil-fixkopf-view');
   const wrap = document.createElement('div');
-  wrap.className = 'wrap pad-bottom';
+  wrap.className = 'wrap pad-bottom profil-fixkopf';
   wrap.innerHTML = `
     <nav class="kategorie-kopf profil-kopf" aria-label="Mein Konto bedienen">
       <div class="kategorie-kopftitel"><strong>MEIN KONTO</strong></div>
@@ -415,5 +416,11 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   version.className = 'buildinfo';
   version.textContent = `Version ${__BUILD_COMMIT__} · ${__BUILD_TIME__}`;
   wrap.appendChild(version);
+
+  const kopf = wrap.querySelector(':scope > .profil-kopf');
+  const inhalt = document.createElement('div');
+  inhalt.className = 'profil-scrollinhalt';
+  while (kopf?.nextSibling) inhalt.appendChild(kopf.nextSibling);
+  wrap.appendChild(inhalt);
   container.appendChild(wrap);
 }
