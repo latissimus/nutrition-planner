@@ -4033,10 +4033,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Ein globaler, musterfreier App-Hintergrund. Die Safe Area hinter den
    iOS-Systemsymbolen wechselt dadurch beim Navigieren weder Farbe noch
    Tapete; nur die deckende Inhaltsseite bewegt sich. */
-:root[data-seite],
+/* Nur html traegt Farbe und Muster; body/#app/#view bleiben transparent,
+   damit das Tapeten-Muster ueberall (auch in der Safe-Area unter dem
+   Home-Indicator) sichtbar durchscheint. Frueher hat diese Regel die Flaechen
+   deckend gemacht – dadurch entstand am unteren Rand ein einfarbiger Streifen,
+   hinter dem der scrollende Inhalt verschwand. */
 :root[data-seite] body,
-:root[data-seite] #app{background-color:var(--bg)!important;background-image:none!important}
-:root[data-seite] #view{background-image:none!important}
+:root[data-seite] #app,
+:root[data-seite] #view{background-color:transparent!important;background-image:none!important}
 
 /* Eine individuell gewaehlte Dex-Tapete hat Vorrang vor dem globalen,
    musterfreien Seitenwechsel-Hintergrund. Die Tapete liegt auf html und
