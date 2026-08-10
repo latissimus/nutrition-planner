@@ -62,11 +62,12 @@ describe('Vorschaubilder', () => {
     expect(markup).toContain('tiktok-foto-post');
   });
 
-  it('verändert normale Link-Vorschaubilder nicht', () => {
+  it('zentriert normale Artikelbilder ohne einseitigen Beschnitt', () => {
     const markup = dexEntryOverviewMarkup({
       id: 'link-1', entry_type: 'link', title: 'Rezept',
       url: 'https://example.com/rezept', preview_url: 'https://example.com/preview.jpg',
     });
     expect(markup).not.toContain('dex-foto-post-vorschau');
+    expect(markup).toContain('dex-artikel-vorschau');
   });
 });

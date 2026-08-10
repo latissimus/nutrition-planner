@@ -394,10 +394,15 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
   const type = entry.entry_type === 'routine' ? 'routine' : entry.entry_type === 'audio' ? 'audio' : entry.entry_type === 'note' ? 'note' : entry.entry_type === 'image' || isTikTokPhoto ? 'image' : video ? 'video' : 'link';
   const icon = type === 'routine' ? 'bucket_check' : type === 'audio' ? 'mic' : type === 'note' ? 'note_add' : type === 'image' ? 'add_photo_alternate' : type === 'video' ? 'play_arrow' : 'bookmark_star';
   const playable = Boolean(videoEmbedUrl(entry.url));
+  const previewClass = isTikTokPhoto
+    ? 'dex-foto-post-vorschau'
+    : type === 'link' && entry.preview_url
+      ? 'dex-artikel-vorschau'
+      : '';
   return dexEntryCardMarkup({
     id: entry.id, type, title: entry.title, note: entry.note,
     favorite: Boolean(entry.favorite),
-    previewUrl: entry.preview_url, previewClass: isTikTokPhoto ? 'dex-foto-post-vorschau' : '',
+    previewUrl: entry.preview_url, previewClass,
     cardClass: [
       entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe' ? 'eigenes-rezept' : '',
       isTikTokPhoto ? 'tiktok-foto-post' : '',

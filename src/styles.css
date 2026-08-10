@@ -2798,7 +2798,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
   transition:opacity .72s cubic-bezier(.2,.65,.3,1);
 }
 .dex-foto-post-vorschau{background:#111!important}
-.dex-foto-post-vorschau img{object-fit:contain!important;object-position:center center!important;transform:none!important}
+.dex-foto-post-vorschau img,
+.dex-artikel-vorschau img{object-fit:contain!important;object-position:center center!important;transform:none!important}
+.dex-artikel-vorschau{background:var(--surface)!important}
 .dex-inhaltskarte.tiktok-foto-post .dex-inhaltskarte-streifen{display:block!important;position:relative;z-index:5}
 .dex-inhaltskarte-vorschau img.ist-geladen{opacity:1}
 .dex-inhaltskarte-vorschau.hat-vorschaubild::after{
