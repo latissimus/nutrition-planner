@@ -13,7 +13,7 @@ import '@fontsource/figtree/latin-700.css';
 import '@fontsource/figtree/latin-800.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
-import { getTheme, applyTheme, setTheme, getSchatten, applySchatten } from './theme.js';
+import { getTheme, applyTheme, setTheme } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
 import { mountProfile } from './profile.js';
 import { startDexSelection } from './dexSelection.js';
@@ -39,7 +39,6 @@ import {
 } from './collections.js';
 
 applyTheme(getTheme());
-applySchatten(getSchatten());
 registriereServiceWorker().catch(() => {});
 
 // iOS berechnet :hover/:active fuer Buttons und Links nur, wenn irgendwo im

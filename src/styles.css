@@ -183,14 +183,6 @@
   --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.03'/%3E%3C/svg%3E");
   --muster-tropfen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23EDF0F6' fill-opacity='.032' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
 }
-/* Schatten aus: eine eigene Einstellung, unabhaengig vom Theme. Steht hinter
-   allen drei Themebloecken, weil :root[data-schatten] und :root[data-theme]
-   dieselbe Spezifitaet haben – hier entscheidet die Reihenfolge. */
-:root[data-schatten="aus"]{
-  --hart:none;
-  --hart-klein:none;
-}
-
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Scrollen bleibt per Touch, Mausrad und Tastatur erhalten; nur die sichtbare
    Browserleiste verschwindet. Das gilt auch fuer seitlich scrollbare Picker. */
@@ -3473,8 +3465,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .profil-kopf .kategorie-schliessen{grid-column:2}
 :root[data-seite="profile"]{--akzent:#492426;--akzent-ink:#fff}
 :root[data-seite="profile"] :is(.themebtn.on,.profile-datei-knopf,.role-tag,.btn-primary){background:#492426!important;color:#fff!important}
-:root[data-seite="profile"] :is(.profile-abschnitt input[type="checkbox"],.schattenschalter input){accent-color:#492426}
-:root[data-seite="profile"] .themeseg + .schattenschalter{margin-top:24px}
+:root[data-seite="profile"] .profile-abschnitt input[type="checkbox"]{accent-color:#492426}
 .sheet-menue{display:grid}
 .sheet-menue>button{
   display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:13px;
@@ -4400,4 +4391,136 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :is(.kategorie-kopfknopf,.seiten-x,.dex-detail-knopf,.tuck-quadrat,.tuck-ablage-knopf)>:is(svg,.material-svg){
   margin:auto;
+}
+
+/* ============================================================
+   Darkmode — abschliessender Lesbarkeits- und Bedienpass
+
+   Einige spaeter hinzugekommene Picker und Detailansichten verwendeten
+   absichtlich schwarze Icons auf hellen Flaechen. Im Darkmode waren dieselben
+   Icons auf den dunklen Theme-Flaechen kaum oder gar nicht mehr sichtbar.
+   Dieser Block laesst Marken- und Ordnerfarben unangetastet, vereinheitlicht
+   aber neutrale Flaechen, Konturen, Formulare und Bedienzustände.
+   ============================================================ */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --surface:#182234;
+  --surface2:#222E43;
+  --ink:#94A0B4;
+  --line:#94A0B4;
+  --text:#F4F6FA;
+  --muted:#B7C0CF;
+  --faint:#A1ACBD;
+  --app-card:var(--surface);
+  --app-field:var(--surface2);
+  --app-outline:var(--ink);
+  --app-divider:rgba(244,246,250,.2);
+  --app-hard-shadow:#05080E;
+  --hart:4px 4px 0 #05080E;
+  --hart-klein:3px 3px 0 #05080E;
+}
+
+:root[data-theme="dark"] :is(input,textarea,select,.input){
+  caret-color:var(--fe-blue-light);
+}
+:root[data-theme="dark"] :is(input,textarea,.input)::placeholder{
+  color:var(--faint);opacity:1;
+}
+:root[data-theme="dark"] :is(input,textarea,select):-webkit-autofill{
+  -webkit-text-fill-color:var(--text);
+  box-shadow:0 0 0 1000px var(--surface2) inset;
+}
+:root[data-theme="dark"] option{background:var(--surface2);color:var(--text)}
+
+/* Neutrale quadratische Aktionen tragen im Darkmode helle Symbole. Farbige
+   Plus-/Primärknöpfe behalten dagegen ihre bereits berechnete Kontrastfarbe. */
+:root[data-theme="dark"] :is(
+  .seiten-x,
+  .dex-detail-knopf:not(.dex-detail-favorit.aktiv),
+  .kategorie-kopfknopf:not(.kategorie-plus),
+  .kategorie-sheet>header button
+){color:var(--text)!important}
+:root[data-theme="dark"] :is(
+  .seiten-x,
+  .dex-detail-knopf:not(.dex-detail-favorit.aktiv),
+  .kategorie-kopfknopf:not(.kategorie-plus),
+  .kategorie-sheet>header button
+) :is(.material-svg,svg,svg *){
+  color:var(--text)!important;fill:var(--text)!important;
+}
+
+/* Icon-Picker zeigen weiterhin die gewuenschten schwarzen Icons. Eine feste
+   helle Musterkarte sorgt dafuer, dass sie auch im Darkmode sicher erkennbar
+   und nicht von der jeweiligen Seitenfarbe abhaengig sind. */
+:root[data-theme="dark"] :is(
+  .icon-option,
+  .sammlung-editor-icons button,
+  .rem-icon-grid button,
+  .rem-icon-waehler
+){background:#F2EBE0;color:#111}
+:root[data-theme="dark"] .icon-option.aktiv{background:var(--fe-pink);color:#111}
+:root[data-theme="dark"] :is(.emoji-eigen input,.sammlung-emoji-eigen input){
+  border-color:var(--ink);background:var(--surface2);color:var(--text);
+}
+:root[data-theme="dark"] .emoji-eigen button{color:#111}
+
+/* Dex-Ordner und Auswahlmodus: Konturen duerfen auf Navy nicht schwarz
+   verschwinden. Der eigentliche Retroschatten bleibt bewusst tiefschwarz. */
+:root[data-theme="dark"] .dex-ordner-form{
+  filter:drop-shadow(4px 4px 0 #05080E);
+}
+:root[data-theme="dark"] .dex-ordner-form path{stroke:var(--ink)}
+:root[data-theme="dark"] .dex-detail-audio{
+  border-bottom-color:var(--ink);
+  background:color-mix(in srgb,var(--eintrag-farbe) 22%,var(--surface));
+}
+:root[data-theme="dark"] .dex-auswahl-marker{
+  border-color:var(--ink);background:var(--surface2);
+}
+:root[data-theme="dark"] .dex-auswahlleiste{border-color:var(--ink)}
+:root[data-theme="dark"] .dex-auswahlleiste button{color:var(--text)}
+:root[data-theme="dark"] .dex-auswahlleiste button :is(.material-svg,svg,svg *){
+  color:var(--text)!important;fill:var(--text)!important;
+}
+
+/* System-Dex: ungefaerbte Icons, Chevrons und Sekundäraktionen erhalten den
+   gleichen Kontrast wie Texte. Gefuellte braune Aktionen bleiben weiss. */
+:root[data-theme="dark"] :is(
+  .rem-row-emoji .reminder-emoji,
+  .rem-row-emoji .reminder-svg,
+  .rem-row-emoji svg,
+  .routine-edit,.routine-attach,.routine-start,.routine-open,
+  .mobility-exercise-row>button
+){color:var(--text)}
+:root[data-theme="dark"] :is(
+  .rem-row-emoji .reminder-svg,
+  .rem-row-emoji svg,
+  .routine-edit,.routine-attach,.routine-start,.routine-open,
+  .mobility-exercise-row>button
+) :is(.material-svg,svg,svg *){
+  color:var(--text)!important;fill:var(--text)!important;
+}
+:root[data-theme="dark"] .mahl-zeitblock .rem-row-chevron{
+  filter:invert(1) brightness(1.7);
+}
+:root[data-theme="dark"] :is(.rem-row-status,.rem-erledigt-btn,.rem-push-refresh){
+  color:#F0B8BA;border-color:#B8787C;
+}
+:root[data-theme="dark"] .rem-row-status{
+  background:rgba(240,184,186,.12);
+}
+:root[data-theme="dark"] .routine-delete{
+  border-color:#FF9A83!important;color:#FF9A83!important;background:var(--surface)!important;
+}
+:root[data-theme="dark"] :is(.rem-push-warn,.msg.err){
+  color:#FFD1C7;background:#3B211D;border-color:#8E493D;
+}
+
+/* Sichtbarer Tastaturfokus ist nicht nur fuer Desktop wichtig: Er hilft auch
+   Nutzern mit externer Tastatur und Switch-Control auf iPhone/iPad. */
+:root[data-theme="dark"] :is(button,a,input,textarea,select,summary):focus-visible{
+  outline:3px solid var(--fe-blue-light);outline-offset:3px;
+}
+:root[data-theme="dark"] :is(button,input,textarea,select):disabled{
+  opacity:.58;
 }
