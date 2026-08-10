@@ -3627,7 +3627,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-editor-icons button,.sammlung-editor-tapeten button{display:grid;place-items:center;background:var(--surface);}
 .sammlung-editor-icons button svg{width:28px;height:28px;fill:#000}
 .sammlung-editor-tapeten button i{display:block;width:100%;height:100%;border-radius:6px;background-color:var(--dex-seitenfarbe,var(--surface));background-size:34px}
-.sammlung-editor-tapeten button.aktiv{background:var(--fe-pink)}
+.sammlung-editor-tapeten button.aktiv{background:var(--surface);box-shadow:3px 3px 0 #000}
 .sammlung-editor-tapeten button i[data-muster="triangles"]{background-image:var(--muster-dreieck)}
 .sammlung-editor-tapeten button i[data-muster="drops"]{background-image:var(--muster-tropfen)}
 .sammlung-editor-tapeten button i[data-muster="bones"]{background-image:url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")}
@@ -3812,6 +3812,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite] body,
 :root[data-seite] #app{background-color:var(--bg)!important;background-image:none!important}
 :root[data-seite] #view{background-image:none!important}
+
+/* Eine individuell gewaehlte Dex-Tapete hat Vorrang vor dem globalen,
+   musterfreien Seitenwechsel-Hintergrund. Die Tapete liegt auf html und
+   reicht dadurch auch hinter die Statusleiste; die Inhaltsflaechen bleiben
+   transparent, damit sie bis zur fixierten Kopfzeile sichtbar bleibt. */
+:root[data-dex-muster] body,
+:root[data-dex-muster] #app,
+:root[data-dex-muster] #view{
+  background-color:transparent!important;
+  background-image:inherit!important;
+  background-size:inherit!important;
+  background-repeat:inherit!important;
+  background-position:inherit!important;
+  background-attachment:inherit!important;
+}
+:root[data-dex-muster]{background-color:var(--dex-seitenfarbe)!important}
 
 /* ============================================================
    EINKAUFSLISTE
