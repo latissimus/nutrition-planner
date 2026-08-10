@@ -110,7 +110,7 @@ export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   // zustaendig. Die Tapete darf den globalen Seitenhintergrund nicht
   // umfaerben; sie steuert hier deshalb ausschliesslich das Muster.
   root.style.removeProperty('--dex-seitenfarbe');
-  root.dataset.dexMuster = look.pattern;
+  delete root.dataset.dexMuster;
   return look;
 }
 
@@ -130,7 +130,7 @@ export function commitPendingPageLook() {
   if (!look) return;
   const root = document.documentElement;
   root.style.removeProperty('--dex-seitenfarbe');
-  root.dataset.dexMuster = look.pattern;
+  delete root.dataset.dexMuster;
 }
 
 function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
@@ -403,7 +403,8 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   container.classList.add('hat-kategoriefarbe', 'dex-fixkopf');
   container.style.setProperty('--ordner', options.color || categoryColor(route));
   const lookScope = options.pageLookScope || options.inheritedPageLookScope || route;
-  applyPageLook(lookScope, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
+  const look = pageLook(lookScope, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
+  container.dataset.dexMuster = look.pattern;
   wrap.querySelector(':scope > .seitenkopf')?.remove();
   let content = wrap.querySelector(':scope > .kategorie-scrollinhalt');
   if (!content) {
