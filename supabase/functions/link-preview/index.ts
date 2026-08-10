@@ -20,10 +20,10 @@ function safeUrl(value: unknown) {
 function content(html: string, property: string) {
   const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const patterns = [
-    new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']*)`, 'i'),
-    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${escaped}["']`, 'i'),
+    new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=(["'])(.*?)\\1`, 'i'),
+    new RegExp(`<meta[^>]+content=(["'])(.*?)\\1[^>]+(?:property|name)=["']${escaped}["']`, 'i'),
   ];
-  return patterns.map((pattern) => html.match(pattern)?.[1]).find(Boolean) || '';
+  return patterns.map((pattern) => html.match(pattern)?.[2]).find(Boolean) || '';
 }
 
 function embeddedJsonString(html: string, key: string) {
@@ -68,7 +68,14 @@ async function oembed(endpoint: string) {
 }
 
 async function pageMetadata(url: URL, existingResponse?: Response) {
-  const response = existingResponse || await fetch(url, {
+  const fetchUrl = new URL(url.href);
+  // Muscle & Strength liefert fuer serverseitige Standard-Requests teilweise
+  // nur die Bot-Schutzseite. Die AMP-Variante enthaelt dieselben Artikel-
+  // Metadaten, ist aber ohne Challenge abrufbar.
+  if (fetchUrl.hostname.toLowerCase().endsWith('muscleandstrength.com') && !fetchUrl.searchParams.has('amp')) {
+    fetchUrl.searchParams.set('amp', '1');
+  }
+  const response = existingResponse || await fetch(fetchUrl, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -76,12 +83,35 @@ async function pageMetadata(url: URL, existingResponse?: Response) {
     },
     redirect: 'follow', signal: AbortSignal.timeout(6500),
   });
-  const html = (await response.text()).slice(0, 1_000_000);
+  let html = (await response.text()).slice(0, 1_000_000);
+  // Einige redaktionelle Seiten (u. a. Muscle & Strength) liefern aus
+  // Serverless-Umgebungen nur eine Bot-Schutzseite. Die übersetzte HTML-
+  // Ansicht ist weiterhin öffentlich lesbar und enthält die originalen
+  // title/description/og:image-Tags. Sie wird nur bei einer Challenge
+  // verwendet, nie als allgemeiner Proxy.
+  if (/just a moment|security verification|checking your browser/i.test(html)
+    && url.hostname.toLowerCase().endsWith('muscleandstrength.com')) {
+    try {
+      const proxyHost = `${url.hostname.replace(/\./g, '-')}.translate.goog`;
+      const proxyUrl = new URL(`https://${proxyHost}${url.pathname}`);
+      url.searchParams.forEach((value, key) => proxyUrl.searchParams.set(key, value));
+      proxyUrl.searchParams.set('_x_tr_sl', 'auto');
+      proxyUrl.searchParams.set('_x_tr_tl', 'en');
+      proxyUrl.searchParams.set('_x_tr_hl', 'en');
+      const proxyResponse = await fetch(proxyUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+        redirect: 'follow', signal: AbortSignal.timeout(8000),
+      });
+      if (proxyResponse.ok) html = (await proxyResponse.text()).slice(0, 1_000_000);
+    } catch { /* Den normalen Fallback weiterverwenden. */ }
+  }
   const structured = structuredMetadata(html, url.hostname.replace(/^www\./, '')) as Record<string, unknown>;
+  const documentTitle = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.replace(/\s+/g, ' ').trim() || '';
+  const preloadImage = html.match(/<link[^>]+rel=["'][^"']*preload[^"']*["'][^>]+as=["']image["'][^>]+href=["']([^"']+)/i)?.[1] || '';
   return {
-    title: content(html, 'og:title') || content(html, 'twitter:title') || String(structured.title || ''),
+    title: content(html, 'og:title') || content(html, 'twitter:title') || String(structured.title || '') || documentTitle,
     description: content(html, 'og:description') || content(html, 'twitter:description') || content(html, 'description') || String(structured.description || ''),
-    thumbnail_url: content(html, 'og:image') || content(html, 'og:image:url') || content(html, 'twitter:image') || String(structured.thumbnail_url || ''),
+    thumbnail_url: content(html, 'og:image') || content(html, 'og:image:url') || content(html, 'twitter:image') || String(structured.thumbnail_url || '') || preloadImage,
     provider_name: url.hostname.replace(/^www\./, ''),
   };
 }
