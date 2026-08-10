@@ -106,7 +106,10 @@ export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
     return look;
   }
   const root = document.documentElement;
-  root.style.setProperty('--dex-seitenfarbe', look.color);
+  // Die Dex-Farbe bleibt fuer Register, Iconflaeche und Eintragsstreifen
+  // zustaendig. Die Tapete darf den globalen Seitenhintergrund nicht
+  // umfaerben; sie steuert hier deshalb ausschliesslich das Muster.
+  root.style.removeProperty('--dex-seitenfarbe');
   root.dataset.dexMuster = look.pattern;
   return look;
 }
@@ -126,7 +129,7 @@ export function commitPendingPageLook() {
   deferredPageLook = null;
   if (!look) return;
   const root = document.documentElement;
-  root.style.setProperty('--dex-seitenfarbe', look.color);
+  root.style.removeProperty('--dex-seitenfarbe');
   root.dataset.dexMuster = look.pattern;
 }
 
@@ -283,7 +286,6 @@ function appearancePicker(route, onChange) {
     const emoji = emojiInput.value.trim();
     setPreference(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
     setPreference(colorKey(route), selectedColor);
-    setPreference(pageColorKey(route), selectedColor);
     setPageLookPattern(route, selectedPattern);
     applyPageLook(route, selectedColor, selectedPattern);
     closeSheet(backdrop);
