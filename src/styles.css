@@ -2798,7 +2798,10 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-favorit-marker .material-svg,.dex-favorit-marker svg,.dex-favorit-marker svg *{width:25px;height:25px;color:var(--fe-pink)!important;fill:var(--fe-pink)!important}
 .dex-inhaltskarte-body,.dex-inhaltskarte-vorschau,.dex-inhaltskarte-streifen{position:relative;z-index:1}
-.dex-inhaltskarte-streifen{height:7px;flex:0 0 7px;background:var(--eintrag-farbe)}
+.dex-inhaltskarte-streifen{
+  position:relative;z-index:3;display:block;width:100%;height:7px;flex:0 0 7px;
+  background:var(--eintrag-farbe);pointer-events:none;
+}
 .dex-inhaltskarte-vorschau{display:block;aspect-ratio:16/9;overflow:hidden;background:var(--eintrag-farbe)}
 .dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
 .dex-inhaltskarte-vorschau img{
