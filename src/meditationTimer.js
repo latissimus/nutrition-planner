@@ -6,7 +6,16 @@ const today = () => new Date().toLocaleDateString('sv-SE');
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
-const soundNames = { off: 'Ohne Hintergrundsound', rain: 'Regen', forest: 'Wald', ocean: 'Meeresrauschen', brown: 'Braunes Rauschen' };
+export const meditationSounds = [
+  ['off', 'Ohne Sound'],
+  ['rain', 'Regen'],
+  ['campfire', 'Lagerfeuer'],
+  ['space', 'Space Music'],
+  ['forest', 'Wald'],
+  ['ocean', 'Meeresrauschen'],
+  ['brown', 'Braunes Rauschen'],
+];
+const soundNames = Object.fromEntries(meditationSounds.map(([value, label]) => [value, value === 'off' ? 'Ohne Hintergrundsound' : label]));
 
 export async function completeRoutine(userId, routineId) {
   const date = today();
@@ -55,13 +64,36 @@ function noiseBuffer(context, brown = false) {
 
 function startAmbient(context, type, volume) {
   if (!context || type === 'off' || volume <= 0) return () => {};
+  if (type === 'space') {
+    const master = context.createGain();
+    master.gain.value = volume * 0.16;
+    master.connect(context.destination);
+    const oscillators = [110, 164.81, 220].map((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = index === 1 ? 'triangle' : 'sine';
+      oscillator.frequency.value = frequency;
+      gain.gain.value = index === 0 ? 0.72 : 0.34;
+      oscillator.connect(gain).connect(master);
+      oscillator.start();
+      return oscillator;
+    });
+    const lfo = context.createOscillator();
+    const lfoGain = context.createGain();
+    lfo.frequency.value = 0.055;
+    lfoGain.gain.value = volume * 0.045;
+    lfo.connect(lfoGain).connect(master.gain);
+    lfo.start();
+    return () => { try { oscillators.forEach((node) => node.stop()); lfo.stop(); master.disconnect(); } catch {} };
+  }
   const source = context.createBufferSource();
-  source.buffer = noiseBuffer(context, type === 'brown');
+  source.buffer = noiseBuffer(context, type === 'brown' || type === 'campfire');
   source.loop = true;
   const filter = context.createBiquadFilter();
   const gain = context.createGain();
-  gain.gain.value = volume * (type === 'rain' ? 0.19 : 0.28);
+  gain.gain.value = volume * (type === 'rain' ? 0.19 : type === 'campfire' ? 0.15 : 0.28);
   if (type === 'rain') { filter.type = 'highpass'; filter.frequency.value = 1200; }
+  else if (type === 'campfire') { filter.type = 'bandpass'; filter.frequency.value = 430; filter.Q.value = 0.7; }
   else { filter.type = 'lowpass'; filter.frequency.value = type === 'ocean' ? 850 : 520; }
   source.connect(filter).connect(gain).connect(context.destination);
   let lfo = null;
@@ -73,7 +105,7 @@ function startAmbient(context, type, volume) {
     lfo.connect(lfoGain).connect(gain.gain);
     lfo.start();
   }
-  const chirps = [];
+  const chirps = new Set();
   let chirpTimer = null;
   if (type === 'forest') {
     chirpTimer = window.setInterval(() => {
@@ -86,13 +118,48 @@ function startAmbient(context, type, volume) {
       chirpGain.gain.setValueAtTime(volume * 0.035, now);
       chirpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
       oscillator.connect(chirpGain).connect(context.destination);
-      oscillator.start(); oscillator.stop(now + 0.25); chirps.push(oscillator);
+      oscillator.onended = () => chirps.delete(oscillator);
+      oscillator.start(); oscillator.stop(now + 0.25); chirps.add(oscillator);
     }, 3200);
+  }
+  const crackles = new Set();
+  let crackleTimer = null;
+  if (type === 'campfire') {
+    const crackleBuffer = noiseBuffer(context);
+    crackleTimer = window.setInterval(() => {
+      if (Math.random() < 0.42) return;
+      const crackle = context.createBufferSource();
+      const crackleFilter = context.createBiquadFilter();
+      const crackleGain = context.createGain();
+      const now = context.currentTime;
+      crackle.buffer = crackleBuffer;
+      crackleFilter.type = 'highpass'; crackleFilter.frequency.value = 1600 + Math.random() * 1800;
+      crackleGain.gain.setValueAtTime(volume * (0.025 + Math.random() * 0.045), now);
+      crackleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055 + Math.random() * 0.08);
+      crackle.connect(crackleFilter).connect(crackleGain).connect(context.destination);
+      crackle.onended = () => crackles.delete(crackle);
+      crackle.start(now, Math.random() * 2, 0.18); crackles.add(crackle);
+    }, 170);
   }
   source.start();
   return () => {
-    try { source.stop(); lfo?.stop(); chirps.forEach((node) => node.stop()); } catch {}
+    try { source.stop(); lfo?.stop(); chirps.forEach((node) => node.stop()); crackles.forEach((node) => node.stop()); } catch {}
     if (chirpTimer) clearInterval(chirpTimer);
+    if (crackleTimer) clearInterval(crackleTimer);
+  };
+}
+
+export async function previewMeditationSound(type, volume = 0.35) {
+  const context = audioContext();
+  if (!context || type === 'off') return () => {};
+  await context.resume();
+  const stopAmbient = startAmbient(context, type, volume);
+  let stopped = false;
+  return async () => {
+    if (stopped) return;
+    stopped = true;
+    stopAmbient();
+    await context.close().catch(() => {});
   };
 }
 

@@ -2955,6 +2955,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .meditation-volume>span{display:flex;justify-content:space-between;gap:10px;font:800 12px/1.2 var(--ui)}
 .meditation-volume output{color:var(--muted);font-variant-numeric:tabular-nums}
 .meditation-volume input{width:100%;accent-color:var(--ordner)}
+.meditation-sound-picker{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch}
+.meditation-sound-picker .input{min-width:0}
+.meditation-sound-picker .btn{display:flex;min-width:108px;min-height:46px;padding:8px 12px;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.meditation-sound-picker .btn svg{width:20px;height:20px;fill:currentColor}
+.meditation-sound-picker .btn.aktiv{background:var(--ordner);color:var(--ordner-ink,#000)}
 .meditation-timer{overflow:hidden;text-align:center}
 .meditation-timer>header{text-align:left}
 .meditation-timer>header>div{display:flex;min-width:0;flex-direction:column;gap:3px}

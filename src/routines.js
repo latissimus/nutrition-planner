@@ -4,7 +4,7 @@ import { chooseReminderIcon, reminderIconMarkup } from './reminders.js';
 import { dexEntryOverviewMarkup, loadDexEntries, openDexEntryEditor, vorschaubilderEinblenden } from './dexEntries.js';
 import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
-import { maybePromptExternalMeditation, openMeditationTimer } from './meditationTimer.js';
+import { maybePromptExternalMeditation, meditationSounds, openMeditationTimer, previewMeditationSound } from './meditationTimer.js';
 import { toast } from './toast.js';
 
 const escapeHtml = (value = '') => String(value)
@@ -56,9 +56,9 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       ${meditation ? `<section class="meditation-editor-settings">
         <fieldset class="routine-duration"><legend>Dauer</legend><div>${[2, 5, 10, 15, 20].map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${Number(existing?.duration_minutes || 5) === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div></fieldset>
         <label class="dex-entry-field"><span>Externer Meditationslink <small>optional</small></span><input class="input" type="text" inputmode="url" data-routine-external-url value="${escapeHtml(existing?.external_url || '')}" placeholder="Headspace, Calm, YouTube …"></label>
-        <label class="dex-entry-field"><span>Hintergrundsound</span><select class="input" data-routine-ambient>
-          ${[['off','Ohne Sound'],['rain','Regen'],['forest','Wald'],['ocean','Meeresrauschen'],['brown','Braunes Rauschen']].map(([value, label]) => `<option value="${value}"${(existing?.ambient_sound || 'off') === value ? ' selected' : ''}>${label}</option>`).join('')}
-        </select></label>
+        <div class="dex-entry-field"><span>Hintergrundsound</span><div class="meditation-sound-picker"><select class="input" data-routine-ambient>
+          ${meditationSounds.map(([value, label]) => `<option value="${value}"${(existing?.ambient_sound || 'off') === value ? ' selected' : ''}>${label}</option>`).join('')}
+        </select><button class="btn" type="button" data-sound-preview>${materialIconMarkup('play_arrow')}<span>Anhören</span></button></div></div>
         <label class="meditation-volume"><span>Hintergrundlautstärke <output data-ambient-output>${Math.round(Number(existing?.ambient_volume ?? 0.35) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.ambient_volume ?? 0.35)}" data-routine-ambient-volume></label>
         <label class="meditation-volume"><span>Gong-Lautstärke <output data-gong-output>${Math.round(Number(existing?.gong_volume ?? 0.7) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.gong_volume ?? 0.7)}" data-routine-gong-volume></label>
       </section>` : ''}
@@ -72,8 +72,26 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       ${existing ? '<button class="btn btn-block routine-delete" type="button" data-routine-delete>Routine löschen</button>' : ''}
     </form>
   </section>`;
-  const close = () => backdrop.remove();
+  let stopSoundPreview = async () => {};
+  const previewButton = backdrop.querySelector('[data-sound-preview]');
+  const ambientSelect = backdrop.querySelector('[data-routine-ambient]');
+  const resetPreviewButton = () => {
+    if (!previewButton) return;
+    previewButton.classList.remove('aktiv');
+    previewButton.innerHTML = `${materialIconMarkup('play_arrow')}<span>Anhören</span>`;
+  };
+  const stopPreview = async () => { await stopSoundPreview(); stopSoundPreview = async () => {}; resetPreviewButton(); };
+  const close = async () => { await stopPreview(); backdrop.remove(); };
   backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+  previewButton?.addEventListener('click', async () => {
+    if (previewButton.classList.contains('aktiv')) return stopPreview();
+    await stopPreview();
+    if (ambientSelect.value === 'off') return toast('Bitte zuerst einen Sound auswählen.');
+    stopSoundPreview = await previewMeditationSound(ambientSelect.value, Number(backdrop.querySelector('[data-routine-ambient-volume]').value));
+    previewButton.classList.add('aktiv');
+    previewButton.innerHTML = `${materialIconMarkup('stop')}<span>Stoppen</span>`;
+  });
+  ambientSelect?.addEventListener('change', stopPreview);
   backdrop.querySelector('.routine-days').onclick = (event) => {
     const button = event.target.closest('[data-routine-day]');
     if (!button) return;
