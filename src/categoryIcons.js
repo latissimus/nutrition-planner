@@ -381,9 +381,16 @@ function eintragTypWaehlen(container, route, options = {}) {
 export function mountCategoryChrome(container, route, title, options = {}) {
   const wrap = container.querySelector(':scope > .wrap');
   if (!wrap) return;
-  container.classList.add('hat-kategoriefarbe');
+  container.classList.add('hat-kategoriefarbe', 'dex-fixkopf');
   container.style.setProperty('--ordner', options.color || categoryColor(route));
   wrap.querySelector(':scope > .seitenkopf')?.remove();
+  let content = wrap.querySelector(':scope > .kategorie-scrollinhalt');
+  if (!content) {
+    content = document.createElement('div');
+    content.className = 'kategorie-scrollinhalt';
+    while (wrap.firstChild) content.appendChild(wrap.firstChild);
+    wrap.appendChild(content);
+  }
   const bar = document.createElement('nav');
   bar.className = 'kategorie-kopf';
   bar.setAttribute('aria-label', `${title} bedienen`);
@@ -396,7 +403,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
     <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
     <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
   bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(options.color || categoryColor(route)));
-  wrap.prepend(bar);
+  wrap.insertBefore(bar, content);
   // options.onPlus umgeht das Link/Notiz/Bild-Menue vollstaendig: Dex-Typen,
   // die keine Bookmarks sammeln (z. B. die Einkaufsliste), oeffnen darueber
   // ihr eigenes Formular direkt.
