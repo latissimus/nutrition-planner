@@ -26,6 +26,10 @@ describe('Anbieter- und Farbkontrast', () => {
   it('unterscheidet dunkle und helle Buttonfarben', () => {
     expect(colorIsDark('#492426')).toBe(true);
     expect(colorIsDark('#F2EBE0')).toBe(false);
+    expect(colorIsDark('#007DCC')).toBe(false);
+    expect(colorIsDark('#525CEB')).toBe(true);
+    expect(colorIsDark('#FF3483')).toBe(false);
+    expect(colorIsDark('#00E0BA')).toBe(false);
   });
 });
 

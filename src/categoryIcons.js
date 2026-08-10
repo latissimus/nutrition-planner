@@ -34,36 +34,26 @@ const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 let deferredPageLook = null;
 let deferPageLook = false;
 const defaultColors = {
-  body: '#A9DCE8', reminders: '#E99ABF', 'food-log': '#9B83BD',
-  recipes: '#83CFE0', training: '#F2A65A', habits: '#B7C98B',
-  shopping: '#A7B879',
+  body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#91008D',
+  recipes: '#007DCC', training: '#525CEB', habits: '#245953',
+  shopping: '#FFCF00',
 };
 const colorGroups = [
-  ['Knallig-Retro', [
-    ['Eisblau', '#B1F1FF'], ['Feastables Blau', '#15CCFF'],
-    ['Retro Muscle Blau', '#5A78FF'], ['Königsblau', '#1532CB'],
-    ['Navy', '#001454'], ['Nachtblau', '#1A1A2E'],
-    ['Retro Pink', '#FF69AE'], ['Candy Pink', '#FF5DB5'],
-    ['Magenta', '#FF3BB1'], ['Neonpink', '#FF2F9F'],
-    ['Himbeere', '#EC1791'], ['Dunkelrosa', '#C8036F'],
-    ['Rot', '#FF4347'], ['Rotorange', '#FF3E01'], ['Orange', '#FF7B42'],
-    ['Mandarine', '#FF9125'], ['Signalorange', '#FF5F00'],
-    ['Goldgelb', '#FFD369'], ['Gelb', '#FFED00'],
-    ['Sonnengelb', '#FBCD0A'], ['Acid', '#F3FF00'],
-    ['Retro Muscle Grün', '#108474'], ['Violett', '#723EC3'],
-    ['Schokobraun', '#492426'],
-  ]],
-  ['Pastell-Retro', [
-    ['Bubblegum', '#E99ABF'], ['Koralle', '#F3A09A'],
-    ['Pfirsich', '#F5B69C'], ['Aprikose', '#F2A65A'],
-    ['Buttergelb', '#F1D889'], ['Avocado', '#A7B879'],
-    ['Pistazie', '#B7C98B'], ['Salbei', '#A8BFA0'],
-    ['Eukalyptus', '#83AA9A'], ['Mint', '#9FD5C0'],
-    ['Aqua', '#83CFE0'], ['Puderblau', '#A9DCE8'],
-    ['Denim', '#7896BE'], ['Lavendel', '#C0A9D8'],
-    ['Pastell-Violett', '#9B83BD'], ['Kakaobraun', '#A9826C'],
-    ['Sand', '#D7C3A6'], ['Feastables Creme', '#F2EBE0'],
-    ['Retro Muscle Off-White', '#F4F3EF'],
+  ['DEX-Farben', [
+    ['Kaffeebraun', '#492426'],
+    ['Creme', '#F2EBE0'],
+    ['Retro Muscle Hellblau', '#B1E7FF'],
+    ['Retro Muscle Navy', '#001454'],
+    ['Arcadeblau', '#007DCC'],
+    ['Minttürkis', '#00E0BA'],
+    ['Magenta', '#91008D'],
+    ['Pink', '#FF3483'],
+    ['Goldgelb', '#FFCF00'],
+    ['Dunkelviolett', '#450693'],
+    ['Indigoblau', '#525CEB'],
+    ['Dunkelgrün', '#245953'],
+    ['Petrol', '#006E7F'],
+    ['Electric Violet', '#8C00FF'],
   ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
@@ -72,14 +62,18 @@ export const dexEditorColors = [...new Set(retroColors.map(([, color]) => color)
 export function colorIsDark(color) {
   const hex = String(color || '').trim().replace('#', '');
   if (!/^[0-9a-f]{6}$/i.test(hex)) return false;
-  const [r, g, b] = [0, 2, 4].map((start) => Number.parseInt(hex.slice(start, start + 2), 16));
-  return (r * 299 + g * 587 + b * 114) / 1000 < 145;
+  const channels = [0, 2, 4].map((start) => Number.parseInt(hex.slice(start, start + 2), 16) / 255)
+    .map((value) => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4));
+  const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  const contrastWithBlack = (luminance + 0.05) / 0.05;
+  const contrastWithWhite = 1.05 / (luminance + 0.05);
+  return contrastWithWhite >= contrastWithBlack;
 }
 
 export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
-  return valid ? saved.toUpperCase() : (defaultColors[route] || '#A9DCE8');
+  return valid ? saved.toUpperCase() : (defaultColors[route] || '#B1E7FF');
 }
 
 const wallpaperPatterns = Object.entries(wallpaperModules).map(([path, url]) => {
