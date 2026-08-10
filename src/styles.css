@@ -4485,6 +4485,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .emoji-eigen button{color:#111}
 
+/* Es gibt keine globale feste Bedienleiste mehr. Die frueher dafuer
+   reservierten 42/88/118px erzeugen am unteren Rand eine sichtbare, helle
+   Flaeche und lassen Karten scheinbar darunter verschwinden. Alle Scroll-
+   bereiche enden deshalb mit einem kleinen normalen Innenabstand. */
+.pad-bottom,
+.home-scrollinhalt,
+.dex-detail-scrollinhalt,
+.profil-scrollinhalt,
+.kategorie-scrollinhalt{padding-bottom:16px!important}
+
 /* Dex-Ordner und Auswahlmodus: Konturen duerfen auf Navy nicht schwarz
    verschwinden. Der eigentliche Retroschatten bleibt bewusst tiefschwarz. */
 :root[data-theme="dark"] .dex-ordner-form{
