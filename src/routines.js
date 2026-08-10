@@ -66,6 +66,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       : selectedTemplate === 'walk' ? [15, 30, 45, 60] : [5, 10, 15, 20];
   const defaultDuration = selectedTemplate === 'walk' ? 15 : 5;
   const selectedDuration = Number(existing?.duration_minutes || defaultDuration);
+  const customDuration = selectedTemplate === 'custom' && !durationOptions.includes(selectedDuration) ? selectedDuration : '';
   const mobilityExercises = normalizeMobilityExercises(existing?.mobility_exercises, mobility);
   const defaultName = meditation ? 'Meditation' : selectedTemplate === 'mobility' ? 'Mobility' : selectedTemplate === 'walk' ? 'Spaziergang' : '';
   const defaultIcon = meditation ? 'emoji:🧘' : selectedTemplate === 'mobility' ? 'emoji:🤸' : selectedTemplate === 'walk' ? 'emoji:🚶' : 'emoji:✓';
@@ -87,7 +88,10 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       ${fixedTimerTemplate ? `<fieldset class="routine-duration"><legend>Dauer</legend><div>${durationOptions.map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${selectedDuration === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div></fieldset>` : `
       <section class="custom-timer-settings">
         <label class="mess-zeile"><span>Timer verwenden</span><input type="checkbox" data-routine-timer-enabled${customTimerEnabled ? ' checked' : ''}></label>
-        <fieldset class="routine-duration" data-custom-timer-duration${customTimerEnabled ? '' : ' hidden'}><legend>Dauer</legend><div>${durationOptions.map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${selectedDuration === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div></fieldset>
+        <fieldset class="routine-duration" data-custom-timer-duration${customTimerEnabled ? '' : ' hidden'}><legend>Dauer</legend>
+          <div>${durationOptions.map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${selectedDuration === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div>
+          <label class="custom-duration-input"><span>Eigene Zeit</span><span><input class="input" type="number" inputmode="numeric" min="1" max="240" step="1" data-routine-custom-duration value="${customDuration}" placeholder="z. B. 12"><i>min</i></span></label>
+        </fieldset>
       </section>`}
       ${meditation ? `<section class="meditation-editor-settings">
         <label class="dex-entry-field"><span>Externer Meditationslink <small>optional</small></span><input class="input" type="text" inputmode="url" data-routine-external-url value="${escapeHtml(existing?.external_url || '')}" placeholder="Headspace, Calm, YouTube …"></label>
@@ -144,8 +148,14 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
     const button = event.target.closest('[data-routine-duration]');
     if (!button) return;
     backdrop.querySelectorAll('[data-routine-duration]').forEach((item) => item.classList.toggle('aktiv', item === button));
+    const customInput = backdrop.querySelector('[data-routine-custom-duration]');
+    if (customInput) customInput.value = '';
     const hint = backdrop.querySelector('[data-routine-coin-hint]');
     if (hint) hint.textContent = `${routineCoinValue(selectedTemplate, Number(button.dataset.routineDuration))} MUSCLE-COINS pro Abschluss`;
+  });
+  backdrop.querySelector('[data-routine-custom-duration]')?.addEventListener('input', (event) => {
+    if (!event.currentTarget.value) return;
+    backdrop.querySelectorAll('[data-routine-duration]').forEach((button) => button.classList.remove('aktiv'));
   });
   backdrop.querySelector('[data-routine-timer-enabled]')?.addEventListener('change', (event) => {
     const duration = backdrop.querySelector('[data-custom-timer-duration]');
@@ -190,6 +200,12 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       if (!/^https?:/i.test(externalUrl)) { submit.disabled = false; return toast('Bitte einen HTTP- oder HTTPS-Link verwenden.'); }
     }
     const timerEnabled = fixedTimerTemplate || Boolean(form.querySelector('[data-routine-timer-enabled]')?.checked);
+    const ownDuration = Number(form.querySelector('[data-routine-custom-duration]')?.value || 0);
+    const chosenDuration = ownDuration || Number(form.querySelector('[data-routine-duration].aktiv')?.dataset.routineDuration || defaultDuration);
+    if (timerEnabled && (chosenDuration < 1 || chosenDuration > 240)) {
+      submit.disabled = false;
+      return toast('Bitte eine Timerdauer zwischen 1 und 240 Minuten wählen.');
+    }
     const payload = {
       user_id: userId, name: form.querySelector('[data-routine-name]').value.trim(),
       icon: form.querySelector('[data-routine-icon]').value.trim() || '✓',
@@ -197,7 +213,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       time: form.querySelector('[data-routine-time]').value || null,
       note: form.querySelector('[data-routine-note]').value.trim(), weekdays,
       template_type: selectedTemplate,
-      duration_minutes: timerEnabled ? Number(form.querySelector('[data-routine-duration].aktiv')?.dataset.routineDuration || defaultDuration) : null,
+      duration_minutes: timerEnabled ? chosenDuration : null,
       external_url: meditation ? externalUrl : null,
       ambient_sound: meditation ? form.querySelector('[data-routine-ambient]').value : 'off',
       ambient_volume: meditation ? Number(form.querySelector('[data-routine-ambient-volume]').value) : 0.35,
