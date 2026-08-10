@@ -3723,19 +3723,10 @@ body{overscroll-behavior:none}
 }
 #app.app-shell{
   display:grid;grid-template-rows:minmax(0,1fr);
-  /* iOS behandelt den Home-Indicator-Bereich in einer standalone-PWA
-     teilweise ausserhalb von 100dvh. Ohne diesen Zuschlag endet die aktive
-     View einige Pixel zu frueh und der Body-Hintergrund erscheint als
-     farbiger Streifen ueber dem letzten Inhalt. */
-  width:100%;height:calc(100dvh + env(safe-area-inset-bottom));
-  min-height:calc(100dvh + env(safe-area-inset-bottom));overflow:hidden;
+  width:100%;height:100dvh;min-height:0;overflow:hidden;
 }
 .app-shell>#view{
-  /* Das aktive View muss den kompletten App-Viewport fuellen. `height:auto`
-     liess bei langen System-Dex-Seiten unterhalb des Inhalts einen zweiten,
-     cremefarbenen App-Hintergrund stehen, der den unteren Inhalt wie eine
-     feste Leiste ueberdeckte. Der View selbst ist der einzige Scrollcontainer. */
-  width:100%;height:100%!important;min-height:0!important;overflow-x:hidden;overflow-y:auto;
+  width:100%;height:auto;min-height:0!important;overflow-x:hidden;overflow-y:auto;
   overscroll-behavior-x:none;overscroll-behavior-y:contain;
   -webkit-overflow-scrolling:touch;scroll-behavior:auto;
   background-attachment:scroll!important;
@@ -4484,16 +4475,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:var(--ink);background:var(--surface2);color:var(--text);
 }
 :root[data-theme="dark"] .emoji-eigen button{color:#111}
-
-/* Es gibt keine globale feste Bedienleiste mehr. Die frueher dafuer
-   reservierten 42/88/118px erzeugen am unteren Rand eine sichtbare, helle
-   Flaeche und lassen Karten scheinbar darunter verschwinden. Alle Scroll-
-   bereiche enden deshalb mit einem kleinen normalen Innenabstand. */
-.pad-bottom,
-.home-scrollinhalt,
-.dex-detail-scrollinhalt,
-.profil-scrollinhalt,
-.kategorie-scrollinhalt{padding-bottom:16px!important}
 
 /* Dex-Ordner und Auswahlmodus: Konturen duerfen auf Navy nicht schwarz
    verschwinden. Der eigentliche Retroschatten bleibt bewusst tiefschwarz. */
