@@ -103,6 +103,9 @@
   --r:12px;
   --hart:4px 4px 0 var(--ink);
   --hart-klein:3px 3px 0 var(--ink);
+  /* Anteil des deckenden Seitenfarb-Schleiers ueber externen SVG-Tapeten.
+     Im hellen Theme genuegen sieben Prozent sichtbares Schwarz. */
+  --tapeten-schleier:93%;
 
   /* Ueberschriften: Retro setzt kursive Versalien, der Standard nicht. Damit
      die Basisregel weiter unten fuer beide Themes gilt, steckt der Unterschied
@@ -172,6 +175,11 @@
   --prio-soft:#362641;
   --prio-wash:rgba(201,164,223,.16);
   --prio-text:#D7B3EF;
+
+  /* Die SVG-Tapeten sind ueberwiegend schwarz gezeichnet. Auf tiefem Navy
+     brauchen sie deutlich mehr Eigenanteil, um optisch so praesent zu sein
+     wie dieselben Motive auf dem hellen Hintergrund. */
+  --tapeten-schleier:45%;
 
   /* Logo: Das gedeckte Navy verschwindet auf dunklem Grund, die Kontur waere
      weg. Dunkles Blau bleibt als Kontur, ist aber vom Hintergrund abgesetzt. */
@@ -4062,8 +4070,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
   /* Externe SVG-Tapeten haben oft eine sehr grosse Zeichenflaeche. Eine feste
      Kachelbreite macht sie auf Smartphones sichtbar und konsistent mit den
-     eingebauten Mustern. Der Schleier lässt die Tapete mit 7 % durchscheinen. */
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 93%,transparent),color-mix(in srgb,var(--bg) 93%,transparent)),var(--dex-tapete)!important;
+     eingebauten Mustern. Die Theme-Variable gleicht den sehr unterschiedlichen
+     Kontrast schwarzer Motive auf hellem Creme und tiefem Navy aus. */
+  background-image:linear-gradient(color-mix(in srgb,var(--bg) var(--tapeten-schleier),transparent),color-mix(in srgb,var(--bg) var(--tapeten-schleier),transparent)),var(--dex-tapete)!important;
   background-size:auto,360px auto!important;background-repeat:repeat!important;
 }
 
