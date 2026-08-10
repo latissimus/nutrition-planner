@@ -632,7 +632,7 @@ async function mountCustomCollection(container, item, signal) {
 
 async function mountSearch(container, signal) {
   setSeite('search');
-  container.classList.add('such-fixkopf-view');
+  container.classList.add('dex-fixkopf', 'such-fixkopf-view');
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-suche-seite such-fixkopf">
       <div class="tuck-suchzeile">
@@ -708,8 +708,6 @@ async function mountSearch(container, signal) {
     vorgemerkteSuche = '';
     renderResults();
   }
-  requestAnimationFrame(() => input.focus({ preventScroll: true }));
-
 }
 
 function mountComingSoon(container, route) {
