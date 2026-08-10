@@ -2,6 +2,8 @@ import { supabase } from './supabase.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { chooseReminderIcon, reminderIconMarkup } from './reminders.js';
 import { dexEntryOverviewMarkup, loadDexEntries, openDexEntryEditor, vorschaubilderEinblenden } from './dexEntries.js';
+import { editEntry } from './dexEntryDetail.js';
+import { bindLongPress } from './longPress.js';
 import { toast } from './toast.js';
 
 const escapeHtml = (value = '') => String(value)
@@ -65,11 +67,12 @@ function editor(userId, { existing = null, onSaved }) {
   };
   backdrop.querySelector('[data-routine-icon-open]').onclick = (event) => {
     event.preventDefault();
+    const button = event.currentTarget;
     const input = backdrop.querySelector('[data-routine-icon]');
     chooseReminderIcon(input.value, (value) => {
       input.value = value;
-      event.currentTarget.innerHTML = reminderIconMarkup(value);
-    });
+      button.innerHTML = reminderIconMarkup(value);
+    }, { hostBackdrop: backdrop });
   };
   backdrop.querySelector('[data-routine-form]').onsubmit = async (event) => {
     event.preventDefault();
@@ -166,7 +169,8 @@ export async function mountRoutines(container, { session, signal }) {
     vorschaubilderEinblenden(container.querySelector('[data-routine-plan]'));
   };
   paint();
-  container.querySelector('[data-routine-plan]').onclick = async (event) => {
+  const plan = container.querySelector('[data-routine-plan]');
+  plan.onclick = async (event) => {
     const row = event.target.closest('[data-routine-id]');
     if (!row) return;
     const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
@@ -195,5 +199,10 @@ export async function mountRoutines(container, { session, signal }) {
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
     paint();
   };
+  bindLongPress(plan, '.routine-anhaenge .dex-inhaltskarte', (element) => {
+    const entry = state.attachments.find((item) => item.id === element.dataset.dexEntryId);
+    if (!entry) return null;
+    return () => editEntry(entry, refresh, { onDeleted: refresh });
+  });
   return { openRoutineEditor: () => editor(userId, { onSaved: refresh }) };
 }

@@ -541,27 +541,45 @@ function choosePeriod(type, onSelected) {
   };
 }
 
-export function chooseReminderIcon(current, onSelected) {
-  const backdrop = reminderOverlay(`
-    <header><h2>Icon auswählen</h2><button data-reminder-overlay-close aria-label="Schließen">×</button></header>
+export function chooseReminderIcon(current, onSelected, { hostBackdrop = null } = {}) {
+  const markup = `
+    <header><h2>Icon auswählen</h2><button class="rem-icon-close" data-reminder-overlay-close aria-label="Schließen">×</button></header>
     <div class="sammlung-editor-icons rem-icon-grid">${availableCategoryIcons.map((icon) => `<button type="button" data-rem-icon="${icon.id}" class="${current === icon.id ? 'aktiv' : ''}" aria-label="${escapeHtml(icon.title)}">${icon.svg}</button>`).join('')}</div>
     <form class="sammlung-emoji-eigen rem-eigenes-emoji" data-rem-emoji-form>
       <label for="rem-eigenes-emoji"><span>Eigenes Emoji</span>
         <input id="rem-eigenes-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🍳" value="${current.startsWith('emoji:') ? escapeHtml(current.slice(6)) : ''}">
       </label>
       <button class="btn btn-primary" type="submit">Emoji übernehmen</button>
-    </form>`);
-  backdrop.querySelector('.rem-icon-grid').onclick = (event) => {
+    </form>`;
+  let root;
+  let close;
+  if (hostBackdrop) {
+    const original = hostBackdrop.querySelector(':scope > .kategorie-sheet');
+    const picker = document.createElement('section');
+    picker.className = 'kategorie-sheet sammlung-editor rem-icon-picker-sheet';
+    picker.setAttribute('role', 'dialog');
+    picker.setAttribute('aria-modal', 'true');
+    picker.innerHTML = markup;
+    original.replaceWith(picker);
+    root = picker;
+    close = () => picker.replaceWith(original);
+    picker.querySelector('[data-reminder-overlay-close]').onclick = close;
+  } else {
+    const backdrop = reminderOverlay(markup);
+    root = backdrop;
+    close = () => backdrop.remove();
+  }
+  root.querySelector('.rem-icon-grid').onclick = (event) => {
     const value = event.target.closest('[data-rem-icon]')?.dataset.remIcon;
     if (!value) return;
-    backdrop.remove();
+    close();
     onSelected(value);
   };
-  backdrop.querySelector('[data-rem-emoji-form]').onsubmit = (event) => {
+  root.querySelector('[data-rem-emoji-form]').onsubmit = (event) => {
     event.preventDefault();
     const emoji = event.currentTarget.querySelector('input').value.trim();
     if (!emoji) return;
-    backdrop.remove();
+    close();
     onSelected(`emoji:${emoji}`);
   };
 }
