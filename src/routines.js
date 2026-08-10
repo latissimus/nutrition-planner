@@ -4,6 +4,7 @@ import { chooseReminderIcon, reminderIconMarkup } from './reminders.js';
 import { dexEntryOverviewMarkup, loadDexEntries, openDexEntryEditor, vorschaubilderEinblenden } from './dexEntries.js';
 import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
+import { maybePromptExternalMeditation, openMeditationTimer } from './meditationTimer.js';
 import { toast } from './toast.js';
 
 const escapeHtml = (value = '') => String(value)
@@ -32,7 +33,11 @@ async function load(userId, signal) {
   };
 }
 
-function editor(userId, { existing = null, onSaved }) {
+function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
+  const selectedTemplate = existing?.template_type || templateType;
+  const meditation = selectedTemplate === 'meditation';
+  const defaultName = meditation ? 'Meditation' : selectedTemplate === 'mobility' ? 'Mobility' : '';
+  const defaultIcon = meditation ? 'emoji:🧘' : selectedTemplate === 'mobility' ? 'emoji:🤸' : 'emoji:✓';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop routine-editor-backdrop';
   backdrop.style.setProperty('--ordner', categoryColor('habits'));
@@ -43,11 +48,20 @@ function editor(userId, { existing = null, onSaved }) {
     <form data-routine-form>
       <div class="routine-name-row">
         <div class="dex-entry-field routine-icon-field"><span>Icon</span>
-          <button type="button" class="rem-icon-waehler" data-routine-icon-open aria-label="Icon auswählen">${reminderIconMarkup(existing?.icon || 'emoji:✓')}</button>
-          <input type="hidden" data-routine-icon value="${escapeHtml(existing?.icon || 'emoji:✓')}">
+          <button type="button" class="rem-icon-waehler" data-routine-icon-open aria-label="Icon auswählen">${reminderIconMarkup(existing?.icon || defaultIcon)}</button>
+          <input type="hidden" data-routine-icon value="${escapeHtml(existing?.icon || defaultIcon)}">
         </div>
-        <label class="dex-entry-field"><span>Name</span><input class="input" data-routine-name maxlength="100" value="${escapeHtml(existing?.name || '')}" placeholder="z. B. 10 Minuten Mobility" required></label>
+        <label class="dex-entry-field"><span>Name</span><input class="input" data-routine-name maxlength="100" value="${escapeHtml(existing?.name || defaultName)}" placeholder="z. B. 10 Minuten Mobility" required></label>
       </div>
+      ${meditation ? `<section class="meditation-editor-settings">
+        <fieldset class="routine-duration"><legend>Dauer</legend><div>${[2, 5, 10, 15, 20].map((minutes) => `<button type="button" data-routine-duration="${minutes}" class="${Number(existing?.duration_minutes || 5) === minutes ? 'aktiv' : ''}">${minutes} min</button>`).join('')}</div></fieldset>
+        <label class="dex-entry-field"><span>Externer Meditationslink <small>optional</small></span><input class="input" type="text" inputmode="url" data-routine-external-url value="${escapeHtml(existing?.external_url || '')}" placeholder="Headspace, Calm, YouTube …"></label>
+        <label class="dex-entry-field"><span>Hintergrundsound</span><select class="input" data-routine-ambient>
+          ${[['off','Ohne Sound'],['rain','Regen'],['forest','Wald'],['ocean','Meeresrauschen'],['brown','Braunes Rauschen']].map(([value, label]) => `<option value="${value}"${(existing?.ambient_sound || 'off') === value ? ' selected' : ''}>${label}</option>`).join('')}
+        </select></label>
+        <label class="meditation-volume"><span>Hintergrundlautstärke <output data-ambient-output>${Math.round(Number(existing?.ambient_volume ?? 0.35) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.ambient_volume ?? 0.35)}" data-routine-ambient-volume></label>
+        <label class="meditation-volume"><span>Gong-Lautstärke <output data-gong-output>${Math.round(Number(existing?.gong_volume ?? 0.7) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.gong_volume ?? 0.7)}" data-routine-gong-volume></label>
+      </section>` : ''}
       <div class="routine-plan-row">
         <label class="dex-entry-field"><span>Tageszeit</span><select class="input" data-routine-period>${periods.map(([key, label]) => `<option value="${key}"${existing?.period === key ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
         <label class="dex-entry-field"><span>Uhrzeit</span><input class="input" type="time" data-routine-time value="${escapeHtml(existing?.time?.slice(0, 5) || '')}"></label>
@@ -66,6 +80,15 @@ function editor(userId, { existing = null, onSaved }) {
     button.classList.toggle('aktiv');
     button.setAttribute('aria-pressed', String(button.classList.contains('aktiv')));
   };
+  backdrop.querySelector('.routine-duration')?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-routine-duration]');
+    if (!button) return;
+    backdrop.querySelectorAll('[data-routine-duration]').forEach((item) => item.classList.toggle('aktiv', item === button));
+  });
+  [['[data-routine-ambient-volume]','[data-ambient-output]'],['[data-routine-gong-volume]','[data-gong-output]']].forEach(([inputSelector, outputSelector]) => {
+    const input = backdrop.querySelector(inputSelector); const output = backdrop.querySelector(outputSelector);
+    input?.addEventListener('input', () => { output.textContent = `${Math.round(Number(input.value) * 100)} %`; });
+  });
   backdrop.querySelector('[data-routine-icon-open]').onclick = (event) => {
     event.preventDefault();
     const button = event.currentTarget;
@@ -82,12 +105,24 @@ function editor(userId, { existing = null, onSaved }) {
     const weekdays = [...form.querySelectorAll('[data-routine-day].aktiv')].map((button) => Number(button.dataset.routineDay));
     if (!weekdays.length) return toast('Bitte mindestens einen Wochentag auswählen.');
     submit.disabled = true;
+    let externalUrl = form.querySelector('[data-routine-external-url]')?.value.trim() || null;
+    if (externalUrl && !/^[a-z][a-z\d+.-]*:/i.test(externalUrl)) externalUrl = `https://${externalUrl}`;
+    if (externalUrl) {
+      try { externalUrl = new URL(externalUrl).href; } catch { submit.disabled = false; return toast('Bitte einen gültigen Meditationslink eintragen.'); }
+      if (!/^https?:/i.test(externalUrl)) { submit.disabled = false; return toast('Bitte einen HTTP- oder HTTPS-Link verwenden.'); }
+    }
     const payload = {
       user_id: userId, name: form.querySelector('[data-routine-name]').value.trim(),
       icon: form.querySelector('[data-routine-icon]').value.trim() || '✓',
       period: form.querySelector('[data-routine-period]').value,
       time: form.querySelector('[data-routine-time]').value || null,
       note: form.querySelector('[data-routine-note]').value.trim(), weekdays,
+      template_type: selectedTemplate,
+      duration_minutes: meditation ? Number(form.querySelector('[data-routine-duration].aktiv')?.dataset.routineDuration || 5) : null,
+      external_url: meditation ? externalUrl : null,
+      ambient_sound: meditation ? form.querySelector('[data-routine-ambient]').value : 'off',
+      ambient_volume: meditation ? Number(form.querySelector('[data-routine-ambient-volume]').value) : 0.35,
+      gong_volume: meditation ? Number(form.querySelector('[data-routine-gong-volume]').value) : 0.7,
     };
     const query = existing
       ? supabase.from('routines').update(payload).eq('id', existing.id).eq('user_id', userId)
@@ -108,14 +143,37 @@ function editor(userId, { existing = null, onSaved }) {
 
 function routineRow(item, completed, attachments = [], darkColor = false) {
   const dayNames = item.weekdays?.length === 7 ? 'Täglich' : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label).join(' · ');
-  return `<article class="routine-row${completed ? ' erledigt' : ''}" data-routine-id="${item.id}">
+  const meditation = item.template_type === 'meditation';
+  return `<article class="routine-row${completed ? ' erledigt' : ''}${meditation ? ' hat-timer' : ''}" data-routine-id="${item.id}">
     <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
     <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
     <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
+    ${meditation ? `<button class="routine-start" type="button" data-routine-start aria-label="Meditation starten">${materialIconMarkup('play_arrow')}</button>` : ''}
     <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
     <button class="routine-edit" type="button" data-routine-edit aria-label="${escapeHtml(item.name)} bearbeiten">${materialIconMarkup('build')}</button>
     ${attachments.length ? `<div class="routine-anhaenge">${attachments.map((entry) => dexEntryOverviewMarkup(entry, categoryColor('habits'))).join('')}</div>` : ''}
   </article>`;
+}
+
+function chooseRoutineTemplate(userId, onSaved) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop routine-template-backdrop offen';
+  backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Routine auswählen">
+    <header><h2>Routine hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="sheet-menue routine-template-list">
+      <button type="button" data-routine-template="meditation"><span class="routine-template-icon">🧘</span><span><b>Meditation</b><small>Timer, Atemhilfe und Sounds</small></span></button>
+      <button type="button" data-routine-template="mobility"><span class="routine-template-icon">🤸</span><span><b>Mobility</b><small>Grundlage – Übungen folgen separat</small></span></button>
+      <button type="button" data-routine-template="custom">${materialIconMarkup('add')}<span><b>Leere Routine</b><small>Alles selbst festlegen</small></span></button>
+    </div>
+  </section>`;
+  const close = () => backdrop.remove();
+  backdrop.onclick = (event) => {
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
+    const templateType = event.target.closest('[data-routine-template]')?.dataset.routineTemplate;
+    if (!templateType) return;
+    close(); editor(userId, { templateType, onSaved });
+  };
+  document.body.append(backdrop);
 }
 
 function chooseAttachment(item, userId, onSaved) {
@@ -176,6 +234,7 @@ export async function mountRoutines(container, { session, signal }) {
     if (!row) return;
     const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
     if (!item) return;
+    if (event.target.closest('[data-routine-start]')) return openMeditationTimer({ userId, routine: item, onCompleted: refresh });
     if (event.target.closest('[data-routine-attach]')) return chooseAttachment(item, userId, refresh);
     if (event.target.closest('[data-routine-edit]')) return editor(userId, { existing: item, onSaved: refresh });
     if (!event.target.closest('[data-routine-check]')) return;
@@ -205,5 +264,6 @@ export async function mountRoutines(container, { session, signal }) {
     if (!entry) return null;
     return () => editEntry(entry, refresh, { onDeleted: refresh });
   });
-  return { openRoutineEditor: () => editor(userId, { onSaved: refresh }) };
+  maybePromptExternalMeditation({ userId, routines: state.routines, onCompleted: refresh });
+  return { openRoutineEditor: () => chooseRoutineTemplate(userId, refresh) };
 }

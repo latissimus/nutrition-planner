@@ -2901,6 +2901,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 :root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
 .routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;border-bottom:1px solid var(--app-divider)}
+.routine-row.hat-timer{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check:active{transform:none!important;box-shadow:none!important}
@@ -2918,8 +2919,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-copy b,.routine-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .routine-row.erledigt .routine-copy{opacity:.48}.routine-row.erledigt .routine-copy b{text-decoration:line-through}
 .routine-row.erledigt .routine-check{background:var(--ordner)}
-.routine-edit,.routine-attach{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
-.routine-edit .material-svg,.routine-edit svg,.routine-attach .material-svg,.routine-attach svg{width:18px;height:18px;fill:#000}
+.routine-edit,.routine-attach,.routine-start{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
+.routine-edit .material-svg,.routine-edit svg,.routine-attach .material-svg,.routine-attach svg,.routine-start .material-svg,.routine-start svg{width:18px;height:18px;fill:#000}
 .routine-zeitblock-leer{margin:0;padding:15px;color:var(--muted);font:500 12px/1.4 var(--ui)}
 .routine-anhaenge{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;padding:3px 0 5px}
 .routine-anhaenge .dex-inhaltskarte{min-width:0}
@@ -2938,6 +2939,47 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-days button{min-width:0;height:38px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);font:800 11px/1 var(--ui)}
 .routine-days button.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
 .routine-delete{border-color:#B42318!important;color:#B42318!important;background:#fff!important}
+.routine-template-list>button{grid-template-columns:42px minmax(0,1fr)}
+.routine-template-list>button>span:last-child{display:flex;min-width:0;flex-direction:column;gap:3px}
+.routine-template-list>button b{font:800 17px/1.1 var(--ui)}
+.routine-template-list>button small{color:var(--muted);font:500 12px/1.25 var(--ui)}
+.routine-template-icon{display:grid;place-items:center;width:36px;height:36px;font-size:26px;line-height:1}
+.routine-template-list .material-svg,.routine-template-list svg{width:27px;height:27px;fill:#000}
+.meditation-editor-settings{display:grid;gap:15px;padding:15px;border:1px solid var(--app-divider);border-radius:13px;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}
+.routine-duration{min-width:0;margin:0;padding:0;border:0}
+.routine-duration legend{margin-bottom:8px;font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
+.routine-duration>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.routine-duration button{min-width:0;height:39px;padding:0 3px;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);font:800 11px/1 var(--ui)}
+.routine-duration button.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
+.meditation-volume{display:grid;gap:7px}
+.meditation-volume>span{display:flex;justify-content:space-between;gap:10px;font:800 12px/1.2 var(--ui)}
+.meditation-volume output{color:var(--muted);font-variant-numeric:tabular-nums}
+.meditation-volume input{width:100%;accent-color:var(--ordner)}
+.meditation-timer{overflow:hidden;text-align:center}
+.meditation-timer>header{text-align:left}
+.meditation-timer>header>div{display:flex;min-width:0;flex-direction:column;gap:3px}
+.meditation-timer>header small{color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.09em}
+.meditation-atmung{position:relative;display:grid;place-items:center;width:min(52vw,220px);aspect-ratio:1;margin:20px auto 16px;border-radius:50%;background:color-mix(in srgb,var(--ordner) 20%,var(--surface));overflow:hidden}
+.meditation-atmung i{position:absolute;width:54%;aspect-ratio:1;border-radius:50%;background:var(--ordner);opacity:.82;transform:scale(.72)}
+.meditation-atmung span{position:relative;z-index:1;color:var(--ordner-ink,#000);font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
+.meditation-atmung.laeuft i{animation:meditation-atmen 8s ease-in-out infinite}
+.meditation-atmung.laeuft span{animation:meditation-atemtext 8s linear infinite}
+@keyframes meditation-atmen{0%,100%{transform:scale(.64)}45%,55%{transform:scale(1.35)}}
+@keyframes meditation-atemtext{0%,49%{opacity:1}50%,99%{opacity:.65}}
+.meditation-time{display:block;margin:0 auto;color:var(--ink);font:800 clamp(42px,14vw,68px)/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.meditation-sound-label{display:block;margin:9px 0 20px;color:var(--muted);font:700 12px/1.2 var(--ui)}
+.meditation-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:10px}
+.meditation-controls .btn{display:flex;min-height:50px;align-items:center;justify-content:center;gap:8px}
+.meditation-controls .material-svg,.meditation-controls svg,.meditation-external .material-svg,.meditation-external svg{width:21px;height:21px;fill:currentColor}
+.meditation-external{display:flex;width:100%;min-height:48px;margin-top:10px;align-items:center;justify-content:center;gap:8px}
+.meditation-timer.abgeschlossen .meditation-atmung i{transform:scale(1);opacity:1}
+.meditation-timer.abgeschlossen .meditation-atmung span{font-size:0}
+.meditation-timer.abgeschlossen .meditation-atmung span::after{content:"✓";font-size:42px}
+.meditation-timer.abgeschlossen .meditation-controls{grid-template-columns:1fr}
+.meditation-return>p{margin:0 0 18px;color:var(--muted);font:500 14px/1.4 var(--ui)}
+.meditation-return-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meditation-return-actions .btn{min-height:50px}
+@media (prefers-reduced-motion:reduce){.meditation-atmung.laeuft i,.meditation-atmung.laeuft span{animation:none}}
 .routine-push-actions>header>div{display:flex;min-width:0;flex-direction:column;gap:3px}
 .routine-push-actions>header small{color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.09em}
 .routine-push-actions>p{margin:-2px 0 15px;color:var(--muted);font:500 13px/1.4 var(--ui)}
