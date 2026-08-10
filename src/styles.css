@@ -204,7 +204,7 @@ html{background:var(--bg)}
    auch wenn das Tutorial automatisch zur naechsten Uebung faehrt. */
 html.overlay-scroll-gesperrt .app-shell #view{overflow:hidden}
 body{
-  background:transparent;color:var(--text);font-family:var(--mono);
+  background:var(--bg);color:var(--text);font-family:var(--mono);
   font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
 }
 /* 700 statt 900: Das Vorbild setzt --heading-font-weight auf 700. Unsere
@@ -2210,11 +2210,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 
 
-html{min-height:100%;background-color:var(--bg)}
-/* body und #app bleiben transparent, damit das auf html liegende Tapeten-
-   Muster ueberall durchscheint (auch in der iOS-Home-Indicator-Zone unten
-   und unter der Statusleiste oben). */
-body,#app{min-height:100%;background-color:transparent}
+html,body,#app{min-height:100%;background-color:var(--bg)}
 #app{min-height:100dvh}
 #view{min-height:calc(100dvh - 68px)}
 
@@ -4033,14 +4029,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Ein globaler, musterfreier App-Hintergrund. Die Safe Area hinter den
    iOS-Systemsymbolen wechselt dadurch beim Navigieren weder Farbe noch
    Tapete; nur die deckende Inhaltsseite bewegt sich. */
-/* Nur html traegt Farbe und Muster; body/#app/#view bleiben transparent,
-   damit das Tapeten-Muster ueberall (auch in der Safe-Area unter dem
-   Home-Indicator) sichtbar durchscheint. Frueher hat diese Regel die Flaechen
-   deckend gemacht – dadurch entstand am unteren Rand ein einfarbiger Streifen,
-   hinter dem der scrollende Inhalt verschwand. */
+:root[data-seite],
 :root[data-seite] body,
-:root[data-seite] #app,
-:root[data-seite] #view{background-color:transparent!important;background-image:none!important}
+:root[data-seite] #app{background-color:var(--bg)!important;background-image:none!important}
+:root[data-seite] #view{background-image:none!important}
 
 /* Eine individuell gewaehlte Dex-Tapete hat Vorrang vor dem globalen,
    musterfreien Seitenwechsel-Hintergrund. Die Tapete liegt auf html und
