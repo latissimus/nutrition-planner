@@ -952,16 +952,11 @@ async function render() {
   } else if (route === 'habits') {
     setSeite('habits');
     const routineActions = await mountRoutines(view, { session, signal });
-    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-    const openEntry = (type, entryLabel = '') => openDexEntryEditor({ type, entryLabel, userId: session.user.id, rootKey: 'habits', onSaved: refresh });
     mountCategoryChrome(view, route, 'ROUTINEN', {
       pageLookScope: route, pageLookPattern: 'triangles',
-      onAddNote: () => openEntry('note'),
-      onAddImage: () => openEntry('image'),
-      onAddAudio: () => openEntry('audio'),
-      onAddRoutine: () => routineActions?.openRoutineEditor?.(),
+      onPlus: () => routineActions?.openRoutineEditor?.(),
     });
-    await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', color: categoryColor('habits'), signal, hideEmpty: true });
+    await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', routineId: null, color: categoryColor('habits'), signal, hideEmpty: true });
   } else {
     mountHome(view, signal);
   }

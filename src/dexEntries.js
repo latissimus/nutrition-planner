@@ -10,7 +10,7 @@ const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
 const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
-const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -37,11 +37,13 @@ function queryScope(query, { collectionId }) {
   return collectionId ? query.eq('collection_id', collectionId) : query.is('collection_id', null);
 }
 
-export async function loadDexEntries(userId, { rootKey, collectionId = null, signal } = {}) {
+export async function loadDexEntries(userId, { rootKey, collectionId = null, routineId, signal } = {}) {
   let query = supabase.from('dex_entries')
     .select(ENTRY_COLUMNS)
     .eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
+  if (routineId === null) query = query.is('routine_id', null);
+  else if (routineId) query = query.eq('routine_id', routineId);
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
@@ -139,7 +141,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
   </section>`;
 }
 
-export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, foodKind = null, entryLabel = '', onSaved }) {
+export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
   if (!['link', 'image', 'note', 'audio', 'routine'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
   const foodMode = rootKey === 'food-log';
   const backdrop = document.createElement('div');
@@ -277,7 +279,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         }
       }
       const { data, error } = await supabase.from('dex_entries').insert({
-        user_id: userId, collection_id: collectionId, root_key: rootKey,
+        user_id: userId, collection_id: collectionId, routine_id: routineId, root_key: rootKey,
         entry_type: type, title, note: form.querySelector('#dex-entry-note')?.value.trim() || linkPreview.description || '',
         url, image_path: imagePath, audio_path: audioPath,
         preview_url: linkPreview.previewUrl || null,
@@ -475,12 +477,12 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
 }
 
 export async function renderDexEntries(container, {
-  userId, rootKey, collectionId = null, color, signal, onChanged, foodFilters = rootKey === 'food-log', hasChildren = false, hideEmpty = false,
+  userId, rootKey, collectionId = null, routineId, color, signal, onChanged, foodFilters = rootKey === 'food-log', hasChildren = false, hideEmpty = false,
 } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
   try {
-    const entries = await loadDexEntries(userId, { rootKey, collectionId, signal });
+    const entries = await loadDexEntries(userId, { rootKey, collectionId, routineId, signal });
     if (signal?.aborted) return [];
     let activeFilter = 'all';
     const paint = () => {

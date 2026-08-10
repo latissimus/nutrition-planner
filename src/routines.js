@@ -1,5 +1,7 @@
 import { supabase } from './supabase.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import { chooseReminderIcon, reminderIconMarkup } from './reminders.js';
+import { dexEntryOverviewMarkup, loadDexEntries, openDexEntryEditor, vorschaubilderEinblenden } from './dexEntries.js';
 import { toast } from './toast.js';
 
 const escapeHtml = (value = '') => String(value)
@@ -17,10 +19,15 @@ async function load(userId, signal) {
   let routinesQuery = supabase.from('routines').select('*').eq('user_id', userId).order('position');
   let completionsQuery = supabase.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).eq('completed_on', today());
   if (signal) { routinesQuery = routinesQuery.abortSignal(signal); completionsQuery = completionsQuery.abortSignal(signal); }
-  const [{ data: routines, error }, { data: completions, error: completionError }] = await Promise.all([routinesQuery, completionsQuery]);
+  const [{ data: routines, error }, { data: completions, error: completionError }, attachments] = await Promise.all([
+    routinesQuery, completionsQuery, loadDexEntries(userId, { rootKey: 'habits', signal }),
+  ]);
   if (error) throw error;
   if (completionError) throw completionError;
-  return { routines: routines || [], completed: new Set((completions || []).map((item) => item.routine_id)) };
+  return {
+    routines: routines || [], completed: new Set((completions || []).map((item) => item.routine_id)),
+    attachments: (attachments || []).filter((entry) => entry.routine_id),
+  };
 }
 
 function editor(userId, { existing = null, onSaved }) {
@@ -32,7 +39,10 @@ function editor(userId, { existing = null, onSaved }) {
     <header><h2>${existing ? 'Routine bearbeiten' : 'Neue Routine'}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-routine-form>
       <div class="routine-name-row">
-        <label class="dex-entry-field routine-icon-field"><span>Icon</span><input class="input" data-routine-icon maxlength="8" value="${escapeHtml(existing?.icon || '✓')}" inputmode="text"></label>
+        <div class="dex-entry-field routine-icon-field"><span>Icon</span>
+          <button type="button" class="rem-icon-waehler" data-routine-icon-open aria-label="Icon auswählen">${reminderIconMarkup(existing?.icon || 'emoji:✓')}</button>
+          <input type="hidden" data-routine-icon value="${escapeHtml(existing?.icon || 'emoji:✓')}">
+        </div>
         <label class="dex-entry-field"><span>Name</span><input class="input" data-routine-name maxlength="100" value="${escapeHtml(existing?.name || '')}" placeholder="z. B. 10 Minuten Mobility" required></label>
       </div>
       <div class="routine-plan-row">
@@ -52,6 +62,14 @@ function editor(userId, { existing = null, onSaved }) {
     if (!button) return;
     button.classList.toggle('aktiv');
     button.setAttribute('aria-pressed', String(button.classList.contains('aktiv')));
+  };
+  backdrop.querySelector('[data-routine-icon-open]').onclick = (event) => {
+    event.preventDefault();
+    const input = backdrop.querySelector('[data-routine-icon]');
+    chooseReminderIcon(input.value, (value) => {
+      input.value = value;
+      event.currentTarget.innerHTML = reminderIconMarkup(value);
+    });
   };
   backdrop.querySelector('[data-routine-form]').onsubmit = async (event) => {
     event.preventDefault();
@@ -84,14 +102,40 @@ function editor(userId, { existing = null, onSaved }) {
   requestAnimationFrame(() => { backdrop.classList.add('offen'); backdrop.querySelector('[data-routine-name]')?.focus({ preventScroll: true }); });
 }
 
-function routineRow(item, completed, darkColor = false) {
+function routineRow(item, completed, attachments = [], darkColor = false) {
   const dayNames = item.weekdays?.length === 7 ? 'Täglich' : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label).join(' · ');
   return `<article class="routine-row${completed ? ' erledigt' : ''}" data-routine-id="${item.id}">
     <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
-    <span class="routine-icon" aria-hidden="true">${escapeHtml(item.icon || '✓')}</span>
+    <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
     <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
+    <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
     <button class="routine-edit" type="button" data-routine-edit aria-label="${escapeHtml(item.name)} bearbeiten">${materialIconMarkup('build')}</button>
+    ${attachments.length ? `<div class="routine-anhaenge">${attachments.map((entry) => dexEntryOverviewMarkup(entry, categoryColor('habits'))).join('')}</div>` : ''}
   </article>`;
+}
+
+function chooseAttachment(item, userId, onSaved) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop routine-attachment-backdrop offen';
+  backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Anhang hinzufügen">
+    <header><h2>Anhang hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="sheet-menue">
+      <button type="button" data-routine-attachment="image">${materialIconMarkup('add_photo_alternate')}<span>Bild</span></button>
+      <button type="button" data-routine-attachment="link">${materialIconMarkup('place_item')}<span>Link</span></button>
+    </div>
+  </section>`;
+  const close = () => backdrop.remove();
+  backdrop.onclick = (event) => {
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
+    const type = event.target.closest('[data-routine-attachment]')?.dataset.routineAttachment;
+    if (!type) return;
+    close();
+    openDexEntryEditor({
+      type, userId, rootKey: 'habits', routineId: item.id,
+      entryLabel: type === 'image' ? 'Routine-Bild' : 'Routine-Link', onSaved,
+    });
+  };
+  document.body.append(backdrop);
 }
 
 export async function mountRoutines(container, { session, signal }) {
@@ -115,9 +159,11 @@ export async function mountRoutines(container, { session, signal }) {
     container.querySelector('[data-routine-progress]').textContent = scheduled.length ? `${done} von ${scheduled.length} für heute erledigt` : 'Heute ist keine Routine geplant.';
     container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
       const items = state.routines.filter((item) => item.period === key);
-      if (!items.length) return '';
-      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.map((item) => routineRow(item, state.completed.has(item.id), darkColor)).join('')}</div></section>`;
-    }).join('') || '';
+      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
+        ? items.map((item) => routineRow(item, state.completed.has(item.id), state.attachments.filter((entry) => entry.routine_id === item.id), darkColor)).join('')
+        : '<p class="routine-zeitblock-leer">Noch keine Routine geplant.</p>'}</div></section>`;
+    }).join('');
+    vorschaubilderEinblenden(container.querySelector('[data-routine-plan]'));
   };
   paint();
   container.querySelector('[data-routine-plan]').onclick = async (event) => {
@@ -125,6 +171,7 @@ export async function mountRoutines(container, { session, signal }) {
     if (!row) return;
     const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
     if (!item) return;
+    if (event.target.closest('[data-routine-attach]')) return chooseAttachment(item, userId, refresh);
     if (event.target.closest('[data-routine-edit]')) return editor(userId, { existing: item, onSaved: refresh });
     if (!event.target.closest('[data-routine-check]')) return;
     const completed = state.completed.has(item.id);

@@ -2900,7 +2900,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
   padding:12px 15px;border-bottom:1px solid var(--app-divider);
 }
 :root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
-.routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 34px;align-items:center;gap:10px;min-height:64px;padding:9px 11px;border-bottom:1px solid var(--app-divider)}
+.routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;border-bottom:1px solid var(--app-divider)}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check:active{transform:none!important;box-shadow:none!important}
@@ -2912,19 +2912,24 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-check.kontrast-weiss .material-svg svg,
 .routine-check.kontrast-weiss .material-svg svg *{color:#fff!important;fill:#fff!important}
 .routine-icon{display:grid;place-items:center;width:34px;height:34px;font-size:22px;line-height:1}
+.routine-icon :is(.reminder-svg,.reminder-emoji){display:grid;width:25px;height:25px;place-items:center}
+.routine-icon .reminder-svg svg{display:block;width:23px;height:23px;fill:#000}
 .routine-copy{display:flex;min-width:0;flex-direction:column;gap:3px}
 .routine-copy b,.routine-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .routine-row.erledigt .routine-copy{opacity:.48}.routine-row.erledigt .routine-copy b{text-decoration:line-through}
 .routine-row.erledigt .routine-check{background:var(--ordner)}
-.routine-edit{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent;color:#000}
-.routine-edit .material-svg,.routine-edit svg{width:19px;height:19px;fill:#000}
+.routine-edit,.routine-attach{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
+.routine-edit .material-svg,.routine-edit svg,.routine-attach .material-svg,.routine-attach svg{width:18px;height:18px;fill:#000}
+.routine-zeitblock-leer{margin:0;padding:15px;color:var(--muted);font:500 12px/1.4 var(--ui)}
+.routine-anhaenge{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;padding:3px 0 5px}
+.routine-anhaenge .dex-inhaltskarte{min-width:0}
 .routine-notizen{margin-top:18px}
 .routine-editor form{display:grid;gap:16px}
 .routine-name-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:10px}
 .routine-plan-row{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:10px}
 .routine-plan-row>label:last-child{width:100px;justify-self:end}
 .routine-plan-row input[type="time"]{width:100px;max-width:100px;padding-inline:8px;font-variant-numeric:tabular-nums}
-.routine-icon-field .input{text-align:center;font-size:23px}
+.routine-icon-field .rem-icon-waehler{width:100%;min-height:48px;margin:0}
 .routine-days{min-width:0;margin:0;padding:0;border:0}
 .routine-days legend{margin-bottom:8px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .routine-days>div{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}

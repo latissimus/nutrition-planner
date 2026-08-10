@@ -65,7 +65,7 @@ function notificationSymbol(reminder) {
   return ({ fastfood: '🍔', pill: '💊', water_drop: '💧' })[value] || '◆';
 }
 
-function reminderIconMarkup(value, className = '') {
+export function reminderIconMarkup(value, className = '') {
   if (String(value).startsWith('emoji:')) {
     return `<span class="reminder-emoji ${className}">${escapeHtml(String(value).slice(6))}</span>`;
   }
@@ -449,7 +449,7 @@ function reminderBodyMarkup(reminder, completion) {
         <span class="rem-switch-thumb"></span>
         <span class="rem-switch-label">Aktiv</span>
       </label>
-      ${reminder.id ? `<button type="button" class="rem-erledigt-btn${completion?.completed_at ? ' ist-aktiv' : ''}" data-done>
+      ${reminder.id && !isDrink ? `<button type="button" class="rem-erledigt-btn${completion?.completed_at ? ' ist-aktiv' : ''}" data-done>
         ${completion?.completed_at ? 'Heute erledigt ✓' : 'Für heute erledigt'}
       </button>` : ''}
     </div>
@@ -541,7 +541,7 @@ function choosePeriod(type, onSelected) {
   };
 }
 
-function chooseReminderIcon(current, onSelected) {
+export function chooseReminderIcon(current, onSelected) {
   const backdrop = reminderOverlay(`
     <header><h2>Icon auswählen</h2><button data-reminder-overlay-close aria-label="Schließen">×</button></header>
     <div class="sammlung-editor-icons rem-icon-grid">${availableCategoryIcons.map((icon) => `<button type="button" data-rem-icon="${icon.id}" class="${current === icon.id ? 'aktiv' : ''}" aria-label="${escapeHtml(icon.title)}">${icon.svg}</button>`).join('')}</div>
