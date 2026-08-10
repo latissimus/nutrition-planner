@@ -95,7 +95,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
           ${meditationSounds.map(([value, label]) => `<option value="${value}"${(existing?.ambient_sound || 'off') === value ? ' selected' : ''}>${label}</option>`).join('')}
         </select><button class="btn" type="button" data-sound-preview>${materialIconMarkup('play_arrow')}<span>Anhören</span></button></div></div>
         <label class="meditation-volume"><span>Hintergrundlautstärke <output data-ambient-output>${Math.round(Number(existing?.ambient_volume ?? 0.35) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.ambient_volume ?? 0.35)}" data-routine-ambient-volume></label>
-        <label class="meditation-volume"><span>Gong-Lautstärke <output data-gong-output>${Math.round(Number(existing?.gong_volume ?? 0.7) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.gong_volume ?? 0.7)}" data-routine-gong-volume></label>
+        <label class="meditation-volume"><span>Start-/Endsignal <output data-gong-output>${Math.round(Number(existing?.gong_volume ?? 0.7) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.gong_volume ?? 0.7)}" data-routine-gong-volume></label>
       </section>` : ''}
       ${mobility ? `<section class="mobility-editor-settings">
         <header><span><b>Übungsablauf</b><small>Reihenfolge, Wiederholungen oder Dauer genau festlegen.</small></span><button type="button" data-mobility-add><b>+</b><span>Übung</span></button></header>
@@ -109,7 +109,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       ${selectedTemplate === 'custom'
         ? `<label class="dex-entry-field"><span>Coins pro Abschluss</span><input class="input coin-zahlenfeld" data-routine-coins type="number" inputmode="numeric" min="0" max="50" value="${existing?.coin_reward ?? 5}" required><small class="routine-coin-info">Für diese freie Routine selbst festlegen: 0–50 Coins.</small></label>`
         : `<div class="routine-coin-fest" data-routine-coin-hint>${routineCoinValue(selectedTemplate, selectedDuration)} MUSCLE-COINS pro Abschluss</div>`}
-      <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" data-routine-note maxlength="500" rows="3" placeholder="Kurzer Hinweis zur Durchführung …">${escapeHtml(existing?.note || '')}</textarea></label>
+      <label class="dex-entry-field"><span>${selectedTemplate === 'custom' ? 'Ablauf' : 'Notiz'} <small>optional</small></span><textarea class="input" data-routine-note maxlength="500" rows="3" placeholder="${selectedTemplate === 'custom' ? 'Jeden Schritt in eine neue Zeile schreiben …' : 'Kurzer Hinweis zur Durchführung …'}">${escapeHtml(existing?.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block" type="submit">Routine speichern</button>
       ${existing ? '<button class="btn btn-block routine-delete" type="button" data-routine-delete>Routine löschen</button>' : ''}
     </form>

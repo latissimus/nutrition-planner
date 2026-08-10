@@ -27,6 +27,16 @@ const meditationTrackUrls = {
   brown: new URL('../Meditate Music/Braunes Rauschen.mp3', import.meta.url).href,
   blue: new URL('../Meditate Music/Blaues Rauschen.mp3', import.meta.url).href,
 };
+const timerCueUrls = {
+  meditation: {
+    start: new URL('../Meditate Music/Meditation Beginn.mp3', import.meta.url).href,
+    end: new URL('../Meditate Music/Meditation Ende.mp3', import.meta.url).href,
+  },
+  routine: {
+    start: new URL('../Meditate Music/Routine Beginn.mp3', import.meta.url).href,
+    end: new URL('../Meditate Music/Routine Ende.mp3', import.meta.url).href,
+  },
+};
 
 export async function completeRoutine(userId, routineId) {
   const date = today();
@@ -286,10 +296,13 @@ export function maybePromptExternalMeditation({ userId, routines, onCompleted })
 export function openMeditationTimer({ userId, routine, onCompleted, mobilityExercises = [] }) {
   const isMeditation = routine.template_type === 'meditation';
   const isMobility = routine.template_type === 'mobility';
+  const isCustom = routine.template_type === 'custom';
   const timerLabel = routine.template_type === 'mobility' ? 'MOBILITY'
     : routine.template_type === 'walk' ? 'SPAZIERGANG'
       : routine.template_type === 'custom' ? 'ROUTINE' : 'MEDITATION';
   const timerEmoji = routine.template_type === 'walk' ? '🚶' : '⏱️';
+  const routineSteps = isCustom ? String(routine.note || '').split(/\n+/)
+    .map((step) => step.trim().replace(/^[-•*\d.)]+\s*/, '')).filter(Boolean) : [];
   const duration = Number(routine.duration_minutes || 5) * 60;
   let remaining = duration;
   let running = false;
@@ -298,12 +311,26 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   let wakeLock = null;
   let context = null;
   let stopAmbient = () => {};
+  let startedOnce = false;
+  const cuePlayer = new Audio();
+  cuePlayer.preload = 'auto';
+  cuePlayer.playsInline = true;
+  const cueKind = isMeditation ? 'meditation' : 'routine';
+  const cueVolume = Number(routine.gong_volume ?? 0.7);
+  const playCue = async (phase) => {
+    cuePlayer.pause();
+    cuePlayer.src = timerCueUrls[cueKind][phase];
+    cuePlayer.currentTime = 0;
+    cuePlayer.volume = Math.max(0, Math.min(1, cueVolume));
+    try { await cuePlayer.play(); }
+    catch { playGong(context, cueVolume); }
+  };
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop meditation-timer-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet meditation-timer${isMeditation ? '' : ' routine-countdown'}" role="dialog" aria-modal="true" aria-label="${escapeHtml(timerLabel)}-Timer">
     <header><div><small>${timerLabel}</small><h2>${escapeHtml(routine.name)}</h2></div><button type="button" data-meditation-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    ${isMobility ? `<ol class="routine-timer-exercises" data-timer-visual aria-label="Übungsablauf">
-      ${mobilityExercises.map((exercise, index) => `<li><span>${index + 1}</span><p><b>${escapeHtml(exercise.name)}</b>${exercise.prescription ? `<small>${escapeHtml(exercise.prescription)}</small>` : ''}</p></li>`).join('')}
+    ${isMobility || routineSteps.length ? `<ol class="routine-timer-exercises" data-timer-visual aria-label="Ablauf">
+      ${(isMobility ? mobilityExercises.map((exercise) => ({ name: exercise.name, detail: exercise.prescription })) : routineSteps.map((step) => ({ name: step, detail: '' }))).map((step, index) => `<li><span>${index + 1}</span><p><b>${escapeHtml(step.name)}</b>${step.detail ? `<small>${escapeHtml(step.detail)}</small>` : ''}</p></li>`).join('')}
     </ol>` : `<div class="meditation-atmung${isMeditation ? '' : ' routine-timer-symbol'}" data-timer-visual aria-hidden="true">
       <span class="meditation-face">${isMeditation ? '😌' : timerEmoji}</span>
       ${isMeditation ? '<i class="meditation-stern stern-eins">✦</i><i class="meditation-stern stern-zwei">✧</i><i class="meditation-stern stern-drei">✦</i>' : ''}
@@ -332,12 +359,13 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   document.addEventListener('visibilitychange', visibilityHandler);
   const close = async () => {
     document.removeEventListener('visibilitychange', visibilityHandler);
+    cuePlayer.pause(); cuePlayer.removeAttribute('src'); cuePlayer.load();
     await stop(); await context?.close().catch(() => {}); backdrop.remove();
   };
   const finish = async () => {
     await stop(); remaining = 0; timeNode.textContent = '00:00';
     await context?.resume().catch(() => {});
-    playGong(context, Number(routine.gong_volume ?? 0.7));
+    await playCue('end');
     try {
       await completeRoutine(userId, routine.id);
       backdrop.querySelector('.meditation-timer').classList.add('abgeschlossen');
@@ -354,7 +382,7 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   };
   const start = async () => {
     context ||= audioContext(); await context?.resume();
-    if (remaining >= duration - 0.5) playGong(context, Number(routine.gong_volume ?? 0.7));
+    if (!startedOnce) { startedOnce = true; await playCue('start'); }
     stopAmbient = isMeditation ? startAmbient(context, routine.ambient_sound || 'off', Number(routine.ambient_volume ?? 0.35)) : () => {};
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
     endAt = performance.now() + remaining * 1000; running = true; visual?.classList.add('laeuft');
