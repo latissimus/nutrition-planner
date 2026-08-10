@@ -2930,12 +2930,12 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-plan-row>label:last-child{width:100px;justify-self:end}
 .routine-plan-row input[type="time"]{width:100px;max-width:100px;padding-inline:8px;font-variant-numeric:tabular-nums}
 .routine-icon-field .rem-icon-waehler{width:52px;height:48px;min-height:48px;margin:0}
-.routine-name-row .input{height:48px;min-height:48px}
+:root[data-seite="habits"] .routine-name-row .dex-entry-field .input{height:48px;min-height:48px}
 .routine-days{min-width:0;margin:0;padding:0;border:0}
 .routine-days legend{margin-bottom:8px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .routine-days>div{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
 .routine-days button{min-width:0;height:38px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);font:800 11px/1 var(--ui)}
-.routine-days button.aktiv{border-color:#000;background:var(--ordner);color:#000}
+.routine-days button.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
 .routine-delete{border-color:#B42318!important;color:#B42318!important;background:#fff!important}
 :root[data-seite="shopping"] .einkauf-formular .input{margin:0}
 :root[data-seite="shopping"] .einkauf-formular-zeile{gap:9px}
