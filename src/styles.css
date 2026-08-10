@@ -2926,6 +2926,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-anhaenge .dex-inhaltskarte{min-width:0}
 .routine-notizen{margin-top:18px}
 .routine-editor form{display:grid;gap:16px}
+.routine-template-editor{width:min(100%,640px);max-height:min(91dvh,850px);padding-inline:12px}
 .routine-name-row{display:grid;grid-template-columns:82px minmax(0,1fr);align-items:end;gap:10px}
 .routine-name-row>.dex-entry-field{grid-template-rows:auto 48px;align-self:end}
 .routine-plan-row{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:10px}

@@ -43,7 +43,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
   backdrop.style.setProperty('--ordner', categoryColor('habits'));
   backdrop.style.setProperty('--ordner-ink', colorIsDark(categoryColor('habits')) ? '#fff' : '#000');
   const selectedDays = new Set((existing?.weekdays || [1, 2, 3, 4, 5, 6, 7]).map(String));
-  backdrop.innerHTML = `<section class="kategorie-sheet routine-editor" role="dialog" aria-modal="true" aria-label="Routine ${existing ? 'bearbeiten' : 'hinzufügen'}">
+  backdrop.innerHTML = `<section class="kategorie-sheet routine-editor${selectedTemplate === 'custom' ? '' : ' routine-template-editor'}" role="dialog" aria-modal="true" aria-label="Routine ${existing ? 'bearbeiten' : 'hinzufügen'}">
     <header><h2>${existing ? 'Routine bearbeiten' : 'Neue Routine'}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-routine-form>
       <div class="routine-name-row">
