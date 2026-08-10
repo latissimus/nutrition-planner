@@ -204,7 +204,7 @@ html{background:var(--bg)}
    auch wenn das Tutorial automatisch zur naechsten Uebung faehrt. */
 html.overlay-scroll-gesperrt .app-shell #view{overflow:hidden}
 body{
-  background:var(--bg);color:var(--text);font-family:var(--mono);
+  background:transparent;color:var(--text);font-family:var(--mono);
   font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
 }
 /* 700 statt 900: Das Vorbild setzt --heading-font-weight auf 700. Unsere
@@ -2210,7 +2210,11 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 
 
-html,body,#app{min-height:100%;background-color:var(--bg)}
+html{min-height:100%;background-color:var(--bg)}
+/* body und #app bleiben transparent, damit das auf html liegende Tapeten-
+   Muster ueberall durchscheint (auch in der iOS-Home-Indicator-Zone unten
+   und unter der Statusleiste oben). */
+body,#app{min-height:100%;background-color:transparent}
 #app{min-height:100dvh}
 #view{min-height:calc(100dvh - 68px)}
 
