@@ -1390,12 +1390,12 @@ html.overlay-vollflaechig body::before{display:none}
 :root[data-seite="food-log"] main .wrap>*{min-width:0}
 
 .auth-marquee{display:flex;overflow:hidden;height:var(--mq-h);margin-top:env(safe-area-inset-top);align-items:center;
-  background:var(--navy);color:#fff;border-bottom:var(--bw) solid var(--ink);
-  font-size:11px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+  background:#001454;color:#fff;border-bottom:1.5px solid #000;
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.09em;white-space:nowrap}
 .auth-marquee span{flex:0 0 auto;min-width:max-content;animation:nutrition-laufband 18s linear infinite}
 @keyframes nutrition-laufband{to{transform:translateX(-100%)}}
-.auth-marke{display:flex;justify-content:center;align-items:center;margin-bottom:30px}
-.auth-marke .kopf-logo{display:block;width:min(78vw,310px);max-width:310px;max-height:170px;object-fit:contain}
+.auth-marke{display:flex;justify-content:center;align-items:center;margin-bottom:24px}
+.auth-marke .kopf-logo{display:block;width:min(62vw,230px);max-width:230px;max-height:125px;object-fit:contain}
 .auth-shell{min-height:calc(100dvh - var(--mq-h) - env(safe-area-inset-top))}
 .auth-shell [data-auth-form]{border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart)}
 
@@ -1865,7 +1865,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .themebtn{border:0;border-right:1px solid var(--app-divider);font-family:var(--ui);font-style:normal}
 .themebtn.on{background:var(--navy);color:#fff}
 .role-tag{border:0;background:var(--pink)}
-.auth-marquee{border:0;background:var(--navy)}
+.auth-marquee{background:#001454}
 .setup-card{border:0;border-radius:20px;background:var(--app-card)}
 .auth-title{color:var(--app-purple);font-style:normal}
 .auth-sub{color:var(--app-secondary)}
