@@ -39,11 +39,13 @@ describe('videoEmbedUrl', () => {
     expect(videoEmbedUrl('https://www.youtube.com/watch?v=xyz789')).toBe('https://www.youtube-nocookie.com/embed/xyz789');
     expect(videoEmbedUrl('https://vimeo.com/123456')).toBe('https://player.vimeo.com/video/123456');
     expect(videoEmbedUrl('https://www.tiktok.com/@creator/video/123456789')).toBe('https://www.tiktok.com/player/v1/123456789');
-    expect(videoEmbedUrl('https://www.instagram.com/reel/ABC123/')).toBe('');
+    expect(videoEmbedUrl('https://www.instagram.com/reel/ABC123/')).toBe('https://www.instagram.com/reel/ABC123/embed/');
+    expect(videoEmbedUrl('https://www.instagram.com/reels/XYZ789/?utm_source=test')).toBe('https://www.instagram.com/reel/XYZ789/embed/');
   });
 
   it('bettet gewöhnliche Links nicht ein', () => {
     expect(videoEmbedUrl('https://example.com/rezept')).toBe('');
+    expect(videoEmbedUrl('https://www.instagram.com/p/ABC123/')).toBe('');
   });
 });
 

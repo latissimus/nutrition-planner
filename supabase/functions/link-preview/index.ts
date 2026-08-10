@@ -71,6 +71,23 @@ async function tiktokEmbedMetadata(url: URL) {
   };
 }
 
+async function youtubeMetadata(url: URL, encoded: string) {
+  const embed = await oembed(`https://www.youtube.com/oembed?format=json&url=${encoded}`);
+  try {
+    const page = await pageMetadata(url);
+    return {
+      ...page,
+      ...embed,
+      // YouTubes oEmbed liefert keine Videobeschreibung. Die Open-Graph-
+      // Beschreibung der Videoseite ergänzt sie, ohne Titel und Thumbnail
+      // aus der stabileren oEmbed-Antwort zu verdrängen.
+      description: page.description || '',
+    };
+  } catch {
+    return embed;
+  }
+}
+
 async function stablePreviewUrl(value: string) {
   if (!value) return '';
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
@@ -121,7 +138,7 @@ Deno.serve(async (request) => {
     }
     const encoded = encodeURIComponent(url.href);
     let data: Record<string, unknown> = {};
-    if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) data = await oembed(`https://www.youtube.com/oembed?format=json&url=${encoded}`);
+    if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) data = await youtubeMetadata(url, encoded);
     else if (url.hostname.includes('tiktok.com')) {
       try { data = await oembed(`https://www.tiktok.com/oembed?url=${encoded}`); }
       catch {

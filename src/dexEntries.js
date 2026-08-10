@@ -328,10 +328,12 @@ export function videoEmbedUrl(value) {
       const id = url.pathname.match(/\/video\/(\d+)/)?.[1];
       return id ? `https://www.tiktok.com/player/v1/${id}` : '';
     }
-    // Instagram-Embeds veraendern auf iOS ihre Breite dynamisch und reagieren
-    // im PWA-iframe unzuverlaessig auf Play. Die App zeigt dafuer bewusst die
-    // gespeicherte Vorschau und den externen Aufruf.
-    if (url.hostname.includes('instagram.com')) return '';
+    if (url.hostname.includes('instagram.com')) {
+      const match = url.pathname.match(/\/(reel|reels|tv)\/([^/?#]+)/i);
+      if (!match) return '';
+      const type = match[1].toLowerCase() === 'reels' ? 'reel' : match[1].toLowerCase();
+      return `https://www.instagram.com/${type}/${match[2]}/embed/`;
+    }
   } catch { return ''; }
   return '';
 }
