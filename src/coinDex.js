@@ -1,0 +1,163 @@
+import { supabase } from './supabase.js';
+import { materialIconMarkup } from './categoryIcons.js';
+import { toast } from './toast.js';
+
+const escapeHtml = (value = '') => String(value)
+  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+
+export const muscleCoinMarkup = (className = '') => `
+  <span class="muscle-coin ${className}" aria-hidden="true"><span>M</span></span>`;
+
+function nextReward(rewards, balance) {
+  const active = rewards.filter((item) => item.active).sort((a, b) => a.cost - b.cost);
+  return active.find((item) => item.cost > balance) || active[0] || null;
+}
+
+export async function loadCoinSummary(userId, signal) {
+  try {
+    const balanceQuery = supabase.rpc('muscle_coin_balance');
+    let rewardsQuery = supabase.from('muscle_rewards').select('id,name,cost,active').eq('user_id', userId).eq('active', true).order('cost');
+    if (signal) rewardsQuery = rewardsQuery.abortSignal(signal);
+    const [{ data: balanceData, error }, { data: rewards, error: rewardError }] = await Promise.all([balanceQuery, rewardsQuery]);
+    if (error || rewardError) throw error || rewardError;
+    const balance = Number(balanceData || 0);
+    const next = nextReward(rewards || [], balance);
+    return { balance, next, available: true };
+  } catch {
+    // Vor dem Einspielen der Migration bleibt Home voll benutzbar. Die
+    // Wallet zeigt dann nur einen neutralen Startwert.
+    return { balance: 0, next: null, available: false };
+  }
+}
+
+export async function syncRoutineCoins(routineId, completionDate, completed) {
+  const { data, error } = await supabase.rpc('set_routine_coin_state', {
+    target_routine: routineId,
+    target_date: completionDate,
+    is_completed: completed,
+  });
+  if (error) throw error;
+  return Number(data || 0);
+}
+
+export function coinWalletMarkup(summary) {
+  const next = summary.next;
+  const remaining = next ? Math.max(0, Number(next.cost) - summary.balance) : 0;
+  const secondary = !summary.available
+    ? 'Nach dem Datenbank-Update verfügbar'
+    : next
+      ? `${remaining} bis „${escapeHtml(next.name)}“`
+      : 'Eigene Belohnung festlegen';
+  return `<a class="coin-wallet" href="#coins" aria-label="COIN-DEX öffnen, ${summary.balance} MUSCLE-COINS">
+    ${muscleCoinMarkup('coin-wallet-symbol')}
+    <span class="coin-wallet-copy"><b>MUSCLE-COINS</b><small>${secondary}</small></span>
+    <strong>${summary.balance}</strong>
+    ${materialIconMarkup('chevron_right')}
+  </a>`;
+}
+
+function closeOverlay(backdrop) {
+  backdrop?.remove();
+}
+
+function rewardEditor({ userId, existing = null, onSaved }) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop coin-editor-backdrop';
+  backdrop.innerHTML = `<section class="kategorie-sheet coin-editor" role="dialog" aria-modal="true" aria-label="Belohnung ${existing ? 'bearbeiten' : 'anlegen'}">
+    <header><h2>${existing ? 'Belohnung bearbeiten' : 'Neue Belohnung'}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <form data-coin-reward-form>
+      <label class="dex-entry-field"><span>Belohnung</span><input class="input" data-reward-name maxlength="80" value="${escapeHtml(existing?.name || '')}" placeholder="z. B. Lieblingssnack" required></label>
+      <label class="dex-entry-field"><span>Preis in MUSCLE-COINS</span><input class="input coin-zahlenfeld" data-reward-cost type="number" inputmode="numeric" min="1" max="100000" value="${existing?.cost || 100}" required></label>
+      <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" data-reward-note maxlength="500" rows="3" placeholder="Womit möchtest du dich belohnen?">${escapeHtml(existing?.note || '')}</textarea></label>
+      <label class="dex-entry-field"><span>Link <small>optional</small></span><input class="input" data-reward-link type="url" inputmode="url" value="${escapeHtml(existing?.link_url || '')}" placeholder="https://…"></label>
+      <button class="btn btn-primary btn-block" type="submit">Belohnung speichern</button>
+      ${existing ? '<button class="btn btn-block coin-reward-delete" type="button" data-reward-delete>Belohnung löschen</button>' : ''}
+    </form>
+  </section>`;
+  backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeOverlay(backdrop); };
+  backdrop.querySelector('[data-coin-reward-form]').onsubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submit = form.querySelector('[type="submit"]');
+    submit.disabled = true;
+    const payload = {
+      user_id: userId,
+      name: form.querySelector('[data-reward-name]').value.trim(),
+      cost: Number(form.querySelector('[data-reward-cost]').value),
+      note: form.querySelector('[data-reward-note]').value.trim(),
+      link_url: form.querySelector('[data-reward-link]').value.trim() || null,
+    };
+    const query = existing
+      ? supabase.from('muscle_rewards').update(payload).eq('id', existing.id).eq('user_id', userId)
+      : supabase.from('muscle_rewards').insert(payload);
+    const { error } = await query;
+    if (error) { toast('Belohnung konnte nicht gespeichert werden.'); submit.disabled = false; return; }
+    closeOverlay(backdrop); toast('Belohnung gespeichert'); await onSaved?.();
+  };
+  backdrop.querySelector('[data-reward-delete]')?.addEventListener('click', async () => {
+    if (!confirm(`„${existing.name}“ wirklich löschen?`)) return;
+    const { error } = await supabase.from('muscle_rewards').delete().eq('id', existing.id).eq('user_id', userId);
+    if (error) return toast('Belohnung konnte nicht gelöscht werden.');
+    closeOverlay(backdrop); toast('Belohnung gelöscht'); await onSaved?.();
+  });
+  document.body.append(backdrop);
+}
+
+function rewardMarkup(item, balance) {
+  const percent = Math.min(100, Math.round((balance / item.cost) * 100));
+  return `<article class="coin-reward" data-reward-id="${item.id}">
+    <div class="coin-reward-kopf">${muscleCoinMarkup()}<span><b>${escapeHtml(item.name)}</b><small>${item.cost} Coins</small></span><strong>${percent}%</strong></div>
+    <div class="coin-progress"><i style="width:${percent}%"></i></div>
+    ${item.note ? `<p>${escapeHtml(item.note)}</p>` : ''}
+    <div class="coin-reward-actions">
+      <button type="button" data-reward-edit>Bearbeiten</button>
+      <button type="button" class="coin-redeem" data-reward-redeem${balance < item.cost ? ' disabled' : ''}>Einlösen</button>
+    </div>
+  </article>`;
+}
+
+function historyText(item) {
+  if (item.event_type === 'reward_redeem') return item.note || 'Belohnung eingelöst';
+  if (item.event_type === 'adjustment') return item.note || 'Anpassung';
+  return item.note || 'Routine erledigt';
+}
+
+export async function mountCoinDex(container, { userId, signal, mountChrome }) {
+  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="seitenkopf"><h1>COIN-DEX</h1></div><div class="coin-dex-inhalt"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
+  const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+  mountChrome(container, 'coins', 'COIN-DEX', { color: '#05BDE8', meta: 'Belohnungen', onPlus: () => rewardEditor({ userId, onSaved: refresh }) });
+  let ledgerQuery = supabase.from('muscle_coin_ledger').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30);
+  let rewardsQuery = supabase.from('muscle_rewards').select('*').eq('user_id', userId).eq('active', true).order('cost');
+  if (signal) { ledgerQuery = ledgerQuery.abortSignal(signal); rewardsQuery = rewardsQuery.abortSignal(signal); }
+  const [{ data: ledger, error }, { data: rewards, error: rewardsError }] = await Promise.all([ledgerQuery, rewardsQuery]);
+  if (error || rewardsError) {
+    container.querySelector('.coin-dex-inhalt').innerHTML = '<div class="tuck-leer"><b>COIN-DEX noch nicht bereit</b><span>Bitte zuerst das neue Datenbank-Update einspielen.</span></div>';
+    return;
+  }
+  const balance = (ledger || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  const next = nextReward(rewards || [], balance);
+  const progress = next ? Math.min(100, Math.round((balance / next.cost) * 100)) : 0;
+  container.querySelector('.coin-dex-inhalt').innerHTML = `
+    <section class="coin-balance-card">
+      ${muscleCoinMarkup('coin-balance-symbol')}
+      <span><small>DEIN KONTOSTAND</small><strong>${balance}</strong><b>MUSCLE-COINS</b></span>
+    </section>
+    ${next ? `<section class="coin-next"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} Coins</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
+    <header class="coin-section-title"><h2>Belohnungen</h2><button type="button" data-new-reward>${materialIconMarkup('add')}<span>Neu</span></button></header>
+    <section class="coin-reward-list">${(rewards || []).length ? rewards.map((item) => rewardMarkup(item, balance)).join('') : '<div class="coin-empty"><b>Noch keine Belohnung</b><span>Lege etwas fest, auf das du dich wirklich freust.</span></div>'}</section>
+    ${(ledger || []).length ? `<h2 class="coin-history-title">Zuletzt</h2><section class="coin-history">${ledger.slice(0, 8).map((item) => `<div><span>${escapeHtml(historyText(item))}<small>${new Date(item.created_at).toLocaleDateString('de-DE')}</small></span><b class="${item.amount > 0 ? 'plus' : 'minus'}">${item.amount > 0 ? '+' : ''}${item.amount}</b></div>`).join('')}</section>` : ''}`;
+  container.querySelector('[data-new-reward]').onclick = () => rewardEditor({ userId, onSaved: refresh });
+  container.querySelector('.coin-reward-list').onclick = async (event) => {
+    const card = event.target.closest('[data-reward-id]');
+    if (!card) return;
+    const reward = (rewards || []).find((item) => item.id === card.dataset.rewardId);
+    if (!reward) return;
+    if (event.target.closest('[data-reward-edit]')) return rewardEditor({ userId, existing: reward, onSaved: refresh });
+    if (!event.target.closest('[data-reward-redeem]')) return;
+    if (!confirm(`„${reward.name}“ für ${reward.cost} MUSCLE-COINS einlösen?`)) return;
+    const { error: redeemError } = await supabase.rpc('redeem_muscle_reward', { target_reward: reward.id });
+    if (redeemError) return toast(redeemError.message || 'Einlösen fehlgeschlagen.');
+    toast('Belohnung eingelöst'); refresh();
+  };
+}

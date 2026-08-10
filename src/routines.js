@@ -6,6 +6,7 @@ import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
 import { maybePromptExternalMeditation, meditationSounds, openMeditationTimer, previewMeditationSound } from './meditationTimer.js';
 import { toast } from './toast.js';
+import { syncRoutineCoins } from './coinDex.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -67,6 +68,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
         <label class="dex-entry-field"><span>Uhrzeit</span><input class="input" type="time" data-routine-time value="${escapeHtml(existing?.time?.slice(0, 5) || '')}"></label>
       </div>
       <fieldset class="routine-days"><legend>Wiederholen</legend><div>${days.map(([value, label]) => `<button type="button" data-routine-day="${value}" class="${selectedDays.has(value) ? 'aktiv' : ''}" aria-pressed="${selectedDays.has(value)}">${label}</button>`).join('')}</div></fieldset>
+      <label class="dex-entry-field"><span>MUSCLE-COINS <small>optional</small></span><input class="input coin-zahlenfeld" data-routine-coins type="number" inputmode="numeric" min="0" max="50" value="${existing?.coin_reward ?? ''}" placeholder="Automatisch"></label>
       <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" data-routine-note maxlength="500" rows="3" placeholder="Kurzer Hinweis zur Durchführung …">${escapeHtml(existing?.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block" type="submit">Routine speichern</button>
       ${existing ? '<button class="btn btn-block routine-delete" type="button" data-routine-delete>Routine löschen</button>' : ''}
@@ -141,6 +143,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       ambient_sound: meditation ? form.querySelector('[data-routine-ambient]').value : 'off',
       ambient_volume: meditation ? Number(form.querySelector('[data-routine-ambient-volume]').value) : 0.35,
       gong_volume: meditation ? Number(form.querySelector('[data-routine-gong-volume]').value) : 0.7,
+      coin_reward: form.querySelector('[data-routine-coins]').value === '' ? null : Number(form.querySelector('[data-routine-coins]').value),
     };
     const query = existing
       ? supabase.from('routines').update(payload).eq('id', existing.id).eq('user_id', userId)
@@ -274,6 +277,8 @@ export async function mountRoutines(container, { session, signal }) {
         completed_at: new Date().toISOString(), snoozed_until: null,
       }, { onConflict: 'user_id,reminder_id,date' });
     }
+    try { await syncRoutineCoins(item.id, today(), !completed); }
+    catch { toast('Routine gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
     paint();
   };

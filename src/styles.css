@@ -2676,6 +2676,29 @@ button,a,[role="button"],summary{touch-action:manipulation;
   gap:10px 19px;padding:30px 3px 6px;
 }
 
+/* MUSCLE-COINS bleiben auf Home bewusst eine Nebeninformation und konkurrieren
+   weder mit der Suche noch mit den eigentlichen DEX-Karten. */
+.coin-wallet{
+  display:grid;grid-template-columns:32px minmax(0,1fr) auto 18px;align-items:center;gap:10px;
+  min-height:54px;margin:20px 3px 4px;padding:8px 11px;
+  border:1px solid color-mix(in srgb,var(--ink) 28%,transparent);border-radius:12px;
+  background:color-mix(in srgb,var(--surface) 72%,transparent);color:var(--text);text-decoration:none;
+}
+.coin-wallet-copy{display:flex;min-width:0;flex-direction:column;gap:2px}
+.coin-wallet-copy b{font-size:12px;line-height:1;letter-spacing:.045em}
+.coin-wallet-copy small{overflow:hidden;color:var(--muted);font-size:11px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.coin-wallet>strong{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.coin-wallet>.material-svg,.coin-wallet>.material-svg svg{width:17px;height:17px;fill:var(--muted)}
+
+.muscle-coin{
+  position:relative;display:grid;place-items:center;width:32px;height:32px;border:2px solid #492426;
+  border-radius:50%;background:#05bde8;color:#492426;box-shadow:2px 2px 0 #492426;
+  font:900 14px/1 var(--ui);transform:rotate(-6deg)
+}
+.muscle-coin::after{content:"";position:absolute;inset:4px;border:1px dashed #492426;border-radius:50%;opacity:.72}
+.muscle-coin>span{position:relative;z-index:1}
+.coin-wallet:active{transform:translateY(1px)}
+
 /* Dex-Karten: Die Farbe sitzt als schmaler Streifen innerhalb der Oberkante. */
 .tuck-fach{
   --ordner:var(--fe-blue-cloud);
@@ -3338,6 +3361,42 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .hat-kategoriefarbe .kategorie-kopfknopf[data-category-settings] .material-svg svg{fill:#000}
 .hat-kategoriefarbe .app-icon{color:#000}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
+
+/* ---------- COIN-DEX ---------- */
+.coin-dex-seite{--ordner:#05bde8}
+.coin-dex-inhalt{display:grid;gap:18px;padding:2px 2px 24px}
+.coin-balance-card{
+  display:flex;align-items:center;gap:17px;padding:18px;
+  border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface);box-shadow:var(--hart)
+}
+.coin-balance-card .coin-balance-symbol{width:64px;height:64px;flex:0 0 64px;border-width:3px;box-shadow:4px 4px 0 #492426;font-size:26px}
+.coin-balance-card>span{display:grid;min-width:0}
+.coin-balance-card small{font-size:11px;font-weight:800;letter-spacing:.08em}
+.coin-balance-card strong{font-size:clamp(34px,11vw,48px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.coin-balance-card b{font-size:13px;letter-spacing:.035em}
+.coin-next{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px 15px;border-radius:14px;background:color-mix(in srgb,#05bde8 17%,var(--surface))}
+.coin-next>span{display:grid;gap:2px}.coin-next small{color:var(--muted);font-size:12px;font-weight:600}.coin-next>strong{align-self:center;font-size:12px}
+.coin-progress{grid-column:1/-1;height:7px;overflow:hidden;border-radius:10px;background:color-mix(in srgb,var(--ink) 12%,transparent)}
+.coin-progress i{display:block;height:100%;border-radius:inherit;background:#05bde8}
+.coin-section-title{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.coin-section-title h2,.coin-history-title{margin:0;font-size:19px;text-transform:uppercase}
+.coin-section-title button{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:var(--surface);font:800 12px/1 var(--ui)}
+.coin-section-title button .material-svg,.coin-section-title button svg{width:16px;height:16px}
+.coin-reward-list{display:grid;gap:12px}
+.coin-reward{display:grid;gap:10px;padding:14px;border:1.5px solid var(--ink);border-radius:15px;background:var(--surface)}
+.coin-reward-kopf{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px}
+.coin-reward-kopf .muscle-coin{width:30px;height:30px;box-shadow:2px 2px 0 #492426;font-size:12px}
+.coin-reward-kopf>span{display:grid}.coin-reward-kopf b{font-size:15px}.coin-reward-kopf small{color:var(--muted);font-size:12px}.coin-reward-kopf>strong{font-size:12px}
+.coin-reward p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
+.coin-reward-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.coin-reward-actions button{min-height:38px;border:1.5px solid var(--ink);border-radius:10px;background:var(--surface);font:800 12px/1 var(--ui)}
+.coin-reward-actions .coin-redeem{background:#492426;color:#fff}.coin-reward-actions .coin-redeem:disabled{opacity:.32}
+.coin-empty{display:grid;gap:4px;padding:18px;border:1px dashed var(--muted);border-radius:14px;text-align:center}.coin-empty span{color:var(--muted);font-size:13px}
+.coin-history{display:grid;border-top:1px solid color-mix(in srgb,var(--ink) 24%,transparent)}
+.coin-history>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
+.coin-history span{display:grid;font-size:13px;font-weight:700}.coin-history small{color:var(--muted);font-size:11px;font-weight:500}.coin-history b{font-variant-numeric:tabular-nums}.coin-history .plus{color:#08794c}.coin-history .minus{color:#b51f55}
+.coin-editor form{display:grid;gap:14px}.coin-zahlenfeld{text-align:center;font-variant-numeric:tabular-nums}.coin-reward-delete{color:#b51f55}
 .seiten-x{
   display:grid!important;place-items:center;width:44px;min-width:44px;height:44px;padding:0!important;
   border:var(--karten-bw) solid var(--ink)!important;border-radius:var(--r)!important;

@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
+import { syncRoutineCoins } from './coinDex.js';
 
 const today = () => new Date().toLocaleDateString('sv-SE');
 const escapeHtml = (value = '') => String(value)
@@ -35,6 +36,8 @@ export async function completeRoutine(userId, routineId) {
     supabase.from('reminder_completions').upsert({ reminder_id: routineId, user_id: userId, date, completed_at: completedAt, snoozed_until: null }, { onConflict: 'user_id,reminder_id,date' }),
   ]);
   if (routineError || reminderError) throw routineError || reminderError;
+  try { await syncRoutineCoins(routineId, date, true); }
+  catch { toast('Meditation gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
 }
 
 function audioContext() {

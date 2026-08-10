@@ -24,6 +24,7 @@ import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountShoppingList } from './shoppingList.js';
 import { mountRoutines } from './routines.js';
 import { openRoutineNotificationActions } from './routineNotificationActions.js';
+import { coinWalletMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -552,6 +553,8 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
   eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
   try { eigeneStats = await eigeneDexStatistik(session.user.id, eigene, signal); }
   catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
+  const coinSummary = await loadCoinSummary(session.user.id, signal);
+  if (signal?.aborted) return;
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home home-fixkopf">
       <div class="tuck-kopfzeile">
@@ -580,6 +583,7 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
       <section class="tuck-grid" aria-label="Meine Dex-Einträge">
         ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
       </section>
+      ${coinWalletMarkup(coinSummary)}
       </div>
     </div>`;
 
@@ -828,7 +832,7 @@ async function render() {
   if (generation !== renderGeneration) return;
   const angefragt = (location.hash || '#home').slice(1);
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  const route = ['home', 'search', 'profile'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
+  const route = ['home', 'search', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
     : 'home';
@@ -868,6 +872,9 @@ async function render() {
         if (slot) slot.innerHTML = avatarMarkup();
       },
     });
+  } else if (route === 'coins') {
+    setSeite('coins');
+    await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
   } else if (route === 'body') {
     setSeite('body');
     await mountBodyMetrics(view, {
