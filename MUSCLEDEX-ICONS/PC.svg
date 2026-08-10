@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(0.0332234,0,0,0.0332234,12,13.8074)">
+        <clipPath id="_clip1">
+            <rect id="noun-retro-computer-5678842.svg" x="-228.85" y="-295.687" width="457.7" height="482.572"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <g transform="matrix(1,0,0,1,-228.85,-295.688)">
+                <clipPath id="_clip2">
+                    <rect x="0" y="0" width="457.7" height="591.375"/>
+                </clipPath>
+                <g clip-path="url(#_clip2)">
+                    <path d="M39.5,404.1C46.7,404.1 52.5,398.3 52.5,391.1C52.5,383.9 46.7,378.1 39.5,378.1C32.3,378.1 26.5,383.9 26.5,391.1C26.5,398.3 32.3,404.1 39.5,404.1Z" style="fill-rule:nonzero;"/>
+                    <path d="M69.6,404.1C76.8,404.1 82.6,398.3 82.6,391.1C82.6,383.9 76.8,378.1 69.6,378.1C62.4,378.1 56.6,383.9 56.6,391.1C56.6,398.3 62.4,404.1 69.6,404.1Z" style="fill-rule:nonzero;"/>
+                    <path d="M423.3,239.9L423.3,0L127.1,0L40.6,86.5L40.6,308.9L0,349.5L0,473.1L348.2,473.1L457.8,363.5L457.8,239.9L423.3,239.9ZM131.2,10L404.4,10L330.9,83.5L57.7,83.5L131.2,10ZM50.6,93.5L327.9,93.5L327.9,325.3L50.6,325.3L50.6,93.5ZM341.1,463.1L10,463.1L10,356.5L341.1,356.5L341.1,463.1ZM344,346.5L17.1,346.5L40.6,323L40.6,335.3L335,335.3L420.4,249.9L440.6,249.9L344,346.5Z" style="fill-rule:nonzero;"/>
+                    <rect x="81.4" y="118.1" width="215.2" height="182.7"/>
+                    <rect x="207.1" y="386.1" width="114.5" height="10"/>
+                    <g transform="matrix(1,0,0,1,0,488.1)">
+                        <text x="0px" y="0px" style="font-family:'HelveticaNeue-Bold', 'Helvetica Neue';font-weight:700;font-size:5px;">Created by WiStudio</text>
+                    </g>
+                    <g transform="matrix(1,0,0,1,0,493.1)">
+                        <text x="0px" y="0px" style="font-family:'HelveticaNeue-Bold', 'Helvetica Neue';font-weight:700;font-size:5px;">from the Noun Project</text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
