@@ -24,7 +24,7 @@ import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountShoppingList } from './shoppingList.js';
 import { mountRoutines } from './routines.js';
 import { openRoutineNotificationActions } from './routineNotificationActions.js';
-import { coinWalletMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
+import { coinHeaderMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -563,6 +563,7 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
           <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
             ${materialIconMarkup('create_new_folder')}
           </button>
+          ${coinHeaderMarkup(coinSummary)}
           <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
         </div>
       </div>
@@ -583,7 +584,6 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
       <section class="tuck-grid" aria-label="Meine Dex-Einträge">
         ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
       </section>
-      ${coinWalletMarkup(coinSummary)}
       </div>
     </div>`;
 

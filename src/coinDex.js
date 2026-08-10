@@ -7,7 +7,7 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
 export const muscleCoinMarkup = (className = '') => `
-  <span class="muscle-coin ${className}" aria-hidden="true"><span>M</span></span>`;
+  <span class="muscle-coin ${className}" aria-hidden="true"><img src="/muscle-coin.png" alt=""></span>`;
 
 function nextReward(rewards, balance) {
   const active = rewards.filter((item) => item.active).sort((a, b) => a.cost - b.cost);
@@ -41,19 +41,10 @@ export async function syncRoutineCoins(routineId, completionDate, completed) {
   return Number(data || 0);
 }
 
-export function coinWalletMarkup(summary) {
-  const next = summary.next;
-  const remaining = next ? Math.max(0, Number(next.cost) - summary.balance) : 0;
-  const secondary = !summary.available
-    ? 'Nach dem Datenbank-Update verfügbar'
-    : next
-      ? `${remaining} bis „${escapeHtml(next.name)}“`
-      : 'Eigene Belohnung festlegen';
-  return `<a class="coin-wallet" href="#coins" aria-label="COIN-DEX öffnen, ${summary.balance} MUSCLE-COINS">
-    ${muscleCoinMarkup('coin-wallet-symbol')}
-    <span class="coin-wallet-copy"><b>MUSCLE-COINS</b><small>${secondary}</small></span>
+export function coinHeaderMarkup(summary) {
+  return `<a class="coin-kopfstand" href="#coins" aria-label="MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}">
+    ${muscleCoinMarkup('coin-kopf-symbol')}
     <strong>${summary.balance}</strong>
-    ${materialIconMarkup('chevron_right')}
   </a>`;
 }
 
