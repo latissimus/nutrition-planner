@@ -2619,7 +2619,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
    quadratisch und so hoch wie das Feld. */
 .tuck-ablage{
   display:grid;grid-template-columns:minmax(0,1fr) 62px;gap:10px;align-items:stretch;
-  margin:0 2px 28px;
+  margin:0 2px 40px;
 }
 .tuck-ablage-feld{
   display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;
@@ -2914,6 +2914,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 :root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
 .routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;border-bottom:1px solid var(--app-divider)}
 .routine-row.hat-timer{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px}
+.routine-row.hat-ablauf{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px;cursor:pointer}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check:active{transform:none!important;box-shadow:none!important}
@@ -2931,8 +2932,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-copy b,.routine-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .routine-row.erledigt .routine-copy{opacity:.48}.routine-row.erledigt .routine-copy b{text-decoration:line-through}
 .routine-row.erledigt .routine-check{background:var(--ordner)}
-.routine-edit,.routine-attach,.routine-start{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
-.routine-edit .material-svg,.routine-edit svg,.routine-attach .material-svg,.routine-attach svg,.routine-start .material-svg,.routine-start svg{width:18px;height:18px;fill:#000}
+.routine-edit,.routine-attach,.routine-start,.routine-open{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
+.routine-edit .material-svg,.routine-edit svg,.routine-attach .material-svg,.routine-attach svg,.routine-start .material-svg,.routine-start svg,.routine-open .material-svg,.routine-open svg{width:18px;height:18px;fill:#000}
 .routine-zeitblock-leer{margin:0;padding:15px;color:var(--muted);font:500 12px/1.4 var(--ui)}
 .routine-anhaenge{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;padding:3px 0 5px}
 .routine-anhaenge .dex-inhaltskarte{min-width:0}
@@ -2959,6 +2960,12 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-template-icon{display:grid;place-items:center;width:36px;height:36px;font-size:26px;line-height:1}
 .routine-template-list .material-svg,.routine-template-list svg{width:27px;height:27px;fill:#000}
 .meditation-editor-settings{display:grid;gap:15px;padding:15px;border:1px solid var(--app-divider);border-radius:13px;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}
+.mobility-editor-settings{display:grid;gap:11px;padding:14px;border:1px solid var(--app-divider);border-radius:13px;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}
+.mobility-editor-settings>header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.mobility-editor-settings>header>span{display:grid;gap:3px}.mobility-editor-settings>header b{font-size:14px}.mobility-editor-settings>header small{color:var(--muted);font-size:11px;line-height:1.25}
+.mobility-editor-settings>header button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:6px 10px;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);font:800 11px/1 var(--ui);white-space:nowrap}.mobility-editor-settings>header button>b{font-size:18px;line-height:1}
+.mobility-exercise-list{display:grid;gap:8px}.mobility-exercise-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.7fr) 34px;gap:7px;align-items:center}.mobility-exercise-row .input{min-width:0;height:44px;min-height:44px;padding:8px 10px;font-size:12px}.mobility-exercise-row>button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent}.mobility-exercise-row>button .material-svg,.mobility-exercise-row>button svg{width:18px;height:18px;fill:#000}
+.mobility-overview>header>span{display:grid;gap:3px}.mobility-overview>header h2{margin:0}.mobility-overview>header small{color:var(--muted);font-size:11px;font-weight:700}.mobility-overview ol{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--app-divider)}
+.mobility-overview li{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--app-divider)}.mobility-overview li>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#000);font-size:12px;font-weight:800}.mobility-overview li p{display:grid;gap:3px;margin:0}.mobility-overview li b{font-size:15px}.mobility-overview li small{color:var(--muted);font-size:12px;font-weight:600}.mobility-overview-note{display:grid;gap:5px;margin-top:15px;padding:12px;border-radius:10px;background:var(--surface2)}.mobility-overview-note b{font-size:11px;text-transform:uppercase}.mobility-overview-note p{margin:0;font-size:13px;line-height:1.4}
 .routine-duration{min-width:0;margin:0;padding:0;border:0}
 .routine-duration legend{margin-bottom:8px;font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
 .routine-duration>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
@@ -4038,7 +4045,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   /* Externe SVG-Tapeten haben oft eine sehr grosse Zeichenflaeche. Eine feste
      Kachelbreite macht sie auf Smartphones sichtbar und konsistent mit den
      eingebauten Mustern. Der stärkere Schleier hält die Tapete dezent. */
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 88%,transparent)),var(--dex-tapete)!important;
+  background-image:linear-gradient(color-mix(in srgb,var(--bg) 98%,transparent),color-mix(in srgb,var(--bg) 98%,transparent)),var(--dex-tapete)!important;
   background-size:auto,360px auto!important;background-repeat:repeat!important;
 }
 

@@ -18,6 +18,28 @@ const periods = [
 const days = [['1', 'Mo'], ['2', 'Di'], ['3', 'Mi'], ['4', 'Do'], ['5', 'Fr'], ['6', 'Sa'], ['7', 'So']];
 const today = () => new Date().toLocaleDateString('sv-SE');
 const weekday = () => new Date().getDay() || 7;
+const defaultMobilityExercises = [
+  { name: 'Cat-Cow', prescription: '8–10 Wiederholungen' },
+  { name: '90/90 Hip Switches', prescription: '8 pro Seite' },
+  { name: 'World’s Greatest Stretch', prescription: '4 pro Seite' },
+  { name: 'Deep Squat Hold', prescription: '45 Sekunden' },
+];
+
+function normalizeMobilityExercises(value, useDefaults = true) {
+  const entries = Array.isArray(value) ? value.map((item) => ({
+    name: String(item?.name || '').trim().slice(0, 100),
+    prescription: String(item?.prescription || '').trim().slice(0, 100),
+  })).filter((item) => item.name) : [];
+  return entries.length || !useDefaults ? entries : defaultMobilityExercises.map((item) => ({ ...item }));
+}
+
+function mobilityExerciseRowMarkup(item = { name: '', prescription: '' }) {
+  return `<div class="mobility-exercise-row" data-mobility-exercise>
+    <input class="input" data-mobility-name maxlength="100" value="${escapeHtml(item.name)}" placeholder="Übung" required>
+    <input class="input" data-mobility-prescription maxlength="100" value="${escapeHtml(item.prescription)}" placeholder="z. B. 8 pro Seite">
+    <button type="button" data-mobility-remove aria-label="Übung entfernen">${materialIconMarkup('close')}</button>
+  </div>`;
+}
 
 async function load(userId, signal) {
   let routinesQuery = supabase.from('routines').select('*').eq('user_id', userId).order('position');
@@ -37,12 +59,14 @@ async function load(userId, signal) {
 function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
   const selectedTemplate = existing?.template_type || templateType;
   const meditation = selectedTemplate === 'meditation';
+  const mobility = selectedTemplate === 'mobility';
   const timedTemplate = ['meditation', 'mobility', 'walk'].includes(selectedTemplate);
   const durationOptions = selectedTemplate === 'meditation' ? [2, 5, 10, 15, 20]
     : selectedTemplate === 'mobility' ? [5, 10, 15, 20]
       : selectedTemplate === 'walk' ? [15, 30, 45, 60] : [];
   const defaultDuration = selectedTemplate === 'walk' ? 15 : 5;
   const selectedDuration = Number(existing?.duration_minutes || defaultDuration);
+  const mobilityExercises = normalizeMobilityExercises(existing?.mobility_exercises, mobility);
   const defaultName = meditation ? 'Meditation' : selectedTemplate === 'mobility' ? 'Mobility' : selectedTemplate === 'walk' ? 'Spaziergang' : '';
   const defaultIcon = meditation ? 'emoji:🧘' : selectedTemplate === 'mobility' ? 'emoji:🤸' : selectedTemplate === 'walk' ? 'emoji:🚶' : 'emoji:✓';
   const backdrop = document.createElement('div');
@@ -68,6 +92,10 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
         </select><button class="btn" type="button" data-sound-preview>${materialIconMarkup('play_arrow')}<span>Anhören</span></button></div></div>
         <label class="meditation-volume"><span>Hintergrundlautstärke <output data-ambient-output>${Math.round(Number(existing?.ambient_volume ?? 0.35) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.ambient_volume ?? 0.35)}" data-routine-ambient-volume></label>
         <label class="meditation-volume"><span>Gong-Lautstärke <output data-gong-output>${Math.round(Number(existing?.gong_volume ?? 0.7) * 100)} %</output></span><input type="range" min="0" max="1" step="0.05" value="${Number(existing?.gong_volume ?? 0.7)}" data-routine-gong-volume></label>
+      </section>` : ''}
+      ${mobility ? `<section class="mobility-editor-settings">
+        <header><span><b>Übungsablauf</b><small>Reihenfolge, Wiederholungen oder Dauer genau festlegen.</small></span><button type="button" data-mobility-add><b>+</b><span>Übung</span></button></header>
+        <div class="mobility-exercise-list" data-mobility-list>${mobilityExercises.map(mobilityExerciseRowMarkup).join('')}</div>
       </section>` : ''}
       <div class="routine-plan-row">
         <label class="dex-entry-field"><span>Tageszeit</span><select class="input" data-routine-period>${periods.map(([key, label]) => `<option value="${key}"${existing?.period === key ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
@@ -115,6 +143,18 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
     const hint = backdrop.querySelector('[data-routine-coin-hint]');
     if (hint) hint.textContent = `${routineCoinValue(selectedTemplate, Number(button.dataset.routineDuration))} MUSCLE-COINS pro Abschluss`;
   });
+  const mobilityList = backdrop.querySelector('[data-mobility-list]');
+  backdrop.querySelector('[data-mobility-add]')?.addEventListener('click', () => {
+    mobilityList.insertAdjacentHTML('beforeend', mobilityExerciseRowMarkup());
+    mobilityList.querySelector('[data-mobility-exercise]:last-child [data-mobility-name]')?.focus({ preventScroll: true });
+  });
+  mobilityList?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-mobility-remove]');
+    if (!button) return;
+    const rows = mobilityList.querySelectorAll('[data-mobility-exercise]');
+    if (rows.length === 1) return toast('Mindestens eine Übung eintragen.');
+    button.closest('[data-mobility-exercise]')?.remove();
+  });
   [['[data-routine-ambient-volume]','[data-ambient-output]'],['[data-routine-gong-volume]','[data-gong-output]']].forEach(([inputSelector, outputSelector]) => {
     const input = backdrop.querySelector(inputSelector); const output = backdrop.querySelector(outputSelector);
     input?.addEventListener('input', () => { output.textContent = `${Math.round(Number(input.value) * 100)} %`; });
@@ -154,7 +194,12 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       ambient_volume: meditation ? Number(form.querySelector('[data-routine-ambient-volume]').value) : 0.35,
       gong_volume: meditation ? Number(form.querySelector('[data-routine-gong-volume]').value) : 0.7,
       coin_reward: selectedTemplate === 'custom' ? Number(form.querySelector('[data-routine-coins]').value) : null,
+      mobility_exercises: mobility ? [...form.querySelectorAll('[data-mobility-exercise]')].map((row) => ({
+        name: row.querySelector('[data-mobility-name]').value.trim(),
+        prescription: row.querySelector('[data-mobility-prescription]').value.trim(),
+      })).filter((item) => item.name) : [],
     };
+    if (mobility && !payload.mobility_exercises.length) { submit.disabled = false; return toast('Bitte mindestens eine Mobility-Übung eintragen.'); }
     const query = existing
       ? supabase.from('routines').update(payload).eq('id', existing.id).eq('user_id', userId)
       : supabase.from('routines').insert(payload);
@@ -172,14 +217,32 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
   requestAnimationFrame(() => { backdrop.classList.add('offen'); backdrop.querySelector('[data-routine-name]')?.focus({ preventScroll: true }); });
 }
 
+function openMobilityOverview(item) {
+  const exercises = normalizeMobilityExercises(item.mobility_exercises);
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop mobility-overview-backdrop';
+  backdrop.style.setProperty('--ordner', categoryColor('habits'));
+  backdrop.style.setProperty('--ordner-ink', colorIsDark(categoryColor('habits')) ? '#fff' : '#000');
+  backdrop.innerHTML = `<section class="kategorie-sheet mobility-overview" role="dialog" aria-modal="true" aria-label="${escapeHtml(item.name)} – Übungsablauf">
+    <header><span><h2>${escapeHtml(item.name)}</h2><small>${Number(item.duration_minutes || 5)} Minuten · ${exercises.length} Übungen</small></span><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <ol>${exercises.map((exercise, index) => `<li><span>${index + 1}</span><p><b>${escapeHtml(exercise.name)}</b>${exercise.prescription ? `<small>${escapeHtml(exercise.prescription)}</small>` : ''}</p></li>`).join('')}</ol>
+    ${item.note ? `<div class="mobility-overview-note"><b>Notiz</b><p>${escapeHtml(item.note)}</p></div>` : ''}
+  </section>`;
+  backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) backdrop.remove(); };
+  document.body.append(backdrop);
+}
+
 function routineRow(item, completed, attachments = [], darkColor = false) {
   const dayNames = item.weekdays?.length === 7 ? 'Täglich' : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label).join(' · ');
   const meditation = item.template_type === 'meditation';
-  return `<article class="routine-row${completed ? ' erledigt' : ''}${meditation ? ' hat-timer' : ''}" data-routine-id="${item.id}">
+  const mobility = item.template_type === 'mobility';
+  const exerciseCount = mobility ? normalizeMobilityExercises(item.mobility_exercises).length : 0;
+  return `<article class="routine-row${completed ? ' erledigt' : ''}${meditation ? ' hat-timer' : ''}${mobility ? ' hat-ablauf' : ''}" data-routine-id="${item.id}">
     <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
     <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
-    <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
+    <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${mobility ? `${exerciseCount} Übungen · ${Number(item.duration_minutes || 5)} min · ` : ''}${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
     ${meditation ? `<button class="routine-start" type="button" data-routine-start aria-label="Meditation starten">${materialIconMarkup('play_arrow')}</button>` : ''}
+    ${mobility ? `<button class="routine-open" type="button" data-routine-mobility-open aria-label="Übungsablauf anzeigen">${materialIconMarkup('chevron_right')}</button>` : ''}
     <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
     <button class="routine-edit" type="button" data-routine-edit aria-label="${escapeHtml(item.name)} bearbeiten">${materialIconMarkup('build')}</button>
     ${attachments.length ? `<div class="routine-anhaenge">${attachments.map((entry) => dexEntryOverviewMarkup(entry, categoryColor('habits'))).join('')}</div>` : ''}
@@ -267,9 +330,14 @@ export async function mountRoutines(container, { session, signal }) {
     const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
     if (!item) return;
     if (event.target.closest('[data-routine-start]')) return openMeditationTimer({ userId, routine: item, onCompleted: refresh });
+    if (event.target.closest('[data-routine-mobility-open]')) return openMobilityOverview(item);
     if (event.target.closest('[data-routine-attach]')) return chooseAttachment(item, userId, refresh);
     if (event.target.closest('[data-routine-edit]')) return editor(userId, { existing: item, onSaved: refresh });
-    if (!event.target.closest('[data-routine-check]')) return;
+    if (event.target.closest('.routine-anhaenge')) return;
+    if (!event.target.closest('[data-routine-check]')) {
+      if (item.template_type === 'mobility') return openMobilityOverview(item);
+      return;
+    }
     const completed = state.completed.has(item.id);
     const query = completed
       ? supabase.from('routine_completions').delete().eq('routine_id', item.id).eq('completed_on', today()).eq('user_id', userId)
