@@ -54,6 +54,10 @@ const colorGroups = [
     ['Dunkelgrün', '#245953'],
     ['Petrol', '#006E7F'],
     ['Electric Violet', '#8C00FF'],
+    ['Retro-Lavendel', '#9772FB'],
+    ['Vanillegelb', '#FFE59D'],
+    ['Hot Pink', '#FF06B7'],
+    ['Periwinkle', '#8CA9FF'],
   ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
