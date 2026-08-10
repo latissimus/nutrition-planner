@@ -3140,8 +3140,8 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 /* FOOD-LOG: eine kompakte, horizontal scrollbare Klassifizierung. Die
    freie Tag-Suche bleibt davon unabhaengig. */
 .food-dex-filter{
-  position:sticky;top:0;z-index:5;display:flex;gap:8px;margin:0 -2px 22px;padding:8px 2px 11px;
-  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:var(--page-bg,var(--bg));
+  position:relative;z-index:auto;display:flex;gap:8px;margin:0 -2px 22px;padding:8px 2px 11px;
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:transparent;
 }
 .food-dex-filter::-webkit-scrollbar{display:none}
 .food-dex-filter button{
