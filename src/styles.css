@@ -2923,6 +2923,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 /* ROUTINEN: gleiche Kartenhuelle und Textstaffelung wie die anderen
    System-DEX, mit einer klaren Heute-Aktion pro Zeile. */
 :root[data-seite="habits"] .routine-zeitblock{overflow:hidden;margin:0}
+:root[data-seite="habits"] .routine-zeitblock::before{
+  content:"";display:block;width:100%;height:7px;background:var(--ordner);
+}
 :root[data-seite="habits"] .routine-zeitblock>header{
   display:flex;align-items:center;justify-content:space-between;min-height:55px;
   padding:12px 15px;border-bottom:1px solid var(--app-divider);
