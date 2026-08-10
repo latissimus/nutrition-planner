@@ -47,6 +47,41 @@ registriereServiceWorker().catch(() => {});
 // nicht. Leerer Listener reicht, er muss nur existieren.
 document.addEventListener('touchstart', () => {}, { passive: true });
 
+// Einheitliches iOS-Schreibverhalten fuer alle dynamisch gemounteten
+// App-Formulare. Safari darf die systemeigene QuickType-Leiste trotz dieser
+// Attribute weiterhin anzeigen; die Webseite kann sie nicht erzwingen. Der
+// blaue Fertig-Haken wird fuer einzeilige Felder jedoch explizit angefordert.
+function konfiguriereSchreibfeld(element) {
+  if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) return;
+  if (element instanceof HTMLInputElement) {
+    const type = (element.type || 'text').toLowerCase();
+    if (!['text', 'search', 'url', 'tel'].includes(type)) return;
+    element.setAttribute('enterkeyhint', 'done');
+    element.setAttribute('autocomplete', 'off');
+    element.setAttribute('autocorrect', 'off');
+    element.setAttribute('spellcheck', 'false');
+    element.setAttribute('aria-autocomplete', 'none');
+    if (type === 'url') element.setAttribute('autocapitalize', 'none');
+    return;
+  }
+  // Mehrzeilige Notizen behalten die Return-Taste, damit Absätze möglich
+  // bleiben. Vorschläge und Rechtschreibkorrektur werden trotzdem deaktiviert.
+  element.setAttribute('autocomplete', 'off');
+  element.setAttribute('autocorrect', 'off');
+  element.setAttribute('spellcheck', 'false');
+  element.setAttribute('aria-autocomplete', 'none');
+}
+
+function konfiguriereSchreibfelder(root) {
+  if (root instanceof HTMLInputElement || root instanceof HTMLTextAreaElement) konfiguriereSchreibfeld(root);
+  root.querySelectorAll?.('input,textarea').forEach(konfiguriereSchreibfeld);
+}
+
+konfiguriereSchreibfelder(document);
+new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+  if (node instanceof Element) konfiguriereSchreibfelder(node);
+}))).observe(document.body, { childList: true, subtree: true });
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.typ === 'gehe-zu' && event.data.url) location.hash = event.data.url.replace(/^#/, '');
