@@ -1389,13 +1389,15 @@ html.overlay-vollflaechig body::before{display:none}
 :root[data-seite="reminders"] main .wrap>*,
 :root[data-seite="food-log"] main .wrap>*{min-width:0}
 
-.auth-marquee{display:flex;overflow:hidden;background:var(--navy);color:#fff;border-bottom:var(--bw) solid var(--ink);
+.auth-marquee{display:flex;overflow:hidden;height:var(--mq-h);margin-top:env(safe-area-inset-top);align-items:center;
+  background:var(--navy);color:#fff;border-bottom:var(--bw) solid var(--ink);
   font-size:11px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
-.auth-marquee span{min-width:max-content;padding:9px 0;animation:nutrition-laufband 24s linear infinite}
+.auth-marquee span{flex:0 0 auto;min-width:max-content;animation:nutrition-laufband 18s linear infinite}
 @keyframes nutrition-laufband{to{transform:translateX(-100%)}}
-.auth-marke{text-align:center;margin-bottom:28px}
-.auth-shell .produktmarke{font-size:27px;text-align:left}
-.auth-shell .produktmarke-pixel{width:46px;height:46px}
+.auth-marke{display:flex;justify-content:center;align-items:center;margin-bottom:30px}
+.auth-marke .kopf-logo{display:block;width:min(78vw,310px);max-width:310px;max-height:170px;object-fit:contain}
+.auth-shell{min-height:calc(100dvh - var(--mq-h) - env(safe-area-inset-top))}
+.auth-shell [data-auth-form]{border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart)}
 
 .setup-shell{padding-top:max(42px,env(safe-area-inset-top));padding-bottom:40px}
 .setup-shell>.produktmarke{margin-bottom:28px}
@@ -1864,7 +1866,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .themebtn.on{background:var(--navy);color:#fff}
 .role-tag{border:0;background:var(--pink)}
 .auth-marquee{border:0;background:var(--navy)}
-.auth-shell .card,.setup-card{border:0;border-radius:20px;background:var(--app-card)}
+.setup-card{border:0;border-radius:20px;background:var(--app-card)}
 .auth-title{color:var(--app-purple);font-style:normal}
 .auth-sub{color:var(--app-secondary)}
 .auth-switch button{color:var(--app-purple)}

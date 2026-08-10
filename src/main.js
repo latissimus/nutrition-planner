@@ -184,7 +184,7 @@ function renderAuth() {
       <span>ERNÄHRUNG ◆ SUPPLEMENTS ◆ SCHLAF ◆ GEWOHNHEITEN ◆ </span>
     </div>
     <main class="auth-shell">
-      <div class="auth-marke">${brandMarkup()}</div>
+      <div class="auth-marke">${headerBrandMarkup()}</div>
       ${login ? '' : '<h1 class="auth-title">Registrieren</h1>'}
       <p class="auth-sub">${login ? 'Melde dich mit E-Mail und Passwort an.' : 'Erstelle deinen persönlichen Account.'}</p>
       <div data-auth-msg></div>
@@ -235,6 +235,10 @@ function renderAuth() {
     button.disabled = true;
     try {
       if (login) {
+        // Der Auth-Callback kann bereits waehrend signIn rendern. Route und
+        // eigener Navigationsstack muessen deshalb vorher auf Home stehen.
+        navStack = ['home'];
+        if (location.hash !== '#home') history.replaceState(null, '', '#home');
         await signIn(email, password);
       } else {
         const data = await signUp(email, password, name);
