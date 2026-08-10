@@ -160,6 +160,8 @@ function notification(reminder?: Reminder) {
       body: note || bodies.habit,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#habits',
+      reminderId: reminder.id,
+      reminderType: reminder.type,
     };
   }
   return {

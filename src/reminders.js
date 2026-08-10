@@ -240,7 +240,11 @@ async function maybeNotify(reminder, slot, now, userId) {
   await worker.showNotification(text.title, {
     body: text.body,
     tag: `nutrition-${reminder.id}-${slot}`,
-    data: { url: reminder.route || '#reminders' },
+    data: {
+      url: reminder.route || '#reminders',
+      reminderId: reminder.id,
+      reminderType: reminder.type,
+    },
   });
 }
 

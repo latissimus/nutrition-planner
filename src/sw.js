@@ -17,21 +17,30 @@ self.addEventListener('push', (event) => {
     icon: 'icon-192.png',
     badge: 'icon-192.png',
     tag: daten.tag || 'nutrition',
-    data: { url: daten.url || '' },
+    data: {
+      url: daten.url || '',
+      reminderId: daten.reminderId || '',
+      reminderType: daten.reminderType || '',
+    },
   }));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const ziel = event.notification.data?.url || '';
+  const routineId = event.notification.data?.reminderType === 'habit'
+    ? event.notification.data?.reminderId || '' : '';
   event.waitUntil((async () => {
     const fenster = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of fenster) {
       if ('focus' in client) {
-        if (ziel) client.postMessage({ typ: 'gehe-zu', url: ziel });
+        if (routineId) client.postMessage({ typ: 'routine-aktion', routineId, url: ziel || '#habits' });
+        else if (ziel) client.postMessage({ typ: 'gehe-zu', url: ziel });
         return client.focus();
       }
     }
-    return self.clients.openWindow ? self.clients.openWindow(ziel ? `./${ziel}` : './') : undefined;
+    if (!self.clients.openWindow) return undefined;
+    if (routineId) return self.clients.openWindow(`./?routineAction=${encodeURIComponent(routineId)}#habits`);
+    return self.clients.openWindow(ziel ? `./${ziel}` : './');
   })());
 });

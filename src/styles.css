@@ -2937,6 +2937,16 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-days button{min-width:0;height:38px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);font:800 11px/1 var(--ui)}
 .routine-days button.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
 .routine-delete{border-color:#B42318!important;color:#B42318!important;background:#fff!important}
+.routine-push-actions>header>div{display:flex;min-width:0;flex-direction:column;gap:3px}
+.routine-push-actions>header small{color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.09em}
+.routine-push-actions>p{margin:-2px 0 15px;color:var(--muted);font:500 13px/1.4 var(--ui)}
+.routine-push-action-list{display:grid}
+.routine-push-action-list>button{display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:12px;min-height:72px;padding:10px 3px;border:0;border-bottom:1.5px solid var(--ink);background:transparent;color:var(--ink);text-align:left}
+.routine-push-action-list>button:last-child{border-bottom:0}
+.routine-push-action-list .material-svg,.routine-push-action-list svg{display:block;width:27px;height:27px;fill:currentColor}
+.routine-push-action-list span{display:flex;min-width:0;flex-direction:column;gap:3px}
+.routine-push-action-list b{font:800 16px/1.15 var(--ui)}
+.routine-push-action-list small{color:var(--muted);font:500 12px/1.25 var(--ui)}
 :root[data-seite="shopping"] .einkauf-formular .input{margin:0}
 :root[data-seite="shopping"] .einkauf-formular-zeile{gap:9px}
 :root[data-seite="shopping"] .einkauf-gruppe{overflow:hidden;margin:0}

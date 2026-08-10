@@ -23,6 +23,7 @@ import { mountBodyMetrics } from './bodyMetrics.js';
 import { mountReminders, startReminderLoop } from './reminders.js';
 import { mountShoppingList } from './shoppingList.js';
 import { mountRoutines } from './routines.js';
+import { openRoutineNotificationActions } from './routineNotificationActions.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
 import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -84,8 +85,22 @@ new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.add
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.typ === 'routine-aktion' && event.data.routineId) {
+      sessionStorage.setItem('muscledex:pending-routine-action', event.data.routineId);
+      if (location.hash === '#habits') window.dispatchEvent(new HashChangeEvent('hashchange'));
+      else location.hash = 'habits';
+      return;
+    }
     if (event.data?.typ === 'gehe-zu' && event.data.url) location.hash = event.data.url.replace(/^#/, '');
   });
+}
+
+const routineActionFromUrl = new URL(location.href).searchParams.get('routineAction');
+if (routineActionFromUrl) {
+  sessionStorage.setItem('muscledex:pending-routine-action', routineActionFromUrl);
+  const bereinigteUrl = new URL(location.href);
+  bereinigteUrl.searchParams.delete('routineAction');
+  history.replaceState(history.state, '', `${bereinigteUrl.pathname}${bereinigteUrl.search}${bereinigteUrl.hash || '#habits'}`);
 }
 
 const app = document.querySelector('#app');
@@ -957,6 +972,15 @@ async function render() {
       onPlus: () => routineActions?.openRoutineEditor?.(),
     });
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', routineId: null, color: categoryColor('habits'), signal, hideEmpty: true });
+    const pendingRoutineId = sessionStorage.getItem('muscledex:pending-routine-action');
+    if (pendingRoutineId) {
+      sessionStorage.removeItem('muscledex:pending-routine-action');
+      queueMicrotask(() => openRoutineNotificationActions({
+        userId: session.user.id,
+        routineId: pendingRoutineId,
+        onChanged: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+      }));
+    }
   } else {
     mountHome(view, signal);
   }
