@@ -101,6 +101,10 @@ function formatTime(seconds) {
   return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 }
 
+export function remainingMeditationSeconds(endAt, now) {
+  return Math.max(0, (endAt - now) / 1000);
+}
+
 function externalPrompt({ userId, routine, onCompleted }) {
   document.querySelector('.meditation-return-backdrop')?.remove();
   const backdrop = document.createElement('div');
@@ -165,7 +169,10 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
   backdrop.className = 'kategorie-sheet-backdrop meditation-timer-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet meditation-timer" role="dialog" aria-modal="true" aria-label="Meditationstimer">
     <header><div><small>MEDITATION</small><h2>${escapeHtml(routine.name)}</h2></div><button type="button" data-meditation-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="meditation-atmung" aria-hidden="true"><i></i><span data-breath-label>Einatmen</span></div>
+    <div class="meditation-atmung" aria-hidden="true">
+      <span class="meditation-face">😌</span>
+      <i class="meditation-stern stern-eins">✦</i><i class="meditation-stern stern-zwei">✧</i><i class="meditation-stern stern-drei">✦</i>
+    </div>
     <strong class="meditation-time" data-meditation-time>${formatTime(remaining)}</strong>
     <small class="meditation-sound-label">${escapeHtml(soundNames[routine.ambient_sound] || soundNames.off)}</small>
     <div class="meditation-controls">
@@ -177,7 +184,6 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
   const timeNode = backdrop.querySelector('[data-meditation-time]');
   const toggle = backdrop.querySelector('[data-meditation-toggle]');
   const breath = backdrop.querySelector('.meditation-atmung');
-  const breathLabel = backdrop.querySelector('[data-breath-label]');
   const releaseWakeLock = async () => { try { await wakeLock?.release(); } catch {} wakeLock = null; };
   const stop = async () => {
     clearInterval(timer); timer = null; running = false; stopAmbient(); stopAmbient = () => {};
@@ -199,14 +205,14 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
     try {
       await completeRoutine(userId, routine.id);
       backdrop.querySelector('.meditation-timer').classList.add('abgeschlossen');
+      breath.classList.add('fertig');
       backdrop.querySelector('.meditation-controls').innerHTML = `<button class="btn btn-primary" type="button" data-meditation-finished>${materialIconMarkup('check_small')} Meditation erledigt</button>`;
       backdrop.querySelector('[data-meditation-finished]').onclick = async () => { await close(); await onCompleted?.(); };
     } catch (error) { toast(error.message || 'Abschluss konnte nicht gespeichert werden.'); }
   };
   const update = () => {
-    remaining = Math.max(0, (endAt - Date.now()) / 1000);
+    remaining = remainingMeditationSeconds(endAt, performance.now());
     timeNode.textContent = formatTime(remaining);
-    breathLabel.textContent = ((duration - remaining) % 8) < 4 ? 'Einatmen' : 'Ausatmen';
     if (remaining <= 0) finish();
   };
   const start = async () => {
@@ -214,7 +220,7 @@ export function openMeditationTimer({ userId, routine, onCompleted }) {
     if (remaining >= duration - 0.5) playGong(context, Number(routine.gong_volume ?? 0.7));
     stopAmbient = startAmbient(context, routine.ambient_sound || 'off', Number(routine.ambient_volume ?? 0.35));
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
-    endAt = Date.now() + remaining * 1000; running = true; breath.classList.add('laeuft');
+    endAt = performance.now() + remaining * 1000; running = true; breath.classList.add('laeuft');
     toggle.innerHTML = `${materialIconMarkup('pause')}<span>Pause</span>`;
     timer = window.setInterval(update, 250); update();
   };

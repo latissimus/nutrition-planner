@@ -2959,27 +2959,35 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .meditation-timer>header{text-align:left}
 .meditation-timer>header>div{display:flex;min-width:0;flex-direction:column;gap:3px}
 .meditation-timer>header small{color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.09em}
-.meditation-atmung{position:relative;display:grid;place-items:center;width:min(52vw,220px);aspect-ratio:1;margin:20px auto 16px;border-radius:50%;background:color-mix(in srgb,var(--ordner) 20%,var(--surface));overflow:hidden}
-.meditation-atmung i{position:absolute;width:54%;aspect-ratio:1;border-radius:50%;background:var(--ordner);opacity:.82;transform:scale(.72)}
-.meditation-atmung span{position:relative;z-index:1;color:var(--ordner-ink,#000);font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
-.meditation-atmung.laeuft i{animation:meditation-atmen 8s ease-in-out infinite}
-.meditation-atmung.laeuft span{animation:meditation-atemtext 8s linear infinite}
-@keyframes meditation-atmen{0%,100%{transform:scale(.64)}45%,55%{transform:scale(1.35)}}
-@keyframes meditation-atemtext{0%,49%{opacity:1}50%,99%{opacity:.65}}
+.meditation-atmung{position:relative;display:grid;place-items:center;width:min(68vw,270px);height:min(48vw,205px);min-height:172px;margin:5px auto 5px;overflow:visible}
+.meditation-atmung::before{content:"";position:absolute;left:50%;top:55%;width:142px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--ordner) 24%,transparent),transparent 68%);transform:translate(-50%,-50%)}
+.meditation-face{position:relative;z-index:2;display:block;font-size:92px;line-height:1;transform-origin:50% 72%;filter:saturate(.82)}
+.meditation-atmung.laeuft .meditation-face{animation:meditation-atmen 10s ease-in-out infinite}
+.meditation-stern{position:absolute;z-index:3;color:var(--ordner);font-style:normal;line-height:1;text-shadow:1px 1px 0 color-mix(in srgb,var(--ink) 45%,transparent)}
+.stern-eins{left:31%;top:11%;font-size:25px;transform:rotate(-14deg)}
+.stern-zwei{left:55%;top:2%;font-size:34px;transform:rotate(12deg)}
+.stern-drei{right:21%;top:21%;font-size:20px;transform:rotate(20deg)}
+.meditation-atmung.laeuft .stern-eins{animation:meditation-stern-eins 4.8s ease-in-out infinite}
+.meditation-atmung.laeuft .stern-zwei{animation:meditation-stern-zwei 6.2s ease-in-out infinite}
+.meditation-atmung.laeuft .stern-drei{animation:meditation-stern-drei 5.4s ease-in-out infinite}
+@keyframes meditation-atmen{0%,100%{transform:scale(.94) translateY(3px)}45%,58%{transform:scale(1.075) translateY(-3px)}}
+@keyframes meditation-stern-eins{0%,100%{transform:translate(0,2px) rotate(-14deg);opacity:.62}50%{transform:translate(5px,-7px) rotate(4deg);opacity:1}}
+@keyframes meditation-stern-zwei{0%,100%{transform:translate(0,0) rotate(12deg);opacity:.78}50%{transform:translate(-5px,-8px) rotate(-8deg);opacity:1}}
+@keyframes meditation-stern-drei{0%,100%{transform:translate(0,3px) rotate(20deg);opacity:.55}50%{transform:translate(4px,-5px) rotate(35deg);opacity:.95}}
 .meditation-time{display:block;margin:0 auto;color:var(--ink);font:800 clamp(42px,14vw,68px)/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .meditation-sound-label{display:block;margin:9px 0 20px;color:var(--muted);font:700 12px/1.2 var(--ui)}
 .meditation-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:10px}
 .meditation-controls .btn{display:flex;min-height:50px;align-items:center;justify-content:center;gap:8px}
 .meditation-controls .material-svg,.meditation-controls svg,.meditation-external .material-svg,.meditation-external svg{width:21px;height:21px;fill:currentColor}
 .meditation-external{display:flex;width:100%;min-height:48px;margin-top:10px;align-items:center;justify-content:center;gap:8px}
-.meditation-timer.abgeschlossen .meditation-atmung i{transform:scale(1);opacity:1}
-.meditation-timer.abgeschlossen .meditation-atmung span{font-size:0}
-.meditation-timer.abgeschlossen .meditation-atmung span::after{content:"✓";font-size:42px}
+.meditation-atmung.fertig .meditation-face{font-size:0;animation:none}
+.meditation-atmung.fertig .meditation-face::after{content:"😊";font-size:92px}
+.meditation-atmung.fertig .meditation-stern{animation:none;opacity:1}
 .meditation-timer.abgeschlossen .meditation-controls{grid-template-columns:1fr}
 .meditation-return>p{margin:0 0 18px;color:var(--muted);font:500 14px/1.4 var(--ui)}
 .meditation-return-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .meditation-return-actions .btn{min-height:50px}
-@media (prefers-reduced-motion:reduce){.meditation-atmung.laeuft i,.meditation-atmung.laeuft span{animation:none}}
+@media (prefers-reduced-motion:reduce){.meditation-atmung.laeuft .meditation-face,.meditation-atmung.laeuft .meditation-stern{animation:none}}
 .routine-push-actions>header>div{display:flex;min-width:0;flex-direction:column;gap:3px}
 .routine-push-actions>header small{color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.09em}
 .routine-push-actions>p{margin:-2px 0 15px;color:var(--muted);font:500 13px/1.4 var(--ui)}
