@@ -954,8 +954,12 @@ async function render() {
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
   const neuerHintergrund = getComputedStyle(document.body);
+  const rootHintergrund = getComputedStyle(document.documentElement);
   const lookFarbe = neuerHintergrund.backgroundColor;
-  const musterBild = 'none';
+  const musterBild = rootHintergrund.backgroundImage;
+  const musterGroesse = rootHintergrund.backgroundSize;
+  const musterPosition = rootHintergrund.backgroundPosition;
+  const musterWiederholung = rootHintergrund.backgroundRepeat;
   // Die normale Seite ist absichtlich transparent, damit die Tapete auf
   // html/body bis unter die iOS-Statusleiste reicht. Während des Slides muss
   // die neue Seite aber eine EIGENE, deckende Kopie dieser Tapete tragen.
@@ -963,9 +967,9 @@ async function render() {
   // ebenfalls important ist.
   view.style.setProperty('background-color', lookFarbe, 'important');
   view.style.setProperty('background-image', musterBild, 'important');
-  view.style.setProperty('background-size', 'auto', 'important');
-  view.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
-  view.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
+  view.style.setProperty('background-size', musterGroesse, 'important');
+  view.style.setProperty('background-position', musterPosition, 'important');
+  view.style.setProperty('background-repeat', musterWiederholung, 'important');
   view.style.setProperty('background-attachment', 'scroll', 'important');
   const entferneUebergangshintergrund = () => {
     ['background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'background-attachment']

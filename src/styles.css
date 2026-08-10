@@ -3709,6 +3709,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* ---------- Einstellbarer DEX-Seitenlook ---------- */
 :root[data-dex-muster]{background-color:var(--bg)!important}
+
+/* Diese Regeln stehen bewusst nach der globalen Seitenwechsel-Regel: Sie
+   reaktivieren das pro Dex gespeicherte Muster mit hoeherer Kaskadenprioritaet. */
+:root[data-dex-muster="none"]{background-image:none!important}
+:root[data-dex-muster="triangles"]{background-image:var(--muster-dreieck)!important;background-size:auto!important}
+:root[data-dex-muster="drops"]{background-image:linear-gradient(color-mix(in srgb,var(--bg) 38%,transparent),color-mix(in srgb,var(--bg) 38%,transparent)),var(--muster-tropfen)!important;background-size:auto,112px!important}
+:root[data-dex-muster="bones"]{background-image:linear-gradient(color-mix(in srgb,var(--bg) 38%,transparent),color-mix(in srgb,var(--bg) 38%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;background-size:auto,112px!important}
 :root[data-dex-muster] body,
 :root[data-dex-muster] #app,
 :root[data-dex-muster] #view{background-color:transparent!important;background-image:none!important}
@@ -3828,6 +3835,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-attachment:inherit!important;
 }
 :root[data-dex-muster]{background-color:var(--bg)!important}
+
+/* Nach der globalen Hintergrund-Reset-Regel erneut setzen, damit das
+   Muster beim Seiten-Slide und im fertigen Dex erhalten bleibt. */
+:root[data-dex-muster="none"]{background-image:none!important}
+:root[data-dex-muster="triangles"]{background-image:var(--muster-dreieck)!important;background-size:auto!important}
+:root[data-dex-muster="drops"]{background-image:linear-gradient(color-mix(in srgb,var(--bg) 38%,transparent),color-mix(in srgb,var(--bg) 38%,transparent)),var(--muster-tropfen)!important;background-size:auto,112px!important}
+:root[data-dex-muster="bones"]{background-image:linear-gradient(color-mix(in srgb,var(--bg) 38%,transparent),color-mix(in srgb,var(--bg) 38%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;background-size:auto,112px!important}
 
 /* ============================================================
    EINKAUFSLISTE
