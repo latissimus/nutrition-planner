@@ -3362,18 +3362,21 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
    und liegt bei 12 px mit 76 px komfortabel darunter. */
 /* ---------- Suche ---------- */
 .tuck-suche-seite{padding-top:16px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
-.such-fixkopf-view{overflow:hidden!important}
+.app-shell>#view.such-fixkopf-view,
+.app-shell>.such-fixkopf-view{
+  width:100%;height:100%;min-height:0!important;overflow:hidden!important
+}
 .tuck-suche-seite.such-fixkopf{
   display:grid;grid-template-rows:auto minmax(0,1fr);
-  width:100%;height:100%;min-height:0;padding-top:8px;padding-bottom:0;overflow:hidden;isolation:isolate
+  width:100%;height:100%;max-height:100%;min-height:0;padding-top:8px;padding-bottom:0;overflow:hidden;isolation:isolate
 }
 .such-fixkopf .tuck-suchzeile{position:relative;z-index:20;min-height:44px;padding-bottom:8px}
 .such-fixkopf .tuck-suchfeld,
 .such-fixkopf .seiten-x{height:44px;min-height:44px}
 .such-scrollinhalt{
-  min-height:0;overflow-x:hidden;overflow-y:auto;padding-top:10px;
+  position:relative;z-index:0;width:100%;height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;padding-top:10px;
   padding-bottom:calc(42px + env(safe-area-inset-bottom));
-  overscroll-behavior:contain;-webkit-overflow-scrolling:touch
+  overscroll-behavior-x:none;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y
 }
 .such-tags{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:7px;align-items:start;margin:10px 1px 18px}
 .such-tags[hidden]{display:none}
