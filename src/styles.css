@@ -4034,7 +4034,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Die Tapete gehoert zur scrollenden Inhaltsflaeche, nicht zum Viewport.
    Dadurch slidet sie exakt zusammen mit den Dex-Inhalten und endet hart an
    der Unterkante des festen Kopfbereichs. Ein halbdeckender Grundton vor dem
-   Muster reduziert dessen sichtbare Deckkraft auf rund 50 Prozent. */
+   Muster hält dessen sichtbare Deckkraft bewusst dezent. */
 .dex-fixkopf[data-dex-muster] .kategorie-scrollinhalt{
   margin-inline:-12px;padding-inline:12px;
   background-color:transparent!important;background-repeat:repeat!important;
@@ -4044,8 +4044,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
   /* Externe SVG-Tapeten haben oft eine sehr grosse Zeichenflaeche. Eine feste
      Kachelbreite macht sie auf Smartphones sichtbar und konsistent mit den
-     eingebauten Mustern. Der stärkere Schleier hält die Tapete dezent. */
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) 98%,transparent),color-mix(in srgb,var(--bg) 98%,transparent)),var(--dex-tapete)!important;
+     eingebauten Mustern. Der Schleier lässt die Tapete mit 7 % durchscheinen. */
+  background-image:linear-gradient(color-mix(in srgb,var(--bg) 93%,transparent),color-mix(in srgb,var(--bg) 93%,transparent)),var(--dex-tapete)!important;
   background-size:auto,360px auto!important;background-repeat:repeat!important;
 }
 
