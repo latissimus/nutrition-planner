@@ -12,10 +12,20 @@ export const meditationSounds = [
   ['campfire', 'Lagerfeuer'],
   ['space', 'Space Music'],
   ['forest', 'Wald'],
-  ['ocean', 'Meeresrauschen'],
+  ['ocean', 'Wasser'],
   ['brown', 'Braunes Rauschen'],
+  ['blue', 'Blaues Rauschen'],
 ];
 const soundNames = Object.fromEntries(meditationSounds.map(([value, label]) => [value, value === 'off' ? 'Ohne Hintergrundsound' : label]));
+const meditationTrackUrls = {
+  rain: new URL('../Meditate Music/Regen.mp3', import.meta.url).href,
+  campfire: new URL('../Meditate Music/Lagerfeuer.mp3', import.meta.url).href,
+  space: new URL('../Meditate Music/Space.mp3', import.meta.url).href,
+  forest: new URL('../Meditate Music/Wald.mp3', import.meta.url).href,
+  ocean: new URL('../Meditate Music/Wasser.mp3', import.meta.url).href,
+  brown: new URL('../Meditate Music/Braunes Rauschen.mp3', import.meta.url).href,
+  blue: new URL('../Meditate Music/Blaues Rauschen.mp3', import.meta.url).href,
+};
 
 export async function completeRoutine(userId, routineId) {
   const date = today();
@@ -62,8 +72,55 @@ function noiseBuffer(context, brown = false) {
   return buffer;
 }
 
+function startAmbientTrack(type, volume) {
+  const url = meditationTrackUrls[type];
+  if (!url || volume <= 0) return null;
+  const players = [new Audio(url), new Audio(url)];
+  players.forEach((player) => {
+    player.preload = 'auto';
+    player.loop = false;
+    player.playsInline = true;
+  });
+  let active = 0;
+  let fading = false;
+  let stopped = false;
+  let fadeTimer = null;
+  const crossfadeSeconds = 2.4;
+  players[0].volume = volume;
+  players[0].play().catch(() => {});
+  const monitor = window.setInterval(() => {
+    const current = players[active];
+    if (stopped || fading || !Number.isFinite(current.duration) || current.duration - current.currentTime > crossfadeSeconds) return;
+    fading = true;
+    const nextIndex = active === 0 ? 1 : 0;
+    const next = players[nextIndex];
+    next.currentTime = 0;
+    next.volume = 0;
+    next.play().catch(() => { fading = false; });
+    const fadeStarted = performance.now();
+    fadeTimer = window.setInterval(() => {
+      const progress = Math.min(1, (performance.now() - fadeStarted) / (crossfadeSeconds * 1000));
+      current.volume = volume * (1 - progress);
+      next.volume = volume * progress;
+      if (progress < 1) return;
+      clearInterval(fadeTimer); fadeTimer = null;
+      current.pause(); current.currentTime = 0; current.volume = 0;
+      active = nextIndex; fading = false;
+    }, 50);
+  }, 180);
+  return () => {
+    stopped = true;
+    clearInterval(monitor);
+    if (fadeTimer) clearInterval(fadeTimer);
+    players.forEach((player) => { player.pause(); player.removeAttribute('src'); player.load(); });
+  };
+}
+
 function startAmbient(context, type, volume) {
-  if (!context || type === 'off' || volume <= 0) return () => {};
+  if (type === 'off' || volume <= 0) return () => {};
+  const stopTrack = startAmbientTrack(type, volume);
+  if (stopTrack) return stopTrack;
+  if (!context) return () => {};
   if (type === 'space') {
     const master = context.createGain();
     master.gain.value = volume * 0.16;
@@ -151,15 +208,15 @@ function startAmbient(context, type, volume) {
 
 export async function previewMeditationSound(type, volume = 0.35) {
   const context = audioContext();
-  if (!context || type === 'off') return () => {};
-  await context.resume();
+  if (type === 'off') return () => {};
+  await context?.resume();
   const stopAmbient = startAmbient(context, type, volume);
   let stopped = false;
   return async () => {
     if (stopped) return;
     stopped = true;
     stopAmbient();
-    await context.close().catch(() => {});
+    await context?.close().catch(() => {});
   };
 }
 
