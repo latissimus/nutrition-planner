@@ -2939,8 +2939,13 @@ button,a,[role="button"],summary{touch-action:manipulation;
   padding:12px 15px;border-bottom:1px solid var(--app-divider);
 }
 :root[data-seite="habits"] .routine-zeitblock>header small{color:var(--muted);font-size:11px;font-weight:700}
-.routine-row{display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;border-bottom:1px solid var(--app-divider)}
-.routine-row.hat-timer{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px 32px}
+.routine-row{position:relative;display:block;overflow:hidden;border-bottom:1px solid var(--app-divider)}
+.routine-row::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:color-mix(in srgb,var(--ordner) 22%,transparent);opacity:0;transition:opacity .12s ease}
+.routine-row.swipe-aktiv::after{opacity:1}
+.routine-row.swipe-commit::after{background:color-mix(in srgb,var(--ordner) 42%,transparent)}
+.routine-row-inhalt{position:relative;z-index:1;display:grid;grid-template-columns:30px 34px minmax(0,1fr) 32px;align-items:center;gap:8px;min-height:64px;padding:10px 11px;background:var(--app-card);transition:transform .18s cubic-bezier(.32,.72,0,1);will-change:transform;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.routine-row.hat-timer .routine-row-inhalt{grid-template-columns:30px 34px minmax(0,1fr) 32px 32px}
+.routine-row.swipe-aktiv .routine-row-inhalt{transition:none}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1.5px solid #000;border-radius:50%;background:#fff;color:#000}
 .routine-check:active{transform:none!important;box-shadow:none!important}
@@ -2958,10 +2963,10 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-copy b,.routine-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .routine-row.erledigt .routine-copy{opacity:.48}.routine-row.erledigt .routine-copy b{text-decoration:line-through}
 .routine-row.erledigt .routine-check{background:var(--ordner)}
-.routine-edit,.routine-attach,.routine-start,.routine-open{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
-.routine-edit .material-svg,.routine-edit svg,.routine-attach .material-svg,.routine-attach svg,.routine-start .material-svg,.routine-start svg,.routine-open .material-svg,.routine-open svg{width:18px;height:18px;fill:#000}
+.routine-attach,.routine-start,.routine-open{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#000}
+.routine-attach .material-svg,.routine-attach svg,.routine-start .material-svg,.routine-start svg,.routine-open .material-svg,.routine-open svg{width:18px;height:18px;fill:#000}
 .routine-zeitblock-leer{margin:0;padding:15px;color:var(--muted);font:500 12px/1.4 var(--ui)}
-.routine-anhaenge{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;padding:3px 0 5px}
+.routine-anhaenge{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;padding:3px 11px 10px;background:var(--app-card)}
 .routine-anhaenge .dex-inhaltskarte{min-width:0}
 .routine-notizen{margin-top:18px}
 .routine-editor form{display:grid;gap:16px}
@@ -4126,6 +4131,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:relative;z-index:1;
 }
 
+/* In der Auswahl zeigen dieselben schwarzen Quelldateien sonst weiterhin
+   schwarze Motive. Als Maske erhalten sie hier exakt das Blaugrau der
+   dargestellten Darkmode-Tapete – bei voller Deckkraft zur Erkennbarkeit. */
+:root[data-theme="dark"] :is(
+  .sammlung-editor-tapeten i.tapete-datei,
+  .seitenmuster-auswahl i.tapete-datei,
+  .tapeten-langvorschau i.tapete-datei
+){
+  background-color:#DCE6FF;background-image:none!important;
+  -webkit-mask-image:var(--tapeten-vorschau);mask-image:var(--tapeten-vorschau);
+  -webkit-mask-size:cover;mask-size:cover;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+}
+:root[data-theme="dark"] .sammlung-editor-tapeten button.aktiv{
+  box-shadow:3px 3px 0 #43516E;
+}
+
 /* ============================================================
    EINKAUFSLISTE
 
@@ -4570,6 +4593,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .mahl-zeitblock .rem-row-chevron{
   filter:invert(1) brightness(1.7);
 }
+:root[data-theme="dark"] :is(
+  .mobility-overview li>span,
+  .routine-timer-exercises li>span
+){color:#fff}
 :root[data-theme="dark"] :is(.rem-row-status,.rem-erledigt-btn,.rem-push-refresh){
   color:#F0B8BA;border-color:#B8787C;
 }

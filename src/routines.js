@@ -248,14 +248,76 @@ function routineRow(item, completed, attachments = [], darkColor = false) {
   const timed = Number(item.duration_minutes || 0) > 0;
   const exerciseCount = mobility ? normalizeMobilityExercises(item.mobility_exercises).length : 0;
   return `<article class="routine-row${completed ? ' erledigt' : ''}${timed ? ' hat-timer' : ''}" data-routine-id="${item.id}">
-    <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
-    <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
-    <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${mobility ? `${exerciseCount} Übungen · ${Number(item.duration_minutes || 5)} min · ` : ''}${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
-    ${timed ? `<button class="routine-start" type="button" data-routine-start aria-label="${escapeHtml(item.name)}-Timer starten">${materialIconMarkup('play_arrow')}</button>` : ''}
-    <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
-    <button class="routine-edit" type="button" data-routine-edit aria-label="${escapeHtml(item.name)} bearbeiten">${materialIconMarkup('build')}</button>
+    <div class="routine-row-inhalt">
+      <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
+      <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
+      <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${mobility ? `${exerciseCount} Übungen · ${Number(item.duration_minutes || 5)} min · ` : ''}${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
+      ${timed ? `<button class="routine-start" type="button" data-routine-start aria-label="${escapeHtml(item.name)}-Timer starten">${materialIconMarkup('play_arrow')}</button>` : ''}
+      <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
+    </div>
     ${attachments.length ? `<div class="routine-anhaenge">${attachments.map((entry) => dexEntryOverviewMarkup(entry, categoryColor('habits'))).join('')}</div>` : ''}
   </article>`;
+}
+
+// Dieselbe direkte Geste wie in der Einkaufsliste: horizontal wischen
+// wechselt den heutigen Status, langes Drücken auf die Zeile öffnet die
+// Einstellungen. Vertikales Scrollen bleibt bewusst unangetastet.
+function bindRoutineGestures(row, { onSwipeToggle, onLongPress }) {
+  const content = row.querySelector('.routine-row-inhalt');
+  if (!content) return;
+  const state = { active: false, swiping: false, longPressed: false, blockClick: false, startX: 0, startY: 0, dx: 0, timer: null };
+  const clearTimer = () => { if (state.timer) clearTimeout(state.timer); state.timer = null; };
+  const resetVisual = () => {
+    content.style.transform = '';
+    row.classList.remove('swipe-aktiv', 'swipe-commit');
+  };
+
+  content.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    state.active = true; state.swiping = false; state.longPressed = false;
+    state.startX = event.clientX; state.startY = event.clientY; state.dx = 0;
+    state.timer = setTimeout(() => {
+      if (!state.active || state.swiping) return;
+      state.longPressed = true; state.blockClick = true;
+      resetVisual(); navigator.vibrate?.(10); onLongPress?.();
+    }, 500);
+    try { content.setPointerCapture(event.pointerId); } catch { /* optional */ }
+  });
+
+  content.addEventListener('pointermove', (event) => {
+    if (!state.active || state.longPressed) return;
+    const dx = event.clientX - state.startX;
+    const dy = event.clientY - state.startY;
+    if (!state.swiping) {
+      if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
+        clearTimer(); state.active = false; return;
+      }
+      if (Math.abs(dx) > 10) {
+        state.swiping = true; clearTimer(); row.classList.add('swipe-aktiv');
+      }
+    }
+    if (!state.swiping) return;
+    state.dx = Math.max(-140, Math.min(140, dx));
+    content.style.transform = `translateX(${state.dx}px)`;
+    row.classList.toggle('swipe-commit', Math.abs(state.dx) >= 60);
+  });
+
+  const finish = () => {
+    clearTimer();
+    const commit = state.active && state.swiping && Math.abs(state.dx) >= 60;
+    if (state.swiping) state.blockClick = true;
+    resetVisual();
+    state.active = false; state.swiping = false; state.dx = 0;
+    if (commit) onSwipeToggle?.();
+  };
+  content.addEventListener('pointerup', finish);
+  content.addEventListener('pointercancel', finish);
+  content.addEventListener('lostpointercapture', finish);
+  content.addEventListener('click', (event) => {
+    if (!state.blockClick && !state.longPressed) return;
+    event.preventDefault(); event.stopPropagation();
+    state.blockClick = false; state.longPressed = false;
+  }, true);
 }
 
 function chooseRoutineTemplate(userId, onSaved) {
@@ -313,44 +375,13 @@ export async function mountRoutines(container, { session, signal }) {
   </div>`;
   let state = await load(userId, signal);
   if (signal?.aborted) return {};
-  const refresh = async () => {
-    state = await load(userId, signal);
-    paint();
-  };
-  const paint = () => {
-    const darkColor = colorIsDark(categoryColor('habits'));
-    container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
-      const items = state.routines.filter((item) => item.period === key);
-      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
-        ? items.map((item) => routineRow(item, state.completed.has(item.id), state.attachments.filter((entry) => entry.routine_id === item.id), darkColor)).join('')
-        : '<p class="routine-zeitblock-leer">Noch keine Routine geplant.</p>'}</div></section>`;
-    }).join('');
-    vorschaubilderEinblenden(container.querySelector('[data-routine-plan]'));
-  };
-  paint();
-  const plan = container.querySelector('[data-routine-plan]');
-  plan.onclick = async (event) => {
-    const row = event.target.closest('[data-routine-id]');
-    if (!row) return;
-    const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
-    if (!item) return;
-    if (event.target.closest('[data-routine-start]')) return openMeditationTimer({
-      userId, routine: item, onCompleted: refresh,
-      mobilityExercises: item.template_type === 'mobility' ? normalizeMobilityExercises(item.mobility_exercises) : [],
-    });
-    if (event.target.closest('[data-routine-attach]')) return chooseAttachment(item, userId, refresh);
-    if (event.target.closest('[data-routine-edit]')) return editor(userId, { existing: item, onSaved: refresh });
-    if (event.target.closest('.routine-anhaenge')) return;
-    if (!event.target.closest('[data-routine-check]')) return;
+  const toggleRoutine = async (item) => {
     const completed = state.completed.has(item.id);
     const query = completed
       ? supabase.from('routine_completions').delete().eq('routine_id', item.id).eq('completed_on', today()).eq('user_id', userId)
       : supabase.from('routine_completions').insert({ routine_id: item.id, user_id: userId, completed_on: today() });
     const { error } = await query;
     if (error) return toast('Status konnte nicht gespeichert werden.');
-    // Die Push-Erinnerung teilt sich nach der Migration die ID der Routine.
-    // Der Zusatzschritt bleibt absichtlich best effort, damit das Abhaken auch
-    // vor dem Einspielen der Migration weiterhin funktioniert.
     if (completed) {
       await supabase.from('reminder_completions').delete()
         .eq('reminder_id', item.id).eq('date', today()).eq('user_id', userId);
@@ -364,6 +395,44 @@ export async function mountRoutines(container, { session, signal }) {
     catch { toast('Routine gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
     paint();
+  };
+  const refresh = async () => {
+    state = await load(userId, signal);
+    paint();
+  };
+  const paint = () => {
+    const darkColor = colorIsDark(categoryColor('habits'));
+    container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
+      const items = state.routines.filter((item) => item.period === key);
+      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
+        ? items.map((item) => routineRow(item, state.completed.has(item.id), state.attachments.filter((entry) => entry.routine_id === item.id), darkColor)).join('')
+        : '<p class="routine-zeitblock-leer">Noch keine Routine geplant.</p>'}</div></section>`;
+    }).join('');
+    vorschaubilderEinblenden(container.querySelector('[data-routine-plan]'));
+    container.querySelectorAll('.routine-row').forEach((row) => {
+      const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
+      if (!item) return;
+      bindRoutineGestures(row, {
+        onSwipeToggle: () => toggleRoutine(item),
+        onLongPress: () => editor(userId, { existing: item, onSaved: refresh }),
+      });
+    });
+  };
+  paint();
+  const plan = container.querySelector('[data-routine-plan]');
+  plan.onclick = async (event) => {
+    const row = event.target.closest('[data-routine-id]');
+    if (!row) return;
+    const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
+    if (!item) return;
+    if (event.target.closest('[data-routine-start]')) return openMeditationTimer({
+      userId, routine: item, onCompleted: refresh,
+      mobilityExercises: item.template_type === 'mobility' ? normalizeMobilityExercises(item.mobility_exercises) : [],
+    });
+    if (event.target.closest('[data-routine-attach]')) return chooseAttachment(item, userId, refresh);
+    if (event.target.closest('.routine-anhaenge')) return;
+    if (!event.target.closest('[data-routine-check]')) return;
+    await toggleRoutine(item);
   };
   bindLongPress(plan, '.routine-anhaenge .dex-inhaltskarte', (element) => {
     const entry = state.attachments.find((item) => item.id === element.dataset.dexEntryId);
