@@ -1,8 +1,7 @@
 import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
-import muscleCoinUrl from './assets/muscle-coin.png';
-import muscleCoinBackUrl from './assets/muscle-coin-back.png';
+import muscleCoinUrl from '../MUSCLE-COIN Neu.svg';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -10,8 +9,6 @@ const escapeHtml = (value = '') => String(value)
 
 export const muscleCoinMarkup = (className = '') => `
   <span class="muscle-coin ${className}" aria-hidden="true"><img src="${muscleCoinUrl}" alt=""></span>`;
-export const muscleCoinBackMarkup = (className = '') => `
-  <span class="muscle-coin muscle-coin-back ${className}" aria-hidden="true"><img src="${muscleCoinBackUrl}" alt=""></span>`;
 
 export function routineCoinValue(templateType, durationMinutes, customValue = 5) {
   const duration = Number(durationMinutes || 0);
@@ -61,7 +58,7 @@ export function coinHeaderMarkup(summary) {
 }
 
 function coinEarningOverview() {
-  const group = (title, icon, values) => `<div class="coin-verdienst-gruppe"><span class="coin-verdienst-titel"><i>${icon}</i><b>${title}</b></span><div>${values.map(([label, coins]) => `<span><small>${label}</small><strong>${coins}${muscleCoinBackMarkup('coin-wert-symbol')}</strong></span>`).join('')}</div></div>`;
+  const group = (title, icon, values) => `<div class="coin-verdienst-gruppe"><span class="coin-verdienst-titel"><i>${icon}</i><b>${title}</b></span><div>${values.map(([label, coins]) => `<span><small>${label}</small><strong>${coins}${muscleCoinMarkup('coin-wert-symbol')}</strong></span>`).join('')}</div></div>`;
   return `<details class="coin-verdienst">
     <summary><span><b>So verdienst du Coins</b><small>Vergütung anzeigen</small></span>${materialIconMarkup('chevron_right')}</summary>
     <div class="coin-verdienst-inhalt">
@@ -124,7 +121,7 @@ function rewardEditor({ userId, existing = null, onSaved }) {
 function rewardMarkup(item, balance) {
   const percent = Math.min(100, Math.round((balance / item.cost) * 100));
   return `<article class="coin-reward" data-reward-id="${item.id}">
-    <div class="coin-reward-kopf">${muscleCoinBackMarkup('coin-reward-symbol')}<span><b>${escapeHtml(item.name)}</b><small>${item.cost} Coins</small></span><strong>${percent}%</strong></div>
+    <div class="coin-reward-kopf">${muscleCoinMarkup('coin-reward-symbol')}<span><b>${escapeHtml(item.name)}</b><small>${item.cost} Coins</small></span><strong>${percent}%</strong></div>
     <div class="coin-progress"><i style="width:${percent}%"></i></div>
     ${item.note ? `<p>${escapeHtml(item.note)}</p>` : ''}
     <div class="coin-reward-actions">
