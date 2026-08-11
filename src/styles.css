@@ -4107,6 +4107,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-size:auto,360px auto!important;background-repeat:repeat!important;
 }
 
+/* Externe Tapeten sind schwarz gezeichnet. Im Darkmode werden sie als Maske
+   verwendet und dadurch einheitlich blaugrau gefaerbt. Nur die Tapete in der
+   Seite wird abgeschwaecht; ihre Auswahlvorschau bleibt bei voller Deckkraft. */
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
+  position:relative;isolation:isolate;background-image:none!important;
+}
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+  background:#DCE6FF;opacity:.08;
+  -webkit-mask-image:var(--dex-tapete);mask-image:var(--dex-tapete);
+  -webkit-mask-size:360px auto;mask-size:360px auto;
+  -webkit-mask-position:center top;mask-position:center top;
+  -webkit-mask-repeat:repeat;mask-repeat:repeat;
+}
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt>*{
+  position:relative;z-index:1;
+}
+
 /* ============================================================
    EINKAUFSLISTE
 
@@ -4458,9 +4476,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-field:var(--surface2);
   --app-outline:var(--ink);
   --app-divider:rgba(244,246,250,.2);
-  --app-hard-shadow:#05080E;
-  --hart:4px 4px 0 #05080E;
-  --hart-klein:3px 3px 0 #05080E;
+  /* Auf Navy braucht der harte Retro-Versatz einen helleren Eigenwert.
+     Stahlblau trennt ihn sichtbar vom Grund, ohne wie ein Glow zu wirken. */
+  --app-hard-shadow:#43516E;
+  --hart:4px 4px 0 #43516E;
+  --hart-klein:3px 3px 0 #43516E;
 }
 
 :root[data-theme="dark"] :is(input,textarea,select,.input){
@@ -4507,10 +4527,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .emoji-eigen button{color:#111}
 
-/* Dex-Ordner und Auswahlmodus: Konturen duerfen auf Navy nicht schwarz
-   verschwinden. Der eigentliche Retroschatten bleibt bewusst tiefschwarz. */
+/* Dex-Ordner und Auswahlmodus: Konturen und Versatz duerfen auf Navy nicht
+   verschwinden; der Schatten folgt deshalb demselben gedeckten Stahlblau. */
 :root[data-theme="dark"] .dex-ordner-form{
-  filter:drop-shadow(4px 4px 0 #05080E);
+  filter:drop-shadow(4px 4px 0 #43516E);
 }
 :root[data-theme="dark"] .dex-ordner-form path{stroke:var(--ink)}
 :root[data-theme="dark"] .dex-detail-audio{
