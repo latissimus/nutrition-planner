@@ -1493,10 +1493,15 @@ html.overlay-vollflaechig body::before{display:none}
 .mess-einst{margin-top:14px;border-top:2px dashed var(--faint);padding-top:12px;
   display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
 .mess-zeile{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
-.gew-eingabe{display:grid;grid-template-columns:minmax(0,12rem) minmax(0,8rem) auto minmax(0,1fr);
-  align-items:center;gap:10px;margin-top:16px}
-.gew-eingabe .input{margin:0;text-align:center}
-.gew-einheit{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.gew-eingabe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:end;gap:10px;margin-top:16px}
+.gew-feld{display:grid;min-width:0;gap:4px}
+.gew-feld>span:first-child{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.gew-eingabe .input{width:100%;min-width:0;margin:0;text-align:center}
+.gew-wert-eingabe{position:relative;display:block;min-width:0}
+.gew-wert-eingabe .input{padding-inline:32px}
+.gew-wert-eingabe i{position:absolute;right:11px;top:50%;color:var(--muted);font-family:var(--ui);font-size:12px;font-style:normal;transform:translateY(-50%);pointer-events:none}
+.gew-eingabe .btn{grid-column:1/-1;width:100%}
 
 .reminder-list{display:grid;gap:12px;margin:14px 0}
 .reminder-row{position:relative;min-width:0;border:var(--bw) solid var(--ink);border-radius:var(--r);
@@ -1523,11 +1528,7 @@ html.overlay-vollflaechig body::before{display:none}
 [data-skinfold-form]{padding-top:4px}
 
 @media(max-width:520px){
-  .gew-eingabe{grid-template-columns:minmax(0,1fr) auto;gap:8px}
-  .gew-eingabe #weight-date{grid-column:1/-1}
-  .gew-eingabe #weight-value{grid-column:1}
-  .gew-einheit{align-self:center}
-  .gew-eingabe .btn{grid-column:1/-1;width:100%}
+  .gew-eingabe{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .reminder-grid{grid-template-columns:repeat(auto-fit,minmax(108px,1fr))}
   :root[data-seite="body"] .seitenkopf,
   :root[data-seite="reminders"] .seitenkopf,
@@ -3428,7 +3429,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-verdienst>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer;list-style:none;background:color-mix(in srgb,var(--ordner) 8%,var(--surface))}.coin-verdienst>summary::-webkit-details-marker{display:none}
 .coin-verdienst>summary>span{display:grid;gap:2px}.coin-verdienst>summary b{font-size:16px;text-transform:uppercase}.coin-verdienst>summary small{color:var(--muted);font-size:11px;font-weight:600}
 .coin-verdienst>summary .material-svg,.coin-verdienst>summary svg{width:19px;height:19px;fill:var(--ink);transition:transform .18s ease}.coin-verdienst[open]>summary .material-svg{transform:rotate(90deg)}
-.coin-verdienst-inhalt{display:grid;gap:13px;padding:0 15px 15px}.coin-verdienst-hinweis{color:var(--muted);font-size:11px;font-weight:600}
+.coin-verdienst-inhalt{display:grid;gap:13px;padding:16px 15px 15px}.coin-verdienst-hinweis{display:block;color:var(--muted);font-size:11px;font-weight:600}
 .coin-verdienst-gruppe{display:grid;gap:7px;padding-top:11px;border-top:1px solid color-mix(in srgb,var(--ink) 20%,transparent)}
 .coin-verdienst-titel{display:flex;align-items:center;gap:8px}.coin-verdienst-titel i{font-style:normal;font-size:21px}.coin-verdienst-titel b{font-size:14px}
 .coin-verdienst-gruppe>div{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.coin-verdienst-gruppe>div::-webkit-scrollbar{display:none}

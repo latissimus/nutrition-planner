@@ -195,9 +195,12 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
   settings.querySelectorAll('input, select').forEach((field) => { field.onchange = saveSettings; });
 
   weightForm.innerHTML = `<div class="gew-eingabe">
-    <input class="input" id="weight-date" type="date" value="${heute()}">
-    <input class="input" id="weight-value" type="text" inputmode="decimal" placeholder="84,2">
-    <span class="gew-einheit">kg</span>
+    <label class="gew-feld"><span>Datum</span>
+      <input class="input" id="weight-date" type="date" value="${heute()}">
+    </label>
+    <label class="gew-feld"><span>Gewicht</span>
+      <span class="gew-wert-eingabe"><input class="input" id="weight-value" type="text" inputmode="decimal" placeholder="84,2"><i>kg</i></span>
+    </label>
     <button class="btn btn-primary" type="button" data-save-weight>Speichern</button>
   </div>`;
 
