@@ -4,7 +4,11 @@ import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { toast } from './toast.js';
 
 const BUCKET = 'dex-entries';
-const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
+const TRAINING_CLASSES = [
+  ['unset', 'Nicht festgelegt'], ['exercise', 'Übungen'], ['recovery', 'Regeneration'],
+  ['tips', 'Tipps'], ['injury', 'Verletzung'],
+];
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -39,6 +43,7 @@ function backHref(entry) {
 
 export function editEntry(entry, onSaved, { onDeleted } = {}) {
   const ownRecipe = entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe';
+  const fixedTrainingClass = TRAINING_CLASSES.some(([key]) => key === entry.training_class);
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="Eintrag bearbeiten">
@@ -61,6 +66,13 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         <label class="dex-entry-field" for="edit-entry-prep"><span>Zubereitung <small>Minuten</small></span><input id="edit-entry-prep" class="input" type="number" min="1" max="1440" value="${entry.prep_minutes || ''}" placeholder="z. B. 10"></label>
       </div>` : ''}
       ${entry.root_key === 'food-log' && entry.food_kind === 'recipe' ? `<label class="dex-entry-field" for="edit-entry-ingredients"><span>Zutaten <small>eine Zutat pro Zeile</small></span><textarea id="edit-entry-ingredients" class="input" maxlength="4000" rows="6" placeholder="Eine Zutat pro Zeile">${escapeHtml((entry.ingredients || []).join('\n'))}</textarea></label>` : ''}
+      ${entry.root_key === 'training' ? `<label class="dex-entry-field" for="edit-entry-training-class"><span>Training-Klasse</span><select id="edit-entry-training-class" class="input">
+        ${TRAINING_CLASSES.map(([key, label]) => `<option value="${key}"${(entry.training_class || 'unset') === key ? ' selected' : ''}>${label}</option>`).join('')}
+        <option value="custom"${entry.training_class && !fixedTrainingClass ? ' selected' : ''}>Eigene Klasse …</option>
+      </select></label>
+      <label class="dex-entry-field" for="edit-entry-training-class-custom" data-edit-training-class-custom${fixedTrainingClass || !entry.training_class ? ' hidden' : ''}><span>Eigene Klasse</span>
+        <input id="edit-entry-training-class-custom" class="input" maxlength="32" value="${fixedTrainingClass ? '' : escapeHtml(entry.training_class || '')}" placeholder="z. B. Technik">
+      </label>` : ''}
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
       <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${['note', 'routine'].includes(entry.entry_type) ? '4000' : '500'}" rows="${['note', 'routine'].includes(entry.entry_type) ? '9' : '5'}"${['note', 'routine'].includes(entry.entry_type) ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
@@ -69,6 +81,12 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
   </section>`;
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+  const trainingClassSelect = backdrop.querySelector('#edit-entry-training-class');
+  const trainingClassCustom = backdrop.querySelector('[data-edit-training-class-custom]');
+  trainingClassSelect?.addEventListener('change', () => {
+    trainingClassCustom.hidden = trainingClassSelect.value !== 'custom';
+    if (!trainingClassCustom.hidden) backdrop.querySelector('#edit-entry-training-class-custom')?.focus({ preventScroll: true });
+  });
   const replacementInput = backdrop.querySelector('#edit-entry-image');
   replacementInput?.addEventListener('change', () => {
     const file = replacementInput.files?.[0];
@@ -102,6 +120,12 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
           payload.ingredients = String(backdrop.querySelector('#edit-entry-ingredients')?.value || '')
             .split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 100);
         }
+      }
+      if (entry.root_key === 'training') {
+        payload.training_class = trainingClassSelect.value === 'custom'
+          ? backdrop.querySelector('#edit-entry-training-class-custom').value.trim()
+          : trainingClassSelect.value;
+        if (!payload.training_class) throw new Error('Bitte eine eigene Klasse benennen.');
       }
       if (entry.url) payload.url = backdrop.querySelector('#edit-entry-url').value.trim();
       const file = replacementInput?.files?.[0];
@@ -174,6 +198,9 @@ function detailMarkup(entry) {
         ${carbLabels[entry.carb_class] ? `<span>${carbLabels[entry.carb_class]}</span>` : ''}
         ${entry.prep_minutes ? `<span>${entry.prep_minutes} Min.</span>` : ''}
       </div>` : '';
+  const trainingLabels = { exercise: 'Übungen', recovery: 'Regeneration', tips: 'Tipps', injury: 'Verletzung' };
+  const trainingMeta = entry.root_key === 'training' && entry.training_class && entry.training_class !== 'unset'
+    ? `<div class="dex-detail-foodmeta"><span>${escapeHtml(trainingLabels[entry.training_class] || entry.training_class)}</span></div>` : '';
   const ingredients = entry.root_key === 'food-log' && entry.food_kind === 'recipe' && entry.ingredients?.length
     ? `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul>${entry.ingredients.map((ingredient) => `<li>${escapeHtml(ingredient)}</li>`).join('')}</ul></section>` : '';
   return `<div class="wrap pad-bottom dex-detail-seite dex-detail-fixkopf">
@@ -193,6 +220,7 @@ function detailMarkup(entry) {
         <small>${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'TONAUFNAHME' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
+        ${trainingMeta}
         ${ingredients}
         ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span></div>`}
