@@ -196,7 +196,7 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
 
   weightForm.innerHTML = `<div class="gew-eingabe">
     <label class="falte gew-feld"><span>Datum</span>
-      <input class="input gew-in" id="weight-date" type="date" value="${heute()}">
+      <span class="input gew-datum-eingabe"><input id="weight-date" type="date" value="${heute()}" aria-label="Datum"></span>
     </label>
     <label class="falte gew-feld"><span>Gewicht</span>
       <span class="gew-wert-eingabe"><input class="input gew-in" id="weight-value" type="text" inputmode="decimal" placeholder="84,2"><i>kg</i></span>
