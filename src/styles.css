@@ -1495,10 +1495,9 @@ html.overlay-vollflaechig body::before{display:none}
 .mess-zeile{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
 .gew-eingabe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:end;gap:10px;margin-top:16px}
-.gew-feld{display:grid;min-width:0;gap:4px}
-.gew-feld>span:first-child{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.gew-eingabe .input{width:100%;min-width:0;margin:0;text-align:center}
-.gew-wert-eingabe{position:relative;display:block;min-width:0}
+.gew-feld{display:grid;min-width:0;max-width:100%;gap:0;overflow:hidden}
+.gew-eingabe .gew-in{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;margin:0;padding:9px;text-align:center;font-size:15px}
+.gew-wert-eingabe{position:relative;display:block;min-width:0;max-width:100%;overflow:hidden}
 .gew-wert-eingabe .input{padding-inline:32px}
 .gew-wert-eingabe i{position:absolute;right:11px;top:50%;color:var(--muted);font-family:var(--ui);font-size:12px;font-style:normal;transform:translateY(-50%);pointer-events:none}
 .gew-eingabe .btn{grid-column:1/-1;width:100%}
