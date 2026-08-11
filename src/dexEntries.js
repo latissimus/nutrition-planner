@@ -10,12 +10,7 @@ const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
 const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
-const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
-
-const TAG_PRESETS = {
-  training: ['Übungen', 'Regeneration', 'Tipps', 'Verletzung'],
-  'food-log': ['Schnell', 'Protein', 'Meal Prep', 'Snack'],
-};
+const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -88,6 +83,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
   const note = type === 'note' || routine;
   const cheatMeal = foodMode && foodKind === 'cheat_meal';
   const ownRecipe = foodMode && note && !cheatMeal;
+  const trainingMode = rootKey === 'training';
   const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -135,12 +131,19 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       ${foodMode && foodKind !== 'cheat_meal' ? `<label class="dex-entry-field" for="dex-entry-ingredients"><span>Zutaten <small>eine Zutat pro Zeile</small></span>
         <textarea id="dex-entry-ingredients" class="input" maxlength="4000" rows="6" placeholder="z. B.&#10;250 g Skyr&#10;30 g Haferflocken&#10;1 Banane"></textarea>
       </label>` : ''}
+      ${trainingMode ? `<label class="dex-entry-field" for="dex-entry-training-class"><span>Training-Klasse</span>
+        <select id="dex-entry-training-class" class="input">
+          <option value="unset">Nicht festgelegt</option><option value="exercise">Übungen</option>
+          <option value="recovery">Regeneration</option><option value="tips">Tipps</option>
+          <option value="injury">Verletzung</option><option value="custom">Eigene Klasse …</option>
+        </select>
+      </label>
+      <label class="dex-entry-field" for="dex-entry-training-class-custom" data-training-class-custom hidden><span>Eigene Klasse</span>
+        <input id="dex-entry-training-class-custom" class="input" maxlength="32" placeholder="z. B. Technik">
+      </label>` : ''}
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
-      ${TAG_PRESETS[rootKey]?.length ? `<div class="dex-tag-vorschlaege" aria-label="Tag-Vorschläge">
-        ${TAG_PRESETS[rootKey].map((tag) => `<button type="button" data-tag-vorschlag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join('')}
-      </div>` : ''}
       ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
         <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note ? ' required' : ''}></textarea>
       </label>`}
@@ -169,16 +172,11 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     if (!(event.target instanceof Element) || !event.target.closest('.dex-entry-editor')) event.preventDefault();
   }, { passive: false });
   const form = backdrop.querySelector('[data-dex-entry-form]');
-  const tagsInput = backdrop.querySelector('#dex-entry-tags');
-  backdrop.querySelector('.dex-tag-vorschlaege')?.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-tag-vorschlag]');
-    if (!button || !tagsInput) return;
-    const tags = tagsInput.value.split(',').map((tag) => tag.trim()).filter(Boolean);
-    const index = tags.findIndex((tag) => tag.toLocaleLowerCase('de') === button.dataset.tagVorschlag.toLocaleLowerCase('de'));
-    if (index >= 0) tags.splice(index, 1);
-    else tags.push(button.dataset.tagVorschlag);
-    tagsInput.value = tags.slice(0, 12).join(', ');
-    button.classList.toggle('aktiv', index < 0);
+  const trainingClassSelect = backdrop.querySelector('#dex-entry-training-class');
+  const trainingClassCustom = backdrop.querySelector('[data-training-class-custom]');
+  trainingClassSelect?.addEventListener('change', () => {
+    trainingClassCustom.hidden = trainingClassSelect.value !== 'custom';
+    if (!trainingClassCustom.hidden) backdrop.querySelector('#dex-entry-training-class-custom')?.focus({ preventScroll: true });
   });
   const fileInput = backdrop.querySelector('#dex-entry-image, #dex-entry-audio');
   if (fileInput) fileInput.onchange = () => {
@@ -306,6 +304,11 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
         food_kind: foodMode ? (foodKind || 'recipe') : null,
         carb_class: foodMode ? form.querySelector('#dex-entry-carb').value : null,
+        training_class: rootKey === 'training'
+          ? (form.querySelector('#dex-entry-training-class').value === 'custom'
+            ? form.querySelector('#dex-entry-training-class-custom').value.trim()
+            : form.querySelector('#dex-entry-training-class').value)
+          : null,
         prep_minutes: foodMode && form.querySelector('#dex-entry-prep').value
           ? Number(form.querySelector('#dex-entry-prep').value) : null,
         ingredients: foodMode
