@@ -3290,6 +3290,18 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   background:var(--surface);color:var(--text);font:800 11px/1 var(--ui);white-space:nowrap;
 }
 .food-dex-filter button.aktiv{background:#492426;color:#fff}
+.dex-tag-filter{
+  display:flex;gap:7px;margin:-13px -2px 22px;padding:0 2px 4px;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+}
+.dex-tag-filter::-webkit-scrollbar{display:none}
+.dex-tag-filter button,.dex-tag-vorschlaege button{
+  flex:0 0 auto;min-height:30px;padding:6px 10px;border:1px solid color-mix(in srgb,var(--ink) 58%,transparent);
+  border-radius:999px;background:var(--surface);color:var(--text);font:750 11px/1 var(--ui);white-space:nowrap;
+}
+.dex-tag-filter button.aktiv,.dex-tag-vorschlaege button.aktiv{border-color:#492426;background:#492426;color:#fff}
+.dex-tag-vorschlaege{display:flex;gap:7px;margin-top:-9px;padding:1px 1px 3px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.dex-tag-vorschlaege::-webkit-scrollbar{display:none}
 @media(max-width:380px){.food-entry-meta{grid-template-columns:1fr}}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
@@ -3404,7 +3416,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- COIN-DEX ---------- */
-.coin-dex-inhalt{display:grid;gap:18px;padding:2px 2px 24px}
+.coin-dex-inhalt{display:grid;gap:18px;padding:6px 2px 24px}
 .coin-balance-card{
   display:flex;align-items:center;gap:17px;padding:18px;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
@@ -3434,7 +3446,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-section-title h2,.coin-history-title{margin:0;font-size:19px;text-transform:uppercase}
 .coin-section-title button{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:color-mix(in srgb,var(--ordner) 15%,var(--surface));font:800 12px/1 var(--ui)}
 .coin-section-title button .material-svg,.coin-section-title button svg{width:16px;height:16px}
-.coin-reward-list{display:grid;gap:12px}
+.coin-reward-list{display:grid;gap:12px;padding-top:3px}
 .coin-reward{display:grid;gap:10px;padding:14px;border:1.5px solid var(--ink);border-top:7px solid var(--ordner);border-radius:15px;background:var(--surface)}
 .coin-reward-kopf{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px}
 .coin-reward-kopf .coin-reward-symbol{width:38px;height:38px;transform:translateX(-2px)}

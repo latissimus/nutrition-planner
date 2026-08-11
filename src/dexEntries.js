@@ -12,6 +12,11 @@ const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif
 const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
 const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,prep_minutes,ingredients,created_at,updated_at';
 
+const TAG_PRESETS = {
+  training: ['Übungen', 'Regeneration', 'Tipps', 'Verletzung'],
+  'food-log': ['Schnell', 'Protein', 'Meal Prep', 'Snack'],
+};
+
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -76,7 +81,7 @@ export async function loadAllDexEntries(userId, signal) {
   return entries;
 }
 
-function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = '' } = {}) {
+function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', entryLabel = '' } = {}) {
   const image = type === 'image';
   const audio = type === 'audio';
   const routine = type === 'routine';
@@ -133,6 +138,9 @@ function editorMarkup(type, { foodKind = null, foodMode = false, entryLabel = ''
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
+      ${TAG_PRESETS[rootKey]?.length ? `<div class="dex-tag-vorschlaege" aria-label="Tag-Vorschläge">
+        ${TAG_PRESETS[rootKey].map((tag) => `<button type="button" data-tag-vorschlag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join('')}
+      </div>` : ''}
       ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
         <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note ? ' required' : ''}></textarea>
       </label>`}
@@ -146,7 +154,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   const foodMode = rootKey === 'food-log';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
-  backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode, entryLabel });
+  backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode, rootKey, entryLabel });
   let audioRecorder = null;
   let audioStream = null;
   let recordedAudioFile = null;
@@ -161,6 +169,17 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     if (!(event.target instanceof Element) || !event.target.closest('.dex-entry-editor')) event.preventDefault();
   }, { passive: false });
   const form = backdrop.querySelector('[data-dex-entry-form]');
+  const tagsInput = backdrop.querySelector('#dex-entry-tags');
+  backdrop.querySelector('.dex-tag-vorschlaege')?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-tag-vorschlag]');
+    if (!button || !tagsInput) return;
+    const tags = tagsInput.value.split(',').map((tag) => tag.trim()).filter(Boolean);
+    const index = tags.findIndex((tag) => tag.toLocaleLowerCase('de') === button.dataset.tagVorschlag.toLocaleLowerCase('de'));
+    if (index >= 0) tags.splice(index, 1);
+    else tags.push(button.dataset.tagVorschlag);
+    tagsInput.value = tags.slice(0, 12).join(', ');
+    button.classList.toggle('aktiv', index < 0);
+  });
   const fileInput = backdrop.querySelector('#dex-entry-image, #dex-entry-audio');
   if (fileInput) fileInput.onchange = () => {
     const file = fileInput.files?.[0];
@@ -446,6 +465,25 @@ const foodFilterDefinitions = [
   ['high', 'High Carb'], ['balanced', 'Ausgewogen'], ['favorite', 'Favoriten'],
 ];
 
+function tagDefinitions(entries, rootKey) {
+  const presets = TAG_PRESETS[rootKey] || [];
+  const stored = entries.flatMap((entry) => entry.tags || []).map((tag) => tag.trim()).filter(Boolean);
+  const unique = [];
+  [...presets, ...stored].forEach((tag) => {
+    if (!unique.some((item) => item.toLocaleLowerCase('de') === tag.toLocaleLowerCase('de'))) unique.push(tag);
+  });
+  return unique;
+}
+
+function tagFiltersMarkup(entries, rootKey, activeTag = '') {
+  const tags = tagDefinitions(entries, rootKey);
+  if (!tags.length) return '';
+  return `<nav class="dex-tag-filter" aria-label="Nach Tags filtern">
+    <button type="button" data-dex-tag="" class="${activeTag ? '' : 'aktiv'}" aria-pressed="${!activeTag}">Alle Tags</button>
+    ${tags.map((tag) => `<button type="button" data-dex-tag="${escapeHtml(tag)}" class="${tag === activeTag ? 'aktiv' : ''}" aria-pressed="${tag === activeTag}">#${escapeHtml(tag)}</button>`).join('')}
+  </nav>`;
+}
+
 function foodFiltersMarkup(active = 'all') {
   return `<nav class="food-dex-filter" aria-label="Food-Log filtern">${foodFilterDefinitions.map(([key, label]) =>
     `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
@@ -483,7 +521,8 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
 }
 
 export async function renderDexEntries(container, {
-  userId, rootKey, collectionId = null, routineId, color, signal, onChanged, foodFilters = rootKey === 'food-log', hasChildren = false, hideEmpty = false,
+  userId, rootKey, collectionId = null, routineId, color, signal, onChanged,
+  foodFilters = rootKey === 'food-log', tagFilters = ['food-log', 'training'].includes(rootKey), hasChildren = false, hideEmpty = false,
 } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
@@ -491,15 +530,22 @@ export async function renderDexEntries(container, {
     const entries = await loadDexEntries(userId, { rootKey, collectionId, routineId, signal });
     if (signal?.aborted) return [];
     let activeFilter = 'all';
+    let activeTag = '';
     const paint = () => {
-      const visibleEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined, hasChildren, hideEmpty)}</div>`;
+      const foodEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
+      const visibleEntries = activeTag
+        ? foodEntries.filter((entry) => (entry.tags || []).some((tag) => tag.toLocaleLowerCase('de') === activeTag.toLocaleLowerCase('de')))
+        : foodEntries;
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${tagFilters ? tagFiltersMarkup(entries, rootKey, activeTag) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : undefined, hasChildren, hideEmpty)}</div>`;
       vorschaubilderEinblenden(slot);
       slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
         if (!group.querySelector('.dex-inhaltskarte')) group.remove();
       });
       slot.querySelectorAll('[data-food-filter]').forEach((button) => {
         button.onclick = () => { activeFilter = button.dataset.foodFilter; paint(); };
+      });
+      slot.querySelectorAll('[data-dex-tag]').forEach((button) => {
+        button.onclick = () => { activeTag = button.dataset.dexTag; paint(); };
       });
     };
     paint();

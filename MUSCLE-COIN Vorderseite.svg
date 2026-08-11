@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="brown" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#704044"/>
+      <stop offset="1" stop-color="#492426"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3BD3EF"/>
+      <stop offset="1" stop-color="#05BDE8"/>
+    </linearGradient>
+    <linearGradient id="cream" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8E7"/>
+      <stop offset="1" stop-color="#FFE59D"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="170%" height="180%">
+      <feDropShadow dx="7" dy="9" stdDeviation="5" flood-color="#120A0A" flood-opacity=".42"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="170%" height="180%">
+      <feDropShadow dx="3" dy="4" stdDeviation="2" flood-color="#120A0A" flood-opacity=".38"/>
+    </filter>
+  </defs>
+
+  <g inkscape:groupmode="layer" inkscape:label="Bodenschatten" id="ground-shadow">
+    <ellipse cx="256" cy="468" rx="154" ry="18" fill="#120A0A" opacity=".18"/>
+  </g>
+
+  <g inkscape:groupmode="layer" inkscape:label="Außenring" id="outer-ring" filter="url(#shadow)">
+    <circle cx="256" cy="248" r="213" fill="url(#brown)" stroke="#171010" stroke-width="7"/>
+    <circle cx="256" cy="248" r="191" fill="url(#cyan)" stroke="#171010" stroke-width="6"/>
+    <path d="M83 123A214 214 0 0 1 179 48" fill="none" stroke="#A9686D" stroke-width="6" stroke-linecap="round" opacity=".65"/>
+    <path d="M390 408A214 214 0 0 1 329 448" fill="none" stroke="#2E1517" stroke-width="8" stroke-linecap="round" opacity=".55"/>
+  </g>
+
+  <g inkscape:groupmode="layer" inkscape:label="Seitliche Ringsegmente" id="ring-tabs">
+    <path d="M42 199l25-13 8 9v106l-9 10-24-13c-5-32-5-67 0-99z" fill="#704044" stroke="#171010" stroke-width="5"/>
+    <path d="M470 199l-25-13-8 9v106l9 10 24-13c5-32 5-67 0-99z" fill="#704044" stroke="#171010" stroke-width="5"/>
+    <path d="M47 244h24M441 244h24" stroke="#B57478" stroke-width="3" opacity=".7"/>
+  </g>
+
+  <g inkscape:groupmode="layer" inkscape:label="Obere und untere Einsätze" id="slots" filter="url(#soft)">
+    <path d="M190 50h132l12 34-15 22H193l-15-22z" fill="#492426" stroke="#171010" stroke-width="5"/>
+    <rect x="205" y="63" width="102" height="28" rx="9" fill="url(#cream)" stroke="#171010" stroke-width="4"/>
+    <path d="M190 408h132l12 21-14 35H192l-14-35z" fill="#492426" stroke="#171010" stroke-width="5"/>
+    <rect x="201" y="421" width="110" height="29" rx="8" fill="url(#cream)" stroke="#171010" stroke-width="4"/>
+    <path d="M220 424v23M238 424v23M256 424v23M274 424v23M292 424v23" stroke="#A97A50" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g inkscape:groupmode="layer" inkscape:label="Display und Technikdetails" id="display">
+    <rect x="121" y="132" width="270" height="216" rx="25" fill="#079DC5" stroke="#171010" stroke-width="6" filter="url(#soft)"/>
+    <rect x="135" y="146" width="242" height="188" rx="18" fill="url(#cyan)" stroke="#72E7FA" stroke-width="3"/>
+    <circle cx="375" cy="93" r="15" fill="#9772FB" stroke="#171010" stroke-width="4"/>
+    <g fill="none" stroke="#492426" stroke-width="5" stroke-linecap="round">
+      <path d="M105 91h74M105 106h52M105 121h86"/>
+      <path d="M91 308h26M91 323h36M91 338h36"/>
+      <path d="M395 308h26M385 323h36M385 338h36"/>
+    </g>
+  </g>
+
+  <g inkscape:groupmode="layer" inkscape:label="Bizeps" id="biceps" filter="url(#soft)">
+    <path d="M185 289c-16-8-27-18-29-32-2-12 5-22 17-25 13-4 23-16 28-31l22-61c4-12 14-19 25-18l25 3c12 1 19 10 17 21l-5 24c-2 10-11 15-20 12l-14-5-12 43c19-8 36-16 54-15 30 1 51 21 51 48 0 35-28 60-69 61-34 1-62-8-90-25z" fill="url(#cream)" stroke="#492426" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M255 169c8 6 17 6 25 1M268 139l-1 22M255 143l-3 18M282 145l1 19" fill="none" stroke="#492426" stroke-width="4" stroke-linecap="round"/>
+    <path d="M222 273c31 24 72 21 95-8" fill="none" stroke="#492426" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <g inkscape:groupmode="layer" inkscape:label="Sterne und Plus" id="badges" filter="url(#soft)">
+    <path d="M153 359l9 19 21 3-15 15 4 22-19-10-20 10 4-22-15-15 21-3z" fill="#FF3483" stroke="#492426" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M359 359l9 19 21 3-15 15 4 22-19-10-20 10 4-22-15-15 21-3z" fill="#FF3483" stroke="#492426" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M240 359h32v25h25v32h-25v25h-32v-25h-25v-32h25z" fill="#525CEB" stroke="#492426" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>
