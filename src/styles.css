@@ -1346,6 +1346,18 @@ html.overlay-vollflaechig body::before{display:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 :focus-visible{outline:3px solid var(--pink);outline-offset:2px}
 [role="dialog"] :is([data-sheet-close],[data-reminder-overlay-close],[data-meditation-close],[data-close],.dex-bild-schliessen){min-width:44px;min-height:44px}
+.netzstatus{
+  position:fixed;z-index:95;left:50%;bottom:calc(env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);
+  width:max-content;max-width:calc(100vw - 32px);padding:9px 13px;border:2px solid var(--ink);border-radius:999px;
+  background:var(--ink);color:var(--surface);font-size:12px;font-weight:800;text-align:center;
+}
+.netzstatus[hidden]{display:none}
+.route-fehler-view{display:grid;min-height:100%;padding:calc(env(safe-area-inset-top) + 24px) 18px calc(env(safe-area-inset-bottom) + 24px);place-items:center;overflow:auto}
+.route-fehler{width:min(100%,430px);padding:28px 22px;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart);text-align:center}
+.route-fehler-symbol{display:grid;width:52px;height:52px;margin:0 auto 16px;place-items:center;border:var(--bw) solid var(--ink);border-radius:50%;background:var(--pink);font-family:var(--display);font-size:28px;font-weight:800}
+.route-fehler h1{margin:0;font-family:var(--display);font-size:24px;text-transform:uppercase}
+.route-fehler p{margin:10px auto 20px;color:var(--muted);font-size:15px;line-height:1.45}
+.route-fehler-aktionen{display:grid;gap:10px}.route-fehler-aktionen .btn{display:grid;place-items:center;text-decoration:none}
 
 /* Baustand, unten im Profil – bewusst unauffaellig. */
 /* Dicht unter den Abmelden-Knopf: Der Abstand von dort bis zur Leiste soll dem

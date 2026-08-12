@@ -33,6 +33,7 @@ import { toast } from './toast.js';
 import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
 import { createLruCache, createRouteStack, disposeViewEntry } from './navigationState.js';
 import { setupDialogAccessibility } from './accessibility.js';
+import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
 } from './categoryIcons.js';
@@ -85,6 +86,19 @@ new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.add
   if (node instanceof Element) konfiguriereSchreibfelder(node);
 }))).observe(document.body, { childList: true, subtree: true });
 setupDialogAccessibility();
+
+const netzstatus = document.createElement('div');
+netzstatus.className = 'netzstatus';
+netzstatus.setAttribute('role', 'status');
+netzstatus.setAttribute('aria-live', 'polite');
+netzstatus.hidden = navigator.onLine;
+netzstatus.textContent = 'Offline – Änderungen erst wieder mit Verbindung möglich';
+document.body.append(netzstatus);
+window.addEventListener('offline', () => { netzstatus.hidden = false; });
+window.addEventListener('online', () => {
+  netzstatus.hidden = true;
+  if (app.querySelector('[data-route-retry]')) render();
+});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
@@ -901,7 +915,7 @@ async function profilSicherLaden() {
   return profile;
 }
 
-async function render() {
+async function renderRoute() {
   const generation = ++renderGeneration;
   if (!supabaseKonfiguriert) return renderSetup();
   if (recovery) return renderRecovery();
@@ -910,15 +924,7 @@ async function render() {
     try { await profilSicherLaden(); }
     catch (error) {
       if (generation !== renderGeneration) return;
-      app.replaceChildren();
-      const main = document.createElement('main');
-      main.className = 'setup-shell wrap';
-      const box = document.createElement('div');
-      box.className = 'msg err';
-      box.textContent = fehlertext(error);
-      main.appendChild(box);
-      app.appendChild(main);
-      return;
+      throw error;
     }
   }
   if (generation !== renderGeneration) return;
@@ -1179,6 +1185,47 @@ async function render() {
     if (homeStilBeimTauschSetzen) setSeite('home');
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();
+  }
+}
+
+function renderLadefehler(error) {
+  const info = userFacingLoadError(error, { online: navigator.onLine });
+  routeAbortController?.abort();
+  ansichtsCache.clear();
+  app.querySelectorAll(':scope > main').forEach((node) => node.remove());
+  const view = document.createElement('main');
+  view.id = 'view';
+  view.className = 'route-fehler-view';
+  view.innerHTML = `<section class="route-fehler" role="alert">
+    <span class="route-fehler-symbol" aria-hidden="true">!</span>
+    <h1>${info.title}</h1>
+    <p>${info.message}</p>
+    <div class="route-fehler-aktionen">
+      <button class="btn btn-primary" type="button" data-route-retry>Erneut versuchen</button>
+      <a class="btn" href="#home">Zur Startseite</a>
+    </div>
+  </section>`;
+  app.append(view);
+  const retry = view.querySelector('[data-route-retry]');
+  if (info.kind === 'session') {
+    retry.textContent = 'Neu anmelden';
+    retry.onclick = async () => {
+      await supabase.auth.signOut({ scope: 'local' });
+      session = null;
+      profile = null;
+      render();
+    };
+  } else retry.onclick = () => render();
+  retry.focus({ preventScroll: true });
+}
+
+async function render() {
+  try {
+    await renderRoute();
+  } catch (error) {
+    if (isAbortError(error)) return;
+    console.error('Seite konnte nicht geladen werden:', error);
+    renderLadefehler(error);
   }
 }
 
