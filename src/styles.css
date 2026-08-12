@@ -3373,7 +3373,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   background:var(--bg)
 }
 .profil-scrollinhalt{
-  min-height:0;overflow-x:hidden;overflow-y:auto;padding-top:10px;
+  min-height:0;overflow-x:hidden;overflow-y:auto;padding-top:10px;padding-right:5px;
   padding-bottom:calc(42px + env(safe-area-inset-bottom));
   overscroll-behavior:contain;-webkit-overflow-scrolling:touch
 }
