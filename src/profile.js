@@ -8,6 +8,7 @@ import {
 } from './collectionPreferences.js';
 import { loadCollections } from './collections.js';
 import { materialIconMarkup } from './categoryIcons.js';
+import { createFullDataExport, exportFileName } from './dataExport.js';
 
 const initials = (name, email) => {
   const quelle = (name || email || '?').trim();
@@ -345,26 +346,28 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
-    <p class="profile-hinweis">Exportiert die derzeit gespeicherten Kontodaten als JSON-Datei.</p>
+    <p class="profile-hinweis">Exportiert Profil, Messwerte, Erinnerungen, Routinen, Dex, Einträge, Einkaufsliste, Einstellungen, Freigaben und MUSCLE-COINS als JSON-Datei. Private Medien werden als Speicherpfade aufgeführt.</p>
     <button class="btn btn-block" type="button" data-export>Daten exportieren</button>
     <div class="profile-daten-status" aria-live="polite"></div>`;
-  daten.querySelector('[data-export]').onclick = () => {
-    const heute = new Date().toISOString().slice(0, 10);
-    downloadJson(`nutrition-export-${heute}.json`, {
-      exportiert_am: new Date().toISOString(),
-      profil: {
-        id: session.user.id,
-        email,
-        name: profile.full_name || '',
-        rolle: profile.role,
-        zeitzone: profile.zeitzone,
-        darstellung: getTheme(),
-        hautfalten_erinnerung: profile.falten_erinnerung,
-        hautfalten_intervall_wochen: profile.falten_intervall_wochen,
-        hautfalten_uhrzeit: profile.falten_uhrzeit,
-      },
-    });
-    daten.querySelector('.profile-daten-status').textContent = 'Export heruntergeladen.';
+  daten.querySelector('[data-export]').onclick = async (event) => {
+    const button = event.currentTarget;
+    const status = daten.querySelector('.profile-daten-status');
+    button.disabled = true;
+    status.textContent = 'Datenexport wird vorbereitet …';
+    try {
+      const exportData = await createFullDataExport({
+        session, profile, theme: getTheme(), signal,
+        onProgress: ({ current, total }) => {
+          if (status.isConnected) status.textContent = `Daten werden gesammelt: ${current} von ${total}`;
+        },
+      });
+      downloadJson(exportFileName(), exportData);
+      status.textContent = 'Vollständiger Export heruntergeladen.';
+    } catch (error) {
+      status.textContent = `Export fehlgeschlagen: ${error.message || 'Daten konnten nicht geladen werden.'}`;
+    } finally {
+      if (button.isConnected) button.disabled = false;
+    }
   };
 
   const gefahr = abschnitt(wrap, 'Account löschen', false, 'gefahr');
