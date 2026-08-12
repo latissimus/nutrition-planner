@@ -3183,6 +3183,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltsgrid .dex-inhaltskarte-vorschau{aspect-ratio:4/3}
 .dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:54%;flex:0 0 54%}
 .dex-inhaltsgrid .dex-inhaltskarte-ohne-text{opacity:.7}
+.dex-mehr-laden{display:flex;justify-content:center;padding:0 5px 28px}
+.dex-mehr-laden .btn{min-width:min(100%,280px);display:grid;place-items:center;gap:1px;background:var(--surface)}
+.dex-mehr-laden small{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 .dex-video-vorschau,.dex-provider-vorschau{position:relative}
 .dex-video-vorschau>i,.dex-detail-linkvorschau>i{
   position:absolute;inset:50% auto auto 50%;display:grid;place-items:center;width:42px;height:42px;

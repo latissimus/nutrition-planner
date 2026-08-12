@@ -770,10 +770,10 @@ async function mountCustomCollection(container, item, signal) {
   await renderDexEntries(container, {
     userId: session.user.id, rootKey: item.root_key, collectionId: item.id,
     color: item.color, signal, hasChildren: children.length > 0,
-    onChanged: (entries) => {
+    onChanged: (entries, total) => {
       if (!Array.isArray(entries)) return;
       const meta = container.querySelector('.kategorie-kopftitel small');
-      if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+      if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
     },
   });
 }
@@ -1046,10 +1046,10 @@ async function render() {
     }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
-      onChanged: (entries) => {
+      onChanged: (entries, total) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
-        if (meta) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
   } else if (route === 'training') {
@@ -1071,9 +1071,9 @@ async function render() {
     }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal, hasChildren: children.length > 0,
-      onChanged: (entries) => {
+      onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
-        if (meta && Array.isArray(entries)) meta.textContent = `${entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
   } else if (route.startsWith('collection/')) {

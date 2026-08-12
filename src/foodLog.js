@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
+import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 
 const BUCKET = 'food-log';
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -19,16 +20,10 @@ function dateLabel(value) {
     .format(new Date(`${value}T12:00:00`));
 }
 
-function extension(file) {
-  const fromName = file.name.split('.').pop()?.toLowerCase();
-  if (fromName && /^[a-z0-9]{2,5}$/.test(fromName)) return fromName;
-  return file.type.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
-}
-
 function validateImage(file) {
   if (!file) return;
   if (!ALLOWED_TYPES.has(file.type)) throw new Error('Bitte JPG, PNG, WebP oder HEIC verwenden.');
-  if (file.size > MAX_FILE_SIZE) throw new Error('Das Bild darf maximal 8 MB gross sein.');
+  if (file.size > MAX_FILE_SIZE) throw new Error('Das Bild darf maximal 8 MB groß sein.');
 }
 
 async function loadEntries(userId, signal, collectionId = null) {
@@ -53,10 +48,11 @@ async function loadEntries(userId, signal, collectionId = null) {
 
 async function uploadImage(userId, file) {
   validateImage(file);
-  const path = `${userId}/${crypto.randomUUID()}.${extension(file)}`;
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-    cacheControl: '3600',
-    contentType: file.type,
+  const uploadFile = await optimizeImageFile(file);
+  const path = `${userId}/${crypto.randomUUID()}.${uploadExtension(uploadFile)}`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, uploadFile, {
+    cacheControl: '31536000',
+    contentType: uploadFile.type,
     upsert: false,
   });
   if (error) throw error;

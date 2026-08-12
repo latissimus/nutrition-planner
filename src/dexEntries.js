@@ -4,6 +4,7 @@ import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
 import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
+import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -11,6 +12,7 @@ const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
 const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
 const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
+const DEX_PAGE_SIZE = 24;
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -37,26 +39,48 @@ function queryScope(query, { collectionId }) {
   return collectionId ? query.eq('collection_id', collectionId) : query.is('collection_id', null);
 }
 
-export async function loadDexEntries(userId, { rootKey, collectionId = null, routineId, signal } = {}) {
+async function attachSignedMediaUrls(entries) {
+  const paths = [...new Set(entries.map((entry) => entry.image_path || entry.audio_path).filter(Boolean))];
+  if (!paths.length) return entries;
+  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrls(paths, 60 * 60);
+  if (error) return entries;
+  const urls = new Map((data || []).map((item) => [item.path, item.signedUrl]));
+  entries.forEach((entry) => {
+    const path = entry.image_path || entry.audio_path;
+    if (entry.audio_path) entry.audio_url = urls.get(path) || '';
+    else entry.preview_url = urls.get(path) || entry.preview_url || '';
+  });
+  return entries;
+}
+
+async function dexEntriesQuery({ rootKey, collectionId = null, routineId, signal, offset, limit, count = false }) {
   let query = supabase.from('dex_entries')
-    .select(ENTRY_COLUMNS)
+    .select(ENTRY_COLUMNS, count ? { count: 'exact' } : undefined)
     .eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (routineId === null) query = query.is('routine_id', null);
   else if (routineId) query = query.eq('routine_id', routineId);
+  if (Number.isInteger(offset) && Number.isInteger(limit)) query = query.range(offset, offset + limit - 1);
   if (signal) query = query.abortSignal(signal);
-  const { data, error } = await query;
-  if (error) throw error;
+  return query;
+}
 
+export async function loadDexEntries(userId, { rootKey, collectionId = null, routineId, signal } = {}) {
+  const { data, error } = await dexEntriesQuery({ rootKey, collectionId, routineId, signal });
+  if (error) throw error;
   const entries = data || [];
-  await Promise.all(entries.map(async (entry) => {
-    const path = entry.image_path || entry.audio_path;
-    if (!path) return;
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
-    if (entry.audio_path) entry.audio_url = signed?.signedUrl || '';
-    else entry.preview_url = signed?.signedUrl || '';
-  }));
-  return entries;
+  return attachSignedMediaUrls(entries);
+}
+
+export async function loadDexEntryPage(userId, {
+  rootKey, collectionId = null, routineId, signal, offset = 0, limit = DEX_PAGE_SIZE,
+} = {}) {
+  const { data, error, count } = await dexEntriesQuery({
+    rootKey, collectionId, routineId, signal, offset, limit, count: true,
+  });
+  if (error) throw error;
+  const entries = await attachSignedMediaUrls(data || []);
+  return { entries, total: count ?? entries.length };
 }
 
 export async function loadAllDexEntries(userId, signal) {
@@ -66,14 +90,7 @@ export async function loadAllDexEntries(userId, signal) {
   const { data, error } = await query;
   if (error) throw error;
   const entries = data || [];
-  await Promise.all(entries.map(async (entry) => {
-    const path = entry.image_path || entry.audio_path;
-    if (!path) return;
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
-    if (entry.audio_path) entry.audio_url = signed?.signedUrl || '';
-    else entry.preview_url = signed?.signedUrl || '';
-  }));
-  return entries;
+  return attachSignedMediaUrls(entries);
 }
 
 function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', entryLabel = '' } = {}) {
@@ -263,9 +280,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         if (!file) throw new Error('Bitte ein Bild auswählen.');
         if (!IMAGE_TYPES.has(file.type)) throw new Error('Dieses Bildformat wird nicht unterstützt.');
         if (file.size > MAX_IMAGE_BYTES) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
-        const extension = (file.name.split('.').pop() || file.type.split('/').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const uploadFile = await optimizeImageFile(file);
+        const extension = uploadExtension(uploadFile);
         uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
-        const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
+        const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, uploadFile, { cacheControl: '31536000', contentType: uploadFile.type, upsert: false });
         if (uploadError) throw uploadError;
         imagePath = uploadedPath;
         title ||= 'Gespeichertes Bild';
@@ -288,9 +306,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         if (file) {
           if (!IMAGE_TYPES.has(file.type)) throw new Error('Dieses Bildformat wird nicht unterstützt.');
           if (file.size > MAX_IMAGE_BYTES) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
-          const extension = (file.name.split('.').pop() || file.type.split('/').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+          const uploadFile = await optimizeImageFile(file);
+          const extension = uploadExtension(uploadFile);
           uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
-          const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
+          const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, uploadFile, { cacheControl: '31536000', contentType: uploadFile.type, upsert: false });
           if (uploadError) throw uploadError;
           imagePath = uploadedPath;
         }
@@ -536,14 +555,19 @@ export async function renderDexEntries(container, {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
   try {
-    const entries = await loadDexEntries(userId, { rootKey, collectionId, routineId, signal });
+    const firstPage = await loadDexEntryPage(userId, { rootKey, collectionId, routineId, signal });
+    const entries = [...firstPage.entries];
+    const total = firstPage.total;
     if (signal?.aborted) return [];
     let activeFilter = 'all';
     let activeTrainingFilter = 'all';
+    let loadingMore = false;
+    const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
     const paint = () => {
       const foodEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
       const visibleEntries = trainingFilters ? filterTrainingEntries(foodEntries, activeTrainingFilter) : foodEntries;
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, hasChildren, hideEmpty)}</div>`;
+      const hasMore = entries.length < total;
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, hasChildren, hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
       vorschaubilderEinblenden(slot);
       slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
         if (!group.querySelector('.dex-inhaltskarte')) group.remove();
@@ -554,19 +578,42 @@ export async function renderDexEntries(container, {
       slot.querySelectorAll('[data-training-filter]').forEach((button) => {
         button.onclick = () => { activeTrainingFilter = button.dataset.trainingFilter; paint(); };
       });
+      const loadMoreButton = slot.querySelector('[data-dex-load-more]');
+      if (loadMoreButton) loadMoreButton.onclick = async () => {
+        if (loadingMore) return;
+        loadingMore = true;
+        loadMoreButton.disabled = true;
+        loadMoreButton.firstChild.textContent = 'Einträge werden geladen …';
+        try {
+          const page = await loadDexEntryPage(userId, {
+            rootKey, collectionId, routineId, signal, offset: entries.length,
+          });
+          if (signal?.aborted) return;
+          page.entries.forEach((entry) => {
+            if (entriesById.has(entry.id)) return;
+            entries.push(entry);
+            entriesById.set(entry.id, entry);
+          });
+          paint();
+        } catch (error) {
+          toast(error.message || 'Weitere Einträge konnten nicht geladen werden.');
+          loadMoreButton.disabled = false;
+        } finally {
+          loadingMore = false;
+        }
+      };
     };
     paint();
     // Long-Press auf eine Eintragskarte oeffnet direkt "Eintrag bearbeiten"
     // (Notiz, Video, Bild, Rezept – alle teilen dieselbe Karte). slot bleibt
     // beim Neuzeichnen erhalten, die Delegation ueberlebt jedes paint().
-    const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
     const refreshAlles = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     bindLongPress(slot, '.dex-inhaltskarte', (el) => {
       const entry = entriesById.get(el.dataset.dexEntryId);
       if (!entry) return null;
       return () => editEntry(entry, refreshAlles, { onDeleted: refreshAlles });
     });
-    onChanged?.(entries);
+    onChanged?.(entries, total);
     return entries;
   } catch (error) {
     if (signal?.aborted) return [];
