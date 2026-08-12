@@ -4121,7 +4121,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    verwendet und dadurch einheitlich blaugrau gefaerbt. Nur die Tapete in der
    Seite wird abgeschwaecht; ihre Auswahlvorschau bleibt bei voller Deckkraft. */
 :root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
-  position:relative;isolation:isolate;background-image:none!important;overflow:hidden;
+  position:relative;isolation:isolate;background-image:none!important;
 }
 :root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before{
   content:"";position:absolute;z-index:0;inset:0;display:block;min-height:100%;pointer-events:none;
