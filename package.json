@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "icons": "node scripts/gen-icons.mjs",
     "test": "vitest run",
+    "audit": "npm audit --audit-level=high",
     "check:migrations": "node scripts/check-migrations.mjs",
     "check": "npm run check:migrations && npm test && npm run build",
     "backup:supabase": "node scripts/backup-supabase.mjs",

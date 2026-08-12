@@ -71,3 +71,12 @@ enthalten keine Passwörter oder Passwort-Hashes.
 Wichtig: Supabase-Datenbankbackups enthalten keine Storage-Dateien. Auf
 bezahlten Tarifen stehen Datenbank-Sicherungen zusätzlich unter
 **Database → Backups** bereit; die lokale Sicherung bleibt dennoch sinnvoll.
+
+## Abhängigkeiten
+
+GitHub prüft npm-Pakete wöchentlich und bündelt kompatible Minor- und
+Patch-Updates in höchstens zwei offenen Dependabot-PRs. Hauptversionen werden
+nicht automatisch vorgeschlagen, weil sie bewusste Anpassungen erfordern.
+Jeder Qualitätslauf führt zusätzlich `npm audit --audit-level=high` aus und
+stoppt bei bekannten hohen oder kritischen Sicherheitslücken. Lokal kann
+dieselbe Prüfung mit `npm run audit` gestartet werden.
