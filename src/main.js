@@ -31,6 +31,7 @@ import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
+import { createLruCache, createRouteStack, disposeViewEntry } from './navigationState.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
 } from './categoryIcons.js';
@@ -119,7 +120,8 @@ let browserRueckwaerts = false;
 let appRueckwaerts = false;
 let popstateNavigation = false;
 let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
-const ansichtsCache = new Map();
+
+const ansichtsCache = createLruCache({ limit: 10, onEvict: disposeViewEntry });
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
 // (zurueck/schliessen) zu unterscheiden: location.hash pusht bei jeder
@@ -127,16 +129,15 @@ const ansichtsCache = new Map();
 // iOS-Zurueck-Wischgeste – der Stack bleibt dadurch synchron zum echten
 // Verlauf. "gleich" faengt reine Refresh-Faelle ab (z. B. nach einer
 // Umbenennung per Long-Press bleibt man auf derselben Route).
-let navStack = [aktiveRoute];
-function navRichtung(ziel) {
-  if (navStack[navStack.length - 1] === ziel) return 'gleich';
-  const vorhandenerIndex = navStack.lastIndexOf(ziel);
-  if (vorhandenerIndex >= 0) {
-    navStack = navStack.slice(0, vorhandenerIndex + 1);
-    return 'zurueck';
-  }
-  navStack.push(ziel);
-  return 'vor';
+const routeStack = createRouteStack(aktiveRoute);
+const navRichtung = (ziel) => routeStack.navigate(ziel);
+
+function navigationZuruecksetzen(route = 'home') {
+  routeAbortController?.abort();
+  routeAbortController = null;
+  ansichtsCache.clear();
+  routeStack.reset(route);
+  aktiveRoute = route;
 }
 
 // Bei der interaktiven iOS-Zurueck-Geste malt Safari die vorige History-Seite
@@ -160,7 +161,7 @@ document.addEventListener('click', (event) => {
     document.documentElement.style.setProperty('--detail-origin-x', `${event.clientX}px`);
     document.documentElement.style.setProperty('--detail-origin-y', `${event.clientY}px`);
   }
-  if (navStack.length < 2 || navStack[navStack.length - 2] !== ziel) return;
+  if (!routeStack.isPrevious(ziel)) return;
   event.preventDefault();
   appRueckwaerts = true;
   history.back();
@@ -461,28 +462,22 @@ function renderChrome(transition = 'hart') {
 
 function ansichtMerken(route, node, controller, seite) {
   if (!route || !node) return;
-  const alt = ansichtsCache.get(route);
-  if (alt?.node !== node) {
-    alt?.controller?.abort();
-    alt?.node?.remove();
-  }
   node.removeAttribute('id');
   node.classList.remove('view-alt', 'view-alt-hart', 'view-neu', 'seite-vor', 'seite-detail', 'seite-raus-rechts');
   node.classList.add('view-cache');
+  // Ton darf nach einem Seitenwechsel nie unsichtbar weiterlaufen. Iframes
+  // werden hier noch nicht getrennt, weil die Ansicht fuer den sofortigen
+  // Rueckweg erhalten bleibt.
+  node.querySelectorAll?.('audio,video').forEach((media) => {
+    try { media.pause(); } catch {}
+  });
   node.remove();
   ansichtsCache.set(route, { node, controller, seite });
-  while (ansichtsCache.size > 10) {
-    const [aeltesteRoute, aelteste] = ansichtsCache.entries().next().value;
-    ansichtsCache.delete(aeltesteRoute);
-    aelteste.controller?.abort();
-    aelteste.node?.remove();
-  }
 }
 
 function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
-  const gemerkt = ansichtsCache.get(route);
+  const gemerkt = ansichtsCache.take(route);
   if (!gemerkt) return false;
-  ansichtsCache.delete(route);
   const aktuell = app.querySelector(':scope > #view');
   const bisherigeRoute = aktiveRoute;
   const bisherigerController = routeAbortController;
@@ -498,7 +493,10 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
   if (!aktuell) return true;
   aktuell.removeAttribute('id');
   aktuell.classList.add('view-alt', 'view-alt-zurueck');
+  let abgeschlossen = false;
   const fertig = () => {
+    if (abgeschlossen) return;
+    abgeschlossen = true;
     ansichtMerken(bisherigeRoute, aktuell, bisherigerController, bisherigeSeite);
     gemerkt.node.classList.remove('seite-zurueck');
   };
@@ -1202,11 +1200,13 @@ if (!supabaseKonfiguriert) {
     session = neueSession;
     if (event === 'PASSWORD_RECOVERY') recovery = true;
     if (event === 'SIGNED_OUT') {
+      navigationZuruecksetzen('home');
       profile = null;
       profileLadePromise = null;
       setPreferenceUser('');
     }
     if (event === 'SIGNED_IN' && bisherigeUserId && bisherigeUserId !== session?.user?.id) {
+      navigationZuruecksetzen((location.hash || '#home').slice(1) || 'home');
       profile = null;
       profileLadePromise = null;
     }
