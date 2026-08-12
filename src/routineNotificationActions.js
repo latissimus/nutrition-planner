@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
+import { setRoutineCompletion } from './routineCompletion.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -35,20 +36,11 @@ export async function openRoutineNotificationActions({ userId, routineId, onChan
     try {
       const date = today();
       if (action === 'done') {
-        const completedAt = new Date().toISOString();
-        const [{ error: routineError }, { error: reminderError }] = await Promise.all([
-          supabase.from('routine_completions').upsert({ routine_id: routineId, user_id: userId, completed_on: date }, { onConflict: 'routine_id,completed_on' }),
-          supabase.from('reminder_completions').upsert({ reminder_id: routineId, user_id: userId, date, completed_at: completedAt, snoozed_until: null }, { onConflict: 'user_id,reminder_id,date' }),
-        ]);
-        if (routineError || reminderError) throw routineError || reminderError;
+        await setRoutineCompletion({ routineId, date, completed: true });
         toast('Routine für heute erledigt');
       } else {
         const snoozedUntil = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-        const [{ error: routineError }, { error: reminderError }] = await Promise.all([
-          supabase.from('routine_completions').delete().eq('routine_id', routineId).eq('user_id', userId).eq('completed_on', date),
-          supabase.from('reminder_completions').upsert({ reminder_id: routineId, user_id: userId, date, completed_at: null, snoozed_until: snoozedUntil }, { onConflict: 'user_id,reminder_id,date' }),
-        ]);
-        if (routineError || reminderError) throw routineError || reminderError;
+        await setRoutineCompletion({ routineId, date, completed: false, snoozedUntil });
         toast('Erinnerung um 1 Stunde verschoben');
       }
       close();

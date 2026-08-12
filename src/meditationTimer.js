@@ -1,7 +1,6 @@
-import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
-import { syncRoutineCoins } from './coinDex.js';
+import { setRoutineCompletion } from './routineCompletion.js';
 
 const today = () => new Date().toLocaleDateString('sv-SE');
 const escapeHtml = (value = '') => String(value)
@@ -39,15 +38,7 @@ const timerCueUrls = {
 };
 
 export async function completeRoutine(userId, routineId) {
-  const date = today();
-  const completedAt = new Date().toISOString();
-  const [{ error: routineError }, { error: reminderError }] = await Promise.all([
-    supabase.from('routine_completions').upsert({ routine_id: routineId, user_id: userId, completed_on: date }, { onConflict: 'routine_id,completed_on' }),
-    supabase.from('reminder_completions').upsert({ reminder_id: routineId, user_id: userId, date, completed_at: completedAt, snoozed_until: null }, { onConflict: 'user_id,reminder_id,date' }),
-  ]);
-  if (routineError || reminderError) throw routineError || reminderError;
-  try { await syncRoutineCoins(routineId, date, true); }
-  catch { toast('Routine gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
+  await setRoutineCompletion({ routineId, date: today(), completed: true });
 }
 
 function audioContext() {

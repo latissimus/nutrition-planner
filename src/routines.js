@@ -6,7 +6,8 @@ import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
 import { maybePromptExternalMeditation, meditationSounds, openMeditationTimer, previewMeditationSound } from './meditationTimer.js';
 import { toast } from './toast.js';
-import { routineCoinValue, syncRoutineCoins } from './coinDex.js';
+import { routineCoinValue } from './coinDex.js';
+import { setRoutineCompletion } from './routineCompletion.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -377,22 +378,11 @@ export async function mountRoutines(container, { session, signal }) {
   if (signal?.aborted) return {};
   const toggleRoutine = async (item) => {
     const completed = state.completed.has(item.id);
-    const query = completed
-      ? supabase.from('routine_completions').delete().eq('routine_id', item.id).eq('completed_on', today()).eq('user_id', userId)
-      : supabase.from('routine_completions').insert({ routine_id: item.id, user_id: userId, completed_on: today() });
-    const { error } = await query;
-    if (error) return toast('Status konnte nicht gespeichert werden.');
-    if (completed) {
-      await supabase.from('reminder_completions').delete()
-        .eq('reminder_id', item.id).eq('date', today()).eq('user_id', userId);
-    } else {
-      await supabase.from('reminder_completions').upsert({
-        reminder_id: item.id, user_id: userId, date: today(),
-        completed_at: new Date().toISOString(), snoozed_until: null,
-      }, { onConflict: 'user_id,reminder_id,date' });
+    try {
+      await setRoutineCompletion({ routineId: item.id, date: today(), completed: !completed });
+    } catch {
+      return toast('Status konnte nicht gespeichert werden.');
     }
-    try { await syncRoutineCoins(item.id, today(), !completed); }
-    catch { toast('Routine gespeichert – Coins konnten noch nicht synchronisiert werden.'); }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
     paint();
   };

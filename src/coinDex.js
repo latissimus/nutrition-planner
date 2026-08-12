@@ -40,16 +40,6 @@ export async function loadCoinSummary(userId, signal) {
   }
 }
 
-export async function syncRoutineCoins(routineId, completionDate, completed) {
-  const { data, error } = await supabase.rpc('set_routine_coin_state', {
-    target_routine: routineId,
-    target_date: completionDate,
-    is_completed: completed,
-  });
-  if (error) throw error;
-  return Number(data || 0);
-}
-
 export function coinHeaderMarkup(summary) {
   return `<a class="coin-kopfstand" href="#coins" aria-label="MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}">
     <strong>${summary.balance}</strong>
