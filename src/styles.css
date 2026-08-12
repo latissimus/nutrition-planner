@@ -3552,6 +3552,11 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   min-height:72px;padding:9px 3px;border:0;border-bottom:1.5px solid var(--ink);
   background:transparent;color:var(--text);text-align:left;font:inherit;font-size:17px;font-weight:700;
 }
+/* iOS zeichnet bei programmatisch gewaehlten Dialogaktionen teilweise den
+   globalen pinken Tastaturfokus. In diesen klar abgegrenzten Aktionslisten
+   wird der aktive Eintrag nicht visuell vorausgewaehlt. */
+.sheet-menue>button:focus,
+.sheet-menue>button:focus-visible{outline:none!important;outline-offset:0!important}
 .sheet-menue>button:last-child{border-bottom:0}
 .sheet-list-icon,.sheet-list-icon svg{display:block;width:29px;height:29px;fill:currentColor}
 .sheet-zeichen{display:grid;place-items:center;width:34px;height:34px;font-size:27px;font-weight:800}
