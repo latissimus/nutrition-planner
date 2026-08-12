@@ -3,6 +3,7 @@ import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
+import { dexStoragePath } from './storagePaths.js';
 
 const BUCKET = 'dex-entries';
 const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
@@ -136,7 +137,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         if (file.size > 8 * 1024 * 1024) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
         const uploadFile = await optimizeImageFile(file);
         const extension = uploadExtension(uploadFile);
-        replacementPath = `${entry.user_id}/${crypto.randomUUID()}.${extension}`;
+        replacementPath = dexStoragePath(entry.user_id, entry.root_key, extension);
         const { error: uploadError } = await supabase.storage.from(BUCKET).upload(replacementPath, uploadFile, {
           cacheControl: '31536000', contentType: uploadFile.type,
         });

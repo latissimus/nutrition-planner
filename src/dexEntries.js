@@ -4,6 +4,7 @@ import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
 import { bindLongPress } from './longPress.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
+import { dexStoragePath } from './storagePaths.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -281,7 +282,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         if (file.size > MAX_IMAGE_BYTES) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
         const uploadFile = await optimizeImageFile(file);
         const extension = uploadExtension(uploadFile);
-        uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
+        uploadedPath = dexStoragePath(userId, rootKey, extension);
         const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, uploadFile, { cacheControl: '31536000', contentType: uploadFile.type, upsert: false });
         if (uploadError) throw uploadError;
         imagePath = uploadedPath;
@@ -292,7 +293,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         if (!AUDIO_TYPES.has(file.type)) throw new Error('Dieses Audioformat wird nicht unterstützt.');
         if (file.size > MAX_AUDIO_BYTES) throw new Error('Die Audioaufnahme darf höchstens 25 MB groß sein.');
         const extension = (file.name.split('.').pop() || file.type.split('/').pop() || 'm4a').toLowerCase().replace(/[^a-z0-9]/g, '');
-        uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
+        uploadedPath = dexStoragePath(userId, rootKey, extension);
         const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
         if (uploadError) throw uploadError;
         audioPath = uploadedPath;
@@ -307,7 +308,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
           if (file.size > MAX_IMAGE_BYTES) throw new Error('Das Bild darf höchstens 8 MB groß sein.');
           const uploadFile = await optimizeImageFile(file);
           const extension = uploadExtension(uploadFile);
-          uploadedPath = `${userId}/${crypto.randomUUID()}.${extension}`;
+          uploadedPath = dexStoragePath(userId, rootKey, extension);
           const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, uploadFile, { cacheControl: '31536000', contentType: uploadFile.type, upsert: false });
           if (uploadError) throw uploadError;
           imagePath = uploadedPath;
