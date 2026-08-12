@@ -115,6 +115,13 @@ export async function syncPushSubscription(userId) {
   return true;
 }
 
+export async function browserPushSubscriptionExists() {
+  const support = pushSupport();
+  if (!support.ready || Notification.permission !== 'granted') return false;
+  const current = await registration();
+  return Boolean(await current.pushManager.getSubscription());
+}
+
 export async function disablePush() {
   const support = pushSupport();
   if (!support.ready) return;

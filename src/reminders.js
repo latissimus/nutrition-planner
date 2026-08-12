@@ -4,11 +4,15 @@ import { iconMarkup } from './icons.js';
 import { availableCategoryIcons } from './categoryIcons.js';
 import {
   activatePush,
+  browserPushSubscriptionExists,
   disablePush,
   getPushState,
   sendTestPush,
   syncPushSubscription,
 } from './push.js';
+import {
+  reminderNotificationTag, shouldReuseReminderLoop, shouldStartLocalReminderLoop,
+} from './notificationDelivery.js';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
@@ -16,6 +20,7 @@ const AUTOSAVE_MS = 700;
 let reminderTimer = null;
 let reminderUserId = null;
 let reminderStartPromise = null;
+let reminderLoopGeneration = 0;
 
 const DEFAULT_REMINDERS = [
   { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'fastfood' } },
@@ -239,7 +244,10 @@ async function maybeNotify(reminder, slot, now, userId) {
   if (!worker) return;
   await worker.showNotification(text.title, {
     body: text.body,
-    tag: `nutrition-${reminder.id}-${slot}`,
+    // Derselbe Tag wie beim serverseitigen Web Push: Sollte ein alter lokaler
+    // Timer ausnahmsweise noch einen Tick schaffen, ersetzt iOS die Meldung,
+    // statt zwei identische Benachrichtigungen nebeneinander zu zeigen.
+    tag: reminderNotificationTag(reminder.id),
     data: {
       url: reminder.route || '#reminders',
       reminderId: reminder.id,
@@ -261,20 +269,27 @@ async function tickReminders(userId) {
   });
 }
 
-export async function startReminderLoop(userId) {
+export async function startReminderLoop(userId, { forceRestart = false } = {}) {
   if (!userId) return;
-  if (reminderUserId === userId) return reminderStartPromise;
+  if (shouldReuseReminderLoop({ sameUser: reminderUserId === userId, forceRestart })) return reminderStartPromise;
+  const generation = ++reminderLoopGeneration;
+  if (reminderTimer) clearInterval(reminderTimer);
+  reminderTimer = null;
   reminderUserId = userId;
   reminderStartPromise = (async () => {
+    const browserSubscription = await browserPushSubscriptionExists().catch(() => false);
     const serverPushActive = await syncPushSubscription(userId).catch(() => false);
-    if (reminderUserId !== userId) return;
+    if (reminderUserId !== userId || reminderLoopGeneration !== generation) return;
     if (reminderTimer) clearInterval(reminderTimer);
     reminderTimer = null;
-    if (serverPushActive) return;
+    if (!shouldStartLocalReminderLoop({
+      serverPushActive,
+      browserSubscriptionExists: browserSubscription,
+    })) return;
     tickReminders(userId);
     reminderTimer = setInterval(() => tickReminders(userId), CHECK_INTERVAL_MS);
   })().finally(() => {
-    if (reminderUserId === userId) reminderStartPromise = null;
+    if (reminderUserId === userId && reminderLoopGeneration === generation) reminderStartPromise = null;
   });
   return reminderStartPromise;
 }
@@ -327,7 +342,7 @@ async function renderPushControls(container, userId) {
       try {
         await activatePush(userId);
         await renderPushControls(container, userId);
-        await startReminderLoop(userId);
+        await startReminderLoop(userId, { forceRestart: true });
         toast('Push-Benachrichtigungen aktiviert');
       } catch (error) {
         toast(error.message || 'Push konnte nicht aktiviert werden');
@@ -366,7 +381,7 @@ async function renderPushControls(container, userId) {
       try {
         await disablePush();
         reminderUserId = null;
-        await startReminderLoop(userId);
+        await startReminderLoop(userId, { forceRestart: true });
         await renderPushControls(container, userId);
         toast('Push auf diesem Gerät ausgeschaltet');
       } catch (error) {
