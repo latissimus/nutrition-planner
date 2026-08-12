@@ -11,7 +11,9 @@
     "icons": "node scripts/gen-icons.mjs",
     "test": "vitest run",
     "check:migrations": "node scripts/check-migrations.mjs",
-    "check": "npm run check:migrations && npm test && npm run build"
+    "check": "npm run check:migrations && npm test && npm run build",
+    "backup:supabase": "node scripts/backup-supabase.mjs",
+    "backup:verify": "node scripts/verify-backup.mjs"
   },
   "dependencies": {
     "@fontsource/figtree": "^5.3.0",

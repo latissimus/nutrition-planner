@@ -28,3 +28,19 @@ Storage-Bucket `food-log` mit nutzerbezogenen Policies an.
 `20260728000400_web_push.sql` legt private Geräte-Abos und eine idempotente
 Versandhistorie an. Die Edge Function `send-reminders` versendet Test- und
 fällige Erinnerungen.
+
+## Backup und Wiederherstellung
+
+`npm run backup:supabase` erzeugt ohne Docker eine Sicherung der
+Anwendungsdaten als JSON plus sämtliche Storage-Dateien. Das ist für
+regelmäßige persönliche Sicherungen gedacht. Vor einer Wiederherstellung in
+ein neues Projekt werden zuerst alle Migrationen angewendet, anschließend die
+JSON-Daten in Abhängigkeitsreihenfolge importiert und zuletzt die Storage-
+Dateien hochgeladen. Auth-Nutzer müssen über die Admin-API wiederhergestellt
+werden; Passwörter sind nicht exportierbar, daher ist danach ein Passwortreset
+der Nutzer erforderlich.
+
+Nach jeder Sicherung validiert
+`npm run backup:verify -- backups/muscledex-<Zeitstempel>` alle gespeicherten
+Dateien gegen ihre SHA-256-Prüfsummen. Erst eine erfolgreich geprüfte und
+extern kopierte Sicherung gilt als belastbares Backup.

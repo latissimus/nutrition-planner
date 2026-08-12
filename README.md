@@ -45,3 +45,29 @@ Im GitHub-Repository müssen `VITE_SUPABASE_URL` und
 
 Auf iPhone/iPad muss die HTTPS-App zuerst zum Home-Bildschirm hinzugefügt und
 von dort geöffnet werden. Erst dann kann iOS ein Push-Abo anlegen.
+
+## Datensicherung
+
+Git sichert den App-Code und alle Datenbankmigrationen, aber nicht die
+Nutzerdaten oder hochgeladenen Medien aus Supabase. Für eine vollständige
+MUSCLEDEX-Sicherung:
+
+1. `.env.backup.example` als `.env.backup.local` kopieren.
+2. Unter **Supabase → Project Settings → API Keys** den Service-Role- oder
+   Secret-Key ausschließlich lokal eintragen. Er darf niemals nach GitHub
+   gelangen.
+3. `npm run backup:supabase` ausführen.
+4. Das Ergebnis mit
+   `npm run backup:verify -- backups/muscledex-<Zeitstempel>` prüfen.
+5. Den erzeugten Ordner unter `backups/` zusätzlich auf einem verschlüsselten
+   externen Laufwerk oder in einem verschlüsselten Cloudspeicher sichern.
+
+Das Backup enthält Auth-Nutzer, alle MUSCLEDEX-Tabellen, Push-Abos sowie die
+Dateien aus `dex-entries`, `food-log` und `link-previews`. Prüfsummen stehen in
+`SHA256SUMS.json`. Lokale Backups und der Service-Role-Key sind über
+`.gitignore` vom Repository ausgeschlossen. Die exportierten Auth-Daten
+enthalten keine Passwörter oder Passwort-Hashes.
+
+Wichtig: Supabase-Datenbankbackups enthalten keine Storage-Dateien. Auf
+bezahlten Tarifen stehen Datenbank-Sicherungen zusätzlich unter
+**Database → Backups** bereit; die lokale Sicherung bleibt dennoch sinnvoll.
