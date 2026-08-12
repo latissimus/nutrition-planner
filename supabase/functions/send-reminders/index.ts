@@ -1,5 +1,9 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import webpush from 'npm:web-push@3.6.7';
+import {
+  DELIVERY_GRACE_MINUTES, localDate, scheduledOccurrence, snoozeOccurrence,
+  type ScheduledOccurrence,
+} from './schedule.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -48,58 +52,6 @@ function json(body: Record<string, unknown>, status = 200) {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
-}
-
-function localParts(now: Date, timeZone: string) {
-  try {
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hourCycle: 'h23',
-    }).formatToParts(now);
-    const value = (type: string) => parts.find((part) => part.type === type)?.value || '';
-    const weekdays: Record<string, number> = {
-      Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
-    };
-    return {
-      weekday: weekdays[value('weekday')],
-      hour: Number(value('hour')),
-      minute: Number(value('minute')),
-    };
-  } catch {
-    return localParts(now, 'UTC');
-  }
-}
-
-function localDate(now: Date, timeZone: string): string {
-  try {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-      timeZone,
-      year: 'numeric', month: '2-digit', day: '2-digit',
-    }).formatToParts(now);
-    const value = (type: string) => parts.find((part) => part.type === type)?.value || '';
-    return `${value('year')}-${value('month')}-${value('day')}`;
-  } catch {
-    return now.toISOString().slice(0, 10);
-  }
-}
-
-function minutes(time: string | undefined) {
-  const [hour, minute] = String(time || '00:00').split(':').map(Number);
-  return (Number.isFinite(hour) ? hour : 0) * 60 + (Number.isFinite(minute) ? minute : 0);
-}
-
-function isDue(reminder: Reminder, timeZone: string, now: Date) {
-  const local = localParts(now, timeZone);
-  if (!(reminder.weekdays || [0, 1, 2, 3, 4, 5, 6]).includes(local.weekday)) return false;
-  const current = local.hour * 60 + local.minute;
-  const start = minutes(reminder.time);
-  if (reminder.type !== 'drink') return current === start;
-  const end = minutes(String(reminder.metadata?.bis || '21:00'));
-  const interval = Math.max(15, Number(reminder.metadata?.intervall_minuten || 120));
-  return current >= start && current <= end && (current - start) % interval === 0;
 }
 
 function notificationSymbol(reminder: Reminder) {
@@ -217,7 +169,6 @@ async function testPush(userId: string) {
 
 async function dispatchDue() {
   const now = new Date();
-  const scheduledFor = `${now.toISOString().slice(0, 16)}:00.000Z`;
 
   const [{ data: reminders, error: reminderError }, { data: profiles, error: profileError }] = await Promise.all([
     admin
@@ -233,33 +184,38 @@ async function dispatchDue() {
   const remindersById = new Map<string, Reminder>((reminders || []).map((r: Reminder) => [r.id, r]));
 
   // 1. Regulär zeitplan-fällige Reminders
-  const scheduled = ((reminders || []) as Reminder[])
-    .filter((reminder) => isDue(reminder, zones.get(reminder.user_id) || 'UTC', now));
+  const scheduled = ((reminders || []) as Reminder[]).flatMap((reminder) => {
+    const occurrence = scheduledOccurrence(reminder, zones.get(reminder.user_id) || 'UTC', now);
+    return occurrence ? [{ reminder, occurrence }] : [];
+  });
 
   // 2. Reminders deren Snooze in dieser Minute abgelaufen ist (unabhängig von reminder.time)
   const { data: expiredSnoozes, error: snoozeError } = await admin
     .from('reminder_completions')
-    .select('reminder_id, user_id, date')
+    .select('reminder_id, user_id, date, snoozed_until')
     .not('snoozed_until', 'is', null)
     .is('completed_at', null)
+    .gte('snoozed_until', new Date(now.getTime() - DELIVERY_GRACE_MINUTES * 60_000).toISOString())
     .lte('snoozed_until', now.toISOString());
   if (snoozeError) throw snoozeError;
-  const dueFromSnooze: Reminder[] = [];
-  for (const row of (expiredSnoozes || []) as { reminder_id: string; user_id: string; date: string }[]) {
+  const dueFromSnooze: { reminder: Reminder; occurrence: ScheduledOccurrence }[] = [];
+  for (const row of (expiredSnoozes || []) as { reminder_id: string; user_id: string; date: string; snoozed_until: string }[]) {
     const reminder = remindersById.get(row.reminder_id);
-    if (reminder) dueFromSnooze.push(reminder);
+    if (reminder) dueFromSnooze.push({ reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date) });
   }
 
-  const dueMap = new Map<string, Reminder>();
-  for (const r of scheduled) dueMap.set(r.id, r);
-  for (const r of dueFromSnooze) dueMap.set(r.id, r);
+  const dueMap = new Map<string, { reminder: Reminder; occurrence: ScheduledOccurrence }>();
+  for (const item of scheduled) dueMap.set(item.reminder.id, item);
+  // Ein abgelaufener Snooze hat Vorrang vor einem gleichzeitig faelligen
+  // normalen Zeitplan derselben Erinnerung.
+  for (const item of dueFromSnooze) dueMap.set(item.reminder.id, item);
   const due = [...dueMap.values()];
   if (!due.length) return json({ ok: true, due: 0, sent: 0 });
 
-  const userIds = [...new Set(due.map((reminder) => reminder.user_id))];
+  const userIds = [...new Set(due.map(({ reminder }) => reminder.user_id))];
 
   // Alle heutigen Completions dieser User laden (verhindert doppeltes Feuern und Snooze-Skip)
-  const dueDateList = [...new Set(due.map((r) => localDate(now, zones.get(r.user_id) || 'UTC')))];
+  const dueDateList = [...new Set(due.map(({ occurrence }) => occurrence.localDate))];
   const { data: completionsData, error: completionsError } = await admin
     .from('reminder_completions')
     .select('reminder_id, date, completed_at, snoozed_until, id')
@@ -283,9 +239,8 @@ async function dispatchDue() {
   }
 
   let sent = 0;
-  for (const reminder of due) {
-    const zone = zones.get(reminder.user_id) || 'UTC';
-    const date = localDate(now, zone);
+  for (const { reminder, occurrence } of due) {
+    const date = occurrence.localDate;
     const completion = completionByKey.get(`${reminder.id}:${date}`);
 
     // Bereits heute erledigt → skip
@@ -299,7 +254,8 @@ async function dispatchDue() {
         .insert({
           reminder_id: reminder.id,
           subscription_id: subscription.id,
-          scheduled_for: scheduledFor,
+          scheduled_for: occurrence.scheduledFor,
+          occurrence_key: occurrence.occurrenceKey,
         })
         .select('id')
         .single();
