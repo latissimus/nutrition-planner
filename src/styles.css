@@ -3783,6 +3783,8 @@ body{overscroll-behavior:none}
   padding-top:env(safe-area-inset-top);
 }
 .app-shell>.view-alt-hart{z-index:3}
+.app-shell>.view-cache{display:none!important}
+.app-shell>.view-alt-zurueck{z-index:3;will-change:transform}
 .app-shell>.view-neu{z-index:2;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);background-color:var(--dex-seitenfarbe,var(--bg))}
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
@@ -3808,7 +3810,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 @media(prefers-reduced-motion:reduce){
   .dex-einschub-warten,.seite-warten{transform:none;opacity:1}
-  .dex-einschub,.seite-einblenden{animation:none}
+  .dex-einschub,.seite-einblenden,.seite-vor,.seite-zurueck,.seite-raus-rechts,.seite-detail{animation:none}
+  .seite-vor-warten,.seite-zurueck-warten,.seite-detail-warten{transform:none;opacity:1}
 }
 
 /* ---------- Sammlungen und Unter-Sammlungen ---------- */
@@ -3988,16 +3991,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* ---------- Deterministische Navigation ---------- */
 .seite-vor-warten{transform:translateX(100%);opacity:1}
-.seite-zurueck-warten{transform:translateX(-20px);opacity:0}
-.seite-detail-warten{transform:scale(.985);opacity:0}
+.seite-zurueck-warten{transform:translateX(-18%);opacity:1}
+.seite-detail-warten{transform:scale(.9);opacity:0;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
 .seite-fade-warten{opacity:0}
 .seite-vor{animation:seiteVor .34s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
-.seite-zurueck{animation:seiteZurueck .22s cubic-bezier(.2,.8,.3,1) both}
-.seite-detail{animation:seiteDetail .2s ease-out both}
+.seite-zurueck{animation:seiteZurueck .34s cubic-bezier(.32,.72,0,1) both}
+.seite-raus-rechts{animation:seiteRausRechts .34s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
+.seite-detail{animation:seiteDetail .3s cubic-bezier(.2,.8,.2,1) both;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
 .seite-fade{animation:seiteFade .16s ease-out both}
 @keyframes seiteVor{from{transform:translateX(100%)}to{transform:translateX(0)}}
-@keyframes seiteZurueck{from{transform:translateX(-20px);opacity:0}to{transform:none;opacity:1}}
-@keyframes seiteDetail{from{transform:scale(.985);opacity:0}to{transform:none;opacity:1}}
+@keyframes seiteZurueck{from{transform:translateX(-18%)}to{transform:none}}
+@keyframes seiteRausRechts{from{transform:none}to{transform:translateX(100%)}}
+@keyframes seiteDetail{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
 @keyframes seiteFade{from{opacity:0}to{opacity:1}}
 
 /* ---------- MAHLZEITEN: Tagesplan statt Push-Verwaltung ---------- */

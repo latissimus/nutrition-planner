@@ -116,6 +116,10 @@ let renderGeneration = 0;
 let routeAbortController = null;
 let vorgemerkteSuche = '';
 let browserRueckwaerts = false;
+let appRueckwaerts = false;
+let popstateNavigation = false;
+let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
+const ansichtsCache = new Map();
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
 // (zurueck/schliessen) zu unterscheiden: location.hash pusht bei jeder
@@ -123,7 +127,7 @@ let browserRueckwaerts = false;
 // iOS-Zurueck-Wischgeste – der Stack bleibt dadurch synchron zum echten
 // Verlauf. "gleich" faengt reine Refresh-Faelle ab (z. B. nach einer
 // Umbenennung per Long-Press bleibt man auf derselben Route).
-let navStack = ['home'];
+let navStack = [aktiveRoute];
 function navRichtung(ziel) {
   if (navStack[navStack.length - 1] === ziel) return 'gleich';
   const vorhandenerIndex = navStack.lastIndexOf(ziel);
@@ -138,7 +142,29 @@ function navRichtung(ziel) {
 // Bei der interaktiven iOS-Zurueck-Geste malt Safari die vorige History-Seite
 // bereits selbst. Der folgende App-Render darf die weggewischte Ansicht nicht
 // noch einmal darueberlegen.
-window.addEventListener('popstate', () => { browserRueckwaerts = true; });
+window.addEventListener('popstate', () => {
+  popstateNavigation = true;
+  browserRueckwaerts = !appRueckwaerts;
+  appRueckwaerts = false;
+});
+
+// Schliessen- und Zurueck-Knoepfe duerfen keinen neuen History-Eintrag
+// erzeugen. Liegt ihr Ziel direkt hinter der aktuellen Route, verwenden wir
+// den echten Browser-Stack. Das ist besonders wichtig fuer die interaktive
+// iOS-Zurueck-Geste: Sie sieht dadurch dieselbe Reihenfolge wie die App.
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const ziel = link.getAttribute('href')?.slice(1) || 'home';
+  if (ziel.startsWith('entry/')) {
+    document.documentElement.style.setProperty('--detail-origin-x', `${event.clientX}px`);
+    document.documentElement.style.setProperty('--detail-origin-y', `${event.clientY}px`);
+  }
+  if (navStack.length < 2 || navStack[navStack.length - 2] !== ziel) return;
+  event.preventDefault();
+  appRueckwaerts = true;
+  history.back();
+});
 
 
 function fehlertext(error) {
@@ -418,7 +444,7 @@ function renderChrome(transition = 'hart') {
     bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
     view = document.createElement('main');
     view.id = 'view';
-    view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : ''}`;
+    view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : transition === 'detail' ? ' seite-detail-warten' : ''}`;
     app.append(view);
   } else {
     app.replaceChildren();
@@ -431,6 +457,67 @@ function renderChrome(transition = 'hart') {
   // gegen eine alte Dokument-Scrollposition neu zusammensetzen.
   view.scrollTop = 0;
   return view;
+}
+
+function ansichtMerken(route, node, controller, seite) {
+  if (!route || !node) return;
+  const alt = ansichtsCache.get(route);
+  if (alt?.node !== node) {
+    alt?.controller?.abort();
+    alt?.node?.remove();
+  }
+  node.removeAttribute('id');
+  node.classList.remove('view-alt', 'view-alt-hart', 'view-neu', 'seite-vor', 'seite-detail', 'seite-raus-rechts');
+  node.classList.add('view-cache');
+  node.remove();
+  ansichtsCache.set(route, { node, controller, seite });
+  while (ansichtsCache.size > 10) {
+    const [aeltesteRoute, aelteste] = ansichtsCache.entries().next().value;
+    ansichtsCache.delete(aeltesteRoute);
+    aelteste.controller?.abort();
+    aelteste.node?.remove();
+  }
+}
+
+function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
+  const gemerkt = ansichtsCache.get(route);
+  if (!gemerkt) return false;
+  ansichtsCache.delete(route);
+  const aktuell = app.querySelector(':scope > #view');
+  const bisherigeRoute = aktiveRoute;
+  const bisherigerController = routeAbortController;
+  const bisherigeSeite = document.documentElement.dataset.seite || '';
+
+  gemerkt.node.classList.remove('view-cache', 'view-alt', 'view-alt-hart', 'view-alt-zurueck', 'seite-raus-rechts');
+  gemerkt.node.id = 'view';
+  app.insertBefore(gemerkt.node, aktuell || null);
+  routeAbortController = gemerkt.controller;
+  aktiveRoute = route;
+  setSeite(gemerkt.seite || (route === 'home' ? 'home' : route.startsWith('entry/') || route.startsWith('collection/') ? 'collection' : route));
+
+  if (!aktuell) return true;
+  aktuell.removeAttribute('id');
+  aktuell.classList.add('view-alt', 'view-alt-zurueck');
+  const fertig = () => {
+    ansichtMerken(bisherigeRoute, aktuell, bisherigerController, bisherigeSeite);
+    gemerkt.node.classList.remove('seite-zurueck');
+  };
+  if (ohneAnimation) {
+    fertig();
+  } else {
+    gemerkt.node.classList.add('seite-zurueck');
+    aktuell.classList.add('seite-raus-rechts');
+    aktuell.addEventListener('animationend', fertig, { once: true });
+    setTimeout(fertig, 460);
+  }
+  // Die gespeicherte Ansicht liefert den sofortigen, stabilen Rueckweg. Im
+  // Hintergrund wird sie anschliessend ohne Ladebild neu aufgebaut, damit
+  // etwa geloeschte Eintraege oder neue Favoriten trotzdem aktuell sind.
+  setTimeout(() => {
+    const aktuelleHashRoute = (location.hash || '#home').slice(1) || 'home';
+    if (aktiveRoute === route && aktuelleHashRoute === route) render();
+  }, ohneAnimation ? 0 : 380);
+  return true;
 }
 
 function istDunkleOrdnerfarbe(farbe) {
@@ -841,19 +928,38 @@ async function render() {
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
     : 'home';
-  routeAbortController?.abort();
+  const richtung = navRichtung(angefragt);
+  const warBrowserRueckwaerts = browserRueckwaerts;
+  browserRueckwaerts = false;
+
+  // Eine schon besuchte Zielseite ist sofort da. Beim nativen iOS-Swipe hat
+  // WebKit die Bewegung bereits interaktiv gezeichnet; wir tauschen dann nur
+  // noch lautlos auf dieselbe, erhaltene DOM-Ansicht. Beim X-/Zurueck-Tap
+  // zeichnet die App selbst den Rueckwaerts-Slide.
+  if (richtung === 'zurueck' && gemerkteAnsichtZeigen(route, richtung, warBrowserRueckwaerts)) return;
+
+  const vorherigeRoute = aktiveRoute;
+  const vorherigerController = routeAbortController;
+  const vorherigeSeite = document.documentElement.dataset.seite || '';
+  if (richtung === 'gleich') vorherigerController?.abort();
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
-  const richtung = navRichtung(angefragt);
-  // Reinschieben von rechts nur beim Vorwaertsgehen in einen Dex/Profil/
-  // Suche (von Home oder von einem Dex aus). Rueckwaerts (Schliessen,
-  // iOS-Zurueck-Wischgeste), Home selbst und Eintraege bekommen stattdessen
-  // ein reines Einblenden – ein Reinschieben waere dort der Blickrichtung
-  // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
-  const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
+  const transition = richtung === 'vor' && route.startsWith('entry/')
+    ? 'detail'
+    : richtung === 'vor' && route !== 'home'
+      ? 'vor'
+      : richtung === 'zurueck'
+        ? 'zurueck'
+        : 'hart';
   const view = renderChrome(transition);
-  if (browserRueckwaerts && richtung === 'zurueck') app.querySelector(':scope > .view-alt')?.remove();
-  browserRueckwaerts = false;
+  if (richtung === 'vor') {
+    const ausgehend = app.querySelector(':scope > .view-alt');
+    if (ausgehend) ansichtsCache.set(vorherigeRoute, {
+      node: ausgehend,
+      controller: vorherigerController,
+      seite: vorherigeSeite,
+    });
+  }
   // Beim Schliessen eines Vollbild-DEX bleibt dessen alte Ansicht bis zum
   // fertigen Home-Mount sichtbar. `data-seite="home"` darf deshalb erst im
   // selben Takt wie das Entfernen dieser Ansicht gesetzt werden; andernfalls
@@ -863,6 +969,7 @@ async function render() {
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
   if (transition === 'vor') view.classList.add('seite-vor-warten');
+  if (transition === 'detail') view.classList.add('seite-detail-warten');
   if (route === 'home') {
     await mountHome(view, signal, { setzeSeite: !homeStilBeimTauschSetzen });
   } else if (route === 'search') {
@@ -998,6 +1105,13 @@ async function render() {
   } else {
     mountHome(view, signal);
   }
+  // Wurde waehrend eines langsamen Mounts bereits zurueck navigiert, darf
+  // die inzwischen veraltete Zielseite nicht spaeter doch noch ueber die
+  // sofort wiederhergestellte Ansicht gelegt werden.
+  if (generation !== renderGeneration || aktiveRoute !== vorherigeRoute && richtung === 'gleich') {
+    view.remove();
+    return;
+  }
   // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.
   // Supabase-Roundtrip). War alles praktisch sofort da – etwa nach der
   // iOS-Zurueck-Wischgeste, die den Inhalt oft schon zeigt, bevor unser
@@ -1030,22 +1144,38 @@ async function render() {
   // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
   // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if (transition === 'vor') {
-    view.classList.remove('seite-vor-warten');
-    view.classList.add('seite-vor');
+  aktiveRoute = route;
+  if (transition === 'vor' || transition === 'detail') {
+    view.classList.remove('seite-vor-warten', 'seite-detail-warten');
+    view.classList.add(transition === 'detail' ? 'seite-detail' : 'seite-vor');
     const alteSeite = app.querySelector(':scope > .view-alt');
     let abgeschlossen = false;
     const aufraeumen = () => {
       if (abgeschlossen) return;
       abgeschlossen = true;
-      alteSeite?.remove();
-      view.classList.remove('view-neu', 'seite-vor');
+      if (aktiveRoute !== route) return;
+      if (richtung === 'vor' && alteSeite) ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
+      else alteSeite?.remove();
+      view.classList.remove('view-neu', 'seite-vor', 'seite-detail');
       entferneUebergangshintergrund();
     };
     view.addEventListener('animationend', aufraeumen, { once: true });
     setTimeout(aufraeumen, 520);
+  } else if (transition === 'zurueck') {
+    const alteSeite = app.querySelector(':scope > .view-alt');
+    view.classList.add('seite-zurueck');
+    alteSeite?.classList.add('view-alt-zurueck', 'seite-raus-rechts');
+    const aufraeumen = () => {
+      alteSeite?.remove();
+      vorherigerController?.abort();
+      view.classList.remove('view-neu', 'seite-zurueck');
+      entferneUebergangshintergrund();
+    };
+    alteSeite?.addEventListener('animationend', aufraeumen, { once: true });
+    setTimeout(aufraeumen, 460);
   } else {
     app.querySelector(':scope > .view-alt')?.remove();
+    if (richtung === 'gleich') vorherigerController?.abort();
     if (homeStilBeimTauschSetzen) setSeite('home');
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();
@@ -1056,6 +1186,11 @@ async function render() {
 // noch zeichnet, bevor render() den kompletten Seiteninhalt ersetzt – ohne
 // Verzoegerung verschwindet das gedrueckte Element vor dem ersten Paint.
 window.addEventListener('hashchange', () => {
+  if (popstateNavigation) {
+    popstateNavigation = false;
+    render();
+    return;
+  }
   requestAnimationFrame(() => requestAnimationFrame(() => render()));
 });
 
