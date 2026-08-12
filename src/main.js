@@ -508,7 +508,7 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
     gemerkt.node.classList.add('seite-zurueck');
     aktuell.classList.add('seite-raus-rechts');
     aktuell.addEventListener('animationend', fertig, { once: true });
-    setTimeout(fertig, 460);
+    setTimeout(fertig, 540);
   }
   // Die gespeicherte Ansicht liefert den sofortigen, stabilen Rueckweg. Im
   // Hintergrund wird sie anschliessend ohne Ladebild neu aufgebaut, damit
@@ -516,7 +516,7 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
   setTimeout(() => {
     const aktuelleHashRoute = (location.hash || '#home').slice(1) || 'home';
     if (aktiveRoute === route && aktuelleHashRoute === route) render();
-  }, ohneAnimation ? 0 : 380);
+  }, ohneAnimation ? 0 : 440);
   return true;
 }
 
@@ -1172,7 +1172,7 @@ async function render() {
       entferneUebergangshintergrund();
     };
     alteSeite?.addEventListener('animationend', aufraeumen, { once: true });
-    setTimeout(aufraeumen, 460);
+    setTimeout(aufraeumen, 540);
   } else {
     app.querySelector(':scope > .view-alt')?.remove();
     if (richtung === 'gleich') vorherigerController?.abort();

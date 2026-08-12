@@ -3992,17 +3992,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ---------- Deterministische Navigation ---------- */
 .seite-vor-warten{transform:translateX(100%);opacity:1}
 .seite-zurueck-warten{transform:translateX(-18%);opacity:1}
-.seite-detail-warten{transform:scale(.9);opacity:0;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
+.seite-detail-warten{transform:scale(.86);opacity:0;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
 .seite-fade-warten{opacity:0}
-.seite-vor{animation:seiteVor .34s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
-.seite-zurueck{animation:seiteZurueck .34s cubic-bezier(.32,.72,0,1) both}
-.seite-raus-rechts{animation:seiteRausRechts .34s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
-.seite-detail{animation:seiteDetail .3s cubic-bezier(.2,.8,.2,1) both;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
+.seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
+.seite-zurueck{animation:seiteZurueck .4s cubic-bezier(.32,.72,0,1) both}
+.seite-raus-rechts{animation:seiteRausRechts .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
+.seite-detail{animation:seiteDetail .46s cubic-bezier(.16,.78,.22,1) both;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
 .seite-fade{animation:seiteFade .16s ease-out both}
 @keyframes seiteVor{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes seiteZurueck{from{transform:translateX(-18%)}to{transform:none}}
 @keyframes seiteRausRechts{from{transform:none}to{transform:translateX(100%)}}
-@keyframes seiteDetail{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+@keyframes seiteDetail{from{transform:scale(.86);opacity:0}to{transform:none;opacity:1}}
 @keyframes seiteFade{from{opacity:0}to{opacity:1}}
 
 /* ---------- MAHLZEITEN: Tagesplan statt Push-Verwaltung ---------- */
