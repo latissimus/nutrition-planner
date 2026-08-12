@@ -273,10 +273,16 @@ export function alleTags(items) {
 // nurAusgewaehlt: im Laden soll nur sehen, was noch zu besorgen ist.
 // activeTag: derselbe Tag-Filter wie in der globalen Suche, hier auf die
 // Einkaufsliste bezogen.
-export function sichtbareItems(items, { nurAusgewaehlt = false, activeTag = '' } = {}) {
+export function sichtbareItems(items, { nurAusgewaehlt = false, activeTag = '', query = '' } = {}) {
+  const suchtext = String(query).trim().toLocaleLowerCase('de');
   return items.filter((item) => {
     if (nurAusgewaehlt && !item.checked) return false;
     if (activeTag && !(item.tags || []).some((tag) => tag.toLocaleLowerCase('de') === activeTag.toLocaleLowerCase('de'))) return false;
+    if (suchtext) {
+      const inhalt = [item.name, item.note, item.section, ...(item.tags || [])]
+        .filter(Boolean).join(' ').toLocaleLowerCase('de');
+      if (!inhalt.includes(suchtext)) return false;
+    }
     return true;
   });
 }
@@ -688,6 +694,11 @@ export async function mountShoppingList(container, { session, signal }) {
         <b>Was du brauchst, bekommt einen Haken</b>
         <span>Im Laden nimmst du ihn beim Einpacken wieder raus.</span>
       </section>
+      <label class="einkauf-suche">
+        ${materialIconMarkup('search')}
+        <input type="search" data-einkauf-suche placeholder="Einkauf durchsuchen" aria-label="Einkauf durchsuchen">
+        <button type="button" data-einkauf-suche-leeren aria-label="Suche leeren" hidden>${materialIconMarkup('close')}</button>
+      </label>
       <div data-einkauf-tags-slot></div>
       <div class="einkauf-kopfzeile">
         <span data-einkauf-status role="status" aria-live="polite">Wird geladen …</span>
@@ -704,7 +715,7 @@ export async function mountShoppingList(container, { session, signal }) {
   let items = [];
   // nurAusgewaehlt: Filter auf das, was schon einen Haken hat (die aktuelle
   // Einkaufsrunde). activeTag: derselbe Ein-Tag-Filter wie in der Suche.
-  const filter = { nurAusgewaehlt: false, activeTag: '' };
+  const filter = { nurAusgewaehlt: false, activeTag: '', query: '' };
 
   function redraw() {
     const slot = container.querySelector('[data-einkauf-liste]');
@@ -809,6 +820,18 @@ export async function mountShoppingList(container, { session, signal }) {
     filter.activeTag = filter.activeTag === chip.dataset.filterTag ? '' : chip.dataset.filterTag;
     redraw();
   });
+
+  const suchfeld = container.querySelector('[data-einkauf-suche]');
+  const sucheLeeren = container.querySelector('[data-einkauf-suche-leeren]');
+  suchfeld.addEventListener('input', () => {
+    filter.query = suchfeld.value;
+    sucheLeeren.hidden = !filter.query;
+    redraw();
+  });
+  sucheLeeren.onclick = () => {
+    suchfeld.value = ''; filter.query = ''; sucheLeeren.hidden = true;
+    redraw(); suchfeld.focus({ preventScroll: true });
+  };
 
   container.querySelector('[data-only-selected]').onclick = () => {
     filter.nurAusgewaehlt = !filter.nurAusgewaehlt;

@@ -5,7 +5,9 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')));
 
-self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('message', (event) => {
+  if (event.data?.typ === 'skip-waiting') self.skipWaiting();
+});
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
 
 self.addEventListener('push', (event) => {

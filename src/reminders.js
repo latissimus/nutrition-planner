@@ -453,9 +453,6 @@ function reminderBodyMarkup(reminder, completion) {
         <span class="rem-switch-thumb"></span>
         <span class="rem-switch-label">Aktiv</span>
       </label>
-      ${reminder.id && !isDrink ? `<button type="button" class="rem-erledigt-btn${completion?.completed_at ? ' ist-aktiv' : ''}" data-done>
-        ${completion?.completed_at ? 'Heute erledigt ✓' : 'Für heute erledigt'}
-      </button>` : ''}
     </div>
     <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
     ${reminder.id && (reminder.type === 'meal' || reminder.type === 'supplement') ? `

@@ -115,6 +115,7 @@ let authMode = 'login';
 let renderGeneration = 0;
 let routeAbortController = null;
 let vorgemerkteSuche = '';
+let browserRueckwaerts = false;
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
 // (zurueck/schliessen) zu unterscheiden: location.hash pusht bei jeder
@@ -133,6 +134,11 @@ function navRichtung(ziel) {
   navStack.push(ziel);
   return 'vor';
 }
+
+// Bei der interaktiven iOS-Zurueck-Geste malt Safari die vorige History-Seite
+// bereits selbst. Der folgende App-Render darf die weggewischte Ansicht nicht
+// noch einmal darueberlegen.
+window.addEventListener('popstate', () => { browserRueckwaerts = true; });
 
 
 function fehlertext(error) {
@@ -846,6 +852,8 @@ async function render() {
   // entgegengesetzt bzw. (bei Eintraegen) einfach nicht passend.
   const transition = richtung === 'vor' && route !== 'home' ? 'vor' : 'hart';
   const view = renderChrome(transition);
+  if (browserRueckwaerts && richtung === 'zurueck') app.querySelector(':scope > .view-alt')?.remove();
+  browserRueckwaerts = false;
   // Beim Schliessen eines Vollbild-DEX bleibt dessen alte Ansicht bis zum
   // fertigen Home-Mount sichtbar. `data-seite="home"` darf deshalb erst im
   // selben Takt wie das Entfernen dieser Ansicht gesetzt werden; andernfalls
