@@ -3489,6 +3489,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   z-index:1000;display:grid;place-items:center;padding:22px;
   background:rgba(0,0,0,.55);opacity:1;
   overscroll-behavior:contain;
+  animation:overlayAbdunkeln .28s ease-out both;
 }
 .kategorie-sheet{
   width:min(100%,560px);max-height:min(82dvh,760px);margin:0 auto;
@@ -3496,7 +3497,19 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   border:var(--bw) solid var(--ink);border-radius:22px;
   background:var(--surface);color:var(--text);box-shadow:none;
-  transform:none;transition:none;
+  transform-origin:50% 50%;
+  animation:overlayKarteZoom .44s cubic-bezier(.16,.78,.22,1) both;
+}
+@keyframes overlayAbdunkeln{
+  from{background-color:rgba(0,0,0,0)}
+  to{background-color:rgba(0,0,0,.55)}
+}
+@keyframes overlayKarteZoom{
+  from{transform:scale(.88);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .kategorie-sheet-backdrop,.kategorie-sheet{animation:none}
 }
 .sheet-griff{display:none}
 .kategorie-sheet>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
