@@ -191,7 +191,7 @@ function detailMarkup(entry) {
     ? `<div class="dex-detail-audio">${materialIconMarkup('mic')}<audio controls preload="metadata" src="${escapeHtml(entry.audio_url)}"></audio></div>`
     : entry.image_path && entry.preview_url
     ? `<button class="dex-detail-bild" type="button" data-fullscreen><img src="${escapeHtml(entry.preview_url)}" alt="${escapeHtml(entry.title)}"></button>`
-    : embed ? `<div class="dex-detail-video${provider?.key === 'instagram' ? ' dex-detail-video-instagram' : ''}"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
+    : embed ? `<div class="dex-detail-video${provider?.key === 'instagram' ? ' dex-detail-video-instagram' : ''}"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" scrolling="no" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
       : entry.preview_url ? `<div class="dex-detail-linkvorschau"><img src="${escapeHtml(entry.preview_url)}" alt=""></div>`
         : provider ? `<div class="dex-detail-provider"><strong>${escapeHtml(entry.provider || provider.name)}</strong><span>Vorschau dieses Videos</span></div>` : '';
   const tags = (entry.tags || []).map((tag) => `<span>#${escapeHtml(tag.replace(/^#/, ''))}</span>`).join('');
