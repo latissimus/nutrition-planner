@@ -32,6 +32,7 @@ import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
 import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
 import { createLruCache, createRouteStack, disposeViewEntry } from './navigationState.js';
+import { setupDialogAccessibility } from './accessibility.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
 } from './categoryIcons.js';
@@ -83,6 +84,7 @@ konfiguriereSchreibfelder(document);
 new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
   if (node instanceof Element) konfiguriereSchreibfelder(node);
 }))).observe(document.body, { childList: true, subtree: true });
+setupDialogAccessibility();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {

@@ -1345,6 +1345,7 @@ html.overlay-vollflaechig body::before{display:none}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 :focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+[role="dialog"] :is([data-sheet-close],[data-reminder-overlay-close],[data-meditation-close],[data-close],.dex-bild-schliessen){min-width:44px;min-height:44px}
 
 /* Baustand, unten im Profil – bewusst unauffaellig. */
 /* Dicht unter den Abmelden-Knopf: Der Abstand von dort bis zur Leiste soll dem
