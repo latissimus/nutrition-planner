@@ -4117,22 +4117,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-size:auto,360px auto!important;background-repeat:repeat!important;
 }
 
-/* Externe Tapeten sind schwarz gezeichnet. Im Darkmode werden sie als Maske
-   verwendet und dadurch einheitlich blaugrau gefaerbt. Nur die Tapete in der
-   Seite wird abgeschwaecht; ihre Auswahlvorschau bleibt bei voller Deckkraft. */
-:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
-  position:relative;isolation:isolate;background-image:none!important;
+/* Wie im Retromode liegt die Tapete auf der festen Dex-Seitenebene und nicht
+   im Scrollinhalt. Die Maske dient im Darkmode nur zur hellen Einfaerbung;
+   ihre Position bleibt beim Scrollen und beim iOS-Overscroll unveraendert. */
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei{
+  position:relative;isolation:isolate;
 }
-:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before{
-  content:"";position:absolute;z-index:0;inset:0;display:block;min-height:100%;pointer-events:none;
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei::before{
+  content:"";position:absolute;z-index:0;inset:0;display:block;pointer-events:none;
   background:#DCE6FF;opacity:.08;
   -webkit-mask-image:var(--dex-tapete);mask-image:var(--dex-tapete);
   -webkit-mask-size:360px auto;mask-size:360px auto;
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
-:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt>*{
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei>.wrap{
   position:relative;z-index:1;
+}
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
+  background-image:none!important;
 }
 
 /* In der Auswahl zeigen dieselben schwarzen Quelldateien sonst weiterhin
