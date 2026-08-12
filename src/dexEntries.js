@@ -2,7 +2,6 @@ import { supabase } from './supabase.js';
 import { colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
-import { editEntry } from './dexEntryDetail.js';
 import { bindLongPress } from './longPress.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 
@@ -611,7 +610,10 @@ export async function renderDexEntries(container, {
     bindLongPress(slot, '.dex-inhaltskarte', (el) => {
       const entry = entriesById.get(el.dataset.dexEntryId);
       if (!entry) return null;
-      return () => editEntry(entry, refreshAlles, { onDeleted: refreshAlles });
+      return async () => {
+        const { editEntry } = await import('./dexEntryDetail.js');
+        editEntry(entry, refreshAlles, { onDeleted: refreshAlles });
+      };
     });
     onChanged?.(entries, total);
     return entries;

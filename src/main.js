@@ -15,18 +15,9 @@ import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
-import { mountProfile } from './profile.js';
-import { startDexSelection } from './dexSelection.js';
-import { openShareSheet } from './sharing.js';
 import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes } from './collectionPreferences.js';
-import { mountBodyMetrics } from './bodyMetrics.js';
-import { mountReminders, startReminderLoop } from './reminders.js';
-import { mountShoppingList } from './shoppingList.js';
-import { mountRoutines } from './routines.js';
-import { openRoutineNotificationActions } from './routineNotificationActions.js';
 import { coinHeaderMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
-import { mountDexEntryDetail } from './dexEntryDetail.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
@@ -40,6 +31,21 @@ import {
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
+
+// Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
+// werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
+const profileModule = () => import('./profile.js');
+const bodyMetricsModule = () => import('./bodyMetrics.js');
+const remindersModule = () => import('./reminders.js');
+const shoppingModule = () => import('./shoppingList.js');
+const routinesModule = () => import('./routines.js');
+const routineActionsModule = () => import('./routineNotificationActions.js');
+const entryDetailModule = () => import('./dexEntryDetail.js');
+const selectionModule = () => import('./dexSelection.js');
+const sharingModule = () => import('./sharing.js');
+
+const startDexSelection = async (...args) => (await selectionModule()).startDexSelection(...args);
+const openShareSheet = async (...args) => (await sharingModule()).openShareSheet(...args);
 
 applyTheme(getTheme());
 registriereServiceWorker().catch(() => {});
@@ -982,6 +988,7 @@ async function renderRoute() {
     await mountSearch(view, signal);
   } else if (route === 'profile') {
     setSeite('profile');
+    const { mountProfile } = await profileModule();
     mountProfile(view, {
       session,
       profile,
@@ -997,6 +1004,7 @@ async function renderRoute() {
     await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
   } else if (route === 'body') {
     setSeite('body');
+    const { mountBodyMetrics } = await bodyMetricsModule();
     await mountBodyMetrics(view, {
       session,
       profile,
@@ -1014,6 +1022,7 @@ async function renderRoute() {
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
   } else if (route === 'reminders') {
     setSeite('reminders');
+    const { mountReminders } = await remindersModule();
     const reminderActions = await mountReminders(view, { session, profile, signal });
     mountCategoryChrome(view, route, 'MAHLZEITEN', {
       pageLookScope: route, pageLookPattern: 'bones',
@@ -1021,6 +1030,7 @@ async function renderRoute() {
     });
   } else if (route === 'shopping') {
     setSeite('shopping');
+    const { mountShoppingList } = await shoppingModule();
     const shoppingActions = await mountShoppingList(view, { session, signal });
     mountCategoryChrome(view, route, 'EINKAUF', {
       pageLookScope: route, pageLookPattern: 'drops',
@@ -1090,9 +1100,11 @@ async function renderRoute() {
     await mountCustomCollection(view, item, signal);
   } else if (route.startsWith('entry/')) {
     setSeite('collection');
+    const { mountDexEntryDetail } = await entryDetailModule();
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     setSeite('habits');
+    const { mountRoutines } = await routinesModule();
     const routineActions = await mountRoutines(view, { session, signal });
     mountCategoryChrome(view, route, 'ROUTINEN', {
       pageLookScope: route, pageLookPattern: 'triangles',
@@ -1102,11 +1114,14 @@ async function renderRoute() {
     const pendingRoutineId = sessionStorage.getItem('muscledex:pending-routine-action');
     if (pendingRoutineId) {
       sessionStorage.removeItem('muscledex:pending-routine-action');
-      queueMicrotask(() => openRoutineNotificationActions({
-        userId: session.user.id,
-        routineId: pendingRoutineId,
-        onChanged: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
-      }));
+      queueMicrotask(async () => {
+        const { openRoutineNotificationActions } = await routineActionsModule();
+        openRoutineNotificationActions({
+          userId: session.user.id,
+          routineId: pendingRoutineId,
+          onChanged: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+        });
+      });
     }
   } else {
     mountHome(view, signal);
@@ -1261,7 +1276,7 @@ if (!supabaseKonfiguriert) {
     }
     if (session?.user?.id) {
       setPreferenceUser(session.user.id);
-      startReminderLoop(session.user.id);
+      remindersModule().then(({ startReminderLoop }) => startReminderLoop(session.user.id)).catch(() => {});
     }
     // Ein still erneuertes Zugriffstoken darf die gerade benutzte Unterseite
     // nicht neu aufbauen. Auch wiederholte SIGNED_IN-Ereignisse desselben

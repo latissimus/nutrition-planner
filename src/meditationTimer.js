@@ -14,7 +14,7 @@ export const meditationSounds = [
   ['forest', 'Wald'],
   ['ocean', 'Wasser'],
   ['brown', 'Braunes Rauschen'],
-  ['blue', 'Blaues Rauschen'],
+  ['blue', 'Graues Rauschen'],
 ];
 const soundNames = Object.fromEntries(meditationSounds.map(([value, label]) => [value, value === 'off' ? 'Ohne Hintergrundsound' : label]));
 const meditationTrackUrls = {
@@ -24,7 +24,7 @@ const meditationTrackUrls = {
   forest: new URL('../Meditate Music/Wald.mp3', import.meta.url).href,
   ocean: new URL('../Meditate Music/Wasser.mp3', import.meta.url).href,
   brown: new URL('../Meditate Music/Braunes Rauschen.mp3', import.meta.url).href,
-  blue: new URL('../Meditate Music/Blaues Rauschen.mp3', import.meta.url).href,
+  blue: new URL('../Meditate Music/Graues Rauschen.mp3', import.meta.url).href,
 };
 const timerCueUrls = {
   meditation: {
