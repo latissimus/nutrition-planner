@@ -56,10 +56,12 @@ function enhanceDialog(dialog) {
   queueMicrotask(() => {
     if (!dialog.isConnected) return;
     updateAppInert();
-    const initial = dialog.querySelector('[data-initial-focus],[autofocus]')
-      || focusableElements(dialog).find((element) => !element.matches(CLOSE_SELECTOR))
-      || focusableElements(dialog)[0]
-      || dialog;
+    // Reine Aktionsdialoge starten auf der Dialogflaeche. Ein automatisch
+    // fokussierter erster Button erzeugt auf iOS sonst einen sichtbaren
+    // Fokusrahmen, obwohl der Nutzer weder Tastatur noch Switch-Control nutzt.
+    // Formulare koennen mit data-initial-focus/autofocus weiterhin bewusst ein
+    // Eingabefeld als Startziel festlegen.
+    const initial = dialog.querySelector('[data-initial-focus],[autofocus]') || dialog;
     initial.focus({ preventScroll: true });
   });
 }
