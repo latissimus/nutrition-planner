@@ -3487,7 +3487,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
      explizite Large-Viewport-Hoehe deckt dagegen den kompletten Bildschirm. */
   position:fixed;left:0;top:0;width:100vw;height:100vh;height:100lvh;
   z-index:1000;display:grid;place-items:center;padding:22px;
-  background:rgba(0,0,0,.55);opacity:1;
+  background:rgba(0,0,0,.68);opacity:1;
   overscroll-behavior:contain;
   animation:overlayAbdunkeln .28s ease-out both;
 }
@@ -3502,7 +3502,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 }
 @keyframes overlayAbdunkeln{
   from{background-color:rgba(0,0,0,0)}
-  to{background-color:rgba(0,0,0,.55)}
+  to{background-color:rgba(0,0,0,.68)}
 }
 @keyframes overlayKarteZoom{
   from{transform:scale(.88);opacity:0}
