@@ -307,7 +307,7 @@ function renderAuth() {
       if (login) {
         // Der Auth-Callback kann bereits waehrend signIn rendern. Route und
         // eigener Navigationsstack muessen deshalb vorher auf Home stehen.
-        navStack = ['home'];
+        navigationZuruecksetzen('home');
         if (location.hash !== '#home') history.replaceState(null, '', '#home');
         await signIn(email, password);
       } else {
