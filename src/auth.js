@@ -1,5 +1,19 @@
 import { supabase } from './supabase.js';
 
+const lokaleHosts = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1', '[::1]']);
+
+export function authRedirectUrl(locationLike = window.location) {
+  const configured = String(import.meta.env.VITE_PUBLIC_APP_URL || '').trim();
+  if (configured) return `${configured.replace(/\/+$/, '')}/`;
+  if (!lokaleHosts.has(locationLike.hostname)) {
+    return `${locationLike.origin}${locationLike.pathname}`;
+  }
+  // Die lokale Adresse ist vom iPhone aus nicht erreichbar. Ohne eigens
+  // gesetzte Produktions-URL verwenden Entwicklungsbuilds deshalb dieselbe
+  // GitHub-Pages-Adresse wie das Deployment dieses Repositories.
+  return 'https://latissimus.github.io/nutrition-planner/';
+}
+
 export async function signIn(email, password) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
@@ -21,7 +35,7 @@ export async function signOut() {
 }
 
 export async function resetPassword(email) {
-  const redirectTo = window.location.origin + window.location.pathname;
+  const redirectTo = authRedirectUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   if (error) throw error;
 }

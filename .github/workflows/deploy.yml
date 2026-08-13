@@ -33,6 +33,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
+          VITE_PUBLIC_APP_URL: https://latissimus.github.io/nutrition-planner/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

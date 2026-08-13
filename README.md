@@ -33,6 +33,12 @@ Im GitHub-Repository müssen `VITE_SUPABASE_URL` und
 `VITE_SUPABASE_ANON_KEY` als Actions-Secrets hinterlegt werden. Für Push kommt
 `VITE_VAPID_PUBLIC_KEY` hinzu.
 
+Für Passwort-Reset-Mails muss unter **Supabase → Authentication → URL
+Configuration** als Site URL und zusätzliche Redirect URL
+`https://latissimus.github.io/nutrition-planner/` eingetragen sein. Der Build
+verwendet dieselbe Adresse über `VITE_PUBLIC_APP_URL`; dadurch enthalten auch
+lokal ausgelöste Reset-Mails keine vom iPhone unerreichbare Localhost-Adresse.
+
 ## Web Push
 
 1. Migration `20260728000400_web_push.sql` anwenden.
