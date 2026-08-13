@@ -167,10 +167,10 @@
   --middle:#225e61;
   --navy-panel:#1B2C5C;
   --link:#91A9FF;
-  --dark-action:#C77B80;
-  --dark-action-ink:#101A2B;
-  --dark-danger:#FF9A83;
-  --dark-danger-soft:#3B211D;
+  --dark-action:#9CCBFF;
+  --dark-action-ink:#0A1330;
+  --dark-danger:#D2D9E5;
+  --dark-danger-soft:#293244;
 
   /* Akzente bleiben unveraendert – sie sind die Marke. */
   --up:#28C46B;        /* nur aufgehellt: das Original war auf dunkel zu satt */
@@ -4673,6 +4673,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dark-action-ink)!important;fill:var(--dark-action-ink)!important;
 }
 :root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb{background:var(--dark-action)}
+:root[data-theme="dark"] .switchline input{accent-color:var(--dark-action)}
 :root[data-theme="dark"] :is(.rem-row-loeschen,.sheet-gefahr,.dex-entry-delete,.coin-reward-delete,.btn-danger){
   color:var(--dark-danger)!important;border-color:var(--dark-danger)!important;background:var(--dark-danger-soft)!important;
 }
