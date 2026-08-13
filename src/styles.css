@@ -1344,7 +1344,8 @@ html.overlay-vollflaechig body::before{display:none}
 .empty{color:var(--muted);font-weight:600;padding:20px 0;text-align:center}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+:focus-visible{outline:none}
+html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-offset:2px}
 [role="dialog"]:focus{outline:none}
 [role="dialog"] :is([data-sheet-close],[data-reminder-overlay-close],[data-meditation-close],[data-close],.dex-bild-schliessen){min-width:44px;min-height:44px}
 .netzstatus{
@@ -4686,7 +4687,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Sichtbarer Tastaturfokus ist nicht nur fuer Desktop wichtig: Er hilft auch
    Nutzern mit externer Tastatur und Switch-Control auf iPhone/iPad. */
-:root[data-theme="dark"] :is(button,a,input,textarea,select,summary):focus-visible{
+:root[data-theme="dark"].tastatur-bedienung :is(button,a,input,textarea,select,summary):focus-visible{
   outline:3px solid var(--fe-blue-light);outline-offset:3px;
 }
 :root[data-theme="dark"] :is(button,input,textarea,select):disabled{

@@ -18,6 +18,22 @@ const FOCUSABLE_SELECTOR = [
 const dialogState = new WeakMap();
 let idCounter = 0;
 
+function setupInputModality() {
+  const root = document.documentElement;
+  const keyboard = (event) => {
+    if (event.key === 'Tab' || event.key.startsWith('Arrow')) root.classList.add('tastatur-bedienung');
+  };
+  const pointer = () => root.classList.remove('tastatur-bedienung');
+  document.addEventListener('keydown', keyboard, true);
+  document.addEventListener('pointerdown', pointer, true);
+  document.addEventListener('touchstart', pointer, true);
+  return () => {
+    document.removeEventListener('keydown', keyboard, true);
+    document.removeEventListener('pointerdown', pointer, true);
+    document.removeEventListener('touchstart', pointer, true);
+  };
+}
+
 function isVisible(element) {
   return element instanceof HTMLElement && !element.hidden && element.getClientRects().length > 0;
 }
@@ -127,6 +143,7 @@ function handleDialogKeys(event) {
 }
 
 export function setupDialogAccessibility(root = document.body) {
+  const removeInputModality = setupInputModality();
   enhanceNode(root);
   const observer = new MutationObserver((mutations) => mutations.forEach((mutation) => {
     mutation.addedNodes.forEach(enhanceNode);
@@ -137,5 +154,6 @@ export function setupDialogAccessibility(root = document.body) {
   return () => {
     observer.disconnect();
     document.removeEventListener('keydown', handleDialogKeys, true);
+    removeInputModality();
   };
 }
