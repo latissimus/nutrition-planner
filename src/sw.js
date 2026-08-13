@@ -14,11 +14,11 @@ self.addEventListener('push', (event) => {
   let daten = {};
   try { daten = event.data ? event.data.json() : {}; }
   catch (e) { daten = { body: event.data ? event.data.text() : '' }; }
-  event.waitUntil(self.registration.showNotification(daten.title || 'Nutrition Planner', {
+  event.waitUntil(self.registration.showNotification(daten.title || 'MUSCLEDEX', {
     body: daten.body || '',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
-    tag: daten.tag || 'nutrition',
+    icon: './muscledex-icon-192-v4.png',
+    badge: './muscledex-icon-192-v4.png',
+    tag: daten.tag || 'muscledex',
     data: {
       url: daten.url || '',
       reminderId: daten.reminderId || '',

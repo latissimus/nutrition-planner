@@ -1,4 +1,4 @@
-# Nutrition Planner
+# MUSCLEDEX
 
 Eigenständige PWA für Ernährung, Supplements, Körperwerte, Schlaf und
 Gewohnheiten. Der sichtbare Produktname ist vorläufig; die Namensfindung folgt
