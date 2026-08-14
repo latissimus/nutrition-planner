@@ -26,6 +26,7 @@ import { toast } from './toast.js';
 import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
 import { createLruCache, createRouteStack, disposeViewEntry } from './navigationState.js';
 import { setupDialogAccessibility } from './accessibility.js';
+import { showGestureHintOnce } from './gestureHints.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
@@ -713,6 +714,12 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
     refresh: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
     itemsById: new Map(eigene.map((item) => [item.id, item])),
   }));
+  if (container.querySelector('.dex-ordner-test')) showGestureHintOnce({
+    key: 'dex-langer-tipp',
+    title: 'Dex schnell bearbeiten',
+    text: 'Halte einen Dex länger gedrückt, um seine Einstellungen zu öffnen.',
+    gesture: 'hold',
+  });
 
   const sucheOeffnen = () => {
     vorgemerkteSuche = container.querySelector('#schnell-suche').value.trim();

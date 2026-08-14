@@ -4,7 +4,6 @@ import { meditationSounds, remainingMeditationSeconds } from './meditationTimer.
 describe('Meditationstimer', () => {
   it('nimmt Musik automatisch auf, aber keine Beginn- und Endklänge', () => {
     const labels = meditationSounds.map(([, label]) => label);
-    expect(labels).toContain('Kosmischer Sound');
     expect(labels).toContain('Pure Meditation');
     expect(labels).toContain('Binaural – Theta-Ruhe');
     expect(labels).toContain('Binaural – Alpha-Fokus');

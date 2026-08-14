@@ -2,6 +2,7 @@ import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import { showGestureHintOnce } from './gestureHints.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -787,6 +788,12 @@ export async function mountShoppingList(container, { session, signal }) {
     if (signal?.aborted) return;
     redraw();
     befuelleAbteilungen(container, items);
+    if (items.length) showGestureHintOnce({
+      key: 'einkauf-gesten',
+      title: 'Einkauf direkt bedienen',
+      text: 'Seitlich wischen hakt ab. Langes Drücken öffnet die Bearbeitung.',
+      gesture: 'swipe',
+    });
   } catch (error) {
     if (signal?.aborted) return;
     const slot = container.querySelector('[data-einkauf-liste]');

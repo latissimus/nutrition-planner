@@ -8,6 +8,7 @@ import { maybePromptExternalMeditation, meditationSounds, openMeditationTimer, p
 import { toast } from './toast.js';
 import { routineCoinValue } from './coinDex.js';
 import { setRoutineCompletion } from './routineCompletion.js';
+import { showGestureHintOnce } from './gestureHints.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -409,6 +410,12 @@ export async function mountRoutines(container, { session, signal }) {
     });
   };
   paint();
+  if (state.routines.length) showGestureHintOnce({
+    key: 'routinen-gesten',
+    title: 'Routinen direkt bedienen',
+    text: 'Seitlich wischen hakt ab. Langes Drücken öffnet die Einstellungen.',
+    gesture: 'swipe',
+  });
   const plan = container.querySelector('[data-routine-plan]');
   plan.onclick = async (event) => {
     const row = event.target.closest('[data-routine-id]');

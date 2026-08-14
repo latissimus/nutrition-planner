@@ -5,6 +5,7 @@ import { toast } from './toast.js';
 import { bindLongPress } from './longPress.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
+import { showGestureHintOnce } from './gestureHints.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -615,6 +616,12 @@ export async function renderDexEntries(container, {
         const { editEntry } = await import('./dexEntryDetail.js');
         editEntry(entry, refreshAlles, { onDeleted: refreshAlles });
       };
+    });
+    if (entries.length) showGestureHintOnce({
+      key: 'eintrag-langer-tipp',
+      title: 'Eintrag schnell bearbeiten',
+      text: 'Halte eine Eintragskarte länger gedrückt, um sie zu bearbeiten.',
+      gesture: 'hold',
     });
     onChanged?.(entries, total);
     return entries;
