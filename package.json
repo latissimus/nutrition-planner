@@ -15,7 +15,8 @@
     "check": "npm run check:migrations && npm test && npm run build",
     "backup:supabase": "node scripts/backup-supabase.mjs",
     "backup:verify": "node scripts/verify-backup.mjs",
-    "audio:optimize": "node scripts/optimize-meditation-audio.mjs"
+    "audio:optimize": "node scripts/optimize-meditation-audio.mjs",
+    "audio:generate-binaural": "node scripts/generate-binaural-audio.mjs"
   },
   "dependencies": {
     "@fontsource/figtree": "^5.3.0",

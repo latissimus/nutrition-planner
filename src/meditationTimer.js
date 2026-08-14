@@ -17,9 +17,11 @@ const legacyKeys = {
 const specialLabels = {
   Space: 'Space Music', purebinaural: 'Pure Binaural', 'purebinaural 2mp3': 'Pure Binaural II',
   puremeditation: 'Pure Meditation', 'Regen 2': 'Regen II',
+  'Binaural Theta Ruhe': 'Binaural – Theta-Ruhe',
+  'Binaural Alpha Fokus': 'Binaural – Alpha-Fokus',
 };
 const preferredOrder = ['rain', 'track-regen-2', 'campfire', 'forest', 'ocean', 'space',
-  'track-kosmischer-sound', 'brown', 'blue', 'track-pure-binaural',
+  'track-kosmischer-sound', 'track-binaural-theta-ruhe', 'track-binaural-alpha-fokus', 'brown', 'blue', 'track-pure-binaural',
   'track-pure-binaural-ii', 'track-pure-meditation'];
 const slug = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

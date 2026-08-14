@@ -6,6 +6,8 @@ describe('Meditationstimer', () => {
     const labels = meditationSounds.map(([, label]) => label);
     expect(labels).toContain('Kosmischer Sound');
     expect(labels).toContain('Pure Meditation');
+    expect(labels).toContain('Binaural – Theta-Ruhe');
+    expect(labels).toContain('Binaural – Alpha-Fokus');
     expect(labels).not.toContain('Routine Beginn');
     expect(labels).not.toContain('Routine Ende');
     expect(labels).not.toContain('Meditation Beginn');

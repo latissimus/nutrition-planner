@@ -63,6 +63,9 @@ Neue MP3-Dateien vor dem Push einmal mit `npm run audio:optimize` in
 mobilfreundliches AAC umwandeln. Die Originale landen lokal unter
 `Meditate Music/.originals/` und werden nicht nach GitHub übertragen. Kurze
 Stücke werden während des Timers automatisch weich überblendet und wiederholt.
+Die beiden MUSCLE-DEX-Binaural-Tracks lassen sich bei Bedarf reproduzierbar mit
+`npm run audio:generate-binaural` neu erzeugen. Für den Binaural-Effekt sind
+Kopfhörer erforderlich.
 
 ## Datensicherung
 
