@@ -4757,11 +4757,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .dex-detail-inhalt footer,
   .coin-kopfstand strong,
   .coin-balance-card strong,
+  .coin-next small,
+  .coin-next>strong,
+  .coin-verdienst-gruppe small,
+  .coin-verdienst-gruppe strong,
+  .coin-verdienst-frei small,
   .coin-reward-kopf small,
   .coin-reward-kopf>strong,
   .coin-history small,
   .coin-history b,
-  .coin-zahlenfeld
+  .coin-zahlenfeld,
+  .timerfeld,
+  .meditation-time,
+  .routine-duration button,
+  .custom-duration-input input,
+  .meditation-volume output,
+  .routine-timer-exercises li>span,
+  .mobility-overview li>span
 ){
   font-family:var(--tech);
   font-variant-numeric:tabular-nums;
