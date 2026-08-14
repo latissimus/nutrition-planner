@@ -314,6 +314,11 @@ function renderAuth() {
         if (location.hash !== '#home') history.replaceState(null, '', '#home');
         await signIn(email, password);
       } else {
+        // Auch wenn Supabase eine E-Mail-Bestätigung verlangt, soll der
+        // spätere Einstieg nicht einen alten Hash (z. B. einen geöffneten
+        // Dex) wiederherstellen. Ein neues Konto beginnt immer auf Home.
+        navigationZuruecksetzen('home');
+        if (location.hash !== '#home') history.replaceState(null, '', '#home');
         const data = await signUp(email, password, name);
         if (!data.session) {
           meldung(msg, 'Bitte bestätige deine E-Mail und melde dich danach an.', 'ok');
@@ -1211,6 +1216,15 @@ async function renderRoute() {
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();
   }
+  const dexAddButton = route !== 'coins' ? view.querySelector('.kategorie-plus') : null;
+  if (dexAddButton) showGestureHintOnce({
+    key: 'dex-hinzufuegen',
+    title: 'Hier kommt Neues hinein',
+    text: 'Der Hinzufügen-Button oben passt sich jedem Dex an und zeigt die passenden Einträge.',
+    gesture: 'add',
+    target: dexAddButton,
+    replace: true,
+  });
 }
 
 function renderLadefehler(error) {
@@ -1278,6 +1292,10 @@ if (!supabaseKonfiguriert) {
       profile = null;
       profileLadePromise = null;
       setPreferenceUser('');
+    }
+    if (event === 'SIGNED_IN' && !bisherigeUserId) {
+      navigationZuruecksetzen('home');
+      if (location.hash !== '#home') history.replaceState(null, '', '#home');
     }
     if (event === 'SIGNED_IN' && bisherigeUserId && bisherigeUserId !== session?.user?.id) {
       navigationZuruecksetzen((location.hash || '#home').slice(1) || 'home');
