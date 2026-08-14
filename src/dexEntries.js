@@ -28,6 +28,17 @@ export function normalizeDexUrl(value) {
   return parsed.href;
 }
 
+async function readClipboardWebUrl() {
+  if (!window.isSecureContext || !navigator.clipboard?.readText) return '';
+  try {
+    const value = (await navigator.clipboard.readText()).trim();
+    if (!/^(?:https?:\/\/|www\.)/i.test(value)) return '';
+    return normalizeDexUrl(value);
+  } catch {
+    return '';
+  }
+}
+
 export function sourceFromUrl(value) {
   if (!value) return 'MUSCLE-DEX';
   try {
@@ -123,7 +134,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
           <strong class="dex-audio-status" data-audio-status hidden role="status">Aufnahme läuft …</strong>
           <audio data-audio-preview controls hidden></audio>
         </div>` : note ? '' : `<label class="dex-entry-field" for="dex-entry-url"><span>Link URL</span>
-          <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="url" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Link zum Speichern einfügen …" required>${materialIconMarkup('place_item')}</div>
+          <div class="dex-entry-urlfeld"><input id="dex-entry-url" type="url" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Link zum Speichern einfügen …" required><button class="dex-entry-paste" type="button" data-paste-url aria-label="Link aus Zwischenablage einfügen">${materialIconMarkup('place_item')}</button></div>
         </label>`}
       ${ownRecipe ? `<label class="dex-entry-file dex-recipe-file" for="dex-entry-image">
           <span class="dex-entry-file-icon">${materialIconMarkup('add_photo_alternate')}</span>
@@ -171,6 +182,9 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
 
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
   if (!['link', 'image', 'note', 'audio', 'routine'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
+  // Direkt innerhalb des auslösenden Tipps lesen: iOS erlaubt den
+  // Zwischenablagezugriff nur mit einer aktuellen Nutzerinteraktion.
+  const initialClipboardUrl = type === 'link' ? readClipboardWebUrl() : Promise.resolve('');
   const foodMode = rootKey === 'food-log';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
@@ -189,6 +203,20 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     if (!(event.target instanceof Element) || !event.target.closest('.dex-entry-editor')) event.preventDefault();
   }, { passive: false });
   const form = backdrop.querySelector('[data-dex-entry-form]');
+  const urlInput = backdrop.querySelector('#dex-entry-url');
+  const applyClipboardUrl = async (clipboardPromise, announce = false) => {
+    const url = await clipboardPromise;
+    if (!url || !urlInput || urlInput.value.trim()) return false;
+    urlInput.value = url;
+    urlInput.dispatchEvent(new Event('input', { bubbles: true }));
+    if (announce) toast('Kopierter Link eingefügt');
+    return true;
+  };
+  backdrop.querySelector('[data-paste-url]')?.addEventListener('click', () => {
+    applyClipboardUrl(readClipboardWebUrl(), true).then((inserted) => {
+      if (!inserted && !urlInput?.value.trim()) toast('Kein kopierter Link gefunden');
+    });
+  });
   const trainingClassSelect = backdrop.querySelector('#dex-entry-training-class');
   const trainingClassCustom = backdrop.querySelector('[data-training-class-custom]');
   trainingClassSelect?.addEventListener('change', () => {
@@ -347,11 +375,14 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     }
   };
   document.body.append(backdrop);
+  applyClipboardUrl(initialClipboardUrl);
   requestAnimationFrame(() => {
     backdrop.classList.add('offen');
     // Audio-Dateifelder nicht automatisch fokussieren: iOS kann einen Fokus
     // auf <input type=file> faelschlich als Kamera-Capture interpretieren.
-    if (type !== 'audio') backdrop.querySelector(type === 'link' ? '#dex-entry-url' : '#dex-entry-image')?.focus({ preventScroll: true });
+    // Bei Links bleibt die Tastatur zunächst geschlossen: Der kopierte Link
+    // wird automatisch eingesetzt. Das Feld kann bei Bedarf angetippt werden.
+    if (type !== 'audio' && type !== 'link') backdrop.querySelector('#dex-entry-image')?.focus({ preventScroll: true });
   });
   return backdrop;
 }
