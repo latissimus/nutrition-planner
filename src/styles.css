@@ -3206,7 +3206,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
   color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
 }
 .dex-inhaltskarte strong{
-  display:-webkit-box;overflow:hidden;font-family:var(--display);font-size:15px;line-height:1.12;
+  display:-webkit-box;overflow:hidden;font-family:var(--display);font-size:15px;line-height:1.2;
   -webkit-box-orient:vertical;-webkit-line-clamp:2;
 }
 .dex-inhaltskarte-text{
@@ -3225,12 +3225,12 @@ button,a,[role="button"],summary{touch-action:manipulation;
   margin:0 0 14px;font-family:var(--display);font-size:18px;line-height:1;text-transform:uppercase;
 }
 .dex-inhaltsgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-inline:5px}
-.dex-inhaltsgrid .dex-inhaltskarte-body{gap:6px;padding:10px}
+.dex-inhaltsgrid .dex-inhaltskarte-body{gap:4px;padding:9px 10px 10px}
 .dex-inhaltsgrid .dex-inhaltskarte-icon{width:30px;height:30px}
 .dex-inhaltsgrid .dex-inhaltskarte-icon svg{width:18px;height:18px}
 .dex-inhaltsgrid .dex-inhaltskarte strong{font-size:14px}
 .dex-inhaltsgrid .dex-inhaltskarte-vorschau{aspect-ratio:4/3}
-.dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:54%;flex:0 0 54%}
+.dex-inhaltsgrid .dex-inhaltskarte-vorschau{height:51%;flex:0 0 51%}
 .dex-inhaltsgrid .dex-inhaltskarte-ohne-text{opacity:.7}
 .dex-mehr-laden{display:flex;justify-content:center;padding:0 5px 28px}
 .dex-mehr-laden .btn{min-width:min(100%,280px);display:grid;place-items:center;gap:1px;background:var(--surface)}
