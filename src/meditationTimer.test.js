@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { remainingMeditationSeconds } from './meditationTimer.js';
+import { meditationSounds, remainingMeditationSeconds } from './meditationTimer.js';
 
 describe('Meditationstimer', () => {
+  it('nimmt Musik automatisch auf, aber keine Beginn- und Endklänge', () => {
+    const labels = meditationSounds.map(([, label]) => label);
+    expect(labels).toContain('Kosmischer Sound');
+    expect(labels).toContain('Pure Meditation');
+    expect(labels).not.toContain('Routine Beginn');
+    expect(labels).not.toContain('Routine Ende');
+    expect(labels).not.toContain('Meditation Beginn');
+    expect(labels).not.toContain('Meditation Ende');
+  });
+
   it('zieht genau eine Sekunde pro realer Sekunde ab', () => {
     const start = 12_000;
     const end = start + 5 * 60 * 1000;

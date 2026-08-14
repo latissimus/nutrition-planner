@@ -6,26 +6,38 @@ const today = () => new Date().toLocaleDateString('sv-SE');
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
-export const meditationSounds = [
-  ['off', 'Ohne Sound'],
-  ['rain', 'Regen'],
-  ['campfire', 'Lagerfeuer'],
-  ['space', 'Space Music'],
-  ['forest', 'Wald'],
-  ['ocean', 'Wasser'],
-  ['brown', 'Braunes Rauschen'],
-  ['blue', 'Graues Rauschen'],
-];
-const soundNames = Object.fromEntries(meditationSounds.map(([value, label]) => [value, value === 'off' ? 'Ohne Hintergrundsound' : label]));
-const meditationTrackUrls = {
-  rain: new URL('../Meditate Music/Regen.mp3', import.meta.url).href,
-  campfire: new URL('../Meditate Music/Lagerfeuer.mp3', import.meta.url).href,
-  space: new URL('../Meditate Music/Space.mp3', import.meta.url).href,
-  forest: new URL('../Meditate Music/Wald.mp3', import.meta.url).href,
-  ocean: new URL('../Meditate Music/Wasser.mp3', import.meta.url).href,
-  brown: new URL('../Meditate Music/Braunes Rauschen.mp3', import.meta.url).href,
-  blue: new URL('../Meditate Music/Graues Rauschen.mp3', import.meta.url).href,
+const trackModules = import.meta.glob('../Meditate Music/*.{mp3,m4a}', {
+  eager: true, query: '?url', import: 'default',
+});
+const cueStems = new Set(['Meditation Beginn', 'Meditation Ende', 'Routine Beginn', 'Routine Ende']);
+const legacyKeys = {
+  Regen: 'rain', Lagerfeuer: 'campfire', Space: 'space', Wald: 'forest', Wasser: 'ocean',
+  'Braunes Rauschen': 'brown', 'Graues Rauschen': 'blue',
 };
+const specialLabels = {
+  Space: 'Space Music', purebinaural: 'Pure Binaural', 'purebinaural 2mp3': 'Pure Binaural II',
+  puremeditation: 'Pure Meditation', 'Regen 2': 'Regen II',
+};
+const preferredOrder = ['rain', 'track-regen-2', 'campfire', 'forest', 'ocean', 'space',
+  'track-kosmischer-sound', 'brown', 'blue', 'track-pure-binaural',
+  'track-pure-binaural-ii', 'track-pure-meditation'];
+const slug = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const catalog = Object.entries(trackModules).map(([path, url]) => {
+  const file = decodeURIComponent(path.split('/').pop() || '');
+  const stem = file.replace(/\.(?:mp3|m4a)$/i, '');
+  const label = specialLabels[stem] || stem.replace(/[_-]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const key = legacyKeys[stem] || `track-${slug(label)}`;
+  return { key, label, stem, url };
+}).filter(({ stem }) => !cueStems.has(stem))
+  .sort((a, b) => {
+    const rankA = preferredOrder.indexOf(a.key); const rankB = preferredOrder.indexOf(b.key);
+    if (rankA >= 0 || rankB >= 0) return (rankA < 0 ? 999 : rankA) - (rankB < 0 ? 999 : rankB);
+    return a.label.localeCompare(b.label, 'de');
+  });
+const meditationTrackUrls = Object.fromEntries(catalog.map(({ key, url }) => [key, url]));
+export const meditationSounds = [['off', 'Ohne Sound'], ...catalog.map(({ key, label }) => [key, label])];
+const soundNames = Object.fromEntries(meditationSounds.map(([value, label]) => [value, value === 'off' ? 'Ohne Hintergrundsound' : label]));
 const timerCueUrls = {
   meditation: {
     start: new URL('../Meditate Music/Meditation Beginn.mp3', import.meta.url).href,
@@ -76,10 +88,33 @@ function noiseBuffer(context, brown = false) {
   return buffer;
 }
 
-function startAmbientTrack(type, volume) {
+function preparedAmbientTrack(type) {
+  const url = meditationTrackUrls[type];
+  if (!url) return null;
+  const player = new Audio(url);
+  player.preload = 'auto'; player.playsInline = true; player.load();
+  return player;
+}
+
+function waitForAudio(player, timeout = 8000) {
+  if (!player || player.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return Promise.resolve();
+  return new Promise((resolveWait) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return; settled = true;
+      player.removeEventListener('canplay', finish); player.removeEventListener('error', finish);
+      clearTimeout(timer); resolveWait();
+    };
+    const timer = setTimeout(finish, timeout);
+    player.addEventListener('canplay', finish, { once: true });
+    player.addEventListener('error', finish, { once: true });
+  });
+}
+
+function startAmbientTrack(type, volume, prepared = null) {
   const url = meditationTrackUrls[type];
   if (!url || volume <= 0) return null;
-  const players = [new Audio(url), new Audio(url)];
+  const players = [prepared || new Audio(url), new Audio(url)];
   players.forEach((player) => {
     player.preload = 'auto';
     player.loop = false;
@@ -120,9 +155,9 @@ function startAmbientTrack(type, volume) {
   };
 }
 
-function startAmbient(context, type, volume) {
+function startAmbient(context, type, volume, prepared = null) {
   if (type === 'off' || volume <= 0) return () => {};
-  const stopTrack = startAmbientTrack(type, volume);
+  const stopTrack = startAmbientTrack(type, volume, prepared);
   if (stopTrack) return stopTrack;
   if (!context) return () => {};
   if (type === 'space') {
@@ -302,6 +337,7 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   let wakeLock = null;
   let context = null;
   let stopAmbient = () => {};
+  let preparedAmbient = isMeditation ? preparedAmbientTrack(routine.ambient_sound || 'off') : null;
   let startedOnce = false;
   const cuePlayer = new Audio();
   cuePlayer.preload = 'auto';
@@ -374,7 +410,23 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   const start = async () => {
     context ||= audioContext(); await context?.resume();
     if (!startedOnce) { startedOnce = true; await playCue('start'); }
-    stopAmbient = isMeditation ? startAmbient(context, routine.ambient_sound || 'off', Number(routine.ambient_volume ?? 0.35)) : () => {};
+    if (isMeditation && (routine.ambient_sound || 'off') !== 'off') {
+      preparedAmbient ||= preparedAmbientTrack(routine.ambient_sound);
+      // iOS muss die Wiedergabe noch innerhalb des auslösenden Tipps sehen.
+      // Lautloses Anspielen entsperrt den Player; danach darf das Puffern
+      // asynchron fertig werden, ohne dass Safari den eigentlichen Start blockiert.
+      if (preparedAmbient) {
+        preparedAmbient.volume = 0;
+        preparedAmbient.play().catch(() => {});
+      }
+      toggle.disabled = true;
+      toggle.innerHTML = `${materialIconMarkup('hourglass_top')}<span>Sound wird geladen …</span>`;
+      await waitForAudio(preparedAmbient);
+      if (preparedAmbient) { preparedAmbient.pause(); preparedAmbient.currentTime = 0; }
+      toggle.disabled = false;
+    }
+    stopAmbient = isMeditation ? startAmbient(context, routine.ambient_sound || 'off', Number(routine.ambient_volume ?? 0.35), preparedAmbient) : () => {};
+    preparedAmbient = null;
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
     endAt = performance.now() + remaining * 1000; running = true; visual?.classList.add('laeuft');
     toggle.innerHTML = `${materialIconMarkup('pause')}<span>Pause</span>`;

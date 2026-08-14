@@ -52,6 +52,18 @@ lokal ausgelöste Reset-Mails keine vom iPhone unerreichbare Localhost-Adresse.
 Auf iPhone/iPad muss die HTTPS-App zuerst zum Home-Bildschirm hinzugefügt und
 von dort geöffnet werden. Erst dann kann iOS ein Push-Abo anlegen.
 
+## Meditationsmusik
+
+Neue MP3- oder M4A-Dateien direkt unter `Meditate Music/` erscheinen beim
+nächsten Build automatisch in der Soundauswahl. Die vier Dateien
+`Meditation Beginn/Ende` und `Routine Beginn/Ende` sind ausschließlich
+Timerklänge und werden nicht als Hintergrundmusik angeboten.
+
+Neue MP3-Dateien vor dem Push einmal mit `npm run audio:optimize` in
+mobilfreundliches AAC umwandeln. Die Originale landen lokal unter
+`Meditate Music/.originals/` und werden nicht nach GitHub übertragen. Kurze
+Stücke werden während des Timers automatisch weich überblendet und wiederholt.
+
 ## Datensicherung
 
 Git sichert den App-Code und alle Datenbankmigrationen, aber nicht die
