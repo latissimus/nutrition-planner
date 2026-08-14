@@ -52,15 +52,15 @@ export async function playRoutineSound(phase, volume = 0.7) {
 function cueForControl(control) {
   if (control.matches('input[type="checkbox"],input[type="radio"]')) return control.checked ? 'toggle-on' : 'toggle-off';
   const description = `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
-  // Ein Overlay wird abgebrochen, eine Seite geht im Verlauf zurück. Zwei
-  // getrennte Arcade-Cues machen die räumlich unterschiedlichen Aktionen
-  // auch akustisch verständlich.
-  if (control.matches('[data-sheet-close]')) return 'cancel';
+  // Schließen und Zurück verwenden appweit denselben Cue. Dadurch klingt das
+  // X eines Overlays genauso vertraut wie das Schließen eines Dex.
+  if (control.matches('[data-sheet-close]')) return 'back';
   if (control.matches('.kategorie-schliessen')
     || (control.matches('a[href]') && /schließen|zurück|übersicht/.test(description))) return 'back';
-  if (/schließen/.test(description)) return 'cancel';
+  if (/schließen/.test(description)) return 'back';
   if (control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete') || /löschen|entfernen/.test(description)) return 'delete';
-  if (control.matches('.kategorie-plus,.neu-sammlung') || /hinzufügen|erstellen|neuer eintrag/.test(description)) return 'open';
+  if (control.matches('.kategorie-plus,.neu-sammlung,[data-category-settings]')
+    || /hinzufügen|erstellen|neuer eintrag/.test(description)) return 'open';
   if (control.matches('a[href]')) return 'select';
   return 'press';
 }
