@@ -9,6 +9,7 @@ import { toast } from './toast.js';
 import { routineCoinValue } from './coinDex.js';
 import { setRoutineCompletion } from './routineCompletion.js';
 import { showGestureHintOnce } from './gestureHints.js';
+import { playInterfaceSound } from './uiSounds.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -281,7 +282,7 @@ function bindRoutineGestures(row, { onSwipeToggle, onLongPress }) {
     state.timer = setTimeout(() => {
       if (!state.active || state.swiping) return;
       state.longPressed = true; state.blockClick = true;
-      resetVisual(); navigator.vibrate?.(10); onLongPress?.();
+      resetVisual(); navigator.vibrate?.(10); playInterfaceSound('long-press'); onLongPress?.();
     }, 500);
     try { content.setPointerCapture(event.pointerId); } catch { /* optional */ }
   });
@@ -385,6 +386,7 @@ export async function mountRoutines(container, { session, signal }) {
       return toast('Status konnte nicht gespeichert werden.');
     }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
+    playInterfaceSound(completed ? 'uncheck' : 'check');
     paint();
   };
   const refresh = async () => {

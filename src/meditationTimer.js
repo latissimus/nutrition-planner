@@ -1,6 +1,7 @@
 import { materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
 import { setRoutineCompletion } from './routineCompletion.js';
+import { playRoutineSound } from './uiSounds.js';
 
 const today = () => new Date().toLocaleDateString('sv-SE');
 const escapeHtml = (value = '') => String(value)
@@ -41,14 +42,8 @@ const meditationTrackUrls = Object.fromEntries(catalog.map(({ key, url }) => [ke
 export const meditationSounds = [['off', 'Ohne Sound'], ...catalog.map(({ key, label }) => [key, label])];
 const soundNames = Object.fromEntries(meditationSounds.map(([value, label]) => [value, value === 'off' ? 'Ohne Hintergrundsound' : label]));
 const timerCueUrls = {
-  meditation: {
-    start: new URL('../Meditate Music/Meditation Beginn.mp3', import.meta.url).href,
-    end: new URL('../Meditate Music/Meditation Ende.mp3', import.meta.url).href,
-  },
-  routine: {
-    start: new URL('../Meditate Music/Routine Beginn.mp3', import.meta.url).href,
-    end: new URL('../Meditate Music/Routine Ende.mp3', import.meta.url).href,
-  },
+  start: new URL('../Meditate Music/Meditation Beginn.mp3', import.meta.url).href,
+  end: new URL('../Meditate Music/Meditation Ende.mp3', import.meta.url).href,
 };
 
 export async function completeRoutine(userId, routineId) {
@@ -344,11 +339,11 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   const cuePlayer = new Audio();
   cuePlayer.preload = 'auto';
   cuePlayer.playsInline = true;
-  const cueKind = isMeditation ? 'meditation' : 'routine';
   const cueVolume = Number(routine.gong_volume ?? 0.7);
   const playCue = async (phase) => {
+    if (!isMeditation) return playRoutineSound(phase, cueVolume);
     cuePlayer.pause();
-    cuePlayer.src = timerCueUrls[cueKind][phase];
+    cuePlayer.src = timerCueUrls[phase];
     cuePlayer.currentTime = 0;
     cuePlayer.volume = Math.max(0, Math.min(1, cueVolume));
     try { await cuePlayer.play(); }

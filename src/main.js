@@ -27,6 +27,7 @@ import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
 import { createLruCache, createRouteStack, disposeViewEntry } from './navigationState.js';
 import { setupDialogAccessibility } from './accessibility.js';
 import { showGestureHintOnce } from './gestureHints.js';
+import { initInterfaceSounds, syncInterfaceSounds } from './uiSounds.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
@@ -95,6 +96,7 @@ new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.add
   if (node instanceof Element) konfiguriereSchreibfelder(node);
 }))).observe(document.body, { childList: true, subtree: true });
 setupDialogAccessibility();
+initInterfaceSounds();
 
 const netzstatus = document.createElement('div');
 netzstatus.className = 'netzstatus';
@@ -1314,6 +1316,7 @@ if (!supabaseKonfiguriert) {
     const preferenceUserId = session?.user?.id || '';
     setTimeout(async () => {
       if (preferenceUserId) await loadUserPreferences(preferenceUserId);
+      syncInterfaceSounds();
       if ((session?.user?.id || '') !== preferenceUserId) return;
       render();
     }, 0);

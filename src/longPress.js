@@ -1,3 +1,5 @@
+import { playInterfaceSound } from './uiSounds.js';
+
 // Generischer Long-Press: oeffnet eine Schnellaktion statt zu navigieren.
 // Per Pointer Events, damit Touch und Maus gleich behandelt werden; ein
 // kurzer Tap bleibt eine normale Navigation, da preventDefault nur beim
@@ -21,6 +23,7 @@ export function bindLongPress(root, selector, resolveOpen) {
       if (!open) return;
       ausgeloest = true;
       navigator.vibrate?.(10);
+      playInterfaceSound('long-press');
       open();
     }, SCHWELLE_MS);
   });

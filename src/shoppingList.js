@@ -3,6 +3,7 @@ import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { showGestureHintOnce } from './gestureHints.js';
+import { playInterfaceSound } from './uiSounds.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -453,6 +454,7 @@ function bindeZeilenGesten(row, { onSwipeToggle, onLongPress }) {
       state.blockClick = true;
       row.classList.remove('swipe-aktiv', 'swipe-commit');
       inhalt.style.transform = '';
+      playInterfaceSound('long-press');
       onLongPress?.();
     }, LONG_PRESS_MS);
     try { row.setPointerCapture(event.pointerId); } catch { /* egal */ }
@@ -813,6 +815,7 @@ export async function mountShoppingList(container, { session, signal }) {
     item.checked = checkbox.checked;
     try {
       await toggleItem(userId, id, item.checked);
+      playInterfaceSound(item.checked ? 'check' : 'uncheck');
       redraw();
     } catch (error) {
       item.checked = zuvor;

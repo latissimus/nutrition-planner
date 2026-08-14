@@ -10,6 +10,9 @@ import {
 import { loadCollections } from './collections.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { createFullDataExport, exportFileName } from './dataExport.js';
+import {
+  interfaceSoundsEnabled, playInterfaceSound, setInterfaceSoundsEnabled,
+} from './uiSounds.js';
 
 const initials = (name, email) => {
   const quelle = (name || email || '?').trim();
@@ -244,6 +247,20 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
     seg.appendChild(button);
   });
   darstellung.appendChild(seg);
+  const interfaceSoundLabel = document.createElement('label');
+  interfaceSoundLabel.className = 'switchline interface-sound-setting';
+  const interfaceSoundCheckbox = document.createElement('input');
+  interfaceSoundCheckbox.type = 'checkbox';
+  interfaceSoundCheckbox.checked = interfaceSoundsEnabled();
+  const interfaceSoundText = document.createElement('span');
+  interfaceSoundText.innerHTML = '<b>Interface-Sounds</b><small>Retro-Arcade-Klänge bei der Bedienung</small>';
+  interfaceSoundCheckbox.onchange = () => {
+    setInterfaceSoundsEnabled(interfaceSoundCheckbox.checked);
+    if (interfaceSoundCheckbox.checked) playInterfaceSound('success');
+    toast(`Interface-Sounds ${interfaceSoundCheckbox.checked ? 'eingeschaltet' : 'ausgeschaltet'}.`);
+  };
+  interfaceSoundLabel.append(interfaceSoundCheckbox, interfaceSoundText);
+  darstellung.appendChild(interfaceSoundLabel);
 
   const startseite = abschnitt(wrap, 'Startseite anpassen');
   const startHinweis = document.createElement('p');

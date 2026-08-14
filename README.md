@@ -67,6 +67,12 @@ Die beiden MUSCLE-DEX-Binaural-Tracks lassen sich bei Bedarf reproduzierbar mit
 `npm run audio:generate-binaural` neu erzeugen. Für den Binaural-Effekt sind
 Kopfhörer erforderlich.
 
+Die optionalen Interface-Sounds verwenden den lokal synthetisierten
+`arcade`-Pack von `uisfx` (Code: MIT, Audio: CC0). Der Schalter unter
+„Mein Konto → Darstellung“ betrifft nur die Bediengeräusche. Start und Ende
+normaler Routinen bleiben aktiv; Meditationen verwenden weiterhin ihre eigenen
+Klänge aus `Meditate Music/`.
+
 ## Datensicherung
 
 Git sichert den App-Code und alle Datenbankmigrationen, aber nicht die
