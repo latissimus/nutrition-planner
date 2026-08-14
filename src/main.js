@@ -43,6 +43,20 @@ const bodyMetricsModule = () => import('./bodyMetrics.js');
 const remindersModule = () => import('./reminders.js');
 const shoppingModule = () => import('./shoppingList.js');
 const routinesModule = () => import('./routines.js');
+
+/* Android und andere installierte PWAs können die Displayausrichtung direkt
+   sperren. iOS wertet dafür primär den orientation-Eintrag im Manifest aus;
+   der erneute Versuch nach dem ersten Tipp deckt Browser ab, die zuvor eine
+   Nutzerinteraktion verlangen. Fehler bleiben absichtlich lautlos, weil die
+   CSS-Sperrfläche den Landschaftsmodus zusätzlich sicher abfängt. */
+async function sperreHochformat() {
+  const standalone = window.matchMedia?.('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  if (!standalone || typeof window.screen?.orientation?.lock !== 'function') return;
+  try { await window.screen.orientation.lock('portrait-primary'); } catch {}
+}
+sperreHochformat();
+window.addEventListener('pointerdown', sperreHochformat, { once: true, passive: true });
 const routineActionsModule = () => import('./routineNotificationActions.js');
 const entryDetailModule = () => import('./dexEntryDetail.js');
 const selectionModule = () => import('./dexSelection.js');

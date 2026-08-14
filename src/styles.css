@@ -4753,6 +4753,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .pwa-update-button b{font-size:13px}.pwa-update-button small{font-size:10px;opacity:.82}
 :root[data-theme="dark"] .pwa-update-button{background:var(--dark-action);color:var(--dark-action-ink);border-color:var(--text);box-shadow:3px 3px 0 #43516E}
 
+/* iOS stellt keine verlässliche JavaScript-Drehsperre für PWAs bereit. Falls
+   das Manifest die Drehung dort nicht verhindert, bleibt statt eines
+   verzogenen App-Layouts eine klare Hochformat-Aufforderung sichtbar. */
+.ausrichtung-sperre{display:none}
+@media (orientation:landscape) and (pointer:coarse) and (max-height:600px){
+  .ausrichtung-sperre{
+    position:fixed;inset:0;z-index:5000;display:grid;place-content:center;gap:10px;
+    padding:max(24px,env(safe-area-inset-top)) max(28px,env(safe-area-inset-right))
+      max(24px,env(safe-area-inset-bottom)) max(28px,env(safe-area-inset-left));
+    background:var(--bg);color:var(--text);text-align:center;
+  }
+  .ausrichtung-sperre strong{font:800 clamp(24px,6vw,38px)/1.05 var(--display);text-transform:uppercase}
+  .ausrichtung-sperre span{max-width:420px;color:var(--muted);font:500 15px/1.4 var(--ui)}
+}
+
 /* ============================================================
    Typografie — Figtree plus gezielter LOGMAN-Technikakzent
 
