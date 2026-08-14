@@ -18,6 +18,9 @@ export const EXPORT_TABLES = [
   ['einstellungen', 'user_preferences', 'user_id', ['key']],
   ['coin_belohnungen', 'muscle_rewards', 'user_id', ['id']],
   ['coin_verlauf', 'muscle_coin_ledger', 'user_id', ['id']],
+  ['schlaf_einstellungen', 'sleep_settings', 'user_id', ['user_id']],
+  ['schlaf_plan', 'sleep_schedules', 'user_id', ['weekday']],
+  ['schlaf_protokoll', 'sleep_logs', 'user_id', ['sleep_date']],
 ];
 
 async function loadAllRows(table, userColumn, orderColumns, userId, signal, pageSize = EXPORT_PAGE_SIZE) {

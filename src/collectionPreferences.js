@@ -5,8 +5,9 @@ const ORDER_KEY = 'muscledex:sammlungs-reihenfolge';
 const CUSTOM_HIDDEN_KEY = 'muscledex:eigene-dex-ausgeblendet';
 const CUSTOM_ORDER_KEY = 'muscledex:eigene-dex-reihenfolge';
 const COIN_DEX_VISIBLE_KEY = 'muscledex:coin-dex-sichtbar';
+const SLEEP_DEX_MIGRATED_KEY = 'muscledex:sleep-dex-sichtbarkeit-v1';
 
-export const collectionRoutes = ['body', 'reminders', 'food-log', 'training', 'shopping', 'habits'];
+export const collectionRoutes = ['body', 'reminders', 'food-log', 'training', 'shopping', 'habits', 'sleep'];
 
 export function collectionOrder() {
   try {
@@ -21,7 +22,12 @@ export function collectionOrder() {
 
 export function visibleCollectionRoutes() {
   try {
-    const saved = getPreference(STORAGE_KEY);
+    let saved = getPreference(STORAGE_KEY);
+    if (Array.isArray(saved) && !getPreference(SLEEP_DEX_MIGRATED_KEY, false)) {
+      saved = [...new Set([...saved, 'sleep'])];
+      setPreference(STORAGE_KEY, saved);
+      setPreference(SLEEP_DEX_MIGRATED_KEY, true);
+    }
     if (!Array.isArray(saved)) return collectionOrder();
     return collectionOrder().filter((route) => saved.includes(route));
   } catch {

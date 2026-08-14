@@ -26,6 +26,7 @@ const defaults = {
   body: 'body_fat', reminders: 'notifications', 'food-log': 'fork_spoon',
   recipes: 'menu_book', training: 'fitness_center', habits: 'bucket_check',
   shopping: 'shopping_cart',
+  sleep: 'bedtime',
   coins: 'star',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
@@ -38,6 +39,7 @@ const defaultColors = {
   body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#91008D',
   recipes: '#007DCC', training: '#525CEB', habits: '#245953',
   shopping: '#FFCF00',
+  sleep: '#001454',
   coins: '#05BDE8',
 };
 const colorGroups = [

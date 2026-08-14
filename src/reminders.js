@@ -42,6 +42,7 @@ const TYPE_LABEL = {
   supplement: 'Supplement',
   drink: 'Trinken',
   body: 'Körperwerte',
+  sleep: 'Schlaf',
 };
 
 // Analog zur Notification-Body-Formatierung in send-reminders/index.ts.
@@ -67,7 +68,7 @@ function reminderIconValue(reminder) {
 function notificationSymbol(reminder) {
   const value = reminderIconValue(reminder);
   if (value.startsWith('emoji:')) return value.replace(/^(emoji:)+/, '');
-  return ({ fastfood: '🍔', pill: '💊', water_drop: '💧' })[value] || '◆';
+  return ({ fastfood: '🍔', pill: '💊', water_drop: '💧', bedtime: '🌙' })[value] || '◆';
 }
 
 export function reminderIconMarkup(value, className = '') {
@@ -114,6 +115,13 @@ function notificationText(reminder) {
     return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: parts.join(' · ') || 'Supplement-Stack checken.' };
   }
   if (reminder.type === 'drink') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Ein Glas Wasser einplanen.' };
+  if (reminder.type === 'sleep') {
+    const phase = reminder.metadata?.phase;
+    const body = phase === 'wind-down' ? 'Zeit, Bildschirm und Tempo langsam herunterzufahren.'
+      : phase === 'check-in' ? 'Wie war deine Nacht? Dein Check-in bringt 3 MUSCLE-COINS.'
+        : 'Dein geplanter Schlaf beginnt jetzt.';
+    return { title: `${notificationSymbol(reminder)} ${reminder.label.split(' · ')[0]}`, body };
+  }
   return { title: reminder.label, body: 'Geplante Erinnerung.' };
 }
 
@@ -220,10 +228,11 @@ async function deleteReminder(userId, reminderId) {
 
 async function ensureDefaults(userId, signal) {
   const current = await loadReminders(userId, signal);
-  if (current.length) return current;
-  const payloads = DEFAULT_REMINDERS.map((reminder) => reminderPayload(userId, {
+  const existing = new Set(current.map((reminder) => `${reminder.type}:${reminder.label}`));
+  const payloads = DEFAULT_REMINDERS.filter((reminder) => !existing.has(`${reminder.type}:${reminder.label}`)).map((reminder) => reminderPayload(userId, {
     ...reminder, active: false, weekdays: WEEKDAYS,
   }));
+  if (!payloads.length) return current;
   let query = supabase
     .from('reminders')
     .upsert(payloads, { onConflict: 'user_id,type,label' })
@@ -231,7 +240,7 @@ async function ensureDefaults(userId, signal) {
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
-  return data ?? [];
+  return [...current, ...(data ?? [])];
 }
 
 async function maybeNotify(reminder, slot, now, userId) {
@@ -507,7 +516,7 @@ function reminderGroups(reminders, completions) {
     ['MITTAGS', 11 * 60, 17 * 60],
     ['ABENDS', 17 * 60, 24 * 60],
   ];
-  const timed = reminders.filter((item) => item.type !== 'drink')
+  const timed = reminders.filter((item) => item.type === 'meal' || item.type === 'supplement')
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
   const timeline = periods.map(([title, start, end]) => {
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);

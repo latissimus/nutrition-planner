@@ -256,6 +256,72 @@ export async function previewMeditationSound(type, volume = 0.35) {
   };
 }
 
+export function openSleepSoundTimer() {
+  const choices = meditationSounds.filter(([value]) => value !== 'off');
+  if (!choices.length) return toast('Noch keine Schlafsounds verfügbar.');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kategorie-sheet-backdrop sleep-sound-backdrop';
+  backdrop.innerHTML = `<section class="kategorie-sheet sleep-sound-timer" role="dialog" aria-modal="true" aria-label="Schlafsound">
+    <header><div><small>SANFTES AUSBLENDEN</small><h2>Schlafsound</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <label class="dex-entry-field"><span>Sound</span><div class="meditation-sound-picker"><select class="input" data-sleep-sound>${choices.map(([value, label]) => `<option value="${value}">${escapeHtml(label)}</option>`).join('')}</select><button class="btn" type="button" data-sleep-preview>Anhören</button></div></label>
+    <fieldset class="routine-duration"><legend>Abschalten nach</legend><div>${[15, 30, 45, 60, 90].map((value) => `<button type="button" data-sleep-duration="${value}"${value === 30 ? ' class="on"' : ''}>${value} min</button>`).join('')}</div></fieldset>
+    <label class="meditation-volume"><span>Lautstärke <output data-sleep-volume-output>35 %</output></span><input type="range" min="0.05" max="1" step="0.05" value="0.35" data-sleep-volume></label>
+    <strong class="meditation-time" data-sleep-time>30:00</strong>
+    <button class="btn btn-primary btn-block" type="button" data-sleep-sound-start>${materialIconMarkup('play_arrow')} Start</button>
+  </section>`;
+  let duration = 30;
+  let player = null;
+  let timer = null;
+  let endAt = 0;
+  const time = backdrop.querySelector('[data-sleep-time]');
+  const volume = backdrop.querySelector('[data-sleep-volume]');
+  const stop = () => {
+    clearInterval(timer); timer = null;
+    if (player) { player.pause(); player.removeAttribute('src'); player.load(); player = null; }
+  };
+  const close = () => { stop(); backdrop.remove(); };
+  const showTime = (seconds) => { time.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; };
+  backdrop.onclick = (event) => {
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close();
+  };
+  backdrop.querySelectorAll('[data-sleep-duration]').forEach((button) => {
+    button.onclick = () => {
+      duration = Number(button.dataset.sleepDuration);
+      backdrop.querySelectorAll('[data-sleep-duration]').forEach((item) => item.classList.toggle('on', item === button));
+      if (!timer) showTime(duration * 60);
+    };
+  });
+  volume.oninput = () => {
+    backdrop.querySelector('[data-sleep-volume-output]').textContent = `${Math.round(Number(volume.value) * 100)} %`;
+    if (player) player.volume = Number(volume.value);
+  };
+  backdrop.querySelector('[data-sleep-preview]').onclick = async (event) => {
+    event.currentTarget.disabled = true;
+    await previewMeditationSound(backdrop.querySelector('[data-sleep-sound]').value, Number(volume.value));
+    if (event.currentTarget.isConnected) event.currentTarget.disabled = false;
+  };
+  backdrop.querySelector('[data-sleep-sound-start]').onclick = () => {
+    stop();
+    const type = backdrop.querySelector('[data-sleep-sound]').value;
+    const url = meditationTrackUrls[type];
+    if (!url) return toast('Sound konnte nicht geladen werden.');
+    const targetVolume = Number(volume.value);
+    player = new Audio(url); player.loop = true; player.preload = 'auto'; player.playsInline = true; player.volume = targetVolume;
+    player.play().catch(() => toast('Sound konnte nicht gestartet werden.'));
+    endAt = Date.now() + duration * 60_000;
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+      showTime(remaining);
+      if (player && remaining <= 30) player.volume = targetVolume * (remaining / 30);
+      if (remaining > 0) return;
+      stop(); backdrop.querySelector('[data-sleep-sound-start]').innerHTML = `${materialIconMarkup('check_small')} Beendet`;
+    };
+    tick(); timer = window.setInterval(tick, 250);
+    backdrop.querySelector('[data-sleep-sound-start]').textContent = 'Läuft …';
+  };
+  document.body.append(backdrop);
+}
+
 function formatTime(seconds) {
   const value = Math.max(0, Math.ceil(seconds));
   return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;

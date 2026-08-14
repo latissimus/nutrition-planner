@@ -6,6 +6,7 @@ const TABLES = [
   'profiles', 'skinfolds', 'weights', 'reminders', 'reminder_completions',
   'routines', 'routine_completions', 'collections', 'dex_entries', 'food_logs',
   'shopping_items', 'user_preferences', 'muscle_rewards', 'muscle_coin_ledger',
+  'sleep_settings', 'sleep_schedules', 'sleep_logs',
   'shared_spaces', 'push_subscriptions', 'push_deliveries',
 ];
 const BUCKETS = ['dex-entries', 'food-log', 'link-previews'];

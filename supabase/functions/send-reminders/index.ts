@@ -60,6 +60,7 @@ function notificationSymbol(reminder: Reminder) {
   if (icon === 'fastfood' || reminder.type === 'meal') return '🍔';
   if (icon === 'pill' || reminder.type === 'supplement') return '💊';
   if (icon === 'water_drop' || reminder.type === 'drink') return '💧';
+  if (icon === 'bedtime' || reminder.type === 'sleep') return '🌙';
   return '◆';
 }
 
@@ -82,6 +83,7 @@ function notification(reminder?: Reminder) {
     drink: 'Ein Glas Wasser einplanen.',
     body: 'Zeit für deine geplanten Körperwerte.',
     habit: 'Zeit für deine geplante Routine.',
+    sleep: 'Zeit für deinen Schlafplan.',
   };
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
@@ -114,6 +116,18 @@ function notification(reminder?: Reminder) {
       url: reminder.route || '#habits',
       reminderId: reminder.id,
       reminderType: reminder.type,
+    };
+  }
+  if (reminder.type === 'sleep') {
+    const phase = String(reminder.metadata?.phase || '');
+    const body = phase === 'wind-down' ? 'Zeit, Bildschirm und Tempo langsam herunterzufahren.'
+      : phase === 'check-in' ? 'Wie war deine Nacht? Dein Check-in bringt 3 MUSCLE-COINS.'
+        : 'Dein geplanter Schlaf beginnt jetzt.';
+    return {
+      title: `${notificationSymbol(reminder)} ${reminder.label.split(' · ')[0]}`,
+      body,
+      tag: `nutrition-${reminder.id}`,
+      url: reminder.route || '#sleep',
     };
   }
   return {

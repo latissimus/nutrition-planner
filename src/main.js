@@ -44,6 +44,7 @@ const bodyMetricsModule = () => import('./bodyMetrics.js');
 const remindersModule = () => import('./reminders.js');
 const shoppingModule = () => import('./shoppingList.js');
 const routinesModule = () => import('./routines.js');
+const sleepModule = () => import('./sleep.js');
 
 /* Android und andere installierte PWAs können die Displayausrichtung direkt
    sperren. iOS wertet dafür primär den orientation-Eintrag im Manifest aus;
@@ -407,6 +408,7 @@ const sammlungen = [
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
+  ['sleep', 'SLEEP-DEX', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 const sichtbareSammlungen = () => {
@@ -425,7 +427,7 @@ let zaehlerStand = {};
 
 const ZAEHLQUELLEN = {
   body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
-  reminders: { tabelle: 'reminders', eins: 'Erinnerung', viele: 'Erinnerungen' },
+  reminders: { tabelle: 'reminders', filterIn: ['type', ['meal', 'supplement', 'drink']], eins: 'Erinnerung', viele: 'Erinnerungen' },
   'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
   training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
   // Gezaehlt wird, was fuer den naechsten Einkauf ausgewaehlt (angehakt) ist –
@@ -433,15 +435,17 @@ const ZAEHLQUELLEN = {
   // besorgen?" statt "Wie viele koennte ich theoretisch besorgen?".
   shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel', viele: 'Lebensmittel' },
   habits: { tabelle: 'routines', eins: 'Routine', viele: 'Routinen' },
+  sleep: { tabelle: 'sleep_logs', eins: 'Nacht', viele: 'Nächte' },
 };
 
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
 // leere Antworten statt der kompletten Tabellen.
 async function zaehlerLaden(signal) {
-  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter }]) => {
+  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter, filterIn }]) => {
     try {
       let countQuery = supabase.from(tabelle).select('*', { count: 'exact', head: true });
       if (filter) countQuery = countQuery.eq(filter[0], filter[1]);
+      if (filterIn) countQuery = countQuery.in(filterIn[0], filterIn[1]);
       countQuery = countQuery.abortSignal(signal);
       const { count, error } = await countQuery;
       return [route, error ? null : (count ?? 0)];
@@ -1161,6 +1165,10 @@ async function renderRoute() {
         });
       });
     }
+  } else if (route === 'sleep') {
+    setSeite('sleep');
+    const { mountSleepDex } = await sleepModule();
+    await mountSleepDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
   } else {
     mountHome(view, signal);
   }
