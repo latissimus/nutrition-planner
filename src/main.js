@@ -415,7 +415,7 @@ const ZAEHLQUELLEN = {
   // Gezaehlt wird, was fuer den naechsten Einkauf ausgewaehlt (angehakt) ist –
   // die Karte beantwortet damit direkt "Wie viele Lebensmittel muss ich noch
   // besorgen?" statt "Wie viele koennte ich theoretisch besorgen?".
-  shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel einkaufen', viele: 'Lebensmittel einkaufen' },
+  shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel', viele: 'Lebensmittel' },
   habits: { tabelle: 'routines', eins: 'Routine', viele: 'Routinen' },
 };
 

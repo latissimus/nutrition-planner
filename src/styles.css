@@ -25,6 +25,19 @@
    auch Feastables setzen ihre harten Versatzschatten in #000, ein brauner
    Rand macht die Flaechen stumpf.
    ------------------------------------------------------------ */
+/* Die Ziffern erhalten appweit den LOGMAN-Monospace-Look, ohne dass auch
+   Wörter und Überschriften auf eine Schreibmaschinenschrift wechseln. Die
+   lokalen Alternativen decken iOS, Android, macOS und Windows ab. */
+@font-face{
+  font-family:"MUSCLEDEX Ziffern";
+  src:local("SFMono-Regular"),local("SF Mono"),local("Menlo"),
+      local("Roboto Mono"),local("Droid Sans Mono"),local("Consolas");
+  font-style:normal;
+  font-weight:100 900;
+  font-display:swap;
+  unicode-range:U+0030-0039;
+}
+
 :root{
   /* Feastables-Vollton-Palette, unveraendert uebernommen */
   --fe-yellow:#CEFC17;        /* yellow-neon  */
@@ -139,9 +152,9 @@
   --feast-royal:var(--fe-blurple);
   --feast-violet:var(--fe-blurple);
 
-  --mono:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --ui:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --display:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"MUSCLEDEX Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --ui:"MUSCLEDEX Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --display:"MUSCLEDEX Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   /* LOGMAN nutzt für Messwerte und technische Angaben die native
      Monospace-Schrift des Geräts. In MUSCLE-DEX bleibt sie bewusst ein
      eigener Akzent, damit Navigation und Fließtext weiterhin ruhig in
