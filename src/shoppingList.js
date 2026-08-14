@@ -4,6 +4,8 @@ import { iconMarkup } from './icons.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
+import { resolveSharedSpace } from './sharing.js';
+import { subscribeToTableChanges } from './realtime.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -224,6 +226,7 @@ const SELECT_COLUMNS = 'id,user_id,section,name,note,tags,checked,position';
 
 async function loadItems(userId, signal) {
   let query = supabase.from('shopping_items').select(SELECT_COLUMNS)
+    .eq('user_id', userId)
     .order('position', { ascending: true });
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
@@ -521,6 +524,7 @@ export function parseRecipeLines(text) {
 async function loadFoodLogRecipes(userId, signal) {
   let query = supabase.from('dex_entries')
     .select('id,title,note,ingredients,entry_type,created_at')
+    .eq('user_id', userId)
     .eq('root_key', 'food-log').eq('food_kind', 'recipe')
     .order('created_at', { ascending: false }).limit(30);
   if (signal) query = query.abortSignal(signal);
@@ -679,7 +683,8 @@ function tagLeiste(items, activeTag) {
 }
 
 export async function mountShoppingList(container, { session, signal }) {
-  const userId = session.user.id;
+  const space = await resolveSharedSpace(session.user.id, 'shopping', signal);
+  const userId = space.ownerId;
   // Die Abteilungs-Icons faerben sich nach der Ordnerfarbe (--ordner, siehe
   // mountCategoryChrome); bei einer dunklen Wahl braucht das Icon Weiss statt
   // der festen Tinte, um lesbar zu bleiben.
@@ -803,6 +808,21 @@ export async function mountShoppingList(container, { session, signal }) {
     return;
   }
 
+  const itemStand = (values) => JSON.stringify(values.map((item) => [
+    item.id, item.section, item.name, item.note, item.tags, item.checked, item.position,
+  ]));
+  subscribeToTableChanges({
+    table: 'shopping_items', signal,
+    onChange: async () => {
+      const aktuell = await loadItems(userId, signal);
+      if (signal?.aborted || itemStand(aktuell) === itemStand(items)) return;
+      items = aktuell;
+      redraw();
+      befuelleAbteilungen(container, items);
+    },
+    onError: () => {},
+  });
+
   const liste = container.querySelector('[data-einkauf-liste]');
   liste.addEventListener('change', async (event) => {
     const checkbox = event.target.closest('[data-item-check]');
@@ -865,6 +885,8 @@ export async function mountShoppingList(container, { session, signal }) {
   };
 
   return {
+    isShared: space.isShared,
+    ownerId: userId,
     openAddMenu() {
       const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((item) => item.section)])];
       const backdrop = document.createElement('div');

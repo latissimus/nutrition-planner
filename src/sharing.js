@@ -6,6 +6,27 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
+export function chooseSharedSpace(userId, shares = []) {
+  const incoming = shares.find((share) => share.partner_id === userId && share.owner_id);
+  return {
+    ownerId: incoming?.owner_id || userId,
+    isShared: Boolean(incoming),
+    shareId: incoming?.id || null,
+  };
+}
+
+export async function resolveSharedSpace(userId, scope, signal) {
+  let query = supabase.from('shared_spaces')
+    .select('id,owner_id,partner_id,created_at')
+    .eq('scope', scope)
+    .eq('partner_id', userId)
+    .order('created_at', { ascending: true });
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
+  if (error) throw error;
+  return chooseSharedSpace(userId, data || []);
+}
+
 export async function openShareSheet(scope) {
   const label = scope === 'shopping' ? 'Einkauf' : 'Food-Log';
   const backdrop = document.createElement('div');

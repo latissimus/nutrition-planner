@@ -29,6 +29,7 @@ import { setupDialogAccessibility } from './accessibility.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { initInterfaceSounds, syncInterfaceSounds } from './uiSounds.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
+import { subscribeToTableChanges } from './realtime.js';
 import {
   categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
 } from './categoryIcons.js';
@@ -64,6 +65,7 @@ const sharingModule = () => import('./sharing.js');
 
 const startDexSelection = async (...args) => (await selectionModule()).startDexSelection(...args);
 const openShareSheet = async (...args) => (await sharingModule()).openShareSheet(...args);
+const resolveSharedSpace = async (...args) => (await sharingModule()).resolveSharedSpace(...args);
 
 applyTheme(getTheme());
 registriereServiceWorker().catch(() => {});
@@ -769,7 +771,8 @@ async function mountCustomCollection(container, item, signal) {
     if (!parent || signal?.aborted) break;
     lookRoot = parent;
   }
-  const children = await loadCollections(session.user.id, { rootKey: item.root_key, parentId: item.id, signal });
+  const ownerId = item.user_id || session.user.id;
+  const children = await loadCollections(ownerId, { rootKey: item.root_key, parentId: item.id, signal });
   if (signal?.aborted) return;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
@@ -804,24 +807,24 @@ async function mountCustomCollection(container, item, signal) {
       userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
     onSelect: () => startDexSelection(container, {
-      rootKey: item.root_key, currentCollectionId: item.id, onChanged: refresh,
+      userId: ownerId, rootKey: item.root_key, currentCollectionId: item.id, onChanged: refresh,
     }),
     onDelete: async () => {
       if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
       try {
-        await deleteCollection(session.user.id, item);
+        await deleteCollection(ownerId, item);
         toast('Dex gelöscht');
         location.hash = backHref.slice(1);
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
   });
   bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-    userId: session.user.id,
+    userId: ownerId,
     refresh,
     itemsById: new Map(children.map((kind) => [kind.id, kind])),
   }));
   await renderDexEntries(container, {
-    userId: session.user.id, rootKey: item.root_key, collectionId: item.id,
+    userId: ownerId, rootKey: item.root_key, collectionId: item.id,
     color: item.color, signal, hasChildren: children.length > 0,
     onChanged: (entries, total) => {
       if (!Array.isArray(entries)) return;
@@ -829,6 +832,7 @@ async function mountCustomCollection(container, item, signal) {
       if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
     },
   });
+  subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
 }
 
 async function mountSearch(container, signal) {
@@ -1068,15 +1072,17 @@ async function renderRoute() {
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
       onPlus: () => shoppingActions?.openAddMenu?.(),
-      onShare: () => openShareSheet('shopping'),
+      onShare: shoppingActions?.isShared ? null : () => openShareSheet('shopping'),
     });
   } else if (route === 'food-log') {
     setSeite('food-log');
-    const children = await loadCollections(session.user.id, { rootKey: 'food-log', signal });
+    const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
+    const foodOwnerId = foodSpace.ownerId;
+    const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-LOG</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
-      type, foodKind, userId: session.user.id, rootKey: 'food-log', onSaved: refresh,
+      type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
     });
     mountCategoryChrome(view, route, 'Food-Log', {
       pageLookScope: route, pageLookPattern: 'triangles',
@@ -1086,21 +1092,22 @@ async function renderRoute() {
       onAddImage: () => openEntry('image'),
       onAddRecipeLink: () => openEntry('link', 'recipe'),
       onAddOwnRecipe: () => openEntry('note', 'recipe'),
-      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'food-log', onSaved: refresh }),
-      onSelect: () => startDexSelection(view, { rootKey: 'food-log', onChanged: refresh }),
-      onShare: () => openShareSheet('food-log'),
+      onCreateSub: () => openCollectionEditor({ userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh }),
+      onSelect: () => startDexSelection(view, { userId: foodOwnerId, rootKey: 'food-log', onChanged: refresh }),
+      onShare: foodSpace.isShared ? null : () => openShareSheet('food-log'),
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-      userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
+      userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
     await renderDexEntries(view, {
-      userId: session.user.id, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
+      userId: foodOwnerId, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
+    subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
   } else if (route === 'training') {
     setSeite('training');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
@@ -1113,7 +1120,7 @@ async function renderRoute() {
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
-      onSelect: () => startDexSelection(view, { rootKey: 'training', onChanged: refresh }),
+      onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: 'training', onChanged: refresh }),
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),

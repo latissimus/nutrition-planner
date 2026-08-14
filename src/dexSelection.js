@@ -31,7 +31,8 @@ function targetSheet(collections, currentCollectionId, onPick) {
 }
 
 export async function startDexSelection(container, {
-  rootKey, currentCollectionId = null, onChanged = () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+  userId, rootKey, currentCollectionId = null,
+  onChanged = () => window.dispatchEvent(new HashChangeEvent('hashchange')),
 } = {}) {
   if (container.classList.contains('dex-auswahlmodus')) return;
   const cards = [...container.querySelectorAll('.dex-ordner-test[data-collection-id],.dex-inhaltskarte[data-dex-entry-id]')];
@@ -89,15 +90,17 @@ export async function startDexSelection(container, {
     try {
       if (selectedEntries.size) {
         const ids = [...selectedEntries];
-        const { data: media, error: mediaError } = await supabase.from('dex_entries').select('image_path,audio_path').in('id', ids);
+        const { data: media, error: mediaError } = await supabase.from('dex_entries')
+          .select('image_path,audio_path').eq('user_id', userId).in('id', ids);
         if (mediaError) throw mediaError;
-        const { error } = await supabase.from('dex_entries').delete().in('id', ids);
+        const { error } = await supabase.from('dex_entries').delete().eq('user_id', userId).in('id', ids);
         if (error) throw error;
         const paths = (media || []).flatMap((item) => [item.image_path, item.audio_path]).filter(Boolean);
         if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
       }
       if (selectedCollections.size) {
-        const { error } = await supabase.from('collections').delete().in('id', [...selectedCollections]);
+        const { error } = await supabase.from('collections').delete()
+          .eq('user_id', userId).in('id', [...selectedCollections]);
         if (error) throw error;
       }
       cleanup(); toast('Auswahl gelöscht'); await onChanged?.();
@@ -106,7 +109,8 @@ export async function startDexSelection(container, {
 
   bar.querySelector('[data-selection-move]').onclick = async () => {
     const { data: collections, error } = await supabase.from('collections')
-      .select('id,parent_id,root_key,name,icon_key,user_id').eq('root_key', rootKey).order('name');
+      .select('id,parent_id,root_key,name,icon_key,user_id')
+      .eq('user_id', userId).eq('root_key', rootKey).order('name');
     if (error) return toast('Ziel-Dex konnten nicht geladen werden.');
     const blocked = new Set(selectedCollections);
     // Auch alle Nachfahren sperren: Sonst koennte ein ausgewaehlter Dex in
@@ -124,11 +128,13 @@ export async function startDexSelection(container, {
       if (targetId && blocked.has(targetId)) return toast('Ein Dex kann nicht in sich selbst verschoben werden.');
       try {
         if (selectedEntries.size) {
-          const { error: entryError } = await supabase.from('dex_entries').update({ collection_id: targetId }).in('id', [...selectedEntries]);
+          const { error: entryError } = await supabase.from('dex_entries')
+            .update({ collection_id: targetId }).eq('user_id', userId).in('id', [...selectedEntries]);
           if (entryError) throw entryError;
         }
         if (selectedCollections.size) {
-          const { error: collectionError } = await supabase.from('collections').update({ parent_id: targetId }).in('id', [...selectedCollections]);
+          const { error: collectionError } = await supabase.from('collections')
+            .update({ parent_id: targetId }).eq('user_id', userId).in('id', [...selectedCollections]);
           if (collectionError) throw collectionError;
         }
         cleanup(); toast('Auswahl verschoben'); await onChanged?.();

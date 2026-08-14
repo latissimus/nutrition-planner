@@ -7,6 +7,7 @@ import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
+import { subscribeToTableChanges } from './realtime.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -55,10 +56,10 @@ async function attachSignedMediaUrls(entries) {
   return entries;
 }
 
-async function dexEntriesQuery({ rootKey, collectionId = null, routineId, signal, offset, limit, count = false }) {
+async function dexEntriesQuery({ userId, rootKey, collectionId = null, routineId, signal, offset, limit, count = false }) {
   let query = supabase.from('dex_entries')
     .select(ENTRY_COLUMNS, count ? { count: 'exact' } : undefined)
-    .eq('root_key', rootKey).order('created_at', { ascending: false });
+    .eq('user_id', userId).eq('root_key', rootKey).order('created_at', { ascending: false });
   query = queryScope(query, { collectionId });
   if (routineId === null) query = query.is('routine_id', null);
   else if (routineId) query = query.eq('routine_id', routineId);
@@ -68,7 +69,7 @@ async function dexEntriesQuery({ rootKey, collectionId = null, routineId, signal
 }
 
 export async function loadDexEntries(userId, { rootKey, collectionId = null, routineId, signal } = {}) {
-  const { data, error } = await dexEntriesQuery({ rootKey, collectionId, routineId, signal });
+  const { data, error } = await dexEntriesQuery({ userId, rootKey, collectionId, routineId, signal });
   if (error) throw error;
   const entries = data || [];
   return attachSignedMediaUrls(entries);
@@ -78,7 +79,7 @@ export async function loadDexEntryPage(userId, {
   rootKey, collectionId = null, routineId, signal, offset = 0, limit = DEX_PAGE_SIZE,
 } = {}) {
   const { data, error, count } = await dexEntriesQuery({
-    rootKey, collectionId, routineId, signal, offset, limit, count: true,
+    userId, rootKey, collectionId, routineId, signal, offset, limit, count: true,
   });
   if (error) throw error;
   const entries = await attachSignedMediaUrls(data || []);
@@ -562,12 +563,13 @@ export async function renderDexEntries(container, {
   try {
     const firstPage = await loadDexEntryPage(userId, { rootKey, collectionId, routineId, signal });
     const entries = [...firstPage.entries];
-    const total = firstPage.total;
+    let total = firstPage.total;
     if (signal?.aborted) return [];
     let activeFilter = 'all';
     let activeTrainingFilter = 'all';
     let loadingMore = false;
     const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
+    const stand = () => `${total}|${entries.map((entry) => `${entry.id}:${entry.updated_at || ''}`).join('|')}`;
     const paint = () => {
       const foodEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
       const visibleEntries = trainingFilters ? filterTrainingEntries(foodEntries, activeTrainingFilter) : foodEntries;
@@ -609,6 +611,24 @@ export async function renderDexEntries(container, {
       };
     };
     paint();
+    let aktuellerStand = stand();
+    subscribeToTableChanges({
+      table: 'dex_entries', signal,
+      onChange: async () => {
+        const page = await loadDexEntryPage(userId, { rootKey, collectionId, routineId, signal });
+        if (signal?.aborted) return;
+        const neuerStand = `${page.total}|${page.entries.map((entry) => `${entry.id}:${entry.updated_at || ''}`).join('|')}`;
+        if (neuerStand === aktuellerStand) return;
+        entries.splice(0, entries.length, ...page.entries);
+        total = page.total;
+        entriesById.clear();
+        entries.forEach((entry) => entriesById.set(entry.id, entry));
+        aktuellerStand = neuerStand;
+        paint();
+        onChanged?.(entries, total);
+      },
+      onError: () => {},
+    });
     // Long-Press auf eine Eintragskarte oeffnet direkt "Eintrag bearbeiten"
     // (Notiz, Video, Bild, Rezept – alle teilen dieselbe Karte). slot bleibt
     // beim Neuzeichnen erhalten, die Delegation ueberlebt jedes paint().

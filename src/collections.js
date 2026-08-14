@@ -15,6 +15,7 @@ const escapeHtml = (value = '') => String(value)
 export async function loadCollections(userId, { rootKey, parentId = null, signal } = {}) {
   let query = supabase.from('collections')
     .select('id,user_id,parent_id,root_key,name,color,icon_key,position,created_at')
+    .eq('user_id', userId)
     .eq('root_key', rootKey)
     .order('position', { ascending: true })
     .order('created_at', { ascending: true });
