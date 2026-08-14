@@ -56,7 +56,8 @@ function cueForControl(control) {
   // getrennte Arcade-Cues machen die räumlich unterschiedlichen Aktionen
   // auch akustisch verständlich.
   if (control.matches('[data-sheet-close]')) return 'cancel';
-  if (control.matches('.kategorie-schliessen') || /zurück|übersicht/.test(description)) return 'back';
+  if (control.matches('.kategorie-schliessen')
+    || (control.matches('a[href]') && /schließen|zurück|übersicht/.test(description))) return 'back';
   if (/schließen/.test(description)) return 'cancel';
   if (control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete') || /löschen|entfernen/.test(description)) return 'delete';
   if (control.matches('.kategorie-plus,.neu-sammlung') || /hinzufügen|erstellen|neuer eintrag/.test(description)) return 'open';
