@@ -3,8 +3,9 @@ import { signOut } from './auth.js';
 import { getTheme, setTheme } from './theme.js';
 import { toast } from './toast.js';
 import {
-  collectionIsVisible, collectionOrder, customCollectionIsVisible, moveCollection,
-  moveCustomCollection, orderCustomCollections, setCollectionVisible, setCustomCollectionVisible,
+  coinDexIsVisible, collectionIsVisible, collectionOrder, customCollectionIsVisible, moveCollection,
+  moveCustomCollection, orderCustomCollections, setCoinDexVisible, setCollectionVisible,
+  setCustomCollectionVisible,
 } from './collectionPreferences.js';
 import { loadCollections } from './collections.js';
 import { materialIconMarkup } from './categoryIcons.js';
@@ -257,7 +258,22 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   sammlungsListe.className = 'sammlungs-sortierung';
   const renderSammlungen = () => {
     const order = collectionOrder();
-    sammlungsListe.replaceChildren(...order.map((route, index) => {
+    const coinZeile = document.createElement('div');
+    coinZeile.className = 'sammlung-sichtbarkeit';
+    const coinLabel = document.createElement('label');
+    coinLabel.className = 'switchline';
+    const coinCheckbox = document.createElement('input');
+    coinCheckbox.type = 'checkbox';
+    coinCheckbox.checked = coinDexIsVisible();
+    coinCheckbox.onchange = () => {
+      setCoinDexVisible(coinCheckbox.checked);
+      toast(`COIN-DEX ${coinCheckbox.checked ? 'eingeblendet' : 'ausgeblendet'}.`);
+    };
+    const coinText = document.createElement('span');
+    coinText.textContent = 'COIN-DEX';
+    coinLabel.append(coinCheckbox, coinText);
+    coinZeile.append(coinLabel);
+    sammlungsListe.replaceChildren(coinZeile, ...order.map((route, index) => {
       const title = sammlungsNamen.get(route);
       const zeile = document.createElement('div');
       zeile.className = 'sammlung-sichtbarkeit';

@@ -4,6 +4,7 @@ const STORAGE_KEY = 'muscledex:sichtbare-sammlungen';
 const ORDER_KEY = 'muscledex:sammlungs-reihenfolge';
 const CUSTOM_HIDDEN_KEY = 'muscledex:eigene-dex-ausgeblendet';
 const CUSTOM_ORDER_KEY = 'muscledex:eigene-dex-reihenfolge';
+const COIN_DEX_VISIBLE_KEY = 'muscledex:coin-dex-sichtbar';
 
 export const collectionRoutes = ['body', 'reminders', 'food-log', 'training', 'shopping', 'habits'];
 
@@ -30,6 +31,14 @@ export function visibleCollectionRoutes() {
 
 export function collectionIsVisible(route) {
   return visibleCollectionRoutes().includes(route);
+}
+
+export function coinDexIsVisible() {
+  return getPreference(COIN_DEX_VISIBLE_KEY, true) !== false;
+}
+
+export function setCoinDexVisible(visible) {
+  setPreference(COIN_DEX_VISIBLE_KEY, Boolean(visible));
 }
 
 export function setCollectionVisible(route, visible) {

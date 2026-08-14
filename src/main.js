@@ -15,7 +15,9 @@ import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
 import { brandMarkup, headerBrandMarkup } from './brand.js';
-import { customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes } from './collectionPreferences.js';
+import {
+  coinDexIsVisible, customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes,
+} from './collectionPreferences.js';
 import { coinHeaderMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
 import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
 import { registriereServiceWorker } from './pwa.js';
@@ -665,14 +667,15 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
   eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
   try { eigeneStats = await eigeneDexStatistik(session.user.id, eigene, signal); }
   catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
-  const coinSummary = await loadCoinSummary(session.user.id, signal);
+  const coinSichtbar = coinDexIsVisible();
+  const coinSummary = coinSichtbar ? await loadCoinSummary(session.user.id, signal) : null;
   if (signal?.aborted) return;
   container.innerHTML = `
     <div class="wrap pad-bottom tuck-home home-fixkopf">
       <div class="tuck-kopfzeile">
         <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
         <div class="tuck-kopf-aktionen">
-          ${coinHeaderMarkup(coinSummary)}
+          ${coinSichtbar ? coinHeaderMarkup(coinSummary) : ''}
           <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
             ${materialIconMarkup('create_new_folder')}
           </button>
