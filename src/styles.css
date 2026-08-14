@@ -142,6 +142,11 @@
   --mono:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   --ui:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   --display:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  /* LOGMAN nutzt für Messwerte und technische Angaben die native
+     Monospace-Schrift des Geräts. In MUSCLE-DEX bleibt sie bewusst ein
+     eigener Akzent, damit Navigation und Fließtext weiterhin ruhig in
+     Figtree gesetzt werden. */
+  --tech:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 
 /* ============================================================
@@ -4734,3 +4739,80 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .pwa-update-button[hidden]{display:none}
 .pwa-update-button b{font-size:13px}.pwa-update-button small{font-size:10px;opacity:.82}
 :root[data-theme="dark"] .pwa-update-button{background:var(--dark-action);color:var(--dark-action-ink);border-color:var(--text);box-shadow:3px 3px 0 #43516E}
+
+/* ============================================================
+   Typografie — Figtree plus gezielter LOGMAN-Technikakzent
+
+   Überschriften, Bedienung und normale Beschreibungen bleiben in Figtree.
+   Nur echte Werte und kompakte Metadaten verwenden die native Monospace-
+   Schrift. So bleibt MUSCLE-DEX eigenständig und wird nicht unruhig.
+   ============================================================ */
+:is(
+  .dex-datensatz-meta,
+  .kategorie-kopftitel small,
+  .tuck-bibliothek-werte,
+  .rem-row-zeit,
+  .mess-datum,
+  .dex-detail-herkunft span,
+  .dex-detail-inhalt footer,
+  .coin-kopfstand strong,
+  .coin-balance-card strong,
+  .coin-reward-kopf small,
+  .coin-reward-kopf>strong,
+  .coin-history small,
+  .coin-history b,
+  .coin-zahlenfeld
+){
+  font-family:var(--tech);
+  font-variant-numeric:tabular-nums;
+}
+
+:is(
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  #skinfold-date,
+  #skinfold-time,
+  #weight-date,
+  [data-routine-time]
+){
+  font-family:var(--tech);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Die spezifische KFA-Regel setzt bislang erneut Figtree. Diese spätere,
+   gleich gezielte Regel hält Datum und Messwert typografisch zusammen. */
+:root[data-seite="body"] .gew-datum-eingabe>#weight-date{
+  font-family:var(--tech);
+}
+
+/* Kleine erklärende Texte bleiben bewusst proportional, werden auf dem
+   Smartphone aber etwas kräftiger und ruhiger lesbar. */
+:is(
+  .dex-inhaltskarte-text,
+  .dex-inhaltskarte-fuss,
+  .rem-row-titel small,
+  .routine-copy small,
+  .einkauf-row-note,
+  .seiten-einstieg>span,
+  .mahl-intro>span,
+  .mess-hinweis,
+  .mess-leer,
+  .kurve-leer
+){
+  font-family:var(--ui);
+  font-weight:500;
+}
+
+.dex-inhaltskarte-text{
+  font-size:12.5px;
+  line-height:1.35;
+}
+
+.dex-detail-herkunft span,
+.dex-detail-inhalt footer,
+.kategorie-kopftitel small,
+.coin-history small{
+  font-size:12px;
+  line-height:1.35;
+}
