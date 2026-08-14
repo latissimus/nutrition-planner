@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { meditationSounds, remainingMeditationSeconds } from './meditationTimer.js';
+import { meditationSounds, nextMeditationTickDelay, remainingMeditationSeconds } from './meditationTimer.js';
 
 describe('Meditationstimer', () => {
   it('nimmt Musik automatisch auf, aber keine Beginn- und Endklänge', () => {
@@ -23,5 +23,12 @@ describe('Meditationstimer', () => {
 
   it('wird nach Ablauf nicht negativ', () => {
     expect(remainingMeditationSeconds(10_000, 11_500)).toBe(0);
+  });
+
+  it('richtet sichtbare Updates an der nächsten Sekundengrenze aus', () => {
+    expect(nextMeditationTickDelay(300)).toBe(1012);
+    expect(nextMeditationTickDelay(299.75)).toBe(762);
+    expect(nextMeditationTickDelay(299.08)).toBe(92);
+    expect(nextMeditationTickDelay(0)).toBe(0);
   });
 });

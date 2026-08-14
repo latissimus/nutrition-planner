@@ -265,6 +265,18 @@ export function remainingMeditationSeconds(endAt, now) {
   return Math.max(0, (endAt - now) / 1000);
 }
 
+// Die Anzeige nutzt Math.ceil(). Deshalb liegt der nächste sichtbare Wechsel
+// genau an der nächsten ganzzahligen Restsekunde. Ein starres 250-ms-Intervall
+// trifft diese Grenze je nach Startphase mal früh und mal spät. Dieser Abstand
+// richtet jeden Tick erneut an der echten Endzeit aus und sammelt keinen Drift.
+export function nextMeditationTickDelay(remainingSeconds) {
+  const remaining = Math.max(0, Number(remainingSeconds) || 0);
+  if (remaining <= 0) return 0;
+  const fraction = remaining - Math.floor(remaining);
+  const untilBoundary = fraction < 0.002 ? 1000 : fraction * 1000;
+  return Math.max(25, Math.min(1012, Math.round(untilBoundary + 12)));
+}
+
 function externalPrompt({ userId, routine, onCompleted }) {
   document.querySelector('.meditation-return-backdrop')?.remove();
   const backdrop = document.createElement('div');
@@ -372,7 +384,7 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   const visual = backdrop.querySelector('[data-timer-visual]');
   const releaseWakeLock = async () => { try { await wakeLock?.release(); } catch {} wakeLock = null; };
   const stop = async () => {
-    clearInterval(timer); timer = null; running = false; stopAmbient(); stopAmbient = () => {};
+    clearTimeout(timer); timer = null; running = false; stopAmbient(); stopAmbient = () => {};
     visual?.classList.remove('laeuft'); await releaseWakeLock();
   };
   const visibilityHandler = async () => {
@@ -404,6 +416,12 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
     timeNode.textContent = formatTime(remaining);
     if (remaining <= 0) finish();
   };
+  const scheduleUpdate = () => {
+    if (!running) return;
+    update();
+    if (!running || remaining <= 0) return;
+    timer = window.setTimeout(scheduleUpdate, nextMeditationTickDelay(remaining));
+  };
   const start = async () => {
     context ||= audioContext(); await context?.resume();
     if (!startedOnce) { startedOnce = true; await playCue('start'); }
@@ -427,10 +445,10 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
     endAt = performance.now() + remaining * 1000; running = true; visual?.classList.add('laeuft');
     toggle.innerHTML = `${materialIconMarkup('pause')}<span>Pause</span>`;
-    timer = window.setInterval(update, 250); update();
+    scheduleUpdate();
   };
   const pause = async () => {
-    update(); clearInterval(timer); timer = null; running = false; stopAmbient(); stopAmbient = () => {};
+    update(); clearTimeout(timer); timer = null; running = false; stopAmbient(); stopAmbient = () => {};
     visual?.classList.remove('laeuft'); toggle.innerHTML = `${materialIconMarkup('play_arrow')}<span>Weiter</span>`; await releaseWakeLock();
   };
   toggle.onclick = () => running ? pause() : start();
