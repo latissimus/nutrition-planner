@@ -6,6 +6,7 @@ import { bindLongPress } from './longPress.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
 import { showGestureHintOnce } from './gestureHints.js';
+import { playInterfaceSound } from './uiSounds.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -341,6 +342,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       close();
       toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'audio' ? 'Tonaufnahme im Dex gespeichert' : type === 'routine' ? 'Routine im Dex gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} im Dex gespeichert` : 'Link im Dex gespeichert');
       await onSaved?.(data);
+      // Erst nach Upload, Datenbank-Insert UND aktualisierter Dex-Ansicht:
+      // Der Ton bestätigt das fertige Ergebnis, nicht nur den Buttondruck.
+      playInterfaceSound('success', { volume: 0.34, retrigger: 'restart' });
     } catch (error) {
       if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
       toast(error.message || 'Eintrag konnte nicht gespeichert werden.');

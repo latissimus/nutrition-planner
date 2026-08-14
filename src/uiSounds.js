@@ -9,7 +9,7 @@ let initialized = false;
 function player(kind = 'interface') {
   if (typeof window === 'undefined') return null;
   if (kind === 'routine') {
-    routinePlayer ||= createUISFX({ pack: 'arcade', volume: 0.58, enabled: true, cooldownMs: 35 });
+    routinePlayer ||= createUISFX({ pack: 'arcade', volume: 0.32, enabled: true, cooldownMs: 35 });
     return routinePlayer;
   }
   interfacePlayer ||= createUISFX({
@@ -44,7 +44,7 @@ export async function playRoutineSound(phase, volume = 0.7) {
   if (!sound) return null;
   await sound.unlock().catch(() => false);
   return sound.play(phase === 'end' ? 'complete' : 'start', {
-    volume: Math.max(0, Math.min(1, Number(volume) || 0.7)),
+    volume: 0.16 + Math.max(0, Math.min(1, Number(volume) || 0.7)) * 0.16,
     retrigger: 'restart',
   });
 }
@@ -52,7 +52,12 @@ export async function playRoutineSound(phase, volume = 0.7) {
 function cueForControl(control) {
   if (control.matches('input[type="checkbox"],input[type="radio"]')) return control.checked ? 'toggle-on' : 'toggle-off';
   const description = `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
-  if (control.matches('[data-sheet-close],.kategorie-schliessen') || /schließen|zurück/.test(description)) return 'close';
+  // Ein Overlay wird abgebrochen, eine Seite geht im Verlauf zurück. Zwei
+  // getrennte Arcade-Cues machen die räumlich unterschiedlichen Aktionen
+  // auch akustisch verständlich.
+  if (control.matches('[data-sheet-close]')) return 'cancel';
+  if (control.matches('.kategorie-schliessen') || /zurück|übersicht/.test(description)) return 'back';
+  if (/schließen/.test(description)) return 'cancel';
   if (control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete') || /löschen|entfernen/.test(description)) return 'delete';
   if (control.matches('.kategorie-plus,.neu-sammlung') || /hinzufügen|erstellen|neuer eintrag/.test(description)) return 'open';
   if (control.matches('a[href]')) return 'select';
