@@ -105,8 +105,21 @@ function nutritionTarget(state) {
 }
 
 function progress(value, target) { return target ? Math.min(100, Math.max(0, value / target * 100)) : 0; }
+function nutritionEnabled(state) { return state.settings?.tracking_enabled !== false; }
+
+function trackingToggleMarkup(enabled) {
+  return `<label class="nutrition-tracking-toggle">
+    <span><b>Kalorien zählen</b><small>Konkrete Mahlzeiten und Makros protokollieren</small></span>
+    <input type="checkbox" data-nutrition-enabled${enabled ? ' checked' : ''}>
+    <i aria-hidden="true"></i>
+  </label>`;
+}
 
 function summaryMarkup(state, date) {
+  const enabled = nutritionEnabled(state);
+  if (!enabled) return `<section class="nutrition-card nutrition-card-compact" data-nutrition-card>
+    <div class="nutrition-stripe"></div>${trackingToggleMarkup(false)}
+  </section>`;
   const kcal = rounded(total(state.entries, 'energy_kcal'));
   const protein = rounded(total(state.entries, 'protein_g'));
   const carbs = rounded(total(state.entries, 'carbs_g'));
@@ -116,6 +129,7 @@ function summaryMarkup(state, date) {
   const over = Math.max(0, kcal - target);
   return `<section class="nutrition-card" data-nutrition-card>
     <div class="nutrition-stripe"></div>
+    ${trackingToggleMarkup(true)}
     <header class="nutrition-day-nav">
       <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag">${materialIconMarkup('arrow_back_ios')}</button>
       <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
@@ -132,7 +146,6 @@ function summaryMarkup(state, date) {
       <summary>Kalorienbedarf berechnen ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
       <form data-nutrition-settings-form>${calculatorMarkup(state, calculated)}</form>
     </details>
-    <div class="nutrition-log">${logMarkup(state.entries)}</div>
   </section>`;
 }
 
@@ -157,13 +170,16 @@ function calculationResultMarkup(result, customTarget = 0) {
   return result ? `<span><small>GRUNDUMSATZ</small><b>${decimal(result.resting)} kcal</b></span><span><small>ERHALTUNG</small><b>${decimal(result.maintenance)} kcal</b></span><span><small>ZIEL</small><b>${decimal(customTarget || result.target)} kcal</b></span><p>${result.method} · Schätzung, keine Messung</p>` : '<p>Geburtsdatum, Größe und Gewicht vervollständigen.</p>';
 }
 
-function logMarkup(entries) {
-  if (!entries.length) return '<p class="nutrition-empty">Heute noch nichts eingetragen.</p>';
-  return PERIODS.map(([period, label]) => {
-    const rows = entries.filter((item) => item.period === period);
-    if (!rows.length) return '';
-    return `<section class="nutrition-period"><header><h3>${label}</h3><span>${decimal(total(rows, 'energy_kcal'))} kcal</span></header><div>${rows.map((item) => `<article class="nutrition-entry" data-nutrition-entry="${item.id}"><div><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} ${item.unit === 'portion' ? 'Portion' : 'g'} · ${decimal(item.protein_g, 1)} g Protein</small></div><strong>${decimal(item.energy_kcal)} kcal</strong><button type="button" data-nutrition-delete aria-label="Eintrag löschen">×</button></article>`).join('')}</div></section>`;
-  }).join('');
+function periodEntriesMarkup(entries) {
+  if (!entries.length) return '';
+  return `<section class="nutrition-period-inline">
+    <header><span>GEGESSEN</span><b>${decimal(total(entries, 'energy_kcal'))} kcal</b></header>
+    <div>${entries.map((item) => `<article class="nutrition-entry" data-nutrition-entry="${item.id}">
+      <div><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} ${item.unit === 'portion' ? 'Portion' : 'g'} · ${decimal(item.protein_g, 1)} g P · ${decimal(item.carbs_g, 1)} g K · ${decimal(item.fat_g, 1)} g F</small></div>
+      <strong>${decimal(item.energy_kcal)} kcal</strong>
+      <button type="button" data-nutrition-delete aria-label="Eintrag löschen">×</button>
+    </article>`).join('')}</div>
+  </section>`;
 }
 
 function createOverlay(markup, className = '') {
@@ -230,7 +246,7 @@ function amountEditor({ product, date, onSave }) {
       carbs_g: number(product.carbs_100g) * factor, fat_g: number(product.fat_100g) * factor,
     };
   };
-  const render = () => { const data = values(); result.innerHTML = `<b>${decimal(data.energy_kcal)} kcal</b><span>${decimal(data.protein_g, 1)} P · ${decimal(data.carbs_g, 1)} C · ${decimal(data.fat_g, 1)} F</span>`; };
+  const render = () => { const data = values(); result.innerHTML = `<b>${decimal(data.energy_kcal)} kcal</b><span>${decimal(data.protein_g, 1)} P · ${decimal(data.carbs_g, 1)} K · ${decimal(data.fat_g, 1)} F</span>`; };
   amount.oninput = render; render();
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault(); const button = event.submitter; button.disabled = true;
@@ -278,10 +294,12 @@ function searchEditor({ date, onSave }) {
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault(); const query = backdrop.querySelector('[data-food-query]').value.trim(); if (query.length < 2) return;
     results.innerHTML = '<p>Produkte werden gesucht …</p>';
+    const streamingSound = playInterfaceSound('streaming', { loop: true, retrigger: 'restart' });
     try {
       products = (await productLookup('search', query)).products || [];
       results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : '<span></span>'}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigene Mahlzeit“.</p>';
     } catch { results.innerHTML = '<p>Produktsuche gerade nicht erreichbar.</p>'; }
+    finally { streamingSound?.stop?.(); }
   };
   results.onclick = (event) => {
     const index = event.target.closest('[data-product-index]')?.dataset.productIndex;
@@ -314,10 +332,15 @@ async function barcodeResult(barcode, { date, onSave }, closeCurrent) {
 function scannerEditor(context) {
   const backdrop = createOverlay(`<header><h2>Barcode scannen</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
     <div class="nutrition-scanner"><video playsinline muted></video><span></span></div>
-    <p class="nutrition-calc-note">Barcode in den Rahmen halten. Die Kamera wird nur für die Erkennung verwendet.</p>
+    <p class="nutrition-scanner-status" data-scanner-status>Kamera wird gestartet …</p>
+    <p class="nutrition-calc-note nutrition-scanner-help">Barcode in den Rahmen halten. Die Kamera wird nur für die Erkennung verwendet.</p>
     <form class="nutrition-barcode-manual"><input class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Barcode manuell eingeben"><button class="btn btn-primary" type="submit">Suchen</button></form>`);
-  let controls = null; let detected = false;
-  const stop = () => { controls?.stop?.(); backdrop.remove(); };
+  let controls = null; let stream = null; let detected = false;
+  const stop = () => {
+    controls?.stop?.();
+    stream?.getTracks?.().forEach((track) => track.stop());
+    backdrop.remove();
+  };
   backdrop.querySelector('[data-nutrition-close]').onclick = stop;
   backdrop.addEventListener('click', (event) => { if (event.target === backdrop) stop(); });
   backdrop.querySelector('form').onsubmit = (event) => {
@@ -327,12 +350,26 @@ function scannerEditor(context) {
   };
   import('@zxing/browser').then(async ({ BrowserMultiFormatReader }) => {
     if (!backdrop.isConnected) return;
-    const reader = new BrowserMultiFormatReader();
-    controls = await reader.decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } }, audio: false }, backdrop.querySelector('video'), (result, _error, scannerControls) => {
-      if (!result || detected) return; detected = true; scannerControls.stop();
-      const barcode = result.getText(); backdrop.remove(); barcodeResult(barcode, context);
+    if (!navigator.mediaDevices?.getUserMedia) throw new Error('Kamera wird von diesem Browser nicht unterstützt');
+    const video = backdrop.querySelector('video');
+    const status = backdrop.querySelector('[data-scanner-status]');
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false,
     });
-  }).catch(() => toast('Kamera nicht verfügbar. Barcode bitte manuell eingeben.'));
+    video.srcObject = stream;
+    await video.play();
+    if (status) status.textContent = 'Scanner aktiv';
+    const reader = new BrowserMultiFormatReader(undefined, { delayBetweenScanAttempts: 80, delayBetweenScanSuccess: 350 });
+    controls = await reader.decodeFromStream(stream, video, (result, _error, scannerControls) => {
+      if (!result || detected) return; detected = true; scannerControls.stop();
+      const barcode = result.getText();
+      stream?.getTracks?.().forEach((track) => track.stop());
+      backdrop.remove(); barcodeResult(barcode, context);
+    });
+  }).catch((error) => {
+    backdrop.querySelector('[data-scanner-status]')?.replaceChildren(document.createTextNode('Kamera nicht verfügbar'));
+    toast(error?.name === 'NotAllowedError' ? 'Kamerazugriff wurde nicht erlaubt.' : 'Kamera nicht verfügbar. Barcode bitte manuell eingeben.');
+  });
 }
 
 function addMenu(context) {
@@ -357,7 +394,29 @@ export async function mountNutrition(container, { userId, signal }) {
   let date = localDateKey();
   let automaticToday = true;
   let state = { settings: {}, entries: [], recent: [], latestWeight: 0 };
-  const render = () => { container.innerHTML = summaryMarkup(state, date); bind(); };
+  const deleteEntry = async (button) => {
+    const id = button.closest('[data-nutrition-entry]')?.dataset.nutritionEntry;
+    if (!id || !confirm('Diesen Kalorieneintrag löschen?')) return;
+    const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);
+    if (error) return toast('Eintrag konnte nicht gelöscht werden');
+    await refresh();
+  };
+  const renderIntegrated = () => {
+    const root = container.closest('.wrap') || container.parentElement;
+    const enabled = nutritionEnabled(state);
+    root?.querySelectorAll('[data-nutrition-period]').forEach((slot) => {
+      const entries = enabled ? state.entries.filter((item) => item.period === slot.dataset.nutritionPeriod) : [];
+      slot.innerHTML = periodEntriesMarkup(entries);
+      slot.querySelectorAll('[data-nutrition-delete]').forEach((button) => { button.onclick = () => deleteEntry(button); });
+      const block = slot.closest('.mahl-zeitblock');
+      const count = block?.querySelector('[data-period-count]');
+      const reminderCount = Number(count?.dataset.reminderCount || 0);
+      if (count) count.textContent = String(reminderCount + entries.length);
+      const empty = block?.querySelector('[data-reminder-empty]');
+      if (empty) empty.hidden = entries.length > 0;
+    });
+  };
+  const render = () => { container.innerHTML = summaryMarkup(state, date); bind(); renderIntegrated(); };
   const refresh = async () => { state = await loadNutrition(userId, date, signal); if (!signal?.aborted) render(); };
   const saveEntry = async (payload) => {
     try {
@@ -386,6 +445,21 @@ export async function mountNutrition(container, { userId, signal }) {
     } catch (error) { toast(error.message || 'Eintrag konnte nicht gespeichert werden'); return false; }
   };
   function bind() {
+    const trackingToggle = container.querySelector('[data-nutrition-enabled]');
+    if (trackingToggle) trackingToggle.onchange = async () => {
+      trackingToggle.disabled = true;
+      const enabled = trackingToggle.checked;
+      const { error } = await supabase.from('nutrition_settings').upsert({
+        user_id: userId, tracking_enabled: enabled,
+      }, { onConflict: 'user_id' });
+      if (error) {
+        trackingToggle.disabled = false;
+        trackingToggle.checked = !enabled;
+        return toast('Kalorienzählen konnte nicht umgestellt werden');
+      }
+      state.settings = { ...state.settings, tracking_enabled: enabled };
+      render();
+    };
     container.querySelectorAll('[data-nutrition-day]').forEach((button) => {
       button.onclick = async () => {
         date = shiftedDate(date, Number(button.dataset.nutritionDay));
@@ -394,6 +468,7 @@ export async function mountNutrition(container, { userId, signal }) {
       };
     });
     const calculatorForm = container.querySelector('[data-nutrition-settings-form]');
+    if (!calculatorForm) return;
     const updateCalculatorPreview = () => {
       const preview = calculateEnergyNeed({
         calculationBasis: calculatorForm.querySelector('[data-calc-basis]').value,
@@ -431,15 +506,6 @@ export async function mountNutrition(container, { userId, signal }) {
       if (settingsResult.error || weightResult.error) { submit.disabled = false; return toast('Bedarf konnte nicht gespeichert werden'); }
       toast('Kalorienbedarf gespeichert'); await refresh();
     };
-    container.querySelectorAll('[data-nutrition-delete]').forEach((button) => {
-      button.onclick = async () => {
-        const id = button.closest('[data-nutrition-entry]').dataset.nutritionEntry;
-        if (!confirm('Diesen Kalorieneintrag löschen?')) return;
-        const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);
-        if (error) return toast('Eintrag konnte nicht gelöscht werden');
-        playInterfaceSound('error', { retrigger: 'restart' }); await refresh();
-      };
-    });
   }
   container.innerHTML = '<section class="nutrition-card"><p class="nutrition-empty">Kalorien werden geladen …</p></section>';
   try { await refresh(); }
@@ -452,5 +518,9 @@ export async function mountNutrition(container, { userId, signal }) {
     date = today; refresh().catch(() => {});
   }, 60000);
   signal?.addEventListener('abort', () => clearInterval(dayWatcher), { once: true });
-  return { openAddMenu: () => addMenu({ date, recent: state.recent, onSave: saveEntry }) };
+  return {
+    isEnabled: () => nutritionEnabled(state),
+    renderIntegrated,
+    openAddMenu: () => addMenu({ date, recent: state.recent, onSave: saveEntry }),
+  };
 }

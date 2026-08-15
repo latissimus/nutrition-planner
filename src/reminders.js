@@ -513,19 +513,21 @@ function reminderGroups(reminders, completions) {
   const drink = reminders.find((item) => item.type === 'drink');
   const interval = Number(drink?.metadata?.intervall_minuten || 120);
   const periods = [
-    ['MORGENS', 0, 11 * 60],
-    ['MITTAGS', 11 * 60, 17 * 60],
-    ['ABENDS', 17 * 60, 24 * 60],
+    ['morning', 'MORGENS', 0, 11 * 60],
+    ['midday', 'MITTAGS', 11 * 60, 17 * 60],
+    ['evening', 'ABENDS', 17 * 60, 24 * 60],
   ];
   const timed = reminders.filter((item) => item.type === 'meal' || item.type === 'supplement')
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
-  const timeline = periods.map(([title, start, end]) => {
+  const timeline = periods.map(([period, title, start, end]) => {
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     return `<section class="mahl-zeitblock">
-      <header><h2>${title}</h2><span>${rows.length}</span></header>
-      <div class="mahl-timeline">${rows.length
+      <header><h2>${title}</h2><span data-period-count data-reminder-count="${rows.length}">${rows.length}</span></header>
+      <div class="mahl-timeline"><div data-period-reminders>${rows.length
         ? rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')
-        : '<p class="mahl-leerzeile">Keine Erinnerungen</p>'}</div>
+        : '<p class="mahl-leerzeile" data-reminder-empty>Keine Erinnerungen</p>'}</div>
+        <div data-nutrition-period="${period}"></div>
+      </div>
     </section>`;
   }).join('');
   const water = `<section class="mahl-zeitblock mahl-trinken">
@@ -638,7 +640,10 @@ export async function mountReminders(container, { session, signal }) {
 
   let reminders = [];
   let completions = [];
-  const rerender = () => { list.innerHTML = reminderGroups(reminders, completions); };
+  const rerender = () => {
+    list.innerHTML = reminderGroups(reminders, completions);
+    nutritionActions?.renderIntegrated?.();
+  };
   const rerenderRow = (key) => {
     const row = list.querySelector(`[data-reminder-key="${key}"]`);
     if (!row) return;
@@ -884,6 +889,7 @@ export async function mountReminders(container, { session, signal }) {
   });
 
   await nutritionPromise;
+  nutritionActions?.renderIntegrated?.();
   return {
     openAddMenu() {
       document.querySelector('.mahl-add-backdrop')?.remove();
@@ -892,7 +898,7 @@ export async function mountReminders(container, { session, signal }) {
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
         <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">×</button></header>
         <div class="sheet-menue">
-          <button type="button" data-add-type="nutrition">${iconMarkup('meal')}<span><b>Kalorien-Log</b><small>Lebensmittel und Mahlzeiten eintragen</small></span></button>
+          ${nutritionActions?.isEnabled?.() ? `<button type="button" data-add-type="nutrition">${iconMarkup('meal')}<span><b>Essen eintragen</b><small>Barcode, Suche oder eigene Mahlzeit</small></span></button>` : ''}
           <button type="button" data-add-type="meal">${iconMarkup('meal')}<span>Mahlzeit</span></button>
           <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
           <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>

@@ -106,11 +106,6 @@ export function initInterfaceSounds(root = document) {
     player('routine')?.unlock().catch(() => false);
   };
   root.addEventListener('pointerdown', unlock, { capture: true, passive: true, once: true });
-  root.addEventListener('pointerdown', (event) => {
-    const control = event.target.closest?.('button,a[href]');
-    if (!control || control.disabled || control.matches('[data-no-interface-sound]')) return;
-    if (isDeleteControl(control)) playInterfaceSound('error', { retrigger: 'restart' });
-  }, { capture: true, passive: true });
   root.addEventListener('input', (event) => {
     const field = event.target;
     if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {
