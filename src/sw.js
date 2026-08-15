@@ -30,17 +30,28 @@ self.addEventListener('push', (event) => {
   let daten = {};
   try { daten = event.data ? event.data.json() : {}; }
   catch (e) { daten = { body: event.data ? event.data.text() : '' }; }
-  event.waitUntil(self.registration.showNotification(daten.title || 'MUSCLEDEX', {
+  const title = daten.title || 'MUSCLEDEX';
+  const basis = {
     body: daten.body || '',
-    icon: './muscledex-icon-192-v4.png',
-    badge: './muscledex-icon-192-v4.png',
     tag: daten.tag || 'muscledex',
     data: {
       url: daten.url || '',
       reminderId: daten.reminderId || '',
       reminderType: daten.reminderType || '',
     },
-  }));
+  };
+  const icon = new URL('muscledex-icon-192-v4.png', self.registration.scope).href;
+  // Einzelne iOS-Versionen verwerfen die komplette Notification, wenn ein
+  // Icon/Badge beim Aufwecken des Workers nicht dekodiert werden kann. Apple
+  // hat den Web Push dann bereits erfolgreich angenommen, der Nutzer sieht
+  // aber nichts. In diesem Fall sofort ohne Branding erneut anzeigen.
+  event.waitUntil((async () => {
+    try {
+      await self.registration.showNotification(title, { ...basis, icon, badge: icon });
+    } catch {
+      await self.registration.showNotification(title, basis);
+    }
+  })());
 });
 
 self.addEventListener('notificationclick', (event) => {
