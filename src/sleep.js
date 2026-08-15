@@ -119,7 +119,7 @@ function closeOverlay(backdrop) { backdrop?.remove(); }
 
 function planEditor({ userId, state, onSaved }) {
   const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop sleep-overlay';
+  backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   const byDay = new Map(state.schedules.map((item) => [item.weekday, item]));
   backdrop.innerHTML = `<section class="kategorie-sheet sleep-editor" role="dialog" aria-modal="true" aria-label="Schlafplan bearbeiten">
@@ -175,7 +175,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
   const selectedTags = new Set(existing?.tags || []);
   const customTags = [...selectedTags].filter((tag) => !TAGS.includes(tag));
   const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop sleep-overlay';
+  backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   backdrop.innerHTML = `<section class="kategorie-sheet sleep-editor sleep-checkin-editor" role="dialog" aria-modal="true" aria-label="Morgen-Check-in">
     <header><div><small>+3 MUSCLE-COINS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -224,7 +224,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
 
 function actionsMenu({ userId, state, onSaved }) {
   const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop sleep-overlay';
+  backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   backdrop.innerHTML = `<section class="kategorie-sheet sleep-action-card" role="dialog" aria-modal="true" aria-label="SLEEP ergänzen"><header><h2>SLEEP</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button><button type="button" data-sleep-action="routines">${materialIconMarkup('self_improvement')}<span><b>Abendroutine</b><small>Meditation und Routinen öffnen</small></span></button></div></section>`;
   const close = () => closeOverlay(backdrop);
@@ -288,7 +288,7 @@ function render(container, userId, state, refresh) {
     </section>
     <section class="sleep-section">
       <header><div class="sleep-section-title">${materialIconMarkup('coffee')}<h2>Morgen-Check-in</h2></div></header>
-      ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : '<div class="sleep-empty">Noch kein Morgen-Check-in. Dein erster Eintrag bringt 3 MUSCLE-COINS.</div>'}
+      ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : '<div class="sleep-empty">Noch kein Morgen-Check-in. Dein erster Eintrag bringt 3 MUSCLE-COINS.</div>'}
     </section>
     <section class="sleep-section">
       <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
