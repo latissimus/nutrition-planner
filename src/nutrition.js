@@ -400,7 +400,7 @@ async function barcodeResult(barcode, { date, onSave }, closeCurrent) {
 function scannerEditor(context) {
   const backdrop = createOverlay(`<header><h2>Barcode scannen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-scanner"><video playsinline muted></video><span></span></div>
-    <div class="nutrition-scanner-tools"><button type="button" data-scanner-torch hidden aria-pressed="false" aria-label="Kameralicht einschalten">${materialIconMarkup('light_mode')}<span>Kameralicht</span></button></div>
+    <div class="nutrition-scanner-tools"><button type="button" data-scanner-torch hidden aria-pressed="false" aria-label="Kameralicht einschalten">${materialIconMarkup('light_mode')}<span data-scanner-torch-label>Kameralicht</span></button></div>
     <p class="nutrition-scanner-status" data-scanner-status>Kamera wird gestartet …</p>
     <p class="nutrition-calc-note nutrition-scanner-help">Barcode in den Rahmen halten. Die Kamera wird nur für die Erkennung verwendet.</p>
     <form class="nutrition-barcode-manual"><input class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Barcode manuell eingeben"><button class="btn btn-primary" type="submit">Suchen</button></form>`);
@@ -439,7 +439,7 @@ function scannerEditor(context) {
           await BrowserMultiFormatReader.mediaStreamSetTorch(track, enabled);
           torch.setAttribute('aria-pressed', String(enabled));
           torch.setAttribute('aria-label', enabled ? 'Kameralicht ausschalten' : 'Kameralicht einschalten');
-          const label = torch.querySelector('span');
+          const label = torch.querySelector('[data-scanner-torch-label]');
           if (label) label.textContent = enabled ? 'Ausschalten' : 'Kameralicht';
         } catch { toast('Die Taschenlampe konnte nicht geschaltet werden.'); }
       };

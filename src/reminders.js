@@ -914,9 +914,15 @@ export async function mountReminders(container, { session, signal }) {
     }
   });
 
-  list.addEventListener('change', async (event) => {
+  list.addEventListener('focusin', (event) => {
+    const timeInput = event.target.closest('[data-slot-time]');
+    if (timeInput) timeInput.dataset.initialTime = timeInput.value;
+  });
+
+  list.addEventListener('focusout', async (event) => {
     const timeInput = event.target.closest('[data-slot-time]');
     if (!timeInput) return;
+    if (timeInput.dataset.initialTime === timeInput.value) return;
     const key = timeInput.dataset.slotKey;
     const reminder = reminders.find((item) => (item._key || item.id) === key);
     if (!reminder) return;
