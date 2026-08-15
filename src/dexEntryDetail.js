@@ -260,6 +260,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
       if (!entry.url) return;
       refreshButton.disabled = true;
       refreshButton.classList.add('rotiert');
+      const streamingSound = playInterfaceSound('streaming', { loop: true, retrigger: 'restart' });
       try {
         const { data: previewData, error: previewError } = await supabase.functions.invoke('link-preview', { body: { url: entry.url } });
         if (previewError) throw previewError;
@@ -277,9 +278,11 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
         if (!entry.note?.trim() && previewData.description) patch.note = previewData.description;
         const { error: updateError } = await supabase.from('dex_entries').update(patch).eq('id', entry.id).eq('user_id', userId);
         if (updateError) throw updateError;
+        streamingSound?.stop();
         toast('Vorschau aktualisiert');
         await mountDexEntryDetail(container, { userId, id, signal });
       } catch (error) {
+        streamingSound?.stop();
         toast(error.message || 'Vorschau konnte nicht aktualisiert werden.');
         refreshButton.classList.remove('rotiert');
         refreshButton.disabled = false;

@@ -89,9 +89,10 @@ function cueForControl(control) {
   if (control.matches('.kategorie-schliessen')
     || (control.matches('a[href]') && /schließen|zurück|übersicht/.test(description))) return 'back';
   if (/schließen/.test(description)) return 'back';
-  // Das erneute Laden der Vorschau/Metadaten eines Eintrags ist ein eigener
-  // Scan-Vorgang und soll deshalb nicht wie ein gewöhnlicher Button klingen.
-  if (control.matches('[data-entry-refresh]')) return 'scanning';
+  // Die Aktualisierung startet ihren eigenen laufenden Streaming-Cue im
+  // Handler. Der globale Click-Listener darf hier keinen zweiten Sound
+  // darüberlegen.
+  if (control.matches('[data-entry-refresh]')) return null;
   // Destruktive Aktionen erklingen bereits beim Pointerdown. Das ist vor allem
   // auf iOS wichtig, weil window.confirm() die Audiowiedergabe beim Click sonst
   // blockiert, bis der native Dialog wieder geschlossen wurde.
