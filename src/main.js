@@ -701,8 +701,8 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
     reminders: ['#525CEB', 'wallpaper-burger', '🍔'],
     sleep: ['#001454', 'wallpaper-moon', '🌙'],
     shopping: ['#00E0BA', 'wallpaper-brokkoli', '🥦'],
-    habits: ['#8C00FF', 'wallpaper-wolke', '☁️'],
-    training: ['#006E7F', 'wallpaper-dumbbell', '💪'],
+    habits: ['#8C00FF', 'wallpaper-wolke', '🧠'],
+    training: ['#006E7F', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#8CA9FF', 'wallpaper-measure', '📐'],
     coins: ['#00A8FF', 'wallpaper-game', '🎮'],
   };
@@ -713,7 +713,7 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   });
   try {
     const neu = await saveCollection(userId, {
-      rootKey: 'home', parentId: null, name: 'Neu', color: '#FF3483', iconKey: 'emoji:⚡',
+      rootKey: 'home', parentId: null, name: 'Neu', color: '#FF3483', iconKey: 'emoji:🆕',
     });
     if (neu?.id) setPageLookPattern(`collection-${neu.id}`, 'wallpaper-blitz');
   } catch (error) {

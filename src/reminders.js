@@ -30,8 +30,6 @@ const DEFAULT_REMINDERS = [
   { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'lunch_dining', meal_slot: 'lunch' } },
   { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'Snack', meal_slot: 'snack_afternoon' } },
   { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'Abendessen', meal_slot: 'dinner' } },
-  { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders', metadata: { icon: 'pill' } },
-  { type: 'supplement', label: 'Supplement PM', time: '20:00', route: '#reminders', metadata: { icon: 'pill' } },
   {
     type: 'drink',
     label: 'Trinken',
@@ -260,7 +258,24 @@ async function deleteReminder(userId, reminderId) {
 }
 
 async function ensureDefaults(userId, signal) {
-  const current = await loadReminders(userId, signal, { includeDeleted: true });
+  let current = await loadReminders(userId, signal, { includeDeleted: true });
+  // Frühere Versionen legten zwei generische Supplement-Zeilen an. Sie waren
+  // keine echten Nutzerdaten und sollen bei bestehenden Konten einmalig
+  // verschwinden, damit sie nicht weiter im Meal-Log auftauchen.
+  const alteStandardSupps = current.filter((reminder) => reminder.type === 'supplement'
+    && !reminder.active
+    && !reminder.metadata?.deleted
+    && /^Supplement (AM|PM)$/i.test(String(reminder.label || '').trim()));
+  if (alteStandardSupps.length) {
+    await Promise.all(alteStandardSupps.map(async (reminder) => {
+      const metadata = { ...(reminder.metadata || {}), deleted: true };
+      const { error } = await supabase.from('reminders').update({ active: false, metadata })
+        .eq('id', reminder.id).eq('user_id', userId);
+      if (error) throw error;
+      reminder.active = false;
+      reminder.metadata = metadata;
+    }));
+  }
   const existing = new Set(current.map((reminder) => `${reminder.type}:${reminder.label}`));
   const payloads = DEFAULT_REMINDERS.filter((reminder) => !existing.has(`${reminder.type}:${reminder.label}`)).map((reminder) => reminderPayload(userId, {
     ...reminder, active: false, weekdays: WEEKDAYS,
