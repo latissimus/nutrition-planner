@@ -561,13 +561,10 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
     aktuell.addEventListener('animationend', fertig, { once: true });
     setTimeout(fertig, 540);
   }
-  // Die gespeicherte Ansicht liefert den sofortigen, stabilen Rueckweg. Im
-  // Hintergrund wird sie anschliessend ohne Ladebild neu aufgebaut, damit
-  // etwa geloeschte Eintraege oder neue Favoriten trotzdem aktuell sind.
-  setTimeout(() => {
-    const aktuelleHashRoute = (location.hash || '#home').slice(1) || 'home';
-    if (aktiveRoute === route && aktuelleHashRoute === route) render();
-  }, ohneAnimation ? 0 : 440);
+  // Die gespeicherte Ansicht bleibt bewusst stabil. Ein nachgelagerter
+  // Voll-Render hat auf iOS den inneren Home-Scroller kurz ersetzt und konnte
+  // dadurch direkt nach dem Zurückkehren eine Berührung verschlucken.
+  // Aktualisierungen kommen über Realtime bzw. beim nächsten echten Öffnen.
   return true;
 }
 
