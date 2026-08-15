@@ -2,6 +2,7 @@ import { createUISFX } from 'uisfx';
 import { getPreference, setPreference } from './userPreferences.js';
 
 const preferenceKey = 'muscledex:interface-sounds';
+const soundVolume = 0.28;
 let interfacePlayer = null;
 let routinePlayer = null;
 let initialized = false;
@@ -9,11 +10,11 @@ let initialized = false;
 function player(kind = 'interface') {
   if (typeof window === 'undefined') return null;
   if (kind === 'routine') {
-    routinePlayer ||= createUISFX({ pack: 'arcade', volume: 0.32, enabled: true, cooldownMs: 35 });
+    routinePlayer ||= createUISFX({ pack: 'arcade', volume: soundVolume, enabled: true, cooldownMs: 35 });
     return routinePlayer;
   }
   interfacePlayer ||= createUISFX({
-    pack: 'arcade', volume: 0.28, enabled: interfaceSoundsEnabled(), cooldownMs: 45,
+    pack: 'arcade', volume: soundVolume, enabled: interfaceSoundsEnabled(), cooldownMs: 45,
   });
   return interfacePlayer;
 }
@@ -33,27 +34,41 @@ export function setInterfaceSoundsEnabled(enabled) {
 }
 
 export function playInterfaceSound(cue = 'snap', options) {
-  return player()?.play(cue, options) || null;
+  return player()?.play(cue, { ...(options || {}), volume: soundVolume }) || null;
 }
 
 // Routine-Sounds sind bewusst NICHT an den Interface-Schalter gekoppelt.
 // Meditationen rufen diese Funktion nicht auf und behalten ihre eigenen
 // Anfangs- und Endklänge aus dem Meditate-Music-Ordner.
-export async function playRoutineSound(phase, volume = 0.7) {
+export async function playRoutineSound(phase) {
   const sound = player('routine');
   if (!sound) return null;
   await sound.unlock().catch(() => false);
-  return sound.play(phase === 'end' ? 'complete' : 'start', {
-    volume: 0.16 + Math.max(0, Math.min(1, Number(volume) || 0.7)) * 0.16,
+  return sound.play(phase === 'end' ? 'complete' : 'notification', {
+    volume: soundVolume,
     retrigger: 'restart',
   });
 }
 
+function isChip(control) {
+  return control.matches('.food-dex-filter button,.einkauf-tag-chip,.einkauf-chip-btn,.such-tag-liste button,[data-search-tag],.sleep-tags input');
+}
+
+function isSwitch(control) {
+  return Boolean(control.closest('.switchline,.rem-switch,.sleep-mini-switch,.sleep-setting-switch,.mess-zeile'));
+}
+
 function cueForControl(control) {
-  if (control.matches('input[type="checkbox"]')) return control.checked ? 'snap' : 'deselect';
-  if (control.matches('input[type="radio"]')) return 'snap';
+  if (isChip(control)) return null;
+  if (control.matches('summary')) return control.closest('details')?.open ? 'collapse' : 'expand';
+  if (control.matches('[aria-expanded]')) return control.getAttribute('aria-expanded') === 'true' ? 'collapse' : 'expand';
+  if (control.matches('input[type="checkbox"]')) {
+    if (isSwitch(control)) return control.checked ? 'skip-next' : 'skip-previous';
+    return 'hover';
+  }
+  if (control.matches('input[type="radio"],select')) return 'hover';
   const description = `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
-  if (control.matches('[data-sleep-routine-check]')) return /wieder öffnen/.test(description) ? 'deselect' : 'snap';
+  if (control.matches('[data-sleep-routine-check]')) return 'hover';
   // Der COIN-DEX ist die Belohnungszentrale und erhält deshalb den eigenen
   // Arcade-Achievement-Cue statt des gewöhnlichen Navigationsklangs.
   if (control.matches('a[href="#coins"]')) return 'achievement';
@@ -63,14 +78,9 @@ function cueForControl(control) {
   if (control.matches('.kategorie-schliessen')
     || (control.matches('a[href]') && /schließen|zurück|übersicht/.test(description))) return 'back';
   if (/schließen/.test(description)) return 'back';
-  if (control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete') || /löschen|entfernen/.test(description)) return 'delete';
-  // Overlay-Menüs sollen sich akustisch von einer normalen Seitennavigation
-  // unterscheiden. "expand" ist kürzer als der bisherige Open-Cue und passt
-  // sowohl zum Hinzufügen-Menü als auch zu den Dex-Einstellungen.
-  if (control.matches('.kategorie-plus,.neu-sammlung,[data-category-settings],[data-action="appearance"],[data-action="rename"],[data-action="sub"],[data-action="share"],[data-action="select"],[data-entry-type],[data-sleep-action],[data-routine-template],[data-routine-attachment]')
-    || /hinzufügen|erstellen|neuer eintrag/.test(description)) return 'expand';
-  if (control.matches('a[href]')) return 'select';
-  return 'snap';
+  if (control.matches('.tuck-ablage-knopf')) return 'forward';
+  if (control.matches('.dex-inhaltskarte-oeffnen,.dex-ordner-test a,a[href^="#"]')) return 'forward';
+  return 'hover';
 }
 
 export function initInterfaceSounds(root = document) {
@@ -87,6 +97,7 @@ export function initInterfaceSounds(root = document) {
   root.addEventListener('click', (event) => {
     const control = event.target.closest('button,a[href],summary,input[type="checkbox"],input[type="radio"],select');
     if (!control || control.disabled || control.matches('[data-no-interface-sound],[data-meditation-toggle],[data-routine-check],[data-item-check]')) return;
-    playInterfaceSound(cueForControl(control));
+    const cue = cueForControl(control);
+    if (cue) playInterfaceSound(cue);
   }, true);
 }

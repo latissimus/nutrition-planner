@@ -256,7 +256,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   interfaceSoundText.innerHTML = '<b>Interface-Sounds</b><small>Retro-Arcade-Klänge bei der Bedienung</small>';
   interfaceSoundCheckbox.onchange = () => {
     setInterfaceSoundsEnabled(interfaceSoundCheckbox.checked);
-    if (interfaceSoundCheckbox.checked) playInterfaceSound('success');
+    if (interfaceSoundCheckbox.checked) playInterfaceSound('skip-next');
     toast(`Interface-Sounds ${interfaceSoundCheckbox.checked ? 'eingeschaltet' : 'ausgeschaltet'}.`);
   };
   interfaceSoundLabel.append(interfaceSoundCheckbox, interfaceSoundText);

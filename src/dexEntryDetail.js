@@ -4,6 +4,7 @@ import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
 import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
+import { playInterfaceSound } from './uiSounds.js';
 
 const BUCKET = 'dex-entries';
 const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
@@ -212,7 +213,7 @@ function detailMarkup(entry) {
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
       <span></span>
-      <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${materialIconMarkup('favorite')}</button>
+      <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${materialIconMarkup('favorite')}</button>
       ${entry.url ? `<button class="dex-detail-knopf" type="button" data-entry-refresh aria-label="Vorschau neu laden">${materialIconMarkup('refresh')}</button>` : ''}
       <button class="dex-detail-knopf" type="button" data-entry-edit aria-label="Eintrag bearbeiten">${materialIconMarkup('build')}</button>
       <button class="dex-detail-knopf" type="button" data-entry-share aria-label="Eintrag teilen">${materialIconMarkup('upload_file')}</button>
@@ -249,6 +250,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
     button.disabled = true;
     const { error } = await supabase.from('dex_entries').update({ favorite }).eq('id', entry.id).eq('user_id', userId);
     if (error) { toast(error.message || 'Favorit konnte nicht geändert werden.'); button.disabled = false; return; }
+    playInterfaceSound(favorite ? 'level-up' : 'hover', { retrigger: 'restart' });
     toast(favorite ? 'Zu Favoriten hinzugefügt' : 'Aus Favoriten entfernt');
     await mountDexEntryDetail(container, { userId, id, signal });
   };

@@ -265,7 +265,6 @@ export function openSleepSoundTimer() {
     <header><div><small>SANFTES AUSBLENDEN</small><h2>Schlafsound</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <label class="dex-entry-field"><span>Sound</span><div class="meditation-sound-picker"><select class="input" data-sleep-sound>${choices.map(([value, label]) => `<option value="${value}">${escapeHtml(label)}</option>`).join('')}</select><button class="btn" type="button" data-sleep-preview>Anhören</button></div></label>
     <fieldset class="routine-duration"><legend>Abschalten nach</legend><div>${[15, 30, 45, 60, 90].map((value) => `<button type="button" data-sleep-duration="${value}"${value === 30 ? ' class="on"' : ''}>${value} min</button>`).join('')}</div></fieldset>
-    <label class="meditation-volume"><span>Lautstärke <output data-sleep-volume-output>35 %</output></span><input type="range" min="0.05" max="1" step="0.05" value="0.35" data-sleep-volume></label>
     <strong class="meditation-time" data-sleep-time>30:00</strong>
     <button class="btn btn-primary btn-block" type="button" data-sleep-sound-start>${materialIconMarkup('play_arrow')} Start</button>
   </section>`;
@@ -274,7 +273,7 @@ export function openSleepSoundTimer() {
   let timer = null;
   let endAt = 0;
   const time = backdrop.querySelector('[data-sleep-time]');
-  const volume = backdrop.querySelector('[data-sleep-volume]');
+  const soundVolume = 1;
   const stop = () => {
     clearInterval(timer); timer = null;
     if (player) { player.pause(); player.removeAttribute('src'); player.load(); player = null; }
@@ -291,13 +290,9 @@ export function openSleepSoundTimer() {
       if (!timer) showTime(duration * 60);
     };
   });
-  volume.oninput = () => {
-    backdrop.querySelector('[data-sleep-volume-output]').textContent = `${Math.round(Number(volume.value) * 100)} %`;
-    if (player) player.volume = Number(volume.value);
-  };
   backdrop.querySelector('[data-sleep-preview]').onclick = async (event) => {
     event.currentTarget.disabled = true;
-    await previewMeditationSound(backdrop.querySelector('[data-sleep-sound]').value, Number(volume.value));
+    await previewMeditationSound(backdrop.querySelector('[data-sleep-sound]').value, soundVolume);
     if (event.currentTarget.isConnected) event.currentTarget.disabled = false;
   };
   backdrop.querySelector('[data-sleep-sound-start]').onclick = () => {
@@ -305,7 +300,7 @@ export function openSleepSoundTimer() {
     const type = backdrop.querySelector('[data-sleep-sound]').value;
     const url = meditationTrackUrls[type];
     if (!url) return toast('Sound konnte nicht geladen werden.');
-    const targetVolume = Number(volume.value);
+    const targetVolume = soundVolume;
     player = new Audio(url); player.loop = true; player.preload = 'auto'; player.playsInline = true; player.volume = targetVolume;
     player.play().catch(() => toast('Sound konnte nicht gestartet werden.'));
     endAt = Date.now() + duration * 60_000;
@@ -419,7 +414,7 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   cuePlayer.playsInline = true;
   const cueVolume = Number(routine.gong_volume ?? 0.7);
   const playCue = async (phase) => {
-    if (!isMeditation) return playRoutineSound(phase, cueVolume);
+    if (!isMeditation) return playRoutineSound(phase);
     cuePlayer.pause();
     cuePlayer.src = timerCueUrls[phase];
     cuePlayer.currentTime = 0;

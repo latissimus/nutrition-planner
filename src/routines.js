@@ -282,7 +282,7 @@ function bindRoutineGestures(row, { onSwipeToggle, onLongPress }) {
     state.timer = setTimeout(() => {
       if (!state.active || state.swiping) return;
       state.longPressed = true; state.blockClick = true;
-      resetVisual(); navigator.vibrate?.(10); playInterfaceSound('expand'); onLongPress?.();
+      resetVisual(); navigator.vibrate?.(10); playInterfaceSound('hover'); onLongPress?.();
     }, 500);
     try { content.setPointerCapture(event.pointerId); } catch { /* optional */ }
   });
@@ -386,7 +386,7 @@ export async function mountRoutines(container, { session, signal }) {
       return toast('Status konnte nicht gespeichert werden.');
     }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
-    playInterfaceSound(completed ? 'deselect' : 'snap');
+    playInterfaceSound('hover');
     paint();
   };
   const refresh = async () => {

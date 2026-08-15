@@ -457,7 +457,7 @@ function bindeZeilenGesten(row, { onSwipeToggle, onLongPress }) {
       state.blockClick = true;
       row.classList.remove('swipe-aktiv', 'swipe-commit');
       inhalt.style.transform = '';
-      playInterfaceSound('expand');
+      playInterfaceSound('hover');
       onLongPress?.();
     }, LONG_PRESS_MS);
     try { row.setPointerCapture(event.pointerId); } catch { /* egal */ }
@@ -835,7 +835,7 @@ export async function mountShoppingList(container, { session, signal }) {
     item.checked = checkbox.checked;
     try {
       await toggleItem(userId, id, item.checked);
-      playInterfaceSound(item.checked ? 'snap' : 'deselect');
+      playInterfaceSound('hover');
       redraw();
     } catch (error) {
       item.checked = zuvor;

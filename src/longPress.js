@@ -23,7 +23,7 @@ export function bindLongPress(root, selector, resolveOpen) {
       if (!open) return;
       ausgeloest = true;
       navigator.vibrate?.(10);
-      playInterfaceSound('expand');
+      playInterfaceSound('hover');
       open();
     }, SCHWELLE_MS);
   });
