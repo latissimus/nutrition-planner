@@ -131,7 +131,8 @@ function hinweisLabel(value) {
 function notificationText(reminder, reminders = []) {
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    const hasSupplements = reminders.some((item) => item.type === 'supplement' && item.active);
+    const hasSupplements = reminders.some((item) => item.type === 'supplement'
+      && (item.active || !/^Supplement (AM|PM)$/i.test(String(item.label || '').trim())));
     return { title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & Supps 💊' : ''}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
   }
   if (reminder.type === 'supplement') {

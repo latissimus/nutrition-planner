@@ -30,6 +30,7 @@ type Reminder = {
   weekdays: number[];
   metadata: Record<string, unknown>;
   route: string;
+  active: boolean;
 };
 
 type Subscription = {
@@ -76,6 +77,11 @@ function unitLabel(value: string) {
   return ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' } as Record<string, string>)[value] || value;
 }
 
+function isConfiguredSupplement(reminder: Reminder) {
+  return reminder.type === 'supplement'
+    && (reminder.active || !/^Supplement (AM|PM)$/i.test(String(reminder.label || '').trim()));
+}
+
 function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   if (!reminder) {
     return {
@@ -95,7 +101,7 @@ function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   };
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    const hasSupplements = reminders.some((item) => item.type === 'supplement');
+    const hasSupplements = reminders.some(isConfiguredSupplement);
     return {
       title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & Supps 💊' : ''}`,
       body: note || bodies.meal,
@@ -196,8 +202,7 @@ async function dispatchDue() {
   const [{ data: reminders, error: reminderError }, { data: profiles, error: profileError }] = await Promise.all([
     admin
       .from('reminders')
-      .select('id,user_id,type,label,time,weekdays,metadata,route')
-      .eq('active', true),
+      .select('id,user_id,type,label,time,weekdays,metadata,route,active'),
     admin.from('profiles').select('id,zeitzone'),
   ]);
   if (reminderError) throw reminderError;
@@ -209,7 +214,7 @@ async function dispatchDue() {
   // 1. Regulär zeitplan-fällige Reminders
   const scheduled = ((reminders || []) as Reminder[]).flatMap((reminder) => {
     const occurrence = scheduledOccurrence(reminder, zones.get(reminder.user_id) || 'UTC', now);
-    return occurrence ? [{ reminder, occurrence }] : [];
+    return reminder.active && occurrence ? [{ reminder, occurrence }] : [];
   });
 
   // 2. Reminders deren Snooze in dieser Minute abgelaufen ist (unabhängig von reminder.time)
@@ -224,7 +229,7 @@ async function dispatchDue() {
   const dueFromSnooze: { reminder: Reminder; occurrence: ScheduledOccurrence }[] = [];
   for (const row of (expiredSnoozes || []) as { reminder_id: string; user_id: string; date: string; snoozed_until: string }[]) {
     const reminder = remindersById.get(row.reminder_id);
-    if (reminder) dueFromSnooze.push({ reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date) });
+    if (reminder?.active) dueFromSnooze.push({ reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date) });
   }
 
   const dueMap = new Map<string, { reminder: Reminder; occurrence: ScheduledOccurrence }>();
