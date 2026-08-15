@@ -21,6 +21,9 @@ export const EXPORT_TABLES = [
   ['schlaf_einstellungen', 'sleep_settings', 'user_id', ['user_id']],
   ['schlaf_plan', 'sleep_schedules', 'user_id', ['weekday']],
   ['schlaf_protokoll', 'sleep_logs', 'user_id', ['sleep_date']],
+  ['ernaehrungs_einstellungen', 'nutrition_settings', 'user_id', ['user_id']],
+  ['ernaehrungs_produkte', 'nutrition_products', 'user_id', ['id']],
+  ['kalorien_protokoll', 'nutrition_log_entries', 'user_id', ['log_date', 'created_at']],
 ];
 
 async function loadAllRows(table, userColumn, orderColumns, userId, signal, pageSize = EXPORT_PAGE_SIZE) {

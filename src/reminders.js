@@ -13,6 +13,7 @@ import {
 import {
   reminderNotificationTag, shouldReuseReminderLoop, shouldStartLocalReminderLoop,
 } from './notificationDelivery.js';
+import { mountNutrition } from './nutrition.js';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
@@ -621,15 +622,19 @@ export async function mountReminders(container, { session, signal }) {
         <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
       </div>
       <section class="mahl-intro">
-        <b>ERINNERUNGEN</b>
-        <span>Mahlzeiten, Supplements und Trinkintervalle einfach planen.</span>
+        <b>TAGESPLAN</b>
+        <span>Kalorien, Mahlzeiten, Supplements und Trinkintervalle an einem Ort.</span>
       </section>
+      <div data-nutrition-root></div>
       <section data-reminders-card>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
       </section>
     </div>`;
 
   const list = container.querySelector('[data-reminder-list]');
+  let nutritionActions = null;
+  const nutritionPromise = mountNutrition(container.querySelector('[data-nutrition-root]'), { userId, signal })
+    .then((actions) => { nutritionActions = actions; });
 
   let reminders = [];
   let completions = [];
@@ -878,14 +883,16 @@ export async function mountReminders(container, { session, signal }) {
     }
   });
 
+  await nutritionPromise;
   return {
     openAddMenu() {
       document.querySelector('.mahl-add-backdrop')?.remove();
       const backdrop = document.createElement('div');
       backdrop.className = 'kategorie-sheet-backdrop mahl-add-backdrop offen';
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
-        <header><h2>Zum Tagesplan</h2><button type="button" data-close aria-label="Schließen">×</button></header>
+        <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">×</button></header>
         <div class="sheet-menue">
+          <button type="button" data-add-type="nutrition">${iconMarkup('meal')}<span><b>Kalorien-Log</b><small>Lebensmittel und Mahlzeiten eintragen</small></span></button>
           <button type="button" data-add-type="meal">${iconMarkup('meal')}<span>Mahlzeit</span></button>
           <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
           <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>
@@ -896,6 +903,10 @@ export async function mountReminders(container, { session, signal }) {
         const type = event.target.closest('[data-add-type]')?.dataset.addType;
         if (!type) return;
         backdrop.remove();
+        if (type === 'nutrition') {
+          nutritionActions?.openAddMenu?.();
+          return;
+        }
         if (type === 'drink' && reminders.some((item) => item.type === 'drink')) {
           list.querySelector('[data-type="drink"] > summary')?.click();
           list.querySelector('[data-type="drink"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
