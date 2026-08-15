@@ -63,6 +63,24 @@ const colorGroups = [
     ['Hot Pink', '#FF06B7'],
     ['Periwinkle', '#8CA9FF'],
   ]],
+  ['Weitere Retro-Farben', [
+    ['Dusty Rose', '#D35D6E'],
+    ['Puderrosa', '#FFDADA'],
+    ['Eisweiß', '#F4F6FF'],
+    ['Rosé', '#F599C6'],
+    ['Pastellgrün', '#ACE1AF'],
+    ['Flieder', '#B983FF'],
+    ['Cornflower', '#94B3FD'],
+    ['Himmelblau', '#94DAFF'],
+    ['Cyan Pastell', '#99FEFF'],
+    ['Pastellgelb', '#FCFFA6'],
+    ['Stahlblau', '#316B83'],
+    ['Vintage Petrol', '#79B4B7'],
+    ['Tiefgrün', '#064420'],
+    ['Braunrosa', '#865858'],
+    ['Schwarz', '#000000'],
+    ['Ultra Violet', '#6F00FF'],
+  ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
 export const dexEditorColors = [...new Set(retroColors.map(([, color]) => color))];
