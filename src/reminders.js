@@ -560,7 +560,7 @@ function reminderGroups(reminders, completions) {
     return `<section class="mahl-zeitblock">
       <header class="mahl-slot-kopf">
         <div class="mahl-slot-titel">${reminderIconMarkup(fallbackIcon)}<h2>${title}</h2></div>
-        ${slotReminder ? `<label class="mahl-slot-zeit"><span>Uhrzeit für ${title}</span><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
+        ${slotReminder ? `<label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
       </header>
       <div class="mahl-timeline"><div data-period-reminders>${rows.length
         ? rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')

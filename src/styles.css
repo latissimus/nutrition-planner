@@ -4997,8 +4997,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-zeitblock>header h2{font:900 12.5px/1 var(--ui);letter-spacing:.055em}
 .mahl-slot-titel>.reminder-svg{flex-basis:34px;width:34px;height:34px;border-radius:9px}
 .mahl-slot-titel>.reminder-svg svg{width:20px;height:20px}
-.mahl-slot-zeit{display:grid;flex:0 0 auto;justify-items:end;gap:3px;min-height:44px}
-.mahl-slot-zeit>span{display:block;color:var(--ink);font:800 10.5px/1.05 var(--ui);white-space:nowrap}
+.mahl-slot-zeit{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;min-height:44px}
 .mahl-slot-zeit input{width:64px;height:24px!important;min-height:24px!important;padding:0;border:0;border-radius:0;background:transparent;color:var(--muted);font:850 10.5px/24px var(--ui);letter-spacing:.02em;box-shadow:none;text-align:right}
 .mahl-slot-zeit input::-webkit-date-and-time-value{height:24px!important;line-height:24px!important;font-weight:850;text-align:right}
 .nutrition-period-inline{border-top:1px solid var(--app-divider);background:color-mix(in srgb,var(--ordner) 4%,var(--surface))}
