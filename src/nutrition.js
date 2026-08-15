@@ -149,9 +149,9 @@ function summaryMarkup(state, date) {
     <div class="nutrition-stripe"></div>
     ${trackingToggleMarkup(true)}
     <header class="nutrition-day-nav">
-      <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag" class="nutrition-day-nav-prev">${materialIconMarkup('chevron_right')}</button>
+      <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag" class="nutrition-day-nav-prev"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg></button>
       <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
-      <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right')}</button>
+      <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button>
     </header>
     <div class="nutrition-balance">
       <div><small>${target ? (over ? 'ÜBER ZIEL' : 'NOCH OFFEN') : 'HEUTE'}</small><strong>${target ? decimal(over || remaining) : decimal(kcal)} <i>kcal</i></strong></div>

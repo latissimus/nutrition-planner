@@ -57,6 +57,14 @@ function json(body: Record<string, unknown>, status = 200) {
 function notificationSymbol(reminder: Reminder) {
   const icon = String(reminder.metadata?.icon || '');
   if (icon.startsWith('emoji:')) return icon.replace(/^(emoji:)+/, '');
+  if (reminder.type === 'meal') {
+    const slot = String(reminder.metadata?.meal_slot || '').toLowerCase();
+    const label = String(reminder.label || '').toLowerCase();
+    if (slot === 'breakfast' || label.includes('frühstück')) return '🍳';
+    if (slot === 'lunch' || label.includes('mittag')) return '🍖';
+    if (slot === 'dinner' || label.includes('abend')) return '🥩';
+    if (slot.includes('snack') || label.includes('snack')) return '🌰';
+  }
   if (icon === 'fastfood' || reminder.type === 'meal') return '🍔';
   if (icon === 'pill' || reminder.type === 'supplement') return '💊';
   if (icon === 'water_drop' || reminder.type === 'drink') return '💧';
@@ -68,7 +76,7 @@ function unitLabel(value: string) {
   return ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' } as Record<string, string>)[value] || value;
 }
 
-function notification(reminder?: Reminder) {
+function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   if (!reminder) {
     return {
       title: 'Test erfolgreich',
@@ -87,8 +95,9 @@ function notification(reminder?: Reminder) {
   };
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
+    const hasSupplements = reminders.some((item) => item.type === 'supplement');
     return {
-      title: `${notificationSymbol(reminder)} ${reminder.label}`,
+      title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & Supps 💊' : ''}`,
       body: note || bodies.meal,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#reminders',
@@ -277,7 +286,7 @@ async function dispatchDue() {
       if (claimError) throw claimError;
 
       try {
-        await send(subscription, notification(reminder));
+        await send(subscription, notification(reminder, reminders as Reminder[]));
         sent += 1;
         await admin
           .from('push_deliveries')

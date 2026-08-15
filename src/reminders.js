@@ -72,6 +72,13 @@ function reminderIconValue(reminder) {
 function notificationSymbol(reminder) {
   const value = reminderIconValue(reminder);
   if (value.startsWith('emoji:')) return value.replace(/^(emoji:)+/, '');
+  if (reminder.type === 'meal') {
+    const slot = mealSlotForReminder(reminder);
+    if (slot === 'breakfast') return '🍳';
+    if (slot === 'lunch') return '🍖';
+    if (slot === 'dinner') return '🥩';
+    if (slot === 'snack_morning' || slot === 'snack_afternoon') return '🌰';
+  }
   return ({ fastfood: '🍔', pill: '💊', water_drop: '💧', bedtime: '🌙' })[value] || '◆';
 }
 
@@ -121,10 +128,11 @@ function hinweisLabel(value) {
   return paar && paar[0] ? paar[1] : '';
 }
 
-function notificationText(reminder) {
+function notificationText(reminder, reminders = []) {
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
+    const hasSupplements = reminders.some((item) => item.type === 'supplement' && item.active);
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & Supps 💊' : ''}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
   }
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();
@@ -262,12 +270,12 @@ async function ensureDefaults(userId, signal) {
   return [...current, ...(data ?? [])];
 }
 
-async function maybeNotify(reminder, slot, now, userId) {
+async function maybeNotify(reminder, slot, now, userId, reminders = []) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   const key = `nutrition-reminder:${userId}:${reminder.id}:${dateKey(now)}:${slot}`;
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
-  const text = notificationText(reminder);
+  const text = notificationText(reminder, reminders);
   const worker = await navigator.serviceWorker?.ready;
   if (!worker) return;
   await worker.showNotification(text.title, {
@@ -293,7 +301,7 @@ async function tickReminders(userId) {
   const currentMinute = minuteKey(now);
   reminders.filter((reminder) => reminder.active && (reminder.weekdays || WEEKDAYS).includes(today)).forEach((reminder) => {
     const slot = reminder.type === 'drink' ? nextDrinkSlot(reminder, now) : reminder.time?.slice(0, 5);
-    if (slot === currentMinute) maybeNotify(reminder, slot, now, userId);
+    if (slot === currentMinute) maybeNotify(reminder, slot, now, userId, reminders);
   });
 }
 
@@ -453,12 +461,6 @@ function reminderBodyMarkup(reminder, completion) {
       <label class="rem-field"><span>Name</span>
         <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
       </label>
-      <label class="rem-field"><span>Uhrzeit</span>
-        <div class="rem-time-mit-switch">
-          <input class="input" data-time type="time" value="${zeit}">
-          <label class="mahl-mini-switch" aria-label="Benachrichtigung"><input type="checkbox" data-active${reminder.active ? ' checked' : ''}><i class="mahl-mini-switch-track" aria-hidden="true"></i></label>
-        </div>
-      </label>
       <div class="rem-field-reihe">
         <label class="rem-field"><span>Dosis</span>
           <input class="input" data-dosis type="number" inputmode="decimal" min="0" step="any" placeholder="z. B. 5000" value="${escapeHtml(reminder.metadata?.dosis || '')}">
@@ -565,7 +567,7 @@ function reminderGroups(reminders, completions) {
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     return `<section class="mahl-zeitblock">
       <header class="mahl-slot-kopf">
-        <div class="mahl-slot-titel">${title === 'SNACK' ? '' : reminderIconMarkup(fallbackIcon)}<h2>${title}</h2>${slotReminder ? `<button type="button" class="mahl-slot-info${(slotReminder.metadata?.notiz || '').trim() ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Info zu ${title}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>` : ''}</div>
+        <div class="mahl-slot-titel"><h2>${title}</h2>${slotReminder ? `<button type="button" class="mahl-slot-info${(slotReminder.metadata?.notiz || '').trim() ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Info zu ${title}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>` : ''}</div>
         ${slotReminder ? `<div class="mahl-slot-rechts">
           <label class="mahl-mini-switch" aria-label="${title} aktivieren">
             <input type="checkbox" data-slot-active data-slot-key="${slotReminder._key || slotReminder.id}"${slotReminder.active ? ' checked' : ''}>
@@ -837,7 +839,7 @@ export async function mountReminders(container, { session, signal }) {
       id: null, _key: `new:${crypto.randomUUID()}`, type,
       label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
       time: type === 'drink' ? '09:00' : (times[period] || '08:00'),
-      weekdays: WEEKDAYS, active: false,
+      weekdays: WEEKDAYS, active: type === 'supplement',
       metadata: { icon: type === 'supplement' ? 'pill' : type === 'drink' ? 'water_drop' : 'fastfood' }, route: '#reminders',
     };
     reminders.push(neu);
