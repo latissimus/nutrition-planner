@@ -197,7 +197,7 @@ function periodEntriesMarkup(entries, period) {
         <strong>${decimal(item.energy_kcal)} kcal</strong><span class="rem-row-chevron" aria-hidden="true">⌄</span>
       </summary>
       <div class="rem-row-body nutrition-entry-body">
-        <label class="rem-field"><span>Gegessene Menge</span><select class="input nutrition-gram-picker" data-nutrition-inline-amount>${gramOptions(item.amount)}</select></label>
+        <label class="rem-field"><span>Gegessene Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(number(item.amount) || 100)))}" data-nutrition-inline-amount><i>g</i></span></label>
         <button class="btn btn-primary btn-block" type="button" data-nutrition-inline-save>Änderungen speichern</button>
         <button type="button" class="rem-row-loeschen" data-nutrition-delete>Eintrag löschen</button>
       </div>
@@ -220,12 +220,6 @@ function periodSelect(selected = 'breakfast') {
   return `<label class="nutrition-form-field"><span>Tageszeit</span><select class="input" data-log-period>${PERIODS.map(([key, label]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${label}</option>`).join('')}</select></label>`;
 }
 
-function gramOptions(selected = 100) {
-  const current = Math.min(1000, Math.max(1, Math.round(number(selected) || 100)));
-  return Array.from({ length: 1000 }, (_, index) => index + 1)
-    .map((grams) => `<option value="${grams}"${grams === current ? ' selected' : ''}>${grams} g</option>`).join('');
-}
-
 function manualEditor({ date, onSave, ownProducts = [] }) {
   const backdrop = createOverlay(`<header><h2>Eigene Mahlzeit</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     ${ownProducts.length ? `<section class="nutrition-own-products"><h3>GESPEICHERTE MAHLZEITEN</h3><div>${ownProducts.map((product, index) => `<button type="button" data-own-product="${index}"><span><b>${escapeHtml(product.name)}</b><small>${decimal(product.kcal_100g)} kcal · ${decimal(product.protein_100g, 1)} P · ${decimal(product.carbs_100g, 1)} K · ${decimal(product.fat_100g, 1)} F</small></span>${materialIconMarkup('chevron_right')}</button>`).join('')}</div></section>` : ''}
@@ -239,7 +233,7 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
         <label><span>Fett</span><input class="input" data-manual-fat type="text" inputmode="decimal" placeholder="0"></label>
         <label><span>Protein</span><input class="input" data-manual-protein type="text" inputmode="decimal" placeholder="0"></label>
       </div>
-      <label class="nutrition-form-field"><span>Gegessene Menge</span><select class="input nutrition-gram-picker" data-manual-amount>${gramOptions(100)}</select></label>
+      <label class="nutrition-form-field"><span>Gegessene Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="100" data-manual-amount><i>g</i></span></label>
       <div class="nutrition-product-result" data-manual-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Eintrag speichern</button>
     </form>`);
@@ -292,7 +286,7 @@ function amountEditor({ product, date, onSave, entry = null }) {
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon" data-product-slot-icon>${materialIconMarkup(PERIOD_ICONS[selectedPeriod])}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
     <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'base_food' ? 'Durchschnittlicher Basiswert' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
-      <label class="nutrition-form-field"><span>Menge</span><select class="input nutrition-gram-picker" data-product-amount>${gramOptions(serving)}</select></label>
+      <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
       <div class="nutrition-product-result" data-product-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
     </form>`);
@@ -523,6 +517,7 @@ export async function mountNutrition(container, { userId, signal }) {
           const entry = state.entries.find((item) => item.id === card?.dataset.nutritionEntry);
           if (!entry) return;
           const grams = number(card.querySelector('[data-nutrition-inline-amount]')?.value);
+          if (grams < 1 || grams > 1000) return toast('Bitte eine Menge zwischen 1 und 1000 g eintragen');
           const previous = Math.max(1, number(entry.amount));
           button.disabled = true;
           const saved = await saveEntry({

@@ -4984,7 +4984,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-zeitblock .nutrition-entry>.nutrition-entry-head{grid-template-columns:24px minmax(0,1fr) auto 22px;min-height:68px;padding:12px 16px;column-gap:11px}
 .mahl-zeitblock .nutrition-entry>.nutrition-entry-head>strong{font-size:12px;white-space:nowrap}
 .nutrition-entry-body{display:grid;gap:12px;padding:14px 16px 17px!important;border-top:1px solid var(--app-divider)}
-.nutrition-entry-body .rem-field{display:grid;gap:7px}.nutrition-entry-body .rem-field>span{font-size:11px;font-weight:800;text-transform:uppercase}
+.nutrition-entry-body .rem-field{display:grid;gap:7px}.nutrition-entry-body .rem-field>span:first-child{font-size:11px;font-weight:800;text-transform:uppercase}
 
 /* Hinzufügen-Menü: die drei Wege stehen sichtbar unter Mahlzeit eintragen. */
 .mahl-add-gruppe{display:grid;gap:9px}.mahl-add-gruppe>h3{display:flex;align-items:center;gap:10px;margin:0;padding:2px 4px 0;font:850 15px/1.1 var(--ui)}
@@ -4993,17 +4993,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-add-zwischenkopf{margin:18px 4px 7px;font:850 12px/1 var(--ui);letter-spacing:.07em;text-transform:uppercase}
 
 /* Noch kompaktere Zeitköpfe und flachere Ernährungszeilen. */
-.mahl-zeitblock>header{min-height:48px;padding:7px 13px}
+.mahl-zeitblock>header{min-height:58px;padding:8px 13px}
 .mahl-zeitblock>header h2{font:900 12.5px/1 var(--ui);letter-spacing:.055em}
 .mahl-slot-titel>.reminder-svg{flex-basis:34px;width:34px;height:34px;border-radius:9px}
 .mahl-slot-titel>.reminder-svg svg{width:20px;height:20px}
-.mahl-slot-zeit{flex-basis:74px}
-.mahl-slot-zeit input{width:74px;height:32px!important;min-height:32px!important;padding:0 4px;border:0;border-radius:9px;background:color-mix(in srgb,var(--ordner) 30%,var(--surface));font:900 12px/32px var(--ui);letter-spacing:.015em;box-shadow:none}
-.mahl-slot-zeit input::-webkit-date-and-time-value{height:32px!important;line-height:32px!important;font-weight:900}
+.mahl-slot-zeit{display:grid;flex:0 0 auto;justify-items:end;gap:3px;min-height:44px}
+.mahl-slot-zeit>span{display:block;color:var(--ink);font:800 10.5px/1.05 var(--ui);white-space:nowrap}
+.mahl-slot-zeit input{width:64px;height:24px!important;min-height:24px!important;padding:0;border:0;border-radius:0;background:transparent;color:var(--muted);font:850 10.5px/24px var(--ui);letter-spacing:.02em;box-shadow:none;text-align:right}
+.mahl-slot-zeit input::-webkit-date-and-time-value{height:24px!important;line-height:24px!important;font-weight:850;text-align:right}
 .nutrition-period-inline{border-top:1px solid var(--app-divider);background:color-mix(in srgb,var(--ordner) 4%,var(--surface))}
 .nutrition-period-inline>header{display:none}
-.mahl-zeitblock .nutrition-entry>.nutrition-entry-head{min-height:56px;padding:8px 14px}
+.mahl-zeitblock .nutrition-entry>.nutrition-entry-head{min-height:64px;padding:10px 14px}
 .mahl-zeitblock .nutrition-entry .rem-row-titel>b{font-size:13px;line-height:1.15}
 .mahl-zeitblock .nutrition-entry .rem-row-titel>small{margin-top:3px;color:var(--ink);font-size:10.5px;font-weight:780;line-height:1.2}
 .mahl-zeitblock .nutrition-entry>.nutrition-entry-head>strong{font-size:11.5px;font-weight:850}
-.nutrition-gram-picker{-webkit-appearance:auto;appearance:auto}
+.nutrition-gram-input{position:relative;display:block;min-width:0}.nutrition-gram-input .nutrition-gram-picker{box-sizing:border-box;width:100%;height:52px;padding-right:42px!important;text-align:center;font-size:17px;font-weight:800;-webkit-appearance:none;appearance:none}.nutrition-gram-input>i{position:absolute;top:0;right:14px;display:grid;place-items:center;height:52px;color:var(--muted);font:800 12px/1 var(--ui);pointer-events:none}
