@@ -453,6 +453,21 @@ function reminderBodyMarkup(reminder, completion) {
       <label class="rem-field"><span>Name</span>
         <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
       </label>
+      <div class="rem-field-reihe">
+        <label class="rem-field"><span>Dosis</span>
+          <input class="input" data-dosis type="number" inputmode="decimal" min="0" step="any" placeholder="z. B. 5000" value="${escapeHtml(reminder.metadata?.dosis || '')}">
+        </label>
+        <label class="rem-field"><span>Einheit</span>
+          <select class="input" data-einheit>
+            ${EINHEITEN.map((einheit) => `<option value="${escapeHtml(einheit)}"${(reminder.metadata?.einheit || '') === einheit ? ' selected' : ''}>${einheit ? einheitLabel(einheit) : '—'}</option>`).join('')}
+          </select>
+        </label>
+      </div>
+      <label class="rem-field"><span>Einnahmehinweis</span>
+        <select class="input" data-hinweis>
+          ${HINWEISE.map(([wert, name]) => `<option value="${escapeHtml(wert)}"${(reminder.metadata?.hinweis || '') === wert ? ' selected' : ''}>${name}</option>`).join('')}
+        </select>
+      </label>
       <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
       ${reminder.id ? '<button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>' : ''}
     </div>`;
@@ -746,7 +761,12 @@ export async function mountReminders(container, { session, signal }) {
         intervall_minuten: Number(body.querySelector('[data-interval]')?.value || 120),
       };
     } else if (row.dataset.type === 'supplement') {
-      patch.metadata = { icon: 'pill' };
+      patch.metadata = {
+        icon: 'pill',
+        dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
+        einheit: body.querySelector('[data-einheit]')?.value || '',
+        hinweis: body.querySelector('[data-hinweis]')?.value || '',
+      };
     } else {
       patch.metadata = {
         icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'meal', metadata: {} }),
