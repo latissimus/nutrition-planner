@@ -250,7 +250,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
     button.disabled = true;
     const { error } = await supabase.from('dex_entries').update({ favorite }).eq('id', entry.id).eq('user_id', userId);
     if (error) { toast(error.message || 'Favorit konnte nicht geändert werden.'); button.disabled = false; return; }
-    playInterfaceSound(favorite ? 'level-up' : 'hover', { retrigger: 'restart' });
+    playInterfaceSound(favorite ? 'level-up' : 'error', { retrigger: 'restart' });
     toast(favorite ? 'Zu Favoriten hinzugefügt' : 'Aus Favoriten entfernt');
     await mountDexEntryDetail(container, { userId, id, signal });
   };

@@ -80,6 +80,8 @@ function cueForControl(control) {
   if (control.matches('.kategorie-schliessen')
     || (control.matches('a[href]') && /schließen|zurück|übersicht/.test(description))) return 'back';
   if (/schließen/.test(description)) return 'back';
+  if (control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete,[data-entry-delete],[data-reward-delete]')
+    || /\blöschen\b/.test(description)) return 'error';
   if (control.matches('.tuck-ablage-knopf')) return 'forward';
   if (control.matches('.dex-inhaltskarte-oeffnen,.dex-ordner-test a,a[href^="#"]')) return 'forward';
   return 'hover';
