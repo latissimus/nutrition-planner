@@ -4,10 +4,11 @@ import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
 import { setRoutineCompletion } from './routineCompletion.js';
 import { subscribeToTableChanges } from './realtime.js';
 import { toast } from './toast.js';
+import { playInterfaceSound } from './uiSounds.js';
 
 const DAYS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
-const TAGS = ['Meditation', 'Spätes Koffein', 'Spät gegessen', 'Alkohol', 'Spätes Training', 'Bildschirm', 'Stress', 'Abendroutine'];
+const TAGS = ['Meditation', 'Buch lesen', 'Spätes Koffein', 'Spät gegessen', 'Alkohol', 'Spätes Training', 'Bildschirm', 'Stress', 'Abendroutine'];
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -127,13 +128,12 @@ function planEditor({ userId, state, onSaved }) {
       <div class="sleep-plan-grid"><span>Tag</span><span>Schlafen</span><span>Aufstehen</span><span>Aktiv</span>
         ${DAY_ORDER.map((weekday) => { const item = byDay.get(weekday) || defaultSchedule(userId, weekday); return `<b>${DAYS[weekday].slice(0, 2)}</b><input class="input" type="time" data-bedtime="${weekday}" value="${String(item.bedtime).slice(0, 5)}"><input class="input" type="time" data-wake="${weekday}" value="${String(item.wake_time).slice(0, 5)}"><label class="sleep-mini-switch"><input type="checkbox" data-day-active="${weekday}"${item.active ? ' checked' : ''}><span></span></label>`; }).join('')}
       </div>
-      <label class="dex-entry-field"><span>Runterfahren vorher</span><select class="input" data-wind-down>${[15, 30, 45, 60, 90].map((value) => `<option value="${value}"${state.settings.wind_down_minutes === value ? ' selected' : ''}>${value} Minuten</option>`).join('')}</select></label>
+      <label class="dex-entry-field"><span>Runterfahren vorher <small>Ab diesem Zeitpunkt keine Bildschirmzeit mehr</small></span><select class="input" data-wind-down>${[15, 30, 45, 60, 90].map((value) => `<option value="${value}"${state.settings.wind_down_minutes === value ? ' selected' : ''}>${value} Minuten</option>`).join('')}</select></label>
       <div class="sleep-reminder-switches">
         <label class="sleep-setting-switch"><span>Runterfahren erinnern</span><input type="checkbox" data-wind-reminder${state.settings.wind_down_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
         <label class="sleep-setting-switch"><span>Schlafenszeit erinnern</span><input type="checkbox" data-bed-reminder${state.settings.bedtime_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
         <label class="sleep-setting-switch"><span>Morgen-Check-in erinnern</span><input type="checkbox" data-morning-reminder${state.settings.morning_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
       </div>
-      <p class="sleep-editor-note">Push wird über die Benachrichtigungseinstellung im MAHLZEITEN-DEX aktiviert.</p>
       <button class="btn btn-primary btn-block" type="submit">Schlafplan speichern</button>
     </form>
   </section>`;
@@ -185,9 +185,9 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
       ${ratingField('quality', 'Schlafqualität', existing?.quality, ['😫', '😕', '😐', '🙂', '🤩'])}
       ${ratingField('energy', 'Energie am Morgen', existing?.energy, ['🪫', '🥱', '😐', '⚡', '🚀'])}
       <label class="dex-entry-field"><span>Wachphasen</span><input class="input" type="number" inputmode="numeric" min="0" max="30" data-awakenings value="${existing?.awakenings ?? 0}"></label>
-      <fieldset class="sleep-tags"><legend>Einflüsse</legend><div>${TAGS.map((tag) => `<label><input type="checkbox" value="${tag}"${selectedTags.has(tag) ? ' checked' : ''}><span>${tag}</span></label>`).join('')}</div><input class="input" data-custom-tags value="${escapeHtml(customTags.join(', '))}" placeholder="Eigene Tags, durch Komma getrennt"></fieldset>
+      <fieldset class="sleep-tags"><legend>Einflüsse am Vortag</legend><div>${TAGS.map((tag) => `<label><input type="checkbox" value="${tag}"${selectedTags.has(tag) ? ' checked' : ''}><span>${tag}</span></label>`).join('')}</div><input class="input" data-custom-tags value="${escapeHtml(customTags.join(', '))}" placeholder="Eigene Tags, durch Komma getrennt"></fieldset>
       <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" rows="3" maxlength="1000" data-sleep-note placeholder="Was war anders als sonst?">${escapeHtml(existing?.note || '')}</textarea></label>
-      <button class="btn btn-primary btn-block" type="submit">Check-in speichern</button>
+      <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Check-in speichern</button>
       ${existing ? '<button class="btn btn-block sleep-delete" type="button" data-sleep-delete>Eintrag löschen</button>' : ''}
     </form>
   </section>`;
@@ -211,6 +211,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
     const result = await supabase.from('sleep_logs').upsert(payload, { onConflict: 'user_id,sleep_date' }).select().single();
     if (result.error) { toast('Check-in konnte nicht gespeichert werden.'); submit.disabled = false; return; }
     closeOverlay(backdrop); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
+    playInterfaceSound('bonus', { retrigger: 'restart' });
   };
   backdrop.querySelector('[data-sleep-delete]')?.addEventListener('click', async () => {
     if (!confirm('Diesen Schlaf-Eintrag wirklich löschen?')) return;

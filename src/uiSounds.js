@@ -54,6 +54,15 @@ function isSwitch(control) {
   return Boolean(control.closest('.switchline,.rem-switch,.sleep-mini-switch,.sleep-setting-switch,.mess-zeile'));
 }
 
+function controlDescription(control) {
+  return `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
+}
+
+function isDeleteControl(control) {
+  return control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete,[data-entry-delete],[data-reward-delete]')
+    || /\blöschen\b/.test(controlDescription(control));
+}
+
 function isTextEntry(control) {
   if (control.matches('textarea,[contenteditable="true"]')) return true;
   if (!control.matches('input')) return false;
@@ -69,7 +78,7 @@ function cueForControl(control) {
     return 'hover';
   }
   if (control.matches('input[type="radio"],select')) return 'hover';
-  const description = `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
+  const description = controlDescription(control);
   if (control.matches('[data-sleep-routine-check]')) return 'hover';
   // Der COIN-DEX ist die Belohnungszentrale und erhält deshalb den eigenen
   // Arcade-Achievement-Cue statt des gewöhnlichen Navigationsklangs.
@@ -80,8 +89,10 @@ function cueForControl(control) {
   if (control.matches('.kategorie-schliessen')
     || (control.matches('a[href]') && /schließen|zurück|übersicht/.test(description))) return 'back';
   if (/schließen/.test(description)) return 'back';
-  if (control.matches('.btn-danger,.sheet-gefahr,.dex-entry-delete,.routine-delete,.coin-reward-delete,[data-entry-delete],[data-reward-delete]')
-    || /\blöschen\b/.test(description)) return 'error';
+  // Destruktive Aktionen erklingen bereits beim Pointerdown. Das ist vor allem
+  // auf iOS wichtig, weil window.confirm() die Audiowiedergabe beim Click sonst
+  // blockiert, bis der native Dialog wieder geschlossen wurde.
+  if (isDeleteControl(control)) return null;
   if (control.matches('.tuck-ablage-knopf')) return 'forward';
   if (control.matches('.dex-inhaltskarte-oeffnen,.dex-ordner-test a,a[href^="#"]')) return 'forward';
   return 'hover';
@@ -95,6 +106,11 @@ export function initInterfaceSounds(root = document) {
     player('routine')?.unlock().catch(() => false);
   };
   root.addEventListener('pointerdown', unlock, { capture: true, passive: true, once: true });
+  root.addEventListener('pointerdown', (event) => {
+    const control = event.target.closest?.('button,a[href]');
+    if (!control || control.disabled || control.matches('[data-no-interface-sound]')) return;
+    if (isDeleteControl(control)) playInterfaceSound('error', { retrigger: 'restart' });
+  }, { capture: true, passive: true });
   root.addEventListener('input', (event) => {
     const field = event.target;
     if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {
