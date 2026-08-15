@@ -3,6 +3,7 @@ import { toast } from './toast.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { subscribeToTableChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
+import { bindLongPress } from './longPress.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
@@ -210,6 +211,15 @@ function periodSelect(selected = 'breakfast') {
   return `<label class="nutrition-form-field"><span>Tageszeit</span><select class="input" data-log-period>${PERIODS.map(([key, label]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${label}</option>`).join('')}</select></label>`;
 }
 
+function gramOptions(selected = 100) {
+  const current = Math.max(1, Math.round(number(selected) || 100));
+  const values = new Set([current]);
+  for (let grams = 5; grams <= 500; grams += 5) values.add(grams);
+  for (let grams = 525; grams <= 1000; grams += 25) values.add(grams);
+  return [...values].sort((a, b) => a - b)
+    .map((grams) => `<option value="${grams}"${grams === current ? ' selected' : ''}>${grams} g</option>`).join('');
+}
+
 function manualEditor({ date, onSave, ownProducts = [] }) {
   const backdrop = createOverlay(`<header><h2>Eigene Mahlzeit</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     ${ownProducts.length ? `<section class="nutrition-own-products"><h3>GESPEICHERTE MAHLZEITEN</h3><div>${ownProducts.map((product, index) => `<button type="button" data-own-product="${index}"><span><b>${escapeHtml(product.name)}</b><small>${decimal(product.kcal_100g)} kcal · ${decimal(product.protein_100g, 1)} P · ${decimal(product.carbs_100g, 1)} K · ${decimal(product.fat_100g, 1)} F</small></span>${materialIconMarkup('chevron_right')}</button>`).join('')}</div></section>` : ''}
@@ -223,7 +233,7 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
         <label><span>Fett</span><input class="input" data-manual-fat type="text" inputmode="decimal" placeholder="0"></label>
         <label><span>Protein</span><input class="input" data-manual-protein type="text" inputmode="decimal" placeholder="0"></label>
       </div>
-      <label class="nutrition-form-field"><span>Gegessene Menge</span><span class="nutrition-unit-field"><input class="input" data-manual-amount type="text" inputmode="decimal" value="100" required><i>g</i></span></label>
+      <label class="nutrition-form-field"><span>Gegessene Menge</span><select class="input nutrition-gram-picker" data-manual-amount>${gramOptions(100)}</select></label>
       <div class="nutrition-product-result" data-manual-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Eintrag speichern</button>
     </form>`);
@@ -269,15 +279,16 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
   };
 }
 
-function amountEditor({ product, date, onSave }) {
-  const serving = number(product.serving_g) || 100;
+function amountEditor({ product, date, onSave, entry = null }) {
+  const serving = number(entry?.amount) || number(product.serving_g) || 100;
+  const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : materialIconMarkup('fastfood')}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
     <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'base_food' ? 'Durchschnittlicher Basiswert' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
-    <form class="nutrition-form" data-product-amount-form>${periodSelect()}
-      <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-unit-field"><input class="input" data-product-amount type="text" inputmode="decimal" value="${decimal(serving, 1)}" required><i>g</i></span></label>
+    <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
+      <label class="nutrition-form-field"><span>Menge</span><select class="input nutrition-gram-picker" data-product-amount>${gramOptions(serving)}</select></label>
       <div class="nutrition-product-result" data-product-result></div>
-      <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Eintrag speichern</button>
+      <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
     </form>`);
   const amount = backdrop.querySelector('[data-product-amount]');
   const result = backdrop.querySelector('[data-product-result]');
@@ -294,6 +305,8 @@ function amountEditor({ product, date, onSave }) {
     event.preventDefault(); const button = event.submitter; button.disabled = true;
     const grams = number(amount.value); if (!grams) { button.disabled = false; return; }
     const saved = await onSave({
+      id: entry?.id,
+      product_id: entry?.product_id,
       log_date: date, period: backdrop.querySelector('[data-log-period]').value,
       name: product.name, amount: grams, unit: 'g', ...values(), product,
     });
@@ -381,7 +394,8 @@ async function barcodeResult(barcode, { date, onSave }, closeCurrent) {
 
 function scannerEditor(context) {
   const backdrop = createOverlay(`<header><h2>Barcode scannen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="nutrition-scanner"><video playsinline muted></video><span></span><button type="button" data-scanner-torch hidden aria-pressed="false" aria-label="Taschenlampe einschalten">${materialIconMarkup('brightness_empty')}</button></div>
+    <div class="nutrition-scanner"><video playsinline muted></video><span></span></div>
+    <div class="nutrition-scanner-tools"><button type="button" data-scanner-torch hidden aria-pressed="false" aria-label="Kameralicht einschalten">${materialIconMarkup('light_mode')}<span>Kameralicht</span></button></div>
     <p class="nutrition-scanner-status" data-scanner-status>Kamera wird gestartet …</p>
     <p class="nutrition-calc-note nutrition-scanner-help">Barcode in den Rahmen halten. Die Kamera wird nur für die Erkennung verwendet.</p>
     <form class="nutrition-barcode-manual"><input class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Barcode manuell eingeben"><button class="btn btn-primary" type="submit">Suchen</button></form>`);
@@ -419,7 +433,7 @@ function scannerEditor(context) {
         try {
           await BrowserMultiFormatReader.mediaStreamSetTorch(track, enabled);
           torch.setAttribute('aria-pressed', String(enabled));
-          torch.setAttribute('aria-label', enabled ? 'Taschenlampe ausschalten' : 'Taschenlampe einschalten');
+          torch.setAttribute('aria-label', enabled ? 'Kameralicht ausschalten' : 'Kameralicht einschalten');
         } catch { toast('Die Taschenlampe konnte nicht geschaltet werden.'); }
       };
     }
