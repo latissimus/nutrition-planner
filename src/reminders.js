@@ -821,10 +821,14 @@ export async function mountReminders(container, { session, signal }) {
     rerender();
     const details = list.querySelector(`[data-reminder-key="${neu._key}"]`);
     if (details) {
-      details.open = true;
       details.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const input = details.querySelector('[data-label]');
-      input?.focus(); input?.select();
+      if (type === 'drink') {
+        details.open = true;
+        const input = details.querySelector('[data-label]');
+        input?.focus(); input?.select();
+      } else {
+        openReminderSheet(neu);
+      }
     }
     toast('Erinnerung angelegt');
   };
