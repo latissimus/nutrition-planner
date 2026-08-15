@@ -479,6 +479,20 @@ export async function mountNutrition(container, { userId, signal }) {
     if (error) return toast('Eintrag konnte nicht gelöscht werden');
     await refresh();
   };
+  const editEntry = (entry) => {
+    const snapshot = entry?.product_snapshot || {};
+    const amount = Math.max(1, number(entry?.amount));
+    const product = {
+      ...snapshot,
+      name: snapshot.name || entry.name,
+      serving_g: number(snapshot.serving_g) || 100,
+      kcal_100g: number(snapshot.kcal_100g) || number(entry.energy_kcal) / amount * 100,
+      protein_100g: number(snapshot.protein_100g) || number(entry.protein_g) / amount * 100,
+      carbs_100g: number(snapshot.carbs_100g) || number(entry.carbs_g) / amount * 100,
+      fat_100g: number(snapshot.fat_100g) || number(entry.fat_g) / amount * 100,
+    };
+    amountEditor({ product, date, onSave: saveEntry, entry });
+  };
   const renderIntegrated = () => {
     const root = container.closest('.wrap') || container.parentElement;
     const enabled = nutritionEnabled(state);
@@ -533,9 +547,14 @@ export async function mountNutrition(container, { userId, signal }) {
         carbs_g: payload.carbs_g || 0, fat_g: payload.fat_g || 0,
         product_snapshot: payload.product || payload.product_snapshot || {},
       };
-      const { error } = await supabase.from('nutrition_log_entries').insert(row);
+      const request = payload.id
+        ? supabase.from('nutrition_log_entries').update(row).eq('id', payload.id).eq('user_id', userId)
+        : supabase.from('nutrition_log_entries').insert(row);
+      const { error } = await request;
       if (error) throw error;
-      playInterfaceSound('bonus', { retrigger: 'restart' }); toast('Kalorien eingetragen'); await refresh(); return true;
+      playInterfaceSound('bonus', { retrigger: 'restart' });
+      toast(payload.id ? 'Mahlzeit aktualisiert' : 'Kalorien eingetragen');
+      await refresh(); return true;
     } catch (error) { toast(error.message || 'Eintrag konnte nicht gespeichert werden'); return false; }
   };
   function bind() {
@@ -606,6 +625,10 @@ export async function mountNutrition(container, { userId, signal }) {
   catch (error) { container.innerHTML = `<section class="nutrition-card"><p class="nutrition-empty">Kalorien-Log konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section>`; }
   subscribeToTableChanges({ table: 'nutrition_log_entries', signal, onChange: refresh });
   subscribeToTableChanges({ table: 'nutrition_settings', signal, onChange: refresh });
+  bindLongPress(container.closest('.wrap') || container.parentElement, '[data-nutrition-entry]', (element) => {
+    const entry = state.entries.find((item) => item.id === element.dataset.nutritionEntry);
+    return entry ? () => editEntry(entry) : null;
+  });
   const dayWatcher = setInterval(() => {
     const today = localDateKey();
     if (!automaticToday || date === today || signal?.aborted) return;

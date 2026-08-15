@@ -24,11 +24,11 @@ let reminderStartPromise = null;
 let reminderLoopGeneration = 0;
 
 const DEFAULT_REMINDERS = [
-  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'breakfast' } },
-  { type: 'meal', label: 'Snack vormittags', time: '10:30', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'snack_morning' } },
-  { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'lunch' } },
-  { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'snack_afternoon' } },
-  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'dinner' } },
+  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'breakfast_dining', meal_slot: 'breakfast' } },
+  { type: 'meal', label: 'Snack vormittags', time: '10:30', route: '#reminders', metadata: { icon: 'cookie', meal_slot: 'snack_morning' } },
+  { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'lunch_dining', meal_slot: 'lunch' } },
+  { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'cookie', meal_slot: 'snack_afternoon' } },
+  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'meal_dinner', meal_slot: 'dinner' } },
   { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders', metadata: { icon: 'pill' } },
   { type: 'supplement', label: 'Supplement PM', time: '20:00', route: '#reminders', metadata: { icon: 'pill' } },
   {
@@ -530,23 +530,25 @@ function reminderGroups(reminders, completions) {
   const drink = reminders.find((item) => item.type === 'drink');
   const interval = Number(drink?.metadata?.intervall_minuten || 120);
   const periods = [
-    ['breakfast', 'FRÜHSTÜCK', 0, 9 * 60 + 45],
-    ['snack_morning', 'SNACK', 9 * 60 + 45, 12 * 60],
-    ['lunch', 'MITTAGESSEN', 12 * 60, 15 * 60],
-    ['snack_afternoon', 'SNACK', 15 * 60, 18 * 60],
-    ['dinner', 'ABENDESSEN', 18 * 60, 24 * 60],
+    ['breakfast', 'FRÜHSTÜCK', 'breakfast_dining', 0, 9 * 60 + 45],
+    ['snack_morning', 'SNACK', 'cookie', 9 * 60 + 45, 12 * 60],
+    ['lunch', 'MITTAGESSEN', 'lunch_dining', 12 * 60, 15 * 60],
+    ['snack_afternoon', 'SNACK', 'cookie', 15 * 60, 18 * 60],
+    ['dinner', 'ABENDESSEN', 'meal_dinner', 18 * 60, 24 * 60],
   ];
-  const timed = reminders.filter((item) => item.type === 'meal' || item.type === 'supplement')
+  const timed = reminders.filter((item) => item.type === 'supplement')
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
-  const timeline = periods.map(([period, title, start, end]) => {
-    const rows = timed.filter((item) => item.type === 'meal'
-      ? mealSlotForReminder(item) === period
-      : minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
+  const timeline = periods.map(([period, title, fallbackIcon, start, end]) => {
+    const slotReminder = reminders.find((item) => item.type === 'meal' && mealSlotForReminder(item) === period);
+    const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     return `<section class="mahl-zeitblock">
-      <header><h2>${title}</h2><span data-period-count data-reminder-count="${rows.length}">${rows.length}</span></header>
+      <header class="mahl-slot-kopf">
+        <div class="mahl-slot-titel">${reminderIconMarkup(fallbackIcon)}<h2>${title}</h2></div>
+        ${slotReminder ? `<label class="mahl-slot-zeit"><span class="sr-only">Uhrzeit für ${title}</span><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
+      </header>
       <div class="mahl-timeline"><div data-period-reminders>${rows.length
         ? rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')
-        : '<p class="mahl-leerzeile" data-reminder-empty>Keine Erinnerungen</p>'}</div>
+        : '<p class="mahl-leerzeile" data-reminder-empty>Noch keine Einträge</p>'}</div>
         <div data-nutrition-period="${period}"></div>
       </div>
     </section>`;
@@ -558,7 +560,7 @@ function reminderGroups(reminders, completions) {
       : '<p class="mahl-leerzeile">Noch kein Trinkintervall</p>'}</div>
   </section>`;
   return `<div class="mahl-tagesplan">${timeline}${water}</div>
-    <button hidden data-add-reminder="meal"></button><button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
+    <button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
 }
 
 function reminderOverlay(markup) {
@@ -575,12 +577,14 @@ function reminderOverlay(markup) {
 
 function choosePeriod(type, onSelected) {
   const backdrop = reminderOverlay(`
-    <header><h2>${type === 'meal' ? 'Mahlzeit' : 'Supplement'} eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <p class="rem-overlay-hinweis">Wann soll die Erinnerung erscheinen?</p>
+    <header><h2>Supplement eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <p class="rem-overlay-hinweis">Zu welcher Mahlzeit gehört es?</p>
     <div class="sheet-menue rem-period-menu">
-      <button type="button" data-period="morning"><span>Morgens</span></button>
-      <button type="button" data-period="midday"><span>Mittags</span></button>
-      <button type="button" data-period="evening"><span>Abends</span></button>
+      <button type="button" data-period="breakfast"><span>Frühstück</span></button>
+      <button type="button" data-period="snack_morning"><span>Snack vormittags</span></button>
+      <button type="button" data-period="lunch"><span>Mittagessen</span></button>
+      <button type="button" data-period="snack_afternoon"><span>Snack nachmittags</span></button>
+      <button type="button" data-period="dinner"><span>Abendessen</span></button>
     </div>`);
   backdrop.querySelector('.rem-period-menu').onclick = (event) => {
     const period = event.target.closest('[data-period]')?.dataset.period;
@@ -798,7 +802,7 @@ export async function mountReminders(container, { session, signal }) {
   });
 
   const createReminder = async (type, period = '') => {
-    const times = { morning: '08:00', midday: '13:00', evening: '19:00' };
+    const times = { breakfast: '08:00', snack_morning: '10:30', lunch: '13:00', snack_afternoon: '16:30', dinner: '19:00' };
     const neu = {
       id: null, _key: `new:${crypto.randomUUID()}`, type,
       label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
@@ -910,6 +914,29 @@ export async function mountReminders(container, { session, signal }) {
     }
   });
 
+  list.addEventListener('change', async (event) => {
+    const timeInput = event.target.closest('[data-slot-time]');
+    if (!timeInput) return;
+    const key = timeInput.dataset.slotKey;
+    const reminder = reminders.find((item) => (item._key || item.id) === key);
+    if (!reminder) return;
+    timeInput.disabled = true;
+    const wasActive = reminder.active;
+    reminder.time = timeInput.value || reminder.time;
+    reminder.active = true;
+    try {
+      if (!wasActive) await ensureReminderPush();
+      const saved = await saveReminder(userId, reminder);
+      Object.assign(reminder, saved);
+      startReminderLoop(userId);
+      toast('Uhrzeit gespeichert');
+    } catch {
+      toast('Uhrzeit konnte nicht gespeichert werden');
+    } finally {
+      if (timeInput.isConnected) timeInput.disabled = false;
+    }
+  });
+
   await nutritionPromise;
   nutritionActions?.renderIntegrated?.();
   return {
@@ -920,7 +947,7 @@ export async function mountReminders(container, { session, signal }) {
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
         <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         <div class="sheet-menue">
-          ${nutritionActions?.isEnabled?.() ? `<button type="button" data-add-type="nutrition">${iconMarkup('meal')}<span><b>Mahlzeit eintragen</b><small>Barcode, Suche oder eigene Mahlzeit</small></span></button>` : ''}
+          ${nutritionActions?.isEnabled?.() ? `<button type="button" data-add-type="nutrition">${materialIconMarkup('local_pizza')}<span><b>Mahlzeit eintragen</b><small>Barcode, Suche oder eigene Mahlzeit</small></span></button>` : ''}
           <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
           <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>
         </div>

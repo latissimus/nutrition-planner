@@ -5,6 +5,22 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')));
 
+// Produktbilder von Open Food Facts ändern sich praktisch nie. Cache-first
+// verhindert, dass dieselben Vorschaubilder bei jeder Suche erneut langsam
+// über das Mobilfunknetz geladen werden müssen.
+registerRoute(
+  ({ url, request }) => request.destination === 'image'
+    && (url.hostname === 'images.openfoodfacts.org' || url.hostname.endsWith('.openfoodfacts.org')),
+  async ({ request }) => {
+    const cache = await caches.open('muscledex-food-images-v1');
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    const response = await fetch(request);
+    if (response.ok || response.type === 'opaque') await cache.put(request, response.clone());
+    return response;
+  },
+);
+
 self.addEventListener('message', (event) => {
   if (event.data?.typ === 'skip-waiting') self.skipWaiting();
 });
