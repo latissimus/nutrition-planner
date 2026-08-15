@@ -835,7 +835,7 @@ export async function mountShoppingList(container, { session, signal }) {
     item.checked = checkbox.checked;
     try {
       await toggleItem(userId, id, item.checked);
-      playInterfaceSound(item.checked ? 'checkpoint' : 'undo');
+      playInterfaceSound(item.checked ? 'press' : 'release');
       redraw();
     } catch (error) {
       item.checked = zuvor;

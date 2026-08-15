@@ -50,10 +50,10 @@ export async function playRoutineSound(phase, volume = 0.7) {
 }
 
 function cueForControl(control) {
-  if (control.matches('input[type="checkbox"]')) return control.checked ? 'connect' : 'disconnect';
-  if (control.matches('input[type="radio"]')) return control.checked ? 'select' : 'deselect';
+  if (control.matches('input[type="checkbox"]')) return control.checked ? 'press' : 'release';
+  if (control.matches('input[type="radio"]')) return 'press';
   const description = `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
-  if (control.matches('[data-sleep-routine-check]')) return /wieder öffnen/.test(description) ? 'undo' : 'checkpoint';
+  if (control.matches('[data-sleep-routine-check]')) return /wieder öffnen/.test(description) ? 'release' : 'press';
   // Der COIN-DEX ist die Belohnungszentrale und erhält deshalb den eigenen
   // Arcade-Achievement-Cue statt des gewöhnlichen Navigationsklangs.
   if (control.matches('a[href="#coins"]')) return 'achievement';

@@ -386,7 +386,7 @@ export async function mountRoutines(container, { session, signal }) {
       return toast('Status konnte nicht gespeichert werden.');
     }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
-    playInterfaceSound(completed ? 'undo' : 'checkpoint');
+    playInterfaceSound(completed ? 'release' : 'press');
     paint();
   };
   const refresh = async () => {
