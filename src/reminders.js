@@ -504,20 +504,26 @@ function reminderRowMarkup(reminder, completion) {
   const badge = statusBadge(completion);
   const dimmed = completion?.completed_at ? ' ist-erledigt' : '';
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
-  return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}>
-    <summary class="rem-row-head">
-      <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminder.type === 'supplement' ? 'pill' : reminderIconValue(reminder))}</span>
-      <span class="rem-row-titel">
-        <b>${escapeHtml(reminder.label)}</b>
-        <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
-        ${zusammenfassung.detail ? `<small>${escapeHtml(zusammenfassung.detail)}</small>` : ''}
-        ${badge}
-      </span>
-      ${reminder.type === 'supplement' ? '' : `<span class="rem-row-zeit">${escapeHtml(zusammenfassung.time)}</span>`}
-      ${reminder.type === 'drink' ? '<span class="rem-row-chevron" aria-hidden="true">⌄</span>' : ''}
-    </summary>
-    ${reminderBodyMarkup(reminder, completion)}
-  </details>`;
+  const commonAttrs = `data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}`;
+  const head = `
+    <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminder.type === 'supplement' ? 'pill' : reminderIconValue(reminder))}</span>
+    <span class="rem-row-titel">
+      <b>${escapeHtml(reminder.label)}</b>
+      <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
+      ${zusammenfassung.detail ? `<small>${escapeHtml(zusammenfassung.detail)}</small>` : ''}
+      ${badge}
+    </span>
+    ${reminder.type === 'supplement' ? '' : `<span class="rem-row-zeit">${escapeHtml(zusammenfassung.time)}</span>`}
+    ${reminder.type === 'drink' ? '<span class="rem-row-chevron" aria-hidden="true">⌄</span>' : ''}`;
+  if (reminder.type === 'drink') {
+    return `<details class="rem-row${dimmed}${inaktiv}" ${commonAttrs}>
+      <summary class="rem-row-head">${head}</summary>
+      ${reminderBodyMarkup(reminder, completion)}
+    </details>`;
+  }
+  return `<div class="rem-row${dimmed}${inaktiv}" ${commonAttrs}>
+    <div class="rem-row-head">${head}</div>
+  </div>`;
 }
 
 function reminderGroups(reminders, completions) {
@@ -906,16 +912,89 @@ export async function mountReminders(container, { session, signal }) {
     }
   });
 
-  // Für Mahlzeit und Supplement: Tap auf die Kopfzeile darf das <details> nicht
-  // togglen — Bearbeitung öffnet sich nur per Long-Press (siehe unten).
-  list.addEventListener('click', (event) => {
-    const head = event.target.closest('.rem-row-head');
-    if (!head) return;
-    const row = head.closest('[data-reminder-key]');
-    if (!row || row.dataset.type === 'drink') return;
-    event.preventDefault();
-  }, true);
-  bindLongPress(list, '.rem-row:not([data-type="drink"])', (row) => () => { row.open = !row.open; });
+  // Mahlzeit und Supplement bekommen bei Long-Press ein Overlay-Sheet zum
+  // Bearbeiten und Löschen — kein inline-Aufklappen mehr.
+  const openReminderSheet = (reminder) => {
+    const key = reminder._key || reminder.id;
+    const title = reminder.type === 'supplement' ? 'Supplement' : 'Mahlzeit';
+    const markup = `
+      <header><h2>${title}</h2><button type="button" data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+      <div class="rem-row rem-row-sheet" data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}>
+        ${reminderBodyMarkup(reminder, completions.find((c) => c.reminder_id === reminder.id))}
+      </div>`;
+    const backdrop = reminderOverlay(markup);
+    const sheet = backdrop.querySelector('.kategorie-sheet');
+    const row = sheet.querySelector('[data-reminder-key]');
+
+    sheet.addEventListener('click', async (event) => {
+      const iconButton = event.target.closest('[data-reminder-icon-open]');
+      if (iconButton) {
+        const valueInput = row.querySelector('[data-icon-value]');
+        if (!valueInput) return;
+        chooseReminderIcon(valueInput.value, (value) => {
+          valueInput.value = value;
+          iconButton.innerHTML = reminderIconMarkup(value);
+          dirtyPatches.set(key, patchFromBody(row));
+        }, { hostBackdrop: backdrop });
+        return;
+      }
+      const saveButton = event.target.closest('[data-save-reminder]');
+      if (saveButton) {
+        const patch = patchFromBody(row);
+        if (patch?.active) await ensureReminderPush();
+        dirtyPatches.set(key, patch);
+        saveButton.disabled = true;
+        const saved = await flushSave(key);
+        if (saved) {
+          rerender();
+          toast('Erinnerung gespeichert');
+          backdrop.remove();
+        } else if (saveButton.isConnected) saveButton.disabled = false;
+        return;
+      }
+      const remove = event.target.closest('[data-remove-reminder]');
+      if (remove) {
+        const aktuell = reminders.find((r) => (r._key || r.id) === key);
+        if (!aktuell) return;
+        if (!confirm(`„${aktuell.label}“ wirklich löschen?`)) return;
+        if (aktuell.id) {
+          try { await deleteReminder(userId, aktuell.id); }
+          catch { toast('Löschen fehlgeschlagen'); return; }
+        }
+        reminders = reminders.filter((r) => (r._key || r.id) !== key);
+        completions = completions.filter((c) => c.reminder_id !== aktuell.id);
+        rerender();
+        toast('Erinnerung gelöscht');
+        backdrop.remove();
+      }
+    });
+
+    sheet.addEventListener('change', async (event) => {
+      const patch = patchFromBody(row);
+      if (!patch) return;
+      if (event.target.matches('[data-active]') && event.target.checked) await ensureReminderPush();
+      dirtyPatches.set(key, patch);
+      await flushSave(key);
+    });
+    sheet.addEventListener('input', (event) => {
+      if (event.target.matches('input[type="text"], input[type="time"], input:not([type]), textarea')) {
+        const patch = patchFromBody(row);
+        if (!patch) return;
+        dirtyPatches.set(key, patch);
+        scheduleSave(key);
+      }
+    });
+
+    requestAnimationFrame(() => {
+      row.querySelector('[data-label]')?.focus({ preventScroll: true });
+    });
+  };
+
+  bindLongPress(list, '.rem-row:not([data-type="drink"])', (row) => {
+    const key = row.dataset.reminderKey;
+    const reminder = reminders.find((r) => (r._key || r.id) === key);
+    return reminder ? () => openReminderSheet(reminder) : null;
+  });
 
   list.addEventListener('focusin', (event) => {
     const timeInput = event.target.closest('[data-slot-time]');

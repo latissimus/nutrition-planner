@@ -190,18 +190,13 @@ function calculationResultMarkup(result, customTarget = 0) {
 
 function periodEntriesMarkup(entries, period) {
   if (!entries.length) return '';
-  return `<section class="nutrition-period-inline"><div>${entries.map((item) => `<details class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
-      <summary class="rem-row-head nutrition-entry-head">
+  return `<section class="nutrition-period-inline"><div>${entries.map((item) => `<div class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
+      <div class="rem-row-head nutrition-entry-head">
         <span class="rem-row-emoji" aria-hidden="true">${materialIconMarkup(PERIOD_ICONS[period] || 'local_pizza')}</span>
         <span class="rem-row-titel"><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} g · ${decimal(item.protein_g, 1)} P · ${decimal(item.carbs_g, 1)} K · ${decimal(item.fat_g, 1)} F</small></span>
         <strong>${decimal(item.energy_kcal)} kcal</strong>
-      </summary>
-      <div class="rem-row-body nutrition-entry-body">
-        <label class="rem-field"><span>Gegessene Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(number(item.amount) || 100)))}" data-nutrition-inline-amount><i>g</i></span></label>
-        <button class="btn btn-primary btn-block" type="button" data-nutrition-inline-save>Änderungen speichern</button>
-        <button type="button" class="rem-row-loeschen" data-nutrition-delete>Eintrag löschen</button>
       </div>
-    </details>`).join('')}</div>
+    </div>`).join('')}</div>
   </section>`;
 }
 
@@ -310,7 +305,7 @@ function ownProductsEditor(context) {
   };
 }
 
-function amountEditor({ product, date, onSave, entry = null }) {
+function amountEditor({ product, date, onSave, entry = null, onDelete = null }) {
   const serving = number(entry?.amount) || number(product.serving_g) || 100;
   const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -320,6 +315,7 @@ function amountEditor({ product, date, onSave, entry = null }) {
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
       <div class="nutrition-product-result" data-product-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
+      ${entry && onDelete ? '<button type="button" class="rem-row-loeschen" data-product-delete>Eintrag löschen</button>' : ''}
     </form>`);
   const amount = backdrop.querySelector('[data-product-amount]');
   const period = backdrop.querySelector('[data-log-period]');
@@ -348,6 +344,15 @@ function amountEditor({ product, date, onSave, entry = null }) {
     });
     if (saved) backdrop.remove(); else button.disabled = false;
   };
+  const deleteBtn = backdrop.querySelector('[data-product-delete]');
+  if (deleteBtn && onDelete) {
+    deleteBtn.onclick = async () => {
+      if (!confirm('Diesen Kalorieneintrag löschen?')) return;
+      deleteBtn.disabled = true;
+      const ok = await onDelete(entry);
+      if (ok) backdrop.remove(); else deleteBtn.disabled = false;
+    };
+  }
 }
 
 async function productLookup(action, value) {
@@ -514,12 +519,11 @@ export async function mountNutrition(container, { userId, signal }) {
   let date = localDateKey();
   let automaticToday = true;
   let state = { settings: {}, entries: [], recent: [], ownProducts: [], latestWeight: 0 };
-  const deleteEntry = async (button) => {
-    const id = button.closest('[data-nutrition-entry]')?.dataset.nutritionEntry;
-    if (!id || !confirm('Diesen Kalorieneintrag löschen?')) return;
+  const deleteEntryById = async (id) => {
     const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);
-    if (error) return toast('Eintrag konnte nicht gelöscht werden');
+    if (error) { toast('Eintrag konnte nicht gelöscht werden'); return false; }
     await refresh();
+    return true;
   };
   const deleteOwnProduct = async (id) => {
     const { error } = await supabase.from('nutrition_products').delete().eq('id', id).eq('user_id', userId).eq('source', 'manual');
@@ -540,7 +544,10 @@ export async function mountNutrition(container, { userId, signal }) {
       carbs_100g: number(snapshot.carbs_100g) || number(entry.carbs_g) / amount * 100,
       fat_100g: number(snapshot.fat_100g) || number(entry.fat_g) / amount * 100,
     };
-    amountEditor({ product, date, onSave: saveEntry, entry });
+    amountEditor({
+      product, date, onSave: saveEntry, entry,
+      onDelete: (target) => (target?.id ? deleteEntryById(target.id) : Promise.resolve(false)),
+    });
   };
   const renderIntegrated = () => {
     const root = container.closest('.wrap') || container.parentElement;
@@ -548,27 +555,6 @@ export async function mountNutrition(container, { userId, signal }) {
     root?.querySelectorAll('[data-nutrition-period]').forEach((slot) => {
       const entries = enabled ? state.entries.filter((item) => item.period === slot.dataset.nutritionPeriod) : [];
       slot.innerHTML = periodEntriesMarkup(entries, slot.dataset.nutritionPeriod);
-      slot.querySelectorAll('[data-nutrition-delete]').forEach((button) => { button.onclick = () => deleteEntry(button); });
-      slot.querySelectorAll('[data-nutrition-inline-save]').forEach((button) => {
-        button.onclick = async () => {
-          const card = button.closest('[data-nutrition-entry]');
-          const entry = state.entries.find((item) => item.id === card?.dataset.nutritionEntry);
-          if (!entry) return;
-          const grams = number(card.querySelector('[data-nutrition-inline-amount]')?.value);
-          if (grams < 1 || grams > 1000) return toast('Bitte eine Menge zwischen 1 und 1000 g eintragen');
-          const previous = Math.max(1, number(entry.amount));
-          button.disabled = true;
-          const saved = await saveEntry({
-            ...entry, id: entry.id, product_id: entry.product_id, amount: grams,
-            energy_kcal: number(entry.energy_kcal) / previous * grams,
-            protein_g: number(entry.protein_g) / previous * grams,
-            carbs_g: number(entry.carbs_g) / previous * grams,
-            fat_g: number(entry.fat_g) / previous * grams,
-            product: entry.product_snapshot,
-          });
-          if (!saved && button.isConnected) button.disabled = false;
-        };
-      });
       const block = slot.closest('.mahl-zeitblock');
       const count = block?.querySelector('[data-period-count]');
       const reminderCount = Number(count?.dataset.reminderCount || 0);
