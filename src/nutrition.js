@@ -86,7 +86,7 @@ async function loadNutrition(userId, date, signal) {
   let settingsQuery = supabase.from('nutrition_settings').select('*').eq('user_id', userId).maybeSingle();
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
   let recentQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(40);
-  let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false }).limit(30);
+  let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false });
   let weightQuery = supabase.from('weights').select('kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(1).maybeSingle();
   if (signal) {
     settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
@@ -222,7 +222,6 @@ function periodSelect(selected = 'breakfast') {
 
 function manualEditor({ date, onSave, ownProducts = [] }) {
   const backdrop = createOverlay(`<header><h2>Eigene Mahlzeit</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    ${ownProducts.length ? `<section class="nutrition-own-products"><h3>GESPEICHERTE MAHLZEITEN</h3><div>${ownProducts.map((product, index) => `<button type="button" data-own-product="${index}"><span><b>${escapeHtml(product.name)}</b><small>${decimal(product.kcal_100g)} kcal · ${decimal(product.protein_100g, 1)} P · ${decimal(product.carbs_100g, 1)} K · ${decimal(product.fat_100g, 1)} F</small></span>${materialIconMarkup('chevron_right')}</button>`).join('')}</div></section>` : ''}
     <form class="nutrition-form" data-manual-food-form>
       <label class="nutrition-form-field"><span>Name</span><input class="input" data-manual-name maxlength="160" placeholder="z. B. Protein-Porridge" required></label>
       ${periodSelect()}
@@ -237,13 +236,6 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
       <div class="nutrition-product-result" data-manual-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Eintrag speichern</button>
     </form>`);
-  backdrop.querySelectorAll('[data-own-product]').forEach((button) => {
-    button.onclick = () => {
-      const product = ownProducts[Number(button.dataset.ownProduct)];
-      backdrop.remove();
-      amountEditor({ product, date, onSave });
-    };
-  });
   const per100 = () => ({
     energy_kcal: number(backdrop.querySelector('[data-manual-kcal]').value),
     protein_g: number(backdrop.querySelector('[data-manual-protein]').value),
@@ -276,6 +268,45 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
     if (!payload.name || !base.energy_kcal || !amount) { button.disabled = false; return toast('Name, Kalorien und Grammzahl eintragen'); }
     const saved = await onSave(payload);
     if (saved) backdrop.remove(); else button.disabled = false;
+  };
+}
+
+function ownProductsEditor(context) {
+  const products = [...(context.ownProducts || [])];
+  const backdrop = createOverlay(`<header><h2>Gespeicherte Mahlzeiten</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <label class="nutrition-own-search"><span>Gespeicherte Mahlzeiten suchen</span><input class="input" type="search" enterkeyhint="search" placeholder="Name eingeben" data-own-search></label>
+    <div class="nutrition-own-list" data-own-list></div>
+    <button class="btn btn-primary btn-block nutrition-own-new" type="button" data-own-new>${materialIconMarkup('add')}<span>Neue eigene Mahlzeit</span></button>`);
+  const list = backdrop.querySelector('[data-own-list]');
+  const render = (query = '') => {
+    const normalized = query.trim().toLocaleLowerCase('de');
+    const visible = products.filter((product) => !normalized || product.name.toLocaleLowerCase('de').includes(normalized));
+    list.innerHTML = visible.length ? visible.map((product) => `<article data-own-product-id="${product.id}">
+      <button type="button" class="nutrition-own-select" data-own-select="${product.id}"><span><b>${escapeHtml(product.name)}</b><small>${decimal(product.kcal_100g)} kcal · ${decimal(product.protein_100g, 1)} P · ${decimal(product.carbs_100g, 1)} K · ${decimal(product.fat_100g, 1)} F</small></span>${materialIconMarkup('chevron_right')}</button>
+      <button type="button" class="nutrition-own-delete" data-own-delete="${product.id}" aria-label="${escapeHtml(product.name)} löschen">${materialIconMarkup('delete_forever')}</button>
+    </article>`).join('') : `<p>${products.length ? 'Keine passende Mahlzeit gefunden.' : 'Noch keine eigene Mahlzeit gespeichert.'}</p>`;
+  };
+  render();
+  backdrop.querySelector('[data-own-search]').oninput = (event) => render(event.currentTarget.value);
+  backdrop.querySelector('[data-own-new]').onclick = () => {
+    backdrop.remove();
+    manualEditor(context);
+  };
+  list.onclick = async (event) => {
+    const select = event.target.closest('[data-own-select]');
+    if (select) {
+      const product = products.find((item) => item.id === select.dataset.ownSelect);
+      if (!product) return;
+      backdrop.remove(); amountEditor({ product, date: context.date, onSave: context.onSave }); return;
+    }
+    const remove = event.target.closest('[data-own-delete]');
+    if (!remove || !confirm('Diese gespeicherte Mahlzeit löschen?')) return;
+    remove.disabled = true;
+    const deleted = await context.onDeleteOwnProduct?.(remove.dataset.ownDelete);
+    if (!deleted) { remove.disabled = false; return; }
+    const index = products.findIndex((item) => item.id === remove.dataset.ownDelete);
+    if (index >= 0) products.splice(index, 1);
+    render(backdrop.querySelector('[data-own-search]').value);
   };
 }
 
@@ -460,7 +491,7 @@ function scannerEditor(context) {
 function openNutritionAction(action, context) {
   if (action === 'scan') scannerEditor(context);
   if (action === 'search') searchEditor(context);
-  if (action === 'manual') manualEditor(context);
+  if (action === 'manual') ownProductsEditor(context);
   if (action === 'recent') recentEditor(context);
 }
 
@@ -489,6 +520,13 @@ export async function mountNutrition(container, { userId, signal }) {
     const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);
     if (error) return toast('Eintrag konnte nicht gelöscht werden');
     await refresh();
+  };
+  const deleteOwnProduct = async (id) => {
+    const { error } = await supabase.from('nutrition_products').delete().eq('id', id).eq('user_id', userId).eq('source', 'manual');
+    if (error) { toast('Gespeicherte Mahlzeit konnte nicht gelöscht werden'); return false; }
+    state.ownProducts = state.ownProducts.filter((product) => product.id !== id);
+    toast('Gespeicherte Mahlzeit gelöscht');
+    return true;
   };
   const editEntry = (entry) => {
     const snapshot = entry?.product_snapshot || {};
@@ -656,6 +694,7 @@ export async function mountNutrition(container, { userId, signal }) {
   catch (error) { container.innerHTML = `<section class="nutrition-card"><p class="nutrition-empty">Kalorien-Log konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section>`; }
   subscribeToTableChanges({ table: 'nutrition_log_entries', signal, onChange: refresh });
   subscribeToTableChanges({ table: 'nutrition_settings', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'nutrition_products', signal, onChange: refresh });
   bindLongPress(container.closest('.wrap') || container.parentElement, '[data-nutrition-entry]', (element) => {
     const entry = state.entries.find((item) => item.id === element.dataset.nutritionEntry);
     return entry ? () => editEntry(entry) : null;
@@ -669,7 +708,7 @@ export async function mountNutrition(container, { userId, signal }) {
   return {
     isEnabled: () => nutritionEnabled(state),
     renderIntegrated,
-    openAddMenu: () => addMenu({ date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry }),
-    openAction: (action) => openNutritionAction(action, { date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry }),
+    openAddMenu: () => addMenu({ date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
+    openAction: (action) => openNutritionAction(action, { date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
   };
 }
