@@ -282,7 +282,7 @@ function bindRoutineGestures(row, { onSwipeToggle, onLongPress }) {
     state.timer = setTimeout(() => {
       if (!state.active || state.swiping) return;
       state.longPressed = true; state.blockClick = true;
-      resetVisual(); navigator.vibrate?.(10); playInterfaceSound('long-press'); onLongPress?.();
+      resetVisual(); navigator.vibrate?.(10); playInterfaceSound('expand'); onLongPress?.();
     }, 500);
     try { content.setPointerCapture(event.pointerId); } catch { /* optional */ }
   });

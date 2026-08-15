@@ -457,7 +457,7 @@ function bindeZeilenGesten(row, { onSwipeToggle, onLongPress }) {
       state.blockClick = true;
       row.classList.remove('swipe-aktiv', 'swipe-commit');
       inhalt.style.transform = '';
-      playInterfaceSound('long-press');
+      playInterfaceSound('expand');
       onLongPress?.();
     }, LONG_PRESS_MS);
     try { row.setPointerCapture(event.pointerId); } catch { /* egal */ }
