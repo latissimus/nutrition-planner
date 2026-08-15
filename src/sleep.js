@@ -128,9 +128,9 @@ function planEditor({ userId, state, onSaved }) {
       </div>
       <label class="dex-entry-field"><span>Runterfahren vorher</span><select class="input" data-wind-down>${[15, 30, 45, 60, 90].map((value) => `<option value="${value}"${state.settings.wind_down_minutes === value ? ' selected' : ''}>${value} Minuten</option>`).join('')}</select></label>
       <div class="sleep-reminder-switches">
-        <label class="sleep-setting-switch"><span>Runterfahren erinnern</span><input type="checkbox" data-wind-reminder${state.settings.wind_down_reminder ? ' checked' : ''}><i aria-hidden="true"></i></label>
-        <label class="sleep-setting-switch"><span>Schlafenszeit erinnern</span><input type="checkbox" data-bed-reminder${state.settings.bedtime_reminder ? ' checked' : ''}><i aria-hidden="true"></i></label>
-        <label class="sleep-setting-switch"><span>Morgen-Check-in erinnern</span><input type="checkbox" data-morning-reminder${state.settings.morning_reminder ? ' checked' : ''}><i aria-hidden="true"></i></label>
+        <label class="sleep-setting-switch"><span>Runterfahren erinnern</span><input type="checkbox" data-wind-reminder${state.settings.wind_down_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
+        <label class="sleep-setting-switch"><span>Schlafenszeit erinnern</span><input type="checkbox" data-bed-reminder${state.settings.bedtime_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
+        <label class="sleep-setting-switch"><span>Morgen-Check-in erinnern</span><input type="checkbox" data-morning-reminder${state.settings.morning_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
       </div>
       <p class="sleep-editor-note">Push wird über die Benachrichtigungseinstellung im MAHLZEITEN-DEX aktiviert.</p>
       <button class="btn btn-primary btn-block" type="submit">Schlafplan speichern</button>
