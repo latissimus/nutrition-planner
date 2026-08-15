@@ -23,7 +23,7 @@ import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDe
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
-import { loadUserPreferences, setPreferenceUser } from './userPreferences.js';
+import { getPreference, loadUserPreferences, setPreference, setPreferenceUser } from './userPreferences.js';
 import { createLruCache, createRouteStack, disposeViewEntry } from './navigationState.js';
 import { setupDialogAccessibility } from './accessibility.js';
 import { showGestureHintOnce } from './gestureHints.js';
@@ -31,10 +31,10 @@ import { initInterfaceSounds, syncInterfaceSounds } from './uiSounds.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, settingsSheet,
+  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
-  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
+  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
 } from './collections.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
@@ -682,12 +682,58 @@ async function eigeneDexStatistik(userId, roots, signal) {
   return result;
 }
 
+// Neue Konten starten mit derselben klaren Reihenfolge und Farb-/Emoji-Sprache
+// wie die aktuelle MUSCLE-DEX-Startseite. Die Initialisierung ist bewusst
+// einmalig und überschreibt keine bestehenden persönlichen Einstellungen.
+async function initialeStartseiteEinrichten(userId, signal, existing = []) {
+  const key = 'muscledex:home-defaults-v1';
+  if (getPreference(key, false) || existing.length) {
+    if (!getPreference(key, false)) setPreference(key, true);
+    return false;
+  }
+  if (signal?.aborted) return false;
+  const order = ['food-log', 'reminders', 'sleep', 'shopping', 'habits', 'training', 'body'];
+  setPreference('muscledex:sammlungs-reihenfolge', order);
+  setPreference('muscledex:sichtbare-sammlungen', order);
+  setPreference('muscledex:coin-dex-sichtbar', true);
+  const looks = {
+    'food-log': ['#FFE59D', 'wallpaper-pizza', '🍕'],
+    reminders: ['#525CEB', 'wallpaper-burger', '🍔'],
+    sleep: ['#001454', 'wallpaper-moon', '🌙'],
+    shopping: ['#00E0BA', 'wallpaper-brokkoli', '🥦'],
+    habits: ['#8C00FF', 'wallpaper-wolke', '☁️'],
+    training: ['#006E7F', 'wallpaper-dumbbell', '💪'],
+    body: ['#8CA9FF', 'wallpaper-measure', '📐'],
+    coins: ['#00A8FF', 'wallpaper-game', '🎮'],
+  };
+  Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
+    setPreference(`muscledex:kategorie-farbe:${route}`, color);
+    setPreference(`muscledex:kategorie-icon:${route}`, `emoji:${emoji}`);
+    setPageLookPattern(route, pattern);
+  });
+  try {
+    const neu = await saveCollection(userId, {
+      rootKey: 'home', parentId: null, name: 'Neu', color: '#FF3483', iconKey: 'emoji:⚡',
+    });
+    if (neu?.id) setPageLookPattern(`collection-${neu.id}`, 'wallpaper-blitz');
+  } catch (error) {
+    if (!signal?.aborted) console.warn('Standard-Dex konnte nicht angelegt werden:', error.message);
+  }
+  setPreference(key, true);
+  return true;
+}
+
 async function mountHome(container, signal, { setzeSeite = true } = {}) {
   if (setzeSeite) setSeite('home');
-  const sichtbar = sichtbareSammlungen();
+  let sichtbar = sichtbareSammlungen();
   let eigene = [];
   let eigeneStats = new Map();
-  try { eigene = await loadCollections(session.user.id, { rootKey: 'home', signal }); }
+  try {
+    eigene = await loadCollections(session.user.id, { rootKey: 'home', signal });
+    const seeded = await initialeStartseiteEinrichten(session.user.id, signal, eigene);
+    if (seeded) eigene = await loadCollections(session.user.id, { rootKey: 'home', signal });
+    sichtbar = sichtbareSammlungen();
+  }
   catch (error) { if (!signal?.aborted) toast('Eigene Dex-Einträge konnten nicht geladen werden.'); }
   if (signal?.aborted) return;
   eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
