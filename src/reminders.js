@@ -455,8 +455,8 @@ function reminderBodyMarkup(reminder, completion) {
       </label>
       <label class="rem-field"><span>Uhrzeit</span>
         <div class="rem-time-mit-switch">
-          <label class="mahl-mini-switch" aria-label="Benachrichtigung"><input type="checkbox" data-active${reminder.active ? ' checked' : ''}><i class="mahl-mini-switch-track" aria-hidden="true"></i></label>
           <input class="input" data-time type="time" value="${zeit}">
+          <label class="mahl-mini-switch" aria-label="Benachrichtigung"><input type="checkbox" data-active${reminder.active ? ' checked' : ''}><i class="mahl-mini-switch-track" aria-hidden="true"></i></label>
         </div>
       </label>
       <div class="rem-field-reihe">
