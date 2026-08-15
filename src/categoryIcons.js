@@ -301,6 +301,12 @@ function closeSheet(backdrop) {
   backdrop.remove();
 }
 
+function notifyAppearanceChanged(route) {
+  window.dispatchEvent(new CustomEvent('muscledex:appearance-changed', {
+    detail: { route },
+  }));
+}
+
 function iconPicker(route, onChange) {
   const current = getPreference(storageKey(route), defaults[route]);
   const backdrop = sheet(`
@@ -319,6 +325,7 @@ function iconPicker(route, onChange) {
     if (!button) return;
     const value = button.dataset.iconId;
     setPreference(storageKey(route), value);
+    notifyAppearanceChanged(route);
     closeSheet(backdrop);
     onChange?.();
     toast('Kategorie-Icon geändert.');
@@ -328,6 +335,7 @@ function iconPicker(route, onChange) {
     const emoji = event.currentTarget.querySelector('input').value.trim();
     if (!emoji) return;
     setPreference(storageKey(route), `emoji:${emoji}`);
+    notifyAppearanceChanged(route);
     closeSheet(backdrop);
     onChange?.();
     toast('Eigenes Emoji übernommen.');
@@ -379,6 +387,7 @@ function appearancePicker(route, onChange, { hideIcon = false } = {}) {
     setPreference(colorKey(route), selectedColor);
     setPageLookPattern(route, selectedPattern);
     applyPageLook(route, selectedColor, selectedPattern);
+    notifyAppearanceChanged(route);
     closeSheet(backdrop);
     onChange?.();
     toast(hideIcon ? 'Farbe und Tapete geändert.' : 'Icon und Farbe geändert.');
@@ -403,6 +412,7 @@ function colorPicker(route, onChange) {
     const button = event.target.closest('[data-color]');
     if (!button) return;
     setPreference(colorKey(route), button.dataset.color);
+    notifyAppearanceChanged(route);
     closeSheet(backdrop);
     onChange?.();
     toast('Retrofarbe geändert.');

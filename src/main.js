@@ -167,6 +167,14 @@ let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
 
 const ansichtsCache = createLruCache({ limit: 10, onEvict: disposeViewEntry });
 
+// Die Startseite wird fuer den schnellen Rueckweg als abgetrennte DOM-Ansicht
+// zwischengespeichert. Aendert sich die Darstellung eines Dex auf einer
+// Unterseite, darf diese Kopie nicht mit alter Farbe bzw. altem Icon wieder
+// eingeblendet werden. Beim Zurueckkehren wird sie dann frisch aufgebaut.
+window.addEventListener('muscledex:appearance-changed', () => {
+  if (aktiveRoute !== 'home') ansichtsCache.delete('home');
+});
+
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
 // (zurueck/schliessen) zu unterscheiden: location.hash pusht bei jeder
 // Navigation einen Browser-Verlaufseintrag, egal ob per Tap oder per
@@ -846,12 +854,16 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
   });
 
   const aktualisiereHomeZaehler = async () => {
-    if (!container.isConnected || signal?.aborted) return;
+    // `container` darf hier bewusst vom Dokument getrennt sein: Genau so wird
+    // die Startseite im Navigationscache gehalten. Das Aktualisieren einer
+    // abgetrennten DOM-Struktur ist gueltig und sorgt dafuer, dass beim
+    // Zurueckkehren sofort der aktuelle Stand sichtbar ist.
+    if (signal?.aborted) return;
     const [zaehler, stats] = await Promise.all([
       zaehlerLaden(signal),
       eigeneDexStatistik(session.user.id, eigene, signal).catch(() => new Map()),
     ]);
-    if (signal?.aborted || !container.isConnected) return;
+    if (signal?.aborted) return;
     zaehlerStand = zaehler;
     eigeneStats = stats;
     zaehlerEintragen(container, zaehler);
@@ -868,7 +880,10 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
     .forEach((table) => subscribeToTableChanges({ table, signal, onChange: aktualisiereHomeZaehler, onError: () => {} }));
   subscribeToTableChanges({
     table: 'collections', signal,
-    onChange: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    onChange: () => {
+      if (aktiveRoute !== 'home') ansichtsCache.delete('home');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    },
     onError: () => {},
   });
 }

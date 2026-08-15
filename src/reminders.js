@@ -266,7 +266,6 @@ async function ensureDefaults(userId, signal) {
   // keine echten Nutzerdaten und sollen bei bestehenden Konten einmalig
   // verschwinden, damit sie nicht weiter im Meal-Log auftauchen.
   const alteStandardSupps = current.filter((reminder) => reminder.type === 'supplement'
-    && !reminder.active
     && !reminder.metadata?.deleted
     && /^Supplement (AM|PM)$/i.test(String(reminder.label || '').trim()));
   if (alteStandardSupps.length) {
@@ -942,6 +941,9 @@ export async function mountReminders(container, { session, signal }) {
       if (!reminder) return;
       if (!confirm(`„${reminder.label}“ wirklich löschen?`)) return;
       if (reminder.id) {
+        if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+        saveTimers.delete(key);
+        dirtyPatches.delete(key);
         try { await deleteReminder(userId, reminder.id); }
         catch { toast('Löschen fehlgeschlagen'); return; }
       }
@@ -1021,6 +1023,9 @@ export async function mountReminders(container, { session, signal }) {
         if (!aktuell) return;
         if (!confirm(`„${aktuell.label}“ wirklich löschen?`)) return;
         if (aktuell.id) {
+          if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+          saveTimers.delete(key);
+          dirtyPatches.delete(key);
           try { await deleteReminder(userId, aktuell.id); }
           catch { toast('Löschen fehlgeschlagen'); return; }
         }
