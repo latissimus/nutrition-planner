@@ -427,7 +427,7 @@ let zaehlerStand = {};
 
 const ZAEHLQUELLEN = {
   body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
-  reminders: { tabelle: 'reminders', filterIn: ['type', ['meal', 'supplement', 'drink']], eins: 'Erinnerung', viele: 'Erinnerungen' },
+  reminders: { tabelle: 'reminders', filters: [['active', true]], filterIn: ['type', ['meal', 'supplement', 'drink']], eins: 'Erinnerung', viele: 'Erinnerungen' },
   'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
   training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
   // Gezaehlt wird, was fuer den naechsten Einkauf ausgewaehlt (angehakt) ist –
@@ -441,10 +441,11 @@ const ZAEHLQUELLEN = {
 // head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
 // leere Antworten statt der kompletten Tabellen.
 async function zaehlerLaden(signal) {
-  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter, filterIn }]) => {
+  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter, filters = [], filterIn }]) => {
     try {
       let countQuery = supabase.from(tabelle).select('*', { count: 'exact', head: true });
       if (filter) countQuery = countQuery.eq(filter[0], filter[1]);
+      filters.forEach(([field, value]) => { countQuery = countQuery.eq(field, value); });
       if (filterIn) countQuery = countQuery.in(filterIn[0], filterIn[1]);
       countQuery = countQuery.abortSignal(signal);
       const { count, error } = await countQuery;

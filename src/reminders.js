@@ -585,7 +585,7 @@ function reminderGroups(reminders, completions) {
     </section>`;
   }).join('');
   const water = `<section class="mahl-zeitblock mahl-trinken">
-    <header><h2>TRINKEN</h2><span>${drink ? '1' : '0'}</span></header>
+    <header><h2>TRINKEN</h2></header>
     <div class="mahl-timeline">${drink
       ? reminderRowMarkup(drink, completionByReminder.get(drink.id))
       : '<p class="mahl-leerzeile">Noch kein Trinkintervall</p>'}</div>
