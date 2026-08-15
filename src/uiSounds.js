@@ -50,16 +50,18 @@ export async function playRoutineSound(phase) {
   });
 }
 
-function isChip(control) {
-  return control.matches('.food-dex-filter button,.einkauf-tag-chip,.einkauf-chip-btn,.such-tag-liste button,[data-search-tag],.sleep-tags input');
-}
-
 function isSwitch(control) {
   return Boolean(control.closest('.switchline,.rem-switch,.sleep-mini-switch,.sleep-setting-switch,.mess-zeile'));
 }
 
+function isTextEntry(control) {
+  if (control.matches('textarea,[contenteditable="true"]')) return true;
+  if (!control.matches('input')) return false;
+  return !['button', 'checkbox', 'color', 'date', 'file', 'hidden', 'image', 'month', 'radio', 'range', 'reset', 'submit', 'time', 'week']
+    .includes((control.getAttribute('type') || 'text').toLowerCase());
+}
+
 function cueForControl(control) {
-  if (isChip(control)) return null;
   if (control.matches('summary')) return control.closest('details')?.open ? 'collapse' : 'expand';
   if (control.matches('[aria-expanded]')) return control.getAttribute('aria-expanded') === 'true' ? 'collapse' : 'expand';
   if (control.matches('input[type="checkbox"]')) {
@@ -91,6 +93,16 @@ export function initInterfaceSounds(root = document) {
     player('routine')?.unlock().catch(() => false);
   };
   root.addEventListener('pointerdown', unlock, { capture: true, passive: true, once: true });
+  root.addEventListener('pointerdown', (event) => {
+    const field = event.target.closest?.('input,textarea,[contenteditable="true"]');
+    if (field && isTextEntry(field) && !field.disabled && !field.readOnly) playInterfaceSound('snap');
+  }, { capture: true, passive: true });
+  root.addEventListener('input', (event) => {
+    const field = event.target;
+    if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {
+      playInterfaceSound('typing', { retrigger: 'overlap', cooldownMs: 35 });
+    }
+  }, true);
   root.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') unlock();
   }, { capture: true, once: true });
