@@ -4944,7 +4944,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 .sleep-editor,.sleep-action-card{width:min(100%,580px);max-height:min(82dvh,760px);margin:auto;padding:16px}
 .sleep-checkin-editor{box-sizing:border-box;max-width:calc(100vw - 24px);overflow-x:hidden}.sleep-checkin-editor form,.sleep-checkin-editor fieldset,.sleep-checkin-editor label,.sleep-checkin-editor .input{box-sizing:border-box;min-width:0;max-width:100%}
-.sleep-editor>header,.sleep-action-card>header{position:sticky;top:0;z-index:2;background:var(--surface)}
+.sleep-editor>header,.sleep-action-card>header{position:sticky;top:0;z-index:2;margin:-16px -16px 16px;padding:16px;background:var(--surface)!important;isolation:isolate}
 .sleep-editor>header>div small{display:block;color:var(--ordner);font-size:10px;font-weight:850}.sleep-editor>header>div h2{margin-top:1px}
 .sleep-checkin-editor>header>div h2{margin-top:7px}
 .sleep-editor form{display:grid;gap:14px}.sleep-plan-grid{display:grid;grid-template-columns:30px minmax(0,102px) minmax(0,102px) 52px;justify-content:space-between;gap:6px;align-items:center}

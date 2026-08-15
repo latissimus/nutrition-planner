@@ -153,7 +153,7 @@ function notificationText(reminder, reminders = []) {
   return { title: reminder.label, body: 'Geplante Erinnerung.' };
 }
 
-async function loadReminders(userId, signal) {
+async function loadReminders(userId, signal, { includeDeleted = false } = {}) {
   let query = supabase
     .from('reminders')
     .select('id, type, label, time, weekdays, active, metadata, route')
@@ -163,7 +163,7 @@ async function loadReminders(userId, signal) {
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
-  return data ?? [];
+  return includeDeleted ? (data ?? []) : (data ?? []).filter((reminder) => !reminder.metadata?.deleted);
 }
 
 async function loadCompletionsToday(userId, signal) {
@@ -250,17 +250,22 @@ async function saveReminder(userId, reminder) {
 }
 
 async function deleteReminder(userId, reminderId) {
-  const { error } = await supabase.from('reminders').delete().eq('id', reminderId).eq('user_id', userId);
+  const { data: existing, error: loadError } = await supabase.from('reminders')
+    .select('metadata').eq('id', reminderId).eq('user_id', userId).single();
+  if (loadError) throw loadError;
+  const { error } = await supabase.from('reminders')
+    .update({ active: false, metadata: { ...(existing?.metadata || {}), deleted: true } })
+    .eq('id', reminderId).eq('user_id', userId);
   if (error) throw error;
 }
 
 async function ensureDefaults(userId, signal) {
-  const current = await loadReminders(userId, signal);
+  const current = await loadReminders(userId, signal, { includeDeleted: true });
   const existing = new Set(current.map((reminder) => `${reminder.type}:${reminder.label}`));
   const payloads = DEFAULT_REMINDERS.filter((reminder) => !existing.has(`${reminder.type}:${reminder.label}`)).map((reminder) => reminderPayload(userId, {
     ...reminder, active: false, weekdays: WEEKDAYS,
   }));
-  if (!payloads.length) return current;
+  if (!payloads.length) return current.filter((reminder) => !reminder.metadata?.deleted);
   let query = supabase
     .from('reminders')
     .upsert(payloads, { onConflict: 'user_id,type,label' })
@@ -268,7 +273,7 @@ async function ensureDefaults(userId, signal) {
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
-  return [...current, ...(data ?? [])];
+  return [...current, ...(data ?? [])].filter((reminder) => !reminder.metadata?.deleted);
 }
 
 async function maybeNotify(reminder, slot, now, userId, reminders = []) {
