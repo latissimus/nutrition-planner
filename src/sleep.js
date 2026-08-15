@@ -119,6 +119,7 @@ function closeOverlay(backdrop) { backdrop?.remove(); }
 function planEditor({ userId, state, onSaved }) {
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sleep-overlay';
+  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   const byDay = new Map(state.schedules.map((item) => [item.weekday, item]));
   backdrop.innerHTML = `<section class="kategorie-sheet sleep-editor" role="dialog" aria-modal="true" aria-label="Schlafplan bearbeiten">
     <header><h2>Schlafplan</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -175,6 +176,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
   const customTags = [...selectedTags].filter((tag) => !TAGS.includes(tag));
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sleep-overlay';
+  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   backdrop.innerHTML = `<section class="kategorie-sheet sleep-editor sleep-checkin-editor" role="dialog" aria-modal="true" aria-label="Morgen-Check-in">
     <header><div><small>+3 MUSCLE-COINS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-sleep-checkin-form>
@@ -222,6 +224,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
 function actionsMenu({ userId, state, onSaved }) {
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sleep-overlay';
+  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   backdrop.innerHTML = `<section class="kategorie-sheet sleep-action-card" role="dialog" aria-modal="true" aria-label="SLEEP ergänzen"><header><h2>SLEEP</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button><button type="button" data-sleep-action="routines">${materialIconMarkup('self_improvement')}<span><b>Abendroutine</b><small>Meditation und Routinen öffnen</small></span></button></div></section>`;
   const close = () => closeOverlay(backdrop);
   backdrop.onclick = (event) => {
