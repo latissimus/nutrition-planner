@@ -750,7 +750,7 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   });
   try {
     const neu = await saveCollection(userId, {
-      rootKey: 'home', parentId: null, name: 'Neu', color: '#FF3483', iconKey: 'emoji:🆕',
+      rootKey: 'home', parentId: null, name: 'Neu', color: '#FF06B7', iconKey: 'emoji:🆕',
     });
     if (neu?.id) setPageLookPattern(`collection-${neu.id}`, 'wallpaper-blitz');
   } catch (error) {
