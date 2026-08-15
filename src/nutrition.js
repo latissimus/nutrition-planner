@@ -5,8 +5,20 @@ import { subscribeToTableChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 
 const PERIODS = [
-  ['morning', 'Morgens'], ['midday', 'Mittags'], ['evening', 'Abends'],
+  ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
+  ['lunch', 'Mittagessen'], ['snack_afternoon', 'Snack nachmittags'], ['dinner', 'Abendessen'],
 ];
+const BASE_FOODS = [
+  ['Apfel', 52, 0.3, 11.4, 0.2], ['Banane', 89, 1.1, 20.0, 0.3],
+  ['Orange', 47, 0.9, 8.3, 0.1], ['Kartoffel, gekocht', 77, 2.0, 15.0, 0.1],
+  ['Reis, gekocht', 130, 2.7, 28.0, 0.3], ['Haferflocken', 372, 13.5, 58.7, 7.0],
+  ['Hähnchenbrust', 110, 23.1, 0, 1.2], ['Ei', 137, 12.3, 1.5, 9.3],
+  ['Magerquark', 67, 12.0, 4.0, 0.2], ['Lachs', 208, 20.4, 0, 13.4],
+  ['Brokkoli', 34, 2.8, 4.0, 0.4], ['Avocado', 160, 2.0, 1.8, 14.7],
+].map(([name, kcal, protein, carbs, fat]) => ({
+  barcode: '', name, brand: 'Basislebensmittel', image_url: '', serving_g: 100,
+  kcal_100g: kcal, protein_100g: protein, carbs_100g: carbs, fat_100g: fat, source: 'base_food',
+}));
 const GOALS = {
   lose: ['Langsam reduzieren', -300], maintain: ['Gewicht halten', 0],
   gain: ['Muskelaufbau', 200], gain_fast: ['Deutlich zunehmen', 350],
@@ -69,16 +81,17 @@ async function loadNutrition(userId, date, signal) {
   let settingsQuery = supabase.from('nutrition_settings').select('*').eq('user_id', userId).maybeSingle();
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
   let recentQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(40);
+  let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false }).limit(30);
   let weightQuery = supabase.from('weights').select('kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(1).maybeSingle();
   if (signal) {
     settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
-    recentQuery = recentQuery.abortSignal(signal); weightQuery = weightQuery.abortSignal(signal);
+    recentQuery = recentQuery.abortSignal(signal); ownQuery = ownQuery.abortSignal(signal); weightQuery = weightQuery.abortSignal(signal);
   }
-  const [settings, entries, recent, weight] = await Promise.all([settingsQuery, logQuery, recentQuery, weightQuery]);
-  const error = settings.error || entries.error || recent.error || weight.error;
+  const [settings, entries, recent, own, weight] = await Promise.all([settingsQuery, logQuery, recentQuery, ownQuery, weightQuery]);
+  const error = settings.error || entries.error || recent.error || own.error || weight.error;
   if (error) throw error;
   return {
-    settings: settings.data || {}, entries: entries.data || [], recent: recent.data || [],
+    settings: settings.data || {}, entries: entries.data || [], recent: recent.data || [], ownProducts: own.data || [],
     latestWeight: number(weight.data?.kg),
   };
 }
@@ -111,7 +124,7 @@ function trackingToggleMarkup(enabled) {
   return `<label class="nutrition-tracking-toggle">
     <span><b>Kalorien zählen</b><small>Konkrete Mahlzeiten und Makros protokollieren</small></span>
     <input type="checkbox" data-nutrition-enabled${enabled ? ' checked' : ''}>
-    <i aria-hidden="true"></i>
+    <i class="nutrition-switch-track" aria-hidden="true"></i>
   </label>`;
 }
 
@@ -193,35 +206,64 @@ function createOverlay(markup, className = '') {
   return backdrop;
 }
 
-function periodSelect(selected = 'morning') {
+function periodSelect(selected = 'breakfast') {
   return `<label class="nutrition-form-field"><span>Tageszeit</span><select class="input" data-log-period>${PERIODS.map(([key, label]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${label}</option>`).join('')}</select></label>`;
 }
 
-function manualEditor({ date, onSave }) {
-  const backdrop = createOverlay(`<header><h2>Eigene Mahlzeit</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
+function manualEditor({ date, onSave, ownProducts = [] }) {
+  const backdrop = createOverlay(`<header><h2>Eigene Mahlzeit</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    ${ownProducts.length ? `<section class="nutrition-own-products"><h3>GESPEICHERTE MAHLZEITEN</h3><div>${ownProducts.map((product, index) => `<button type="button" data-own-product="${index}"><span><b>${escapeHtml(product.name)}</b><small>${decimal(product.kcal_100g)} kcal · ${decimal(product.protein_100g, 1)} P · ${decimal(product.carbs_100g, 1)} K · ${decimal(product.fat_100g, 1)} F</small></span>${materialIconMarkup('chevron_right')}</button>`).join('')}</div></section>` : ''}
     <form class="nutrition-form" data-manual-food-form>
-      <label class="nutrition-form-field"><span>Name</span><input class="input" data-manual-name maxlength="160" placeholder="z. B. Frühstück" required></label>
+      <label class="nutrition-form-field"><span>Name</span><input class="input" data-manual-name maxlength="160" placeholder="z. B. Protein-Porridge" required></label>
       ${periodSelect()}
+      <p class="nutrition-form-hint">Nährwerte jeweils pro 100 g</p>
       <div class="nutrition-four-grid">
-        <label><span>Kalorien</span><input class="input" data-manual-kcal type="text" inputmode="decimal" placeholder="500" required></label>
-        <label><span>Protein</span><input class="input" data-manual-protein type="text" inputmode="decimal" placeholder="0"></label>
-        <label><span>Carbs</span><input class="input" data-manual-carbs type="text" inputmode="decimal" placeholder="0"></label>
+        <label><span>Kalorien</span><input class="input" data-manual-kcal type="text" inputmode="decimal" placeholder="250" required></label>
+        <label><span>Kohlenhydrate</span><input class="input" data-manual-carbs type="text" inputmode="decimal" placeholder="0"></label>
         <label><span>Fett</span><input class="input" data-manual-fat type="text" inputmode="decimal" placeholder="0"></label>
+        <label><span>Protein</span><input class="input" data-manual-protein type="text" inputmode="decimal" placeholder="0"></label>
       </div>
+      <label class="nutrition-form-field"><span>Gegessene Menge</span><span class="nutrition-unit-field"><input class="input" data-manual-amount type="text" inputmode="decimal" value="100" required><i>g</i></span></label>
+      <div class="nutrition-product-result" data-manual-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Eintrag speichern</button>
     </form>`);
+  backdrop.querySelectorAll('[data-own-product]').forEach((button) => {
+    button.onclick = () => {
+      const product = ownProducts[Number(button.dataset.ownProduct)];
+      backdrop.remove();
+      amountEditor({ product, date, onSave });
+    };
+  });
+  const per100 = () => ({
+    energy_kcal: number(backdrop.querySelector('[data-manual-kcal]').value),
+    protein_g: number(backdrop.querySelector('[data-manual-protein]').value),
+    carbs_g: number(backdrop.querySelector('[data-manual-carbs]').value),
+    fat_g: number(backdrop.querySelector('[data-manual-fat]').value),
+  });
+  const scaled = () => {
+    const factor = number(backdrop.querySelector('[data-manual-amount]').value) / 100;
+    return Object.fromEntries(Object.entries(per100()).map(([key, value]) => [key, value * factor]));
+  };
+  const renderResult = () => {
+    const value = scaled();
+    backdrop.querySelector('[data-manual-result]').innerHTML = `<b>${decimal(value.energy_kcal)} kcal</b><span>${decimal(value.protein_g, 1)} P · ${decimal(value.carbs_g, 1)} K · ${decimal(value.fat_g, 1)} F</span>`;
+  };
+  backdrop.querySelectorAll('[data-manual-kcal],[data-manual-protein],[data-manual-carbs],[data-manual-fat],[data-manual-amount]').forEach((input) => { input.oninput = renderResult; });
+  renderResult();
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault();
     const button = event.submitter; button.disabled = true;
+    const name = backdrop.querySelector('[data-manual-name]').value.trim();
+    const amount = number(backdrop.querySelector('[data-manual-amount]').value);
+    const base = per100();
     const payload = {
       log_date: date, period: backdrop.querySelector('[data-log-period]').value,
-      name: backdrop.querySelector('[data-manual-name]').value.trim(), amount: 1, unit: 'portion',
-      energy_kcal: number(backdrop.querySelector('[data-manual-kcal]').value),
-      protein_g: number(backdrop.querySelector('[data-manual-protein]').value),
-      carbs_g: number(backdrop.querySelector('[data-manual-carbs]').value),
-      fat_g: number(backdrop.querySelector('[data-manual-fat]').value), product_snapshot: { source: 'manual' },
+      name, amount, unit: 'g', ...scaled(),
+      product: { barcode: '', name, brand: 'Eigene Mahlzeit', image_url: '', serving_g: 100,
+        kcal_100g: base.energy_kcal, protein_100g: base.protein_g,
+        carbs_100g: base.carbs_g, fat_100g: base.fat_g, source: 'manual' },
     };
-    if (!payload.name || !payload.energy_kcal) { button.disabled = false; return toast('Name und Kalorien eintragen'); }
+    if (!payload.name || !base.energy_kcal || !amount) { button.disabled = false; return toast('Name, Kalorien und Grammzahl eintragen'); }
     const saved = await onSave(payload);
     if (saved) backdrop.remove(); else button.disabled = false;
   };
@@ -229,9 +271,9 @@ function manualEditor({ date, onSave }) {
 
 function amountEditor({ product, date, onSave }) {
   const serving = number(product.serving_g) || 100;
-  const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
+  const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : materialIconMarkup('fastfood')}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
-    <p class="nutrition-source">Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> · Werte vor dem Speichern prüfen</p>
+    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'base_food' ? 'Durchschnittlicher Basiswert' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect()}
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-unit-field"><input class="input" data-product-amount type="text" inputmode="decimal" value="${decimal(serving, 1)}" required><i>g</i></span></label>
       <div class="nutrition-product-result" data-product-result></div>
@@ -262,7 +304,11 @@ function amountEditor({ product, date, onSave }) {
 async function productLookup(action, value) {
   const body = action === 'barcode' ? { action, barcode: value } : { action, query: value };
   const { data, error } = await supabase.functions.invoke('food-products', { body });
-  if (!error && data) return data;
+  const basis = action === 'search'
+    ? BASE_FOODS.filter((product) => product.name.toLocaleLowerCase('de').includes(String(value).trim().toLocaleLowerCase('de')))
+    : [];
+  const mergeProducts = (products = []) => [...new Map([...basis, ...products].map((product) => [`${product.name.toLocaleLowerCase('de')}:${product.brand || ''}`, product])).values()].slice(0, 16);
+  if (!error && data) return action === 'search' ? { ...data, products: mergeProducts(data.products) } : data;
   const fields = 'code,product_name,product_name_de,brands,image_front_small_url,image_front_url,serving_quantity,nutriments';
   const normalize = (product) => {
     const nutrients = product.nutriments || {};
@@ -282,13 +328,13 @@ async function productLookup(action, value) {
   const url = new URL('https://world.openfoodfacts.org/cgi/search.pl');
   Object.entries({ search_terms: value, search_simple: '1', action: 'process', json: '1', page_size: '12', fields }).forEach(([key, val]) => url.searchParams.set(key, val));
   const payload = await (await fetch(url)).json();
-  return { products: (payload.products || []).map(normalize).filter((product) => product.name && product.kcal_100g) };
+  return { products: mergeProducts((payload.products || []).map(normalize).filter((product) => product.name && product.kcal_100g)) };
 }
 
 function searchEditor({ date, onSave }) {
-  const backdrop = createOverlay(`<header><h2>Lebensmittel suchen</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
+  const backdrop = createOverlay(`<header><h2>Lebensmittel suchen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="nutrition-search-form"><input class="input" data-food-query placeholder="Produkt oder Marke" autocomplete="off"><button class="btn btn-primary" type="submit">Suchen</button></form>
-    <div class="nutrition-search-results" data-food-results><p>Suche nach einem verpackten Lebensmittel.</p></div>`);
+    <div class="nutrition-search-results" data-food-results><p>Suche nach einem Basislebensmittel, Produkt oder einer Marke.</p></div>`);
   const results = backdrop.querySelector('[data-food-results]');
   let products = [];
   backdrop.querySelector('form').onsubmit = async (event) => {
@@ -297,7 +343,11 @@ function searchEditor({ date, onSave }) {
     const streamingSound = playInterfaceSound('streaming', { loop: true, retrigger: 'restart' });
     try {
       products = (await productLookup('search', query)).products || [];
-      results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : '<span></span>'}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigene Mahlzeit“.</p>';
+      results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${index < 2 ? ' fetchpriority="high"' : ''}>` : '<span></span>'}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigene Mahlzeit“.</p>';
+      results.querySelectorAll('img').forEach((image) => {
+        const reveal = () => image.classList.add('ist-geladen');
+        if (image.complete) reveal(); else image.addEventListener('load', reveal, { once: true });
+      });
     } catch { results.innerHTML = '<p>Produktsuche gerade nicht erreichbar.</p>'; }
     finally { streamingSound?.stop?.(); }
   };
@@ -310,7 +360,7 @@ function searchEditor({ date, onSave }) {
 
 function recentEditor({ recent, date, onSave }) {
   const unique = [...new Map(recent.map((item) => [`${item.name}:${item.amount}:${item.unit}`, item])).values()].slice(0, 16);
-  const backdrop = createOverlay(`<header><h2>Zuletzt verwendet</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
+  const backdrop = createOverlay(`<header><h2>Zuletzt verwendet</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-recent">${unique.length ? unique.map((item, index) => `<button type="button" data-recent-index="${index}"><span><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} ${item.unit === 'portion' ? 'Portion' : 'g'}</small></span><strong>${decimal(item.energy_kcal)} kcal</strong></button>`).join('') : '<p>Noch keine früheren Einträge.</p>'}</div>`);
   backdrop.querySelector('.nutrition-recent').onclick = async (event) => {
     const index = event.target.closest('[data-recent-index]')?.dataset.recentIndex; if (index == null) return;
@@ -330,8 +380,8 @@ async function barcodeResult(barcode, { date, onSave }, closeCurrent) {
 }
 
 function scannerEditor(context) {
-  const backdrop = createOverlay(`<header><h2>Barcode scannen</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
-    <div class="nutrition-scanner"><video playsinline muted></video><span></span></div>
+  const backdrop = createOverlay(`<header><h2>Barcode scannen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="nutrition-scanner"><video playsinline muted></video><span></span><button type="button" data-scanner-torch hidden aria-pressed="false" aria-label="Taschenlampe einschalten">${materialIconMarkup('brightness_empty')}</button></div>
     <p class="nutrition-scanner-status" data-scanner-status>Kamera wird gestartet …</p>
     <p class="nutrition-calc-note nutrition-scanner-help">Barcode in den Rahmen halten. Die Kamera wird nur für die Erkennung verwendet.</p>
     <form class="nutrition-barcode-manual"><input class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Barcode manuell eingeben"><button class="btn btn-primary" type="submit">Suchen</button></form>`);
@@ -359,6 +409,20 @@ function scannerEditor(context) {
     video.srcObject = stream;
     await video.play();
     if (status) status.textContent = 'Scanner aktiv';
+    const torch = backdrop.querySelector('[data-scanner-torch]');
+    const track = stream.getVideoTracks()[0];
+    if (BrowserMultiFormatReader.mediaStreamIsTorchCompatibleTrack(track)) {
+      torch.hidden = false;
+      torch.onclick = async (event) => {
+        event.stopPropagation();
+        const enabled = torch.getAttribute('aria-pressed') !== 'true';
+        try {
+          await BrowserMultiFormatReader.mediaStreamSetTorch(track, enabled);
+          torch.setAttribute('aria-pressed', String(enabled));
+          torch.setAttribute('aria-label', enabled ? 'Taschenlampe ausschalten' : 'Taschenlampe einschalten');
+        } catch { toast('Die Taschenlampe konnte nicht geschaltet werden.'); }
+      };
+    }
     const reader = new BrowserMultiFormatReader(undefined, { delayBetweenScanAttempts: 80, delayBetweenScanSuccess: 350 });
     controls = await reader.decodeFromStream(stream, video, (result, _error, scannerControls) => {
       if (!result || detected) return; detected = true; scannerControls.stop();
@@ -373,10 +437,10 @@ function scannerEditor(context) {
 }
 
 function addMenu(context) {
-  const backdrop = createOverlay(`<header><h2>Kalorien eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">×</button></header>
+  const backdrop = createOverlay(`<header><h2>Mahlzeit eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue nutrition-add-menu">
       <button type="button" data-nutrition-action="scan">${materialIconMarkup('photo_camera')}<span><b>Barcode scannen</b><small>Verpacktes Produkt erkennen</small></span></button>
-      <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Open Food Facts durchsuchen</small></span></button>
+      <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Basislebensmittel und Produkte</small></span></button>
       <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigene Mahlzeit</b><small>Kalorien und Makros selbst eintragen</small></span></button>
       <button type="button" data-nutrition-action="recent">${materialIconMarkup('calendar_meal')}<span><b>Zuletzt verwendet</b><small>Frühere Mahlzeit wiederholen</small></span></button>
     </div>`);
@@ -393,7 +457,7 @@ function addMenu(context) {
 export async function mountNutrition(container, { userId, signal }) {
   let date = localDateKey();
   let automaticToday = true;
-  let state = { settings: {}, entries: [], recent: [], latestWeight: 0 };
+  let state = { settings: {}, entries: [], recent: [], ownProducts: [], latestWeight: 0 };
   const deleteEntry = async (button) => {
     const id = button.closest('[data-nutrition-entry]')?.dataset.nutritionEntry;
     if (!id || !confirm('Diesen Kalorieneintrag löschen?')) return;
@@ -431,9 +495,25 @@ export async function mountNutrition(container, { userId, signal }) {
           source: 'open_food_facts', source_snapshot: product,
         }, { onConflict: 'user_id,barcode' }).select('id').single();
         if (error) throw error; productId = data.id;
+      } else if (payload.product?.source === 'manual') {
+        const product = payload.product;
+        const existing = await supabase.from('nutrition_products').select('id')
+          .eq('user_id', userId).eq('source', 'manual').eq('name', product.name).limit(1).maybeSingle();
+        if (existing.error) throw existing.error;
+        const values = {
+          user_id: userId, barcode: null, name: product.name, brand: 'Eigene Mahlzeit', image_url: null,
+          serving_g: 100, kcal_100g: product.kcal_100g, protein_100g: product.protein_100g || 0,
+          carbs_100g: product.carbs_100g || 0, fat_100g: product.fat_100g || 0,
+          source: 'manual', source_snapshot: product,
+        };
+        const savedProduct = existing.data?.id
+          ? await supabase.from('nutrition_products').update(values).eq('id', existing.data.id).eq('user_id', userId).select('id').single()
+          : await supabase.from('nutrition_products').insert(values).select('id').single();
+        if (savedProduct.error) throw savedProduct.error;
+        productId = savedProduct.data.id;
       }
       const row = {
-        user_id: userId, log_date: payload.log_date || date, period: payload.period || 'morning', product_id: productId,
+        user_id: userId, log_date: payload.log_date || date, period: payload.period || 'breakfast', product_id: productId,
         name: payload.name, amount: payload.amount || 1, unit: payload.unit || 'portion',
         energy_kcal: payload.energy_kcal || 0, protein_g: payload.protein_g || 0,
         carbs_g: payload.carbs_g || 0, fat_g: payload.fat_g || 0,
@@ -521,6 +601,6 @@ export async function mountNutrition(container, { userId, signal }) {
   return {
     isEnabled: () => nutritionEnabled(state),
     renderIntegrated,
-    openAddMenu: () => addMenu({ date, recent: state.recent, onSave: saveEntry }),
+    openAddMenu: () => addMenu({ date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry }),
   };
 }

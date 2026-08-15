@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { availableCategoryIcons } from './categoryIcons.js';
+import { availableCategoryIcons, materialIconMarkup } from './categoryIcons.js';
 import {
   activatePush,
   browserPushSubscriptionExists,
@@ -24,9 +24,11 @@ let reminderStartPromise = null;
 let reminderLoopGeneration = 0;
 
 const DEFAULT_REMINDERS = [
-  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'fastfood' } },
-  { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'fastfood' } },
-  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'fastfood' } },
+  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'breakfast' } },
+  { type: 'meal', label: 'Snack vormittags', time: '10:30', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'snack_morning' } },
+  { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'lunch' } },
+  { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'snack_afternoon' } },
+  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'fastfood', meal_slot: 'dinner' } },
   { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders', metadata: { icon: 'pill' } },
   { type: 'supplement', label: 'Supplement PM', time: '20:00', route: '#reminders', metadata: { icon: 'pill' } },
   {
@@ -86,6 +88,21 @@ const minuteKey = (date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 const minutesFromTime = (time) => {
   const [hours, minutes] = String(time || '00:00').split(':').map((part) => Number(part));
   return (Number.isFinite(hours) ? hours : 0) * 60 + (Number.isFinite(minutes) ? minutes : 0);
+};
+const mealSlotForReminder = (item) => {
+  if (item.metadata?.meal_slot) return item.metadata.meal_slot;
+  const label = String(item.label || '').toLocaleLowerCase('de');
+  if (label.includes('frühstück')) return 'breakfast';
+  if (label.includes('vormittag')) return 'snack_morning';
+  if (label.includes('mittagessen')) return 'lunch';
+  if (label.includes('nachmittag')) return 'snack_afternoon';
+  if (label.includes('abend')) return 'dinner';
+  const minutes = minutesFromTime(item.time);
+  if (minutes < 9 * 60 + 45) return 'breakfast';
+  if (minutes < 12 * 60) return 'snack_morning';
+  if (minutes < 15 * 60) return 'lunch';
+  if (minutes < 18 * 60) return 'snack_afternoon';
+  return 'dinner';
 };
 const einheitLabel = (value) => ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' })[value] || value;
 
@@ -492,7 +509,7 @@ function reminderRowMarkup(reminder, completion) {
   const badge = statusBadge(completion);
   const dimmed = completion?.completed_at ? ' ist-erledigt' : '';
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
-  return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}">
+  return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}>
     <summary class="rem-row-head">
       <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminderIconValue(reminder))}</span>
       <span class="rem-row-titel">
@@ -513,14 +530,18 @@ function reminderGroups(reminders, completions) {
   const drink = reminders.find((item) => item.type === 'drink');
   const interval = Number(drink?.metadata?.intervall_minuten || 120);
   const periods = [
-    ['morning', 'MORGENS', 0, 11 * 60],
-    ['midday', 'MITTAGS', 11 * 60, 17 * 60],
-    ['evening', 'ABENDS', 17 * 60, 24 * 60],
+    ['breakfast', 'FRÜHSTÜCK', 0, 9 * 60 + 45],
+    ['snack_morning', 'SNACK', 9 * 60 + 45, 12 * 60],
+    ['lunch', 'MITTAGESSEN', 12 * 60, 15 * 60],
+    ['snack_afternoon', 'SNACK', 15 * 60, 18 * 60],
+    ['dinner', 'ABENDESSEN', 18 * 60, 24 * 60],
   ];
   const timed = reminders.filter((item) => item.type === 'meal' || item.type === 'supplement')
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
   const timeline = periods.map(([period, title, start, end]) => {
-    const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
+    const rows = timed.filter((item) => item.type === 'meal'
+      ? mealSlotForReminder(item) === period
+      : minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     return `<section class="mahl-zeitblock">
       <header><h2>${title}</h2><span data-period-count data-reminder-count="${rows.length}">${rows.length}</span></header>
       <div class="mahl-timeline"><div data-period-reminders>${rows.length
@@ -554,7 +575,7 @@ function reminderOverlay(markup) {
 
 function choosePeriod(type, onSelected) {
   const backdrop = reminderOverlay(`
-    <header><h2>${type === 'meal' ? 'Mahlzeit' : 'Supplement'} eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">×</button></header>
+    <header><h2>${type === 'meal' ? 'Mahlzeit' : 'Supplement'} eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <p class="rem-overlay-hinweis">Wann soll die Erinnerung erscheinen?</p>
     <div class="sheet-menue rem-period-menu">
       <button type="button" data-period="morning"><span>Morgens</span></button>
@@ -571,7 +592,7 @@ function choosePeriod(type, onSelected) {
 
 export function chooseReminderIcon(current, onSelected, { hostBackdrop = null } = {}) {
   const markup = `
-    <header><h2>Icon auswählen</h2><button class="rem-icon-close" data-reminder-overlay-close aria-label="Schließen">×</button></header>
+    <header><h2>Icon auswählen</h2><button class="rem-icon-close" data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sammlung-editor-icons rem-icon-grid">${availableCategoryIcons.map((icon) => `<button type="button" data-rem-icon="${icon.id}" class="${current === icon.id ? 'aktiv' : ''}" aria-label="${escapeHtml(icon.title)}">${icon.svg}</button>`).join('')}</div>
     <form class="sammlung-emoji-eigen rem-eigenes-emoji" data-rem-emoji-form>
       <label for="rem-eigenes-emoji"><span>Eigenes Emoji</span>
@@ -728,6 +749,7 @@ export async function mountReminders(container, { session, signal }) {
       patch.metadata = {
         icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'meal', metadata: {} }),
         notiz: body.querySelector('[data-meal-note]')?.value.trim() || '',
+        meal_slot: row.dataset.mealSlot || mealSlotForReminder({ label: patch.label, time: patch.time, metadata: {} }),
       };
     }
     return patch;
@@ -896,10 +918,9 @@ export async function mountReminders(container, { session, signal }) {
       const backdrop = document.createElement('div');
       backdrop.className = 'kategorie-sheet-backdrop mahl-add-backdrop offen';
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
-        <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">×</button></header>
+        <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         <div class="sheet-menue">
-          ${nutritionActions?.isEnabled?.() ? `<button type="button" data-add-type="nutrition">${iconMarkup('meal')}<span><b>Essen eintragen</b><small>Barcode, Suche oder eigene Mahlzeit</small></span></button>` : ''}
-          <button type="button" data-add-type="meal">${iconMarkup('meal')}<span>Mahlzeit</span></button>
+          ${nutritionActions?.isEnabled?.() ? `<button type="button" data-add-type="nutrition">${iconMarkup('meal')}<span><b>Mahlzeit eintragen</b><small>Barcode, Suche oder eigene Mahlzeit</small></span></button>` : ''}
           <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
           <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>
         </div>
