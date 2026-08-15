@@ -14,6 +14,7 @@ import {
   reminderNotificationTag, shouldReuseReminderLoop, shouldStartLocalReminderLoop,
 } from './notificationDelivery.js';
 import { mountNutrition } from './nutrition.js';
+import { bindLongPress } from './longPress.js';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
@@ -447,6 +448,15 @@ function reminderBodyMarkup(reminder, completion) {
   const isDrink = reminder.type === 'drink';
   const isSupplement = reminder.type === 'supplement';
   const zeit = (reminder.time || '08:00').slice(0, 5);
+  if (isSupplement) {
+    return `<div class="rem-row-body">
+      <label class="rem-field"><span>Name</span>
+        <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
+      </label>
+      <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
+      ${reminder.id ? '<button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>' : ''}
+    </div>`;
+  }
   return `<div class="rem-row-body">
     <div class="rem-name-reihe">
       <div class="rem-field rem-icon-field"><span>Icon</span>
@@ -471,22 +481,7 @@ function reminderBodyMarkup(reminder, completion) {
           </select>
         </label>` : ''}
     </div>
-    ${isSupplement ? `<div class="rem-field-reihe">
-      <label class="rem-field"><span>Dosis</span>
-        <input class="input" data-dosis type="number" inputmode="decimal" min="0" step="any" placeholder="z. B. 5000" value="${escapeHtml(reminder.metadata?.dosis || '')}">
-      </label>
-      <label class="rem-field"><span>Einheit</span>
-        <select class="input" data-einheit>
-          ${EINHEITEN.map((einheit) => `<option value="${escapeHtml(einheit)}"${(reminder.metadata?.einheit || '') === einheit ? ' selected' : ''}>${einheit ? einheitLabel(einheit) : '—'}</option>`).join('')}
-        </select>
-      </label>
-    </div>
-    <label class="rem-field"><span>Einnahmehinweis</span>
-      <select class="input" data-hinweis>
-        ${HINWEISE.map(([wert, name]) => `<option value="${escapeHtml(wert)}"${(reminder.metadata?.hinweis || '') === wert ? ' selected' : ''}>${name}</option>`).join('')}
-      </select>
-    </label>` : ''}
-    ${!isDrink && !isSupplement ? `<label class="rem-field"><span>Notiz</span>
+    ${!isDrink ? `<label class="rem-field"><span>Notiz</span>
       <textarea class="input rem-mahlzeit-notiz" data-meal-note maxlength="240" rows="3" placeholder="z. B. 40 g Haferflocken, Banane und Protein">${escapeHtml(reminder.metadata?.notiz || '')}</textarea>
     </label>` : ''}
     <div class="rem-row-body-aktionen">
@@ -497,7 +492,7 @@ function reminderBodyMarkup(reminder, completion) {
       </label>
     </div>
     <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
-    ${reminder.id && (reminder.type === 'meal' || reminder.type === 'supplement') ? `
+    ${reminder.id && reminder.type === 'meal' ? `
       <button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>
     ` : ''}
   </div>`;
@@ -511,7 +506,7 @@ function reminderRowMarkup(reminder, completion) {
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
   return `<details class="rem-row${dimmed}${inaktiv}" data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}>
     <summary class="rem-row-head">
-      <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminderIconValue(reminder))}</span>
+      <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminder.type === 'supplement' ? 'pill' : reminderIconValue(reminder))}</span>
       <span class="rem-row-titel">
         <b>${escapeHtml(reminder.label)}</b>
         <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
@@ -519,7 +514,7 @@ function reminderRowMarkup(reminder, completion) {
         ${badge}
       </span>
       ${reminder.type === 'supplement' ? '' : `<span class="rem-row-zeit">${escapeHtml(zusammenfassung.time)}</span>`}
-      <span class="rem-row-chevron" aria-hidden="true">⌄</span>
+      ${reminder.type === 'drink' ? '<span class="rem-row-chevron" aria-hidden="true">⌄</span>' : ''}
     </summary>
     ${reminderBodyMarkup(reminder, completion)}
   </details>`;
@@ -731,11 +726,13 @@ export async function mountReminders(container, { session, signal }) {
   const patchFromBody = (row) => {
     const body = row.querySelector('.rem-row-body');
     if (!body) return null;
-    const patch = {
-      label: body.querySelector('[data-label]')?.value.trim(),
-      time: body.querySelector('[data-time]')?.value,
-      active: body.querySelector('[data-active]')?.checked,
-    };
+    const patch = {};
+    const labelInput = body.querySelector('[data-label]');
+    if (labelInput) patch.label = labelInput.value.trim();
+    const timeInput = body.querySelector('[data-time]');
+    if (timeInput) patch.time = timeInput.value;
+    const activeInput = body.querySelector('[data-active]');
+    if (activeInput) patch.active = activeInput.checked;
     if (row.dataset.type === 'drink') {
       patch.metadata = {
         icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'drink', metadata: {} }),
@@ -743,12 +740,7 @@ export async function mountReminders(container, { session, signal }) {
         intervall_minuten: Number(body.querySelector('[data-interval]')?.value || 120),
       };
     } else if (row.dataset.type === 'supplement') {
-      patch.metadata = {
-        icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'supplement', metadata: {} }),
-        dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
-        einheit: body.querySelector('[data-einheit]')?.value || '',
-        hinweis: body.querySelector('[data-hinweis]')?.value || '',
-      };
+      patch.metadata = { icon: 'pill' };
     } else {
       patch.metadata = {
         icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'meal', metadata: {} }),
@@ -913,6 +905,17 @@ export async function mountReminders(container, { session, signal }) {
       }
     }
   });
+
+  // Für Mahlzeit und Supplement: Tap auf die Kopfzeile darf das <details> nicht
+  // togglen — Bearbeitung öffnet sich nur per Long-Press (siehe unten).
+  list.addEventListener('click', (event) => {
+    const head = event.target.closest('.rem-row-head');
+    if (!head) return;
+    const row = head.closest('[data-reminder-key]');
+    if (!row || row.dataset.type === 'drink') return;
+    event.preventDefault();
+  }, true);
+  bindLongPress(list, '.rem-row:not([data-type="drink"])', (row) => () => { row.open = !row.open; });
 
   list.addEventListener('focusin', (event) => {
     const timeInput = event.target.closest('[data-slot-time]');
