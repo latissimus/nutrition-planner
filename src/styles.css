@@ -5007,8 +5007,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-period-inline{border-top:1px solid var(--app-divider);background:color-mix(in srgb,var(--ordner) 4%,var(--surface))}
 .nutrition-period-inline>header{display:none}
 .mahl-zeitblock .nutrition-entry>.nutrition-entry-head{min-height:64px;padding:10px 14px}
-.mahl-zeitblock .nutrition-entry .rem-row-titel>b{font-size:13px;line-height:1.15}
-.mahl-zeitblock .nutrition-entry .rem-row-titel>small{margin-top:3px;color:var(--ink);font-size:10.5px;font-weight:780;line-height:1.2}
+.mahl-zeitblock .nutrition-entry .rem-row-titel>b{color:var(--text);font-family:var(--ui);font-size:14.5px;font-weight:700;line-height:1.25}
+.mahl-zeitblock .nutrition-entry .rem-row-titel>small{margin-top:2px;color:var(--text);font-family:var(--ui);font-size:11.5px;font-weight:500;line-height:1.3}
 .mahl-zeitblock .nutrition-entry>.nutrition-entry-head>strong{font-size:11.5px;font-weight:850}
 .nutrition-gram-input{position:relative;display:block;min-width:0}.nutrition-gram-input .nutrition-gram-picker{box-sizing:border-box;width:100%;height:52px;padding-right:42px!important;text-align:center;font-size:17px;font-weight:800;-webkit-appearance:none;appearance:none}.nutrition-gram-input>i{position:absolute;top:0;right:14px;display:grid;place-items:center;height:52px;color:var(--muted);font:800 12px/1 var(--ui);pointer-events:none}
 
