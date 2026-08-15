@@ -4099,6 +4099,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-day-nav{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--app-divider)}
 .nutrition-day-nav button{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1.5px solid var(--ink);border-radius:11px;background:var(--surface);color:var(--ink);box-shadow:none!important}
 .nutrition-day-nav button:disabled{opacity:.28}.nutrition-day-nav button .material-svg,.nutrition-day-nav button svg{display:block;width:21px;height:21px;fill:currentColor}
+.nutrition-day-nav-prev .nutrition-chevron{transform:scaleX(-1)}
 .nutrition-day-nav>div{min-width:0;text-align:center}.nutrition-day-nav b,.nutrition-day-nav small{display:block}.nutrition-day-nav b{font:800 16px/1.1 var(--ui);text-transform:uppercase}.nutrition-day-nav small{margin-top:3px;color:var(--muted);font-size:11px}
 .nutrition-balance{display:grid;grid-template-columns:minmax(0,1fr) 104px;align-items:center;gap:14px;padding:16px}
 .nutrition-balance>div:first-child small{display:block;margin-bottom:5px;color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.08em}.nutrition-balance strong{display:block;font:800 30px/.95 var(--ui);letter-spacing:-.04em}.nutrition-balance strong i{font-size:13px;font-style:normal;letter-spacing:0}
