@@ -5005,9 +5005,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-mini-switch input:checked+.mahl-mini-switch-track{background:var(--ordner)}
 .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{transform:translateX(16px);background:#fff}
 .mahl-mini-switch input:disabled+.mahl-mini-switch-track{opacity:.55}
-.rem-field-switch{gap:6px;align-items:flex-end;padding-left:12px}
-.rem-field-switch>span{align-self:flex-end;text-align:right}
-.rem-field-switch>.mahl-mini-switch{align-self:flex-end;min-height:52px;align-items:center}
+.rem-time-mit-switch{display:flex;align-items:center;gap:14px}
+.rem-time-mit-switch>.mahl-mini-switch{flex:0 0 auto}
+.rem-time-mit-switch>.input{flex:1 1 auto;min-width:0;margin:0}
 .rem-row-body input[type="time"]{height:52px!important;min-height:52px!important;padding-top:0!important;padding-bottom:0!important;line-height:52px;text-align:center;text-align-last:center}
 .rem-row-body input[type="time"]::-webkit-date-and-time-value{height:52px!important;line-height:52px!important;text-align:center;padding:0}
 .mahl-slot-info{display:inline-grid;place-items:center;width:26px;height:26px;margin-left:6px;padding:0;border:0;border-radius:50%;background:transparent;color:color-mix(in srgb,var(--ink) 45%,transparent);cursor:pointer;box-shadow:none;transition:color .12s,background .12s}

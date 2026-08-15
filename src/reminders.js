@@ -453,15 +453,12 @@ function reminderBodyMarkup(reminder, completion) {
       <label class="rem-field"><span>Name</span>
         <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
       </label>
-      <div class="rem-field-reihe">
-        <label class="rem-field"><span>Uhrzeit</span>
+      <label class="rem-field"><span>Uhrzeit</span>
+        <div class="rem-time-mit-switch">
+          <label class="mahl-mini-switch" aria-label="Benachrichtigung"><input type="checkbox" data-active${reminder.active ? ' checked' : ''}><i class="mahl-mini-switch-track" aria-hidden="true"></i></label>
           <input class="input" data-time type="time" value="${zeit}">
-        </label>
-        <div class="rem-field rem-field-switch">
-          <span>Benachrichtigung</span>
-          <label class="mahl-mini-switch"><input type="checkbox" data-active${reminder.active ? ' checked' : ''}><i class="mahl-mini-switch-track" aria-hidden="true"></i></label>
         </div>
-      </div>
+      </label>
       <div class="rem-field-reihe">
         <label class="rem-field"><span>Dosis</span>
           <input class="input" data-dosis type="number" inputmode="decimal" min="0" step="any" placeholder="z. B. 5000" value="${escapeHtml(reminder.metadata?.dosis || '')}">
