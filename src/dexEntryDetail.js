@@ -5,6 +5,7 @@ import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
 import { playInterfaceSound } from './uiSounds.js';
+import { notifyHomeCountsChanged } from './realtime.js';
 
 const BUCKET = 'dex-entries';
 const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
@@ -158,6 +159,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
     if (!confirm(`„${entry.title}“ wirklich löschen?`)) return;
     const { error } = await supabase.from('dex_entries').delete().eq('id', entry.id).eq('user_id', entry.user_id);
     if (error) { toast(error.message || 'Löschen fehlgeschlagen'); return; }
+    notifyHomeCountsChanged();
     if (entry.image_path || entry.audio_path) await supabase.storage.from(BUCKET).remove([entry.image_path || entry.audio_path]);
     close(); toast('Dex-Eintrag gelöscht');
     if (onDeleted) onDeleted();

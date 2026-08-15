@@ -10,6 +10,7 @@ import { routineCoinValue } from './coinDex.js';
 import { setRoutineCompletion } from './routineCompletion.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
+import { notifyHomeCountsChanged } from './realtime.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -233,6 +234,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       : supabase.from('routines').insert(payload);
     const { error } = await query;
     if (error) { toast('Routine konnte nicht gespeichert werden.'); submit.disabled = false; return; }
+    notifyHomeCountsChanged();
     close(); toast('Routine gespeichert'); await onSaved?.();
     if (!existing) playInterfaceSound('bonus', { retrigger: 'restart' });
   };
@@ -240,6 +242,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
     if (!confirm(`„${existing.name}“ wirklich löschen?`)) return;
     const { error } = await supabase.from('routines').delete().eq('id', existing.id).eq('user_id', userId);
     if (error) return toast('Routine konnte nicht gelöscht werden.');
+    notifyHomeCountsChanged();
     close(); toast('Routine gelöscht'); await onSaved?.();
   });
   document.body.append(backdrop);

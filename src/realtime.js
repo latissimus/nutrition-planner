@@ -1,5 +1,12 @@
 import { supabase } from './supabase.js';
 
+// Lokaler Fallback für Zähler auf der Startseite. Er wird nach einem
+// erfolgreichen Schreibvorgang ausgelöst, falls der Postgres-Realtime-Kanal
+// auf dem Gerät verzögert oder gar nicht verbunden ist.
+export function notifyHomeCountsChanged() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:counts-changed'));
+}
+
 const zufallsId = () => globalThis.crypto?.randomUUID?.()
   || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 

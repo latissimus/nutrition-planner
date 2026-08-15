@@ -5,7 +5,7 @@ import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { resolveSharedSpace } from './sharing.js';
-import { subscribeToTableChanges } from './realtime.js';
+import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -295,6 +295,7 @@ export function sichtbareItems(items, { nurAusgewaehlt = false, activeTag = '', 
 async function toggleItem(userId, id, checked) {
   const { error } = await supabase.from('shopping_items').update({ checked }).eq('id', id);
   if (error) throw error;
+  notifyHomeCountsChanged();
 }
 
 async function resetChecked(userId) {
@@ -318,18 +319,21 @@ async function addItem(userId, name, section, tagsInput) {
     if (error.code === '23505') { toast(`„${cleanName}“ steht schon auf der Liste.`); return null; }
     throw error;
   }
+  notifyHomeCountsChanged();
   return data;
 }
 
 async function deleteItem(userId, id) {
   const { error } = await supabase.from('shopping_items').delete().eq('id', id);
   if (error) throw error;
+  notifyHomeCountsChanged();
 }
 
 async function updateItem(userId, id, patch) {
   const { data, error } = await supabase.from('shopping_items').update(patch)
     .eq('id', id).select(SELECT_COLUMNS).single();
   if (error) throw error;
+  notifyHomeCountsChanged();
   return data;
 }
 

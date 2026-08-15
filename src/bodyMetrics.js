@@ -2,6 +2,7 @@ import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { curveSvg } from './curve.js';
 import { FALTEN, datumKurz, heute, schnitt7, summe, zahl } from './measurements.js';
+import { notifyHomeCountsChanged } from './realtime.js';
 
 async function loadSkinfolds(userId, limit = 60, signal) {
   let query = supabase
@@ -21,6 +22,7 @@ async function saveSkinfolds(userId, folds, date = heute()) {
     .from('skinfolds')
     .upsert({ user_id: userId, gemessen_am: date, falten: folds }, { onConflict: 'user_id,gemessen_am' });
   if (error) throw error;
+  notifyHomeCountsChanged();
 }
 
 async function loadWeights(userId, limit = 180, signal) {
@@ -41,6 +43,7 @@ async function saveWeight(userId, kg, date = heute()) {
     .from('weights')
     .upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' });
   if (error) throw error;
+  notifyHomeCountsChanged();
 }
 
 async function deleteMeasurements(userId) {
@@ -48,6 +51,7 @@ async function deleteMeasurements(userId) {
   if (skinfolds.error) throw skinfolds.error;
   const weights = await supabase.from('weights').delete().eq('user_id', userId);
   if (weights.error) throw weights.error;
+  notifyHomeCountsChanged();
 }
 
 const delta = (newValue, oldValue, unit, lowerIsBetter = true) => {

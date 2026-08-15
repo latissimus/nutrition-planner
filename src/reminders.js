@@ -15,6 +15,7 @@ import {
 } from './notificationDelivery.js';
 import { mountNutrition } from './nutrition.js';
 import { bindLongPress } from './longPress.js';
+import { notifyHomeCountsChanged } from './realtime.js';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const CHECK_INTERVAL_MS = 30000;
@@ -244,6 +245,7 @@ async function saveReminder(userId, reminder) {
     .select('id, type, label, time, weekdays, active, metadata, route')
     .single();
   if (error) throw error;
+  notifyHomeCountsChanged();
   return data;
 }
 
@@ -255,6 +257,7 @@ async function deleteReminder(userId, reminderId) {
     .update({ active: false, metadata: { ...(existing?.metadata || {}), deleted: true } })
     .eq('id', reminderId).eq('user_id', userId);
   if (error) throw error;
+  notifyHomeCountsChanged();
 }
 
 async function ensureDefaults(userId, signal) {

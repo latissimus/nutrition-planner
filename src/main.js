@@ -853,6 +853,9 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
       if (meta && stat) meta.innerHTML = `<b>${stat.entries}</b><span>Einträge · ${stat.children} Unter-Dex</span>`;
     });
   };
+  const lokaleZaehlungsAenderung = () => { aktualisiereHomeZaehler().catch(() => {}); };
+  window.addEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung);
+  signal?.addEventListener('abort', () => window.removeEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung), { once: true });
   ['weights', 'reminders', 'dex_entries', 'shopping_items', 'routines', 'sleep_logs']
     .forEach((table) => subscribeToTableChanges({ table, signal, onChange: aktualisiereHomeZaehler, onError: () => {} }));
   subscribeToTableChanges({

@@ -2,7 +2,7 @@ import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
 import { setRoutineCompletion } from './routineCompletion.js';
-import { subscribeToTableChanges } from './realtime.js';
+import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
 import { toast } from './toast.js';
 import { playInterfaceSound } from './uiSounds.js';
 
@@ -159,7 +159,7 @@ function planEditor({ userId, state, onSaved }) {
       supabase.from('sleep_schedules').upsert(schedules, { onConflict: 'user_id,weekday' }).select(),
     ]);
     if (settingsResult.error || scheduleResult.error) { toast('Schlafplan konnte nicht gespeichert werden.'); submit.disabled = false; return; }
-    closeOverlay(backdrop); toast('Schlafplan gespeichert'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlafplan gespeichert'); await onSaved?.();
   };
   document.body.append(backdrop);
 }
@@ -210,14 +210,14 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
     };
     const result = await supabase.from('sleep_logs').upsert(payload, { onConflict: 'user_id,sleep_date' }).select().single();
     if (result.error) { toast('Check-in konnte nicht gespeichert werden.'); submit.disabled = false; return; }
-    closeOverlay(backdrop); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
     playInterfaceSound('bonus', { retrigger: 'restart' });
   };
   backdrop.querySelector('[data-sleep-delete]')?.addEventListener('click', async () => {
     if (!confirm('Diesen Schlaf-Eintrag wirklich löschen?')) return;
     const { error } = await supabase.from('sleep_logs').delete().eq('id', existing.id).eq('user_id', userId);
     if (error) return toast('Eintrag konnte nicht gelöscht werden.');
-    closeOverlay(backdrop); toast('Schlaf-Eintrag gelöscht'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlaf-Eintrag gelöscht'); await onSaved?.();
   });
   document.body.append(backdrop);
 }
