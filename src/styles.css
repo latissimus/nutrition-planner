@@ -2425,13 +2425,12 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
   #view{min-height:calc(100dvh - 66px)}
 }
 
-/* App-artige Bedienung auf dem Homescreen: kein Doppeltipp-Zoom und kein
-   automatisches iOS-Hineinzoomen bei klein gesetzten Formfeldern. Ausserdem
-   keine Textmarkierung/kein Auswahl-Callout bei langem Drücken auf Buttons
-   und button-artigen Links – Eingabe- und Suchfelder sind hiervon nie
-   betroffen, da sie nicht Teil dieses Selektors sind. (Der fruehere Verdacht,
-   user-select wuerde :active unterdruecken, war falsch – Ursache war der
-   fehlende touchstart-Listener, siehe main.js.) */
+/* App-artige Bedienung auf dem Homescreen: feste App-Texte lassen sich nicht
+   versehentlich markieren. Eingabefelder bleiben voll editier- und markierbar. */
+body *{-webkit-user-select:none;user-select:none}
+input,textarea,select,[contenteditable="true"],[contenteditable="true"] *{
+  -webkit-user-select:text;user-select:text
+}
 button,a,[role="button"],summary{touch-action:manipulation;
   -webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 @media(max-width:820px){
