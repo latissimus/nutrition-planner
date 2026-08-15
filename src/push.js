@@ -109,8 +109,19 @@ export async function syncPushSubscription(userId) {
   const support = pushSupport();
   if (!support.ready || Notification.permission !== 'granted') return false;
   const current = await registration(true);
-  const subscription = await current.pushManager.getSubscription();
-  if (!subscription) return false;
+  let subscription = await current.pushManager.getSubscription();
+  // iOS kann ein bestehendes Web-Push-Abo nach einem PWA-/Service-Worker-
+  // Update verlieren, obwohl die Benachrichtigungsberechtigung weiterhin auf
+  // „Erlaubt“ steht. In diesem Zustand waren bisher alle Reminder stumm, bis
+  // Push manuell aus- und wieder eingeschaltet wurde. Bei bereits erteilter
+  // Berechtigung darf das Abo ohne erneuten Systemdialog repariert werden.
+  if (!subscription) {
+    const publicKey = await vapidPublicKey();
+    subscription = await current.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: base64UrlToBytes(publicKey),
+    });
+  }
   await saveSubscription(userId, subscription);
   return true;
 }
