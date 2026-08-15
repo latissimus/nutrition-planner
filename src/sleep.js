@@ -329,7 +329,7 @@ export async function mountSleepDex(container, { userId, signal, mountChrome }) 
     state = await loadState(userId, signal);
     if (!signal?.aborted) render(container, userId, state, refresh);
   };
-  mountChrome(container, 'sleep', 'SLEEP', {
+  mountChrome(container, 'sleep', 'SLEEP-LOG', {
     color, pageLookScope: 'sleep', pageLookPattern: 'drops',
     meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
     onPlus: () => actionsMenu({ userId, state, onSaved: refresh }),

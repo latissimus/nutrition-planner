@@ -403,12 +403,12 @@ function avatarMarkup() {
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
   ['body', 'KFA-LOG', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
-  ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
+  ['reminders', 'MEAL-LOG', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Food-Log', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
-  ['sleep', 'SLEEP', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
+  ['sleep', 'SLEEP-LOG', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 const sichtbareSammlungen = () => {
@@ -1063,7 +1063,7 @@ async function renderRoute() {
     setSeite('reminders');
     const { mountReminders } = await remindersModule();
     const reminderActions = await mountReminders(view, { session, profile, signal });
-    mountCategoryChrome(view, route, 'MAHLZEITEN', {
+    mountCategoryChrome(view, route, 'MEAL-LOG', {
       pageLookScope: route, pageLookPattern: 'bones',
       onPlus: () => reminderActions?.openAddMenu?.(),
     });
