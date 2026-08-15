@@ -627,9 +627,10 @@ function reminderOverlay(markup) {
 }
 
 function choosePeriod(type, onSelected) {
+  const supplement = type === 'supplement';
   const backdrop = reminderOverlay(`
-    <header><h2>Supplement eintragen</h2><button data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <p class="rem-overlay-hinweis">Zu welcher Mahlzeit gehört es?</p>
+    <header><h2>${supplement ? 'Supplement eintragen' : 'Mahlzeit eintragen'}</h2><button data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <p class="rem-overlay-hinweis">Wann soll es eingetragen werden?</p>
     <div class="sheet-menue rem-period-menu">
       <button type="button" data-period="breakfast"><span>Frühstück</span></button>
       <button type="button" data-period="snack_morning"><span>Snack vormittags</span></button>
@@ -924,7 +925,7 @@ export async function mountReminders(container, { session, signal }) {
     const addButton = event.target.closest('[data-add-reminder]');
     if (addButton) {
       const type = addButton.dataset.addReminder;
-      if (type === 'meal') choosePeriod(type, (period) => createReminder(type, period));
+      if (type === 'meal' || type === 'supplement') choosePeriod(type, (period) => createReminder(type, period));
       else await createReminder(type);
       return;
     }
