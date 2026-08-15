@@ -51,7 +51,7 @@ export async function playRoutineSound(phase) {
 }
 
 function isSwitch(control) {
-  return Boolean(control.closest('.switchline,.rem-switch,.sleep-mini-switch,.sleep-setting-switch,.mess-zeile'));
+  return Boolean(control.closest('.switchline,.rem-switch,.sleep-mini-switch,.sleep-setting-switch,.mahl-mini-switch,.mess-zeile'));
 }
 
 function controlDescription(control) {
