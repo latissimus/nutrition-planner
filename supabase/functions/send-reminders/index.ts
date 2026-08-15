@@ -103,7 +103,7 @@ function notification(reminder?: Reminder, reminders: Reminder[] = []) {
     const note = String(reminder.metadata?.notiz || '').trim();
     const hasSupplements = reminders.some(isConfiguredSupplement);
     return {
-      title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & Supps 💊' : ''}`,
+      title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & 💊 Supps' : ''}`,
       body: note || bodies.meal,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#reminders',

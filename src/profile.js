@@ -254,12 +254,14 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   interfaceSoundCheckbox.checked = interfaceSoundsEnabled();
   const interfaceSoundText = document.createElement('span');
   interfaceSoundText.innerHTML = '<b>Interface-Sounds</b><small>Retro-Arcade-Klänge bei der Bedienung</small>';
+  const interfaceSoundTrack = document.createElement('i');
+  interfaceSoundTrack.className = 'switchline-track';
   interfaceSoundCheckbox.onchange = () => {
     setInterfaceSoundsEnabled(interfaceSoundCheckbox.checked);
     if (interfaceSoundCheckbox.checked) playInterfaceSound('skip-next');
     toast(`Interface-Sounds ${interfaceSoundCheckbox.checked ? 'eingeschaltet' : 'ausgeschaltet'}.`);
   };
-  interfaceSoundLabel.append(interfaceSoundCheckbox, interfaceSoundText);
+  interfaceSoundLabel.append(interfaceSoundCheckbox, interfaceSoundTrack, interfaceSoundText);
   darstellung.appendChild(interfaceSoundLabel);
 
   const startseite = abschnitt(wrap, 'Startseite anpassen');
@@ -289,7 +291,9 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
     };
     const coinText = document.createElement('span');
     coinText.textContent = 'COIN-DEX';
-    coinLabel.append(coinCheckbox, coinText);
+    const coinTrack = document.createElement('i');
+    coinTrack.className = 'switchline-track';
+    coinLabel.append(coinCheckbox, coinTrack, coinText);
     coinZeile.append(coinLabel);
     sammlungsListe.replaceChildren(coinZeile, ...order.map((route, index) => {
       const title = sammlungsNamen.get(route);
@@ -306,7 +310,9 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
       };
       const text = document.createElement('span');
       text.textContent = title;
-      label.append(checkbox, text);
+      const track = document.createElement('i');
+      track.className = 'switchline-track';
+      label.append(checkbox, track, text);
       const tasten = document.createElement('span');
       tasten.className = 'sortier-tasten';
       [['↑', -1, 'nach oben'], ['↓', 1, 'nach unten']].forEach(([zeichen, richtung, beschreibung]) => {
@@ -357,7 +363,9 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
         };
         const text = document.createElement('span');
         text.textContent = item.name;
-        label.append(checkbox, text);
+        const track = document.createElement('i');
+        track.className = 'switchline-track';
+        label.append(checkbox, track, text);
         const tasten = document.createElement('span');
         tasten.className = 'sortier-tasten';
         [['↑', -1, 'nach oben'], ['↓', 1, 'nach unten']].forEach(([zeichen, richtung, beschreibung]) => {

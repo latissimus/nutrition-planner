@@ -133,7 +133,7 @@ function notificationText(reminder, reminders = []) {
     const note = String(reminder.metadata?.notiz || '').trim();
     const hasSupplements = reminders.some((item) => item.type === 'supplement'
       && (item.active || !/^Supplement (AM|PM)$/i.test(String(item.label || '').trim())));
-    return { title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & Supps 💊' : ''}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & 💊 Supps' : ''}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
   }
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();
