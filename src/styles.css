@@ -4903,6 +4903,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-tonight,.sleep-section{position:relative;overflow:hidden;width:100%;margin:0;background:var(--surface);border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);box-shadow:var(--hart-klein)}
 .sleep-tonight::before,.sleep-section::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:7px;background:var(--ordner)}
 .sleep-tonight{display:grid;grid-template-columns:42px minmax(0,1fr) 48px;align-items:center;gap:12px;padding:21px 16px 16px;background:color-mix(in srgb,var(--ordner) 15%,var(--surface))}
+.sleep-tonight{background:transparent;border:0;box-shadow:none;border-radius:0}
+.sleep-tonight::before{display:none}
 .sleep-card-icon,.sleep-section-title>.material-svg{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}
 .sleep-card-icon svg,.sleep-section-title>.material-svg svg{display:block;width:21px;height:21px;fill:currentColor}
 .sleep-tonight small,.sleep-tonight strong,.sleep-tonight span{display:block}
