@@ -859,7 +859,7 @@ export async function mountReminders(container, { session, signal }) {
     const addButton = event.target.closest('[data-add-reminder]');
     if (addButton) {
       const type = addButton.dataset.addReminder;
-      if (type === 'meal' || type === 'supplement') choosePeriod(type, (period) => createReminder(type, period));
+      if (type === 'meal') choosePeriod(type, (period) => createReminder(type, period));
       else await createReminder(type);
       return;
     }

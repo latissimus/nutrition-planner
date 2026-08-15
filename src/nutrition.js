@@ -194,7 +194,7 @@ function periodEntriesMarkup(entries, period) {
       <summary class="rem-row-head nutrition-entry-head">
         <span class="rem-row-emoji" aria-hidden="true">${materialIconMarkup(PERIOD_ICONS[period] || 'local_pizza')}</span>
         <span class="rem-row-titel"><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} g · ${decimal(item.protein_g, 1)} P · ${decimal(item.carbs_g, 1)} K · ${decimal(item.fat_g, 1)} F</small></span>
-        <strong>${decimal(item.energy_kcal)} kcal</strong><span class="rem-row-chevron" aria-hidden="true">⌄</span>
+        <strong>${decimal(item.energy_kcal)} kcal</strong>
       </summary>
       <div class="rem-row-body nutrition-entry-body">
         <label class="rem-field"><span>Gegessene Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(number(item.amount) || 100)))}" data-nutrition-inline-amount><i>g</i></span></label>
