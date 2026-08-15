@@ -265,7 +265,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     const button = form.querySelector('[type="submit"]');
     button.disabled = true;
     let uploadedPath = '';
-    const scanningSound = playInterfaceSound('scanning', { loop: true, retrigger: 'restart' });
+    const streamingSound = playInterfaceSound('streaming', { loop: true, retrigger: 'restart' });
     try {
       const titleInput = form.querySelector('#dex-entry-title');
       let url = null;
@@ -346,10 +346,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       await onSaved?.(data);
       // Erst nach Upload, Datenbank-Insert UND aktualisierter Dex-Ansicht:
       // Der Ton bestätigt das fertige Ergebnis, nicht nur den Buttondruck.
-      scanningSound?.stop();
+      streamingSound?.stop();
       playInterfaceSound('bonus', { retrigger: 'restart' });
     } catch (error) {
-      scanningSound?.stop();
+      streamingSound?.stop();
       if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
       toast(error.message || 'Eintrag konnte nicht gespeichert werden.');
       button.disabled = false;

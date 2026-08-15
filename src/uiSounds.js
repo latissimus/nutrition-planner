@@ -93,10 +93,6 @@ export function initInterfaceSounds(root = document) {
     player('routine')?.unlock().catch(() => false);
   };
   root.addEventListener('pointerdown', unlock, { capture: true, passive: true, once: true });
-  root.addEventListener('pointerdown', (event) => {
-    const field = event.target.closest?.('input,textarea,[contenteditable="true"]');
-    if (field && isTextEntry(field) && !field.disabled && !field.readOnly) playInterfaceSound('snap');
-  }, { capture: true, passive: true });
   root.addEventListener('input', (event) => {
     const field = event.target;
     if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {
