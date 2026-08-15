@@ -443,6 +443,35 @@ const ZAEHLQUELLEN = {
 async function zaehlerLaden(signal) {
   const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter, filters = [], filterIn }]) => {
     try {
+      if (route === 'reminders') {
+        // Der MEAL-LOG zeigt die belegten Tageszeit-Kategorien, nicht jede
+        // einzelne Mahlzeit oder jedes Supplement. Ein Frühstück plus ein
+        // Supplement bleibt dadurch genau eine Kategorie.
+        let reminderQuery = supabase.from(tabelle)
+          .select('type,label,time,metadata')
+          .eq('active', true)
+          .in('type', ['meal', 'supplement', 'drink']);
+        reminderQuery = reminderQuery.abortSignal(signal);
+        const { data, error } = await reminderQuery;
+        if (error) return [route, null];
+        const kategorien = new Set();
+        (data || []).forEach((reminder) => {
+          if (reminder.type === 'drink') { kategorien.add('drink'); return; }
+          const label = String(reminder.label || '').toLocaleLowerCase('de');
+          const slot = reminder.metadata?.meal_slot
+            || (label.includes('frühstück') ? 'breakfast'
+              : label.includes('vormittag') ? 'snack_morning'
+                : label.includes('mittagessen') ? 'lunch'
+                  : label.includes('nachmittag') ? 'snack_afternoon'
+                    : label.includes('abend') ? 'dinner' : null);
+          if (slot) { kategorien.add(slot); return; }
+          const [hours, minutes] = String(reminder.time || '00:00').split(':').map(Number);
+          const total = (Number(hours) || 0) * 60 + (Number(minutes) || 0);
+          kategorien.add(total < 585 ? 'breakfast' : total < 720 ? 'snack_morning'
+            : total < 900 ? 'lunch' : total < 1080 ? 'snack_afternoon' : 'dinner');
+        });
+        return [route, kategorien.size];
+      }
       let countQuery = supabase.from(tabelle).select('*', { count: 'exact', head: true });
       if (filter) countQuery = countQuery.eq(filter[0], filter[1]);
       filters.forEach(([field, value]) => { countQuery = countQuery.eq(field, value); });
@@ -806,6 +835,30 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
     zaehlerStand = zaehler;
     // Zwischenzeitlich kann eine andere Seite gemountet sein.
     if (container.isConnected) zaehlerEintragen(container, zaehler);
+  });
+
+  const aktualisiereHomeZaehler = async () => {
+    if (!container.isConnected || signal?.aborted) return;
+    const [zaehler, stats] = await Promise.all([
+      zaehlerLaden(signal),
+      eigeneDexStatistik(session.user.id, eigene, signal).catch(() => new Map()),
+    ]);
+    if (signal?.aborted || !container.isConnected) return;
+    zaehlerStand = zaehler;
+    eigeneStats = stats;
+    zaehlerEintragen(container, zaehler);
+    container.querySelectorAll('[data-collection-id]').forEach((karte) => {
+      const meta = karte.querySelector('.dex-datensatz-meta');
+      const stat = stats.get(karte.dataset.collectionId);
+      if (meta && stat) meta.innerHTML = `<b>${stat.entries}</b><span>Einträge · ${stat.children} Unter-Dex</span>`;
+    });
+  };
+  ['weights', 'reminders', 'dex_entries', 'shopping_items', 'routines', 'sleep_logs']
+    .forEach((table) => subscribeToTableChanges({ table, signal, onChange: aktualisiereHomeZaehler, onError: () => {} }));
+  subscribeToTableChanges({
+    table: 'collections', signal,
+    onChange: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    onError: () => {},
   });
 }
 
