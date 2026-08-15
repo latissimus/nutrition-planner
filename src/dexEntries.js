@@ -167,7 +167,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
         <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note ? ' required' : ''}></textarea>
       </label>`}
-      <button class="btn btn-primary btn-block dex-entry-save" type="submit">${label} speichern</button>
+      <button class="btn btn-primary btn-block dex-entry-save" type="submit" data-no-interface-sound>${label} speichern</button>
     </form>
   </section>`;
 }
