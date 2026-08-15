@@ -7,6 +7,10 @@ export function notifyHomeCountsChanged() {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:counts-changed'));
 }
 
+export function notifyCoinBalanceChanged() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:coins-changed'));
+}
+
 const zufallsId = () => globalThis.crypto?.randomUUID?.()
   || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 

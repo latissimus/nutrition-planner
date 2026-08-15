@@ -878,6 +878,24 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
   signal?.addEventListener('abort', () => window.removeEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung), { once: true });
   ['weights', 'reminders', 'dex_entries', 'shopping_items', 'routines', 'sleep_logs']
     .forEach((table) => subscribeToTableChanges({ table, signal, onChange: aktualisiereHomeZaehler, onError: () => {} }));
+  const aktualisiereCoinStand = async () => {
+    // Wie die Kartenzaehler muss auch der Kopfstand aktualisiert werden,
+    // waehrend Home als abgetrennte Ansicht im Navigationscache liegt.
+    if (signal?.aborted || !coinSichtbar) return;
+    const summary = await loadCoinSummary(session.user.id, signal);
+    if (signal?.aborted) return;
+    const kopf = container.querySelector('.coin-kopfstand');
+    if (!kopf) return;
+    const stand = kopf.querySelector('strong');
+    if (stand) stand.textContent = String(summary.balance);
+    kopf.setAttribute('aria-label', `MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}`);
+  };
+  const lokaleCoinAenderung = () => { aktualisiereCoinStand().catch(() => {}); };
+  window.addEventListener('muscledex:coins-changed', lokaleCoinAenderung);
+  signal?.addEventListener('abort', () => window.removeEventListener('muscledex:coins-changed', lokaleCoinAenderung), { once: true });
+  subscribeToTableChanges({
+    table: 'muscle_coin_ledger', signal, onChange: aktualisiereCoinStand, onError: () => {},
+  });
   subscribeToTableChanges({
     table: 'collections', signal,
     onChange: () => {

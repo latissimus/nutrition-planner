@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
+import { notifyCoinBalanceChanged } from './realtime.js';
 import muscleCoinUrl from '../MUSCLE-COIN Neu.svg';
 
 const escapeHtml = (value = '') => String(value)
@@ -165,6 +166,7 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     if (!confirm(`„${reward.name}“ für ${reward.cost} MUSCLE-COINS einlösen?`)) return;
     const { error: redeemError } = await supabase.rpc('redeem_muscle_reward', { target_reward: reward.id });
     if (redeemError) return toast(redeemError.message || 'Einlösen fehlgeschlagen.');
+    notifyCoinBalanceChanged();
     toast('Belohnung eingelöst'); refresh();
   };
 }

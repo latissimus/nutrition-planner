@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { notifyCoinBalanceChanged } from './realtime.js';
 
 export const localDate = (date = new Date()) => date.toLocaleDateString('sv-SE');
 
@@ -16,6 +17,6 @@ export async function setRoutineCompletion({ routineId, date = localDate(), comp
     target_snoozed_until: snoozedUntil,
   });
   if (error) throw error;
+  notifyCoinBalanceChanged();
   return Number(data || 0);
 }
-

@@ -2,7 +2,7 @@ import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
 import { setRoutineCompletion } from './routineCompletion.js';
-import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
+import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
 import { toast } from './toast.js';
 import { playInterfaceSound } from './uiSounds.js';
 
@@ -210,7 +210,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
     };
     const result = await supabase.from('sleep_logs').upsert(payload, { onConflict: 'user_id,sleep_date' }).select().single();
     if (result.error) { toast('Check-in konnte nicht gespeichert werden.'); submit.disabled = false; return; }
-    closeOverlay(backdrop); notifyHomeCountsChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
     playInterfaceSound('bonus', { retrigger: 'restart' });
   };
   backdrop.querySelector('[data-sleep-delete]')?.addEventListener('click', async () => {
