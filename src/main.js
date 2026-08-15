@@ -803,15 +803,23 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
       </div>
     </div>`;
 
+  // Einstellungen und neue Dex werden auf der Startseite bewusst hart neu
+  // gerendert. Die Startansicht kann im Navigationscache liegen; ein reines
+  // Hashchange würde dann gelegentlich nur die alte DOM-Kopie stehen lassen.
+  const homeNeuLaden = () => {
+    navigationZuruecksetzen('home');
+    render();
+  };
+
   container.querySelector('.neu-sammlung').onclick = () => openCollectionEditor({
     userId: session.user.id,
     rootKey: 'home',
-    onSaved: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    onSaved: homeNeuLaden,
   });
 
   bindLongPress(container.querySelector('.tuck-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
     userId: session.user.id,
-    refresh: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    refresh: homeNeuLaden,
     itemsById: new Map(eigene.map((item) => [item.id, item])),
   }));
   if (container.querySelector('.dex-ordner-test')) showGestureHintOnce({
