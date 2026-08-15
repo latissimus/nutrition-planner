@@ -25,10 +25,10 @@ let reminderLoopGeneration = 0;
 
 const DEFAULT_REMINDERS = [
   { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'breakfast_dining', meal_slot: 'breakfast' } },
-  { type: 'meal', label: 'Snack vormittags', time: '10:30', route: '#reminders', metadata: { icon: 'cookie', meal_slot: 'snack_morning' } },
+  { type: 'meal', label: 'Snack vormittags', time: '10:30', route: '#reminders', metadata: { icon: 'Snack', meal_slot: 'snack_morning' } },
   { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'lunch_dining', meal_slot: 'lunch' } },
-  { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'cookie', meal_slot: 'snack_afternoon' } },
-  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'meal_dinner', meal_slot: 'dinner' } },
+  { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'Snack', meal_slot: 'snack_afternoon' } },
+  { type: 'meal', label: 'Abendessen', time: '19:00', route: '#reminders', metadata: { icon: 'Abendessen', meal_slot: 'dinner' } },
   { type: 'supplement', label: 'Supplement AM', time: '08:00', route: '#reminders', metadata: { icon: 'pill' } },
   { type: 'supplement', label: 'Supplement PM', time: '20:00', route: '#reminders', metadata: { icon: 'pill' } },
   {
@@ -518,7 +518,7 @@ function reminderRowMarkup(reminder, completion) {
         ${zusammenfassung.detail ? `<small>${escapeHtml(zusammenfassung.detail)}</small>` : ''}
         ${badge}
       </span>
-      <span class="rem-row-zeit">${escapeHtml(zusammenfassung.time)}</span>
+      ${reminder.type === 'supplement' ? '' : `<span class="rem-row-zeit">${escapeHtml(zusammenfassung.time)}</span>`}
       <span class="rem-row-chevron" aria-hidden="true">⌄</span>
     </summary>
     ${reminderBodyMarkup(reminder, completion)}
@@ -531,10 +531,10 @@ function reminderGroups(reminders, completions) {
   const interval = Number(drink?.metadata?.intervall_minuten || 120);
   const periods = [
     ['breakfast', 'FRÜHSTÜCK', 'breakfast_dining', 0, 9 * 60 + 45],
-    ['snack_morning', 'SNACK', 'cookie', 9 * 60 + 45, 12 * 60],
+    ['snack_morning', 'SNACK', 'Snack', 9 * 60 + 45, 12 * 60],
     ['lunch', 'MITTAGESSEN', 'lunch_dining', 12 * 60, 15 * 60],
-    ['snack_afternoon', 'SNACK', 'cookie', 15 * 60, 18 * 60],
-    ['dinner', 'ABENDESSEN', 'meal_dinner', 18 * 60, 24 * 60],
+    ['snack_afternoon', 'SNACK', 'Snack', 15 * 60, 18 * 60],
+    ['dinner', 'ABENDESSEN', 'Abendessen', 18 * 60, 24 * 60],
   ];
   const timed = reminders.filter((item) => item.type === 'supplement')
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
@@ -946,8 +946,16 @@ export async function mountReminders(container, { session, signal }) {
       backdrop.className = 'kategorie-sheet-backdrop mahl-add-backdrop offen';
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
         <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+        ${nutritionActions?.isEnabled?.() ? `<section class="mahl-add-gruppe">
+          <h3>${materialIconMarkup('local_pizza')}<span>Mahlzeit eintragen</span></h3>
+          <div class="sheet-menue mahl-add-unterpunkte">
+            <button type="button" data-add-type="nutrition:scan">${materialIconMarkup('photo_camera')}<span><b>Barcode</b><small>Produkt scannen</small></span></button>
+            <button type="button" data-add-type="nutrition:search">${materialIconMarkup('search')}<span><b>Suche</b><small>Lebensmittel finden</small></span></button>
+            <button type="button" data-add-type="nutrition:manual">${materialIconMarkup('edit')}<span><b>Eigene Mahlzeit</b><small>Werte selbst eintragen</small></span></button>
+          </div>
+        </section>` : ''}
+        <h3 class="mahl-add-zwischenkopf">Planung</h3>
         <div class="sheet-menue">
-          ${nutritionActions?.isEnabled?.() ? `<button type="button" data-add-type="nutrition">${materialIconMarkup('local_pizza')}<span><b>Mahlzeit eintragen</b><small>Barcode, Suche oder eigene Mahlzeit</small></span></button>` : ''}
           <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
           <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>
         </div>
@@ -957,8 +965,8 @@ export async function mountReminders(container, { session, signal }) {
         const type = event.target.closest('[data-add-type]')?.dataset.addType;
         if (!type) return;
         backdrop.remove();
-        if (type === 'nutrition') {
-          nutritionActions?.openAddMenu?.();
+        if (type.startsWith('nutrition:')) {
+          nutritionActions?.openAction?.(type.split(':')[1]);
           return;
         }
         if (type === 'drink' && reminders.some((item) => item.type === 'drink')) {

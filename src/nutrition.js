@@ -9,6 +9,10 @@ const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
   ['lunch', 'Mittagessen'], ['snack_afternoon', 'Snack nachmittags'], ['dinner', 'Abendessen'],
 ];
+const PERIOD_ICONS = {
+  breakfast: 'breakfast_dining', snack_morning: 'Snack', lunch: 'lunch_dining',
+  snack_afternoon: 'Snack', dinner: 'Abendessen',
+};
 const BASE_FOODS = [
   ['Apfel', 52, 0.3, 11.4, 0.2], ['Banane', 89, 1.1, 20.0, 0.3],
   ['Orange', 47, 0.9, 8.3, 0.1], ['Kartoffel, gekocht', 77, 2.0, 15.0, 0.1],
@@ -184,15 +188,22 @@ function calculationResultMarkup(result, customTarget = 0) {
   return result ? `<span><small>GRUNDUMSATZ</small><b>${decimal(result.resting)} kcal</b></span><span><small>ERHALTUNG</small><b>${decimal(result.maintenance)} kcal</b></span><span><small>ZIEL</small><b>${decimal(customTarget || result.target)} kcal</b></span><p>${result.method} · Schätzung, keine Messung</p>` : '<p>Geburtsdatum, Größe und Gewicht vervollständigen.</p>';
 }
 
-function periodEntriesMarkup(entries) {
+function periodEntriesMarkup(entries, period) {
   if (!entries.length) return '';
   return `<section class="nutrition-period-inline">
     <header><span>GEGESSEN</span><b>${decimal(total(entries, 'energy_kcal'))} kcal</b></header>
-    <div>${entries.map((item) => `<article class="nutrition-entry" data-nutrition-entry="${item.id}">
-      <div><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} ${item.unit === 'portion' ? 'Portion' : 'g'} · ${decimal(item.protein_g, 1)} g P · ${decimal(item.carbs_g, 1)} g K · ${decimal(item.fat_g, 1)} g F</small></div>
-      <strong>${decimal(item.energy_kcal)} kcal</strong>
-      <button type="button" data-nutrition-delete aria-label="Eintrag löschen">×</button>
-    </article>`).join('')}</div>
+    <div>${entries.map((item) => `<details class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
+      <summary class="rem-row-head nutrition-entry-head">
+        <span class="rem-row-emoji" aria-hidden="true">${materialIconMarkup(PERIOD_ICONS[period] || 'local_pizza')}</span>
+        <span class="rem-row-titel"><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} g · ${decimal(item.protein_g, 1)} P · ${decimal(item.carbs_g, 1)} K · ${decimal(item.fat_g, 1)} F</small></span>
+        <strong>${decimal(item.energy_kcal)} kcal</strong><span class="rem-row-chevron" aria-hidden="true">⌄</span>
+      </summary>
+      <div class="rem-row-body nutrition-entry-body">
+        <label class="rem-field"><span>Gegessene Menge</span><select class="input nutrition-gram-picker" data-nutrition-inline-amount>${gramOptions(item.amount)}</select></label>
+        <button class="btn btn-primary btn-block" type="button" data-nutrition-inline-save>Änderungen speichern</button>
+        <button type="button" class="rem-row-loeschen" data-nutrition-delete>Eintrag löschen</button>
+      </div>
+    </details>`).join('')}</div>
   </section>`;
 }
 
@@ -283,7 +294,7 @@ function amountEditor({ product, date, onSave, entry = null }) {
   const serving = number(entry?.amount) || number(product.serving_g) || 100;
   const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : materialIconMarkup('fastfood')}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
+    <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon" data-product-slot-icon>${materialIconMarkup(PERIOD_ICONS[selectedPeriod])}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
     <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'base_food' ? 'Durchschnittlicher Basiswert' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
       <label class="nutrition-form-field"><span>Menge</span><select class="input nutrition-gram-picker" data-product-amount>${gramOptions(serving)}</select></label>
@@ -291,6 +302,7 @@ function amountEditor({ product, date, onSave, entry = null }) {
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
     </form>`);
   const amount = backdrop.querySelector('[data-product-amount]');
+  const period = backdrop.querySelector('[data-log-period]');
   const result = backdrop.querySelector('[data-product-result]');
   const values = () => {
     const factor = number(amount.value) / 100;
@@ -301,6 +313,10 @@ function amountEditor({ product, date, onSave, entry = null }) {
   };
   const render = () => { const data = values(); result.innerHTML = `<b>${decimal(data.energy_kcal)} kcal</b><span>${decimal(data.protein_g, 1)} P · ${decimal(data.carbs_g, 1)} K · ${decimal(data.fat_g, 1)} F</span>`; };
   amount.oninput = render; render();
+  period.onchange = () => {
+    const icon = backdrop.querySelector('[data-product-slot-icon]');
+    if (icon) icon.innerHTML = materialIconMarkup(PERIOD_ICONS[period.value] || 'local_pizza');
+  };
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault(); const button = event.submitter; button.disabled = true;
     const grams = number(amount.value); if (!grams) { button.disabled = false; return; }
@@ -434,6 +450,8 @@ function scannerEditor(context) {
           await BrowserMultiFormatReader.mediaStreamSetTorch(track, enabled);
           torch.setAttribute('aria-pressed', String(enabled));
           torch.setAttribute('aria-label', enabled ? 'Kameralicht ausschalten' : 'Kameralicht einschalten');
+          const label = torch.querySelector('span');
+          if (label) label.textContent = enabled ? 'Ausschalten' : 'Kameralicht';
         } catch { toast('Die Taschenlampe konnte nicht geschaltet werden.'); }
       };
     }
@@ -450,6 +468,13 @@ function scannerEditor(context) {
   });
 }
 
+function openNutritionAction(action, context) {
+  if (action === 'scan') scannerEditor(context);
+  if (action === 'search') searchEditor(context);
+  if (action === 'manual') manualEditor(context);
+  if (action === 'recent') recentEditor(context);
+}
+
 function addMenu(context) {
   const backdrop = createOverlay(`<header><h2>Mahlzeit eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue nutrition-add-menu">
@@ -461,10 +486,7 @@ function addMenu(context) {
   backdrop.querySelector('.nutrition-add-menu').onclick = (event) => {
     const action = event.target.closest('[data-nutrition-action]')?.dataset.nutritionAction; if (!action) return;
     backdrop.remove();
-    if (action === 'scan') scannerEditor(context);
-    if (action === 'search') searchEditor(context);
-    if (action === 'manual') manualEditor(context);
-    if (action === 'recent') recentEditor(context);
+    openNutritionAction(action, context);
   };
 }
 
@@ -498,8 +520,27 @@ export async function mountNutrition(container, { userId, signal }) {
     const enabled = nutritionEnabled(state);
     root?.querySelectorAll('[data-nutrition-period]').forEach((slot) => {
       const entries = enabled ? state.entries.filter((item) => item.period === slot.dataset.nutritionPeriod) : [];
-      slot.innerHTML = periodEntriesMarkup(entries);
+      slot.innerHTML = periodEntriesMarkup(entries, slot.dataset.nutritionPeriod);
       slot.querySelectorAll('[data-nutrition-delete]').forEach((button) => { button.onclick = () => deleteEntry(button); });
+      slot.querySelectorAll('[data-nutrition-inline-save]').forEach((button) => {
+        button.onclick = async () => {
+          const card = button.closest('[data-nutrition-entry]');
+          const entry = state.entries.find((item) => item.id === card?.dataset.nutritionEntry);
+          if (!entry) return;
+          const grams = number(card.querySelector('[data-nutrition-inline-amount]')?.value);
+          const previous = Math.max(1, number(entry.amount));
+          button.disabled = true;
+          const saved = await saveEntry({
+            ...entry, id: entry.id, product_id: entry.product_id, amount: grams,
+            energy_kcal: number(entry.energy_kcal) / previous * grams,
+            protein_g: number(entry.protein_g) / previous * grams,
+            carbs_g: number(entry.carbs_g) / previous * grams,
+            fat_g: number(entry.fat_g) / previous * grams,
+            product: entry.product_snapshot,
+          });
+          if (!saved && button.isConnected) button.disabled = false;
+        };
+      });
       const block = slot.closest('.mahl-zeitblock');
       const count = block?.querySelector('[data-period-count]');
       const reminderCount = Number(count?.dataset.reminderCount || 0);
@@ -639,5 +680,6 @@ export async function mountNutrition(container, { userId, signal }) {
     isEnabled: () => nutritionEnabled(state),
     renderIntegrated,
     openAddMenu: () => addMenu({ date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry }),
+    openAction: (action) => openNutritionAction(action, { date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry }),
   };
 }
