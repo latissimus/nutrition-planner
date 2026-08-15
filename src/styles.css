@@ -4991,3 +4991,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-add-gruppe>h3>.material-svg,.mahl-add-gruppe>h3>svg{display:block;width:28px;height:28px;fill:currentColor}
 .mahl-add-unterpunkte button>span{display:grid;gap:2px;text-align:left}.mahl-add-unterpunkte button small{color:var(--muted);font-size:11px;font-weight:650}
 .mahl-add-zwischenkopf{margin:18px 4px 7px;font:850 12px/1 var(--ui);letter-spacing:.07em;text-transform:uppercase}
+
+/* Noch kompaktere Zeitköpfe und flachere Ernährungszeilen. */
+.mahl-zeitblock>header{min-height:48px;padding:7px 13px}
+.mahl-zeitblock>header h2{font:900 12.5px/1 var(--ui);letter-spacing:.055em}
+.mahl-slot-titel>.reminder-svg{flex-basis:34px;width:34px;height:34px;border-radius:9px}
+.mahl-slot-titel>.reminder-svg svg{width:20px;height:20px}
+.mahl-slot-zeit{flex-basis:74px}
+.mahl-slot-zeit input{width:74px;height:32px!important;min-height:32px!important;padding:0 4px;border:0;border-radius:9px;background:color-mix(in srgb,var(--ordner) 30%,var(--surface));font:900 12px/32px var(--ui);letter-spacing:.015em;box-shadow:none}
+.mahl-slot-zeit input::-webkit-date-and-time-value{height:32px!important;line-height:32px!important;font-weight:900}
+.nutrition-period-inline{border-top:1px solid var(--app-divider);background:color-mix(in srgb,var(--ordner) 4%,var(--surface))}
+.nutrition-period-inline>header{display:none}
+.mahl-zeitblock .nutrition-entry>.nutrition-entry-head{min-height:56px;padding:8px 14px}
+.mahl-zeitblock .nutrition-entry .rem-row-titel>b{font-size:13px;line-height:1.15}
+.mahl-zeitblock .nutrition-entry .rem-row-titel>small{margin-top:3px;color:var(--ink);font-size:10.5px;font-weight:780;line-height:1.2}
+.mahl-zeitblock .nutrition-entry>.nutrition-entry-head>strong{font-size:11.5px;font-weight:850}
+.nutrition-gram-picker{-webkit-appearance:auto;appearance:auto}

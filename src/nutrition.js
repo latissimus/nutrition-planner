@@ -10,7 +10,7 @@ const PERIODS = [
   ['lunch', 'Mittagessen'], ['snack_afternoon', 'Snack nachmittags'], ['dinner', 'Abendessen'],
 ];
 const PERIOD_ICONS = {
-  breakfast: 'breakfast_dining', snack_morning: 'Snack', lunch: 'lunch_dining',
+  breakfast: 'Frühstück', snack_morning: 'Snack', lunch: 'lunch_dining',
   snack_afternoon: 'Snack', dinner: 'Abendessen',
 };
 const BASE_FOODS = [
@@ -190,9 +190,7 @@ function calculationResultMarkup(result, customTarget = 0) {
 
 function periodEntriesMarkup(entries, period) {
   if (!entries.length) return '';
-  return `<section class="nutrition-period-inline">
-    <header><span>GEGESSEN</span><b>${decimal(total(entries, 'energy_kcal'))} kcal</b></header>
-    <div>${entries.map((item) => `<details class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
+  return `<section class="nutrition-period-inline"><div>${entries.map((item) => `<details class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
       <summary class="rem-row-head nutrition-entry-head">
         <span class="rem-row-emoji" aria-hidden="true">${materialIconMarkup(PERIOD_ICONS[period] || 'local_pizza')}</span>
         <span class="rem-row-titel"><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} g · ${decimal(item.protein_g, 1)} P · ${decimal(item.carbs_g, 1)} K · ${decimal(item.fat_g, 1)} F</small></span>
@@ -223,11 +221,8 @@ function periodSelect(selected = 'breakfast') {
 }
 
 function gramOptions(selected = 100) {
-  const current = Math.max(1, Math.round(number(selected) || 100));
-  const values = new Set([current]);
-  for (let grams = 5; grams <= 500; grams += 5) values.add(grams);
-  for (let grams = 525; grams <= 1000; grams += 25) values.add(grams);
-  return [...values].sort((a, b) => a - b)
+  const current = Math.min(1000, Math.max(1, Math.round(number(selected) || 100)));
+  return Array.from({ length: 1000 }, (_, index) => index + 1)
     .map((grams) => `<option value="${grams}"${grams === current ? ' selected' : ''}>${grams} g</option>`).join('');
 }
 

@@ -13,12 +13,12 @@ const wallpaperModules = import.meta.glob('../MUSCLEDEX-TAPETEN/*.svg', {
 const hiddenPickerFiles = new Set(['pet_supplies-pattern.svg', 'home_119047.svg', 'more_icon_244655.svg']);
 const icons = Object.entries(modules).filter(([path]) => !hiddenPickerFiles.has(path.split('/').at(-1))).map(([path, svg]) => {
   const file = path.split('/').at(-1);
-  const id = file.replace(/_24dp.*$/i, '').replace(/\.svg$/i, '');
+  const id = file.replace(/_24dp.*$/i, '').replace(/\.svg$/i, '').normalize('NFC');
   const title = id.replaceAll('_', ' ');
   return { id, title, svg };
 }).sort((a, b) => a.title.localeCompare(b.title, 'de'));
 export const availableCategoryIcons = icons;
-const iconById = (id) => icons.find((icon) => icon.id === id);
+const iconById = (id) => icons.find((icon) => icon.id === String(id || '').normalize('NFC'));
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');

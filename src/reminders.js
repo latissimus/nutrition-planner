@@ -24,7 +24,7 @@ let reminderStartPromise = null;
 let reminderLoopGeneration = 0;
 
 const DEFAULT_REMINDERS = [
-  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'breakfast_dining', meal_slot: 'breakfast' } },
+  { type: 'meal', label: 'Frühstück', time: '08:00', route: '#reminders', metadata: { icon: 'Frühstück', meal_slot: 'breakfast' } },
   { type: 'meal', label: 'Snack vormittags', time: '10:30', route: '#reminders', metadata: { icon: 'Snack', meal_slot: 'snack_morning' } },
   { type: 'meal', label: 'Mittagessen', time: '13:00', route: '#reminders', metadata: { icon: 'lunch_dining', meal_slot: 'lunch' } },
   { type: 'meal', label: 'Snack nachmittags', time: '16:30', route: '#reminders', metadata: { icon: 'Snack', meal_slot: 'snack_afternoon' } },
@@ -78,7 +78,7 @@ export function reminderIconMarkup(value, className = '') {
   if (String(value).startsWith('emoji:')) {
     return `<span class="reminder-emoji ${className}">${escapeHtml(String(value).slice(6))}</span>`;
   }
-  const icon = availableCategoryIcons.find((item) => item.id === value);
+  const icon = availableCategoryIcons.find((item) => item.id === String(value || '').normalize('NFC'));
   return icon ? `<span class="reminder-svg ${className}">${icon.svg}</span>` : '<span class="reminder-emoji">●</span>';
 }
 
@@ -530,7 +530,7 @@ function reminderGroups(reminders, completions) {
   const drink = reminders.find((item) => item.type === 'drink');
   const interval = Number(drink?.metadata?.intervall_minuten || 120);
   const periods = [
-    ['breakfast', 'FRÜHSTÜCK', 'breakfast_dining', 0, 9 * 60 + 45],
+    ['breakfast', 'FRÜHSTÜCK', 'Frühstück', 0, 9 * 60 + 45],
     ['snack_morning', 'SNACK', 'Snack', 9 * 60 + 45, 12 * 60],
     ['lunch', 'MITTAGESSEN', 'lunch_dining', 12 * 60, 15 * 60],
     ['snack_afternoon', 'SNACK', 'Snack', 15 * 60, 18 * 60],
@@ -947,7 +947,7 @@ export async function mountReminders(container, { session, signal }) {
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
         <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         ${nutritionActions?.isEnabled?.() ? `<section class="mahl-add-gruppe">
-          <h3>${materialIconMarkup('local_pizza')}<span>Mahlzeit eintragen</span></h3>
+          <h3>${materialIconMarkup('Pizza neu')}<span>Mahlzeit eintragen</span></h3>
           <div class="sheet-menue mahl-add-unterpunkte">
             <button type="button" data-add-type="nutrition:scan">${materialIconMarkup('photo_camera')}<span><b>Barcode</b><small>Produkt scannen</small></span></button>
             <button type="button" data-add-type="nutrition:search">${materialIconMarkup('search')}<span><b>Suche</b><small>Lebensmittel finden</small></span></button>
