@@ -32,7 +32,7 @@ export function setInterfaceSoundsEnabled(enabled) {
   player()?.setEnabled(value);
 }
 
-export function playInterfaceSound(cue = 'press', options) {
+export function playInterfaceSound(cue = 'snap', options) {
   return player()?.play(cue, options) || null;
 }
 
@@ -50,10 +50,10 @@ export async function playRoutineSound(phase, volume = 0.7) {
 }
 
 function cueForControl(control) {
-  if (control.matches('input[type="checkbox"]')) return control.checked ? 'press' : 'release';
-  if (control.matches('input[type="radio"]')) return 'press';
+  if (control.matches('input[type="checkbox"]')) return control.checked ? 'snap' : 'deselect';
+  if (control.matches('input[type="radio"]')) return 'snap';
   const description = `${control.getAttribute('aria-label') || ''} ${control.textContent || ''}`.toLocaleLowerCase('de');
-  if (control.matches('[data-sleep-routine-check]')) return /wieder öffnen/.test(description) ? 'release' : 'press';
+  if (control.matches('[data-sleep-routine-check]')) return /wieder öffnen/.test(description) ? 'deselect' : 'snap';
   // Der COIN-DEX ist die Belohnungszentrale und erhält deshalb den eigenen
   // Arcade-Achievement-Cue statt des gewöhnlichen Navigationsklangs.
   if (control.matches('a[href="#coins"]')) return 'achievement';
@@ -70,7 +70,7 @@ function cueForControl(control) {
   if (control.matches('.kategorie-plus,.neu-sammlung,[data-category-settings],[data-action="appearance"],[data-action="rename"],[data-action="sub"],[data-action="share"],[data-action="select"],[data-entry-type],[data-sleep-action],[data-routine-template],[data-routine-attachment]')
     || /hinzufügen|erstellen|neuer eintrag/.test(description)) return 'expand';
   if (control.matches('a[href]')) return 'select';
-  return 'press';
+  return 'snap';
 }
 
 export function initInterfaceSounds(root = document) {
