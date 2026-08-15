@@ -4491,9 +4491,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-erledigt-btn.ist-aktiv{background:#492425;color:#fff}
 .rem-erledigt-btn:active{transform:translate(1px,1px)}
 
-.rem-row-loeschen{margin-top:8px;padding:8px 12px;border:0;border-radius:10px;
-  background:transparent;color:#B42318;font:700 12px/1 var(--ui);cursor:pointer;
-  align-self:flex-start}
+.rem-row-loeschen{align-self:stretch;justify-self:stretch;width:100%;box-sizing:border-box;margin-top:10px;padding:16px 14px;border:0;border-radius:12px;
+  background:transparent;color:#B42318;font:700 13px/1 var(--ui);cursor:pointer;text-align:center}
 .rem-row-loeschen:active{background:color-mix(in srgb,#B42318 10%,transparent)}
 
 /* Push-Statuskarte, klarer strukturiert und in Braun statt Pink/Lila. */
