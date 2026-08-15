@@ -65,7 +65,6 @@ const colorGroups = [
   ['Weitere Retro-Farben', [
     ['Dusty Rose', '#D35D6E'],
     ['Puderrosa', '#FFDADA'],
-    ['Eisweiß', '#F4F6FF'],
     ['Rosé', '#F599C6'],
     ['Pastellgrün', '#ACE1AF'],
     ['Flieder', '#B983FF'],
@@ -73,8 +72,10 @@ const colorGroups = [
     ['Vintage Petrol', '#79B4B7'],
     ['Tiefgrün', '#064420'],
     ['Braunrosa', '#865858'],
-    ['Schwarz', '#000000'],
     ['Ultra Violet', '#6F00FF'],
+    ['Neonorange', '#FF6B00'],
+    ['Neonblau', '#00A8FF'],
+    ['Neoncyan', '#00FFF0'],
   ]],
 ];
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
