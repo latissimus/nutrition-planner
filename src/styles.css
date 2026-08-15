@@ -4100,6 +4100,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-day-nav{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--app-divider)}
 .nutrition-day-nav button{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1.5px solid var(--ink);border-radius:11px;background:var(--surface);color:var(--ink)}
 .nutrition-day-nav button:disabled{opacity:.28}.nutrition-day-nav button .material-svg,.nutrition-day-nav button svg{display:block;width:21px;height:21px;fill:currentColor}
+.nutrition-day-nav-prev .material-svg,.nutrition-day-nav-prev svg{transform:scaleX(-1)}
 .nutrition-day-nav>div{min-width:0;text-align:center}.nutrition-day-nav b,.nutrition-day-nav small{display:block}.nutrition-day-nav b{font:800 16px/1.1 var(--ui);text-transform:uppercase}.nutrition-day-nav small{margin-top:3px;color:var(--muted);font-size:11px}
 .nutrition-balance{display:grid;grid-template-columns:minmax(0,1fr) 104px;align-items:center;gap:14px;padding:16px}
 .nutrition-balance>div:first-child small{display:block;margin-bottom:5px;color:var(--muted);font:800 10px/1 var(--ui);letter-spacing:.08em}.nutrition-balance strong{display:block;font:800 30px/.95 var(--ui);letter-spacing:-.04em}.nutrition-balance strong i{font-size:13px;font-style:normal;letter-spacing:0}
@@ -4999,13 +5000,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-slot-rechts{display:flex;align-items:center;gap:10px}
 .mahl-mini-switch{position:relative;display:inline-flex;align-items:center;cursor:pointer;margin:0}
 .mahl-mini-switch input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
-.mahl-mini-switch-track{position:relative;display:block;box-sizing:border-box;width:38px;height:22px;border:0;border-radius:99px;background:color-mix(in srgb,var(--ink) 15%,var(--surface));box-shadow:none;transition:background .16s}
+.mahl-mini-switch-track{position:relative;display:block;box-sizing:border-box;width:38px;height:22px;border:0;border-radius:99px;background:color-mix(in srgb,var(--ink) 32%,var(--surface));box-shadow:none;transition:background .16s}
 .mahl-mini-switch-track::after{content:"";position:absolute;z-index:1;top:3px;left:3px;box-sizing:border-box;width:16px;height:16px;border:0;border-radius:50%;background:var(--ordner);transition:transform .16s,background .16s}
 .mahl-mini-switch input:checked+.mahl-mini-switch-track{background:var(--ordner)}
 .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{transform:translateX(16px);background:#fff}
 .mahl-mini-switch input:disabled+.mahl-mini-switch-track{opacity:.55}
-.rem-field-switch{gap:6px}
-.rem-field-switch>.mahl-mini-switch{min-height:52px;align-items:center}
+.rem-field-switch{gap:6px;align-items:flex-end;padding-left:12px}
+.rem-field-switch>span{align-self:flex-end;text-align:right}
+.rem-field-switch>.mahl-mini-switch{align-self:flex-end;min-height:52px;align-items:center}
+.rem-row-body input[type="time"]{height:52px!important;min-height:52px!important;padding-top:0!important;padding-bottom:0!important;line-height:52px;text-align:center;text-align-last:center}
+.rem-row-body input[type="time"]::-webkit-date-and-time-value{height:52px!important;line-height:52px!important;text-align:center;padding:0}
 .mahl-slot-info{display:inline-grid;place-items:center;width:26px;height:26px;margin-left:6px;padding:0;border:0;border-radius:50%;background:transparent;color:color-mix(in srgb,var(--ink) 45%,transparent);cursor:pointer;box-shadow:none;transition:color .12s,background .12s}
 .mahl-slot-info svg{display:block;width:16px;height:16px}
 .mahl-slot-info:hover{color:var(--ink);background:color-mix(in srgb,var(--ordner) 22%,var(--surface))}

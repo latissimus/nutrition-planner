@@ -149,7 +149,7 @@ function summaryMarkup(state, date) {
     <div class="nutrition-stripe"></div>
     ${trackingToggleMarkup(true)}
     <header class="nutrition-day-nav">
-      <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag">${materialIconMarkup('arrow_back_ios')}</button>
+      <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag" class="nutrition-day-nav-prev">${materialIconMarkup('chevron_right')}</button>
       <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
       <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right')}</button>
     </header>
@@ -315,7 +315,7 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
       <div class="nutrition-product-result" data-product-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
-      ${entry && onDelete ? '<button type="button" class="rem-row-loeschen" data-product-delete>Eintrag löschen</button>' : ''}
+      ${entry && onDelete ? '<button type="button" class="btn btn-block routine-delete" data-product-delete>Eintrag löschen</button>' : ''}
     </form>`);
   const amount = backdrop.querySelector('[data-product-amount]');
   const period = backdrop.querySelector('[data-log-period]');

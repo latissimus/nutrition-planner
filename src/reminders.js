@@ -478,7 +478,7 @@ function reminderBodyMarkup(reminder, completion) {
         </select>
       </label>
       <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
-      ${reminder.id ? '<button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>' : ''}
+      ${reminder.id ? '<button type="button" class="btn btn-block routine-delete" data-remove-reminder>Eintrag löschen</button>' : ''}
     </div>`;
   }
   return `<div class="rem-row-body">
@@ -517,7 +517,7 @@ function reminderBodyMarkup(reminder, completion) {
     </div>
     <button type="button" class="btn btn-primary rem-speichern" data-save-reminder>Änderungen speichern</button>
     ${reminder.id && reminder.type === 'meal' ? `
-      <button type="button" class="rem-row-loeschen" data-remove-reminder>Erinnerung löschen</button>
+      <button type="button" class="btn btn-block routine-delete" data-remove-reminder>Eintrag löschen</button>
     ` : ''}
   </div>`;
 }
