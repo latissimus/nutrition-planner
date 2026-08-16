@@ -5083,4 +5083,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sammlung-sichtbarkeit .switchline-track::after{background:#492425!important}
 .sammlung-sichtbarkeit .switchline input:checked~.switchline-track{background:#492425!important}
 .sammlung-sichtbarkeit .switchline input:checked~.switchline-track::after{background:#fff!important}
+/* KFA-Log-Erinnerung: derselbe Switch statt der Checkbox. */
+.mess-erinnerung-switch{margin:0}
+.mess-einst .switchline-track{background:#B8B4AF!important}
+.mess-einst .switchline-track::after{background:#492425!important}
+.mess-einst .switchline input:checked~.switchline-track{background:#492425!important}
+.mess-einst .switchline input:checked~.switchline-track::after{background:#fff!important}
+/* Wochen-Select und Uhrzeitfeld gleich hoch, Inhalt vertikal mittig. */
+.mess-einst .compact-input{box-sizing:border-box;height:40px;min-height:40px;padding-top:0;padding-bottom:0;line-height:38px}
+.mess-einst input[type="time"].compact-input::-webkit-date-and-time-value{height:38px;line-height:38px;margin:0;padding:0}
 .nutrition-own-list{display:grid;max-height:min(48dvh,440px);overflow-y:auto;border-block:1px solid var(--app-divider)}.nutrition-own-list>p{margin:0;padding:22px 10px;color:var(--muted);font-size:13px;text-align:center}.nutrition-own-list>article{display:grid;grid-template-columns:minmax(0,1fr) 48px;align-items:stretch;border-bottom:1px solid var(--app-divider)}.nutrition-own-list>article:last-child{border-bottom:0}.nutrition-own-select{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:8px;min-height:68px;padding:10px 5px;border:0;background:transparent;color:var(--ink);text-align:left}.nutrition-own-select>span{min-width:0}.nutrition-own-select b,.nutrition-own-select small{display:block}.nutrition-own-select b{overflow:hidden;font-size:15px;text-overflow:ellipsis;white-space:nowrap}.nutrition-own-select small{margin-top:4px;color:var(--muted);font-size:11px;font-weight:700}.nutrition-own-select .material-svg,.nutrition-own-select svg{width:20px;height:20px;fill:currentColor}.nutrition-own-delete{display:grid;place-items:center;width:48px;min-height:48px;padding:0;border:0;background:transparent;color:var(--danger)}.nutrition-own-delete .material-svg,.nutrition-own-delete svg{width:21px;height:21px;fill:currentColor}.nutrition-own-new{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px}.nutrition-own-new .material-svg,.nutrition-own-new svg{width:21px;height:21px;fill:currentColor}

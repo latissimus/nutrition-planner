@@ -173,8 +173,10 @@ export function mountBodyMetrics(container, { session, profile, onProfileUpdated
 
   const settings = skinfoldCard.querySelector('[data-skinfold-settings]');
   settings.innerHTML = `<div class="mess-einst">
-    <label class="mess-zeile"><span>aktiv</span>
-      <input type="checkbox" id="skinfold-reminder" ${profile.falten_erinnerung ? 'checked' : ''}></label>
+    <label class="switchline mess-erinnerung-switch" aria-label="Erinnerung aktiv">
+      <input type="checkbox" id="skinfold-reminder" ${profile.falten_erinnerung ? 'checked' : ''}>
+      <i class="switchline-track" aria-hidden="true"></i>
+    </label>
     <label class="mess-zeile"><span>alle</span>
       <select class="input compact-input" id="skinfold-interval">
         ${[1, 2, 3, 4].map((weeks) => `<option value="${weeks}" ${profile.falten_intervall_wochen === weeks ? 'selected' : ''}>${weeks} Woche${weeks > 1 ? 'n' : ''}</option>`).join('')}
