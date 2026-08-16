@@ -124,12 +124,15 @@ function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   }
   if (reminder.type === 'habit') {
     const note = String(reminder.metadata?.notiz || '').trim();
+    // Der Deep-Link muss die Routine öffnen, nicht die gespiegelte Reminder-
+    // Zeile – daher die routine_id aus den Metadaten als reminderId.
+    const routineId = String(reminder.metadata?.routine_id || reminder.id);
     return {
       title: `${notificationSymbol(reminder)} ${reminder.label}`,
       body: note || bodies.habit,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#habits',
-      reminderId: reminder.id,
+      reminderId: routineId,
       reminderType: reminder.type,
     };
   }

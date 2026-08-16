@@ -142,6 +142,10 @@ function notificationText(reminder, reminders = []) {
     const parts = [dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit), hinweisLabel(hinweis)].filter(Boolean);
     return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: parts.join(' · ') || 'Supplement-Stack checken.' };
   }
+  if (reminder.type === 'habit') {
+    const note = String(reminder.metadata?.notiz || '').trim();
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: note || 'Zeit für deine geplante Routine.' };
+  }
   if (reminder.type === 'drink') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Ein Glas Wasser einplanen.' };
   if (reminder.type === 'sleep') {
     const phase = reminder.metadata?.phase;
@@ -310,7 +314,7 @@ async function maybeNotify(reminder, slot, now, userId, reminders = []) {
     tag: reminderNotificationTag(reminder.id),
     data: {
       url: reminder.route || '#reminders',
-      reminderId: reminder.id,
+      reminderId: reminder.type === 'habit' ? (reminder.metadata?.routine_id || reminder.id) : reminder.id,
       reminderType: reminder.type,
     },
   });

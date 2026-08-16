@@ -1376,6 +1376,35 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
   background:var(--ink);color:var(--surface);font-size:12px;font-weight:800;text-align:center;
 }
 .netzstatus[hidden]{display:none}
+
+/* Einmalige Onboarding-Karte für Benachrichtigungen – gelbe Karte am oberen
+   Rand, die von oben hereinfährt (LOGMAN-Stil). */
+.push-onboarding{
+  position:fixed;z-index:90;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 10px);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;
+  padding:12px 14px;border:2px solid #B8860B;border-radius:16px;
+  background:#FFE68A;color:#3A2E05;box-shadow:0 8px 24px rgba(0,0,0,.18);
+  transform:translateY(calc(-100% - env(safe-area-inset-top) - 24px));opacity:0;
+  transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .28s ease;
+}
+.push-onboarding.offen{transform:translateY(0);opacity:1}
+.push-onboarding-text{display:flex;align-items:flex-start;gap:10px;min-width:0;flex:1 1 220px}
+.push-onboarding-icon{font-size:20px;line-height:1.2;flex:0 0 auto}
+.push-onboarding-text>span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.push-onboarding-text b{font:800 14px/1.2 var(--ui)}
+.push-onboarding-text small{font:600 12px/1.35 var(--ui);color:#5A4708}
+.push-onboarding-aktionen{display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-left:auto}
+.push-onboarding-aktionen button{min-height:38px;padding:0 15px;border-radius:10px;font:800 13px/1 var(--ui);cursor:pointer}
+.push-onboarding-nein{border:0;background:transparent;color:#5A4708}
+.push-onboarding-nein:active{background:rgba(0,0,0,.08)}
+.push-onboarding-ja{border:2px solid #3A2E05;background:#3A2E05;color:#FFE68A}
+.push-onboarding-ja:active{transform:translateY(1px)}
+:root[data-theme="dark"] .push-onboarding{
+  border-color:#8A6D1F;background:#4A3D12;color:#FBE5B0;box-shadow:0 8px 24px rgba(0,0,0,.45);
+}
+:root[data-theme="dark"] .push-onboarding-text small{color:#D9C583}
+:root[data-theme="dark"] .push-onboarding-nein{color:#D9C583}
+:root[data-theme="dark"] .push-onboarding-ja{border-color:#FBE5B0;background:#FBE5B0;color:#3A2E05}
 .route-fehler-view{display:grid;min-height:100%;padding:calc(env(safe-area-inset-top) + 24px) 18px calc(env(safe-area-inset-bottom) + 24px);place-items:center;overflow:auto}
 .route-fehler{width:min(100%,430px);padding:28px 22px;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart);text-align:center}
 .route-fehler-symbol{display:grid;width:52px;height:52px;margin:0 auto 16px;place-items:center;border:var(--bw) solid var(--ink);border-radius:50%;background:var(--pink);font-family:var(--display);font-size:28px;font-weight:800}

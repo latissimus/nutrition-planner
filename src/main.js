@@ -28,6 +28,7 @@ import { createLruCache, createRouteStack, disposeViewEntry } from './navigation
 import { setupDialogAccessibility } from './accessibility.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { initInterfaceSounds, syncInterfaceSounds } from './uiSounds.js';
+import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
@@ -1475,8 +1476,14 @@ if (!supabaseKonfiguriert) {
       profileLadePromise = null;
     }
     if (session?.user?.id) {
-      setPreferenceUser(session.user.id);
-      remindersModule().then(({ startReminderLoop }) => startReminderLoop(session.user.id)).catch(() => {});
+      const aktiveUserId = session.user.id;
+      setPreferenceUser(aktiveUserId);
+      const reminderLoopStarten = () => remindersModule()
+        .then(({ startReminderLoop }) => startReminderLoop(aktiveUserId)).catch(() => {});
+      reminderLoopStarten();
+      // Einmalige Onboarding-Karte für Benachrichtigungen; nach dem Erlauben
+      // wird der Reminder-Loop mit frischem Abo neu gestartet.
+      maybeShowPushOnboarding(aktiveUserId, reminderLoopStarten);
     }
     // Ein still erneuertes Zugriffstoken darf die gerade benutzte Unterseite
     // nicht neu aufbauen. Auch wiederholte SIGNED_IN-Ereignisse desselben
