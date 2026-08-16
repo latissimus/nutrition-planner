@@ -21,34 +21,6 @@ const periods = [
 ];
 const days = [['1', 'Mo'], ['2', 'Di'], ['3', 'Mi'], ['4', 'Do'], ['5', 'Fr'], ['6', 'Sa'], ['7', 'So']];
 const today = () => new Date().toLocaleDateString('sv-SE');
-
-// Routinen benachrichtigen über dieselbe Push-Pipeline wie Mahlzeiten: zu jeder
-// Routine mit Uhrzeit wird eine gespiegelte 'habit'-Erinnerung gepflegt. Ohne
-// Uhrzeit/Wochentag gibt es nichts zu planen, dann wird der Spiegel entfernt.
-// Wochentage der Routine sind 1–7 (Mo–So); reminders nutzt 0–6 (So–Sa), daher
-// So=7 → 0.
-async function syncRoutineReminder(userId, routine) {
-  if (!routine?.id) return;
-  const zeit = routine.time ? String(routine.time).slice(0, 5) : '';
-  const weekdays = [...new Set((routine.weekdays || []).map((tag) => Number(tag) % 7))].sort((a, b) => a - b);
-  if (!zeit || !weekdays.length) {
-    await supabase.from('reminders').delete().eq('user_id', userId).eq('routine_id', routine.id);
-    return;
-  }
-  const basisLabel = (routine.name || 'Routine').trim().slice(0, 80) || 'Routine';
-  const metadata = { routine_id: routine.id, icon: routine.icon || 'emoji:✓', notiz: routine.note || '' };
-  for (let versuch = 0; versuch < 4; versuch += 1) {
-    // Der Reminder-Name muss (user_id,type,label)-eindeutig sein. Kollidiert ein
-    // gleichnamiger Routinenname, wird ein Suffix angehängt.
-    const label = versuch === 0 ? basisLabel : `${basisLabel.slice(0, 76)} (${versuch + 1})`;
-    const { error } = await supabase.from('reminders').upsert({
-      user_id: userId, routine_id: routine.id, type: 'habit',
-      label, time: zeit, weekdays, active: true, route: '#habits', metadata,
-    }, { onConflict: 'routine_id' });
-    if (!error) return;
-    if (error.code !== '23505') return;
-  }
-}
 const defaultMobilityExercises = [
   { name: 'Cat-Cow', prescription: '8–10 Wiederholungen' },
   { name: '90/90 Hip Switches', prescription: '8 pro Seite' },
@@ -258,13 +230,10 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
     };
     if (mobility && !payload.mobility_exercises.length) { submit.disabled = false; return toast('Bitte mindestens eine Mobility-Übung eintragen.'); }
     const query = existing
-      ? supabase.from('routines').update(payload).eq('id', existing.id).eq('user_id', userId).select().single()
-      : supabase.from('routines').insert(payload).select().single();
-    const { data: gespeicherteRoutine, error } = await query;
+      ? supabase.from('routines').update(payload).eq('id', existing.id).eq('user_id', userId)
+      : supabase.from('routines').insert(payload);
+    const { error } = await query;
     if (error) { toast('Routine konnte nicht gespeichert werden.'); submit.disabled = false; return; }
-    // Gespiegelte Push-Erinnerung pflegen (best effort – die Routine ist schon
-    // gespeichert, ein Sync-Fehler darf den Ablauf nicht blockieren).
-    await syncRoutineReminder(userId, gespeicherteRoutine).catch(() => {});
     notifyHomeCountsChanged();
     close(); toast('Routine gespeichert'); await onSaved?.();
     if (!existing) playInterfaceSound('bonus', { retrigger: 'restart' });
