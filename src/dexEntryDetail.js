@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
-import { sourceFromUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
+import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor } from './dexEntries.js';
 import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
@@ -8,7 +8,7 @@ import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged } from './realtime.js';
 
 const BUCKET = 'dex-entries';
-const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,ingredient_items,created_at,updated_at';
 const TRAINING_CLASSES = [
   ['unset', 'Nicht festgelegt'], ['exercise', 'Übungen'], ['recovery', 'Regeneration'],
   ['tips', 'Tipps'], ['injury', 'Verletzung'],
@@ -16,6 +16,31 @@ const TRAINING_CLASSES = [
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+
+// Rezept-Zutaten in der Detailansicht: strukturierte Einträge (Name · Gramm ·
+// kcal) mit Summe; für ältere Rezepte Rückfall auf die reine Textliste.
+function ingredientsSection(entry) {
+  if (entry.root_key !== 'food-log' || entry.food_kind !== 'recipe') return '';
+  const items = Array.isArray(entry.ingredient_items) ? entry.ingredient_items : [];
+  if (items.length) {
+    const total = items.reduce((acc, it) => {
+      const factor = (Number(it.grams) || 0) / 100;
+      acc.grams += Number(it.grams) || 0;
+      acc.kcal += (Number(it.kcal_100g) || 0) * factor;
+      acc.protein += (Number(it.protein_100g) || 0) * factor;
+      acc.carbs += (Number(it.carbs_100g) || 0) * factor;
+      acc.fat += (Number(it.fat_100g) || 0) * factor;
+      return acc;
+    }, { grams: 0, kcal: 0, protein: 0, carbs: 0, fat: 0 });
+    const rows = items.map((it) => `<li><span class="dex-zutat-name">${escapeHtml(it.name)}</span><span class="dex-zutat-gramm">${Math.round(Number(it.grams) || 0)} g</span><strong>${Math.round((Number(it.kcal_100g) || 0) * (Number(it.grams) || 0) / 100)} kcal</strong></li>`).join('');
+    return `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul class="dex-zutaten-detail">${rows}</ul>
+      <p class="dex-zutaten-summe">Gesamt: ${Math.round(total.grams)} g · ${Math.round(total.kcal)} kcal · ${Math.round(total.protein)} P · ${Math.round(total.carbs)} K · ${Math.round(total.fat)} F</p></section>`;
+  }
+  if (entry.ingredients?.length) {
+    return `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul>${entry.ingredients.map((ingredient) => `<li>${escapeHtml(ingredient)}</li>`).join('')}</ul></section>`;
+  }
+  return '';
+}
 
 async function loadEntry(userId, id, signal) {
   let query = supabase.from('dex_entries')
@@ -69,7 +94,10 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         </select></label>
         <label class="dex-entry-field" for="edit-entry-prep"><span>Zubereitung <small>Minuten</small></span><input id="edit-entry-prep" class="input" type="number" min="1" max="1440" value="${entry.prep_minutes || ''}" placeholder="z. B. 10"></label>
       </div>` : ''}
-      ${entry.root_key === 'food-log' && entry.food_kind === 'recipe' ? `<label class="dex-entry-field" for="edit-entry-ingredients"><span>Zutaten <small>eine Zutat pro Zeile</small></span><textarea id="edit-entry-ingredients" class="input" maxlength="4000" rows="6" placeholder="Eine Zutat pro Zeile">${escapeHtml((entry.ingredients || []).join('\n'))}</textarea></label>` : ''}
+      ${entry.root_key === 'food-log' && entry.food_kind === 'recipe' ? `<div class="dex-entry-field dex-zutaten"><span>Zutaten <small>aus der Lebensmittel-Datenbank</small></span>
+        <div class="dex-zutaten-liste" data-zutaten-liste></div>
+        <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('add')}<span>Zutat hinzufügen</span></button>
+      </div>` : ''}
       ${entry.root_key === 'training' ? `<label class="dex-entry-field" for="edit-entry-training-class"><span>Training-Klasse</span><select id="edit-entry-training-class" class="input">
         ${TRAINING_CLASSES.map(([key, label]) => `<option value="${key}"${(entry.training_class || 'unset') === key ? ' selected' : ''}>${label}</option>`).join('')}
         <option value="custom"${entry.training_class && !fixedTrainingClass ? ' selected' : ''}>Eigene Klasse …</option>
@@ -85,6 +113,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
   </section>`;
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+  const recipeIngredients = mountIngredientEditor(backdrop, entry.ingredient_items || []);
   const trainingClassSelect = backdrop.querySelector('#edit-entry-training-class');
   const trainingClassCustom = backdrop.querySelector('[data-edit-training-class-custom]');
   trainingClassSelect?.addEventListener('change', () => {
@@ -121,8 +150,9 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         payload.prep_minutes = backdrop.querySelector('#edit-entry-prep').value
           ? Number(backdrop.querySelector('#edit-entry-prep').value) : null;
         if (entry.food_kind === 'recipe') {
-          payload.ingredients = String(backdrop.querySelector('#edit-entry-ingredients')?.value || '')
-            .split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 100);
+          const zutaten = recipeIngredients.getItems();
+          payload.ingredient_items = zutaten;
+          payload.ingredients = zutaten.map((it) => `${it.grams} g ${it.name}`);
         }
       }
       if (entry.root_key === 'training') {
@@ -209,8 +239,7 @@ function detailMarkup(entry) {
   const trainingLabels = { exercise: 'Übungen', recovery: 'Regeneration', tips: 'Tipps', injury: 'Verletzung' };
   const trainingMeta = entry.root_key === 'training' && entry.training_class && entry.training_class !== 'unset'
     ? `<div class="dex-detail-foodmeta"><span>${escapeHtml(trainingLabels[entry.training_class] || entry.training_class)}</span></div>` : '';
-  const ingredients = entry.root_key === 'food-log' && entry.food_kind === 'recipe' && entry.ingredients?.length
-    ? `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul>${entry.ingredients.map((ingredient) => `<li>${escapeHtml(ingredient)}</li>`).join('')}</ul></section>` : '';
+  const ingredients = ingredientsSection(entry);
   return `<div class="wrap pad-bottom dex-detail-seite dex-detail-fixkopf">
     <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
       <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>

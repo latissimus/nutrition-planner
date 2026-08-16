@@ -306,7 +306,7 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
   const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
-    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
+    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'recipe' ? 'Eigenes Rezept · aus den Food-Log-Zutaten berechnet' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
       ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>` : ''}
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
@@ -388,9 +388,12 @@ async function productLookup(action, value) {
   return { products: (payload.products || []).map(normalize).filter((product) => product.name && product.kcal_100g).slice(0, 16) };
 }
 
-function searchEditor({ date, onSave }) {
+// Wiederverwendbare Lebensmittelsuche (BLS + Open Food Facts). `onPick` erhält
+// das gewählte Produkt und den Backdrop, damit der Aufrufer entscheidet, was
+// danach passiert (Mengen-Dialog im Meal-Log, Zutat im Rezept-Editor …).
+function foodSearchOverlay({ title = 'Lebensmittel suchen', onPick }) {
   preloadBls();
-  const backdrop = createOverlay(`<header><h2>Lebensmittel suchen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const backdrop = createOverlay(`<header><h2>${title}</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="nutrition-search-form"><input class="input" data-food-query placeholder="Produkt oder Marke" autocomplete="off"><button class="btn btn-primary" type="submit">Suchen</button></form>
     <div class="nutrition-search-results" data-food-results><p>Suche nach einem Grundnahrungsmittel, Produkt oder einer Marke.</p></div>`);
   const results = backdrop.querySelector('[data-food-results]');
@@ -422,9 +425,21 @@ function searchEditor({ date, onSave }) {
   };
   results.onclick = (event) => {
     const index = event.target.closest('[data-product-index]')?.dataset.productIndex;
-    if (index == null) return; const product = products[Number(index)]; backdrop.remove(); amountEditor({ product, date, onSave });
+    if (index == null) return;
+    onPick(products[Number(index)], backdrop);
   };
   setTimeout(() => backdrop.querySelector('[data-food-query]')?.focus(), 120);
+  return backdrop;
+}
+
+function searchEditor({ date, onSave }) {
+  foodSearchOverlay({ onPick: (product, backdrop) => { backdrop.remove(); amountEditor({ product, date, onSave }); } });
+}
+
+// Für den Rezept-Editor im Food-Log: Zutat aus der Datenbank wählen. Liefert das
+// normalisierte Produkt (mit 100-g-Nährwerten und Quelle) an den Aufrufer.
+export function pickFoodIngredient(onPick) {
+  foodSearchOverlay({ title: 'Zutat auswählen', onPick: (product, backdrop) => { backdrop.remove(); onPick(product); } });
 }
 
 function recentEditor({ recent, date, onSave }) {
@@ -436,6 +451,71 @@ function recentEditor({ recent, date, onSave }) {
     const old = unique[Number(index)];
     const saved = await onSave({ ...old, id: undefined, user_id: undefined, created_at: undefined, log_date: date, product: null });
     if (saved) backdrop.remove();
+  };
+}
+
+// Summiert die Nährwerte aller Rezept-Zutaten (jede Zutat trägt ihre eigenen
+// 100-g-Werte aus der Datenbank) und die Gesamtgrammzahl.
+function recipeTotals(items) {
+  return (Array.isArray(items) ? items : []).reduce((acc, item) => {
+    const factor = number(item.grams) / 100;
+    acc.grams += number(item.grams);
+    acc.kcal += number(item.kcal_100g) * factor;
+    acc.protein += number(item.protein_100g) * factor;
+    acc.carbs += number(item.carbs_100g) * factor;
+    acc.fat += number(item.fat_100g) * factor;
+    return acc;
+  }, { grams: 0, kcal: 0, protein: 0, carbs: 0, fat: 0 });
+}
+
+// Rezept als „Produkt" mit 100-g-Nährwerten, damit der bestehende Mengen-Dialog
+// (Portionen, Gramm skalieren, live berechnen) unverändert genutzt werden kann.
+function recipeAsProduct(recipe) {
+  const total = recipeTotals(recipe.ingredient_items);
+  const per100 = (value) => (total.grams ? value / total.grams * 100 : 0);
+  const grams = Math.round(total.grams);
+  return {
+    barcode: '', name: recipe.title || 'Rezept', brand: 'Eigenes Rezept', image_url: '',
+    serving_g: grams || 100,
+    kcal_100g: per100(total.kcal), protein_100g: per100(total.protein),
+    carbs_100g: per100(total.carbs), fat_100g: per100(total.fat),
+    portions: grams ? [['1 Portion (ganzes Rezept)', grams]] : null,
+    source: 'recipe',
+  };
+}
+
+async function recipeEditor({ userId, date, onSave }) {
+  const backdrop = createOverlay(`<header><h2>Rezept übernehmen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="nutrition-search-results nutrition-recipe-list" data-recipe-list><p>Rezepte werden geladen …</p></div>`);
+  const list = backdrop.querySelector('[data-recipe-list]');
+  let recipes = [];
+  try {
+    const { data, error } = await supabase.from('dex_entries')
+      .select('id,title,ingredient_items')
+      .eq('user_id', userId).eq('root_key', 'food-log').eq('food_kind', 'recipe')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    recipes = data || [];
+  } catch { list.innerHTML = '<p>Rezepte konnten nicht geladen werden.</p>'; return; }
+  if (!recipes.length) {
+    list.innerHTML = '<p>Noch kein Rezept vorhanden. Lege im Food-Log ein eigenes Rezept mit Zutaten aus der Datenbank an.</p>';
+    return;
+  }
+  list.innerHTML = recipes.map((recipe, index) => {
+    const items = Array.isArray(recipe.ingredient_items) ? recipe.ingredient_items : [];
+    const total = recipeTotals(items);
+    const usable = items.length > 0;
+    return `<button type="button" data-recipe-index="${index}"${usable ? '' : ' disabled'}>
+      <span class="nutrition-food-platzhalter">${materialIconMarkup('menu_book', 'nutrition-food-icon')}</span>
+      <div><b>${escapeHtml(recipe.title || 'Rezept')}</b><small>${usable ? `${items.length} Zutaten · ${Math.round(total.grams)} g` : 'Zutaten im Food-Log aus der Datenbank wählen'}</small></div>
+      <strong>${usable ? `${decimal(total.kcal)} kcal` : ''}</strong>
+    </button>`;
+  }).join('');
+  list.onclick = (event) => {
+    const index = event.target.closest('[data-recipe-index]')?.dataset.recipeIndex;
+    if (index == null) return;
+    backdrop.remove();
+    amountEditor({ product: recipeAsProduct(recipes[Number(index)]), date, onSave });
   };
 }
 
@@ -511,6 +591,7 @@ function scannerEditor(context) {
 function openNutritionAction(action, context) {
   if (action === 'scan') scannerEditor(context);
   if (action === 'search') searchEditor(context);
+  if (action === 'recipe') recipeEditor(context);
   if (action === 'manual') ownProductsEditor(context);
   if (action === 'recent') recentEditor(context);
 }
@@ -520,6 +601,7 @@ function addMenu(context) {
     <div class="sheet-menue nutrition-add-menu">
       <button type="button" data-nutrition-action="scan">${materialIconMarkup('photo_camera')}<span><b>Barcode scannen</b><small>Verpacktes Produkt erkennen</small></span></button>
       <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Grundnahrungsmittel und Produkte</small></span></button>
+      <button type="button" data-nutrition-action="recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Eigenes Rezept aus dem Food-Log übernehmen</small></span></button>
       <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigene Mahlzeit</b><small>Kalorien und Makros selbst eintragen</small></span></button>
       <button type="button" data-nutrition-action="recent">${materialIconMarkup('calendar_meal')}<span><b>Zuletzt verwendet</b><small>Frühere Mahlzeit wiederholen</small></span></button>
     </div>`);
@@ -709,7 +791,7 @@ export async function mountNutrition(container, { userId, signal }) {
   return {
     isEnabled: () => nutritionEnabled(state),
     renderIntegrated,
-    openAddMenu: () => addMenu({ date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
-    openAction: (action) => openNutritionAction(action, { date, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
+    openAddMenu: () => addMenu({ date, userId, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
+    openAction: (action) => openNutritionAction(action, { date, userId, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
   };
 }

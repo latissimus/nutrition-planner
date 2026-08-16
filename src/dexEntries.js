@@ -8,13 +8,14 @@ import { dexStoragePath } from './storagePaths.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
+import { pickFoodIngredient } from './nutrition.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']);
 const AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/webm', 'audio/ogg']);
-const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,created_at,updated_at';
+const ENTRY_COLUMNS = 'id,user_id,collection_id,routine_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,ingredient_items,created_at,updated_at';
 const DEX_PAGE_SIZE = 24;
 
 const escapeHtml = (value = '') => String(value)
@@ -148,9 +149,10 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
           <input id="dex-entry-prep" class="input" type="number" inputmode="numeric" min="1" max="1440" placeholder="z. B. 10">
         </label>
       </div>` : ''}
-      ${foodMode && foodKind !== 'cheat_meal' ? `<label class="dex-entry-field" for="dex-entry-ingredients"><span>Zutaten <small>eine Zutat pro Zeile</small></span>
-        <textarea id="dex-entry-ingredients" class="input" maxlength="4000" rows="6" placeholder="z. B.&#10;250 g Skyr&#10;30 g Haferflocken&#10;1 Banane"></textarea>
-      </label>` : ''}
+      ${foodMode && foodKind !== 'cheat_meal' ? `<div class="dex-entry-field dex-zutaten"><span>Zutaten <small>aus der Lebensmittel-Datenbank</small></span>
+        <div class="dex-zutaten-liste" data-zutaten-liste></div>
+        <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('add')}<span>Zutat hinzufügen</span></button>
+      </div>` : ''}
       ${trainingMode ? `<label class="dex-entry-field" for="dex-entry-training-class"><span>Training-Klasse</span>
         <select id="dex-entry-training-class" class="input">
           <option value="unset">Nicht festgelegt</option><option value="exercise">Übungen</option>
@@ -170,6 +172,57 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       <button class="btn btn-primary btn-block dex-entry-save" type="submit" data-no-interface-sound>${label} speichern</button>
     </form>
   </section>`;
+}
+
+// Strukturierter Zutaten-Editor: jede Zutat wird aus der Lebensmittel-Datenbank
+// (BLS/Open Food Facts) gewählt und trägt ihre 100-g-Nährwerte mit sich, damit
+// der Meal-Log ohne Namensraten summieren kann. `getItems()` liefert die
+// gültigen Zeilen (Name + Gramm > 0) für den Insert.
+export function mountIngredientEditor(root, initial = []) {
+  const list = root.querySelector('[data-zutaten-liste]');
+  const addBtn = root.querySelector('[data-zutat-add]');
+  if (!list || !addBtn) return { getItems: () => [] };
+  const items = (Array.isArray(initial) ? initial : []).map((it) => ({
+    name: String(it.name || ''), grams: Number(it.grams) || 0,
+    kcal_100g: Number(it.kcal_100g) || 0, protein_100g: Number(it.protein_100g) || 0,
+    carbs_100g: Number(it.carbs_100g) || 0, fat_100g: Number(it.fat_100g) || 0,
+    source: it.source || '', barcode: it.barcode || '', image_url: it.image_url || '',
+  }));
+  const kcalOf = (item) => Math.round(item.kcal_100g * item.grams / 100);
+  const render = () => {
+    list.innerHTML = items.length ? items.map((item, index) => `<div class="dex-zutat-row" data-zutat-index="${index}">
+        <span class="dex-zutat-name">${escapeHtml(item.name)}</span>
+        <span class="dex-zutat-gramm"><input type="number" inputmode="numeric" min="1" max="5000" step="1" value="${item.grams}" data-zutat-gramm aria-label="Gramm"><i>g</i></span>
+        <strong class="dex-zutat-kcal">${kcalOf(item)} kcal</strong>
+        <button type="button" class="dex-zutat-remove" data-zutat-remove aria-label="Zutat entfernen">${materialIconMarkup('close')}</button>
+      </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Über „Zutat hinzufügen" ein Lebensmittel aus der Datenbank wählen.</p>';
+  };
+  list.addEventListener('input', (event) => {
+    const input = event.target.closest('[data-zutat-gramm]'); if (!input) return;
+    const index = Number(input.closest('[data-zutat-index]')?.dataset.zutatIndex);
+    if (!items[index]) return;
+    items[index].grams = Math.max(0, Number(input.value) || 0);
+    const kcal = input.closest('.dex-zutat-row')?.querySelector('.dex-zutat-kcal');
+    if (kcal) kcal.textContent = `${kcalOf(items[index])} kcal`;
+  });
+  list.addEventListener('click', (event) => {
+    const remove = event.target.closest('[data-zutat-remove]'); if (!remove) return;
+    const index = Number(remove.closest('[data-zutat-index]')?.dataset.zutatIndex);
+    if (index >= 0) { items.splice(index, 1); render(); }
+  });
+  addBtn.addEventListener('click', () => {
+    pickFoodIngredient((product) => {
+      items.push({
+        name: product.name, grams: Math.round(Number(product.serving_g)) || 100,
+        kcal_100g: Number(product.kcal_100g) || 0, protein_100g: Number(product.protein_100g) || 0,
+        carbs_100g: Number(product.carbs_100g) || 0, fat_100g: Number(product.fat_100g) || 0,
+        source: product.source || '', barcode: product.barcode || '', image_url: product.image_url || '',
+      });
+      render();
+    });
+  });
+  render();
+  return { getItems: () => items.filter((it) => it.name && it.grams > 0) };
 }
 
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
@@ -192,6 +245,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
     if (!(event.target instanceof Element) || !event.target.closest('.dex-entry-editor')) event.preventDefault();
   }, { passive: false });
   const form = backdrop.querySelector('[data-dex-entry-form]');
+  const recipeIngredients = mountIngredientEditor(backdrop);
   const trainingClassSelect = backdrop.querySelector('#dex-entry-training-class');
   const trainingClassCustom = backdrop.querySelector('[data-training-class-custom]');
   trainingClassSelect?.addEventListener('change', () => {
@@ -336,9 +390,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         training_class: selectedTrainingClass,
         prep_minutes: foodMode && form.querySelector('#dex-entry-prep').value
           ? Number(form.querySelector('#dex-entry-prep').value) : null,
-        ingredients: foodMode
-          ? String(form.querySelector('#dex-entry-ingredients')?.value || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 100)
-          : [],
+        ingredient_items: foodMode ? recipeIngredients.getItems() : [],
+        // Lesbare Spiegelung der strukturierten Zutaten für die Detailansicht.
+        ingredients: foodMode ? recipeIngredients.getItems().map((it) => `${it.grams} g ${it.name}`) : [],
       }).select().single();
       if (error) throw error;
       notifyHomeCountsChanged();
