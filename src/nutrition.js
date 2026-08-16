@@ -4,6 +4,7 @@ import { materialIconMarkup } from './categoryIcons.js';
 import { subscribeToTableChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
+import { blsSuche, preloadBls } from './blsFoods.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
@@ -303,7 +304,7 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
   const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
-    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'usda' ? 'Grundnahrungsmittel · USDA FoodData Central' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
+    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
       ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>` : ''}
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
@@ -360,7 +361,7 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
 async function productLookup(action, value) {
   const body = action === 'barcode' ? { action, barcode: value } : { action, query: value };
   const { data, error } = await supabase.functions.invoke('food-products', { body });
-  // Die Edge-Function liefert bereits USDA-Grundnahrungsmittel + OFF gemischt.
+  // Die Edge-Function liefert OFF-Markenprodukte; BLS mischt der Aufrufer dazu.
   if (!error && data) return data;
   // Fallback nur bei nicht erreichbarer Function: direkte OFF-Abfrage.
   const fields = 'code,product_name,product_name_de,brands,image_front_small_url,image_front_url,serving_quantity,nutriments';
@@ -386,6 +387,7 @@ async function productLookup(action, value) {
 }
 
 function searchEditor({ date, onSave }) {
+  preloadBls();
   const backdrop = createOverlay(`<header><h2>Lebensmittel suchen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="nutrition-search-form"><input class="input" data-food-query placeholder="Produkt oder Marke" autocomplete="off"><button class="btn btn-primary" type="submit">Suchen</button></form>
     <div class="nutrition-search-results" data-food-results><p>Suche nach einem Grundnahrungsmittel, Produkt oder einer Marke.</p></div>`);
@@ -396,7 +398,18 @@ function searchEditor({ date, onSave }) {
     results.innerHTML = '<p>Produkte werden gesucht …</p>';
     const streamingSound = playInterfaceSound('streaming', { loop: true, retrigger: 'restart' });
     try {
-      products = (await productLookup('search', query)).products || [];
+      // BLS-Grundnahrungsmittel (lokal, deutsch) zuerst, dann OFF-Markenprodukte.
+      const [bls, off] = await Promise.all([
+        blsSuche(query).catch(() => []),
+        productLookup('search', query).then((r) => r.products || []).catch(() => []),
+      ]);
+      const gesehen = new Set();
+      products = [...bls, ...off].filter((product) => {
+        const key = product.name.toLocaleLowerCase('de');
+        if (!key || gesehen.has(key)) return false;
+        gesehen.add(key);
+        return true;
+      }).slice(0, 20);
       results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${index < 2 ? ' fetchpriority="high"' : ''}>` : `<span class="nutrition-food-platzhalter">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigene Mahlzeit“.</p>';
       results.querySelectorAll('img').forEach((image) => {
         const reveal = () => image.classList.add('ist-geladen');

@@ -15,10 +15,14 @@ const icons = Object.entries(modules).filter(([path]) => !hiddenPickerFiles.has(
   const file = path.split('/').at(-1);
   const id = file.replace(/_24dp.*$/i, '').replace(/\.svg$/i, '').normalize('NFC').toLocaleLowerCase('de');
   const title = id.replaceAll('_', ' ');
-  return { id, title, svg };
+  // Einige Icons (z. B. Lebensmittel.svg) tragen einen XML-Prolog + DOCTYPE,
+  // der beim Einfügen per innerHTML stört – deshalb entfernen.
+  const bereinigt = String(svg).replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
+  return { id, title, svg: bereinigt };
 }).sort((a, b) => a.title.localeCompare(b.title, 'de'));
 export const availableCategoryIcons = icons;
-const iconById = (id) => icons.find((icon) => icon.id === String(id || '').normalize('NFC'));
+// Groß-/Kleinschreibung egal: die IDs werden beim Laden kleingeschrieben.
+const iconById = (id) => icons.find((icon) => icon.id === String(id || '').normalize('NFC').toLocaleLowerCase('de'));
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
