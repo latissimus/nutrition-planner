@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { availableCategoryIcons, materialIconMarkup } from './categoryIcons.js';
+import { availableCategoryIcons, materialIconMarkup, categoryColor } from './categoryIcons.js';
 import {
   activatePush,
   browserPushSubscriptionExists,
@@ -694,6 +694,8 @@ export function chooseReminderIcon(current, onSelected, { hostBackdrop = null } 
 
 export async function mountReminders(container, { session, signal }) {
   const userId = session.user.id;
+  // Gewählte Dex-Ordnerfarbe (wie die Kartenstreifen) für die Platzhalter-Felder der Einträge.
+  container.style.setProperty('--ordner', categoryColor('reminders'));
   container.innerHTML = `
     <div class="wrap pad-bottom">
       <div class="seitenkopf">

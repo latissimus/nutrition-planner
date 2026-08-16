@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
-import { materialIconMarkup } from './categoryIcons.js';
+import { materialIconMarkup, categoryColor } from './categoryIcons.js';
 import { subscribeToTableChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
@@ -197,6 +197,8 @@ function periodEntriesMarkup(entries, period) {
 function createOverlay(markup, className = '') {
   const backdrop = document.createElement('div');
   backdrop.className = `kategorie-sheet-backdrop nutrition-overlay ${className}`.trim();
+  // Gewählte Dex-Ordnerfarbe (MEAL-LOG = Route „reminders") für die Platzhalter-Felder.
+  backdrop.style.setProperty('--ordner', categoryColor('reminders'));
   backdrop.innerHTML = `<section class="kategorie-sheet nutrition-sheet" role="dialog" aria-modal="true">${markup}</section>`;
   backdrop.addEventListener('click', (event) => {
     if (event.target === backdrop || event.target.closest('[data-nutrition-close]')) backdrop.remove();
