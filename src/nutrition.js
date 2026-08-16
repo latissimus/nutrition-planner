@@ -9,184 +9,6 @@ const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
   ['lunch', 'Mittagessen'], ['snack_afternoon', 'Snack nachmittags'], ['dinner', 'Abendessen'],
 ];
-// Kuratierte Grundnahrungsmittel als Ergänzung zu Open Food Facts (das nur
-// verpackte Markenprodukte kennt). Werte pro 100 g, dazu typische Portionen
-// [Bezeichnung, Gramm] für „1 Tasse Kaffee", „1 mittlerer Apfel" usw.
-const BASE_FOODS = [
-  // Obst
-  ['Apfel', 52, 0.3, 11.4, 0.2, [['1 mittlerer Apfel', 130], ['1 großer Apfel', 200], ['1 kleiner Apfel', 90]]],
-  ['Banane', 89, 1.1, 20, 0.3, [['1 mittlere Banane', 120], ['1 große Banane', 150]]],
-  ['Orange', 47, 0.9, 8.3, 0.1, [['1 Orange', 130]]],
-  ['Birne', 57, 0.4, 12, 0.1, [['1 Birne', 150]]],
-  ['Erdbeeren', 32, 0.7, 5.5, 0.3, [['1 Handvoll', 100], ['1 Schale', 250]]],
-  ['Heidelbeeren', 57, 0.7, 12, 0.3, [['1 Handvoll', 60]]],
-  ['Himbeeren', 52, 1.2, 5, 0.7, [['1 Handvoll', 60]]],
-  ['Weintrauben', 69, 0.7, 16, 0.2, [['1 Handvoll', 80]]],
-  ['Kiwi', 61, 1.1, 11, 0.5, [['1 Kiwi', 75]]],
-  ['Ananas', 50, 0.5, 12, 0.1, [['1 Scheibe', 80]]],
-  ['Mango', 60, 0.8, 13, 0.4, [['1/2 Mango', 150]]],
-  ['Pfirsich', 39, 0.9, 8, 0.3, [['1 Pfirsich', 120]]],
-  ['Pflaume', 46, 0.7, 10, 0.3, [['1 Pflaume', 50]]],
-  ['Kirschen', 63, 1, 12, 0.2, [['1 Handvoll', 100]]],
-  ['Wassermelone', 30, 0.6, 7, 0.2, [['1 Stück', 200]]],
-  ['Zitrone', 29, 1.1, 3, 0.3, [['1 Zitrone', 60]]],
-  ['Mandarine', 53, 0.8, 11, 0.3, [['1 Mandarine', 70]]],
-  ['Aprikose', 48, 1.4, 9, 0.4, [['1 Aprikose', 40]]],
-  ['Dattel, getrocknet', 282, 2.5, 63, 0.4, [['1 Dattel', 8]]],
-  ['Rosinen', 299, 3.1, 71, 0.5, [['1 Handvoll', 30]]],
-  ['Avocado', 160, 2, 1.8, 14.7, [['1/2 Avocado', 100], ['1 Avocado', 200]]],
-  // Gemüse
-  ['Karotte', 41, 0.9, 6.8, 0.2, [['1 Karotte', 60]]],
-  ['Brokkoli', 34, 2.8, 4, 0.4, [['1 Portion', 150]]],
-  ['Blumenkohl', 25, 1.9, 3, 0.3, [['1 Portion', 150]]],
-  ['Spinat', 23, 2.9, 1.4, 0.4, [['1 Portion', 100]]],
-  ['Tomate', 18, 0.9, 2.6, 0.2, [['1 Tomate', 85]]],
-  ['Gurke', 12, 0.7, 1.8, 0.1, [['1/2 Gurke', 150]]],
-  ['Paprika', 26, 1, 4.6, 0.3, [['1 Paprika', 120]]],
-  ['Zwiebel', 40, 1.1, 7, 0.1, [['1 Zwiebel', 100]]],
-  ['Knoblauch', 149, 6.4, 30, 0.5, [['1 Zehe', 5]]],
-  ['Kartoffel, gekocht', 77, 2, 15, 0.1, [['1 mittlere Kartoffel', 120], ['1 Portion', 200]]],
-  ['Süßkartoffel, gekocht', 86, 1.6, 20, 0.1, [['1 Portion', 150]]],
-  ['Zucchini', 17, 1.2, 2, 0.3, [['1 Zucchini', 200]]],
-  ['Aubergine', 25, 1, 3, 0.2, [['1/2 Aubergine', 150]]],
-  ['Champignons', 22, 3.1, 0.3, 0.3, [['1 Portion', 100]]],
-  ['Kopfsalat', 14, 1.4, 1.5, 0.2, [['1 Portion', 50]]],
-  ['Rucola', 25, 2.6, 2, 0.7, [['1 Handvoll', 30]]],
-  ['Mais, Dose', 86, 3.2, 15, 1.2, [['1 Portion', 80]]],
-  ['Erbsen', 81, 5.4, 10, 0.4, [['1 Portion', 80]]],
-  ['Grüne Bohnen', 31, 1.8, 5, 0.1, [['1 Portion', 120]]],
-  ['Rosenkohl', 43, 3.4, 5, 0.3, [['1 Portion', 150]]],
-  ['Kürbis', 26, 1, 5, 0.1, [['1 Portion', 150]]],
-  ['Rote Bete', 43, 1.6, 7, 0.2, [['1 Portion', 100]]],
-  ['Sellerie', 16, 0.7, 3, 0.2],
-  ['Lauch', 29, 1.5, 5, 0.3],
-  // Getreide & Beilagen
-  ['Reis, gekocht', 130, 2.7, 28, 0.3, [['1 Portion', 150]]],
-  ['Reis, roh', 360, 7, 78, 1],
-  ['Vollkornreis, gekocht', 111, 2.6, 23, 0.9, [['1 Portion', 150]]],
-  ['Nudeln, gekocht', 158, 5.8, 31, 0.9, [['1 Portion', 200]]],
-  ['Vollkornnudeln, gekocht', 149, 6, 27, 1.5, [['1 Portion', 200]]],
-  ['Spaghetti, gekocht', 158, 5.8, 31, 0.9, [['1 Portion', 200]]],
-  ['Haferflocken', 372, 13.5, 58.7, 7, [['1 Portion', 50]]],
-  ['Müsli', 360, 9, 60, 8, [['1 Portion', 50]]],
-  ['Cornflakes', 357, 7, 84, 0.9, [['1 Portion', 30]]],
-  ['Weißbrot', 265, 9, 49, 3.2, [['1 Scheibe', 40]]],
-  ['Vollkornbrot', 230, 8, 40, 3, [['1 Scheibe', 50]]],
-  ['Roggenbrot', 250, 7, 48, 1.5, [['1 Scheibe', 50]]],
-  ['Toastbrot', 280, 8, 50, 4, [['1 Scheibe', 25]]],
-  ['Brötchen', 280, 9, 54, 2, [['1 Brötchen', 60]]],
-  ['Knäckebrot', 350, 10, 65, 3, [['1 Scheibe', 10]]],
-  ['Couscous, gekocht', 112, 3.8, 23, 0.2, [['1 Portion', 150]]],
-  ['Quinoa, gekocht', 120, 4.4, 21, 1.9, [['1 Portion', 150]]],
-  ['Bulgur, gekocht', 83, 3, 19, 0.2, [['1 Portion', 150]]],
-  ['Pommes frites', 312, 3.4, 41, 15, [['1 Portion', 150]]],
-  ['Kartoffelpüree', 83, 1.9, 12, 3, [['1 Portion', 200]]],
-  // Hülsenfrüchte & vegetarische Proteine
-  ['Linsen, gekocht', 116, 9, 20, 0.4, [['1 Portion', 150]]],
-  ['Kichererbsen, gekocht', 164, 8.9, 27, 2.6, [['1 Portion', 150]]],
-  ['Kidneybohnen', 127, 8.7, 23, 0.5, [['1 Portion', 150]]],
-  ['Weiße Bohnen', 139, 9.7, 25, 0.5, [['1 Portion', 150]]],
-  ['Tofu', 144, 15, 2, 9, [['1 Portion', 100]]],
-  ['Edamame', 121, 12, 9, 5, [['1 Portion', 80]]],
-  // Milchprodukte & Eier
-  ['Vollmilch 3,5 %', 64, 3.3, 4.8, 3.5, [['1 Glas', 200]]],
-  ['Milch 1,5 %', 47, 3.4, 4.9, 1.5, [['1 Glas', 200]]],
-  ['Magermilch', 35, 3.4, 5, 0.1, [['1 Glas', 200]]],
-  ['Naturjoghurt 3,5 %', 63, 3.5, 4.7, 3.5, [['1 Becher', 150]]],
-  ['Griechischer Joghurt', 133, 5.5, 4, 10, [['1 Portion', 150]]],
-  ['Magerquark', 67, 12, 4, 0.2, [['1 Portion', 250]]],
-  ['Speisequark 20 %', 109, 12, 3.5, 5, [['1 Portion', 250]]],
-  ['Skyr', 63, 11, 4, 0.2, [['1 Becher', 150]]],
-  ['Hüttenkäse', 98, 12, 3, 4.3, [['1 Portion', 100]]],
-  ['Schlagsahne', 292, 2.4, 3.2, 30, [['1 EL', 15]]],
-  ['Butter', 741, 0.7, 0.6, 82, [['1 Portion', 10]]],
-  ['Margarine', 720, 0.2, 0.4, 80, [['1 Portion', 10]]],
-  ['Frischkäse', 253, 6, 3.5, 24, [['1 Portion', 30]]],
-  ['Mozzarella', 254, 18, 1, 20, [['1 Kugel', 125]]],
-  ['Gouda', 356, 25, 0, 28, [['1 Scheibe', 25]]],
-  ['Emmentaler', 380, 28, 0, 30, [['1 Scheibe', 25]]],
-  ['Feta', 264, 14, 1.5, 22, [['1 Portion', 50]]],
-  ['Parmesan', 431, 38, 0, 29, [['1 EL', 10]]],
-  ['Camembert', 300, 20, 0.5, 24, [['1 Portion', 30]]],
-  ['Harzer Käse', 125, 30, 0, 0.7, [['1 Rolle', 125]]],
-  ['Ei', 137, 12.3, 1.5, 9.3, [['1 Ei (M)', 55], ['1 Ei (L)', 65]]],
-  ['Eiklar', 52, 11, 0.7, 0.2, [['1 Eiklar', 33]]],
-  ['Eigelb', 322, 16, 3.6, 27, [['1 Eigelb', 18]]],
-  // Fleisch & Fisch
-  ['Hähnchenbrust', 110, 23, 0, 1.2, [['1 Filet', 150]]],
-  ['Hähnchenschenkel', 180, 18, 0, 12, [['1 Schenkel', 130]]],
-  ['Putenbrust', 105, 24, 0, 1, [['1 Portion', 150]]],
-  ['Rinderhackfleisch', 250, 18, 0, 20, [['1 Portion', 125]]],
-  ['Gemischtes Hack', 230, 17, 0, 18, [['1 Portion', 125]]],
-  ['Schweineschnitzel', 143, 22, 0, 6, [['1 Schnitzel', 150]]],
-  ['Rindersteak', 180, 26, 0, 8, [['1 Steak', 200]]],
-  ['Bratwurst', 300, 12, 1, 27, [['1 Wurst', 100]]],
-  ['Salami', 350, 20, 1, 30, [['1 Scheibe', 10]]],
-  ['Kochschinken', 110, 18, 1, 3.5, [['1 Scheibe', 25]]],
-  ['Speck', 540, 9, 0, 55, [['1 Scheibe', 15]]],
-  ['Lachs', 208, 20, 0, 13, [['1 Filet', 125]]],
-  ['Thunfisch, Dose', 116, 26, 0, 1, [['1 Dose', 150]]],
-  ['Forelle', 119, 20, 0, 4, [['1 Filet', 130]]],
-  ['Kabeljau', 82, 18, 0, 0.7, [['1 Filet', 150]]],
-  ['Garnelen', 99, 24, 0, 0.3, [['1 Portion', 100]]],
-  ['Makrele', 205, 19, 0, 14, [['1 Filet', 100]]],
-  // Nüsse, Samen & Fette
-  ['Mandeln', 579, 21, 22, 49, [['1 Handvoll', 25]]],
-  ['Walnüsse', 654, 15, 14, 65, [['1 Handvoll', 25]]],
-  ['Haselnüsse', 628, 15, 17, 61, [['1 Handvoll', 25]]],
-  ['Cashewkerne', 553, 18, 30, 44, [['1 Handvoll', 25]]],
-  ['Erdnüsse', 567, 26, 16, 49, [['1 Handvoll', 25]]],
-  ['Erdnussbutter', 588, 25, 20, 50, [['1 EL', 16]]],
-  ['Sonnenblumenkerne', 584, 21, 20, 51, [['1 EL', 10]]],
-  ['Kürbiskerne', 559, 30, 11, 49, [['1 EL', 10]]],
-  ['Chiasamen', 486, 17, 42, 31, [['1 EL', 12]]],
-  ['Leinsamen', 534, 18, 29, 42, [['1 EL', 10]]],
-  ['Olivenöl', 884, 0, 0, 100, [['1 EL', 10], ['1 TL', 5]]],
-  ['Rapsöl', 884, 0, 0, 100, [['1 EL', 10]]],
-  ['Kokosöl', 862, 0, 0, 100, [['1 EL', 10]]],
-  // Getränke
-  ['Kaffee, schwarz', 2, 0.1, 0, 0, [['1 Tasse', 200], ['1 große Tasse', 300]]],
-  ['Espresso', 9, 0.1, 1.7, 0.2, [['1 Espresso', 30]]],
-  ['Kaffee mit Milch', 20, 1, 1.7, 1, [['1 Tasse', 200]]],
-  ['Cappuccino', 40, 2.2, 3.5, 2, [['1 Tasse', 150]]],
-  ['Latte Macchiato', 42, 2.3, 3.8, 2, [['1 Glas', 250]]],
-  ['Schwarzer Tee, ungesüßt', 1, 0, 0.2, 0, [['1 Tasse', 200]]],
-  ['Orangensaft', 45, 0.7, 10, 0.2, [['1 Glas', 200]]],
-  ['Apfelsaft', 46, 0.1, 11, 0.1, [['1 Glas', 200]]],
-  ['Cola', 42, 0, 10.6, 0, [['1 Glas', 250], ['1 Dose', 330]]],
-  ['Cola light', 0.3, 0, 0, 0, [['1 Glas', 250]]],
-  ['Bier', 43, 0.5, 3.6, 0, [['1 Glas', 300], ['1 Flasche', 500]]],
-  ['Weißwein', 82, 0.1, 2.6, 0, [['1 Glas', 200]]],
-  ['Rotwein', 85, 0.1, 2.6, 0, [['1 Glas', 200]]],
-  ['Wasser', 0, 0, 0, 0, [['1 Glas', 250]]],
-  // Süßes & Snacks
-  ['Zucker', 400, 0, 100, 0, [['1 TL', 5], ['1 EL', 15]]],
-  ['Honig', 304, 0.3, 82, 0, [['1 TL', 7]]],
-  ['Marmelade', 250, 0.5, 62, 0.1, [['1 EL', 20]]],
-  ['Nuss-Nougat-Creme', 539, 6, 57, 31, [['1 EL', 20]]],
-  ['Vollmilchschokolade', 535, 7.3, 59, 30, [['1 Riegel', 20], ['1 Tafel', 100]]],
-  ['Zartbitterschokolade', 546, 6, 46, 38, [['1 Riegel', 20]]],
-  ['Gummibärchen', 343, 7, 77, 0.2, [['1 Handvoll', 30]]],
-  ['Kartoffelchips', 536, 6, 50, 34, [['1 Handvoll', 30], ['1 Tüte', 175]]],
-  ['Butterkeks', 480, 6, 65, 22, [['1 Keks', 12]]],
-  ['Croissant', 406, 8, 46, 21, [['1 Croissant', 60]]],
-  ['Vanilleeis', 207, 3.5, 24, 11, [['1 Kugel', 60]]],
-  ['Käsekuchen', 280, 6, 30, 15, [['1 Stück', 120]]],
-  // Soßen & Fertiggerichte
-  ['Mayonnaise', 680, 1, 2, 75, [['1 EL', 15]]],
-  ['Ketchup', 112, 1.2, 26, 0.1, [['1 EL', 15]]],
-  ['Senf', 100, 6, 6, 4, [['1 TL', 5]]],
-  ['Sojasoße', 60, 8, 6, 0, [['1 EL', 15]]],
-  ['Pesto', 450, 5, 6, 45, [['1 EL', 15]]],
-  ['Hummus', 237, 8, 14, 17, [['1 Portion', 50]]],
-  ['Tomatensoße', 40, 1.5, 6, 1, [['1 Portion', 125]]],
-  ['Pizza Margherita', 240, 10, 30, 9, [['1 Stück', 100], ['1 Pizza', 300]]],
-].map(([name, kcal, protein, carbs, fat, portions = null]) => ({
-  barcode: '', name, brand: 'Basislebensmittel', image_url: '',
-  serving_g: portions?.[0]?.[1] || 100,
-  kcal_100g: kcal, protein_100g: protein, carbs_100g: carbs, fat_100g: fat,
-  portions, source: 'base_food',
-}));
 const GOALS = {
   lose: ['Langsam reduzieren', -300], maintain: ['Gewicht halten', 0],
   gain: ['Muskelaufbau', 200], gain_fast: ['Deutlich zunehmen', 350],
@@ -481,7 +303,7 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
   const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
-    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'base_food' ? 'Durchschnittlicher Basiswert' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
+    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'usda' ? 'Grundnahrungsmittel · USDA FoodData Central' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
       ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>` : ''}
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
@@ -538,11 +360,9 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
 async function productLookup(action, value) {
   const body = action === 'barcode' ? { action, barcode: value } : { action, query: value };
   const { data, error } = await supabase.functions.invoke('food-products', { body });
-  const basis = action === 'search'
-    ? BASE_FOODS.filter((product) => product.name.toLocaleLowerCase('de').includes(String(value).trim().toLocaleLowerCase('de')))
-    : [];
-  const mergeProducts = (products = []) => [...new Map([...basis, ...products].map((product) => [`${product.name.toLocaleLowerCase('de')}:${product.brand || ''}`, product])).values()].slice(0, 16);
-  if (!error && data) return action === 'search' ? { ...data, products: mergeProducts(data.products) } : data;
+  // Die Edge-Function liefert bereits USDA-Grundnahrungsmittel + OFF gemischt.
+  if (!error && data) return data;
+  // Fallback nur bei nicht erreichbarer Function: direkte OFF-Abfrage.
   const fields = 'code,product_name,product_name_de,brands,image_front_small_url,image_front_url,serving_quantity,nutriments';
   const normalize = (product) => {
     const nutrients = product.nutriments || {};
@@ -562,13 +382,13 @@ async function productLookup(action, value) {
   const url = new URL('https://world.openfoodfacts.org/cgi/search.pl');
   Object.entries({ search_terms: value, search_simple: '1', action: 'process', json: '1', page_size: '12', fields }).forEach(([key, val]) => url.searchParams.set(key, val));
   const payload = await (await fetch(url)).json();
-  return { products: mergeProducts((payload.products || []).map(normalize).filter((product) => product.name && product.kcal_100g)) };
+  return { products: (payload.products || []).map(normalize).filter((product) => product.name && product.kcal_100g).slice(0, 16) };
 }
 
 function searchEditor({ date, onSave }) {
   const backdrop = createOverlay(`<header><h2>Lebensmittel suchen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="nutrition-search-form"><input class="input" data-food-query placeholder="Produkt oder Marke" autocomplete="off"><button class="btn btn-primary" type="submit">Suchen</button></form>
-    <div class="nutrition-search-results" data-food-results><p>Suche nach einem Basislebensmittel, Produkt oder einer Marke.</p></div>`);
+    <div class="nutrition-search-results" data-food-results><p>Suche nach einem Grundnahrungsmittel, Produkt oder einer Marke.</p></div>`);
   const results = backdrop.querySelector('[data-food-results]');
   let products = [];
   backdrop.querySelector('form').onsubmit = async (event) => {
@@ -684,7 +504,7 @@ function addMenu(context) {
   const backdrop = createOverlay(`<header><h2>Mahlzeit eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue nutrition-add-menu">
       <button type="button" data-nutrition-action="scan">${materialIconMarkup('photo_camera')}<span><b>Barcode scannen</b><small>Verpacktes Produkt erkennen</small></span></button>
-      <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Basislebensmittel und Produkte</small></span></button>
+      <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Grundnahrungsmittel und Produkte</small></span></button>
       <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigene Mahlzeit</b><small>Kalorien und Makros selbst eintragen</small></span></button>
       <button type="button" data-nutrition-action="recent">${materialIconMarkup('calendar_meal')}<span><b>Zuletzt verwendet</b><small>Frühere Mahlzeit wiederholen</small></span></button>
     </div>`);
