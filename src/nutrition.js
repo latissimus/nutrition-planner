@@ -81,8 +81,16 @@ async function loadNutrition(userId, date, signal) {
   const [settings, entries, recent, own, weight] = await Promise.all([settingsQuery, logQuery, recentQuery, ownQuery, weightQuery]);
   const error = settings.error || entries.error || recent.error || own.error || weight.error;
   if (error) throw error;
+  // Übernommene Rezeptbilder liegen als privater Storage-Pfad im Snapshot; für
+  // die Anzeige eine frische signierte URL erzeugen (die alte ist längst abgelaufen).
+  const entryList = entries.data || [];
+  const signed = await signImagePaths(entryList.map((entry) => entry.product_snapshot?.image_path));
+  if (signed.size) entryList.forEach((entry) => {
+    const path = entry.product_snapshot?.image_path;
+    if (path && signed.has(path)) entry.product_snapshot.image_url = signed.get(path);
+  });
   return {
-    settings: settings.data || {}, entries: entries.data || [], recent: recent.data || [], ownProducts: own.data || [],
+    settings: settings.data || {}, entries: entryList, recent: recent.data || [], ownProducts: own.data || [],
     latestWeight: number(weight.data?.kg),
   };
 }
@@ -454,6 +462,25 @@ function recentEditor({ recent, date, onSave }) {
   };
 }
 
+// Rezept- und Log-Bilder liegen im privaten dex-entries-Bucket und werden für
+// die Anzeige kurzlebig signiert (1 h). Liefert eine Map path → signierte URL.
+const DEX_BUCKET = 'dex-entries';
+async function signImagePaths(paths) {
+  const unique = [...new Set((paths || []).filter(Boolean))];
+  if (!unique.length) return new Map();
+  try {
+    const { data, error } = await supabase.storage.from(DEX_BUCKET).createSignedUrls(unique, 60 * 60);
+    if (error) return new Map();
+    return new Map((data || []).filter((entry) => entry.signedUrl).map((entry) => [entry.path, entry.signedUrl]));
+  } catch { return new Map(); }
+}
+
+// Rezeptbilder für die Auswahl-Liste signieren → recipe._imageUrl.
+async function signRecipeImages(recipes) {
+  const map = await signImagePaths(recipes.map((recipe) => recipe.image_path));
+  recipes.forEach((recipe) => { if (recipe.image_path && map.has(recipe.image_path)) recipe._imageUrl = map.get(recipe.image_path); });
+}
+
 // Summiert die Nährwerte aller Rezept-Zutaten (jede Zutat trägt ihre eigenen
 // 100-g-Werte aus der Datenbank) und die Gesamtgrammzahl.
 function recipeTotals(items) {
@@ -475,7 +502,10 @@ function recipeAsProduct(recipe) {
   const per100 = (value) => (total.grams ? value / total.grams * 100 : 0);
   const grams = Math.round(total.grams);
   return {
-    barcode: '', name: recipe.title || 'Rezept', brand: 'Eigenes Rezept', image_url: '',
+    barcode: '', name: recipe.title || 'Rezept', brand: 'Eigenes Rezept',
+    // Rezeptbild aus dem Food-Log: `image_path` bleibt erhalten und wird beim
+    // Anzeigen frisch signiert (die signierte URL läuft nach 1 h ab).
+    image_url: recipe._imageUrl || '', image_path: recipe.image_path || '',
     serving_g: grams || 100,
     kcal_100g: per100(total.kcal), protein_100g: per100(total.protein),
     carbs_100g: per100(total.carbs), fat_100g: per100(total.fat),
@@ -491,7 +521,7 @@ async function recipeEditor({ userId, date, onSave }) {
   let recipes = [];
   try {
     const { data, error } = await supabase.from('dex_entries')
-      .select('id,title,ingredient_items')
+      .select('id,title,ingredient_items,image_path')
       .eq('user_id', userId).eq('root_key', 'food-log').eq('food_kind', 'recipe')
       .order('created_at', { ascending: false });
     if (error) throw error;
@@ -501,16 +531,24 @@ async function recipeEditor({ userId, date, onSave }) {
     list.innerHTML = '<p>Noch kein Rezept vorhanden. Lege im Food-Log ein eigenes Rezept mit Zutaten aus der Datenbank an.</p>';
     return;
   }
+  await signRecipeImages(recipes);
   list.innerHTML = recipes.map((recipe, index) => {
     const items = Array.isArray(recipe.ingredient_items) ? recipe.ingredient_items : [];
     const total = recipeTotals(items);
     const usable = items.length > 0;
+    const vorschau = recipe._imageUrl
+      ? `<img src="${escapeHtml(recipe._imageUrl)}" alt="" loading="lazy" decoding="async">`
+      : `<span class="nutrition-food-platzhalter">${materialIconMarkup('menu_book', 'nutrition-food-icon')}</span>`;
     return `<button type="button" data-recipe-index="${index}"${usable ? '' : ' disabled'}>
-      <span class="nutrition-food-platzhalter">${materialIconMarkup('menu_book', 'nutrition-food-icon')}</span>
+      ${vorschau}
       <div><b>${escapeHtml(recipe.title || 'Rezept')}</b><small>${usable ? `${items.length} Zutaten · ${Math.round(total.grams)} g` : 'Zutaten im Food-Log aus der Datenbank wählen'}</small></div>
       <strong>${usable ? `${decimal(total.kcal)} kcal` : ''}</strong>
     </button>`;
   }).join('');
+  list.querySelectorAll('img').forEach((image) => {
+    const reveal = () => image.classList.add('ist-geladen');
+    if (image.complete) reveal(); else image.addEventListener('load', reveal, { once: true });
+  });
   list.onclick = (event) => {
     const index = event.target.closest('[data-recipe-index]')?.dataset.recipeIndex;
     if (index == null) return;
