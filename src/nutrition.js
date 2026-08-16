@@ -186,11 +186,13 @@ function periodEntriesMarkup(entries, period) {
   if (!entries.length) return '';
   return `<section class="nutrition-period-inline"><div>${entries.map((item) => {
     // Das Produktbild aus der Suche ist nur eine URL (Open Food Facts) – kein
-    // eigener Speicher. Basislebensmittel/eigene Mahlzeiten haben keins → Icon.
+    // eigener Speicher. Basislebensmittel/eigene Lebensmittel haben keins → Icon.
+    // Rezepte ohne eigenes Bild bekommen das Rezept-Icon (menu_book) wie im Menü.
     const bild = item.product_snapshot?.image_url;
+    const platzhalter = item.product_snapshot?.source === 'recipe' ? 'menu_book' : 'Lebensmittel';
     const vorschau = bild
       ? `<img class="nutrition-entry-bild" src="${escapeHtml(bild)}" alt="" loading="lazy" decoding="async">`
-      : materialIconMarkup('Lebensmittel', 'nutrition-food-icon');
+      : materialIconMarkup(platzhalter, 'nutrition-food-icon');
     return `<div class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
       <div class="rem-row-head nutrition-entry-head">
         <span class="rem-row-emoji nutrition-entry-icon" aria-hidden="true">${vorschau}</span>
@@ -220,7 +222,7 @@ function periodSelect(selected = 'breakfast') {
 }
 
 function manualEditor({ date, onSave, ownProducts = [] }) {
-  const backdrop = createOverlay(`<header><h2>Eigene Mahlzeit</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const backdrop = createOverlay(`<header><h2>Eigenes Lebensmittel</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="nutrition-form" data-manual-food-form>
       <label class="nutrition-form-field"><span>Name</span><input class="input" data-manual-name maxlength="160" placeholder="z. B. Protein-Porridge" required></label>
       ${periodSelect()}
@@ -260,7 +262,7 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
     const payload = {
       log_date: date, period: backdrop.querySelector('[data-log-period]').value,
       name, amount, unit: 'g', ...scaled(),
-      product: { barcode: '', name, brand: 'Eigene Mahlzeit', image_url: '', serving_g: 100,
+      product: { barcode: '', name, brand: 'Eigenes Lebensmittel', image_url: '', serving_g: 100,
         kcal_100g: base.energy_kcal, protein_100g: base.protein_g,
         carbs_100g: base.carbs_g, fat_100g: base.fat_g, source: 'manual' },
     };
@@ -272,10 +274,10 @@ function manualEditor({ date, onSave, ownProducts = [] }) {
 
 function ownProductsEditor(context) {
   const products = [...(context.ownProducts || [])];
-  const backdrop = createOverlay(`<header><h2>Gespeicherte Mahlzeiten</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <label class="nutrition-own-search"><span>Gespeicherte Mahlzeiten suchen</span><input class="input" type="search" enterkeyhint="search" placeholder="Name eingeben" data-own-search></label>
+  const backdrop = createOverlay(`<header><h2>Gespeicherte Lebensmittel</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <label class="nutrition-own-search"><span>Gespeicherte Lebensmittel suchen</span><input class="input" type="search" enterkeyhint="search" placeholder="Name eingeben" data-own-search></label>
     <div class="nutrition-own-list" data-own-list></div>
-    <button class="btn btn-primary btn-block nutrition-own-new" type="button" data-own-new>${materialIconMarkup('add')}<span>Neue eigene Mahlzeit</span></button>`);
+    <button class="btn btn-primary btn-block nutrition-own-new" type="button" data-own-new>${materialIconMarkup('add')}<span>Neues eigenes Lebensmittel</span></button>`);
   const list = backdrop.querySelector('[data-own-list]');
   const render = (query = '') => {
     const normalized = query.trim().toLocaleLowerCase('de');
@@ -283,7 +285,7 @@ function ownProductsEditor(context) {
     list.innerHTML = visible.length ? visible.map((product) => `<article data-own-product-id="${product.id}">
       <button type="button" class="nutrition-own-select" data-own-select="${product.id}"><span><b>${escapeHtml(product.name)}</b><small>${decimal(product.kcal_100g)} kcal · ${decimal(product.protein_100g, 1)} P · ${decimal(product.carbs_100g, 1)} K · ${decimal(product.fat_100g, 1)} F</small></span>${materialIconMarkup('chevron_right')}</button>
       <button type="button" class="nutrition-own-delete" data-own-delete="${product.id}" aria-label="${escapeHtml(product.name)} löschen">${materialIconMarkup('delete_forever')}</button>
-    </article>`).join('') : `<p>${products.length ? 'Keine passende Mahlzeit gefunden.' : 'Noch keine eigene Mahlzeit gespeichert.'}</p>`;
+    </article>`).join('') : `<p>${products.length ? 'Kein passendes Lebensmittel gefunden.' : 'Noch kein eigenes Lebensmittel gespeichert.'}</p>`;
   };
   render();
   backdrop.querySelector('[data-own-search]').oninput = (event) => render(event.currentTarget.value);
@@ -299,7 +301,7 @@ function ownProductsEditor(context) {
       backdrop.remove(); amountEditor({ product, date: context.date, onSave: context.onSave }); return;
     }
     const remove = event.target.closest('[data-own-delete]');
-    if (!remove || !confirm('Diese gespeicherte Mahlzeit löschen?')) return;
+    if (!remove || !confirm('Dieses gespeicherte Lebensmittel löschen?')) return;
     remove.disabled = true;
     const deleted = await context.onDeleteOwnProduct?.(remove.dataset.ownDelete);
     if (!deleted) { remove.disabled = false; return; }
@@ -313,8 +315,8 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
   const serving = number(entry?.amount) || number(product.serving_g) || 100;
   const selectedPeriod = entry?.period || 'breakfast';
   const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
-    <p class="nutrition-source">${product.source === 'manual' ? 'Eigene gespeicherte Mahlzeit' : product.source === 'recipe' ? 'Eigenes Rezept · aus den Food-Log-Zutaten berechnet' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
+    <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup(product.source === 'recipe' ? 'menu_book' : 'Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
+    <p class="nutrition-source">${product.source === 'manual' ? 'Eigenes gespeichertes Lebensmittel' : product.source === 'recipe' ? 'Eigenes Rezept · aus den Food-Log-Zutaten berechnet' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
       ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>` : ''}
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
@@ -423,7 +425,7 @@ function foodSearchOverlay({ title = 'Lebensmittel suchen', onPick }) {
         gesehen.add(key);
         return true;
       }).slice(0, 20);
-      results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${index < 2 ? ' fetchpriority="high"' : ''}>` : `<span class="nutrition-food-platzhalter">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigene Mahlzeit“.</p>';
+      results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${index < 2 ? ' fetchpriority="high"' : ''}>` : `<span class="nutrition-food-platzhalter">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigenes Lebensmittel“.</p>';
       results.querySelectorAll('img').forEach((image) => {
         const reveal = () => image.classList.add('ist-geladen');
         if (image.complete) reveal(); else image.addEventListener('load', reveal, { once: true });
@@ -662,9 +664,9 @@ export async function mountNutrition(container, { userId, signal }) {
   };
   const deleteOwnProduct = async (id) => {
     const { error } = await supabase.from('nutrition_products').delete().eq('id', id).eq('user_id', userId).eq('source', 'manual');
-    if (error) { toast('Gespeicherte Mahlzeit konnte nicht gelöscht werden'); return false; }
+    if (error) { toast('Gespeichertes Lebensmittel konnte nicht gelöscht werden'); return false; }
     state.ownProducts = state.ownProducts.filter((product) => product.id !== id);
-    toast('Gespeicherte Mahlzeit gelöscht');
+    toast('Gespeichertes Lebensmittel gelöscht');
     return true;
   };
   const editEntry = (entry) => {
@@ -719,7 +721,7 @@ export async function mountNutrition(container, { userId, signal }) {
           .eq('user_id', userId).eq('source', 'manual').eq('name', product.name).limit(1).maybeSingle();
         if (existing.error) throw existing.error;
         const values = {
-          user_id: userId, barcode: null, name: product.name, brand: 'Eigene Mahlzeit', image_url: null,
+          user_id: userId, barcode: null, name: product.name, brand: 'Eigenes Lebensmittel', image_url: null,
           serving_g: 100, kcal_100g: product.kcal_100g, protein_100g: product.protein_100g || 0,
           carbs_100g: product.carbs_100g || 0, fat_100g: product.fat_100g || 0,
           source: 'manual', source_snapshot: product,
