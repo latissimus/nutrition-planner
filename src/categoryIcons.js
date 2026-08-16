@@ -25,8 +25,8 @@ const escapeHtml = (value = '') => String(value)
 const defaults = {
   body: 'body_fat', reminders: 'notifications', 'food-log': 'fork_spoon',
   recipes: 'menu_book', training: 'fitness_center', habits: 'bucket_check',
-  shopping: 'shopping_cart',
-  sleep: 'bedtime',
+  shopping: 'emoji:🛒',
+  sleep: 'emoji:😴',
   coins: 'star',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
@@ -265,12 +265,14 @@ function materialIcon(id, className = '') {
 export const materialIconMarkup = materialIcon;
 
 export function categoryIconMarkup(route, className = 'kategorie-svg') {
-  const saved = getPreference(storageKey(route));
-  if (saved?.startsWith('emoji:')) {
-    const emoji = saved.slice(6).replace(/[<>&"']/g, '');
+  // Ohne gespeicherte Auswahl greift der Standard – der ebenfalls ein Emoji
+  // sein darf (z. B. SLEEP-LOG 😴, EINKAUF 🛒).
+  const value = getPreference(storageKey(route)) || defaults[route];
+  if (typeof value === 'string' && value.startsWith('emoji:')) {
+    const emoji = value.slice(6).replace(/[<>&"']/g, '');
     return `<span class="${className} kategorie-emoji" data-category-icon="${route}" title="Emoji">${emoji}</span>`;
   }
-  const icon = iconById(saved) || iconById(defaults[route]);
+  const icon = iconById(value);
   if (!icon) return '';
   return `<span class="${className}" data-category-icon="${route}" title="${icon.title}">${icon.svg}</span>`;
 }
