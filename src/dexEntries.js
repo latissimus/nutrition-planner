@@ -135,8 +135,8 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
           <input id="dex-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif">
           <img data-image-preview alt="Ausgewähltes Rezeptbild" hidden>
         </label>` : ''}
-      <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>optional</small></span>
-        <input id="dex-entry-title" class="input" maxlength="100" placeholder="z. B. Schnelles Protein-Frühstück">
+      <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>${ownRecipe ? '' : 'optional'}</small></span>
+        <input id="dex-entry-title" class="input" maxlength="100" placeholder="z. B. Schnelles Protein-Frühstück"${ownRecipe ? ' required' : ''}>
       </label>
       ${foodMode ? `<div class="food-entry-meta">
         <label class="dex-entry-field" for="dex-entry-carb"><span>Carb-Klasse</span>
@@ -166,8 +166,8 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
-      ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note ? '' : 'optional'}</small></span>
-        <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note ? ' required' : ''}></textarea>
+      ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note && !ownRecipe ? '' : 'optional'}</small></span>
+        <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note && !ownRecipe ? ' required' : ''}></textarea>
       </label>`}
       <button class="btn btn-primary btn-block dex-entry-save" type="submit" data-no-interface-sound>${label} speichern</button>
     </form>
@@ -228,6 +228,7 @@ export function mountIngredientEditor(root, initial = []) {
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
   if (!['link', 'image', 'note', 'audio', 'routine'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
   const foodMode = rootKey === 'food-log';
+  const ownRecipe = foodMode && type === 'note' && foodKind !== 'cheat_meal';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
   backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode, rootKey, entryLabel });
@@ -358,8 +359,13 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         title ||= 'Tonaufnahme';
       } else {
         const noteText = form.querySelector('#dex-entry-note').value.trim();
-        if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
-        title ||= noteText.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 100) || 'Notiz';
+        if (ownRecipe) {
+          // Rezept: Titel ist Pflicht, Notiz optional (wie Tags).
+          if (!title) throw new Error('Bitte einen Titel für das Rezept eintragen.');
+        } else {
+          if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
+          title ||= noteText.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 100) || 'Notiz';
+        }
         const file = fileInput?.files?.[0];
         if (file) {
           if (!IMAGE_TYPES.has(file.type)) throw new Error('Dieses Bildformat wird nicht unterstützt.');

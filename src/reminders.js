@@ -1202,7 +1202,8 @@ export async function mountReminders(container, { session, signal }) {
           <div class="sheet-menue mahl-add-unterpunkte">
             <button type="button" data-add-type="nutrition:scan">${materialIconMarkup('photo_camera')}<span><b>Barcode</b><small>Produkt scannen</small></span></button>
             <button type="button" data-add-type="nutrition:search">${materialIconMarkup('search')}<span><b>Suche</b><small>Lebensmittel finden</small></span></button>
-            <button type="button" data-add-type="nutrition:manual">${materialIconMarkup('edit')}<span><b>Eigene Mahlzeit</b><small>Werte selbst eintragen</small></span></button>
+            <button type="button" data-add-type="nutrition:recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Aus dem Food-Log übernehmen</small></span></button>
+            <button type="button" data-add-type="nutrition:manual">${materialIconMarkup('edit')}<span><b>Eigenes Lebensmittel</b><small>Werte selbst eintragen</small></span></button>
           </div>
         </section>` : ''}
         <h3 class="mahl-add-zwischenkopf">Planung</h3>

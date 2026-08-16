@@ -602,7 +602,7 @@ function addMenu(context) {
       <button type="button" data-nutrition-action="scan">${materialIconMarkup('photo_camera')}<span><b>Barcode scannen</b><small>Verpacktes Produkt erkennen</small></span></button>
       <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Grundnahrungsmittel und Produkte</small></span></button>
       <button type="button" data-nutrition-action="recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Eigenes Rezept aus dem Food-Log übernehmen</small></span></button>
-      <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigene Mahlzeit</b><small>Kalorien und Makros selbst eintragen</small></span></button>
+      <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigenes Lebensmittel</b><small>Kalorien und Makros selbst eintragen</small></span></button>
       <button type="button" data-nutrition-action="recent">${materialIconMarkup('calendar_meal')}<span><b>Zuletzt verwendet</b><small>Frühere Mahlzeit wiederholen</small></span></button>
     </div>`);
   backdrop.querySelector('.nutrition-add-menu').onclick = (event) => {

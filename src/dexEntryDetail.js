@@ -84,7 +84,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         <strong>${entry.image_path ? 'Rezeptbild wechseln' : 'Rezeptbild hinzufügen'}</strong><small>optional · maximal 8 MB</small>
         <input id="edit-entry-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif">
       </label>` : ''}
-      <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>optional</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"></label>
+      <label class="dex-entry-field" for="edit-entry-title"><span>Titel <small>${ownRecipe ? '' : 'optional'}</small></span><input id="edit-entry-title" class="input" maxlength="100" value="${escapeHtml(entry.title)}"${ownRecipe ? ' required' : ''}></label>
       ${entry.root_key === 'food-log' ? `<div class="food-entry-meta">
         <label class="dex-entry-field" for="edit-entry-carb"><span>Carb-Klasse</span><select id="edit-entry-carb" class="input">
           <option value="unset"${!entry.carb_class || entry.carb_class === 'unset' ? ' selected' : ''}>Nicht festgelegt</option>
@@ -106,7 +106,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         <input id="edit-entry-training-class-custom" class="input" maxlength="32" value="${fixedTrainingClass ? '' : escapeHtml(entry.training_class || '')}" placeholder="z. B. Technik">
       </label>` : ''}
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
-      <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${['note', 'routine'].includes(entry.entry_type) ? '4000' : '500'}" rows="${['note', 'routine'].includes(entry.entry_type) ? '9' : '5'}"${['note', 'routine'].includes(entry.entry_type) ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
+      <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) && !ownRecipe ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${['note', 'routine'].includes(entry.entry_type) ? '4000' : '500'}" rows="${['note', 'routine'].includes(entry.entry_type) ? '9' : '5'}"${['note', 'routine'].includes(entry.entry_type) && !ownRecipe ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
       <button class="btn btn-block dex-entry-delete" type="button" data-entry-delete>Eintrag löschen</button>
     </form>
@@ -145,6 +145,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         note: backdrop.querySelector('#edit-entry-note').value.trim(),
         tags: backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
       };
+      if (ownRecipe && !payload.title) throw new Error('Bitte einen Titel für das Rezept eintragen.');
       if (entry.root_key === 'food-log') {
         payload.carb_class = backdrop.querySelector('#edit-entry-carb').value;
         payload.prep_minutes = backdrop.querySelector('#edit-entry-prep').value
