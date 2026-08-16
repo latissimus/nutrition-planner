@@ -1478,12 +1478,13 @@ if (!supabaseKonfiguriert) {
     if (session?.user?.id) {
       const aktiveUserId = session.user.id;
       setPreferenceUser(aktiveUserId);
-      const reminderLoopStarten = () => remindersModule()
-        .then(({ startReminderLoop }) => startReminderLoop(aktiveUserId)).catch(() => {});
+      const reminderLoopStarten = (opts) => remindersModule()
+        .then(({ startReminderLoop }) => startReminderLoop(aktiveUserId, opts)).catch(() => {});
       reminderLoopStarten();
-      // Einmalige Onboarding-Karte für Benachrichtigungen; nach dem Erlauben
-      // wird der Reminder-Loop mit frischem Abo neu gestartet.
-      maybeShowPushOnboarding(aktiveUserId, reminderLoopStarten);
+      // Einmalige Onboarding-Karte für Benachrichtigungen. Nach dem Erlauben den
+      // Loop mit forceRestart neu bewerten: sobald ein Server-Abo existiert, muss
+      // der lokale 30-Sekunden-Loop abgebaut werden, sonst feuern beide (doppelt).
+      maybeShowPushOnboarding(aktiveUserId, () => reminderLoopStarten({ forceRestart: true }));
     }
     // Ein still erneuertes Zugriffstoken darf die gerade benutzte Unterseite
     // nicht neu aufbauen. Auch wiederholte SIGNED_IN-Ereignisse desselben

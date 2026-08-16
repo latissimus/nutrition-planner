@@ -844,7 +844,10 @@ export async function mountReminders(container, { session, signal }) {
       // Legt bei erteilter Erlaubnis ein frisches Abo an bzw. repariert ein
       // fehlendes serverseitiges Abo (Selbstheilung nach Neuinstallation).
       await activatePush(userId);
-      await startReminderLoop(userId);
+      // forceRestart: sobald das Server-Abo steht, muss ein evtl. aus der App-
+      // Startphase noch laufender lokaler Loop abgebaut werden – sonst feuern
+      // lokaler Loop und Server-Push parallel (doppelte Benachrichtigung).
+      await startReminderLoop(userId, { forceRestart: true });
       toast('Benachrichtigungen auf diesem Gerät aktiviert');
       return true;
     } catch (error) {
