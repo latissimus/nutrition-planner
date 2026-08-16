@@ -7,6 +7,7 @@ import {
   browserPushSubscriptionExists,
   disablePush,
   getPushState,
+  pushSupport,
   sendTestPush,
   syncPushSubscription,
 } from './push.js';
@@ -816,13 +817,32 @@ export async function mountReminders(container, { session, signal }) {
   };
 
   const ensureReminderPush = async () => {
-    try {
-      const state = await getPushState();
-      if (state.subscribed) return true;
-      if (!state.ready) {
-        toast(state.reason);
+    // pushSupport() ist synchron und verbraucht die Nutzergeste nicht.
+    const support = pushSupport();
+    if (!support.ready) {
+      toast(support.reason);
+      return false;
+    }
+    if (Notification.permission === 'denied') {
+      toast('Benachrichtigungen sind in den iPhone-Einstellungen für diese App blockiert.');
+      return false;
+    }
+    // iOS/Safari öffnet den System-Dialog nur, wenn requestPermission SYNCHRON
+    // in der Nutzergeste läuft – noch vor jedem await. Deshalb hier zuerst,
+    // bevor getPushState()/der Service-Worker die transiente Aktivierung
+    // verbraucht. Ohne das blieb der Switch stumm und es kam keine Abfrage.
+    if (Notification.permission !== 'granted') {
+      let permission;
+      try { permission = await Notification.requestPermission(); }
+      catch { permission = 'denied'; }
+      if (permission !== 'granted') {
+        toast('Benachrichtigungen wurden nicht erlaubt.');
         return false;
       }
+    }
+    try {
+      // Legt bei erteilter Erlaubnis ein frisches Abo an bzw. repariert ein
+      // fehlendes serverseitiges Abo (Selbstheilung nach Neuinstallation).
       await activatePush(userId);
       await startReminderLoop(userId);
       toast('Benachrichtigungen auf diesem Gerät aktiviert');
