@@ -424,8 +424,10 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
     button.disabled = true;
     const status = gefahr.querySelector('.profile-daten-status');
     status.textContent = 'Account wird gelöscht…';
-    const { error } = await supabase.rpc('delete_own_account', { nur_pruefen: false });
-    if (error) {
+    // Die Edge-Function entfernt zuerst die Storage-Dateien des Nutzers
+    // physisch und löscht dann den Auth-User (kaskadiert alle DB-Daten).
+    const { data, error } = await supabase.functions.invoke('delete-account', { body: {} });
+    if (error || !data?.ok) {
       if (button.isConnected) button.disabled = false;
       status.textContent = 'Löschen fehlgeschlagen. Es wurden keine Daten entfernt.';
       return;
