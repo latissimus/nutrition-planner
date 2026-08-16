@@ -4155,15 +4155,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-overlay{--ordner:var(--fe-pink)}
 .nutrition-food-icon{display:block}
 .nutrition-food-icon svg{display:block;width:100%;height:100%;fill:currentColor}
-.nutrition-search-results>button>span.nutrition-food-platzhalter{display:grid;place-items:center;color:color-mix(in srgb,var(--ink) 55%,transparent)}
-/* Retro: Farbfeld hinter dem Platzhalter in der Dex-Farbe; Dark: Icon weiß. */
-:root:not([data-theme="dark"]) .nutrition-search-results>button>span.nutrition-food-platzhalter{background:color-mix(in srgb,var(--ordner) 30%,var(--surface))}
-:root[data-theme="dark"] .nutrition-search-results>button>span.nutrition-food-platzhalter{color:#fff}
+/* Platzhalter (Suche + Kategorie-Einträge): Feld in Dex-Farbe, weißes Icon, mittig. */
+.nutrition-search-results>button>span.nutrition-food-platzhalter{display:grid;place-items:center;background:var(--ordner);color:#fff}
 .nutrition-food-platzhalter .nutrition-food-icon{width:30px;height:30px}
 .nutrition-product-slot-icon .nutrition-food-icon{color:color-mix(in srgb,var(--ink) 60%,transparent)}
-/* Kategorie-Einträge: Platzhalter-Box in Form/Größe der Produktbilder. */
-.mahl-zeitblock .nutrition-entry .nutrition-entry-icon{display:grid;place-items:center;border-radius:9px;background:color-mix(in srgb,var(--ink) 8%,var(--surface))}
-.mahl-zeitblock .nutrition-entry .nutrition-entry-icon>.nutrition-food-icon{width:24px;height:24px;color:color-mix(in srgb,var(--ink) 60%,transparent)}
+.mahl-zeitblock{--ordner:var(--fe-pink)}
+.mahl-zeitblock .nutrition-entry .nutrition-entry-icon{display:grid;place-items:center;border-radius:9px;background:var(--ordner)}
+.mahl-zeitblock .nutrition-entry .nutrition-entry-icon>.nutrition-food-icon{width:24px;height:24px;color:#fff}
 /* Portionsauswahl (1 Tasse, 1 Apfel …) – setzt die Grammmenge. */
 .nutrition-portionen{display:flex;flex-wrap:wrap;gap:8px}
 .nutrition-portionen button{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border:1.5px solid var(--ink);border-radius:999px;background:var(--surface);color:var(--ink);font:800 13px/1 var(--ui);cursor:pointer}
