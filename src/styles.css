@@ -4150,6 +4150,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-product-slot-icon{display:grid!important;place-items:center;box-sizing:border-box;width:68px;height:68px;margin:0!important;border-radius:9px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}.nutrition-product-slot-icon .material-svg,.nutrition-product-slot-icon svg{display:block;width:27px;height:27px;margin:auto;fill:currentColor;color:currentColor}
 .nutrition-source{margin:-8px 0 14px;color:var(--muted);font-size:9px;line-height:1.35;text-align:center}.nutrition-source a{color:var(--ink);font-weight:750}
 .nutrition-product-result{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px;border-radius:10px;background:var(--app-field)}.nutrition-product-result b{font-size:20px;font-weight:850}.nutrition-product-result span{color:var(--ink);font-size:13px;font-weight:800}
+/* Standard-Lebensmittel-Icon als Platzhalter, wenn kein Produktbild da ist. */
+.nutrition-food-icon{display:block}
+.nutrition-food-icon svg{display:block;width:100%;height:100%;fill:currentColor}
+.nutrition-search-results>button>span.nutrition-food-platzhalter{display:grid;place-items:center;color:color-mix(in srgb,var(--ink) 55%,transparent)}
+.nutrition-food-platzhalter .nutrition-food-icon{width:30px;height:30px}
+.nutrition-product-slot-icon .nutrition-food-icon{color:color-mix(in srgb,var(--ink) 60%,transparent)}
+.mahl-zeitblock .nutrition-entry .nutrition-entry-icon>.nutrition-food-icon{width:24px;height:24px;color:color-mix(in srgb,var(--ink) 60%,transparent)}
 /* Portionsauswahl (1 Tasse, 1 Apfel …) – setzt die Grammmenge. */
 .nutrition-portionen{display:flex;flex-wrap:wrap;gap:8px}
 .nutrition-portionen button{display:inline-flex;align-items:baseline;gap:6px;min-height:40px;padding:8px 13px;border:1.5px solid var(--ink);border-radius:999px;background:var(--surface);color:var(--ink);font:800 13px/1 var(--ui);cursor:pointer}
