@@ -190,13 +190,21 @@ function calculationResultMarkup(result, customTarget = 0) {
 
 function periodEntriesMarkup(entries, period) {
   if (!entries.length) return '';
-  return `<section class="nutrition-period-inline"><div>${entries.map((item) => `<div class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
+  return `<section class="nutrition-period-inline"><div>${entries.map((item) => {
+    // Das Produktbild aus der Suche ist nur eine URL (Open Food Facts) – kein
+    // eigener Speicher. Basislebensmittel/eigene Mahlzeiten haben keins → Icon.
+    const bild = item.product_snapshot?.image_url;
+    const vorschau = bild
+      ? `<img class="nutrition-entry-bild" src="${escapeHtml(bild)}" alt="" loading="lazy" decoding="async">`
+      : materialIconMarkup(PERIOD_ICONS[period] || 'local_pizza');
+    return `<div class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
       <div class="rem-row-head nutrition-entry-head">
-        <span class="rem-row-emoji" aria-hidden="true">${materialIconMarkup(PERIOD_ICONS[period] || 'local_pizza')}</span>
+        <span class="rem-row-emoji nutrition-entry-icon" aria-hidden="true">${vorschau}</span>
         <span class="rem-row-titel"><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} g · ${decimal(item.protein_g, 1)} P · ${decimal(item.carbs_g, 1)} K · ${decimal(item.fat_g, 1)} F</small></span>
         <strong>${decimal(item.energy_kcal)} kcal</strong>
       </div>
-    </div>`).join('')}</div>
+    </div>`;
+  }).join('')}</div>
   </section>`;
 }
 
