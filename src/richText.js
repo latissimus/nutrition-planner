@@ -37,7 +37,12 @@ function appendClean(source, target) {
   });
 }
 
+// Reiner Klartext ohne DOM (Test-/SSR-Umgebung): Tags grob entfernen.
+const stripTags = (value = '') => String(value).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
 export function sanitizeNoteHtml(input) {
+  // In Umgebungen ohne DOM (Node/Tests) nur Text zurückgeben, statt zu crashen.
+  if (typeof document === 'undefined') return stripTags(input);
   const template = document.createElement('template');
   template.innerHTML = String(input || ''); // inert, führt kein Skript aus
   const output = document.createElement('div');
@@ -134,6 +139,8 @@ export function readNoteText(element) {
 
 // Reiner Klartext eines gespeicherten Notizwerts (für Karten-Vorschau, Teilen …).
 export function noteToText(value) {
+  if (!value) return '';
+  if (typeof document === 'undefined') return stripTags(value);
   const div = document.createElement('div');
   div.innerHTML = renderNoteHtml(value);
   return (div.textContent || '').trim();
