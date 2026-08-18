@@ -257,9 +257,13 @@ function reminderPayload(userId, reminder) {
 async function saveReminder(userId, reminder) {
   const payload = reminderPayload(userId, reminder);
   const query = supabase.from('reminders');
+  // Kein Upsert-on-conflict mehr: Die Label-Uniqueness liegt jetzt in zwei
+  // partiellen Indizes (Supplements per Name+Zeit, Rest per Name), die ein
+  // PostgREST-Upsert ohne Prädikat nicht adressieren kann. Neue Zeilen daher
+  // per Insert; ein echter Konflikt wirft 23505 und wird oben abgefangen.
   const request = reminder.id
     ? query.update(payload).eq('id', reminder.id).eq('user_id', userId)
-    : query.upsert(payload, { onConflict: 'user_id,type,label' });
+    : query.insert(payload);
   const { data, error } = await request
     .select('id, type, label, time, weekdays, active, metadata, route')
     .single();
@@ -302,9 +306,11 @@ async function ensureDefaults(userId, signal) {
     ...reminder, active: false, weekdays: WEEKDAYS,
   }));
   if (!payloads.length) return current.filter((reminder) => !reminder.metadata?.deleted);
+  // Nur die noch fehlenden Defaults werden eingefügt (oben nach `existing`
+  // gefiltert), daher genügt ein Insert – kein Upsert-on-conflict nötig.
   let query = supabase
     .from('reminders')
-    .upsert(payloads, { onConflict: 'user_id,type,label' })
+    .insert(payloads)
     .select('id, type, label, time, weekdays, active, metadata, route');
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
@@ -904,9 +910,18 @@ export async function mountReminders(container, { session, signal }) {
 
   const createReminder = async (type, period = '') => {
     const times = { breakfast: '08:00', snack_morning: '10:30', lunch: '13:00', snack_afternoon: '16:30', dinner: '19:00' };
+    // Default-Namen unter den Supplements eindeutig halten, damit zwei neue
+    // Supplements (auch im selben Slot) nicht am Unique-Index kollidieren –
+    // umbenannt wird ohnehin direkt danach.
+    let label = type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement';
+    if (type === 'supplement') {
+      const belegt = new Set(reminders.filter((r) => r.type === 'supplement' && !r.metadata?.deleted).map((r) => r.label));
+      let n = 2;
+      while (belegt.has(label)) label = `Neues Supplement ${n++}`;
+    }
     const neu = {
       id: null, _key: `new:${crypto.randomUUID()}`, type,
-      label: type === 'meal' ? 'Neue Mahlzeit' : type === 'drink' ? 'Trinken' : 'Neues Supplement',
+      label,
       time: type === 'drink' ? '09:00' : (times[period] || '08:00'),
       weekdays: WEEKDAYS, active: type === 'supplement',
       metadata: { icon: type === 'supplement' ? 'pill' : type === 'drink' ? 'water_drop' : 'fastfood' }, route: '#reminders',
