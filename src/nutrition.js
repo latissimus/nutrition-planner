@@ -311,17 +311,18 @@ function ownProductsEditor(context) {
   };
 }
 
-function amountEditor({ product, date, onSave, entry = null, onDelete = null }) {
+function amountEditor({ product, date, onSave, entry = null, onDelete = null, ingredient = false }) {
   const serving = number(entry?.amount) || number(product.serving_g) || 100;
   const selectedPeriod = entry?.period || 'breakfast';
-  const backdrop = createOverlay(`<header><h2>Lebensmittel eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const maxGramm = ingredient ? 5000 : 1000;
+  const backdrop = createOverlay(`<header><h2>${ingredient ? 'Zutat hinzufügen' : 'Lebensmittel eintragen'}</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup(product.source === 'recipe' ? 'menu_book' : 'Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
     <p class="nutrition-source">${product.source === 'manual' ? 'Eigenes gespeichertes Lebensmittel' : product.source === 'recipe' ? 'Eigenes Rezept · aus den Food-Log-Zutaten berechnet' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
-    <form class="nutrition-form" data-product-amount-form>${periodSelect(selectedPeriod)}
+    <form class="nutrition-form" data-product-amount-form>${ingredient ? '' : periodSelect(selectedPeriod)}
       ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>` : ''}
-      <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="1000" step="1" value="${Math.min(1000, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
+      <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="${maxGramm}" step="1" value="${Math.min(maxGramm, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
       <div class="nutrition-product-result" data-product-result></div>
-      <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
+      <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${ingredient ? 'Zutat übernehmen' : entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
       ${entry && onDelete ? '<button type="button" class="btn btn-block routine-delete" data-product-delete>Eintrag löschen</button>' : ''}
     </form>`);
   const amount = backdrop.querySelector('[data-product-amount]');
@@ -354,7 +355,7 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null }) 
     const saved = await onSave({
       id: entry?.id,
       product_id: entry?.product_id,
-      log_date: date, period: backdrop.querySelector('[data-log-period]').value,
+      log_date: date, period: backdrop.querySelector('[data-log-period]')?.value,
       name: product.name, amount: grams, unit: 'g', ...values(), product,
     });
     if (saved) backdrop.remove(); else button.disabled = false;
@@ -446,10 +447,20 @@ function searchEditor({ date, onSave }) {
   foodSearchOverlay({ onPick: (product, backdrop) => { backdrop.remove(); amountEditor({ product, date, onSave }); } });
 }
 
-// Für den Rezept-Editor im Food-Log: Zutat aus der Datenbank wählen. Liefert das
-// normalisierte Produkt (mit 100-g-Nährwerten und Quelle) an den Aufrufer.
+// Für den Rezept-Editor im Food-Log: Zutat aus der Datenbank wählen. Nutzt exakt
+// dieselbe Suche UND denselben Mengen-Dialog wie der Meal-Log (inkl. Portions-
+// Chips „1 Stück (Größe M/L)" …). Liefert Produkt + gewählte Grammzahl zurück.
 export function pickFoodIngredient(onPick) {
-  foodSearchOverlay({ title: 'Zutat auswählen', onPick: (product, backdrop) => { backdrop.remove(); onPick(product); } });
+  foodSearchOverlay({
+    title: 'Zutat suchen',
+    onPick: (product, backdrop) => {
+      backdrop.remove();
+      amountEditor({
+        product, ingredient: true,
+        onSave: async (payload) => { onPick(payload.product, payload.amount); return true; },
+      });
+    },
+  });
 }
 
 function recentEditor({ recent, date, onSave }) {

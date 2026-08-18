@@ -245,11 +245,13 @@ export function mountIngredientEditor(root, initial = []) {
     if (index >= 0) { items.splice(index, 1); render(); }
   });
   addBtn.addEventListener('click', () => {
-    pickFoodIngredient((product) => {
+    // Auswahl läuft über denselben Mengen-Dialog wie im Meal-Log; `grams` ist die
+    // dort gewählte Menge (per Portion oder frei).
+    pickFoodIngredient((product, grams) => {
       const portions = normPortions(product.portions);
       items.push({
         name: product.name,
-        grams: Math.round(Number(product.serving_g)) || portions[0]?.[1] || 100,
+        grams: Math.round(Number(grams)) || Math.round(Number(product.serving_g)) || portions[0]?.[1] || 100,
         kcal_100g: Number(product.kcal_100g) || 0, protein_100g: Number(product.protein_100g) || 0,
         carbs_100g: Number(product.carbs_100g) || 0, fat_100g: Number(product.fat_100g) || 0,
         source: product.source || '', barcode: product.barcode || '', image_url: product.image_url || '',
