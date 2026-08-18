@@ -4412,6 +4412,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:999px;background:var(--surface);color:var(--text);font:700 11px/1 var(--ui);
   white-space:nowrap}
 .einkauf-tag-chip.aktiv{background:#492426;color:#fff;border-color:#492426}
+/* Tag-Auswahl im Anlegen-/Bearbeiten-Formular: vorhandene Tags zum Antippen. */
+.einkauf-tag-picker{display:flex;flex-wrap:wrap;gap:6px;margin-top:-2px}
+.einkauf-tag-picker .einkauf-tag-chip{cursor:pointer}
 
 /* min-height reserviert den Platz fuer die Chip-Knoepfe, damit die
    Liste beim Ein-/Ausblenden von "Nur Ausgewaehlte"/"Auswahl leeren"

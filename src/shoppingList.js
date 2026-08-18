@@ -275,6 +275,38 @@ export function alleTags(items) {
     .sort((a, b) => a.localeCompare(b, 'de'));
 }
 
+// Klickbare Chips aller bereits vergebenen Tags – zum Direktauswählen im
+// Anlegen-/Bearbeiten-Formular (ergänzend zum freien Kommafeld).
+function tagPickerMarkup(tags, selected = []) {
+  if (!tags.length) return '';
+  const gesetzt = new Set(selected.map((tag) => tag.toLocaleLowerCase('de')));
+  return `<div class="einkauf-tag-picker" data-tag-picker>${tags.map((tag) =>
+    `<button type="button" class="einkauf-tag-chip${gesetzt.has(tag.toLocaleLowerCase('de')) ? ' aktiv' : ''}" data-pick-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join('')}</div>`;
+}
+
+// Verknüpft die Tag-Chips mit dem Freitext-Tagfeld: Chip an/aus toggelt den Tag
+// im Feld, manuelle Tippänderungen aktualisieren die Chips.
+function mountTagPicker(scope, input) {
+  const picker = scope.querySelector('[data-tag-picker]');
+  if (!picker || !input) return;
+  const lese = () => input.value.split(',').map((tag) => tag.trim()).filter(Boolean);
+  const sync = () => {
+    const gesetzt = new Set(lese().map((tag) => tag.toLocaleLowerCase('de')));
+    picker.querySelectorAll('[data-pick-tag]').forEach((btn) =>
+      btn.classList.toggle('aktiv', gesetzt.has(btn.dataset.pickTag.toLocaleLowerCase('de'))));
+  };
+  picker.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-pick-tag]'); if (!btn) return;
+    const tag = btn.dataset.pickTag;
+    const liste = lese();
+    const index = liste.findIndex((wert) => wert.toLocaleLowerCase('de') === tag.toLocaleLowerCase('de'));
+    if (index >= 0) liste.splice(index, 1); else liste.push(tag);
+    input.value = liste.join(', ');
+    sync();
+  });
+  input.addEventListener('input', sync);
+}
+
 // nurAusgewaehlt: im Laden soll nur sehen, was noch zu besorgen ist.
 // activeTag: derselbe Tag-Filter wie in der globalen Suche, hier auf die
 // Einkaufsliste bezogen.
@@ -358,7 +390,7 @@ function itemRow(item) {
 // Bottom-Sheet zum Bearbeiten einer Zeile. Enthaelt auch den Loeschen-Knopf –
 // er ist nicht mehr als Muelleimer neben jedem Artikel sichtbar, sondern hier
 // gebuendelt hinter der Long-Press-Geste.
-function itemEditSheet(item, sections, { onSave, onDelete }) {
+function itemEditSheet(item, sections, { onSave, onDelete, allTags = [] }) {
   const tagsWert = (item.tags || []).join(', ');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop einkauf-edit-backdrop';
@@ -380,6 +412,7 @@ function itemEditSheet(item, sections, { onSave, onDelete }) {
         <label class="dex-entry-field"><span>Tags <small>mit Komma trennen, max. 12</small></span>
           <input class="input" data-edit-tags maxlength="200" value="${escapeHtml(tagsWert)}" placeholder="z. B. Darm, Fermentiert">
         </label>
+        ${tagPickerMarkup(allTags, item.tags || [])}
         <div class="einkauf-edit-aktionen">
           <button class="btn btn-primary btn-block" type="submit">Speichern</button>
           <button class="btn btn-danger btn-block" type="button" data-edit-delete>Artikel löschen</button>
@@ -394,6 +427,7 @@ function itemEditSheet(item, sections, { onSave, onDelete }) {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) schließen();
   });
   const form = backdrop.querySelector('[data-edit-form]');
+  mountTagPicker(backdrop, form.querySelector('[data-edit-tags]'));
   form.onsubmit = async (event) => {
     event.preventDefault();
     const name = form.querySelector('[data-edit-name]').value.trim();
@@ -755,6 +789,7 @@ export async function mountShoppingList(container, { session, signal }) {
             if (!item) return;
             const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((eintrag) => eintrag.section)])];
             itemEditSheet(item, sections, {
+              allTags: alleTags(items),
               onSave: async (patch) => {
                 const aktualisiert = await updateItem(userId, id, patch);
                 Object.assign(item, aktualisiert);
@@ -900,12 +935,14 @@ export async function mountShoppingList(container, { session, signal }) {
         <form class="einkauf-add-form" data-add-overlay-form>
           <label class="dex-entry-field"><span>Lebensmittel</span><input class="input" type="text" data-new-name maxlength="120" placeholder="z. B. Hafermilch" autocomplete="off" required></label>
           <label class="dex-entry-field"><span>Tags <small>optional</small></span><input class="input" type="text" data-new-tags maxlength="200" placeholder="Mit Komma trennen" autocomplete="off"></label>
+          ${tagPickerMarkup(alleTags(items))}
           <label class="dex-entry-field"><span>Abteilung</span><select class="input" data-new-section>${sections.map((section) => `<option value="${escapeHtml(section)}"${section === 'Sonstiges' ? ' selected' : ''}>${escapeHtml(section)}</option>`).join('')}</select></label>
           <button class="btn btn-primary btn-block" type="submit">Lebensmittel hinzufügen</button>
         </form>
       </section>`;
       const close = () => backdrop.remove();
       backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+      mountTagPicker(backdrop, backdrop.querySelector('[data-new-tags]'));
       backdrop.querySelector('[data-add-overlay-form]').onsubmit = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;

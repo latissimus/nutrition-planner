@@ -400,7 +400,14 @@ export async function mountRoutines(container, { session, signal }) {
   const paint = () => {
     const darkColor = colorIsDark(categoryColor('habits'));
     container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
-      const items = state.routines.filter((item) => item.period === key);
+      // In der Übersicht nach Uhrzeit sortieren (ohne Uhrzeit ans Ende).
+      const zeitMinuten = (time) => {
+        if (!time) return Number.MAX_SAFE_INTEGER;
+        const [h, m] = String(time).split(':').map(Number);
+        return (Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0);
+      };
+      const items = state.routines.filter((item) => item.period === key)
+        .slice().sort((a, b) => zeitMinuten(a.time) - zeitMinuten(b.time));
       return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
         ? items.map((item) => routineRow(item, state.completed.has(item.id), state.attachments.filter((entry) => entry.routine_id === item.id), darkColor)).join('')
         : '<p class="routine-zeitblock-leer">Noch keine Routine geplant.</p>'}</div></section>`;
