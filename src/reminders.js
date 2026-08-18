@@ -128,11 +128,29 @@ function hinweisLabel(value) {
   return paar && paar[0] ? paar[1] : '';
 }
 
+// Perioden der Tages-Timeline (Minuten ab Mitternacht) – identisch zu reminderGroups.
+const PERIOD_RANGES = {
+  breakfast: [0, 9 * 60 + 45],
+  snack_morning: [9 * 60 + 45, 12 * 60],
+  lunch: [12 * 60, 15 * 60],
+  snack_afternoon: [15 * 60, 18 * 60],
+  dinner: [18 * 60, 24 * 60],
+};
+// Supplements gehören über ihre Uhrzeit zu genau einer Mahlzeit-Kategorie. Nur
+// Supps in derselben Periode wie die Mahlzeit ergänzen deren Push mit „& 💊 Supps".
+function hasSupplementsInPeriod(reminder, reminders) {
+  const range = PERIOD_RANGES[mealSlotForReminder(reminder)];
+  if (!range) return false;
+  const [start, end] = range;
+  return reminders.some((item) => item.type === 'supplement'
+    && (item.active || !/^Supplement (AM|PM)$/i.test(String(item.label || '').trim()))
+    && minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
+}
+
 function notificationText(reminder, reminders = []) {
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    const hasSupplements = reminders.some((item) => item.type === 'supplement'
-      && (item.active || !/^Supplement (AM|PM)$/i.test(String(item.label || '').trim())));
+    const hasSupplements = hasSupplementsInPeriod(reminder, reminders);
     return { title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & 💊 Supps' : ''}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
   }
   if (reminder.type === 'supplement') {
@@ -323,7 +341,9 @@ async function tickReminders(userId) {
   const now = new Date();
   const today = now.getDay();
   const currentMinute = minuteKey(now);
-  reminders.filter((reminder) => reminder.active && (reminder.weekdays || WEEKDAYS).includes(today)).forEach((reminder) => {
+  // Supplements haben KEINEN eigenen Push – sie erscheinen nur als „& 💊 Supps"
+  // im Push ihrer Mahlzeit-Kategorie. Deshalb hier ausschließen.
+  reminders.filter((reminder) => reminder.active && reminder.type !== 'supplement' && (reminder.weekdays || WEEKDAYS).includes(today)).forEach((reminder) => {
     const slot = reminder.type === 'drink' ? nextDrinkSlot(reminder, now) : reminder.time?.slice(0, 5);
     if (slot === currentMinute) maybeNotify(reminder, slot, now, userId, reminders);
   });

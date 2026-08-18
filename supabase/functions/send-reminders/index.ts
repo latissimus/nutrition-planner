@@ -82,6 +82,34 @@ function isConfiguredSupplement(reminder: Reminder) {
     && (reminder.active || !/^Supplement (AM|PM)$/i.test(String(reminder.label || '').trim()));
 }
 
+// Perioden der Tages-Timeline (Minuten ab Mitternacht) – identisch zum Client.
+const PERIODS: [string, number, number][] = [
+  ['breakfast', 0, 585],
+  ['snack_morning', 585, 720],
+  ['lunch', 720, 900],
+  ['snack_afternoon', 900, 1080],
+  ['dinner', 1080, 1440],
+];
+function minutesFromTime(time?: string) {
+  const [h, m] = String(time || '00:00').split(':').map((part) => Number(part));
+  return (Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0);
+}
+function mealPeriod(reminder: Reminder): [number, number] | null {
+  const slot = String(reminder.metadata?.meal_slot || '').toLowerCase();
+  const bySlot = PERIODS.find(([key]) => key === slot);
+  if (bySlot) return [bySlot[1], bySlot[2]];
+  const t = minutesFromTime(reminder.time);
+  const byTime = PERIODS.find(([, start, end]) => t >= start && t < end);
+  return byTime ? [byTime[1], byTime[2]] : null;
+}
+// Nur Supplements in derselben Periode wie die Mahlzeit ergänzen deren Push.
+function hasSupplementsInPeriod(reminder: Reminder, reminders: Reminder[]) {
+  const range = mealPeriod(reminder);
+  if (!range) return false;
+  return reminders.some((item) => isConfiguredSupplement(item)
+    && minutesFromTime(item.time) >= range[0] && minutesFromTime(item.time) < range[1]);
+}
+
 function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   if (!reminder) {
     return {
@@ -101,7 +129,7 @@ function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   };
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    const hasSupplements = reminders.some(isConfiguredSupplement);
+    const hasSupplements = hasSupplementsInPeriod(reminder, reminders);
     return {
       title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & 💊 Supps' : ''}`,
       body: note || bodies.meal,
@@ -211,10 +239,11 @@ async function dispatchDue() {
   const zones = new Map((profiles || []).map((profile) => [profile.id, profile.zeitzone || 'UTC']));
   const remindersById = new Map<string, Reminder>((reminders || []).map((r: Reminder) => [r.id, r]));
 
-  // 1. Regulär zeitplan-fällige Reminders
+  // 1. Regulär zeitplan-fällige Reminders. Supplements feuern KEINEN eigenen
+  // Push – sie erscheinen nur als „& 💊 Supps" im Push ihrer Mahlzeit-Kategorie.
   const scheduled = ((reminders || []) as Reminder[]).flatMap((reminder) => {
     const occurrence = scheduledOccurrence(reminder, zones.get(reminder.user_id) || 'UTC', now);
-    return reminder.active && occurrence ? [{ reminder, occurrence }] : [];
+    return reminder.active && reminder.type !== 'supplement' && occurrence ? [{ reminder, occurrence }] : [];
   });
 
   // 2. Reminders deren Snooze in dieser Minute abgelaufen ist (unabhängig von reminder.time)
@@ -229,7 +258,7 @@ async function dispatchDue() {
   const dueFromSnooze: { reminder: Reminder; occurrence: ScheduledOccurrence }[] = [];
   for (const row of (expiredSnoozes || []) as { reminder_id: string; user_id: string; date: string; snoozed_until: string }[]) {
     const reminder = remindersById.get(row.reminder_id);
-    if (reminder?.active) dueFromSnooze.push({ reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date) });
+    if (reminder?.active && reminder.type !== 'supplement') dueFromSnooze.push({ reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date) });
   }
 
   const dueMap = new Map<string, { reminder: Reminder; occurrence: ScheduledOccurrence }>();
