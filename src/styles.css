@@ -3229,12 +3229,14 @@ button,a,[role="button"],summary{touch-action:manipulation;
 /* Zutaten-Editor (Rezept anlegen/bearbeiten): je Zeile Name · Grammfeld · kcal · Entfernen. */
 .dex-zutaten-liste{display:grid;gap:8px}
 .dex-zutaten-leer{margin:0;padding:12px;border:1px dashed var(--app-outline);border-radius:10px;color:var(--muted);font-size:13px;line-height:1.4}
-.dex-zutat-row{display:grid;grid-template-columns:minmax(0,1fr) 84px auto 36px;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--app-outline);border-radius:11px;background:var(--app-field)}
+.dex-zutat-row{display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center;gap:8px 10px;padding:9px 11px;border:1px solid var(--app-outline);border-radius:11px;background:var(--app-field)}
 .dex-zutat-row .dex-zutat-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700}
+.dex-zutat-controls{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.dex-zutat-portion{flex:1 1 120px;min-width:0;height:40px;padding:0 10px;border:1px solid var(--app-outline);border-radius:8px;background:var(--surface);color:var(--ink);font:700 13px/1 var(--ui)}
 .dex-zutat-gramm{display:inline-flex;align-items:center;gap:4px}
 .dex-zutat-gramm input{width:56px;min-height:40px;padding:0 6px;border:1px solid var(--app-outline);border-radius:8px;background:var(--surface);color:var(--ink);font:800 15px/1 var(--ui);text-align:right}
 .dex-zutat-gramm i{color:var(--muted);font-style:normal;font-size:12px;font-weight:800}
-.dex-zutat-row .dex-zutat-kcal{font-size:12px;font-weight:850;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.dex-zutat-controls .dex-zutat-kcal{margin-left:auto;font-size:12px;font-weight:850;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
 .dex-zutat-remove{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--muted)}
 .dex-zutat-remove svg{width:18px;height:18px;fill:currentColor}
 .dex-zutat-add{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;margin-top:2px}

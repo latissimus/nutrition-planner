@@ -182,28 +182,62 @@ export function mountIngredientEditor(root, initial = []) {
   const list = root.querySelector('[data-zutaten-liste]');
   const addBtn = root.querySelector('[data-zutat-add]');
   if (!list || !addBtn) return { getItems: () => [] };
+  const normPortions = (list) => (Array.isArray(list) ? list : [])
+    .map(([label, grams]) => [String(label || ''), Number(grams) || 0])
+    .filter(([label, grams]) => label && grams > 0);
   const items = (Array.isArray(initial) ? initial : []).map((it) => ({
     name: String(it.name || ''), grams: Number(it.grams) || 0,
     kcal_100g: Number(it.kcal_100g) || 0, protein_100g: Number(it.protein_100g) || 0,
     carbs_100g: Number(it.carbs_100g) || 0, fat_100g: Number(it.fat_100g) || 0,
     source: it.source || '', barcode: it.barcode || '', image_url: it.image_url || '',
+    portions: normPortions(it.portions),
   }));
   const kcalOf = (item) => Math.round(item.kcal_100g * item.grams / 100);
+  // Dropdown mit den Portionseinheiten (z. B. „1 Stück · 150 g"); „Gramm" bleibt
+  // die freie Eingabe. Zutaten ohne Portionen zeigen nur das Grammfeld.
+  const portionSelect = (item) => {
+    if (!item.portions.length) return '';
+    const custom = !item.portions.some(([, grams]) => grams === item.grams);
+    return `<select class="dex-zutat-portion" data-zutat-portion aria-label="Portion">
+      ${item.portions.map(([label, grams]) => `<option value="${grams}"${!custom && grams === item.grams ? ' selected' : ''}>${escapeHtml(label)} · ${grams} g</option>`).join('')}
+      <option value=""${custom ? ' selected' : ''}>Gramm</option>
+    </select>`;
+  };
   const render = () => {
     list.innerHTML = items.length ? items.map((item, index) => `<div class="dex-zutat-row" data-zutat-index="${index}">
         <span class="dex-zutat-name">${escapeHtml(item.name)}</span>
-        <span class="dex-zutat-gramm"><input type="number" inputmode="numeric" min="1" max="5000" step="1" value="${item.grams}" data-zutat-gramm aria-label="Gramm"><i>g</i></span>
-        <strong class="dex-zutat-kcal">${kcalOf(item)} kcal</strong>
         <button type="button" class="dex-zutat-remove" data-zutat-remove aria-label="Zutat entfernen">${materialIconMarkup('close')}</button>
+        <div class="dex-zutat-controls">
+          ${portionSelect(item)}
+          <span class="dex-zutat-gramm"><input type="number" inputmode="numeric" min="1" max="5000" step="1" value="${item.grams}" data-zutat-gramm aria-label="Gramm"><i>g</i></span>
+          <strong class="dex-zutat-kcal">${kcalOf(item)} kcal</strong>
+        </div>
       </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Über „Zutat hinzufügen" ein Lebensmittel aus der Datenbank wählen.</p>';
+  };
+  const syncKcal = (row, index) => {
+    const kcal = row?.querySelector('.dex-zutat-kcal');
+    if (kcal) kcal.textContent = `${kcalOf(items[index])} kcal`;
   };
   list.addEventListener('input', (event) => {
     const input = event.target.closest('[data-zutat-gramm]'); if (!input) return;
-    const index = Number(input.closest('[data-zutat-index]')?.dataset.zutatIndex);
+    const row = input.closest('[data-zutat-index]');
+    const index = Number(row?.dataset.zutatIndex);
     if (!items[index]) return;
     items[index].grams = Math.max(0, Number(input.value) || 0);
-    const kcal = input.closest('.dex-zutat-row')?.querySelector('.dex-zutat-kcal');
-    if (kcal) kcal.textContent = `${kcalOf(items[index])} kcal`;
+    // Manuelle Grammzahl → Auswahl auf „Gramm" stellen, wenn keine Portion passt.
+    const select = row.querySelector('[data-zutat-portion]');
+    if (select) select.value = items[index].portions.some(([, grams]) => grams === items[index].grams) ? String(items[index].grams) : '';
+    syncKcal(row, index);
+  });
+  list.addEventListener('change', (event) => {
+    const select = event.target.closest('[data-zutat-portion]'); if (!select) return;
+    const row = select.closest('[data-zutat-index]');
+    const index = Number(row?.dataset.zutatIndex);
+    if (!items[index] || !select.value) return;
+    items[index].grams = Number(select.value) || items[index].grams;
+    const input = row.querySelector('[data-zutat-gramm]');
+    if (input) input.value = items[index].grams;
+    syncKcal(row, index);
   });
   list.addEventListener('click', (event) => {
     const remove = event.target.closest('[data-zutat-remove]'); if (!remove) return;
@@ -212,17 +246,23 @@ export function mountIngredientEditor(root, initial = []) {
   });
   addBtn.addEventListener('click', () => {
     pickFoodIngredient((product) => {
+      const portions = normPortions(product.portions);
       items.push({
-        name: product.name, grams: Math.round(Number(product.serving_g)) || 100,
+        name: product.name,
+        grams: Math.round(Number(product.serving_g)) || portions[0]?.[1] || 100,
         kcal_100g: Number(product.kcal_100g) || 0, protein_100g: Number(product.protein_100g) || 0,
         carbs_100g: Number(product.carbs_100g) || 0, fat_100g: Number(product.fat_100g) || 0,
         source: product.source || '', barcode: product.barcode || '', image_url: product.image_url || '',
+        portions,
       });
       render();
     });
   });
   render();
-  return { getItems: () => items.filter((it) => it.name && it.grams > 0) };
+  return {
+    getItems: () => items.filter((it) => it.name && it.grams > 0)
+      .map((it) => ({ ...it, portions: it.portions.length ? it.portions : undefined })),
+  };
 }
 
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
