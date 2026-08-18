@@ -6,15 +6,35 @@ const soundVolume = 0.28;
 let interfacePlayer = null;
 let routinePlayer = null;
 let initialized = false;
+let audioContext = null;
+
+// Ein gemeinsamer, selbst verwalteter AudioContext für beide Player. Dadurch
+// können wir seinen Zustand prüfen und ihn wieder aufwecken – iOS suspendiert
+// ihn im Hintergrund und nach Audio-Unterbrechungen, ohne ihn selbst fortzusetzen.
+function ensureContext() {
+  if (typeof window === 'undefined') return null;
+  if (!audioContext) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) { try { audioContext = new Ctx(); } catch { audioContext = null; } }
+  }
+  return audioContext;
+}
+
+// Suspendierten Kontext fortsetzen (nach Rückkehr in den Vordergrund / Geste).
+function resumeAudio() {
+  const ctx = ensureContext();
+  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+}
 
 function player(kind = 'interface') {
   if (typeof window === 'undefined') return null;
+  const context = ensureContext() || undefined;
   if (kind === 'routine') {
-    routinePlayer ||= createUISFX({ pack: 'arcade', volume: soundVolume, enabled: true, cooldownMs: 35 });
+    routinePlayer ||= createUISFX({ pack: 'arcade', volume: soundVolume, enabled: true, cooldownMs: 35, context });
     return routinePlayer;
   }
   interfacePlayer ||= createUISFX({
-    pack: 'arcade', volume: soundVolume, enabled: interfaceSoundsEnabled(), cooldownMs: 45,
+    pack: 'arcade', volume: soundVolume, enabled: interfaceSoundsEnabled(), cooldownMs: 45, context,
   });
   return interfacePlayer;
 }
@@ -110,6 +130,12 @@ export function initInterfaceSounds(root = document) {
     player('routine')?.unlock().catch(() => false);
   };
   root.addEventListener('pointerdown', unlock, { capture: true, passive: true, once: true });
+  // Dauerhaft: bei Rückkehr in den Vordergrund und bei jeder Geste den
+  // ausgesetzten AudioContext fortsetzen (Zustandsprüfung ist billig, macht bei
+  // laufendem Kontext nichts). Behebt, dass Sounds nach längerer Nutzung/
+  // Hintergrund ausfallen, bis die App neu gestartet wird.
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') resumeAudio(); });
+  root.addEventListener('pointerdown', resumeAudio, { capture: true, passive: true });
   root.addEventListener('input', (event) => {
     const field = event.target;
     if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {

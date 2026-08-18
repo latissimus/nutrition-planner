@@ -478,7 +478,7 @@ function eintragTypWaehlen(container, route, options = {}) {
     <div class="sheet-menue eintrag-typ-menue">
       ${food ? `<button data-entry-type="recipe-link">${materialIcon('bookmark_star', 'sheet-list-icon')}<span>Rezept aus Link</span></button>
         <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>
-        ${standardEntries}`
+        ${options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : ''}`
         : standardEntries}
     </div>`);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
