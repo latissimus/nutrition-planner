@@ -142,7 +142,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
         <label class="dex-entry-field" for="dex-entry-carb"><span>Carb-Klasse</span>
           <select id="dex-entry-carb" class="input">
             <option value="unset">Nicht festgelegt</option><option value="low">Low Carb</option>
-            <option value="balanced">Ausgewogen</option><option value="high">High Carb</option>
+            <option value="balanced">Ausgewogen</option><option value="high">High Carb</option><option value="cheat">Cheat</option>
           </select>
         </label>
         <label class="dex-entry-field" for="dex-entry-prep"><span>Zubereitung <small>Minuten</small></span>
@@ -659,7 +659,7 @@ function filterTrainingEntries(entries, filter) {
 }
 
 function filterFoodEntries(entries, filter) {
-  if (filter === 'cheat') return entries.filter((entry) => entry.food_kind === 'cheat_meal');
+  if (filter === 'cheat') return entries.filter((entry) => entry.food_kind === 'cheat_meal' || entry.carb_class === 'cheat');
   if (filter === 'favorite') return entries.filter((entry) => entry.favorite);
   if (['low', 'high', 'balanced'].includes(filter)) return entries.filter((entry) => entry.carb_class === filter);
   return entries;

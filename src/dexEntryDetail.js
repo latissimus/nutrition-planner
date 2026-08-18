@@ -96,6 +96,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
           <option value="low"${entry.carb_class === 'low' ? ' selected' : ''}>Low Carb</option>
           <option value="balanced"${entry.carb_class === 'balanced' ? ' selected' : ''}>Ausgewogen</option>
           <option value="high"${entry.carb_class === 'high' ? ' selected' : ''}>High Carb</option>
+          <option value="cheat"${entry.carb_class === 'cheat' ? ' selected' : ''}>Cheat</option>
         </select></label>
         <label class="dex-entry-field" for="edit-entry-prep"><span>Zubereitung <small>Minuten</small></span><input id="edit-entry-prep" class="input" type="number" min="1" max="1440" value="${entry.prep_minutes || ''}" placeholder="z. B. 10"></label>
       </div>` : ''}
@@ -235,7 +236,7 @@ function detailMarkup(entry) {
         : provider ? `<div class="dex-detail-provider"><strong>${escapeHtml(entry.provider || provider.name)}</strong><span>Vorschau dieses Videos</span></div>` : '';
   const tags = (entry.tags || []).map((tag) => `<span>#${escapeHtml(tag.replace(/^#/, ''))}</span>`).join('');
   const savedAt = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.created_at));
-  const carbLabels = { low: 'Low Carb', high: 'High Carb', balanced: 'Ausgewogen' };
+  const carbLabels = { low: 'Low Carb', high: 'High Carb', balanced: 'Ausgewogen', cheat: 'Cheat' };
   const foodMeta = entry.root_key === 'food-log' && (entry.food_kind === 'cheat_meal' || carbLabels[entry.carb_class] || entry.prep_minutes)
     ? `<div class="dex-detail-foodmeta">
         ${entry.food_kind === 'cheat_meal' ? '<span>Cheat-Meal</span>' : ''}
