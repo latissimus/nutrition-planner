@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine } from './dexEntries.js';
+import { noteEditorMarkup, mountNoteEditors, readNote, renderNoteHtml, noteToText } from './richText.js';
 import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
@@ -112,7 +113,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         <input id="edit-entry-training-class-custom" class="input" maxlength="32" value="${fixedTrainingClass ? '' : escapeHtml(entry.training_class || '')}" placeholder="z. B. Technik">
       </label>` : ''}
       <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
-      <label class="dex-entry-field" for="edit-entry-note"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) && !ownRecipe ? '' : 'optional'}</small></span><textarea id="edit-entry-note" class="input" maxlength="${['note', 'routine'].includes(entry.entry_type) ? '4000' : '500'}" rows="${['note', 'routine'].includes(entry.entry_type) ? '9' : '5'}"${['note', 'routine'].includes(entry.entry_type) && !ownRecipe ? ' required' : ''}>${escapeHtml(entry.note || '')}</textarea></label>
+      <div class="dex-entry-field"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) && !ownRecipe ? '' : 'optional'}</small></span>${noteEditorMarkup('edit-entry-note', entry.note || '', { required: ['note', 'routine'].includes(entry.entry_type) && !ownRecipe })}</div>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
       <button class="btn btn-block dex-entry-delete" type="button" data-entry-delete>Eintrag löschen</button>
     </form>
@@ -120,6 +121,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
   const recipeIngredients = mountIngredientEditor(backdrop, entry.ingredient_items || []);
+  mountNoteEditors(backdrop);
   const trainingClassSelect = backdrop.querySelector('#edit-entry-training-class');
   const trainingClassCustom = backdrop.querySelector('[data-edit-training-class-custom]');
   trainingClassSelect?.addEventListener('change', () => {
@@ -148,7 +150,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
     try {
       const payload = {
         title: backdrop.querySelector('#edit-entry-title').value.trim(),
-        note: backdrop.querySelector('#edit-entry-note').value.trim(),
+        note: readNote(backdrop.querySelector('#edit-entry-note')),
         tags: backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
       };
       if (ownRecipe && !payload.title) throw new Error('Bitte einen Titel für das Rezept eintragen.');
@@ -215,7 +217,7 @@ function fullscreenImage(url, title) {
 }
 
 async function shareEntry(entry) {
-  const shareData = { title: entry.title, text: entry.note || entry.title, url: entry.url || location.href };
+  const shareData = { title: entry.title, text: noteToText(entry.note) || entry.title, url: entry.url || location.href };
   try {
     if (navigator.share) await navigator.share(shareData);
     else { await navigator.clipboard.writeText(shareData.url); toast('Link kopiert'); }
@@ -266,7 +268,7 @@ function detailMarkup(entry) {
         ${foodMeta}
         ${trainingMeta}
         ${ingredients}
-        ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ''}
+        ${entry.note ? `<div class="dex-detail-notiztext">${renderNoteHtml(entry.note)}</div>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span></div>`}
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}
         <section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>

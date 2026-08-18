@@ -3331,6 +3331,23 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-entry-field>span small{color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none}
 .dex-entry-field .input{width:100%;min-height:56px;font-size:16px;resize:vertical}
 .dex-entry-field textarea.input{padding-top:14px;line-height:1.35}
+/* Rich-Text-Notizen: kleine Format-Leiste + contenteditable-Feld. */
+.rte{display:grid;gap:8px}
+.rte-toolbar{display:flex;flex-wrap:wrap;gap:6px}
+.rte-toolbar button{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:38px;padding:0 11px;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);color:var(--ink);font:800 15px/1 var(--ui);cursor:pointer}
+.rte-toolbar button.aktiv{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.rte .rte-area{min-height:132px;padding:14px;line-height:1.4;overflow-y:auto;text-align:left;-webkit-user-select:text;user-select:text}
+.rte-area:focus{outline:none;border-color:var(--ink)}
+.rte-area[data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--muted)}
+/* Notiz-Inhalt (Editor + Anzeige): Überschrift, Listen, Fett, Unterstrichen. */
+.rte-area h3,.dex-detail-notiztext h3{margin:.5em 0 .25em;font-size:16px;font-weight:850}
+.rte-area h3:first-child,.dex-detail-notiztext h3:first-child{margin-top:0}
+.rte-area p,.dex-detail-notiztext p{margin:.35em 0}
+.rte-area p:first-child,.dex-detail-notiztext p:first-child{margin-top:0}
+.rte-area ul,.rte-area ol,.dex-detail-notiztext ul,.dex-detail-notiztext ol{margin:.35em 0;padding-left:1.4em}
+.rte-area li,.dex-detail-notiztext li{margin:.15em 0}
+.dex-detail-notiztext{line-height:1.5}
+.dex-detail-notiztext u{text-underline-offset:2px}
 .food-entry-meta{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:12px}
 .food-entry-meta select.input{appearance:auto;padding-inline:12px;background:var(--surface)}
 .dex-entry-urlfeld{

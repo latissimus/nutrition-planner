@@ -9,6 +9,7 @@ import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
 import { pickFoodIngredient } from './nutrition.js';
+import { noteEditorMarkup, mountNoteEditors, readNote, readNoteText, noteToText } from './richText.js';
 
 const BUCKET = 'dex-entries';
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -166,9 +167,9 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
-      ${audio ? '' : `<label class="dex-entry-field" for="dex-entry-note"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note && !ownRecipe ? '' : 'optional'}</small></span>
-        <textarea id="dex-entry-note" class="input" maxlength="${note ? '4000' : '500'}" rows="${note ? '9' : '3'}" placeholder="${note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …'}"${note && !ownRecipe ? ' required' : ''}></textarea>
-      </label>`}
+      ${audio ? '' : `<div class="dex-entry-field"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note && !ownRecipe ? '' : 'optional'}</small></span>
+        ${noteEditorMarkup('dex-entry-note', '', { placeholder: note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …', required: note && !ownRecipe })}
+      </div>`}
       <button class="btn btn-primary btn-block dex-entry-save" type="submit" data-no-interface-sound>${label} speichern</button>
     </form>
   </section>`;
@@ -318,6 +319,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   }, { passive: false });
   const form = backdrop.querySelector('[data-dex-entry-form]');
   const recipeIngredients = mountIngredientEditor(backdrop);
+  mountNoteEditors(backdrop);
   const trainingClassSelect = backdrop.querySelector('#dex-entry-training-class');
   const trainingClassCustom = backdrop.querySelector('[data-training-class-custom]');
   trainingClassSelect?.addEventListener('change', () => {
@@ -429,13 +431,13 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         audioPath = uploadedPath;
         title ||= 'Tonaufnahme';
       } else {
-        const noteText = form.querySelector('#dex-entry-note').value.trim();
+        const noteText = readNote(form.querySelector('#dex-entry-note'));
         if (ownRecipe) {
           // Rezept: Titel ist Pflicht, Notiz optional (wie Tags).
           if (!title) throw new Error('Bitte einen Titel für das Rezept eintragen.');
         } else {
           if (!noteText) throw new Error('Bitte einen Notiztext eintragen.');
-          title ||= noteText.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 100) || 'Notiz';
+          title ||= readNoteText(form.querySelector('#dex-entry-note')).split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 100) || 'Notiz';
         }
         const file = fileInput?.files?.[0];
         if (file) {
@@ -457,7 +459,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       if (rootKey === 'training' && !selectedTrainingClass) throw new Error('Bitte eine eigene Klasse benennen.');
       const { data, error } = await supabase.from('dex_entries').insert({
         user_id: userId, collection_id: collectionId, routine_id: routineId, root_key: rootKey,
-        entry_type: type, title, note: form.querySelector('#dex-entry-note')?.value.trim() || linkPreview.description || '',
+        entry_type: type, title, note: readNote(form.querySelector('#dex-entry-note')) || linkPreview.description || '',
         url, image_path: imagePath, audio_path: audioPath,
         preview_url: linkPreview.previewUrl || null,
         provider: linkPreview.provider || null,
@@ -585,7 +587,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
       ? `dex-artikel-vorschau${isYpsiArticle ? ' dex-ypsi-vorschau' : ''}`
       : '';
   return dexEntryCardMarkup({
-    id: entry.id, type, title: entry.title, note: entry.note,
+    id: entry.id, type, title: entry.title, note: noteToText(entry.note),
     favorite: Boolean(entry.favorite),
     previewUrl: entry.preview_url, previewClass,
     cardClass: [
