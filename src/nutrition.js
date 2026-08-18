@@ -342,8 +342,9 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null, in
   const anzahlEinheit = backdrop.querySelector('[data-anzahl-einheit]');
   // Gramm je Einheit der aktiven Portion (0 = freie Grammeingabe, keine Portion).
   let einheitGramm = 0;
+  let aktivLabel = '';
   // Portionslabel als Einheit: führende „1 " entfernen → „2 × Stück (Größe M)".
-  const einheitLabel = (label) => `× ${String(label || '').replace(/^\s*1\s+/, '')}`;
+  const strip = (label) => String(label || '').replace(/^\s*1\s+/, '');
   const markiere = () => portionen?.querySelectorAll('[data-portion]')
     .forEach((button) => button.classList.toggle('aktiv', einheitGramm > 0 && Number(button.dataset.portion) === einheitGramm));
   // Menge aus Einheit × Anzahl berechnen (z. B. 2 × Ei M 55 g = 110 g).
@@ -356,22 +357,24 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null, in
     const start = portionen.querySelector(`[data-portion="${number(amount.value)}"]`);
     if (start) {
       einheitGramm = Number(start.dataset.portion);
-      anzahlEinheit.textContent = einheitLabel(start.dataset.portionLabel);
+      aktivLabel = start.dataset.portionLabel;
+      anzahlEinheit.textContent = `× ${strip(aktivLabel)}`;
       anzahlFeld.hidden = false;
     }
     portionen.onclick = (event) => {
       const button = event.target.closest('[data-portion]');
       if (!button) return;
       einheitGramm = Number(button.dataset.portion);
+      aktivLabel = button.dataset.portionLabel;
       anzahlInput.value = 1;
-      anzahlEinheit.textContent = einheitLabel(button.dataset.portionLabel);
+      anzahlEinheit.textContent = `× ${strip(aktivLabel)}`;
       anzahlFeld.hidden = false;
       ausEinheit();
     };
     anzahlInput.oninput = ausEinheit;
   }
   // Freie Grammeingabe hebt die Portionsauswahl auf.
-  amount.oninput = () => { einheitGramm = 0; if (anzahlFeld) anzahlFeld.hidden = true; render(); markiere(); };
+  amount.oninput = () => { einheitGramm = 0; aktivLabel = ''; if (anzahlFeld) anzahlFeld.hidden = true; render(); markiere(); };
   render(); markiere();
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault(); const button = event.submitter; button.disabled = true;
@@ -381,6 +384,8 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null, in
       product_id: entry?.product_id,
       log_date: date, period: backdrop.querySelector('[data-log-period]')?.value,
       name: product.name, amount: grams, unit: 'g', ...values(), product,
+      // Gewählte Portion + Anzahl (z. B. 6 × „1 Stück (Größe M)") für die Rezeptanzeige.
+      portion: einheitGramm > 0 ? { grams: einheitGramm, label: strip(aktivLabel), count: number(anzahlInput.value) > 0 ? number(anzahlInput.value) : 1 } : null,
     });
     if (saved) backdrop.remove(); else button.disabled = false;
   };
@@ -481,7 +486,7 @@ export function pickFoodIngredient(onPick) {
       backdrop.remove();
       amountEditor({
         product, ingredient: true,
-        onSave: async (payload) => { onPick(payload.product, payload.amount); return true; },
+        onSave: async (payload) => { onPick(payload.product, payload.amount, payload.portion); return true; },
       });
     },
   });

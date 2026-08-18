@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
-import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor } from './dexEntries.js';
+import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine } from './dexEntries.js';
 import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
@@ -32,7 +32,12 @@ function ingredientsSection(entry) {
       acc.fat += (Number(it.fat_100g) || 0) * factor;
       return acc;
     }, { grams: 0, kcal: 0, protein: 0, carbs: 0, fat: 0 });
-    const rows = items.map((it) => `<li><span class="dex-zutat-name">${escapeHtml(it.name)}</span><span class="dex-zutat-gramm">${Math.round(Number(it.grams) || 0)} g</span><strong>${Math.round((Number(it.kcal_100g) || 0) * (Number(it.grams) || 0) / 100)} kcal</strong></li>`).join('');
+    const rows = items.map((it) => {
+      const menge = (Number(it.unitGrams) || 0) > 0 && it.unitLabel
+        ? `${it.count} × ${escapeHtml(it.unitLabel)} <small>(${Math.round(Number(it.grams) || 0)} g)</small>`
+        : `${Math.round(Number(it.grams) || 0)} g`;
+      return `<li><span class="dex-zutat-name">${escapeHtml(it.name)}</span><span class="dex-zutat-gramm">${menge}</span><strong>${Math.round((Number(it.kcal_100g) || 0) * (Number(it.grams) || 0) / 100)} kcal</strong></li>`;
+    }).join('');
     return `<section class="dex-detail-zutaten"><h2>Zutaten</h2><ul class="dex-zutaten-detail">${rows}</ul>
       <p class="dex-zutaten-summe">Gesamt: ${Math.round(total.grams)} g · ${Math.round(total.kcal)} kcal · ${Math.round(total.protein)} P · ${Math.round(total.carbs)} K · ${Math.round(total.fat)} F</p></section>`;
   }
@@ -153,7 +158,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         if (entry.food_kind === 'recipe') {
           const zutaten = recipeIngredients.getItems();
           payload.ingredient_items = zutaten;
-          payload.ingredients = zutaten.map((it) => `${it.grams} g ${it.name}`);
+          payload.ingredients = zutaten.map(ingredientLine);
         }
       }
       if (entry.root_key === 'training') {

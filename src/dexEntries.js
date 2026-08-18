@@ -178,6 +178,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
 // (BLS/Open Food Facts) gewählt und trägt ihre 100-g-Nährwerte mit sich, damit
 // der Meal-Log ohne Namensraten summieren kann. `getItems()` liefert die
 // gültigen Zeilen (Name + Gramm > 0) für den Insert.
+const stripPortionLabel = (label) => String(label || '').replace(/^\s*1\s+/, '');
 export function mountIngredientEditor(root, initial = []) {
   const list = root.querySelector('[data-zutaten-liste]');
   const addBtn = root.querySelector('[data-zutat-add]');
@@ -191,53 +192,62 @@ export function mountIngredientEditor(root, initial = []) {
     carbs_100g: Number(it.carbs_100g) || 0, fat_100g: Number(it.fat_100g) || 0,
     source: it.source || '', barcode: it.barcode || '', image_url: it.image_url || '',
     portions: normPortions(it.portions),
+    // Portionsmodus: unitGrams > 0 → Menge = count × unitGrams; 0 → freie Gramm.
+    unitGrams: Number(it.unitGrams) || 0,
+    unitLabel: stripPortionLabel(it.unitLabel || ''),
+    count: Number(it.count) > 0 ? Number(it.count) : 1,
   }));
   const kcalOf = (item) => Math.round(item.kcal_100g * item.grams / 100);
-  // Dropdown mit den Portionseinheiten (z. B. „1 Stück · 150 g"); „Gramm" bleibt
-  // die freie Eingabe. Zutaten ohne Portionen zeigen nur das Grammfeld.
-  const portionSelect = (item) => {
-    if (!item.portions.length) return '';
-    const custom = !item.portions.some(([, grams]) => grams === item.grams);
-    return `<select class="dex-zutat-portion" data-zutat-portion aria-label="Portion">
-      ${item.portions.map(([label, grams]) => `<option value="${grams}"${!custom && grams === item.grams ? ' selected' : ''}>${escapeHtml(label)} · ${grams} g</option>`).join('')}
-      <option value=""${custom ? ' selected' : ''}>Gramm</option>
-    </select>`;
+  // Einheiten-Dropdown: je Portion „× Stück (Größe M)" + „Gramm" (freie Eingabe).
+  const einheitSelect = (item) => item.portions.length
+    ? `<select class="dex-zutat-portion" data-zutat-portion aria-label="Einheit">
+        ${item.portions.map(([label, grams]) => `<option value="${grams}"${item.unitGrams === grams ? ' selected' : ''}>× ${escapeHtml(stripPortionLabel(label))}</option>`).join('')}
+        <option value=""${item.unitGrams ? '' : ' selected'}>Gramm</option>
+      </select>`
+    : '<span class="dex-zutat-einheit">Gramm</span>';
+  const controls = (item) => {
+    const portionModus = item.unitGrams > 0;
+    const menge = portionModus ? item.count : item.grams;
+    return `<span class="dex-zutat-menge"><input type="number" inputmode="decimal" min="${portionModus ? '0' : '1'}" max="5000" step="1" value="${menge}" data-zutat-qty aria-label="Menge"></span>
+      ${einheitSelect(item)}
+      <span class="dex-zutat-info">${portionModus ? `= ${Math.round(item.grams)} g` : ''}</span>
+      <strong class="dex-zutat-kcal">${kcalOf(item)} kcal</strong>`;
   };
   const render = () => {
     list.innerHTML = items.length ? items.map((item, index) => `<div class="dex-zutat-row" data-zutat-index="${index}">
         <span class="dex-zutat-name">${escapeHtml(item.name)}</span>
         <button type="button" class="dex-zutat-remove" data-zutat-remove aria-label="Zutat entfernen">${materialIconMarkup('close')}</button>
-        <div class="dex-zutat-controls">
-          ${portionSelect(item)}
-          <span class="dex-zutat-gramm"><input type="number" inputmode="numeric" min="1" max="5000" step="1" value="${item.grams}" data-zutat-gramm aria-label="Gramm"><i>g</i></span>
-          <strong class="dex-zutat-kcal">${kcalOf(item)} kcal</strong>
-        </div>
+        <div class="dex-zutat-controls">${controls(item)}</div>
       </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Über „Zutat hinzufügen" ein Lebensmittel aus der Datenbank wählen.</p>';
   };
-  const syncKcal = (row, index) => {
-    const kcal = row?.querySelector('.dex-zutat-kcal');
-    if (kcal) kcal.textContent = `${kcalOf(items[index])} kcal`;
-  };
+  // Menge (Anzahl bzw. Gramm) ändern – ohne Neurender, damit der Fokus bleibt.
   list.addEventListener('input', (event) => {
-    const input = event.target.closest('[data-zutat-gramm]'); if (!input) return;
+    const input = event.target.closest('[data-zutat-qty]'); if (!input) return;
     const row = input.closest('[data-zutat-index]');
-    const index = Number(row?.dataset.zutatIndex);
-    if (!items[index]) return;
-    items[index].grams = Math.max(0, Number(input.value) || 0);
-    // Manuelle Grammzahl → Auswahl auf „Gramm" stellen, wenn keine Portion passt.
-    const select = row.querySelector('[data-zutat-portion]');
-    if (select) select.value = items[index].portions.some(([, grams]) => grams === items[index].grams) ? String(items[index].grams) : '';
-    syncKcal(row, index);
+    const item = items[Number(row?.dataset.zutatIndex)]; if (!item) return;
+    const value = Math.max(0, Number(input.value) || 0);
+    if (item.unitGrams > 0) { item.count = value; item.grams = Math.round(item.unitGrams * value); }
+    else { item.grams = value; }
+    const info = row.querySelector('.dex-zutat-info');
+    if (info) info.textContent = item.unitGrams > 0 ? `= ${Math.round(item.grams)} g` : '';
+    const kcal = row.querySelector('.dex-zutat-kcal');
+    if (kcal) kcal.textContent = `${kcalOf(item)} kcal`;
   });
+  // Einheit wechseln (Portion ⇄ Gramm) – Rolle des Mengenfelds ändert sich → Neurender.
   list.addEventListener('change', (event) => {
     const select = event.target.closest('[data-zutat-portion]'); if (!select) return;
-    const row = select.closest('[data-zutat-index]');
-    const index = Number(row?.dataset.zutatIndex);
-    if (!items[index] || !select.value) return;
-    items[index].grams = Number(select.value) || items[index].grams;
-    const input = row.querySelector('[data-zutat-gramm]');
-    if (input) input.value = items[index].grams;
-    syncKcal(row, index);
+    const item = items[Number(select.closest('[data-zutat-index]')?.dataset.zutatIndex)]; if (!item) return;
+    if (select.value) {
+      const grams = Number(select.value);
+      const treffer = item.portions.find(([, g]) => g === grams);
+      item.unitGrams = grams;
+      item.unitLabel = stripPortionLabel(treffer?.[0] || '');
+      item.count = 1;
+      item.grams = grams;
+    } else {
+      item.unitGrams = 0; item.unitLabel = ''; // Gesamtgramm bleibt erhalten
+    }
+    render();
   });
   list.addEventListener('click', (event) => {
     const remove = event.target.closest('[data-zutat-remove]'); if (!remove) return;
@@ -245,26 +255,45 @@ export function mountIngredientEditor(root, initial = []) {
     if (index >= 0) { items.splice(index, 1); render(); }
   });
   addBtn.addEventListener('click', () => {
-    // Auswahl läuft über denselben Mengen-Dialog wie im Meal-Log; `grams` ist die
-    // dort gewählte Menge (per Portion oder frei).
-    pickFoodIngredient((product, grams) => {
+    // Auswahl über denselben Mengen-Dialog wie im Meal-Log; `portion` trägt die
+    // dort gewählte Einheit + Anzahl (z. B. 6 × Stück (Größe M)).
+    pickFoodIngredient((product, grams, portion) => {
       const portions = normPortions(product.portions);
+      const total = Math.round(Number(grams)) || Math.round(Number(product.serving_g)) || portions[0]?.[1] || 100;
       items.push({
         name: product.name,
-        grams: Math.round(Number(grams)) || Math.round(Number(product.serving_g)) || portions[0]?.[1] || 100,
         kcal_100g: Number(product.kcal_100g) || 0, protein_100g: Number(product.protein_100g) || 0,
         carbs_100g: Number(product.carbs_100g) || 0, fat_100g: Number(product.fat_100g) || 0,
         source: product.source || '', barcode: product.barcode || '', image_url: product.image_url || '',
         portions,
+        unitGrams: Number(portion?.grams) > 0 ? Number(portion.grams) : 0,
+        unitLabel: stripPortionLabel(portion?.label || ''),
+        count: Number(portion?.count) > 0 ? Number(portion.count) : 1,
+        grams: total,
       });
       render();
     });
   });
   render();
   return {
-    getItems: () => items.filter((it) => it.name && it.grams > 0)
-      .map((it) => ({ ...it, portions: it.portions.length ? it.portions : undefined })),
+    getItems: () => items.filter((it) => it.name && it.grams > 0).map((it) => ({
+      name: it.name, grams: it.grams,
+      kcal_100g: it.kcal_100g, protein_100g: it.protein_100g, carbs_100g: it.carbs_100g, fat_100g: it.fat_100g,
+      source: it.source, barcode: it.barcode, image_url: it.image_url,
+      portions: it.portions.length ? it.portions : undefined,
+      unitGrams: it.unitGrams > 0 ? it.unitGrams : undefined,
+      unitLabel: it.unitGrams > 0 ? it.unitLabel : undefined,
+      count: it.unitGrams > 0 ? it.count : undefined,
+    })),
   };
+}
+
+// Lesbare Zeile für die Detail-/Einkaufsansicht: „6 × Stück (Größe M) Ei" bzw.
+// „150 g Reis" – für portionsbasierte Zutaten die Anzahl statt nur Gramm.
+export function ingredientLine(it) {
+  return it.unitGrams > 0 && it.unitLabel
+    ? `${it.count} × ${it.unitLabel} ${it.name}`
+    : `${Math.round(it.grams)} g ${it.name}`;
 }
 
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
@@ -440,7 +469,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
           ? Number(form.querySelector('#dex-entry-prep').value) : null,
         ingredient_items: foodMode ? recipeIngredients.getItems() : [],
         // Lesbare Spiegelung der strukturierten Zutaten für die Detailansicht.
-        ingredients: foodMode ? recipeIngredients.getItems().map((it) => `${it.grams} g ${it.name}`) : [],
+        ingredients: foodMode ? recipeIngredients.getItems().map(ingredientLine) : [],
       }).select().single();
       if (error) throw error;
       notifyHomeCountsChanged();
