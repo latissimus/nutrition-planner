@@ -319,7 +319,8 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null, in
     <div class="nutrition-product-head">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="">` : `<span class="nutrition-product-slot-icon">${materialIconMarkup(product.source === 'recipe' ? 'menu_book' : 'Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small><span>${decimal(product.kcal_100g)} kcal pro 100 g</span></div></div>
     <p class="nutrition-source">${product.source === 'manual' ? 'Eigenes gespeichertes Lebensmittel' : product.source === 'recipe' ? 'Eigenes Rezept · aus den Food-Log-Zutaten berechnet' : product.source === 'bls' ? 'Grundnahrungsmittel · Bundeslebensmittelschlüssel (BLS 4.0)' : 'Produktdaten: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>'} · Werte vor dem Speichern prüfen</p>
     <form class="nutrition-form" data-product-amount-form>${ingredient ? '' : periodSelect(selectedPeriod)}
-      ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>` : ''}
+      ${Array.isArray(product.portions) && product.portions.length ? `<div class="nutrition-form-field"><span>Portion</span><div class="nutrition-portionen" data-portionen>${product.portions.map(([label, grams]) => `<button type="button" data-portion="${grams}" data-portion-label="${escapeHtml(label)}">${escapeHtml(label)}<small>${grams} g</small></button>`).join('')}</div></div>
+      <label class="nutrition-form-field nutrition-anzahl-feld" data-anzahl-feld hidden><span>Anzahl</span><span class="nutrition-anzahl-row"><input class="input" type="number" inputmode="decimal" min="0" step="1" value="1" data-anzahl><b data-anzahl-einheit></b></span></label>` : ''}
       <label class="nutrition-form-field"><span>Menge</span><span class="nutrition-gram-input"><input class="input nutrition-gram-picker" type="number" inputmode="numeric" min="1" max="${maxGramm}" step="1" value="${Math.min(maxGramm, Math.max(1, Math.round(serving)))}" data-product-amount><i>g</i></span></label>
       <div class="nutrition-product-result" data-product-result></div>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>${ingredient ? 'Zutat übernehmen' : entry ? 'Änderungen speichern' : 'Eintrag speichern'}</button>
@@ -336,19 +337,42 @@ function amountEditor({ product, date, onSave, entry = null, onDelete = null, in
   };
   const render = () => { const data = values(); result.innerHTML = `<b>${decimal(data.energy_kcal)} kcal</b><span>${decimal(data.protein_g, 1)} P · ${decimal(data.carbs_g, 1)} K · ${decimal(data.fat_g, 1)} F</span>`; };
   const portionen = backdrop.querySelector('[data-portionen]');
-  let markierePortion = () => {};
+  const anzahlFeld = backdrop.querySelector('[data-anzahl-feld]');
+  const anzahlInput = backdrop.querySelector('[data-anzahl]');
+  const anzahlEinheit = backdrop.querySelector('[data-anzahl-einheit]');
+  // Gramm je Einheit der aktiven Portion (0 = freie Grammeingabe, keine Portion).
+  let einheitGramm = 0;
+  // Portionslabel als Einheit: führende „1 " entfernen → „2 × Stück (Größe M)".
+  const einheitLabel = (label) => `× ${String(label || '').replace(/^\s*1\s+/, '')}`;
+  const markiere = () => portionen?.querySelectorAll('[data-portion]')
+    .forEach((button) => button.classList.toggle('aktiv', einheitGramm > 0 && Number(button.dataset.portion) === einheitGramm));
+  // Menge aus Einheit × Anzahl berechnen (z. B. 2 × Ei M 55 g = 110 g).
+  const ausEinheit = () => {
+    amount.value = Math.max(1, Math.min(maxGramm, Math.round(einheitGramm * number(anzahlInput.value))));
+    render(); markiere();
+  };
   if (portionen) {
-    markierePortion = () => portionen.querySelectorAll('[data-portion]')
-      .forEach((button) => button.classList.toggle('aktiv', Number(button.dataset.portion) === number(amount.value)));
+    // Startet die Menge genau auf einer Portion? Dann Anzahl-Feld direkt zeigen.
+    const start = portionen.querySelector(`[data-portion="${number(amount.value)}"]`);
+    if (start) {
+      einheitGramm = Number(start.dataset.portion);
+      anzahlEinheit.textContent = einheitLabel(start.dataset.portionLabel);
+      anzahlFeld.hidden = false;
+    }
     portionen.onclick = (event) => {
       const button = event.target.closest('[data-portion]');
       if (!button) return;
-      amount.value = button.dataset.portion;
-      render(); markierePortion();
+      einheitGramm = Number(button.dataset.portion);
+      anzahlInput.value = 1;
+      anzahlEinheit.textContent = einheitLabel(button.dataset.portionLabel);
+      anzahlFeld.hidden = false;
+      ausEinheit();
     };
+    anzahlInput.oninput = ausEinheit;
   }
-  amount.oninput = () => { render(); markierePortion(); };
-  render(); markierePortion();
+  // Freie Grammeingabe hebt die Portionsauswahl auf.
+  amount.oninput = () => { einheitGramm = 0; if (anzahlFeld) anzahlFeld.hidden = true; render(); markiere(); };
+  render(); markiere();
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault(); const button = event.submitter; button.disabled = true;
     const grams = number(amount.value); if (!grams) { button.disabled = false; return; }
