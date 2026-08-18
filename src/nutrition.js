@@ -152,7 +152,7 @@ function summaryMarkup(state, date) {
       <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
     </div>
     <div class="nutrition-macros">
-      ${[['Protein', protein, calculated?.protein], ['Carbs', carbs, calculated?.carbs], ['Fett', fat, calculated?.fat]].map(([label, value, goal]) => `<div><span><b>${label}</b><small>${decimal(value)}${goal ? ` / ${decimal(goal)}` : ''} g</small></span><i><u style="width:${progress(value, goal)}%"></u></i></div>`).join('')}
+      ${[['Protein', protein], ['Carbs', carbs], ['Fett', fat]].map(([label, value]) => `<div><span><b>${label}</b><small>${decimal(value)} g</small></span></div>`).join('')}
     </div>
     <details class="nutrition-calculator">
       <summary>Kalorienbedarf berechnen ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
