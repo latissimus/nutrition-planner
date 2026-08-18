@@ -5006,6 +5006,46 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-tonight button .material-icon{width:23px;height:23px}
 .sleep-section{padding:21px 16px 16px}
 .sleep-section>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+/* Nachttisch-Wecker: Karte unter „Heute Nacht". */
+.wecker-card{position:relative;overflow:hidden;width:100%;margin:0;padding:16px;background:var(--surface);border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);box-shadow:var(--hart-klein)}
+.wecker-card::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:7px;background:var(--ordner)}
+.wecker-card-info{display:grid;grid-template-columns:36px minmax(0,1fr) 44px;align-items:center;gap:12px;margin-bottom:13px}
+.wecker-card-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}
+.wecker-card-icon svg{display:block;width:21px;height:21px;fill:currentColor}
+.wecker-card-info>div{min-width:0}
+.wecker-card-info>div small{display:block;font-size:11px;font-weight:850;letter-spacing:.08em;color:var(--muted)}
+.wecker-card-info>div strong{display:block;margin:2px 0;font-size:18px;font-variant-numeric:tabular-nums}
+.wecker-card-info>div span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.wecker-einstellungen{display:grid;place-items:center;width:44px;height:44px;padding:0;border:var(--karten-bw) solid var(--ink);border-radius:12px;background:var(--surface);color:var(--ink);box-shadow:var(--hart-klein)}
+.wecker-einstellungen svg{width:21px;height:21px;fill:currentColor}
+/* Einstell-Sheet */
+.wecker-editor{display:grid;gap:16px}
+.wecker-sound-liste{display:grid;gap:6px}
+.wecker-sound-zeile{display:grid;grid-template-columns:auto minmax(0,1fr) 40px;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--app-outline);border-radius:10px;background:var(--app-field)}
+.wecker-sound-zeile input[type="radio"]{width:18px;height:18px;accent-color:var(--ordner)}
+.wecker-sound-zeile span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700}
+.wecker-vorschau{display:grid;place-items:center;width:36px;height:36px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);color:var(--ink)}
+.wecker-vorschau svg{width:18px;height:18px;fill:currentColor}
+.wecker-leer{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+.wecker-tage{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wecker-tag{min-width:0;height:40px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);color:var(--ink);font:800 12px/1 var(--ui)}
+.wecker-tag.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
+/* Vollbild-Nachttisch (Overlay) */
+.wecker-overlay{position:fixed;inset:0;z-index:4000;display:grid;place-items:center;background:#000;color:#fff;touch-action:none}
+.wecker-overlay-inner{display:grid;justify-items:center;gap:18px;width:100%;max-width:420px;padding:32px;text-align:center;transition:opacity .4s ease}
+.wecker-overlay-inner[data-phase="warten"]{opacity:.4}
+.wecker-overlay-inner[data-phase="alarm"]{opacity:1;animation:wecker-puls 1s ease-in-out infinite}
+@keyframes wecker-puls{0%,100%{opacity:1}50%{opacity:.72}}
+.wecker-aus{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:14px;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff}
+.wecker-aus svg{width:22px;height:22px;fill:currentColor}
+.wecker-uhr{font:800 clamp(64px,22vw,120px)/1 var(--ui);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.wecker-next{font-size:15px;font-weight:700;color:rgba(255,255,255,.72);letter-spacing:.02em}
+.wecker-alarm-aktionen{display:grid;gap:10px;width:100%;margin-top:8px}
+.wecker-overlay-inner[data-phase="warten"] .wecker-alarm-aktionen{display:none}
+.wecker-hinweis{margin:0;font-size:12px;color:rgba(255,255,255,.5);line-height:1.4}
+.wecker-overlay-inner[data-phase="alarm"] .wecker-hinweis{display:none}
+.wecker-stop{background:#fff;color:#000;border-color:#fff}
+.wecker-snooze{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.32)}
 .sleep-section-title{display:flex;align-items:center;min-width:0;gap:10px}
 .sleep-section>header h2{margin:0;font-family:var(--display);font-size:19px;line-height:1.1;text-transform:uppercase}
 .sleep-section>header>a,.sleep-section>header>button{min-height:38px;padding:7px 11px;border:1.5px solid var(--ink);border-radius:10px;background:var(--surface);color:var(--ink);font:800 12px/1 var(--ui);text-decoration:none}
