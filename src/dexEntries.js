@@ -633,7 +633,7 @@ const foodFilterDefinitions = [
 ];
 
 function foodFiltersMarkup(active = 'all') {
-  return `<nav class="food-dex-filter" aria-label="Food-Log filtern">${foodFilterDefinitions.map(([key, label]) =>
+  return `<nav class="food-dex-filter" aria-label="Food-Dex filtern">${foodFilterDefinitions.map(([key, label]) =>
     `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
 }
 

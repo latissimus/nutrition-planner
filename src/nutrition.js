@@ -570,7 +570,7 @@ async function recipeEditor({ userId, date, onSave }) {
     recipes = data || [];
   } catch { list.innerHTML = '<p>Rezepte konnten nicht geladen werden.</p>'; return; }
   if (!recipes.length) {
-    list.innerHTML = '<p>Noch kein Rezept vorhanden. Lege im Food-Log ein eigenes Rezept mit Zutaten aus der Datenbank an.</p>';
+    list.innerHTML = '<p>Noch kein Rezept vorhanden. Lege im Food-Dex ein eigenes Rezept mit Zutaten aus der Datenbank an.</p>';
     return;
   }
   await signRecipeImages(recipes);
@@ -583,7 +583,7 @@ async function recipeEditor({ userId, date, onSave }) {
       : `<span class="nutrition-food-platzhalter">${materialIconMarkup('menu_book', 'nutrition-food-icon')}</span>`;
     return `<button type="button" data-recipe-index="${index}"${usable ? '' : ' disabled'}>
       ${vorschau}
-      <div><b>${escapeHtml(recipe.title || 'Rezept')}</b><small>${usable ? `${items.length} Zutaten · ${Math.round(total.grams)} g` : 'Zutaten im Food-Log aus der Datenbank wählen'}</small></div>
+      <div><b>${escapeHtml(recipe.title || 'Rezept')}</b><small>${usable ? `${items.length} Zutaten · ${Math.round(total.grams)} g` : 'Zutaten im Food-Dex aus der Datenbank wählen'}</small></div>
       <strong>${usable ? `${decimal(total.kcal)} kcal` : ''}</strong>
     </button>`;
   }).join('');
@@ -681,7 +681,7 @@ function addMenu(context) {
     <div class="sheet-menue nutrition-add-menu">
       <button type="button" data-nutrition-action="scan">${materialIconMarkup('photo_camera')}<span><b>Barcode scannen</b><small>Verpacktes Produkt erkennen</small></span></button>
       <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Grundnahrungsmittel und Produkte</small></span></button>
-      <button type="button" data-nutrition-action="recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Eigenes Rezept aus dem Food-Log übernehmen</small></span></button>
+      <button type="button" data-nutrition-action="recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Eigenes Rezept aus dem Food-Dex übernehmen</small></span></button>
       <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigenes Lebensmittel</b><small>Kalorien und Makros selbst eintragen</small></span></button>
       <button type="button" data-nutrition-action="recent">${materialIconMarkup('calendar_meal')}<span><b>Zuletzt verwendet</b><small>Frühere Mahlzeit wiederholen</small></span></button>
     </div>`);

@@ -413,8 +413,8 @@ function avatarMarkup() {
 const sammlungen = [
   ['body', 'KFA-LOG', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MEAL-LOG', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
-  ['food-log', 'Food-Log', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
-  ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
+  ['food-log', 'Food-Dex', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
+  ['training', 'TRAINING-DEX', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
   ['sleep', 'SLEEP-LOG', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
@@ -1225,12 +1225,12 @@ async function renderRoute() {
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-LOG</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
     });
-    mountCategoryChrome(view, route, 'Food-Log', {
+    mountCategoryChrome(view, route, 'Food-Dex', {
       pageLookScope: route, pageLookPattern: 'triangles',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
@@ -1257,10 +1257,10 @@ async function renderRoute() {
   } else if (route === 'training') {
     setSeite('training');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING-DEX</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
-    mountCategoryChrome(view, route, 'TRAINING', {
+    mountCategoryChrome(view, route, 'TRAINING-DEX', {
       pageLookScope: route, pageLookPattern: 'drops',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),

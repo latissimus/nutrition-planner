@@ -270,8 +270,8 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   startHinweis.textContent = 'Lege fest, welche Dex-Einträge auf der Startseite und in der Suche erscheinen.';
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
-    ['body', 'KFA-LOG'], ['reminders', 'MEAL-LOG'], ['food-log', 'FOOD-LOG'],
-    ['training', 'TRAINING'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
+    ['body', 'KFA-LOG'], ['reminders', 'MEAL-LOG'], ['food-log', 'FOOD-DEX'],
+    ['training', 'TRAINING-DEX'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
     ['sleep', 'SLEEP-LOG'],
   ]);
   const sammlungsListe = document.createElement('div');

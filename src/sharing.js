@@ -28,7 +28,7 @@ export async function resolveSharedSpace(userId, scope, signal) {
 }
 
 export async function openShareSheet(scope) {
-  const label = scope === 'shopping' ? 'Einkauf' : 'Food-Log';
+  const label = scope === 'shopping' ? 'Einkauf' : 'Food-Dex';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop teilen-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet teilen-sheet" role="dialog" aria-modal="true" aria-label="${label} teilen">
