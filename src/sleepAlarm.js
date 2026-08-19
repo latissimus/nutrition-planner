@@ -57,17 +57,20 @@ export function setWeckerConfig({ sound, tage }) {
   if (tage !== undefined) setPreference(TAGE_KEY, tage);
 }
 
-// Nächster Weckzeitpunkt aus dem Schlafplan (wake_time je Wochentag) und den
-// scharfgestellten Wecker-Tagen. Liefert ein Date in der Zukunft oder null.
+// Nächster Weckzeitpunkt. Wichtig: Der Schlafplan ist nach dem Zubettgeh-Tag
+// (Abend) geschlüsselt, das Aufwachen liegt am FOLGETAG. Beispiel: Di 22:30 mit
+// Aufsteh-Zeit 06:30 bedeutet Mittwoch 06:30. `tage` sind die Weck-/Morgentage
+// (der Tag, an dem es klingelt); die Uhrzeit kommt aus dem Plan der Nacht davor.
 export function naechsterWecker(schedules, tage, now = new Date()) {
   const proTag = new Map((schedules || []).map((s) => [s.weekday, s]));
   const scharf = new Set(tage || []);
   for (let versatz = 0; versatz < 8; versatz += 1) {
     const tag = new Date(now);
     tag.setDate(now.getDate() + versatz);
-    const wd = tag.getDay();
-    if (!scharf.has(wd)) continue;
-    const wake = String(proTag.get(wd)?.wake_time || '07:00').slice(0, 5);
+    const morgenWd = tag.getDay();          // Tag, an dem geweckt wird
+    if (!scharf.has(morgenWd)) continue;
+    const abendWd = (morgenWd + 6) % 7;     // Vorabend = Plan-Tag mit der Aufsteh-Zeit
+    const wake = String(proTag.get(abendWd)?.wake_time || '07:00').slice(0, 5);
     const [h, m] = wake.split(':').map(Number);
     tag.setHours(Number.isFinite(h) ? h : 7, Number.isFinite(m) ? m : 0, 0, 0);
     if (tag.getTime() > now.getTime() + 1000) return tag;
@@ -125,7 +128,7 @@ export function weckerEditor({ onSaved } = {}) {
           </label>`).join('') : '<p class="wecker-leer">Keine Tondatei gefunden. Lege eine mp3/wav in den Ordner „Wecker-Sounds".</p>'}
         </div>
       </div>
-      <div class="dex-entry-field"><span>Wecktage <small>zur Aufsteh-Zeit aus dem Schlafplan</small></span>
+      <div class="dex-entry-field"><span>Wecktage <small>Tag des Weckens · Uhrzeit automatisch aus dem Schlafplan (Nacht davor)</small></span>
         <div class="wecker-tage" data-wecker-tage>
           ${DAY_ORDER.map((wd) => `<button type="button" class="wecker-tag${gewaehlteTage.has(wd) ? ' aktiv' : ''}" data-tag="${wd}" aria-pressed="${gewaehlteTage.has(wd)}">${DAY_KURZ[wd]}</button>`).join('')}
         </div>
