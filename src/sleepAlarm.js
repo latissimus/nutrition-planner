@@ -6,7 +6,7 @@
 // werden hier automatisch eingesammelt.
 
 import { getPreference, setPreference } from './userPreferences.js';
-import { materialIconMarkup } from './categoryIcons.js';
+import { materialIconMarkup, categoryColor } from './categoryIcons.js';
 
 // Alle Audiodateien aus dem Projektordner bündeln. Neue Dateien erscheinen nach
 // dem nächsten Build/Deploy automatisch – keine manuelle Registrierung nötig.
@@ -116,6 +116,10 @@ export function weckerEditor({ onSaved } = {}) {
   const gewaehlteTage = new Set(config.tage);
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop wecker-editor-backdrop offen';
+  // Das Sheet hängt an document.body, außerhalb der Sleep-Seite – deshalb die
+  // Dex-Farbe hier selbst setzen, sonst bleibt var(--ordner) ungelöst und die
+  // ausgewählten Wochentage färben sich (v. a. im Retromodus) nicht ein.
+  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   backdrop.innerHTML = `
     <section class="kategorie-sheet wecker-editor" role="dialog" aria-modal="true" aria-label="Wecker einstellen">
       <header><h2>Wecker</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>

@@ -5029,7 +5029,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .wecker-leer{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
 .wecker-tage{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .wecker-tag{min-width:0;height:40px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);color:var(--ink);font:800 12px/1 var(--ui)}
-.wecker-tag.aktiv{border-color:#000;background:var(--ordner);color:var(--ordner-ink,#000)}
+.wecker-tag.aktiv{border-color:#000;background:var(--ordner);color:#fff}
 /* Vollbild-Nachttisch (Overlay) */
 .wecker-overlay{position:fixed;inset:0;z-index:4000;display:grid;place-items:center;background:#000;color:#fff;touch-action:none}
 .wecker-overlay-inner{display:grid;justify-items:center;gap:18px;width:100%;max-width:420px;padding:32px;text-align:center;transition:opacity .4s ease}
