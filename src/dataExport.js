@@ -7,6 +7,10 @@ export const EXPORT_PAGE_SIZE = 500;
 export const EXPORT_TABLES = [
   ['hautfalten', 'skinfolds', 'user_id', ['id']],
   ['gewicht', 'weights', 'user_id', ['id']],
+  ['taillenumfang', 'waist_measurements', 'user_id', ['id']],
+  ['externe_kfa_messwerte', 'external_body_fat_measurements', 'user_id', ['id']],
+  ['bodycomp_checkins', 'bodycomp_checkins', 'user_id', ['checkin_date']],
+  ['logman_leistung', 'logman_performance', 'user_id', ['performed_on', 'id']],
   ['erinnerungen', 'reminders', 'user_id', ['id']],
   ['erinnerungsstatus', 'reminder_completions', 'user_id', ['date', 'reminder_id']],
   ['routinen', 'routines', 'user_id', ['id']],
@@ -24,6 +28,7 @@ export const EXPORT_TABLES = [
   ['ernaehrungs_einstellungen', 'nutrition_settings', 'user_id', ['user_id']],
   ['ernaehrungs_produkte', 'nutrition_products', 'user_id', ['id']],
   ['kalorien_protokoll', 'nutrition_log_entries', 'user_id', ['log_date', 'created_at']],
+  ['ernaehrungs_tagesqualitaet', 'nutrition_day_status', 'user_id', ['log_date']],
 ];
 
 async function loadAllRows(table, userColumn, orderColumns, userId, signal, pageSize = EXPORT_PAGE_SIZE) {

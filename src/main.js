@@ -411,7 +411,7 @@ function avatarMarkup() {
 // Stand. Die Beschreibung steht bewusst nicht auf der Karte: Tuckii zeigt dort
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
-  ['body', 'KFA-LOG', 'Gewicht, Hautfalten und Trends.', 'body', 'cyan', 'Aktiv'],
+  ['body', 'KÖRPERWERTE', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MEAL-LOG', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Food-Dex', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'TRAINING-DEX', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
@@ -1196,7 +1196,7 @@ async function renderRoute() {
     bodyWrap?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
-    mountCategoryChrome(view, route, 'KFA-LOG', {
+    mountCategoryChrome(view, route, 'KÖRPERWERTE', {
       pageLookScope: route, pageLookPattern: 'triangles',
       onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
     });

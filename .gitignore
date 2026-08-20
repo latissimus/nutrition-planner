@@ -4,3 +4,4 @@ dist/
 backups/
 Meditate Music/.originals/
 .DS_Store
+supabase/.temp/

@@ -58,6 +58,7 @@ function coinEarningOverview() {
       ${group('Mobility', '🤸', [['5–10 min', 6], ['15–20 min', 10]])}
       ${group('Spaziergang', '🚶', [['15 min', 8], ['30 min', 12], ['45 min', 16], ['60 min', 20]])}
       ${group('Schlaf', '🌙', [['Morgen-Check-in', 3]])}
+      ${group('Körperwerte', '📈', [['Neue Messung', 1]])}
       <div class="coin-verdienst-frei"><span>✨</span><p><b>Freie Routine</b><small>Beim Anlegen selbst zwischen 0 und 50 Coins festlegen. Standard: 5 Coins.</small></p></div>
     </div>
   </details>`;
@@ -127,6 +128,7 @@ function historyText(item) {
   if (item.event_type === 'reward_redeem') return item.note || 'Belohnung eingelöst';
   if (item.event_type === 'adjustment') return item.note || 'Anpassung';
   if (item.event_type === 'sleep_checkin') return item.note || 'Morgen-Check-in';
+  if (item.event_type === 'body_log') return item.note || 'Körperwert protokolliert';
   return item.note || 'Routine erledigt';
 }
 

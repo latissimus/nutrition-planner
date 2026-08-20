@@ -1,269 +1,138 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { curveSvg } from './curve.js';
-import { FALTEN, datumKurz, heute, schnitt7, summe, zahl } from './measurements.js';
-import { notifyHomeCountsChanged } from './realtime.js';
+import { FALTEN, datumKurz, heute, summe, zahl } from './measurements.js';
+import { BODY_EXPLANATIONS, aggregateSkinfoldReadings, confirmedTrendChange, evaluateBodyComp, goalWeightInterpretation, weightTrendSummary } from './bodyComposition.js';
+import { parseLogmanExport, performanceTrend } from './logmanImport.js';
+import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
 
-async function loadSkinfolds(userId, limit = 60, signal) {
-  let query = supabase
-    .from('skinfolds')
-    .select('gemessen_am, falten')
-    .eq('user_id', userId)
-    .order('gemessen_am', { ascending: true })
-    .limit(limit);
-  if (signal) query = query.abortSignal(signal);
-  const { data, error } = await query;
-  if (error) throw error;
-  return (data ?? []).map((row) => ({ datum: row.gemessen_am, falten: row.falten, summe: summe(row.falten) }));
-}
-
-async function saveSkinfolds(userId, folds, date = heute()) {
-  const { error } = await supabase
-    .from('skinfolds')
-    .upsert({ user_id: userId, gemessen_am: date, falten: folds }, { onConflict: 'user_id,gemessen_am' });
-  if (error) throw error;
-  notifyHomeCountsChanged();
-}
-
-async function loadWeights(userId, limit = 180, signal) {
-  let query = supabase
-    .from('weights')
-    .select('gemessen_am, kg')
-    .eq('user_id', userId)
-    .order('gemessen_am', { ascending: true })
-    .limit(limit);
-  if (signal) query = query.abortSignal(signal);
-  const { data, error } = await query;
-  if (error) throw error;
-  return (data ?? []).map((row) => ({ datum: row.gemessen_am, kg: Number(row.kg) }));
-}
-
-async function saveWeight(userId, kg, date = heute()) {
-  const { error } = await supabase
-    .from('weights')
-    .upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' });
-  if (error) throw error;
-  notifyHomeCountsChanged();
-}
-
-async function deleteMeasurements(userId) {
-  const skinfolds = await supabase.from('skinfolds').delete().eq('user_id', userId);
-  if (skinfolds.error) throw skinfolds.error;
-  const weights = await supabase.from('weights').delete().eq('user_id', userId);
-  if (weights.error) throw weights.error;
-  notifyHomeCountsChanged();
-}
-
-const delta = (newValue, oldValue, unit, lowerIsBetter = true) => {
-  if (oldValue == null || newValue == null) return '';
-  const diff = Math.round((newValue - oldValue) * 10) / 10;
-  if (diff === 0) return '<span class="delta d-hold">= gehalten</span>';
-  const good = lowerIsBetter ? diff < 0 : diff > 0;
-  return `<span class="delta ${good ? 'd-up' : 'd-down'}">${diff < 0 ? '▼' : '▲'} ${Math.abs(diff).toString().replace('.', ',')} ${unit}</span>`;
+const FALTEN_HILFE = {
+  kinn: 'Mittig unter dem Kinn eine senkrechte Falte greifen.', wange: 'Seitlich an der Wange immer dieselbe Position verwenden.',
+  brust: 'Schräge Falte zwischen vorderer Achselfalte und Brustwarze.', ruecken: 'Schräge Falte direkt unterhalb des Schulterblatts.',
+  rippe: 'Senkrechte Falte seitlich am Oberkörper auf gleicher Höhe.', huefte: 'Schräge Falte unmittelbar oberhalb des Beckenkamms.',
+  bauch: 'Senkrechte Falte wenige Zentimeter neben dem Bauchnabel.', trizeps: 'Senkrechte Falte mittig an der Rückseite des Oberarms.',
+  bizeps: 'Senkrechte Falte mittig an der Vorderseite des Oberarms.', wade: 'Senkrechte Falte an der Innenseite der Wade auf größtem Umfang.',
+  quadrizeps: 'Senkrechte Falte mittig an der Vorderseite des Oberschenkels.', beinbizeps: 'Senkrechte Falte mittig an der Rückseite des Oberschenkels.',
 };
+const escapeHtml = (value = '') => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+const display = (value, digits = 1) => Number(value || 0).toLocaleString('de-DE', { maximumFractionDigits: digits });
+const day = (value) => Math.floor(new Date(`${value}T12:00:00`).getTime() / 86_400_000);
 
-function pageHeader() {
-  return `
-    <div class="seitenkopf">
-      <div class="seitenkopf-text">
-        <span class="seitenkopf-kicker">Körperwerte</span>
-        <h1 class="section-title">Messwerte</h1>
-      </div>
-      <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
-    </div>
-    <section class="seiten-einstieg">
-      <b>Trend statt Tagesrauschen</b>
-      <span>Gewicht, 7-Tage-Schnitt und zwölf Hautfalten im Verlauf.</span>
-    </section>`;
+async function queryState(userId, signal) {
+  const abort = (query) => signal ? query.abortSignal(signal) : query;
+  const results = await Promise.all([
+    abort(supabase.from('skinfolds').select('*').eq('user_id', userId).order('gemessen_am').limit(60)),
+    abort(supabase.from('weights').select('*').eq('user_id', userId).order('gemessen_am').limit(180)),
+    abort(supabase.from('waist_measurements').select('*').eq('user_id', userId).order('gemessen_am').limit(60)),
+    abort(supabase.from('external_body_fat_measurements').select('*').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(20)),
+    abort(supabase.from('logman_performance').select('*').eq('user_id', userId).order('performed_on').limit(500)),
+    abort(supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(60)),
+    abort(supabase.from('bodycomp_checkins').select('*').eq('user_id', userId).order('checkin_date').limit(60)),
+    abort(supabase.from('nutrition_settings').select('goal,bodycomp_thresholds').eq('user_id', userId).maybeSingle()),
+  ]);
+  const error = results.find((result) => result.error)?.error;
+  if (error) throw error;
+  return {
+    skinfolds: (results[0].data || []).map((row) => ({ ...row, total: summe(row.falten) })),
+    weights: (results[1].data || []).map((row) => ({ ...row, date: row.gemessen_am, kg: Number(row.kg) })),
+    waists: results[2].data || [], externalBodyFat: results[3].data || [], performance: results[4].data || [],
+    sleep: results[5].data || [], checkins: results[6].data || [], settings: results[7].data || {},
+  };
 }
 
-export function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal }) {
-  const userId = session.user.id;
-  container.innerHTML = `
-    <div class="wrap pad-bottom">
-      ${pageHeader()}
-      <section class="card" data-skinfold-card>
-        <h2 class="section-title mini-title">Hautfalten</h2>
-        <div class="mess-kopf" data-skinfold-head>laedt...</div>
-        <div data-skinfold-curve></div>
-        <details class="mess-neu" open>
-          <summary>Neue Messung</summary>
-          <div data-skinfold-form></div>
-        </details>
-        <details class="mess-neu">
-          <summary>Erinnerung</summary>
-          <div data-skinfold-settings></div>
-        </details>
-      </section>
-      <section class="card" data-weight-card>
-        <h2 class="section-title mini-title">Gewicht</h2>
-        <div class="mess-kopf" data-weight-head>laedt...</div>
-        <div data-weight-curve></div>
-        <div data-weight-form></div>
-      </section>
-      <button class="phase-reset" type="button" data-delete-measurements>Messdaten zurücksetzen</button>
-    </div>`;
+function recoveryTrend(sleep, checkins) {
+  const values = [...sleep.map((row) => (Number(row.quality) + Number(row.energy)) / 2), ...checkins.map((row) => Number(row.recovery)).filter(Boolean)];
+  if (values.length < 6) return null;
+  const split = Math.floor(values.length / 2); const mean = (list) => list.reduce((sumValue, value) => sumValue + value, 0) / list.length;
+  const difference = mean(values.slice(split)) - mean(values.slice(0, split));
+  return difference > 0.3 ? 1 : difference < -0.3 ? -1 : 0;
+}
 
-  const skinfoldCard = container.querySelector('[data-skinfold-card]');
-  const weightCard = container.querySelector('[data-weight-card]');
-  const skinfoldForm = skinfoldCard.querySelector('[data-skinfold-form]');
-  const weightForm = weightCard.querySelector('[data-weight-form]');
+function infoDetails(title, text) { return `<details class="body-info"><summary>${title}<span aria-hidden="true">?</span></summary><p>${text}</p></details>`; }
 
-  async function renderSkinfolds() {
-    try {
-      const rows = await loadSkinfolds(userId, 60, signal);
-      if (signal?.aborted) return;
-      const valid = rows.filter((row) => row.summe != null);
-      const last = valid[valid.length - 1];
-      const previous = valid[valid.length - 2];
-      skinfoldCard.querySelector('[data-skinfold-head]').innerHTML = last
-        ? `<span class="mess-label">Summe</span>
-           <div class="mess-wert">${last.summe.toString().replace('.', ',')} <span>mm</span>${delta(last.summe, previous?.summe, 'mm')}</div>
-           <div class="mess-datum">gemessen am ${datumKurz(last.datum)}</div>`
-        : '<div class="mess-leer">Noch keine Hautfalten-Messung.</div>';
-      skinfoldCard.querySelector('[data-skinfold-curve]').innerHTML = curveSvg([
-        { values: valid.map((row) => ({ datum: row.datum, wert: row.summe })), className: 'trend', points: true },
-      ], { unit: 'mm' });
-    } catch (error) {
-      skinfoldCard.querySelector('[data-skinfold-head]').innerHTML = `<div class="msg err">${error.message}</div>`;
-    }
-  }
+function weightMarkup(state) {
+  const trend = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined); const latest = state.weights.at(-1);
+  const interpretation = goalWeightInterpretation(trend, state.settings.goal || 'maintain');
+  return `<section class="card body-evidence-card" data-weight-card><div class="body-card-stripe"></div><h2 class="section-title mini-title">Gewichtstrend</h2>
+    ${latest ? `<div class="body-metric-grid"><span><small>HEUTE</small><b>${display(latest.kg)} kg</b></span><span><small>7-TAGE-SCHNITT</small><b>${display(trend.average7Kg)} kg</b></span><span><small>PRO WOCHE</small><b>${trend.weeklyKg > 0 ? '+' : ''}${display(trend.weeklyKg, 2)} kg · ${trend.weeklyPercent > 0 ? '+' : ''}${display(trend.weeklyPercent, 2)} %</b></span><span><small>28-TAGE-TREND</small><b>${trend.trend28Kg > 0 ? '+' : ''}${display(trend.trend28Kg, 2)} kg</b></span></div><p class="body-confidence">Vertrauensstufe: <b>${trend.confidence}</b> · ${display(trend.measurementsPerWeek)} Wiegungen pro Woche</p>` : '<p>Noch kein Gewicht eingetragen.</p>'}
+    <p class="body-goal-status" data-tone="${interpretation.tone}"><b>${interpretation.label}</b><span>${interpretation.text}</span></p>
+    <div>${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh' }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}</div>
+    ${infoDetails('Warum bewertet MUSCLEDEX den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
+    ${infoDetails('Wie oft wiegen?', BODY_EXPLANATIONS.weighingFrequency)}
+    <form class="gew-eingabe" data-weight-form><label class="falte gew-feld"><span>Datum</span><span class="input gew-datum-eingabe"><input type="date" value="${heute()}" data-weight-date></span></label><label class="falte gew-feld"><span>Gewicht</span><span class="gew-wert-eingabe"><input class="input gew-in" type="text" inputmode="decimal" placeholder="84,2" data-weight-value><i>kg</i></span></label><button class="btn btn-primary" type="submit">Speichern</button></form></section>`;
+}
 
-  skinfoldForm.innerHTML = `
-    <label class="fld-l" for="skinfold-date">Datum</label>
-    <input class="input" id="skinfold-date" type="date" value="${heute()}">
-    <div class="falten-grid">
-      ${FALTEN.map(([key, label]) => `<label class="falte"><span>${label}</span>
-        <input class="input falte-in" data-fold="${key}" type="text" inputmode="decimal" placeholder="-"></label>`).join('')}
-    </div>
-    <div class="falten-summe" data-skinfold-sum>Summe <b>-</b></div>
-    <button class="btn btn-primary btn-block" type="button" data-save-skinfolds>Messung speichern</button>`;
+function skinfoldMarkup(state) {
+  const valid = state.skinfolds.filter((row) => row.total != null); const latest = valid.at(-1); const previous = valid.at(-2);
+  const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
+  const gapDays = latest && previous ? day(latest.gemessen_am) - day(previous.gemessen_am) : null;
+  const comparable = latest && previous && latest.standardisiert && previous.standardisiert;
+  return `<section class="card body-evidence-card" data-skinfold-card><div class="body-card-stripe"></div><h2 class="section-title mini-title">12-Falten-Summe in mm – keine KFA-Schätzung</h2>
+    ${latest ? `<div class="mess-kopf"><span class="mess-label">Letzte Summe</span><div class="mess-wert">${display(latest.total)} <span>mm</span></div><div class="mess-datum">${datumKurz(latest.gemessen_am)} · Messqualität ${latest.messqualitaet || 'nicht dokumentiert'}${gapDays != null ? ` · ${gapDays} Tage seit der vorherigen Messung` : ''}</div></div><p class="body-confidence">Vollständigkeit: <b>${Object.keys(latest.falten || {}).length} von 12 Stellen</b> · Vergleichbarkeit: <b>${comparable ? 'standardisiert' : previous ? 'eingeschränkt' : 'noch kein Vergleich'}</b></p>` : '<p>Noch keine Hautfaltenmessung.</p>'}
+    ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
+    <div>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
+    ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
+    <details class="mess-neu"><summary>Geführte Messung</summary><form data-skinfold-form><p class="body-guide">Alle zwei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p><label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label><label class="body-standard"><input type="checkbox" data-skinfold-standard><span>Standardisierte Bedingungen eingehalten</span></label><div class="guided-fold-grid">${FALTEN.map(([key, label]) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" placeholder="1" data-fold="${key}" data-reading="0"><input class="input" type="text" inputmode="decimal" placeholder="2" data-fold="${key}" data-reading="1"><input class="input" type="text" inputmode="decimal" placeholder="3 bei Abweichung" data-fold="${key}" data-reading="2"></div></fieldset>`).join('')}</div><div class="falten-summe" data-skinfold-quality>Je Stelle zunächst zwei Messungen eintragen.</div><button class="btn btn-primary btn-block" type="submit" disabled>Messung speichern</button></form></details></section>`;
+}
 
-  const fields = [...skinfoldForm.querySelectorAll('.falte-in')];
-  const updateSum = () => {
-    const folds = {};
-    fields.forEach((field) => { folds[field.dataset.fold] = field.value; });
-    const total = summe(folds);
-    const missing = fields.filter((field) => zahl(field.value) === null).length;
-    skinfoldForm.querySelector('[data-skinfold-sum]').innerHTML = total != null
-      ? `Summe <b>${total.toString().replace('.', ',')} mm</b>`
-      : `Summe <b>-</b> <span class="mess-fehlt">noch ${missing} von 12</span>`;
-    skinfoldForm.querySelector('[data-save-skinfolds]').disabled = total == null;
-    return total;
+function waistMarkup(state) {
+  const latest = state.waists.at(-1);
+  return `<section class="card body-evidence-card" data-waist-card><div class="body-card-stripe"></div><h2 class="section-title mini-title">Taillenumfang</h2>${latest ? `<div class="mess-kopf"><span class="mess-label">Zuletzt</span><div class="mess-wert">${display(latest.cm)} <span>cm</span></div><div class="mess-datum">${datumKurz(latest.gemessen_am)}</div></div>` : '<p>Noch kein Taillenumfang eingetragen.</p>'}<div>${curveSvg([{ values: state.waists.map((row) => ({ datum: row.gemessen_am, wert: Number(row.cm) })), className: 'trend', points: true }], { unit: 'cm' })}</div>${infoDetails('Richtig messen', `${BODY_EXPLANATIONS.waist} Miss immer an derselben Position, stehend und nach entspannter Ausatmung.`)}<form class="body-inline-form" data-waist-form><input class="input" type="date" value="${heute()}" data-waist-date><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="90,0" data-waist-value><i>cm</i></span><label><input type="checkbox" data-waist-standard><span>standardisiert</span></label><button class="btn btn-primary" type="submit">Speichern</button></form></section>`;
+}
+
+function bodyCompMarkup(state) {
+  const weight = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined);
+  const skinfoldDelta = confirmedTrendChange(state.skinfolds, (row) => row.total, 2);
+  const waistDelta = confirmedTrendChange(state.waists, (row) => Number(row.cm), 0.5); const performance = performanceTrend(state.performance); const recovery = recoveryTrend(state.sleep, state.checkins);
+  const allDates = [...state.weights.map((row) => row.gemessen_am), ...state.skinfolds.map((row) => row.gemessen_am), ...state.waists.map((row) => row.gemessen_am)].sort();
+  const weeks = allDates.length > 1 ? (day(allDates.at(-1)) - day(allDates[0])) / 7 : 0;
+  const result = evaluateBodyComp({ weight, skinfoldDelta, waistDelta, performanceTrend: performance.direction, recoveryTrend: recovery, weeks });
+  const thresholds = { stableLoss: -0.15, slowLoss: -0.5, stableGain: 0.15, slowGain: 0.3, ...(state.settings.bodycomp_thresholds || {}) };
+  const confidenceText = result.confidence === 'hoch'
+    ? 'Es liegen ein dichter Gewichtstrend und mehrere ergänzende, vergleichbare Datenquellen vor.'
+    : result.confidence === 'mittel'
+      ? 'Der Gewichtstrend ist brauchbar, aber mindestens eine ergänzende Datenquelle fehlt noch oder ist noch nicht bestätigt.'
+      : 'Zeitraum, Messhäufigkeit oder ergänzende Vergleichsdaten reichen noch nicht für eine belastbare Einordnung.';
+  return `<section class="card bodycomp-status"><div class="body-card-stripe"></div><span class="seitenkopf-kicker">Kombinierte Auswertung</span><h2>${state.settings.goal === 'bodycomp' ? 'BodyComp' : 'Körperzusammensetzung'}</h2><p class="bodycomp-message">${escapeHtml(result.message)}</p>${result.suggestion ? `<p>${escapeHtml(result.suggestion)}</p>` : ''}<div class="bodycomp-sources"><span>Gewicht <b>${weight.category || 'unklar'}</b></span><span>Faltensumme <b>${skinfoldDelta == null ? 'noch nicht bestätigt' : `${skinfoldDelta > 0 ? '+' : ''}${display(skinfoldDelta)} mm`}</b></span><span>Taille <b>${waistDelta == null ? 'noch nicht bestätigt' : `${waistDelta > 0 ? '+' : ''}${display(waistDelta)} cm`}</b></span><span>LOGMAN-Leistung <b>${performance.direction == null ? 'Import fehlt' : `${performance.percent > 0 ? '+' : ''}${display(performance.percent)} %`}</b></span><span>Schlaf & Erholung <b>${recovery == null ? 'noch unklar' : recovery > 0 ? 'verbessert' : recovery < 0 ? 'verschlechtert' : 'stabil'}</b></span></div>${infoDetails(`Vertrauensstufe: ${result.confidence}`, confidenceText)}<details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details><details class="mess-neu"><summary>Orientierungsbereiche anpassen</summary><form class="body-threshold-form" data-bodycomp-thresholds><p>Die Grenzen sind Orientierung und keine biologische Exaktheit.</p><label><span>Stabil ab Verlust</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Langsame Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details><details class="mess-neu"><summary>Erholung protokollieren</summary><form class="body-checkin-form" data-bodycomp-checkin><input class="input" type="date" value="${heute()}" data-checkin-date>${[['recovery','Erholung'],['mood','Stimmung'],['hunger','Hunger']].map(([key, label]) => `<label><span>${label}</span><select class="input" data-checkin-${key}>${[1,2,3,4,5].map((value) => `<option value="${value}">${value} von 5</option>`).join('')}</select></label>`).join('')}<div><label><input type="checkbox" data-checkin-illness> Krankheit</label><label><input type="checkbox" data-checkin-travel> Reise</label><label><input type="checkbox" data-checkin-unusual> außergewöhnliche Mahlzeiten</label></div><button class="btn btn-primary" type="submit">Check-in speichern</button></form></details></section>`;
+}
+
+function logmanMarkup(state) {
+  const trend = performanceTrend(state.performance);
+  return `<section class="card body-evidence-card"><div class="body-card-stripe"></div><h2 class="section-title mini-title">Trainingsleistung aus LOGMAN</h2><p>${state.performance.length ? `${state.performance.length} vergleichbare HEAVYS-/MIDDLES-Werte · Trend ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch keine LOGMAN-Leistungsdaten importiert.'}</p>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Importiert werden verwendetes Gewicht, Wiederholungen, geschätzte Maximalkraft, Volumen und die Anzahl vergleichbarer HEAVYS-/MIDDLES-Einheiten.`)}<label class="body-file-input"><span>LOGMAN-JSON-Export auswählen</span><input type="file" accept="application/json,.json" data-logman-import></label><p data-logman-status></p></section>`;
+}
+
+function externalBodyFatMarkup(state) {
+  return `<details class="card body-evidence-card external-kfa"><summary>Optionaler externer Körperfett-Messwert</summary><p>Nur dokumentarisch – dieser Wert beeinflusst weder Kalorienziel noch Hautfaltenauswertung.</p><form class="body-inline-form" data-external-kfa-form><input class="input" type="date" value="${heute()}" data-external-date><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="15" data-external-percent><i>%</i></span><input class="input" placeholder="Methode, z. B. DEXA" data-external-method><input class="input" placeholder="Quelle" data-external-source><button class="btn btn-primary" type="submit">Dokumentieren</button></form>${state.externalBodyFat.map((row) => `<p><b>${display(row.percent)} % · ${escapeHtml(row.methode)}</b><br><small>${datumKurz(row.gemessen_am)} · ${escapeHtml(row.quelle || 'Quelle nicht angegeben')} · ${escapeHtml(row.unsicherheit)}</small></p>`).join('')}</details>`;
+}
+
+export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal }) {
+  const userId = session.user.id; let state;
+  const render = async () => {
+    state = await queryState(userId, signal); if (signal?.aborted) return;
+    container.innerHTML = `<div class="wrap pad-bottom body-metrics-wrap"><section class="seiten-einstieg"><b>Trend statt Tagesrauschen</b><span>Gewicht, 12-Falten-Summe, Taille, Leistung und Erholung werden gemeinsam und ohne falsche Präzision betrachtet.</span></section>${bodyCompMarkup(state)}${weightMarkup(state)}${skinfoldMarkup(state)}${waistMarkup(state)}${logmanMarkup(state)}${externalBodyFatMarkup(state)}<details class="card mess-neu"><summary>Erinnerung für Hautfaltenmessung</summary><div data-skinfold-settings></div></details><button class="phase-reset" type="button" data-delete-measurements>Messdaten zurücksetzen</button></div>`;
+    bind();
   };
-  fields.forEach((field) => { field.oninput = updateSum; });
-  updateSum();
-
-  skinfoldForm.querySelector('[data-save-skinfolds]').onclick = async (event) => {
-    const folds = {};
-    fields.forEach((field) => { folds[field.dataset.fold] = zahl(field.value); });
-    if (summe(folds) == null) return;
-    event.currentTarget.disabled = true;
-    try {
-      await saveSkinfolds(userId, folds, skinfoldForm.querySelector('#skinfold-date').value || heute());
-      fields.forEach((field) => { field.value = ''; });
-      updateSum();
-      await renderSkinfolds();
-      toast('Messung gespeichert');
-    } catch (error) {
-      toast('Speichern fehlgeschlagen');
-    }
-    updateSum();
+  const bind = () => {
+    const weightForm = container.querySelector('[data-weight-form]');
+    weightForm.onsubmit = async (event) => { event.preventDefault(); const kg = zahl(weightForm.querySelector('[data-weight-value]').value); const date = weightForm.querySelector('[data-weight-date]').value; if (!kg || kg <= 0 || kg >= 500) return toast('Bitte ein gültiges Gewicht eintragen'); const isNew = !state.weights.some((row) => row.gemessen_am === date); const { error } = await supabase.from('weights').upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' }); if (error) return toast('Gewicht konnte nicht gespeichert werden'); notifyHomeCountsChanged(); if (isNew) notifyCoinBalanceChanged(); toast(isNew ? 'Gewicht gespeichert · +1 MUSCLE-COIN' : 'Gewicht aktualisiert'); await render(); };
+    const skinfoldForm = container.querySelector('[data-skinfold-form]');
+    const updateSkinfold = () => { const readings = {}; skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { readings[input.dataset.fold] ||= []; readings[input.dataset.fold][Number(input.dataset.reading)] = input.value; }); const result = aggregateSkinfoldReadings(readings); const total = summe(result.values); const message = result.thirdNeeded ? `${result.thirdNeeded} Stelle(n) weichen deutlich ab – dort eine dritte Messung ergänzen.` : `${result.complete} von 12 Stellen vollständig · Messqualität ${result.quality}`; skinfoldForm.querySelector('[data-skinfold-quality]').innerHTML = `${escapeHtml(message)}${total != null ? ` · <b>${display(total)} mm</b>` : ''}`; skinfoldForm.querySelector('button[type="submit"]').disabled = result.complete !== 12 || result.thirdNeeded > 0; return { result, readings }; };
+    skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
+    skinfoldForm.onsubmit = async (event) => { event.preventDefault(); const { result, readings } = updateSkinfold(); if (result.complete !== 12) return; const date = skinfoldForm.querySelector('[data-skinfold-date]').value; const isNew = !state.skinfolds.some((row) => row.gemessen_am === date); const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked; const quality = standardisiert && result.quality === 'hoch' ? 'hoch' : result.quality === 'hoch' ? 'mittel' : result.quality; const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: result.values, messreihen: readings, messqualitaet: quality, standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' }); if (error) return toast('Messung konnte nicht gespeichert werden'); notifyHomeCountsChanged(); if (isNew) notifyCoinBalanceChanged(); toast(isNew ? '12-Falten-Summe gespeichert · +1 MUSCLE-COIN' : '12-Falten-Summe aktualisiert'); await render(); };
+    const waistForm = container.querySelector('[data-waist-form]');
+    waistForm.onsubmit = async (event) => { event.preventDefault(); const cm = zahl(waistForm.querySelector('[data-waist-value]').value); const date = waistForm.querySelector('[data-waist-date]').value; if (!cm || cm < 30 || cm > 250) return toast('Bitte einen gültigen Taillenumfang eintragen'); const isNew = !state.waists.some((row) => row.gemessen_am === date); const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' }); if (error) return toast('Taillenumfang konnte nicht gespeichert werden'); if (isNew) notifyCoinBalanceChanged(); toast(isNew ? 'Taillenumfang gespeichert · +1 MUSCLE-COIN' : 'Taillenumfang aktualisiert'); await render(); };
+    container.querySelector('[data-bodycomp-checkin]').onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const { error } = await supabase.from('bodycomp_checkins').upsert({ user_id: userId, checkin_date: form.querySelector('[data-checkin-date]').value, recovery: Number(form.querySelector('[data-checkin-recovery]').value), mood: Number(form.querySelector('[data-checkin-mood]').value), hunger: Number(form.querySelector('[data-checkin-hunger]').value), illness: form.querySelector('[data-checkin-illness]').checked, travel: form.querySelector('[data-checkin-travel]').checked, unusual_meals: form.querySelector('[data-checkin-unusual]').checked }, { onConflict: 'user_id,checkin_date' }); if (error) return toast('Check-in konnte nicht gespeichert werden'); toast('Erholung protokolliert'); await render(); };
+    container.querySelector('[data-bodycomp-thresholds]').onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const stableLoss = zahl(form.querySelector('[data-threshold-stable-loss]').value); const slowLoss = zahl(form.querySelector('[data-threshold-slow-loss]').value); const stableGain = zahl(form.querySelector('[data-threshold-stable-gain]').value); const slowGain = zahl(form.querySelector('[data-threshold-slow-gain]').value); if (!(stableLoss > 0 && slowLoss > stableLoss && stableGain > 0 && slowGain > stableGain)) return toast('Bitte aufsteigende, positive Prozentgrenzen eintragen'); const bodycomp_thresholds = { stableLoss: -stableLoss, slowLoss: -slowLoss, stableGain, slowGain }; const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, bodycomp_thresholds }, { onConflict: 'user_id' }); if (error) return toast('Orientierungsbereiche konnten nicht gespeichert werden'); toast('Orientierungsbereiche gespeichert'); await render(); };
+    container.querySelector('[data-logman-import]').onchange = async (event) => { const status = container.querySelector('[data-logman-status]'); const file = event.target.files?.[0]; if (!file) return; try { const parsed = JSON.parse(await file.text()); const rows = parseLogmanExport(parsed).map((row) => ({ ...row, user_id: userId })); if (!rows.length) throw new Error('Keine vergleichbaren HEAVYS-/MIDDLES-Werte gefunden.'); const { error } = await supabase.from('logman_performance').upsert(rows, { onConflict: 'user_id,performed_on,exercise,category' }); if (error) throw error; status.textContent = `${rows.length} Leistungswerte importiert.`; toast('LOGMAN-Leistung importiert'); await render(); } catch (error) { status.textContent = error.message || 'Import fehlgeschlagen.'; } };
+    const externalForm = container.querySelector('[data-external-kfa-form]');
+    externalForm.onsubmit = async (event) => { event.preventDefault(); const percent = zahl(externalForm.querySelector('[data-external-percent]').value); const methode = externalForm.querySelector('[data-external-method]').value.trim(); if (!percent || !methode) return toast('Messwert und Methode eintragen'); const { error } = await supabase.from('external_body_fat_measurements').insert({ user_id: userId, gemessen_am: externalForm.querySelector('[data-external-date]').value, percent, methode, quelle: externalForm.querySelector('[data-external-source]').value.trim() }); if (error) return toast('Externer Messwert konnte nicht gespeichert werden'); toast('Externer Messwert dokumentiert'); await render(); };
+    const settings = container.querySelector('[data-skinfold-settings]');
+    settings.innerHTML = `<div class="mess-einst"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;
+    settings.querySelectorAll('input,select').forEach((field) => { field.onchange = async () => { const values = { falten_erinnerung: settings.querySelector('[data-reminder-active]').checked, falten_intervall_wochen: Number(settings.querySelector('[data-reminder-weeks]').value), falten_uhrzeit: settings.querySelector('[data-reminder-time]').value, zeitzone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin' }; const { error } = await supabase.from('profiles').update(values).eq('id', userId); if (error) return toast('Einstellung nicht gespeichert'); Object.assign(profile, values); onProfileUpdated?.(profile); toast('Erinnerung gespeichert'); }; });
+    container.querySelector('[data-delete-measurements]').onclick = async () => { if (!confirm('Alle Gewichts-, Hautfalten- und Taillenmessungen löschen?')) return; const results = await Promise.all(['skinfolds','weights','waist_measurements'].map((table) => supabase.from(table).delete().eq('user_id', userId))); if (results.some((result) => result.error)) return toast('Messdaten konnten nicht vollständig gelöscht werden'); notifyHomeCountsChanged(); toast('Messdaten zurückgesetzt'); await render(); };
   };
-
-  const settings = skinfoldCard.querySelector('[data-skinfold-settings]');
-  settings.innerHTML = `<div class="mess-einst">
-    <label class="switchline mess-erinnerung-switch" aria-label="Erinnerung aktiv">
-      <input type="checkbox" id="skinfold-reminder" ${profile.falten_erinnerung ? 'checked' : ''}>
-      <i class="switchline-track" aria-hidden="true"></i>
-    </label>
-    <label class="mess-zeile"><span>alle</span>
-      <select class="input compact-input" id="skinfold-interval">
-        ${[1, 2, 3, 4].map((weeks) => `<option value="${weeks}" ${profile.falten_intervall_wochen === weeks ? 'selected' : ''}>${weeks} Woche${weeks > 1 ? 'n' : ''}</option>`).join('')}
-      </select></label>
-    <label class="mess-zeile"><span>um</span>
-      <input class="input compact-input" id="skinfold-time" type="time" value="${(profile.falten_uhrzeit || '08:00').slice(0, 5)}"></label>
-  </div>`;
-
-  const saveSettings = async () => {
-    const values = {
-      falten_erinnerung: settings.querySelector('#skinfold-reminder').checked,
-      falten_intervall_wochen: Number(settings.querySelector('#skinfold-interval').value),
-      falten_uhrzeit: settings.querySelector('#skinfold-time').value || '08:00',
-      zeitzone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin',
-    };
-    const { error } = await supabase.from('profiles').update(values).eq('id', userId);
-    if (error) return toast('Einstellung nicht gespeichert');
-    Object.assign(profile, values);
-    onProfileUpdated?.(profile);
-    toast('Erinnerung gespeichert');
-  };
-  settings.querySelectorAll('input, select').forEach((field) => { field.onchange = saveSettings; });
-
-  weightForm.innerHTML = `<div class="gew-eingabe">
-    <label class="falte gew-feld"><span>Datum</span>
-      <span class="input gew-datum-eingabe"><input id="weight-date" type="date" value="${heute()}" aria-label="Datum"></span>
-    </label>
-    <label class="falte gew-feld"><span>Gewicht</span>
-      <span class="gew-wert-eingabe"><input class="input gew-in" id="weight-value" type="text" inputmode="decimal" placeholder="84,2"><i>kg</i></span>
-    </label>
-    <button class="btn btn-primary" type="button" data-save-weight>Speichern</button>
-  </div>`;
-
-  async function renderWeights() {
-    try {
-      const rows = await loadWeights(userId, 180, signal);
-      if (signal?.aborted) return;
-      const trend = schnitt7(rows);
-      const lastTrend = trend[trend.length - 1];
-      const dayNumber = (iso) => Math.floor(new Date(`${iso}T12:00:00`).getTime() / 86400000);
-      const weekBefore = trend.find((point) => lastTrend && dayNumber(lastTrend.datum) - dayNumber(point.datum) <= 7);
-      weightCard.querySelector('[data-weight-head]').innerHTML = lastTrend
-        ? `<span class="mess-label">7-Tage-Schnitt</span>
-           <div class="mess-wert">${lastTrend.kg.toFixed(1).replace('.', ',')} <span>kg</span>${delta(lastTrend.kg, weekBefore && weekBefore !== lastTrend ? weekBefore.kg : null, 'kg')}</div>
-           <div class="mess-datum">zuletzt gewogen ${datumKurz(rows[rows.length - 1].datum)}</div>`
-        : '<div class="mess-leer">Noch kein Gewicht eingetragen.</div>';
-      weightCard.querySelector('[data-weight-curve]').innerHTML = curveSvg([
-        { values: rows.map((row) => ({ datum: row.datum, wert: row.kg })), className: 'roh' },
-        { values: trend.map((row) => ({ datum: row.datum, wert: row.kg })), className: 'trend' },
-      ], { unit: 'kg' });
-      const today = rows.find((row) => row.datum === heute());
-      if (today) weightForm.querySelector('#weight-value').value = today.kg.toFixed(1).replace('.', ',');
-    } catch (error) {
-      weightCard.querySelector('[data-weight-head]').innerHTML = `<div class="msg err">${error.message}</div>`;
-    }
-  }
-
-  weightForm.querySelector('[data-save-weight]').onclick = async (event) => {
-    const kg = zahl(weightForm.querySelector('#weight-value').value);
-    if (kg == null || kg <= 0 || kg >= 500) return toast('Bitte ein Gewicht in kg eintragen');
-    const button = event.currentTarget;
-    button.disabled = true;
-    try {
-      await saveWeight(userId, kg, weightForm.querySelector('#weight-date').value || heute());
-      await renderWeights();
-      toast('Gewicht gespeichert');
-    } catch (error) {
-      toast('Speichern fehlgeschlagen');
-    }
-    if (button.isConnected) button.disabled = false;
-  };
-
-  container.querySelector('[data-delete-measurements]').onclick = async (event) => {
-    if (!confirm('Alle Hautfalten- und Gewichts-Messungen loeschen?')) return;
-    const button = event.currentTarget;
-    button.disabled = true;
-    try {
-      await deleteMeasurements(userId);
-      weightForm.querySelector('#weight-value').value = '';
-      await renderSkinfolds();
-      await renderWeights();
-      toast('Messdaten zurueckgesetzt');
-    } catch (error) {
-      toast('Zuruecksetzen fehlgeschlagen');
-    }
-    if (button.isConnected) button.disabled = false;
-  };
-
-  return Promise.all([renderSkinfolds(), renderWeights()]);
+  container.innerHTML = '<div class="wrap"><section class="card"><p>Körperwerte werden geladen …</p></section></div>';
+  try { await render(); } catch (error) { if (!signal?.aborted) container.innerHTML = `<div class="wrap"><section class="card"><p class="msg err">Körperwerte konnten nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section></div>`; }
+  ['weights', 'skinfolds', 'waist_measurements', 'bodycomp_checkins', 'logman_performance', 'nutrition_settings']
+    .forEach((table) => subscribeToTableChanges({ table, signal, onChange: render }));
 }

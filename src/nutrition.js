@@ -5,6 +5,8 @@ import { subscribeToTableChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
 import { blsSuche, preloadBls } from './blsFoods.js';
+import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp, initialEnergyEstimate, weightTrendSummary } from './bodyComposition.js';
+import { performanceTrend } from './logmanImport.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
@@ -13,6 +15,7 @@ const PERIODS = [
 const GOALS = {
   lose: ['Langsam reduzieren', -300], maintain: ['Gewicht halten', 0],
   gain: ['Muskelaufbau', 200], gain_fast: ['Deutlich zunehmen', 350],
+  bodycomp: ['BodyComp – Muskulatur aufbauen und Fett reduzieren', 0],
 };
 const PAL_LEVELS = [
   [1.4, 'Wenig aktiv · überwiegend sitzend'],
@@ -37,34 +40,7 @@ const rounded = (value) => Math.max(0, Math.round(Number(value) || 0));
 const decimal = (value, digits = 0) => Number(value || 0).toLocaleString('de-DE', { maximumFractionDigits: digits });
 const dateLabel = (key) => key === localDateKey() ? 'Heute' : dateFromKey(key).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
 
-export function calculateEnergyNeed({ calculationBasis, birthDate, heightCm, weightKg, bodyFatPercent, pal, goal }) {
-  const birth = birthDate ? dateFromKey(birthDate) : null;
-  const today = new Date();
-  let exactAge = birth ? today.getFullYear() - birth.getFullYear() : 0;
-  if (birth && (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate()))) exactAge -= 1;
-  const age = exactAge >= 14 && exactAge <= 100 ? exactAge : 0;
-  const weight = number(weightKg);
-  const height = number(heightCm);
-  const bodyFat = number(bodyFatPercent);
-  const activity = number(pal) || 1.6;
-  if (!weight || !height || !age) return null;
-  const useCunningham = bodyFat >= 2 && bodyFat <= 65;
-  const leanMass = useCunningham ? weight * (1 - bodyFat / 100) : null;
-  const resting = useCunningham
-    ? 500 + 22 * leanMass
-    : 10 * weight + 6.25 * height - 5 * age + (calculationBasis === 'female' ? -161 : 5);
-  const maintenance = resting * activity;
-  const adjustment = GOALS[goal]?.[1] || 0;
-  const target = Math.max(1200, maintenance + adjustment);
-  const protein = weight * 1.8;
-  const fat = weight * 0.8;
-  const carbs = Math.max(0, (target - protein * 4 - fat * 9) / 4);
-  return {
-    method: useCunningham ? 'Cunningham' : 'Mifflin–St Jeor', age,
-    resting: rounded(resting), maintenance: rounded(maintenance), target: rounded(target),
-    protein: rounded(protein), carbs: rounded(carbs), fat: rounded(fat),
-  };
-}
+export function calculateEnergyNeed(input) { return initialEnergyEstimate(input); }
 
 function total(entries, field) { return entries.reduce((sum, item) => sum + number(item[field]), 0); }
 
@@ -73,13 +49,29 @@ async function loadNutrition(userId, date, signal) {
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
   let recentQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(40);
   let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false });
-  let weightQuery = supabase.from('weights').select('kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(1).maybeSingle();
+  let weightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: true }).limit(90);
+  let historyQuery = supabase.from('nutrition_log_entries').select('log_date,energy_kcal').eq('user_id', userId)
+    .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
+  let dayStatusQuery = supabase.from('nutrition_day_status').select('*').eq('user_id', userId)
+    .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
+  let skinfoldQuery = supabase.from('skinfolds').select('gemessen_am,falten,standardisiert').eq('user_id', userId).order('gemessen_am').limit(12);
+  let waistQuery = supabase.from('waist_measurements').select('gemessen_am,cm,standardisiert').eq('user_id', userId).order('gemessen_am').limit(12);
+  let performanceQuery = supabase.from('logman_performance').select('performed_on,exercise,category,estimated_1rm').eq('user_id', userId).order('performed_on').limit(300);
+  let sleepQuery = supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(42);
+  let checkinQuery = supabase.from('bodycomp_checkins').select('checkin_date,recovery').eq('user_id', userId).order('checkin_date').limit(42);
   if (signal) {
     settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
     recentQuery = recentQuery.abortSignal(signal); ownQuery = ownQuery.abortSignal(signal); weightQuery = weightQuery.abortSignal(signal);
+    historyQuery = historyQuery.abortSignal(signal); dayStatusQuery = dayStatusQuery.abortSignal(signal);
+    skinfoldQuery = skinfoldQuery.abortSignal(signal); waistQuery = waistQuery.abortSignal(signal);
+    performanceQuery = performanceQuery.abortSignal(signal); sleepQuery = sleepQuery.abortSignal(signal); checkinQuery = checkinQuery.abortSignal(signal);
   }
-  const [settings, entries, recent, own, weight] = await Promise.all([settingsQuery, logQuery, recentQuery, ownQuery, weightQuery]);
-  const error = settings.error || entries.error || recent.error || own.error || weight.error;
+  const [settings, entries, recent, own, weight, history, dayStatus, skinfolds, waists, performance, sleep, checkins] = await Promise.all([
+    settingsQuery, logQuery, recentQuery, ownQuery, weightQuery, historyQuery, dayStatusQuery,
+    skinfoldQuery, waistQuery, performanceQuery, sleepQuery, checkinQuery,
+  ]);
+  const error = settings.error || entries.error || recent.error || own.error || weight.error || history.error || dayStatus.error
+    || skinfolds.error || waists.error || performance.error || sleep.error || checkins.error;
   if (error) throw error;
   // Übernommene Rezeptbilder liegen als privater Storage-Pfad im Snapshot; für
   // die Anzeige eine frische signierte URL erzeugen (die alte ist längst abgelaufen).
@@ -89,10 +81,42 @@ async function loadNutrition(userId, date, signal) {
     const path = entry.product_snapshot?.image_path;
     if (path && signed.has(path)) entry.product_snapshot.image_url = signed.get(path);
   });
+  const kcalByDate = new Map();
+  (history.data || []).forEach((entry) => kcalByDate.set(entry.log_date, (kcalByDate.get(entry.log_date) || 0) + number(entry.energy_kcal)));
+  const statusByDate = new Map((dayStatus.data || []).map((item) => [item.log_date, item]));
+  const historyDays = [];
+  for (let cursor = shiftedDate(date, -34); cursor <= date; cursor = shiftedDate(cursor, 1)) {
+    const status = statusByDate.get(cursor) || {};
+    historyDays.push({ date: cursor, kcal: kcalByDate.get(cursor) || 0, complete: status.complete === true, excluded: status.excluded, exclude_reason: status.exclude_reason || '' });
+  }
+  const weights = (weight.data || []).map((item) => ({ date: item.gemessen_am, kg: number(item.kg) }));
   return {
     settings: settings.data || {}, entries: entryList, recent: recent.data || [], ownProducts: own.data || [],
-    latestWeight: number(weight.data?.kg),
+    latestWeight: number(weights.at(-1)?.kg), weights, historyDays,
+    dayStatus: statusByDate.get(date) || { complete: false, excluded: false, exclude_reason: '' },
+    skinfolds: skinfolds.data || [], waists: waists.data || [], performance: performance.data || [],
+    sleep: sleep.data || [], bodyCheckins: checkins.data || [],
   };
+}
+
+function recoveryDirection(state) {
+  const values = [...state.sleep.map((row) => (number(row.quality) + number(row.energy)) / 2), ...state.bodyCheckins.map((row) => number(row.recovery))].filter(Boolean);
+  if (values.length < 6) return null;
+  const middle = Math.floor(values.length / 2); const mean = (items) => items.reduce((sum, value) => sum + value, 0) / items.length;
+  const difference = mean(values.slice(middle)) - mean(values.slice(0, middle));
+  return difference > 0.3 ? 1 : difference < -0.3 ? -1 : 0;
+}
+
+function adaptiveBodyCompEvidence(state) {
+  if (state.settings?.goal !== 'bodycomp') return { supported: true, status: null };
+  const skinfoldDelta = confirmedTrendChange(state.skinfolds, (row) => Object.values(row.falten || {}).reduce((sum, value) => sum + number(value), 0), 2);
+  const waistDelta = confirmedTrendChange(state.waists, (row) => row.cm, 0.5);
+  const performance = performanceTrend(state.performance);
+  const recovery = recoveryDirection(state);
+  const dates = [...state.weights.map((row) => row.date), ...state.skinfolds.map((row) => row.gemessen_am), ...state.waists.map((row) => row.gemessen_am)].filter(Boolean).sort();
+  const weeks = dates.length > 1 ? (dateFromKey(dates.at(-1)) - dateFromKey(dates[0])) / 604800000 : 0;
+  const status = evaluateBodyComp({ weight: weightTrendSummary(state.weights, state.settings.bodycomp_thresholds), skinfoldDelta, waistDelta, performanceTrend: performance.direction, recoveryTrend: recovery, weeks });
+  return { supported: !['unklar', 'plateau'].includes(status.status), status };
 }
 
 function nutritionTarget(state) {
@@ -102,12 +126,12 @@ function nutritionTarget(state) {
     birthDate: settings.birth_date,
     heightCm: settings.height_cm,
     weightKg: state.latestWeight,
-    bodyFatPercent: settings.body_fat_percent,
     pal: settings.pal,
     goal: settings.goal,
   });
   const customTarget = number(settings.custom_calorie_target);
-  const target = customTarget || calculated?.target || 0;
+  const adaptiveTarget = number(settings.adaptive_target);
+  const target = customTarget || adaptiveTarget || calculated?.target || 0;
   const adjusted = calculated && customTarget ? {
     ...calculated,
     target: rounded(customTarget),
@@ -147,6 +171,14 @@ function summaryMarkup(state, date) {
       <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
       <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
     </header>
+    <div class="nutrition-day-quality">
+      <label><input type="checkbox" data-nutrition-day-complete${state.dayStatus?.complete ? ' checked' : ''}><span>Tag vollständig protokolliert</span></label>
+      <label><input type="checkbox" data-nutrition-day-excluded${state.dayStatus?.excluded ? ' checked' : ''}><span>Sondertag aus Kalibrierung ausschließen</span></label>
+      <select class="input" data-nutrition-exclude-reason${state.dayStatus?.excluded ? '' : ' disabled'} aria-label="Grund für ausgeschlossenen Sondertag">
+        ${[['','Grund auswählen'],['Krankheit','Krankheit'],['Reise','Reise'],['Außergewöhnliche Mahlzeiten','Außergewöhnliche Mahlzeiten'],['Unvollständiges Protokoll','Unvollständiges Protokoll'],['Anderer Sondertag','Anderer Sondertag']].map(([value, label]) => `<option value="${value}"${state.dayStatus?.exclude_reason === value ? ' selected' : ''}>${label}</option>`).join('')}
+      </select>
+      <small>Ausgeschlossene Tage zählen nicht gegen die Vollständigkeit und erzwingen keine Kalorienänderung.</small>
+    </div>
     <div class="nutrition-balance">
       <div><small>${target ? (over ? 'ÜBER ZIEL' : 'NOCH OFFEN') : 'HEUTE'}</small><strong>${target ? decimal(over || remaining) : decimal(kcal)} <i>kcal</i></strong></div>
       <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
@@ -158,18 +190,39 @@ function summaryMarkup(state, date) {
       <summary>Kalorienbedarf berechnen ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
       <form data-nutrition-settings-form>${calculatorMarkup(state, calculated)}</form>
     </details>
+    ${adaptiveMarkup(state, calculated, target)}
   </section>`;
+}
+
+function adaptiveMarkup(state, calculated, target) {
+  const evidence = adaptiveBodyCompEvidence(state);
+  const result = adaptiveEnergyEstimate({
+    nutritionDays: state.historyDays, weights: state.weights, currentTarget: target || calculated?.target,
+    goal: state.settings?.goal || 'maintain', combinedEvidence: evidence.supported,
+    lastAdjustmentDate: state.settings?.adaptive_updated_at,
+  });
+  const details = result.observedMaintenance
+    ? `<div class="nutrition-adaptive-values"><span><small>BISHERIGES KALORIENZIEL</small><b>${decimal(target)} kcal</b></span><span><small>DURCHSCHNITTLICH PROTOKOLLIERT</small><b>${decimal(result.averageCalories)} kcal</b></span><span><small>BEOBACHTETER ERHALTUNGSBEDARF</small><b>${decimal(result.observedMaintenance)} kcal</b></span><span><small>ZEITRAUM</small><b>${result.spanDays} Tage</b></span><span><small>ERNÄHRUNGSTAGE</small><b>${result.nutritionDaysCount}</b></span><span><small>WIEGUNGEN</small><b>${result.weightMeasurements}</b></span><span><small>GEWICHTSTREND</small><b>${result.weightTrend.weeklyKg > 0 ? '+' : ''}${decimal(result.weightTrend.weeklyKg, 2)} kg/Woche</b></span><span><small>VERTRAUENSSTUFE</small><b>${result.confidence}</b></span><span><small>VORGESCHLAGENE ÄNDERUNG</small><b>${result.suggestedChange > 0 ? '+' : ''}${result.suggestedChange} kcal</b></span><span><small>NÄCHSTE BEWERTUNG</small><b>${result.nextReview ? dateFromKey(result.nextReview).toLocaleDateString('de-DE') : 'nach weiteren Daten'}</b></span></div>`
+    : '';
+  const rejectedRecently = state.settings?.adaptive_rejected_at
+    && Date.now() - new Date(state.settings.adaptive_rejected_at).getTime() < 7 * 86400000
+    && number(state.settings.adaptive_rejected_target) === result.suggestedTarget;
+  const action = result.eligible && result.suggestedTarget && !rejectedRecently
+    ? `<div class="nutrition-adaptive-actions"><button class="btn btn-primary" type="button" data-accept-adaptive="${result.suggestedTarget}">Vorschlag von ${decimal(result.suggestedTarget)} kcal übernehmen</button><button class="btn" type="button" data-reject-adaptive="${result.suggestedTarget}">Ablehnen</button><button class="btn" type="button" data-later-adaptive>Später entscheiden</button></div>` : '';
+  return `<details class="nutrition-adaptive"><summary>Adaptive Kalorienkalibrierung ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
+    <h4>Warum wird diese Anpassung vorgeschlagen?</h4><p>${escapeHtml(result.reason)}</p>${rejectedRecently ? '<p>Du hast diesen Vorschlag abgelehnt. MUSCLEDEX bewertet ihn nach weiteren Daten erneut.</p>' : ''}${state.settings?.goal === 'bodycomp' ? `<p>Gemeinsame BodyComp-Auswertung: <b>${escapeHtml(evidence.status?.message || 'noch nicht eindeutig')}</b></p>` : ''}${details}${action}
+    <small>${result.spanDays ? `${result.spanDays} Tage · ${decimal(result.completeness)} % vollständig · ` : ''}7.700 kcal/kg sind nur eine vorsichtige Näherung. Wasser, Salz und Glykogen können das Gewicht kurzfristig deutlich verändern. Änderungen werden nie automatisch erzwungen und auf ungefähr 100 kcal pro Woche begrenzt.</small>
+  </details>`;
 }
 
 function calculatorMarkup(state, result) {
   const value = (key, fallback = '') => escapeHtml(state.settings?.[key] ?? fallback);
-  return `<p class="nutrition-calc-note">Automatisch Cunningham mit KFA, sonst Mifflin–St Jeor. Aktivität wird über den PAL-Faktor genau einmal berücksichtigt.</p>
+  return `<p class="nutrition-calc-note">${BODY_EXPLANATIONS.initialCalories}</p>
     <div class="nutrition-calc-grid">
       <label><span>Berechnungsbasis</span><select class="input" data-calc-basis><option value="male"${value('calculation_basis', 'male') === 'male' ? ' selected' : ''}>Männlich</option><option value="female"${value('calculation_basis') === 'female' ? ' selected' : ''}>Weiblich</option></select></label>
       <label><span>Geburtsdatum</span><input class="input" type="date" data-calc-birth value="${value('birth_date')}"></label>
       <label><span>Größe</span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" data-calc-height value="${value('height_cm')}" placeholder="180"><i>cm</i></span></label>
-      <label><span>Gewicht</span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" data-calc-weight value="${state.latestWeight || ''}" placeholder="80"><i>kg</i></span><small>Wird auch im KFA-LOG gespeichert.</small></label>
-      <label><span>KFA <small>optional</small></span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" data-calc-bodyfat value="${value('body_fat_percent')}" placeholder="12"><i>%</i></span></label>
+      <label><span>Gewicht</span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" data-calc-weight value="${state.latestWeight || ''}" placeholder="80"><i>kg</i></span><small>Wird auch unter Körperwerte gespeichert.</small></label>
       <label class="nutrition-wide"><span>Aktivität</span><select class="input" data-calc-pal>${PAL_LEVELS.map(([pal, label]) => `<option value="${pal}"${number(value('pal', 1.6)) === pal ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
       <label class="nutrition-wide"><span>Ziel</span><select class="input" data-calc-goal>${Object.entries(GOALS).map(([key, [label, adjustment]]) => `<option value="${key}"${value('goal', 'maintain') === key ? ' selected' : ''}>${label}${adjustment ? ` · ${adjustment > 0 ? '+' : ''}${adjustment} kcal` : ''}</option>`).join('')}</select></label>
       <label class="nutrition-wide"><span>Eigenes Kalorienziel <small>optional</small></span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="numeric" data-calc-custom value="${value('custom_calorie_target')}" placeholder="Automatisch"><i>kcal</i></span></label>
@@ -179,7 +232,7 @@ function calculatorMarkup(state, result) {
 }
 
 function calculationResultMarkup(result, customTarget = 0) {
-  return result ? `<span><small>GRUNDUMSATZ</small><b>${decimal(result.resting)} kcal</b></span><span><small>ERHALTUNG</small><b>${decimal(result.maintenance)} kcal</b></span><span><small>ZIEL</small><b>${decimal(customTarget || result.target)} kcal</b></span><p>${result.method} · Schätzung, keine Messung</p>` : '<p>Geburtsdatum, Größe und Gewicht vervollständigen.</p>';
+  return result ? `<span><small>GESCHÄTZTER RUHEENERGIEVERBRAUCH</small><b>${decimal(result.resting)} kcal</b></span><span><small>GESCHÄTZTER ERHALTUNGSBEDARF</small><b>${decimal(result.maintenance)} kcal</b><i>plausibel etwa ${decimal(result.maintenanceRange[0])}–${decimal(result.maintenanceRange[1])}</i></span><span><small>AKTUELLES KALORIENZIEL</small><b>${decimal(customTarget || result.target)} kcal</b></span><p>${result.method} · Startschätzung, keine Messung</p>` : '<p>Geburtsdatum, Größe und Gewicht vervollständigen.</p>';
 }
 
 function periodEntriesMarkup(entries, period) {
@@ -805,6 +858,50 @@ export async function mountNutrition(container, { userId, signal }) {
       state.settings = { ...state.settings, tracking_enabled: enabled };
       render();
     };
+    const saveDayStatus = async () => {
+      const complete = Boolean(container.querySelector('[data-nutrition-day-complete]')?.checked);
+      const excluded = Boolean(container.querySelector('[data-nutrition-day-excluded]')?.checked);
+      const reasonField = container.querySelector('[data-nutrition-exclude-reason]');
+      const excludeReason = excluded ? reasonField?.value || 'Anderer Sondertag' : '';
+      const { error } = await supabase.from('nutrition_day_status').upsert({
+        user_id: userId, log_date: date, complete, excluded,
+        exclude_reason: excludeReason,
+      }, { onConflict: 'user_id,log_date' });
+      if (error) return toast('Protokollstatus konnte nicht gespeichert werden');
+      state.dayStatus = { complete, excluded, exclude_reason: excludeReason };
+      toast(complete ? 'Tag als vollständig protokolliert' : 'Protokollstatus aktualisiert');
+      await refresh();
+    };
+    container.querySelector('[data-nutrition-day-excluded]')?.addEventListener('change', (event) => {
+      const reason = container.querySelector('[data-nutrition-exclude-reason]');
+      if (reason) reason.disabled = !event.currentTarget.checked;
+    });
+    container.querySelectorAll('[data-nutrition-day-complete],[data-nutrition-day-excluded],[data-nutrition-exclude-reason]').forEach((input) => { input.onchange = saveDayStatus; });
+    container.querySelector('[data-accept-adaptive]')?.addEventListener('click', async (event) => {
+      const adaptiveTarget = Number(event.currentTarget.dataset.acceptAdaptive);
+      if (!confirm(`Kalorienziel vorsichtig auf ${adaptiveTarget} kcal anpassen?`)) return;
+      const { error } = await supabase.from('nutrition_settings').upsert({
+        user_id: userId,
+        adaptive_target: adaptiveTarget,
+        adaptive_updated_at: new Date().toISOString(),
+        adaptive_rejected_target: null,
+        adaptive_rejected_at: null,
+        custom_calorie_target: null,
+      }, { onConflict: 'user_id' });
+      if (error) return toast('Vorschlag konnte nicht übernommen werden');
+      toast('Kalorienziel nachvollziehbar angepasst'); await refresh();
+    });
+    container.querySelector('[data-reject-adaptive]')?.addEventListener('click', async (event) => {
+      const adaptiveRejectedTarget = Number(event.currentTarget.dataset.rejectAdaptive);
+      const { error } = await supabase.from('nutrition_settings').upsert({
+        user_id: userId, adaptive_rejected_target: adaptiveRejectedTarget, adaptive_rejected_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+      if (error) return toast('Entscheidung konnte nicht gespeichert werden');
+      event.currentTarget.closest('.nutrition-adaptive').open = false; toast('Vorschlag abgelehnt');
+    });
+    container.querySelector('[data-later-adaptive]')?.addEventListener('click', (event) => {
+      event.currentTarget.closest('.nutrition-adaptive').open = false; toast('Du kannst später entscheiden');
+    });
     container.querySelectorAll('[data-nutrition-day]').forEach((button) => {
       button.onclick = async () => {
         date = shiftedDate(date, Number(button.dataset.nutritionDay));
@@ -820,7 +917,6 @@ export async function mountNutrition(container, { userId, signal }) {
         birthDate: calculatorForm.querySelector('[data-calc-birth]').value,
         heightCm: calculatorForm.querySelector('[data-calc-height]').value,
         weightKg: calculatorForm.querySelector('[data-calc-weight]').value,
-        bodyFatPercent: calculatorForm.querySelector('[data-calc-bodyfat]').value,
         pal: calculatorForm.querySelector('[data-calc-pal]').value,
         goal: calculatorForm.querySelector('[data-calc-goal]').value,
       });
@@ -834,7 +930,6 @@ export async function mountNutrition(container, { userId, signal }) {
         user_id: userId, calculation_basis: form.querySelector('[data-calc-basis]').value,
         birth_date: form.querySelector('[data-calc-birth]').value || null,
         height_cm: number(form.querySelector('[data-calc-height]').value) || null,
-        body_fat_percent: number(form.querySelector('[data-calc-bodyfat]').value) || null,
         pal: number(form.querySelector('[data-calc-pal]').value) || 1.6,
         goal: form.querySelector('[data-calc-goal]').value,
         custom_calorie_target: rounded(number(form.querySelector('[data-calc-custom]').value)) || null,
@@ -842,7 +937,6 @@ export async function mountNutrition(container, { userId, signal }) {
       const enteredWeight = number(form.querySelector('[data-calc-weight]').value);
       if (!payload.birth_date || !payload.height_cm || !enteredWeight) { submit.disabled = false; return toast('Geburtsdatum, Größe und Gewicht werden benötigt'); }
       if (payload.height_cm < 100 || payload.height_cm > 250 || enteredWeight <= 0 || enteredWeight >= 500) { submit.disabled = false; return toast('Größe oder Gewicht liegen außerhalb des gültigen Bereichs'); }
-      if (payload.body_fat_percent && (payload.body_fat_percent < 2 || payload.body_fat_percent > 65)) { submit.disabled = false; return toast('Bitte einen KFA zwischen 2 und 65 % eintragen'); }
       if (payload.custom_calorie_target && (payload.custom_calorie_target < 800 || payload.custom_calorie_target > 10000)) { submit.disabled = false; return toast('Das eigene Kalorienziel muss zwischen 800 und 10.000 kcal liegen'); }
       const [settingsResult, weightResult] = await Promise.all([
         supabase.from('nutrition_settings').upsert(payload).select(),
@@ -858,6 +952,12 @@ export async function mountNutrition(container, { userId, signal }) {
   subscribeToTableChanges({ table: 'nutrition_log_entries', signal, onChange: refresh });
   subscribeToTableChanges({ table: 'nutrition_settings', signal, onChange: refresh });
   subscribeToTableChanges({ table: 'nutrition_products', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'nutrition_day_status', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'weights', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'skinfolds', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'waist_measurements', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'logman_performance', signal, onChange: refresh });
+  subscribeToTableChanges({ table: 'bodycomp_checkins', signal, onChange: refresh });
   bindLongPress(container.closest('.wrap') || container.parentElement, '[data-nutrition-entry]', (element) => {
     const entry = state.entries.find((item) => item.id === element.dataset.nutritionEntry);
     return entry ? () => editEntry(entry) : null;

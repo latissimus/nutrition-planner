@@ -5202,3 +5202,50 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mess-einst .compact-input{box-sizing:border-box;height:40px;min-height:40px;padding-top:0;padding-bottom:0;line-height:38px}
 .mess-einst input[type="time"].compact-input::-webkit-date-and-time-value{height:38px;line-height:38px;margin:0;padding:0}
 .nutrition-own-list{display:grid;max-height:min(48dvh,440px);overflow-y:auto;border-block:1px solid var(--app-divider)}.nutrition-own-list>p{margin:0;padding:22px 10px;color:var(--muted);font-size:13px;text-align:center}.nutrition-own-list>article{display:grid;grid-template-columns:minmax(0,1fr) 48px;align-items:stretch;border-bottom:1px solid var(--app-divider)}.nutrition-own-list>article:last-child{border-bottom:0}.nutrition-own-select{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:8px;min-height:68px;padding:10px 5px;border:0;background:transparent;color:var(--ink);text-align:left}.nutrition-own-select>span{min-width:0}.nutrition-own-select b,.nutrition-own-select small{display:block}.nutrition-own-select b{overflow:hidden;font-size:15px;text-overflow:ellipsis;white-space:nowrap}.nutrition-own-select small{margin-top:4px;color:var(--muted);font-size:11px;font-weight:700}.nutrition-own-select .material-svg,.nutrition-own-select svg{width:20px;height:20px;fill:currentColor}.nutrition-own-delete{display:grid;place-items:center;width:48px;min-height:48px;padding:0;border:0;background:transparent;color:var(--danger)}.nutrition-own-delete .material-svg,.nutrition-own-delete svg{width:21px;height:21px;fill:currentColor}.nutrition-own-new{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px}.nutrition-own-new .material-svg,.nutrition-own-new svg{width:21px;height:21px;fill:currentColor}
+
+/* Evidenzbasierte Körperwerte: bestehende DEX-Optik, aber ohne falsche
+   Präzision. Alle Raster können auf schmalen Geräten auf eine Spalte fallen. */
+.body-metrics-wrap{display:grid;gap:13px}
+.body-metrics-wrap>.card{position:relative;min-width:0;margin:0;overflow:hidden;padding:21px 16px 16px}
+.body-card-stripe{position:absolute;z-index:1;inset:0 0 auto;height:7px;background:var(--ordner)}
+.body-metric-grid,.bodycomp-sources,.nutrition-adaptive-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.body-metric-grid>span,.bodycomp-sources>span,.nutrition-adaptive-values>span{display:grid;min-width:0;gap:3px;padding:11px;border-radius:11px;background:var(--app-field)}
+.body-metric-grid small,.nutrition-adaptive-values small{color:var(--muted);font-size:10px;font-weight:850;line-height:1.25;letter-spacing:.045em}
+.body-metric-grid b,.nutrition-adaptive-values b{overflow-wrap:anywhere;font-size:14px;line-height:1.25}
+.body-confidence{margin:10px 1px;color:var(--muted);font-size:12px;line-height:1.4}
+.body-goal-status{display:grid;gap:3px;margin:10px 0;padding:11px 12px;border-left:5px solid var(--ordner);border-radius:9px;background:var(--app-field)}
+.body-goal-status b{font-size:13px}.body-goal-status span{color:var(--muted);font-size:12px;line-height:1.4}
+.body-info{margin-top:8px;border-top:1px solid var(--app-divider)}
+.body-info>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:7px 1px;cursor:pointer;font-size:13px;font-weight:800;list-style:none}
+.body-info>summary::-webkit-details-marker{display:none}.body-info>summary span{display:grid;place-items:center;width:24px;height:24px;border:1px solid var(--ink);border-radius:50%;font-size:12px}
+.body-info p,.body-guide{color:var(--muted);font-size:12px;line-height:1.5}
+.bodycomp-status h2{margin:3px 0 8px;font-family:var(--display);font-size:23px;text-transform:uppercase}
+.bodycomp-message{font-size:16px;font-weight:800;line-height:1.35}
+.bodycomp-sources>span{font-size:11px;color:var(--muted)}.bodycomp-sources b{color:var(--text);font-size:12px;overflow-wrap:anywhere}
+.guided-fold-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+.guided-fold-grid fieldset{min-width:0;margin:0;padding:11px;border:1px solid var(--app-outline);border-radius:11px;background:var(--app-field)}
+.guided-fold-grid legend{padding:0 3px;font-size:11px;font-weight:850;text-transform:uppercase}.guided-fold-grid small{display:block;min-height:44px;color:var(--muted);font-size:10px;line-height:1.35}
+.guided-fold-grid fieldset>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:7px}.guided-fold-grid .input{height:44px!important;padding:4px!important;text-align:center}
+.body-standard{display:flex;align-items:center;gap:9px;min-height:44px;font-size:12px}.body-standard input{width:21px;height:21px;accent-color:var(--ordner)}
+.body-inline-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px;align-items:end;margin-top:11px}.body-inline-form>*{min-width:0}.body-inline-form>label,.body-inline-form>.btn{grid-column:1/-1}.body-inline-form>label{display:flex;align-items:center;gap:8px;font-size:12px}
+.body-checkin-form,.body-threshold-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding-top:7px}.body-checkin-form>label,.body-threshold-form>label{display:grid;min-width:0;gap:5px;font-size:11px;font-weight:800}.body-checkin-form>div,.body-checkin-form>.btn,.body-threshold-form>p,.body-threshold-form>.btn{grid-column:1/-1}.body-checkin-form>div{display:flex;flex-wrap:wrap;gap:8px 14px}.body-checkin-form>div label{display:flex;align-items:center;gap:6px;font-size:11px}
+.body-threshold-form{grid-template-columns:repeat(2,minmax(0,1fr))}.body-threshold-form>p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
+.body-file-input{display:grid;place-items:center;min-height:54px;margin-top:12px;padding:11px;border:1.5px dashed var(--app-outline);border-radius:11px;background:var(--app-field);font-size:13px;font-weight:800;text-align:center;cursor:pointer}.body-file-input input{width:1px;height:1px;opacity:0}
+.external-kfa>summary{min-height:48px;font-size:14px;font-weight:850;cursor:pointer}.external-kfa>p{font-size:12px;line-height:1.45}
+.body-neutral-note{padding:10px 11px;border-radius:10px;background:var(--app-field);color:var(--muted);font-size:12px;line-height:1.4}
+
+.nutrition-day-quality{display:grid;gap:7px;margin:12px 0;padding:11px;border-radius:11px;background:var(--app-field)}
+.nutrition-day-quality label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:750}.nutrition-day-quality input{width:20px;height:20px;accent-color:var(--ordner)}.nutrition-day-quality small{color:var(--muted);font-size:10px;line-height:1.4}
+.nutrition-day-quality>.input{width:100%;min-width:0;height:44px;font-size:12px}
+.nutrition-adaptive{margin-top:10px;border-top:1px solid var(--app-divider)}.nutrition-adaptive>summary{display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:13px;font-weight:850;cursor:pointer;list-style:none}.nutrition-adaptive>summary::-webkit-details-marker{display:none}.nutrition-adaptive h4{margin:10px 0 4px;font-size:13px}.nutrition-adaptive>p,.nutrition-adaptive>small{display:block;color:var(--muted);font-size:11px;line-height:1.5}.nutrition-adaptive-values{margin:10px 0}.nutrition-adaptive .btn{width:100%;margin:10px 0}.nutrition-adaptive-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.nutrition-adaptive-actions .btn{margin:0}.nutrition-adaptive-actions .btn-primary{grid-column:1/-1}
+.nutrition-calculation span i{display:block;margin-top:2px;color:var(--muted);font-size:10px;font-style:normal;line-height:1.3}
+
+@media(max-width:430px){
+  .body-metric-grid,.bodycomp-sources,.nutrition-adaptive-values{grid-template-columns:minmax(0,1fr)}
+  .guided-fold-grid{grid-template-columns:minmax(0,1fr)}
+  .guided-fold-grid small{min-height:0}
+  .body-checkin-form,.body-threshold-form{grid-template-columns:minmax(0,1fr)}
+  .body-checkin-form>*,:is(.body-threshold-form>p,.body-threshold-form>.btn){grid-column:1}
+  .body-inline-form{grid-template-columns:minmax(0,1fr)}
+  .body-inline-form>*{grid-column:1}
+}
