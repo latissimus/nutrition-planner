@@ -268,6 +268,31 @@ function materialIcon(id, className = '') {
 
 export const materialIconMarkup = materialIcon;
 
+function retroWindowMenuMarkup() {
+  return `<span class="retro-menue-computer" aria-hidden="true">
+    <svg viewBox="0 0 62 55" preserveAspectRatio="none">
+      <defs>
+        <mask id="muscledex-menue-fenster-ausschnitt" maskUnits="userSpaceOnUse">
+          <rect width="62" height="55" fill="#fff"/>
+          <rect x="7" y="21" width="43" height="23" rx="5" fill="#000"/>
+        </mask>
+      </defs>
+      <rect class="retro-menue-schatten" x="6" y="5" width="53" height="47" rx="7" fill="#7560E6" mask="url(#muscledex-menue-fenster-ausschnitt)"/>
+      <g class="retro-menue-front">
+        <rect x="2" y="2" width="54" height="47" rx="7" fill="#F2A5DA" stroke="#8968FF" stroke-width="2.3" mask="url(#muscledex-menue-fenster-ausschnitt)"/>
+        <path d="M9 2h40a7 7 0 0 1 7 7v8H2V9a7 7 0 0 1 7-7Z" fill="#AEEBFA"/>
+        <path d="M2 17h54" fill="none" stroke="#8968FF" stroke-width="2.3"/>
+        <path d="M31 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="38" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
+        <path d="m46 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
+        <rect class="retro-menue-innen" x="7" y="21" width="43" height="23" rx="5"/>
+        <rect x="7" y="21" width="43" height="23" rx="5" fill="none" stroke="#8968FF" stroke-width="1.8"/>
+        <text class="retro-menue-text" x="28.5" y="32.5" fill="#111" font-family="'Helvetica Neue',Arial,system-ui,sans-serif" font-size="9.6" font-style="italic" font-weight="900" text-anchor="middle" dominant-baseline="middle">MENÜ</text>
+      </g>
+    </svg>
+  </span>`;
+}
+
 export function categoryIconMarkup(route, className = 'kategorie-svg') {
   // Ohne gespeicherte Auswahl greift der Standard – der ebenfalls ein Emoji
   // sein darf (z. B. SLEEP-LOG 😴, EINKAUF 🛒).
@@ -505,6 +530,28 @@ function eintragTypWaehlen(container, route, options = {}) {
   };
 }
 
+function retroCategoryMenu(route, title, options) {
+  const items = Array.isArray(options.retroMenuItems) ? options.retroMenuItems : [];
+  const backdrop = sheet(`
+    <header><div><small class="retro-menue-kicker">${escapeHtml(title)}</small><h2>Menü</h2></div><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
+    <div class="sheet-menue retro-kategorie-menue">
+      ${items.map((item, index) => `<button type="button" data-retro-menu-item="${index}">${materialIcon(item.icon || 'place_item', 'sheet-list-icon')}<span><b>${escapeHtml(item.label || '')}</b>${item.description ? `<small>${escapeHtml(item.description)}</small>` : ''}</span></button>`).join('')}
+      <button type="button" data-retro-menu-settings>${materialIcon('build', 'sheet-list-icon')}<span><b>Dex bearbeiten</b><small>Icon, Farbe und Tapete ändern</small></span></button>
+    </div>`);
+  backdrop.querySelector('.retro-kategorie-menue').onclick = (event) => {
+    const itemButton = event.target.closest('[data-retro-menu-item]');
+    if (itemButton) {
+      const item = items[Number(itemButton.dataset.retroMenuItem)];
+      closeSheet(backdrop);
+      item?.onSelect?.();
+      return;
+    }
+    if (!event.target.closest('[data-retro-menu-settings]')) return;
+    closeSheet(backdrop);
+    settingsSheet(route, () => window.dispatchEvent(new HashChangeEvent('hashchange')), options);
+  };
+}
+
 export function mountCategoryChrome(container, route, title, options = {}) {
   const wrap = container.querySelector(':scope > .wrap');
   if (!wrap) return;
@@ -530,11 +577,21 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const safeTitle = escapeHtml(title);
   const safeMeta = escapeHtml(options.meta || '');
   const closeHref = escapeHtml(options.backHref || '#home');
+  if (options.retroMenu) {
+    bar.classList.add('kategorie-kopf-retro');
+    bar.innerHTML = `
+      <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
+      <button class="kategorie-retro-menue" type="button" aria-label="Menü für ${safeTitle} öffnen">${retroWindowMenuMarkup()}</button>
+      <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
+    bar.querySelector('.kategorie-retro-menue').onclick = () => retroCategoryMenu(route, title, options);
+    wrap.insertBefore(bar, content);
+    return;
+  }
   bar.innerHTML = `
-    <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
-    <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Eintrag in ${safeTitle} ablegen">${materialIcon('place_item')}</button>
-    <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
-    <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
+      <div class="kategorie-kopftitel"><strong>${safeTitle}</strong>${safeMeta ? `<small>${safeMeta}</small>` : ''}</div>
+      <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Eintrag in ${safeTitle} ablegen">${materialIcon('place_item')}</button>
+      <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
+      <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
   bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(options.color || categoryColor(route)));
   wrap.insertBefore(bar, content);
   // options.onPlus umgeht das Link/Notiz/Bild-Menue vollstaendig: Dex-Typen,

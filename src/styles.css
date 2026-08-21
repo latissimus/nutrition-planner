@@ -3550,6 +3550,21 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .hat-kategoriefarbe .app-icon{color:#000}
 .kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
+/* Testlauf SLEEP: Der LOGMAN-inspirierte Fensterknopf bündelt Hinzufügen und
+   Bearbeiten. Schließen bleibt als häufigste Navigation separat sichtbar. */
+.kategorie-kopf.kategorie-kopf-retro{grid-template-columns:minmax(0,1fr) 62px 44px;gap:9px}
+.kategorie-retro-menue{position:relative;display:grid;place-items:center;width:62px;height:55px;padding:0;border:0;background:transparent;color:var(--ink);isolation:isolate}
+.retro-menue-computer{position:absolute;inset:0;display:block;pointer-events:none}
+.retro-menue-computer svg{display:block;width:100%;height:100%;overflow:visible}
+.retro-menue-front{transition:transform 70ms ease-out}
+.kategorie-retro-menue:active .retro-menue-front{transform:translate(4px,3px)}
+.kategorie-retro-menue:active .retro-menue-schatten{opacity:0}
+.retro-menue-innen{fill:transparent}
+:root[data-theme="dark"] .retro-menue-text{fill:#fff}
+.retro-menue-kicker{display:block;margin-bottom:3px;color:var(--muted);font:800 10px/1 var(--tech);letter-spacing:.08em;text-transform:uppercase}
+.retro-kategorie-menue button>span b,.retro-kategorie-menue button>span small{display:block}
+.retro-kategorie-menue button>span small{margin-top:3px;color:var(--muted);font-size:11px;font-weight:600;line-height:1.25}
+
 /* ---------- COIN-DEX ---------- */
 .coin-dex-inhalt{display:grid;gap:18px;padding:6px 2px 24px}
 .coin-balance-card{
@@ -5006,6 +5021,46 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-tonight button .material-icon{width:23px;height:23px}
 .sleep-section{padding:21px 16px 16px}
 .sleep-section>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+
+/* SLEEP ist der Prototyp für die redaktionellere Dex-Sprache. Die gewählte
+   Dexfarbe färbt den Seitenraum nur sanft; Weißflächen bleiben Inhaltsträger.
+   Dadurch konkurriert die Tapete nicht mit den funktionalen Akzenten. */
+.sleep-editorial-prototype{--sleep-page-bg:color-mix(in srgb,var(--ordner) 17%,var(--bg))}
+.sleep-editorial-prototype .kategorie-kopf{background:var(--sleep-page-bg)}
+.sleep-editorial-prototype .kategorie-scrollinhalt{background-color:var(--sleep-page-bg)!important}
+.sleep-editorial-prototype.dex-tapete-datei .kategorie-scrollinhalt{
+  background-image:linear-gradient(color-mix(in srgb,var(--sleep-page-bg) var(--tapeten-schleier),transparent),color-mix(in srgb,var(--sleep-page-bg) var(--tapeten-schleier),transparent)),var(--dex-tapete)!important
+}
+:root[data-theme="dark"] .sleep-editorial-prototype{--sleep-page-bg:color-mix(in srgb,var(--ordner) 22%,var(--bg))}
+:root[data-theme="dark"] .sleep-editorial-prototype.dex-tapete-datei .kategorie-scrollinhalt{background-color:var(--sleep-page-bg)!important}
+.sleep-editorial-prototype .sleep-dex-page [data-sleep-content]{gap:14px;padding-top:12px}
+.sleep-editorial-intro{position:relative;padding:15px 16px 16px;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart-klein)}
+.sleep-editorial-intro>span{display:block;margin-bottom:9px;color:var(--muted);font:800 10px/1 var(--tech);letter-spacing:.09em}
+.sleep-editorial-intro>div{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:14px}
+.sleep-editorial-intro h2{margin:0;font:900 italic clamp(18px,5.1vw,22px)/1.08 var(--display);letter-spacing:-.02em;text-transform:uppercase}
+.sleep-editorial-intro button{display:grid;place-items:center;width:44px;height:44px;padding:0;border:var(--karten-bw) solid var(--ink);border-radius:50%;background:color-mix(in srgb,var(--ordner) 35%,var(--surface));color:var(--ink);box-shadow:none}
+.sleep-editorial-intro button:active{transform:translate(1px,1px)}
+.sleep-editorial-intro button i{font:900 25px/1 Georgia,serif;font-style:normal}
+.sleep-editorial-prototype :is(.sleep-section,.wecker-card)::before{display:none}
+.sleep-editorial-prototype .sleep-section{padding-top:16px}
+.sleep-editorial-prototype .wecker-card{padding-top:16px}
+.sleep-editorial-prototype .sleep-section-title>.material-svg,.sleep-editorial-prototype .wecker-card-icon{background:color-mix(in srgb,var(--ordner) 32%,var(--surface))}
+.sleep-editorial-prototype .sleep-progress{background:color-mix(in srgb,var(--ordner) 6%,var(--surface))}
+.sleep-editorial-prototype .sleep-insights{background:color-mix(in srgb,var(--ordner) 9%,var(--surface))}
+
+.sleep-wissen{width:min(100%,560px);max-height:min(86dvh,780px);overflow-y:auto;padding:17px}
+.sleep-wissen>header>div small{display:block;margin-bottom:4px;color:var(--ordner);font:850 10px/1 var(--tech);letter-spacing:.09em}
+.sleep-wissen>header>div h2{margin:0;font:900 italic 21px/1.05 var(--display);text-transform:uppercase}
+.sleep-wissen-karte{padding:16px;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:color-mix(in srgb,var(--ordner) 7%,var(--surface));font-family:var(--tech);box-shadow:none}
+.sleep-wissen-einstieg{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.48}
+.sleep-wissen-einstieg b{color:var(--ink)}
+.sleep-wissen ol{display:grid;gap:15px;margin:0;padding:0;list-style:none}
+.sleep-wissen li{display:grid;grid-template-columns:38px minmax(0,1fr);align-items:start;gap:11px}
+.sleep-wissen li>b{display:grid;place-items:center;width:38px;height:38px;border:1.5px solid var(--ink);border-radius:9px;background:color-mix(in srgb,var(--ordner) 38%,var(--surface));color:var(--ink);font:900 17px/1 var(--tech)}
+.sleep-wissen li p{margin:0}.sleep-wissen li strong,.sleep-wissen li span{display:block}.sleep-wissen li strong{margin:2px 0 4px;color:var(--ink);font-size:13px;line-height:1.2}.sleep-wissen li span{color:var(--muted);font-size:12px;line-height:1.45}
+.sleep-wissen-hinweis{margin:17px 0 0;padding-top:14px;border-top:1.5px dashed var(--ink);color:var(--muted);font-size:11px;line-height:1.45}
+.sleep-wissen-hinweis strong{color:var(--ink)}
+.sleep-wissen>.btn{margin-top:14px}
 /* Nachttisch-Wecker: Karte unter „Heute Nacht". */
 .wecker-card{position:relative;overflow:hidden;width:100%;margin:0;padding:16px;background:var(--surface);border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);box-shadow:var(--hart-klein)}
 .wecker-card::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:7px;background:var(--ordner)}
