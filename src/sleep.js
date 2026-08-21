@@ -118,29 +118,6 @@ async function loadState(userId, signal) {
 
 function closeOverlay(backdrop) { backdrop?.remove(); }
 
-function sleepKnowledgeOverlay() {
-  const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop sleep-wissen-backdrop';
-  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
-  backdrop.innerHTML = `<section class="kategorie-sheet sleep-wissen" role="dialog" aria-modal="true" aria-label="SLEEP verstehen">
-    <header><div><small>DEIN SCHLAFGEDÄCHTNIS</small><h2>SLEEP verstehen</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="sleep-wissen-karte">
-      <p class="sleep-wissen-einstieg"><b>Plane, beobachte und vergleiche.</b> MUSCLE-DEX verbindet deine Schlafzeiten mit dem, was du am Vortag gemacht hast.</p>
-      <ol>
-        <li><b>1</b><p><strong>Rhythmus planen</strong><span>Lege Schlafenszeit, Aufstehen und den Beginn deiner bildschirmfreien Zeit fest.</span></p></li>
-        <li><b>2</b><p><strong>Morgens einchecken</strong><span>Bewerte Schlafqualität und Energie. Ein kurzer Check-in ist wertvoller als eine perfekte Schätzung.</span></p></li>
-        <li><b>3</b><p><strong>Zusammenhänge erkennen</strong><span>Nach mehreren Nächten vergleicht MUSCLE-DEX Zeiten und Einflüsse mit deinen Bewertungen.</span></p></li>
-      </ol>
-      <p class="sleep-wissen-hinweis"><strong>Wichtig:</strong> Die Hinweise zeigen beobachtete Muster, keine medizinischen Ursachen oder Diagnosen.</p>
-    </div>
-    <button class="btn btn-primary btn-block" type="button" data-sheet-close>Verstanden</button>
-  </section>`;
-  backdrop.onclick = (event) => {
-    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeOverlay(backdrop);
-  };
-  document.body.append(backdrop);
-}
-
 function planEditor({ userId, state, onSaved }) {
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop';
@@ -306,10 +283,6 @@ function render(container, userId, state, refresh) {
   const duration = tonight ? sleepDurationMinutes(tonight.bedtime, tonight.wake_time) : 0;
   const content = container.querySelector('[data-sleep-content]');
   content.innerHTML = `
-    <section class="sleep-editorial-intro">
-      <span>DEIN SCHLAFGEDÄCHTNIS</span>
-      <div><h2>Erkenne, was deine Nächte wirklich verbessert.</h2><button type="button" data-sleep-wissen aria-label="Wie SLEEP funktioniert"><i>i</i></button></div>
-    </section>
     <section class="sleep-tonight">
       <div class="sleep-card-icon">${materialIconMarkup('dark_mode')}</div><div><small>HEUTE NACHT</small><strong>${tonight?.active ? `${String(tonight.bedtime).slice(0, 5)} → ${String(tonight.wake_time).slice(0, 5)}` : 'Kein Plan'}</strong><span>${tonight?.active ? `${durationLabel(duration)} · ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Für diese Nacht ist der Plan pausiert.'}</span></div>
       <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('build')}</button>
@@ -335,7 +308,6 @@ function render(container, userId, state, refresh) {
     </section>
     ${state.logs.length ? `<section class="sleep-section sleep-history"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 
-  content.querySelector('[data-sleep-wissen]').onclick = sleepKnowledgeOverlay;
   content.querySelector('[data-edit-sleep-plan]').onclick = () => planEditor({ userId, state, onSaved: refresh });
   content.querySelector('[data-wecker-settings]')?.addEventListener('click', () => weckerEditor({ onSaved: refresh }));
   content.querySelector('[data-wecker-arm]')?.addEventListener('click', () => starteNachttisch(state));
@@ -364,15 +336,8 @@ export async function mountSleepDex(container, { userId, signal, mountChrome }) 
   mountChrome(container, 'sleep', 'SLEEP-LOG', {
     color, pageLookScope: 'sleep', pageLookPattern: 'drops',
     meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
-    retroMenu: true,
-    retroMenuItems: [
-      { icon: 'bedtime', label: 'Morgen-Check-in', description: 'Schlaf und Energie festhalten', onSelect: () => checkinEditor({ userId, state, onSaved: refresh }) },
-      { icon: 'alarm', label: 'Schlafplan', description: 'Zeiten und Erinnerungen einstellen', onSelect: () => planEditor({ userId, state, onSaved: refresh }) },
-      { icon: 'dark_mode', label: 'Schlafsound', description: 'Mit Abschalttimer und Ausblenden', onSelect: openSleepSoundTimer },
-      { icon: 'self_improvement', label: 'Abendroutinen', description: 'Meditation und Routinen öffnen', onSelect: () => { location.hash = 'habits'; } },
-    ],
+    onPlus: () => actionsMenu({ userId, state, onSaved: refresh }),
   });
-  container.classList.add('sleep-editorial-prototype');
   render(container, userId, state, refresh);
   subscribeToTableChanges({ table: 'sleep_logs', signal, onChange: refresh, onError: () => {} });
   subscribeToTableChanges({ table: 'sleep_schedules', signal, onChange: refresh, onError: () => {} });
