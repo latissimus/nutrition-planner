@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
 import { setRoutineCompletion } from './routineCompletion.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
@@ -116,37 +116,6 @@ async function loadState(userId, signal) {
 }
 
 function closeOverlay(backdrop) { backdrop?.remove(); }
-
-function sleepInfoOverlay() {
-  const backdrop = document.createElement('div');
-  const color = categoryColor('sleep');
-  backdrop.className = 'kategorie-sheet-backdrop';
-  backdrop.style.setProperty('--ordner', color);
-  backdrop.style.setProperty('--ordner-ink', colorIsDark(color) ? '#fff' : '#000');
-  backdrop.innerHTML = `<section class="kategorie-sheet sleep-info-overlay" role="dialog" aria-modal="true" aria-label="SLEEP verstehen">
-    <header><div><small>DEIN SCHLAFGEDÄCHTNIS</small><h2>SLEEP verstehen</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="sleep-info-copy">
-      <p><b>1 · Rhythmus planen</b><span>Schlafenszeit, Aufstehen und Runterfahren bilden deinen persönlichen Rahmen.</span></p>
-      <p><b>2 · Morgens einchecken</b><span>Schlafqualität, Energie und Einflüsse des Vortags machen Nächte vergleichbar.</span></p>
-      <p><b>3 · Muster erkennen</b><span>Ab sechs Check-ins zeigt MUSCLE-DEX erste wiederkehrende Zusammenhänge.</span></p>
-      <aside><b>WICHTIG</b> Die Auswertung beschreibt beobachtete Muster. Sie stellt keine medizinische Diagnose dar und beweist keine Ursache.</aside>
-    </div>
-    <button class="btn btn-primary btn-block" type="button" data-sheet-close>Verstanden</button>
-  </section>`;
-  backdrop.onclick = (event) => {
-    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeOverlay(backdrop);
-  };
-  document.body.append(backdrop);
-}
-
-function sleepEmptyMarkup({ icon, title, copy, action = '', actionLabel = '' }) {
-  return `<div class="sleep-empty-state">
-    <span class="sleep-empty-icon">${materialIconMarkup(icon)}</span>
-    <h3>${escapeHtml(title)}</h3>
-    <p>${escapeHtml(copy)}</p>
-    ${action ? `<button type="button" data-sleep-empty-action="${action}">${escapeHtml(actionLabel)}</button>` : ''}
-  </div>`;
-}
 
 function planEditor({ userId, state, onSaved }) {
   const backdrop = document.createElement('div');
@@ -278,11 +247,7 @@ function planForTonight(schedules, now = new Date()) {
 
 function chartMarkup(logs) {
   const points = [...logs].slice(0, 14).reverse();
-  if (points.length < 2) return sleepEmptyMarkup({
-    icon: 'chart',
-    title: 'Noch kein Verlauf',
-    copy: 'Nach zwei Morgen-Check-ins wird deine erste Schlafkurve sichtbar.',
-  });
+  if (points.length < 2) return '<div class="sleep-chart-empty">Ab dem zweiten Check-in erscheint hier dein Verlauf.</div>';
   const durations = points.map((log) => sleepDurationMinutes(log.bedtime, log.wake_time));
   const min = Math.min(...durations, 360); const max = Math.max(...durations, 600); const range = Math.max(60, max - min);
   const coordinates = durations.map((value, index) => `${10 + (index / (durations.length - 1)) * 280},${100 - ((value - min) / range) * 80}`).join(' ');
@@ -315,52 +280,33 @@ function render(container, userId, state, refresh) {
   const latest = state.logs[0];
   const trends = analyzeSleepTrends(state.logs.slice(0, 30));
   const duration = tonight ? sleepDurationMinutes(tonight.bedtime, tonight.wake_time) : 0;
-  const checkedInToday = latest?.sleep_date === localDate();
-  const primaryAction = !tonight?.active || checkedInToday ? 'plan' : 'checkin';
   const content = container.querySelector('[data-sleep-content]');
   content.innerHTML = `
-    <section class="sleep-dex-intro">
-      <p>Erkenne, was deine Nächte wirklich verbessert.</p>
-      <button type="button" data-sleep-info><span><small>DEIN SCHLAFGEDÄCHTNIS</small><b>So funktioniert SLEEP</b></span><i>i</i></button>
-    </section>
-    <section class="sleep-main-status">
-      <div class="sleep-main-status-body">
-        <div class="sleep-card-icon">${materialIconMarkup('dark_mode')}</div>
-        <div><small>HEUTE NACHT</small><strong>${tonight?.active ? `${String(tonight.bedtime).slice(0, 5)} → ${String(tonight.wake_time).slice(0, 5)}` : 'Kein Plan'}</strong><span>${tonight?.active ? `${durationLabel(duration)} · ab ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Lege deinen Rhythmus für heute fest.'}</span></div>
-      </div>
-      <button class="sleep-main-action" type="button" data-sleep-primary="${primaryAction}"><span>${primaryAction === 'checkin' ? 'Morgen-Check-in starten' : 'Schlafplan anpassen'}</span>${materialIconMarkup('chevron_right')}</button>
+    <section class="sleep-tonight">
+      <div class="sleep-card-icon">${materialIconMarkup('dark_mode')}</div><div><small>HEUTE NACHT</small><strong>${tonight?.active ? `${String(tonight.bedtime).slice(0, 5)} → ${String(tonight.wake_time).slice(0, 5)}` : 'Kein Plan'}</strong><span>${tonight?.active ? `${durationLabel(duration)} · ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Für diese Nacht ist der Plan pausiert.'}</span></div>
+      <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('build')}</button>
     </section>
     <section class="sleep-section">
       <header><div class="sleep-section-title">${materialIconMarkup('coffee')}<h2>Morgen-Check-in</h2></div></header>
-      ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : sleepEmptyMarkup({ icon: 'coffee', title: 'Deine erste Nacht', copy: 'Ein kurzer Check-in macht Schlaf und Morgenenergie vergleichbar.', action: 'checkin', actionLabel: 'Check-in starten · +3 Coins' })}
+      ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : '<div class="sleep-empty">Noch kein Morgen-Check-in. Dein erster Eintrag bringt 3 MUSCLE-COINS.</div>'}
     </section>
     <section class="sleep-section">
       <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
-      <div class="sleep-routines">${state.routines.length ? state.routines.map((routine) => routineMarkup(routine, state.completed.has(routine.id))).join('') : sleepEmptyMarkup({ icon: 'self_improvement', title: 'Abend noch ohne Routine', copy: 'Eine kurze Routine schafft einen klaren Übergang in die Nacht.', action: 'routines', actionLabel: 'Routine anlegen' })}</div>
+      <div class="sleep-routines">${state.routines.length ? state.routines.map((routine) => routineMarkup(routine, state.completed.has(routine.id))).join('') : '<div class="sleep-empty">Lege im ROUTINEN-DEX eine Abendroutine oder Meditation an.</div>'}</div>
     </section>
     <section class="sleep-section sleep-progress">
-      <header><div class="sleep-section-title">${materialIconMarkup('chart')}<h2>7-Tage-Verlauf</h2></div><span class="sleep-section-badge">${week.length} / 7</span></header>
+      <header><div class="sleep-section-title">${materialIconMarkup('chart')}<h2>7-Tage-Verlauf</h2></div><small>${week.length} von 7 Nächten</small></header>
       <div class="sleep-stats"><div><strong>${summary.averageMinutes ? durationLabel(summary.averageMinutes) : '–'}</strong><small>Ø Schlaf</small></div><div><strong>${summary.averageQuality ? summary.averageQuality.toFixed(1).replace('.', ',') : '–'}</strong><small>Ø Qualität</small></div><div><strong>${summary.consistencyMinutes || '–'}${summary.consistencyMinutes ? ' min' : ''}</strong><small>Abweichung</small></div></div>
       ${chartMarkup(week)}
       <div class="sleep-month"><span><b>30-Tage-Blick</b><small>${month.length} Check-ins</small></span><span><b>${monthSummary.averageMinutes ? durationLabel(monthSummary.averageMinutes) : '–'}</b><small>Ø Schlaf</small></span><span><b>${bestStreak(state.logs)} Tage</b><small>Beste Serie</small></span></div>
     </section>
     <section class="sleep-section sleep-insights">
-      <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Deine Zusammenhänge</h2></div><button class="sleep-section-info" type="button" data-sleep-info aria-label="Zusammenhänge erklären">i</button></header>
-      <div>${state.logs.length < 6 ? sleepEmptyMarkup({ icon: 'link', title: 'Muster entstehen mit der Zeit', copy: `Noch ${6 - state.logs.length} Check-ins bis zur ersten persönlichen Auswertung.` }) : trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
+      <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Deine Zusammenhänge</h2></div><small>Beobachtete Trends, keine medizinischen Ursachen</small></header>
+      <div>${trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
     </section>
     ${state.logs.length ? `<section class="sleep-section sleep-history"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 
-  content.querySelectorAll('[data-sleep-info]').forEach((button) => { button.onclick = sleepInfoOverlay; });
-  content.querySelector('[data-sleep-primary]').onclick = (event) => {
-    if (event.currentTarget.dataset.sleepPrimary === 'checkin') checkinEditor({ userId, state, onSaved: refresh });
-    else planEditor({ userId, state, onSaved: refresh });
-  };
-  content.querySelectorAll('[data-sleep-empty-action]').forEach((button) => {
-    button.onclick = () => {
-      if (button.dataset.sleepEmptyAction === 'checkin') checkinEditor({ userId, state, onSaved: refresh });
-      if (button.dataset.sleepEmptyAction === 'routines') location.hash = 'habits';
-    };
-  });
+  content.querySelector('[data-edit-sleep-plan]').onclick = () => planEditor({ userId, state, onSaved: refresh });
   content.querySelectorAll('[data-edit-sleep-log]').forEach((button) => { button.onclick = () => checkinEditor({ userId, state, existing: state.logs.find((log) => log.id === button.dataset.editSleepLog), onSaved: refresh }); });
   content.querySelector('.sleep-routines')?.addEventListener('click', async (event) => {
     const row = event.target.closest('[data-sleep-routine]');
@@ -376,7 +322,6 @@ function render(container, userId, state, refresh) {
 
 export async function mountSleepDex(container, { userId, signal, mountChrome }) {
   const color = categoryColor('sleep');
-  container.style.setProperty('--ordner-ink', colorIsDark(color) ? '#fff' : '#000');
   container.innerHTML = `<div class="wrap pad-bottom sleep-dex-page"><div class="seitenkopf"><h1>SLEEP</h1></div><div data-sleep-content><div class="daten-laden">Schlafdaten werden geladen …</div></div></div>`;
   let state = await loadState(userId, signal);
   if (signal?.aborted) return;
