@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
-import { materialIconMarkup, categoryColor } from './categoryIcons.js';
+import { materialIconMarkup, categoryColor, colorIsDark } from './categoryIcons.js';
 import { subscribeToTableChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
@@ -163,7 +163,12 @@ function summaryMarkup(state, date) {
   const { calculated, target } = nutritionTarget(state);
   const remaining = Math.max(0, target - kcal);
   const over = Math.max(0, kcal - target);
-  return `<section class="nutrition-card" data-nutrition-card>
+  const adaptive = adaptiveModel(state, calculated, target);
+  const ordnerInk = colorIsDark(categoryColor('reminders')) ? '#fff' : '#000';
+  const dayStatus = state.dayStatus?.excluded
+    ? 'Sondertag'
+    : state.dayStatus?.complete ? 'Vollständig' : 'Noch offen';
+  return `<section class="nutrition-card" data-nutrition-card style="--ordner-ink:${ordnerInk}">
     <div class="nutrition-stripe"></div>
     ${trackingToggleMarkup(true)}
     <header class="nutrition-day-nav">
@@ -171,14 +176,6 @@ function summaryMarkup(state, date) {
       <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
       <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
     </header>
-    <div class="nutrition-day-quality">
-      <label><input type="checkbox" data-nutrition-day-complete${state.dayStatus?.complete ? ' checked' : ''}><span>Tag vollständig protokolliert</span></label>
-      <label><input type="checkbox" data-nutrition-day-excluded${state.dayStatus?.excluded ? ' checked' : ''}><span>Sondertag aus Kalibrierung ausschließen</span></label>
-      <select class="input" data-nutrition-exclude-reason${state.dayStatus?.excluded ? '' : ' disabled'} aria-label="Grund für ausgeschlossenen Sondertag">
-        ${[['','Grund auswählen'],['Krankheit','Krankheit'],['Reise','Reise'],['Außergewöhnliche Mahlzeiten','Außergewöhnliche Mahlzeiten'],['Unvollständiges Protokoll','Unvollständiges Protokoll'],['Anderer Sondertag','Anderer Sondertag']].map(([value, label]) => `<option value="${value}"${state.dayStatus?.exclude_reason === value ? ' selected' : ''}>${label}</option>`).join('')}
-      </select>
-      <small>Ausgeschlossene Tage zählen nicht gegen die Vollständigkeit und erzwingen keine Kalorienänderung.</small>
-    </div>
     <div class="nutrition-balance">
       <div><small>${target ? (over ? 'ÜBER ZIEL' : 'NOCH OFFEN') : 'HEUTE'}</small><strong>${target ? decimal(over || remaining) : decimal(kcal)} <i>kcal</i></strong></div>
       <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
@@ -186,33 +183,70 @@ function summaryMarkup(state, date) {
     <div class="nutrition-macros">
       ${[['Protein', protein], ['Carbs', carbs], ['Fett', fat]].map(([label, value]) => `<div><span><b>${label}</b><small>${decimal(value)} g</small></span></div>`).join('')}
     </div>
-    <details class="nutrition-calculator">
-      <summary>Kalorienbedarf berechnen ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
-      <form data-nutrition-settings-form>${calculatorMarkup(state, calculated)}</form>
-    </details>
-    ${adaptiveMarkup(state, calculated, target)}
+    <div class="nutrition-quick-actions">
+      <button type="button" data-open-nutrition-calculator>
+        <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
+        ${materialIconMarkup('edit')}
+      </button>
+      <button type="button" data-open-nutrition-day-status>
+        <span><small>PROTOKOLL</small><b>${dayStatus}</b></span>
+        ${materialIconMarkup('select_check_box')}
+      </button>
+    </div>
+    <button class="nutrition-adaptive-teaser" type="button" data-open-nutrition-adaptive>
+      <span><b>Kalorien-Kalibrierung</b><small>${escapeHtml(adaptiveStatusText(adaptive.result))}</small></span>
+      <i aria-hidden="true">i</i>
+    </button>
   </section>`;
 }
 
-function adaptiveMarkup(state, calculated, target) {
+function adaptiveModel(state, calculated, target) {
   const evidence = adaptiveBodyCompEvidence(state);
   const result = adaptiveEnergyEstimate({
     nutritionDays: state.historyDays, weights: state.weights, currentTarget: target || calculated?.target,
     goal: state.settings?.goal || 'maintain', combinedEvidence: evidence.supported,
     lastAdjustmentDate: state.settings?.adaptive_updated_at,
   });
-  const details = result.observedMaintenance
-    ? `<div class="nutrition-adaptive-values"><span><small>BISHERIGES KALORIENZIEL</small><b>${decimal(target)} kcal</b></span><span><small>DURCHSCHNITTLICH PROTOKOLLIERT</small><b>${decimal(result.averageCalories)} kcal</b></span><span><small>BEOBACHTETER ERHALTUNGSBEDARF</small><b>${decimal(result.observedMaintenance)} kcal</b></span><span><small>ZEITRAUM</small><b>${result.spanDays} Tage</b></span><span><small>ERNÄHRUNGSTAGE</small><b>${result.nutritionDaysCount}</b></span><span><small>WIEGUNGEN</small><b>${result.weightMeasurements}</b></span><span><small>GEWICHTSTREND</small><b>${result.weightTrend.weeklyKg > 0 ? '+' : ''}${decimal(result.weightTrend.weeklyKg, 2)} kg/Woche</b></span><span><small>VERTRAUENSSTUFE</small><b>${result.confidence}</b></span><span><small>VORGESCHLAGENE ÄNDERUNG</small><b>${result.suggestedChange > 0 ? '+' : ''}${result.suggestedChange} kcal</b></span><span><small>NÄCHSTE BEWERTUNG</small><b>${result.nextReview ? dateFromKey(result.nextReview).toLocaleDateString('de-DE') : 'nach weiteren Daten'}</b></span></div>`
-    : '';
   const rejectedRecently = state.settings?.adaptive_rejected_at
     && Date.now() - new Date(state.settings.adaptive_rejected_at).getTime() < 7 * 86400000
     && number(state.settings.adaptive_rejected_target) === result.suggestedTarget;
+  return { evidence, result, rejectedRecently, target };
+}
+
+function adaptiveStatusText(result) {
+  if (result.eligible && result.suggestedTarget) return `Vorschlag: ${decimal(result.suggestedTarget)} kcal`;
+  if (!result.spanDays && result.reason) return 'Noch keine ausreichenden Daten';
+  if (result.spanDays && result.spanDays < 21) return `Noch ${21 - result.spanDays} Tage bis zur ersten Auswertung`;
+  if (result.spanDays && number(result.completeness) < 80) return 'Mehr vollständig protokollierte Tage benötigt';
+  if (result.weightTrend && number(result.weightTrend.measurementsPerWeek) < 3) return 'Mehr regelmäßige Gewichtsmessungen benötigt';
+  return 'Verknüpft Ernährung und geglätteten Gewichtstrend';
+}
+
+function adaptiveOverlayMarkup(model) {
+  const { evidence, result, rejectedRecently, target } = model;
+  const details = result.observedMaintenance
+    ? `<div class="nutrition-adaptive-values"><span><small>BISHERIGES KALORIENZIEL</small><b>${decimal(target)} kcal</b></span><span><small>DURCHSCHNITTLICH PROTOKOLLIERT</small><b>${decimal(result.averageCalories)} kcal</b></span><span><small>BEOBACHTETER ERHALTUNGSBEDARF</small><b>${decimal(result.observedMaintenance)} kcal</b></span><span><small>ZEITRAUM</small><b>${result.spanDays} Tage</b></span><span><small>ERNÄHRUNGSTAGE</small><b>${result.nutritionDaysCount}</b></span><span><small>WIEGUNGEN</small><b>${result.weightMeasurements}</b></span><span><small>GEWICHTSTREND</small><b>${result.weightTrend.weeklyKg > 0 ? '+' : ''}${decimal(result.weightTrend.weeklyKg, 2)} kg/Woche</b></span><span><small>VERTRAUENSSTUFE</small><b>${result.confidence}</b></span><span><small>VORGESCHLAGENE ÄNDERUNG</small><b>${result.suggestedChange > 0 ? '+' : ''}${result.suggestedChange} kcal</b></span><span><small>NÄCHSTE BEWERTUNG</small><b>${result.nextReview ? dateFromKey(result.nextReview).toLocaleDateString('de-DE') : 'nach weiteren Daten'}</b></span></div>`
+    : '';
   const action = result.eligible && result.suggestedTarget && !rejectedRecently
     ? `<div class="nutrition-adaptive-actions"><button class="btn btn-primary" type="button" data-accept-adaptive="${result.suggestedTarget}">Vorschlag von ${decimal(result.suggestedTarget)} kcal übernehmen</button><button class="btn" type="button" data-reject-adaptive="${result.suggestedTarget}">Ablehnen</button><button class="btn" type="button" data-later-adaptive>Später entscheiden</button></div>` : '';
-  return `<details class="nutrition-adaptive"><summary>Adaptive Kalorienkalibrierung ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
-    <h4>Warum wird diese Anpassung vorgeschlagen?</h4><p>${escapeHtml(result.reason)}</p>${rejectedRecently ? '<p>Du hast diesen Vorschlag abgelehnt. MUSCLEDEX bewertet ihn nach weiteren Daten erneut.</p>' : ''}${state.settings?.goal === 'bodycomp' ? `<p>Gemeinsame BodyComp-Auswertung: <b>${escapeHtml(evidence.status?.message || 'noch nicht eindeutig')}</b></p>` : ''}${details}${action}
-    <small>${result.spanDays ? `${result.spanDays} Tage · ${decimal(result.completeness)} % vollständig · ` : ''}7.700 kcal/kg sind nur eine vorsichtige Näherung. Wasser, Salz und Glykogen können das Gewicht kurzfristig deutlich verändern. Änderungen werden nie automatisch erzwungen und auf ungefähr 100 kcal pro Woche begrenzt.</small>
-  </details>`;
+  return `<header><div><small>KALORIENZIEL VERSTEHEN</small><h2>Kalorien-Kalibrierung</h2></div><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="nutrition-knowledge-card">
+      <h3>WAS MACHT MUSCLEDEX?</h3>
+      <ol>
+        <li><i>1</i><p><b>Du protokollierst vollständig.</b><span>Mindestens 21 Tage zeigen, was du im Alltag wirklich isst.</span></p></li>
+        <li><i>2</i><p><b>Der Gewichtstrend wird geglättet.</b><span>Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden nicht überbewertet.</span></p></li>
+        <li><i>3</i><p><b>Du entscheidest.</b><span>Ein Vorschlag verändert dein Ziel niemals ohne deine Bestätigung.</span></p></li>
+      </ol>
+      <p class="nutrition-example"><b>Einfaches Beispiel:</b> Isst du im Schnitt 2.700 kcal und dein geglättetes Gewicht sinkt langsam, liegt dein tatsächlicher Erhaltungsbedarf wahrscheinlich etwas über 2.700 kcal.</p>
+    </div>
+    <section class="nutrition-adaptive-status">
+      <h3>DEIN AKTUELLER STAND</h3>
+      <p>${escapeHtml(result.reason)}</p>
+      ${rejectedRecently ? '<p>Du hast diesen Vorschlag abgelehnt. MUSCLEDEX bewertet ihn nach weiteren Daten erneut.</p>' : ''}
+      ${evidence.status ? `<p>Gemeinsame BodyComp-Auswertung: <b>${escapeHtml(evidence.status.message || 'noch nicht eindeutig')}</b></p>` : ''}
+      ${details}${action}
+    </section>
+    <details class="nutrition-technical"><summary>Technische Einordnung ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary><p>Für längere Gewichtstrends nutzt MUSCLEDEX ungefähr 7.700 kcal als grobe rechnerische Entsprechung pro Kilogramm. Das ist keine Tagesregel und keine exakte Messung. Deshalb werden nur geglättete Verläufe bewertet, Vorschläge auf etwa 100 kcal begrenzt und immer von dir bestätigt.</p></details>`;
 }
 
 function calculatorMarkup(state, result) {
@@ -261,7 +295,9 @@ function createOverlay(markup, className = '') {
   const backdrop = document.createElement('div');
   backdrop.className = `kategorie-sheet-backdrop nutrition-overlay ${className}`.trim();
   // Gewählte Dex-Ordnerfarbe (MEAL-LOG = Route „reminders") für die Platzhalter-Felder.
-  backdrop.style.setProperty('--ordner', categoryColor('reminders'));
+  const color = categoryColor('reminders');
+  backdrop.style.setProperty('--ordner', color);
+  backdrop.style.setProperty('--ordner-ink', colorIsDark(color) ? '#fff' : '#000');
   backdrop.innerHTML = `<section class="kategorie-sheet nutrition-sheet" role="dialog" aria-modal="true">${markup}</section>`;
   backdrop.addEventListener('click', (event) => {
     if (event.target === backdrop || event.target.closest('[data-nutrition-close]')) backdrop.remove();
@@ -842,75 +878,8 @@ export async function mountNutrition(container, { userId, signal }) {
       await refresh(); return true;
     } catch (error) { toast(error.message || 'Eintrag konnte nicht gespeichert werden'); return false; }
   };
-  function bind() {
-    const trackingToggle = container.querySelector('[data-nutrition-enabled]');
-    if (trackingToggle) trackingToggle.onchange = async () => {
-      trackingToggle.disabled = true;
-      const enabled = trackingToggle.checked;
-      const { error } = await supabase.from('nutrition_settings').upsert({
-        user_id: userId, tracking_enabled: enabled,
-      }, { onConflict: 'user_id' });
-      if (error) {
-        trackingToggle.disabled = false;
-        trackingToggle.checked = !enabled;
-        return toast('Kalorienzählen konnte nicht umgestellt werden');
-      }
-      state.settings = { ...state.settings, tracking_enabled: enabled };
-      render();
-    };
-    const saveDayStatus = async () => {
-      const complete = Boolean(container.querySelector('[data-nutrition-day-complete]')?.checked);
-      const excluded = Boolean(container.querySelector('[data-nutrition-day-excluded]')?.checked);
-      const reasonField = container.querySelector('[data-nutrition-exclude-reason]');
-      const excludeReason = excluded ? reasonField?.value || 'Anderer Sondertag' : '';
-      const { error } = await supabase.from('nutrition_day_status').upsert({
-        user_id: userId, log_date: date, complete, excluded,
-        exclude_reason: excludeReason,
-      }, { onConflict: 'user_id,log_date' });
-      if (error) return toast('Protokollstatus konnte nicht gespeichert werden');
-      state.dayStatus = { complete, excluded, exclude_reason: excludeReason };
-      toast(complete ? 'Tag als vollständig protokolliert' : 'Protokollstatus aktualisiert');
-      await refresh();
-    };
-    container.querySelector('[data-nutrition-day-excluded]')?.addEventListener('change', (event) => {
-      const reason = container.querySelector('[data-nutrition-exclude-reason]');
-      if (reason) reason.disabled = !event.currentTarget.checked;
-    });
-    container.querySelectorAll('[data-nutrition-day-complete],[data-nutrition-day-excluded],[data-nutrition-exclude-reason]').forEach((input) => { input.onchange = saveDayStatus; });
-    container.querySelector('[data-accept-adaptive]')?.addEventListener('click', async (event) => {
-      const adaptiveTarget = Number(event.currentTarget.dataset.acceptAdaptive);
-      if (!confirm(`Kalorienziel vorsichtig auf ${adaptiveTarget} kcal anpassen?`)) return;
-      const { error } = await supabase.from('nutrition_settings').upsert({
-        user_id: userId,
-        adaptive_target: adaptiveTarget,
-        adaptive_updated_at: new Date().toISOString(),
-        adaptive_rejected_target: null,
-        adaptive_rejected_at: null,
-        custom_calorie_target: null,
-      }, { onConflict: 'user_id' });
-      if (error) return toast('Vorschlag konnte nicht übernommen werden');
-      toast('Kalorienziel nachvollziehbar angepasst'); await refresh();
-    });
-    container.querySelector('[data-reject-adaptive]')?.addEventListener('click', async (event) => {
-      const adaptiveRejectedTarget = Number(event.currentTarget.dataset.rejectAdaptive);
-      const { error } = await supabase.from('nutrition_settings').upsert({
-        user_id: userId, adaptive_rejected_target: adaptiveRejectedTarget, adaptive_rejected_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
-      if (error) return toast('Entscheidung konnte nicht gespeichert werden');
-      event.currentTarget.closest('.nutrition-adaptive').open = false; toast('Vorschlag abgelehnt');
-    });
-    container.querySelector('[data-later-adaptive]')?.addEventListener('click', (event) => {
-      event.currentTarget.closest('.nutrition-adaptive').open = false; toast('Du kannst später entscheiden');
-    });
-    container.querySelectorAll('[data-nutrition-day]').forEach((button) => {
-      button.onclick = async () => {
-        date = shiftedDate(date, Number(button.dataset.nutritionDay));
-        automaticToday = date === localDateKey();
-        await refresh();
-      };
-    });
-    const calculatorForm = container.querySelector('[data-nutrition-settings-form]');
-    if (!calculatorForm) return;
+
+  const bindCalculatorForm = (calculatorForm, backdrop) => {
     const updateCalculatorPreview = () => {
       const preview = calculateEnergyNeed({
         calculationBasis: calculatorForm.querySelector('[data-calc-basis]').value,
@@ -943,8 +912,101 @@ export async function mountNutrition(container, { userId, signal }) {
         supabase.from('weights').upsert({ user_id: userId, gemessen_am: localDateKey(), kg: enteredWeight }, { onConflict: 'user_id,gemessen_am' }).select(),
       ]);
       if (settingsResult.error || weightResult.error) { submit.disabled = false; return toast('Bedarf konnte nicht gespeichert werden'); }
-      toast('Kalorienbedarf gespeichert'); await refresh();
+      backdrop.remove(); toast('Kalorienbedarf gespeichert'); await refresh();
     };
+  };
+
+  const openCalculator = () => {
+    const { calculated } = nutritionTarget(state);
+    const backdrop = createOverlay(`<header><div><small>KALORIENZIEL</small><h2>Kalorienbedarf</h2></div><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+      <form class="nutrition-form" data-nutrition-settings-form>${calculatorMarkup(state, calculated)}</form>`, 'nutrition-calculator-overlay');
+    bindCalculatorForm(backdrop.querySelector('[data-nutrition-settings-form]'), backdrop);
+  };
+
+  const openDayStatus = () => {
+    const status = state.dayStatus || {};
+    const backdrop = createOverlay(`<header><div><small>${escapeHtml(dateLabel(date).toUpperCase())}</small><h2>Protokollstatus</h2></div><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+      <form class="nutrition-form" data-nutrition-day-status-form>
+        <div class="nutrition-day-quality">
+          <label><input type="checkbox" data-nutrition-day-complete${status.complete ? ' checked' : ''}><span>Tag vollständig protokolliert</span></label>
+          <label><input type="checkbox" data-nutrition-day-excluded${status.excluded ? ' checked' : ''}><span>Sondertag aus Kalibrierung ausschließen</span></label>
+          <select class="input" data-nutrition-exclude-reason${status.excluded ? '' : ' disabled'} aria-label="Grund für ausgeschlossenen Sondertag">
+            ${[['','Grund auswählen'],['Krankheit','Krankheit'],['Reise','Reise'],['Außergewöhnliche Mahlzeiten','Außergewöhnliche Mahlzeiten'],['Unvollständiges Protokoll','Unvollständiges Protokoll'],['Anderer Sondertag','Anderer Sondertag']].map(([value, label]) => `<option value="${value}"${status.exclude_reason === value ? ' selected' : ''}>${label}</option>`).join('')}
+          </select>
+          <small>Ein Sondertag wird bei der Kalibrierung übersprungen. Er verschlechtert deine Datenqualität nicht und löst keine Anpassung aus.</small>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Status speichern</button>
+      </form>`, 'nutrition-day-status-overlay');
+    const form = backdrop.querySelector('[data-nutrition-day-status-form]');
+    const excluded = form.querySelector('[data-nutrition-day-excluded]');
+    const reason = form.querySelector('[data-nutrition-exclude-reason]');
+    excluded.onchange = () => { reason.disabled = !excluded.checked; };
+    form.onsubmit = async (event) => {
+      event.preventDefault(); const submit = event.submitter; submit.disabled = true;
+      const complete = form.querySelector('[data-nutrition-day-complete]').checked;
+      const isExcluded = excluded.checked;
+      const excludeReason = isExcluded ? reason.value || 'Anderer Sondertag' : '';
+      const { error } = await supabase.from('nutrition_day_status').upsert({
+        user_id: userId, log_date: date, complete, excluded: isExcluded, exclude_reason: excludeReason,
+      }, { onConflict: 'user_id,log_date' });
+      if (error) { submit.disabled = false; return toast('Protokollstatus konnte nicht gespeichert werden'); }
+      backdrop.remove(); toast('Protokollstatus gespeichert'); await refresh();
+    };
+  };
+
+  const openAdaptive = () => {
+    const { calculated, target } = nutritionTarget(state);
+    const model = adaptiveModel(state, calculated, target);
+    const backdrop = createOverlay(adaptiveOverlayMarkup(model), 'nutrition-adaptive-overlay');
+    backdrop.querySelector('[data-accept-adaptive]')?.addEventListener('click', async (event) => {
+      const adaptiveTarget = Number(event.currentTarget.dataset.acceptAdaptive);
+      if (!confirm(`Kalorienziel vorsichtig auf ${adaptiveTarget} kcal anpassen?`)) return;
+      const { error } = await supabase.from('nutrition_settings').upsert({
+        user_id: userId, adaptive_target: adaptiveTarget, adaptive_updated_at: new Date().toISOString(),
+        adaptive_rejected_target: null, adaptive_rejected_at: null, custom_calorie_target: null,
+      }, { onConflict: 'user_id' });
+      if (error) return toast('Vorschlag konnte nicht übernommen werden');
+      backdrop.remove(); toast('Kalorienziel nachvollziehbar angepasst'); await refresh();
+    });
+    backdrop.querySelector('[data-reject-adaptive]')?.addEventListener('click', async (event) => {
+      const adaptiveRejectedTarget = Number(event.currentTarget.dataset.rejectAdaptive);
+      const { error } = await supabase.from('nutrition_settings').upsert({
+        user_id: userId, adaptive_rejected_target: adaptiveRejectedTarget, adaptive_rejected_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+      if (error) return toast('Entscheidung konnte nicht gespeichert werden');
+      backdrop.remove(); toast('Vorschlag abgelehnt'); await refresh();
+    });
+    backdrop.querySelector('[data-later-adaptive]')?.addEventListener('click', () => {
+      backdrop.remove(); toast('Du kannst später entscheiden');
+    });
+  };
+
+  function bind() {
+    const trackingToggle = container.querySelector('[data-nutrition-enabled]');
+    if (trackingToggle) trackingToggle.onchange = async () => {
+      trackingToggle.disabled = true;
+      const enabled = trackingToggle.checked;
+      const { error } = await supabase.from('nutrition_settings').upsert({
+        user_id: userId, tracking_enabled: enabled,
+      }, { onConflict: 'user_id' });
+      if (error) {
+        trackingToggle.disabled = false;
+        trackingToggle.checked = !enabled;
+        return toast('Kalorienzählen konnte nicht umgestellt werden');
+      }
+      state.settings = { ...state.settings, tracking_enabled: enabled };
+      render();
+    };
+    container.querySelector('[data-open-nutrition-calculator]')?.addEventListener('click', openCalculator);
+    container.querySelector('[data-open-nutrition-day-status]')?.addEventListener('click', openDayStatus);
+    container.querySelector('[data-open-nutrition-adaptive]')?.addEventListener('click', openAdaptive);
+    container.querySelectorAll('[data-nutrition-day]').forEach((button) => {
+      button.onclick = async () => {
+        date = shiftedDate(date, Number(button.dataset.nutritionDay));
+        automaticToday = date === localDateKey();
+        await refresh();
+      };
+    });
   }
   container.innerHTML = '<section class="nutrition-card"><p class="nutrition-empty">Kalorien werden geladen …</p></section>';
   try { await refresh(); }
