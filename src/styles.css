@@ -4213,7 +4213,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte strong{font-size:14px;line-height:1.15}
 .food-dex-page .dex-inhaltskarte-text{font-size:11px;line-height:1.25}
 .food-dex-floating-actions{
-  position:fixed;z-index:70;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));
+  position:fixed;z-index:70;right:16px;bottom:calc(64px + env(safe-area-inset-bottom));
   display:grid;justify-items:end;gap:9px;
 }
 .food-dex-action-button{
@@ -4341,9 +4341,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:0!important;font-variant-numeric:slashed-zero!important;
   font-feature-settings:"zero" 1!important;
 }
-.food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 2px 0 #000}
+.food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 2.5px 0 #000}
 .food-dex-page .dex-inhaltskarte:active{box-shadow:0 1px 0 #000}
-.food-dex-page .dex-inhaltskarte-vorschau{box-sizing:border-box;border:2px solid #000;border-radius:18px 18px 10px 10px;box-shadow:none!important}
+.food-dex-page .dex-inhaltskarte-vorschau{box-sizing:border-box;border:0;border-bottom:2px solid #000;border-radius:18px 18px 10px 10px;box-shadow:none!important}
 .food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 2px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 2px 0 #000}
