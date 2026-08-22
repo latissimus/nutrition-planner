@@ -11,6 +11,13 @@ import '@fontsource/figtree/latin-500.css';
 import '@fontsource/figtree/latin-600.css';
 import '@fontsource/figtree/latin-700.css';
 import '@fontsource/figtree/latin-800.css';
+// Food-Dex typography: open-source display, heading, body and technical faces.
+// These are loaded once here and scoped to .food-dex-page in styles.css so the
+// rest of MUSCLE-DEX keeps its established typography.
+import '@fontsource/bebas-neue/latin-400.css';
+import '@fontsource/outfit/latin.css';
+import '@fontsource/dm-sans/latin.css';
+import '@fontsource/space-mono/latin.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
@@ -1225,6 +1232,7 @@ async function renderRoute() {
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
+    view.classList.add('food-dex-page');
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
       ${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));

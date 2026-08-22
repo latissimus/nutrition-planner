@@ -4130,6 +4130,48 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-dex-muster="triangles"]{background-image:var(--muster-dreieck)!important;background-size:auto!important}
 :root[data-dex-muster="drops"]{background-image:linear-gradient(color-mix(in srgb,var(--bg) 38%,transparent),color-mix(in srgb,var(--bg) 38%,transparent)),var(--muster-tropfen)!important;background-size:auto,112px!important}
 :root[data-dex-muster="bones"]{background-image:linear-gradient(color-mix(in srgb,var(--bg) 38%,transparent),color-mix(in srgb,var(--bg) 38%,transparent)),url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;background-size:auto,112px!important}
+
+/* ---------- FOOD-DEX: Neo-brutalist type and page colour ----------
+   This scope is deliberately limited to the Food-Dex.  The page background
+   is written to the root tokens as well as the view so the same yellow fills
+   the fixed app chrome and the iOS safe-area/status-bar region. */
+:root[data-seite="food-log"]:not([data-theme="dark"]){
+  --bg:#FDEB9E;
+  --surface2:#FDEB9E;
+  --app-bg:#FDEB9E;
+  --app-content-bg:#FDEB9E;
+  --app-chrome-bg:#FDEB9E;
+}
+.food-dex-page{
+  --food-display:"Bebas Neue",sans-serif;
+  --food-heading:"Outfit",sans-serif;
+  --food-body:"DM Sans",sans-serif;
+  --food-mono:"Space Mono",monospace;
+  font-family:var(--food-body);
+}
+.food-dex-page .kategorie-kopftitel strong{
+  font-family:var(--food-display);font-size:clamp(28px,7vw,36px);font-weight:400;
+  line-height:.95;letter-spacing:.025em;text-transform:uppercase;
+}
+.food-dex-page .kategorie-kopftitel small,
+.food-dex-page .dex-inhaltskarte-kopf small,
+.food-dex-page .dex-inhaltskarte-meta,
+.food-dex-page .dex-inhaltskarte-fuss,
+.food-dex-page .sammlung-leer span{
+  font-family:var(--food-mono);font-weight:400;letter-spacing:0;
+}
+.food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2,
+  .unter-sammlung strong,.dex-inhaltskarte strong,.kategorie-kopfknopf,
+  .food-filter-chip,[data-food-filter]){font-family:var(--food-heading);}
+.food-dex-page :is(.dex-inhaltskarte-text,.unter-sammlung small,.sammlung-leer strong,
+  .sammlung-leer span,.dex-mehr-laden small){font-family:var(--food-body);}
+
+/* Food-Dex entries are intentionally clean: no category colour strip at the
+   top of the card.  Keep the preview itself and its border unchanged. */
+.food-dex-page .dex-inhaltskarte-streifen,
+.food-dex-page .dex-inhaltskarte.tiktok-foto-post .dex-inhaltskarte-streifen{
+  display:none!important;height:0!important;flex-basis:0!important;
+}
 :root[data-dex-muster] body,
 :root[data-dex-muster] #app,
 :root[data-dex-muster] #view{background-color:transparent!important;background-image:none!important}
