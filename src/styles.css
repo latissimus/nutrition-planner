@@ -4174,6 +4174,70 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte.tiktok-foto-post .dex-inhaltskarte-streifen{
   display:none!important;height:0!important;flex-basis:0!important;
 }
+
+/* ---------- Food-Dex: Vozzy-inspired card grid ----------
+   The page keeps MUSCLE-DEX's strong outline language, but gives images a
+   generous, softly rounded lower edge and a vertical-only paper shadow. */
+:root[data-seite="food-log"]:not([data-theme="dark"]){
+  --food-page-purple:#6B3FC4;
+  --bg:var(--food-page-purple);
+  --surface2:var(--food-page-purple);
+  --app-bg:var(--food-page-purple);
+  --app-content-bg:var(--food-page-purple);
+  --app-chrome-bg:var(--food-page-purple);
+}
+.food-dex-page .kategorie-kopf{margin-bottom:6px}
+.food-dex-page .kategorie-kopftitel strong{font-size:clamp(18px,5vw,23px);letter-spacing:-.08em}
+.food-dex-page .kategorie-kopftitel small{color:color-mix(in srgb,#fff 78%,transparent)}
+.food-dex-page .kategorie-plus,.food-dex-page [data-category-settings],.food-dex-page .kategorie-schliessen{visibility:hidden;pointer-events:none}
+.food-dex-page .kategorie-scrollinhalt{padding-top:12px}
+.food-dex-intro{
+  display:grid;gap:3px;margin:0 3px 18px;padding:13px 16px 14px;
+  border:2px solid #000;border-radius:18px;background:#fff;color:#111;
+  box-shadow:0 5px 0 #000;
+}
+.food-dex-intro span{font:800 10px/1 "Space Mono",monospace;letter-spacing:.14em;color:#6B3FC4}
+.food-dex-intro strong{font:900 21px/.95 "Outfit",sans-serif;letter-spacing:.01em}
+.food-dex-intro p{margin:0;color:#5f5b67;font:500 12px/1.35 "DM Sans",sans-serif}
+.food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:#fff;border-color:#000}
+.food-dex-page .food-dex-filter button{background:#fff;border-width:2px;box-shadow:none}
+.food-dex-page .dex-inhaltskarte{
+  border-radius:24px;background:#fff;box-shadow:0 8px 0 #000;
+}
+.food-dex-page .dex-inhaltskarte:active{transform:translateY(3px);box-shadow:0 4px 0 #000}
+.food-dex-page .dex-inhaltskarte-vorschau{
+  height:58%!important;flex:0 0 58%!important;aspect-ratio:auto!important;
+  border-bottom:2px solid #000;border-radius:22px 22px 32px 32px;
+}
+.food-dex-page .dex-inhaltskarte-body{padding:10px 11px 12px;gap:4px}
+.food-dex-page .dex-inhaltskarte strong{font-size:14px;line-height:1.15}
+.food-dex-page .dex-inhaltskarte-text{font-size:11px;line-height:1.25}
+.food-dex-floating-actions{
+  position:fixed;z-index:70;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));
+  display:grid;justify-items:end;gap:9px;
+}
+.food-dex-action-button{
+  display:grid;place-items:center;width:52px;height:52px;padding:0;border:2px solid #000;
+  border-radius:17px;background:#fff;color:#000;box-shadow:0 5px 0 #000;text-decoration:none;
+}
+.food-dex-action-button:active{transform:translateY(2px);box-shadow:0 3px 0 #000}
+.food-dex-action-button .material-svg,.food-dex-action-button svg{width:24px;height:24px}
+.food-dex-action-close{background:#fff}
+.food-dex-action-popover{
+  display:grid;gap:0;min-width:210px;padding:5px;border:2px solid #000;border-radius:15px;
+  background:#fff;box-shadow:0 5px 0 #000;color:#111;
+}
+.food-dex-action-popover[hidden]{display:none}
+.food-dex-action-popover button{
+  display:flex;align-items:center;gap:9px;min-height:43px;padding:8px 10px;border:0;background:transparent;
+  color:#111;font:700 13px/1 "Outfit",sans-serif;text-align:left;
+}
+.food-dex-action-popover button+button{border-top:1px solid #000}
+.food-dex-action-popover .material-svg,.food-dex-action-popover svg{width:20px;height:20px}
+
+@media (min-width:700px){
+  .food-dex-floating-actions{right:24px}
+}
 :root[data-dex-muster] body,
 :root[data-dex-muster] #app,
 :root[data-dex-muster] #view{background-color:transparent!important;background-image:none!important}

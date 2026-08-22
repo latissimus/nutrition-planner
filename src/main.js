@@ -1252,6 +1252,40 @@ async function renderRoute() {
       onSelect: () => startDexSelection(view, { userId: foodOwnerId, rootKey: 'food-log', onChanged: refresh }),
       onShare: foodSpace.isShared ? null : () => openShareSheet('food-log'),
     });
+    // Food-Dex gets a compact Vozzy-inspired header: the primary actions live
+    // in one small floating menu so the two-column entry grid has more room.
+    const foodBar = view.querySelector('.kategorie-kopf');
+    const foodAdd = foodBar?.querySelector('.kategorie-plus');
+    const foodSettings = foodBar?.querySelector('[data-category-settings]');
+    const foodClose = foodBar?.querySelector('.kategorie-schliessen');
+    const foodActions = document.createElement('div');
+    foodActions.className = 'food-dex-floating-actions';
+    foodActions.innerHTML = `
+      <div class="food-dex-action-popover" hidden role="menu" aria-label="Food-Dex Aktionen">
+        <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
+        <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>
+      </div>
+      <button type="button" class="food-dex-action-button" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">${materialIconMarkup('more_horiz')}</button>
+      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Food-Dex schließen">${materialIconMarkup('close')}</a>`;
+    foodActions.querySelector('[data-food-menu]').onclick = () => {
+      const panel = foodActions.querySelector('.food-dex-action-popover');
+      const open = panel.hidden;
+      panel.hidden = !open;
+      foodActions.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
+    };
+    foodActions.querySelector('[data-food-action="add"]').onclick = () => { foodActions.querySelector('.food-dex-action-popover').hidden = true; foodAdd?.click(); };
+    foodActions.querySelector('[data-food-action="edit"]').onclick = () => { foodActions.querySelector('.food-dex-action-popover').hidden = true; foodSettings?.click(); };
+    foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
+    foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
+    foodBar?.querySelector('.kategorie-schliessen')?.setAttribute('aria-hidden', 'true');
+    view.appendChild(foodActions);
+    const foodContent = view.querySelector('.kategorie-scrollinhalt');
+    if (foodContent) {
+      const intro = document.createElement('section');
+      intro.className = 'food-dex-intro';
+      intro.innerHTML = `<span>FOOD</span><strong>FOODDEX</strong><p>Rezeptideen, Cheat-Meals und Mahlzeiten an einem Ort.</p>`;
+      foodContent.prepend(intro);
+    }
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
