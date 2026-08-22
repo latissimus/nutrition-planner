@@ -1230,6 +1230,10 @@ async function renderRoute() {
     });
   } else if (route === 'food-log') {
     setSeite('food-log');
+    // The Food-Dex uses its own fixed Pizza wallpaper.  Older builds stored
+    // the former triangles/custom pattern, so migrate that preference before
+    // mounting the page instead of letting the stale value win once more.
+    setPageLookPattern(route, 'wallpaper-pizza');
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
@@ -1241,7 +1245,7 @@ async function renderRoute() {
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
     });
     mountCategoryChrome(view, route, 'Fooddex', {
-      pageLookScope: route, pageLookPattern: 'triangles',
+      pageLookScope: route, pageLookPattern: 'wallpaper-pizza',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),

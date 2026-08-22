@@ -4250,16 +4250,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte:active{box-shadow:0 2px 0 #000}
 .food-dex-page .dex-inhaltskarte-vorschau{border-radius:20px 20px 21px 21px}
 
-/* Vozzy uses a bright, low-contrast lavender pattern instead of dark ink. */
-:root[data-seite="food-log"]:not([data-theme="dark"]){
-  --food-vozzy-pattern:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='150' viewBox='0 0 190 150'%3E%3Cg fill='%23CDB4F4' fill-opacity='.34'%3E%3Ccircle cx='22' cy='24' r='4'/%3E%3Ccircle cx='112' cy='34' r='5'/%3E%3Ccircle cx='171' cy='110' r='4'/%3E%3Cpath d='M65 14l4 9 9 4-9 4-4 9-4-9-9-4 9-4z'/%3E%3Cpath d='M151 57l3 7 7 3-7 3-3 7-3-7-7-3 7-3z'/%3E%3Cpath d='M35 105c9-8 20-8 29 0-9 8-20 8-29 0z'/%3E%3C/g%3E%3C/svg%3E");
-}
-:root[data-seite="food-log"]:not([data-theme="dark"]),
-:root[data-seite="food-log"]:not([data-theme="dark"]) body{
-  background-image:var(--food-vozzy-pattern)!important;
-  background-size:190px 150px!important;
-}
-
 /* Fine spacing and shadow pass for the Food-Dex grid. */
 .food-dex-page .dex-inhaltskarte{
   box-shadow:0 3px 0 #000;
@@ -4318,14 +4308,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Food-Dex final overrides (kept after the generic wallpaper cascade). */
 :root[data-seite="food-log"]:not([data-theme="dark"]){
   --food-page-purple:#6B3FC4;
-  --food-vozzy-pattern:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='150' viewBox='0 0 190 150'%3E%3Cg fill='%23E9D8FF' fill-opacity='.42'%3E%3Ccircle cx='22' cy='24' r='4'/%3E%3Ccircle cx='112' cy='34' r='5'/%3E%3Ccircle cx='171' cy='110' r='4'/%3E%3Cpath d='M65 14l4 9 9 4-9 4-4 9-4-9-9-4 9-4z'/%3E%3Cpath d='M151 57l3 7 7 3-7 3-3 7-3-7-7-3 7-3z'/%3E%3Cpath d='M35 105c9-8 20-8 29 0-9 8-20 8-29 0z'/%3E%3C/g%3E%3C/svg%3E");
-  background-image:var(--food-vozzy-pattern)!important;
-  background-size:190px 150px!important;
-}
-:root[data-seite="food-log"]:not([data-theme="dark"]) body{
-  background-color:var(--food-page-purple)!important;
-  background-image:var(--food-vozzy-pattern)!important;
-  background-size:190px 150px!important;
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) #app,
 :root[data-seite="food-log"]:not([data-theme="dark"]) #view{
@@ -4344,6 +4326,48 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 2px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 2px 0 #000}
+
+/* Food-Dex wallpaper and preview edge: use the supplied Pizza artwork only.
+   The white wash keeps the motif bright and quiet without drawing another
+   decorative pattern on top of it. */
+:root[data-seite="food-log"]:not([data-theme="dark"]){
+  --food-vozzy-pattern:url("../MUSCLEDEX-TAPETEN/Pizza.svg");
+  background-image:linear-gradient(rgba(255,255,255,.48),rgba(255,255,255,.48)),var(--food-vozzy-pattern)!important;
+  background-size:auto,260px 260px!important;
+  background-repeat:repeat!important;
+}
+:root[data-seite="food-log"]:not([data-theme="dark"]) body{
+  background-color:#FBE7A4!important;
+  background-image:linear-gradient(rgba(255,255,255,.48),rgba(255,255,255,.48)),var(--food-vozzy-pattern)!important;
+  background-size:auto,260px 260px!important;
+  background-repeat:repeat!important;
+}
+:root[data-seite="food-log"]:not([data-theme="dark"]) #app,
+:root[data-seite="food-log"]:not([data-theme="dark"]) #view{
+  background-color:transparent!important;background-image:none!important;
+}
+.food-dex-page .dex-inhaltskarte-vorschau{
+  box-sizing:border-box!important;
+  border:2px solid #000!important;
+  border-radius:18px 18px 10px 10px!important;
+  overflow:hidden!important;
+  box-shadow:none!important;
+}
+.food-dex-intro-meta{
+  font-family:"Space Mono",monospace!important;
+  font-variant-numeric:slashed-zero!important;
+  font-feature-settings:"zero" 1!important;
+}
+
+/* The scrollable Food-Dex surface uses the same bright Pizza tile as the
+   status-bar background.  This final rule intentionally comes after the
+   generic wallpaper rules so no legacy drops/triangles layer can win. */
+:root[data-seite="food-log"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
+  background-image:linear-gradient(rgba(255,255,255,.48),rgba(255,255,255,.48)),var(--dex-tapete)!important;
+  background-size:auto,260px 260px!important;
+  background-repeat:repeat!important;
+  background-position:center top!important;
+}
 .seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
 .seite-zurueck{animation:seiteZurueck .4s cubic-bezier(.32,.72,0,1) both}
 .seite-raus-rechts{animation:seiteRausRechts .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
@@ -5465,3 +5489,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .nutrition-adaptive-overlay .nutrition-adaptive-values{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:350px){.nutrition-quick-actions{grid-template-columns:minmax(0,1fr)}.nutrition-adaptive-overlay .nutrition-adaptive-values{grid-template-columns:minmax(0,1fr)}}
+
+/* Keep the Food-Dex's supplied Pizza wallpaper bright on the actual scrolling
+   surface too; this is deliberately last so generic Dex wallpaper rules do
+   not reintroduce the old pattern. */
+:root[data-seite="food-log"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
+  background-image:linear-gradient(rgba(255,255,255,.48),rgba(255,255,255,.48)),var(--dex-tapete)!important;
+  background-size:auto,260px 260px!important;
+  background-repeat:repeat!important;
+  background-position:center top!important;
+}
