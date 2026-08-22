@@ -1257,7 +1257,6 @@ async function renderRoute() {
     const foodBar = view.querySelector('.kategorie-kopf');
     const foodAdd = foodBar?.querySelector('.kategorie-plus');
     const foodSettings = foodBar?.querySelector('[data-category-settings]');
-    const foodClose = foodBar?.querySelector('.kategorie-schliessen');
     const foodActions = document.createElement('div');
     foodActions.className = 'food-dex-floating-actions';
     foodActions.innerHTML = `
@@ -1283,7 +1282,7 @@ async function renderRoute() {
     if (foodContent) {
       const intro = document.createElement('section');
       intro.className = 'food-dex-intro';
-      intro.innerHTML = `<span>FOOD</span><strong>FOODDEX</strong><p>Rezeptideen, Cheat-Meals und Mahlzeiten an einem Ort.</p>`;
+      intro.innerHTML = `<span>FOOD</span><strong>FOODDEX</strong><p>Rezeptideen, Cheat-Meals und Mahlzeiten an einem Ort.</p><small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small>`;
       foodContent.prepend(intro);
     }
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
@@ -1295,6 +1294,8 @@ async function renderRoute() {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        const introMeta = view.querySelector('[data-food-meta]');
+        if (introMeta) introMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
