@@ -4368,16 +4368,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-info-box p{margin:0}
 .food-dex-info-box p+p{margin-top:11px}
 .food-dex-info-box b{font-weight:800}
-.food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 2.5px 0 #000}
+.food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .dex-inhaltskarte:active{box-shadow:0 1px 0 #000}
 .food-dex-page .dex-inhaltskarte-vorschau{
   box-sizing:border-box;width:calc(100% + 4px);max-width:none;
   height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
   border:2px solid #000;border-radius:22px 22px 10px 10px;box-shadow:none!important;
 }
-.food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 2px 0 #000}
+.food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
-.food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 2px 0 #000}
+.food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
 .seite-zurueck{animation:seiteZurueck .4s cubic-bezier(.32,.72,0,1) both}
 .seite-raus-rechts{animation:seiteRausRechts .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
