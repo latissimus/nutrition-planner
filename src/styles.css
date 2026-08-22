@@ -4393,7 +4393,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-retro-window-front{transition:transform 70ms ease-out}
 .food-dex-retro-menu:active .food-dex-retro-window-front{transform:translateY(3px)}
 .food-dex-retro-menu:active .food-dex-retro-window-shadow{opacity:0}
-.food-dex-retro-window-inside{fill:#fff}
+.food-dex-retro-window-inside{fill:transparent}
 .seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
 .seite-zurueck{animation:seiteZurueck .4s cubic-bezier(.32,.72,0,1) both}
 .seite-raus-rechts{animation:seiteRausRechts .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
