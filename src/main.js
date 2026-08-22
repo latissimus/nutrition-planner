@@ -1266,26 +1266,29 @@ async function renderRoute() {
       </div>
       <button type="button" class="food-dex-action-button food-dex-retro-menu" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">
         <span class="food-dex-retro-window" aria-hidden="true">
-          <svg viewBox="0 0 62 55" preserveAspectRatio="none">
+          <svg viewBox="0 0 55 55" preserveAspectRatio="xMidYMid meet">
             <defs>
               <mask id="food-dex-menu-window-cutout" maskUnits="userSpaceOnUse">
-                <rect width="62" height="55" fill="#fff"/>
-                <rect x="7" y="21" width="43" height="23" rx="5" fill="#000"/>
+                <rect width="55" height="55" fill="#fff"/>
+                <rect x="7" y="21" width="38" height="23" rx="7" fill="#000"/>
               </mask>
+              <clipPath id="food-dex-menu-window-clip">
+                <rect x="1" y="1" width="50" height="50" rx="16"/>
+              </clipPath>
             </defs>
-            <rect class="food-dex-retro-window-shadow" x="6" y="5" width="53" height="47" rx="7" fill="#7560E6" mask="url(#food-dex-menu-window-cutout)"/>
+            <rect class="food-dex-retro-window-shadow" x="4" y="4" width="50" height="50" rx="16" fill="#000" mask="url(#food-dex-menu-window-cutout)"/>
             <g class="food-dex-retro-window-front">
-              <rect x="2" y="2" width="54" height="47" rx="7" fill="#F2A5DA" stroke="#8968FF" stroke-width="2.3" mask="url(#food-dex-menu-window-cutout)"/>
-              <path d="M9 2h40a7 7 0 0 1 7 7v8H2V9a7 7 0 0 1 7-7Z" fill="#AEEBFA"/>
-              <path d="M2 17h54" fill="none" stroke="#8968FF" stroke-width="2.3"/>
-              <path d="M31 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
-              <rect x="38" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
-              <path d="m46 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
-              <rect class="food-dex-retro-window-inside" x="7" y="21" width="43" height="23" rx="5"/>
-              <rect x="7" y="21" width="43" height="23" rx="5" fill="none" stroke="#8968FF" stroke-width="1.8"/>
-              <circle cx="22" cy="32.5" r="1.7" fill="#111"/>
-              <circle cx="28.5" cy="32.5" r="1.7" fill="#111"/>
-              <circle cx="35" cy="32.5" r="1.7" fill="#111"/>
+              <rect x="1" y="1" width="50" height="50" rx="16" fill="#F2A5DA" stroke="#000" stroke-width="2" mask="url(#food-dex-menu-window-cutout)"/>
+              <path d="M1 1h50v17H1z" fill="#AEEBFA" clip-path="url(#food-dex-menu-window-clip)"/>
+              <path d="M1 18h50" fill="none" stroke="#000" stroke-width="2"/>
+              <path d="M28 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
+              <rect x="35" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
+              <path d="m43 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
+              <rect class="food-dex-retro-window-inside" x="7" y="21" width="38" height="23" rx="7"/>
+              <rect x="7" y="21" width="38" height="23" rx="7" fill="none" stroke="#000" stroke-width="2"/>
+              <circle cx="20" cy="32.5" r="2.2" fill="#111"/>
+              <circle cx="26" cy="32.5" r="2.2" fill="#111"/>
+              <circle cx="32" cy="32.5" r="2.2" fill="#111"/>
             </g>
           </svg>
         </span>

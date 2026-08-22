@@ -4362,7 +4362,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-info-box{
   margin:-7px 3px 18px;padding:14px 15px;border:2px solid #000;border-radius:14px;
-  background:#fff;color:#586274;font:400 14px/1.55 var(--tech);box-shadow:none;
+  background:#fff;color:#586274;font:400 12.5px/1.55 var(--tech);box-shadow:none;
 }
 .food-dex-info-box[hidden]{display:none}
 .food-dex-info-box p{margin:0}
@@ -4382,10 +4382,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:visible;padding:0;border:0;background:transparent;box-shadow:none!important;
 }
 .food-dex-page .food-dex-retro-menu:active{transform:none;box-shadow:none!important}
-.food-dex-retro-window{display:block;width:58px;height:54px;pointer-events:none}
+.food-dex-retro-window{display:block;width:55px;height:55px;pointer-events:none}
 .food-dex-retro-window svg{display:block;width:100%;height:100%;overflow:visible}
 .food-dex-retro-window-front{transition:transform 70ms ease-out}
-.food-dex-retro-menu:active .food-dex-retro-window-front{transform:translate(4px,3px)}
+.food-dex-retro-menu:active .food-dex-retro-window-front{transform:translate(3px,3px)}
 .food-dex-retro-menu:active .food-dex-retro-window-shadow{opacity:0}
 .food-dex-retro-window-inside{fill:#fff}
 .seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
