@@ -1276,14 +1276,14 @@ async function renderRoute() {
                 <rect x="1" y="1" width="50" height="50" rx="16"/>
               </clipPath>
             </defs>
-            <rect class="food-dex-retro-window-shadow" x="4" y="4" width="50" height="50" rx="16" fill="#000" mask="url(#food-dex-menu-window-cutout)"/>
+            <rect class="food-dex-retro-window-shadow" x="1" y="4" width="50" height="50" rx="16" fill="#000" mask="url(#food-dex-menu-window-cutout)"/>
             <g class="food-dex-retro-window-front">
               <rect x="1" y="1" width="50" height="50" rx="16" fill="#F2A5DA" stroke="#000" stroke-width="2" mask="url(#food-dex-menu-window-cutout)"/>
               <path d="M1 1h50v17H1z" fill="#AEEBFA" clip-path="url(#food-dex-menu-window-clip)"/>
               <path d="M1 18h50" fill="none" stroke="#000" stroke-width="2"/>
-              <path d="M28 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
-              <rect x="35" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
-              <path d="m43 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M24 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
+              <rect x="31" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
+              <path d="m39 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
               <rect class="food-dex-retro-window-inside" x="7" y="21" width="38" height="23" rx="7"/>
               <rect x="7" y="21" width="38" height="23" rx="7" fill="none" stroke="#000" stroke-width="2"/>
               <circle cx="20" cy="32.5" r="2.2" fill="#111"/>
