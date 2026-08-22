@@ -4150,7 +4150,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-family:var(--food-body);
 }
 .food-dex-page .kategorie-kopftitel strong{
-  font-family:var(--food-display);font-size:clamp(19px,5.6vw,29px);font-weight:900;
+  font-family:var(--food-display);font-size:clamp(19px,5.6vw,19px);font-weight:900;
   line-height:.95;letter-spacing:-.01em;text-transform:uppercase;
 }
 .food-dex-page .kategorie-kopftitel small{
