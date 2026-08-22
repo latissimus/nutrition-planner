@@ -4380,7 +4380,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-retro-menu{
   overflow:hidden;padding:0;border:2px solid #000;border-radius:13px;
-  background:rgba(255,255,255,.2);box-shadow:0 3.5px 0 #000!important;
+  background:#000;box-shadow:0 3.5px 0 #000!important;
   -webkit-backdrop-filter:blur(7px) saturate(1.2);
   backdrop-filter:blur(7px) saturate(1.2);
 }
@@ -4391,7 +4391,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:absolute;z-index:1;inset:0;overflow:hidden;border-radius:10px;background:transparent;
 }
 .food-dex-window-face::after{content:none}
-.food-dex-window-shape{position:absolute!important;z-index:2;inset:0;display:block!important;width:100%!important;height:100%!important;color:var(--food-page-purple)}
+.food-dex-window-shape{position:absolute!important;z-index:2;inset:0;display:block!important;width:100%!important;height:100%!important;color:#fff}
 .food-dex-window-shape>svg{display:block;width:100%!important;height:100%!important;overflow:visible}
 .food-dex-window-glass,.food-dex-window-aperture{display:none}
 .food-dex-window-glass-main{display:none}
