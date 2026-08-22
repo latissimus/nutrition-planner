@@ -4137,10 +4137,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    the fixed app chrome and the iOS safe-area/status-bar region. */
 :root[data-seite="food-log"]:not([data-theme="dark"]){
   --bg:#F0E9B6;
-  --surface2:#FAE7CB;
-  --app-bg:#FAE7CB;
-  --app-content-bg:#FAE7CB;
-  --app-chrome-bg:#FAE7CB;
+  --surface2:#FDEB9E;
+  --app-bg:#FDEB9E;
+  --app-content-bg:#FDEB9E;
+  --app-chrome-bg:#FDEB9E;
 }
 .food-dex-page{
   --food-display:"Lexend Exa",sans-serif;
