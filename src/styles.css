@@ -4281,16 +4281,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Match the reference site's heavier ink edge while keeping the shadow
    strictly vertical. */
 .food-dex-page .dex-inhaltskarte{
-  border-width:3px;box-shadow:0 6px 0 #000;
+  border-width:3px;box-shadow:0 3px 0 #000;
 }
 .food-dex-page .dex-inhaltskarte:active{box-shadow:0 3px 0 #000}
 .food-dex-page .dex-inhaltskarte-vorschau{
   border-bottom-width:3px;border-radius:20px 20px 14px 14px;
 }
-.food-dex-page .food-dex-filter button{border-width:3px}
-.food-dex-page .food-dex-action-button{border-width:3px;box-shadow:0 5px 0 #000}
+.food-dex-page .food-dex-filter button{border-width:2px}
+.food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 2px 0 #000}
-.food-dex-page .food-dex-action-popover{border-width:3px;box-shadow:0 5px 0 #000}
+.food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-intro-meta{
   margin:0 0 1px;padding:0;border:0;color:var(--food-page-purple);
   font-size:10px;line-height:1.1;
