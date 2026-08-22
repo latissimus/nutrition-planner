@@ -4325,7 +4325,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page::before{
   content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
-  background:#fff;opacity:.2;
+  background:#fff;opacity:.15;
   -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
   -webkit-mask-size:360px auto;mask-size:360px auto;
   -webkit-mask-position:center top;mask-position:center top;
@@ -4343,7 +4343,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 2px 0 #000}
 .food-dex-page .dex-inhaltskarte:active{box-shadow:0 1px 0 #000}
-.food-dex-page .dex-inhaltskarte-vorschau{border-bottom:2px solid #000;border-radius:18px 18px 10px 10px;box-shadow:none!important}
+.food-dex-page .dex-inhaltskarte-vorschau{box-sizing:border-box;border:2px solid #000;border-radius:18px 18px 10px 10px;box-shadow:none!important}
 .food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 2px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 2px 0 #000}
