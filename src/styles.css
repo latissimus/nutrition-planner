@@ -4380,48 +4380,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-retro-menu{
   overflow:hidden;padding:0;border:2px solid #000;border-radius:13px;
-  background:#fff;box-shadow:0 3.5px 0 #000!important;
+  background:rgba(255,255,255,.2);box-shadow:0 3.5px 0 #000!important;
+  -webkit-backdrop-filter:blur(7px) saturate(1.2);
+  backdrop-filter:blur(7px) saturate(1.2);
 }
 .food-dex-page .food-dex-retro-menu:active{transform:translateY(2px);box-shadow:0 1.5px 0 #000!important}
 .food-dex-window-symbol{position:relative;display:block;width:48px;height:48px;pointer-events:none}
 .food-dex-window-shadow{display:none}
 .food-dex-window-face{
-  position:absolute;z-index:1;inset:0;overflow:hidden;border-radius:10px;background:#fff;
+  position:absolute;z-index:1;inset:0;overflow:hidden;border-radius:10px;background:transparent;
 }
 .food-dex-window-face::after{content:none}
-.food-dex-window-shape{display:none!important}
+.food-dex-window-shape{position:absolute!important;z-index:2;inset:0;display:block!important;width:100%!important;height:100%!important}
 .food-dex-window-shape>svg{display:block;width:100%!important;height:100%!important;overflow:visible}
-.food-dex-window-shape svg path{
-  fill:#fff!important;stroke:none!important;
-}
-.food-dex-window-glass{
-  position:absolute;z-index:1;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.12)),
-    rgba(107,63,196,.48);
-  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
-  backdrop-filter:blur(6.65px) saturate(1.25);
-}
-.food-dex-window-aperture{
-  position:absolute;z-index:3;left:18%;top:38%;width:64%;height:43%;
-  display:block;overflow:hidden;border:0;border-radius:4px;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.08)),
-    rgba(107,63,196,.5);
-  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
-  backdrop-filter:blur(6.65px) saturate(1.25);
-}
+.food-dex-window-glass,.food-dex-window-aperture{display:none}
 .food-dex-window-glass-main{display:none}
 .food-dex-window-glass-dot{top:10.5%;width:12%;aspect-ratio:1;border:0;border-radius:50%}
 .food-dex-window-glass-dot.dot-one{left:10%}
 .food-dex-window-glass-dot.dot-two{left:26%}
 .food-dex-window-glass-dot.dot-three{left:42%}
-.food-dex-window-menu-dots{
-  position:absolute;z-index:4;left:50%;top:59.5%;display:flex;align-items:center;gap:5px;
-  padding:0;border:0;background:transparent;
-  transform:translate(-50%,-50%);
-}
-.food-dex-window-menu-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#111}
+.food-dex-window-menu-dots{display:none}
 .food-dex-retro-menu:active .food-dex-window-face{transform:none}
 .food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
 
