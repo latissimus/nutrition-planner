@@ -11,10 +11,8 @@ import '@fontsource/figtree/latin-500.css';
 import '@fontsource/figtree/latin-600.css';
 import '@fontsource/figtree/latin-700.css';
 import '@fontsource/figtree/latin-800.css';
-// FOOD-DEX-Pilot nach dem Neubrutalism-Guide: klar getrennte Rollen statt
-// einer einzigen Schrift fuer jede Information. Die Dateien liegen lokal im
-// Bundle und funktionieren dadurch auch in der installierten PWA offline.
-import '@fontsource/syne/latin-800.css';
+// FOOD-DEX-Pilot: lokal gebundelte Schriften fuer den ruhigeren Vozzy-Look.
+// Dadurch bleibt die Typografie auch in der installierten PWA offline stabil.
 import '@fontsource/space-grotesk/latin-700.css';
 import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-600.css';
@@ -1236,11 +1234,6 @@ async function renderRoute() {
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
-      <section class="food-dex-editorial" aria-labelledby="food-dex-editorial-title">
-        <span>DEIN REZEPTARCHIV</span>
-        <h2 id="food-dex-editorial-title">GUTE IDEEN.<br>SCHNELL WIEDERGEFUNDEN.</h2>
-        <p>Rezepte, Clips und schnelle Standards für Tage ohne Plan.</p>
-      </section>
       ${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({

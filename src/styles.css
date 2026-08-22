@@ -5272,17 +5272,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:350px){.nutrition-quick-actions{grid-template-columns:minmax(0,1fr)}.nutrition-adaptive-overlay .nutrition-adaptive-values{grid-template-columns:minmax(0,1fr)}}
 
 /* ============================================================
-   FOOD-DEX — isolierter Neo-Brutalismus-Pilot
+   FOOD-DEX — Vozzy-inspirierter Feed
 
-   Typografie nach neubrutalism.com:
-   Syne 800 = Display, Space Grotesk 700 = Ueberschriften,
-   Inter = Lesetext, Space Mono = Metadaten/Zaehler.
-   Die Seite bleibt funktional derselbe Dex; nur Komposition und visuelle
-   Hierarchie werden hier bewusst redaktioneller und kraeftiger.
+   Keine Hero- oder Feature-Karte: Alle Inhalte sind gleichwertig. Vozzy
+   liefert hier nur das Raster (runde Karten, ruhige Typografie, kompakte
+   Kreisaktionen), waehrend Farbe, Tapete und harter Retro-Schatten MUSCLE-DEX
+   bleiben.
    ============================================================ */
 .food-dex-pilot{
   --food-page:#FFE59D;
-  --food-display:"Syne",var(--display);
   --food-heading:"Space Grotesk",var(--display);
   --food-body:"Inter",var(--ui);
   --food-mono:"Space Mono",var(--tech);
@@ -5297,128 +5295,95 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-top:7px;padding-bottom:10px;background:var(--food-page);
 }
 .food-dex-pilot .kategorie-kopftitel strong{
-  font-family:var(--food-display);font-size:clamp(19px,5.2vw,23px);
-  font-weight:800;letter-spacing:-.045em;
+  font-family:var(--ui);font-size:clamp(18px,4.8vw,21px);
+  font-weight:800;letter-spacing:-.025em;
 }
 .food-dex-pilot .kategorie-kopftitel small{
-  margin-top:6px;color:color-mix(in srgb,var(--food-outline) 68%,transparent);
-  font:700 10px/1.15 var(--food-mono);letter-spacing:.015em;
+  margin-top:5px;color:color-mix(in srgb,var(--food-outline) 62%,transparent);
+  font:600 10px/1.2 var(--food-body);letter-spacing:0;
 }
 .food-dex-pilot .kategorie-kopfknopf{
-  border:3px solid var(--food-outline);border-radius:9px;
+  border:2px solid var(--food-outline);border-radius:50%;
   background:var(--food-card);box-shadow:4px 4px 0 var(--food-outline);
 }
 .food-dex-pilot .kategorie-kopfknopf.kategorie-plus{background:var(--food-pink)}
 .food-dex-pilot .kategorie-scrollinhalt{
-  padding-top:14px;background-color:var(--food-page)!important;
+  padding-top:18px;background-color:var(--food-page)!important;
 }
 :root:not([data-theme="dark"]) .food-dex-pilot.dex-tapete-datei .kategorie-scrollinhalt{
   background-image:
-    linear-gradient(color-mix(in srgb,var(--food-page) 76%,transparent),color-mix(in srgb,var(--food-page) 76%,transparent)),
+    linear-gradient(color-mix(in srgb,var(--food-page) 77%,transparent),color-mix(in srgb,var(--food-page) 77%,transparent)),
     var(--dex-tapete)!important;
   background-size:auto,330px auto!important;
 }
 
-.food-dex-editorial{
-  position:relative;display:grid;gap:7px;margin:0 4px 24px;padding:19px 18px 21px;
-  overflow:hidden;border:3px solid var(--food-outline);border-radius:10px;
-  background:var(--food-pink);color:#111;box-shadow:6px 6px 0 var(--food-outline);
-}
-.food-dex-editorial::after{
-  content:"";position:absolute;right:-33px;bottom:-39px;width:126px;height:126px;
-  border:3px solid var(--food-outline);border-radius:50%;background:#FFE59D;
-}
-.food-dex-editorial>span{
-  position:relative;z-index:1;width:max-content;padding:6px 8px;border:2px solid var(--food-outline);
-  border-radius:5px;background:var(--food-brown);color:#fff;
-  font:700 10px/1 var(--food-mono);letter-spacing:.055em;
-}
-.food-dex-editorial h2{
-  position:relative;z-index:1;max-width:83%;margin:4px 0 0;
-  font:800 clamp(25px,7.1vw,34px)/.94 var(--food-display);letter-spacing:-.055em;
-}
-.food-dex-editorial p{
-  position:relative;z-index:1;max-width:76%;margin:2px 0 0;
-  font:600 13px/1.4 var(--food-body);
-}
-
 .food-dex-pilot .food-dex-filter{
-  gap:10px;margin:0 -2px 26px;padding:6px 3px 10px;
+  gap:9px;margin:0 -2px 28px;padding:3px 3px 9px;
 }
 .food-dex-pilot .food-dex-filter button{
-  min-height:40px;padding:9px 14px;border:2px solid var(--food-outline);
-  border-radius:7px;background:var(--food-card);color:#111;
+  min-height:38px;padding:9px 15px;border:2px solid var(--food-outline);
+  border-radius:999px;background:var(--food-card);color:#111;
   box-shadow:3px 3px 0 var(--food-outline);
   font:700 12px/1 var(--food-heading);letter-spacing:-.01em;
 }
 .food-dex-pilot .food-dex-filter button.aktiv{
-  background:var(--food-brown);color:#fff;box-shadow:none;transform:translate(3px,3px);
+  background:var(--food-brown);color:#fff;box-shadow:1px 1px 0 var(--food-outline);
+  transform:translate(2px,2px);
 }
 
-.food-dex-pilot .dex-eintrag-gruppe{margin-bottom:34px}
+.food-dex-pilot .dex-eintrag-gruppe{margin-bottom:36px}
 .food-dex-pilot .dex-eintrag-gruppe>h2,
 .food-dex-pilot .sammlung-alle>h2{
-  display:flex;align-items:center;gap:12px;margin:0 4px 17px;
-  color:#111;font:700 clamp(19px,5.3vw,24px)/1 var(--food-heading);
-  letter-spacing:-.035em;text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;margin:0 4px 16px;
+  color:#111;font:700 clamp(17px,4.8vw,21px)/1 var(--food-heading);
+  letter-spacing:-.025em;text-transform:uppercase;
 }
 .food-dex-pilot .dex-eintrag-gruppe>h2::after,
 .food-dex-pilot .sammlung-alle>h2::after{
-  content:"";min-width:26px;height:3px;flex:1;background:var(--food-outline);
+  content:"";min-width:28px;height:2px;flex:1;background:var(--food-outline);
 }
-.food-dex-pilot .dex-inhaltsgrid{gap:18px;padding:0 6px 7px}
+
+/* Vozzy zeigt auf dem Smartphone einen ruhigen, einspaltigen Feed. Jede
+   Karte hat denselben Rang und dieselbe Geometrie. */
+.food-dex-pilot .dex-inhaltsgrid{
+  grid-template-columns:minmax(0,1fr);gap:24px;padding:0 7px 8px;
+}
 .food-dex-pilot .dex-inhaltskarte{
-  aspect-ratio:4/5;border:3px solid var(--food-outline);border-radius:10px;
-  background:var(--food-card);color:#111;box-shadow:6px 6px 0 var(--food-outline);
+  width:100%;aspect-ratio:auto;min-height:0;border:2px solid var(--food-outline);
+  border-radius:24px;background:var(--food-card);color:#111;
+  box-shadow:5px 5px 0 var(--food-outline);
 }
-.food-dex-pilot .dex-inhaltskarte-streifen{height:8px;flex-basis:8px}
+.food-dex-pilot .dex-inhaltskarte-streifen{display:none}
 .food-dex-pilot .dex-inhaltskarte-vorschau{
-  height:53%;flex:0 0 53%;border-bottom:3px solid var(--food-outline);
+  width:100%;height:auto;flex:0 0 auto;aspect-ratio:16/9;
+  border-bottom:2px solid var(--food-outline);background:var(--eintrag-farbe);
 }
-.food-dex-pilot .dex-inhaltskarte-body{gap:6px;padding:11px 12px 13px}
+.food-dex-pilot .dex-inhaltskarte-body{
+  align-items:center;gap:7px;min-height:104px;padding:17px 20px 19px;text-align:center;
+}
 .food-dex-pilot .dex-inhaltskarte strong{
-  color:#111;font:700 15px/1.12 var(--food-heading);letter-spacing:-.025em;
+  width:100%;color:#111;font:700 clamp(19px,5.3vw,23px)/1.12 var(--food-heading);
+  letter-spacing:-.035em;-webkit-line-clamp:2;
 }
 .food-dex-pilot .dex-inhaltskarte-text{
-  color:#5D554F;font:400 11px/1.35 var(--food-body);
-}
-.food-dex-pilot .dex-inhaltskarte-kopf small,
-.food-dex-pilot .dex-inhaltskarte-meta,
-.food-dex-pilot .dex-inhaltskarte-fuss{
-  color:#5D554F;font-family:var(--food-mono);font-weight:700;letter-spacing:.035em;
-}
-
-/* Vozzy-Prinzip: Das erste sichtbare Ergebnis ist ein redaktionelles Feature,
-   danach folgt das schnelle zweispaltige Archiv. */
-.food-dex-pilot .dex-eintrag-listen>.dex-eintrag-gruppe:first-child .dex-inhaltskarte:first-child{
-  grid-column:1/-1;aspect-ratio:auto;min-height:360px;
-}
-.food-dex-pilot .dex-eintrag-listen>.dex-eintrag-gruppe:first-child .dex-inhaltskarte:first-child .dex-inhaltskarte-vorschau{
-  height:auto;flex-basis:auto;aspect-ratio:16/9;
-}
-.food-dex-pilot .dex-eintrag-listen>.dex-eintrag-gruppe:first-child .dex-inhaltskarte:first-child .dex-inhaltskarte-body{
-  min-height:112px;padding:14px 16px 16px;
-}
-.food-dex-pilot .dex-eintrag-listen>.dex-eintrag-gruppe:first-child .dex-inhaltskarte:first-child strong{
-  font:700 clamp(21px,6vw,27px)/1.03 var(--food-heading);letter-spacing:-.04em;
-}
-.food-dex-pilot .dex-eintrag-listen>.dex-eintrag-gruppe:first-child .dex-inhaltskarte:first-child .dex-inhaltskarte-text{
-  font-size:13px;-webkit-line-clamp:2;
+  width:100%;color:#6B625C;font:400 13px/1.4 var(--food-body);
+  -webkit-line-clamp:2;
 }
 .food-dex-pilot .dex-inhaltskarte:active{
-  transform:translate(5px,5px);box-shadow:1px 1px 0 var(--food-outline);
+  transform:translate(4px,4px);box-shadow:1px 1px 0 var(--food-outline);
 }
+.food-dex-pilot .dex-favorit-marker{top:12px;right:12px}
 
 .food-dex-pilot .sammlung-leer{
-  min-height:330px;margin:0 6px 8px;padding:34px 20px;
-  border:3px solid var(--food-outline);border-radius:10px;
-  background:var(--food-card);box-shadow:6px 6px 0 var(--food-outline);
-  color:#5D554F;font-family:var(--food-body);
+  min-height:300px;margin:0 7px 8px;padding:36px 24px;
+  border:2px solid var(--food-outline);border-radius:24px;
+  background:var(--food-card);box-shadow:5px 5px 0 var(--food-outline);
+  color:#6B625C;font-family:var(--food-body);
 }
 .food-dex-pilot .sammlung-leer strong{
-  color:#111;font:800 24px/1 var(--food-display);letter-spacing:-.045em;text-transform:uppercase;
+  color:#111;font:700 22px/1.05 var(--food-heading);letter-spacing:-.035em;text-transform:uppercase;
 }
-.food-dex-pilot .sammlung-leer span{font:400 14px/1.45 var(--food-body)}
+.food-dex-pilot .sammlung-leer span{font:400 14px/1.5 var(--food-body)}
 .food-dex-pilot .dex-leer-symbol i{box-shadow:4px 4px 0 var(--food-pink)}
 
 .food-dex-pilot .unter-sammlungen-grid{gap:18px;padding-inline:6px}
@@ -5434,9 +5399,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .food-dex-pilot :is(.dex-inhaltskarte-text,.dex-inhaltskarte-meta,.dex-inhaltskarte-fuss){color:#B7C0CF}
 :root[data-theme="dark"] .food-dex-pilot .food-dex-filter button{color:#F4F6FA}
 
+@media(min-width:680px){
+  .food-dex-pilot .dex-inhaltsgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media(max-width:360px){
-  .food-dex-editorial h2{max-width:88%;font-size:24px}
-  .food-dex-editorial p{max-width:82%;font-size:12px}
-  .food-dex-pilot .dex-inhaltsgrid{gap:14px}
-  .food-dex-pilot .dex-inhaltskarte strong{font-size:14px}
+  .food-dex-pilot .dex-inhaltsgrid{gap:20px;padding-inline:5px}
+  .food-dex-pilot .dex-inhaltskarte-body{padding-inline:16px}
+  .food-dex-pilot .dex-inhaltskarte strong{font-size:18px}
 }
