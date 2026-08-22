@@ -4397,14 +4397,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:absolute;display:block;z-index:3;background:var(--food-page-purple);border:0;
 }
 .food-dex-window-aperture{
-  display:block;position:absolute;z-index:3;left:14%;top:33%;width:72%;height:50%;
+  display:block;position:absolute;z-index:3;left:9%;top:33%;width:82%;height:50%;
   overflow:hidden;border:0;border-radius:4px;background:var(--food-page-purple);
 }
 .food-dex-window-glass-main{display:none}
-.food-dex-window-glass-dot{top:10.5%;width:12%;aspect-ratio:1;border:0;border-radius:50%}
-.food-dex-window-glass-dot.dot-one{left:10%}
-.food-dex-window-glass-dot.dot-two{left:26%}
-.food-dex-window-glass-dot.dot-three{left:42%}
+.food-dex-window-glass-dot{top:5.5px;width:5.76px;height:5.76px;border:0;border-radius:50%}
+.food-dex-window-glass-dot.dot-one{left:4.32px}
+.food-dex-window-glass-dot.dot-two{left:11.04px}
+.food-dex-window-glass-dot.dot-three{left:17.76px}
 .food-dex-window-menu-dots{
   position:absolute;z-index:4;left:50%;top:58%;display:flex;align-items:center;gap:3px;
   padding:0;border:0;background:transparent;transform:translate(-50%,-50%);
