@@ -4150,10 +4150,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-family:var(--food-body);
 }
 .food-dex-page .kategorie-kopftitel strong{
-  font-family:var(--food-display);font-size:clamp(28px,7vw,36px);font-weight:400;
-  line-height:.95;letter-spacing:.025em;text-transform:uppercase;
+  font-family:var(--food-display);font-size:clamp(25px,6.2vw,32px);font-weight:400;
+  line-height:.95;letter-spacing:-.035em;text-transform:uppercase;
 }
-.food-dex-page .kategorie-kopftitel small,
+.food-dex-page .kategorie-kopftitel small{
+  font-family:var(--food-mono);font-weight:400;letter-spacing:0;
+}
 .food-dex-page .dex-inhaltskarte-kopf small,
 .food-dex-page .dex-inhaltskarte-meta,
 .food-dex-page .dex-inhaltskarte-fuss,
