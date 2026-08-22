@@ -4382,20 +4382,32 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:visible;padding:0;border:0;background:transparent;box-shadow:none!important;
 }
 .food-dex-page .food-dex-retro-menu:active{transform:none;box-shadow:none!important}
-.food-dex-retro-window{position:relative;display:block;width:55px;height:55px;pointer-events:none}
-.food-dex-retro-window::before{
-  content:"";position:absolute;z-index:0;left:7px;top:21px;width:38px;height:23px;
-  border-radius:7px;background:rgba(255,255,255,.27);
+.food-dex-window-symbol{position:relative;display:block;width:55px;height:55px;pointer-events:none}
+.food-dex-window-shadow{
+  position:absolute;z-index:0;left:2.5px;right:2.5px;bottom:.5px;height:8px;
+  border-radius:0 0 12px 12px;background:#000;
+}
+.food-dex-window-face{position:absolute;z-index:1;inset:1px 3px 4px;transition:transform 70ms ease-out}
+.food-dex-window-shape{position:absolute!important;z-index:2;inset:0;display:block!important;width:100%!important;height:100%!important}
+.food-dex-window-shape>svg{display:block;width:100%!important;height:100%!important;overflow:visible}
+.food-dex-window-shape svg path{
+  fill:#fff!important;stroke:#000!important;stroke-width:2px!important;
+  vector-effect:non-scaling-stroke;paint-order:stroke fill;
+}
+.food-dex-window-glass{
+  position:absolute;z-index:1;background:rgba(255,255,255,.27);
   -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
   backdrop-filter:blur(6.65px) saturate(1.25);
-  transition:transform 70ms ease-out;
 }
-.food-dex-retro-window svg{position:relative;z-index:1;display:block;width:100%;height:100%;overflow:visible}
-.food-dex-retro-window-front{transition:transform 70ms ease-out}
-.food-dex-retro-menu:active .food-dex-retro-window::before{transform:translateY(3px)}
-.food-dex-retro-menu:active .food-dex-retro-window-front{transform:translateY(3px)}
-.food-dex-retro-menu:active .food-dex-retro-window-shadow{opacity:0}
-.food-dex-retro-window-inside{fill:transparent}
+.food-dex-window-glass-main{left:10.2%;top:29%;width:79.6%;height:57.4%;border-radius:3px}
+.food-dex-window-glass-dot{top:13.5%;width:8.2%;aspect-ratio:1;border-radius:50%}
+.food-dex-window-glass-dot.dot-one{left:11.7%}
+.food-dex-window-glass-dot.dot-two{left:23.5%}
+.food-dex-window-glass-dot.dot-three{left:35.3%}
+.food-dex-window-menu-dots{position:absolute;z-index:3;left:50%;top:57.5%;display:flex;gap:4px;transform:translate(-50%,-50%)}
+.food-dex-window-menu-dots i{display:block;width:4px;height:4px;border-radius:50%;background:#111}
+.food-dex-retro-menu:active .food-dex-window-face{transform:translateY(3.5px)}
+.food-dex-retro-menu:active .food-dex-window-shadow{opacity:0}
 .food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
 
 /* Einheitlicher FoodDex-Abschluss: alle harten Schatten stehen exakt 3,5 px

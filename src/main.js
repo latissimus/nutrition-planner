@@ -1265,33 +1265,16 @@ async function renderRoute() {
         <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>
       </div>
       <button type="button" class="food-dex-action-button food-dex-retro-menu" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">
-        <span class="food-dex-retro-window" aria-hidden="true">
-          <svg viewBox="0 0 55 55" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <mask id="food-dex-menu-window-cutout" maskUnits="userSpaceOnUse">
-                <rect width="55" height="55" fill="#fff"/>
-                <rect x="7" y="21" width="38" height="23" rx="7" fill="#000"/>
-              </mask>
-              <clipPath id="food-dex-menu-window-clip">
-                <rect x="1" y="1" width="50" height="50" rx="12"/>
-              </clipPath>
-            </defs>
-            <rect class="food-dex-retro-window-shadow" x="1" y="4.5" width="50" height="50" rx="12" fill="#000" mask="url(#food-dex-menu-window-cutout)"/>
-            <g class="food-dex-retro-window-front">
-              <rect x="1" y="1" width="50" height="50" rx="12" fill="#F2A5DA" mask="url(#food-dex-menu-window-cutout)"/>
-              <path d="M1 1h50v17H1z" fill="#AEEBFA" clip-path="url(#food-dex-menu-window-clip)"/>
-              <path d="M1 18h50" fill="none" stroke="#000" stroke-width="2"/>
-              <path d="M24 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
-              <rect x="31" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
-              <path d="m39 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
-              <rect class="food-dex-retro-window-inside" x="7" y="21" width="38" height="23" rx="7"/>
-              <rect x="7" y="21" width="38" height="23" rx="7" fill="none" stroke="#000" stroke-width="2"/>
-              <circle cx="20" cy="32.5" r="2.2" fill="#111"/>
-              <circle cx="26" cy="32.5" r="2.2" fill="#111"/>
-              <circle cx="32" cy="32.5" r="2.2" fill="#111"/>
-              <rect x="1" y="1" width="50" height="50" rx="12" fill="none" stroke="#000" stroke-width="2"/>
-            </g>
-          </svg>
+        <span class="food-dex-window-symbol" aria-hidden="true">
+          <span class="food-dex-window-shadow"></span>
+          <span class="food-dex-window-face">
+            <span class="food-dex-window-glass food-dex-window-glass-main"></span>
+            <span class="food-dex-window-glass food-dex-window-glass-dot dot-one"></span>
+            <span class="food-dex-window-glass food-dex-window-glass-dot dot-two"></span>
+            <span class="food-dex-window-glass food-dex-window-glass-dot dot-three"></span>
+            ${materialIconMarkup('window', 'food-dex-window-shape')}
+            <span class="food-dex-window-menu-dots"><i></i><i></i><i></i></span>
+          </span>
         </span>
       </button>
       <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">${materialIconMarkup('keyboard_return')}</a>`;
