@@ -19,7 +19,6 @@ import '@fontsource/lexend-exa/latin-900.css';
 import '@fontsource/outfit/latin.css';
 import '@fontsource/dm-sans/latin.css';
 import '@fontsource/space-mono/latin.css';
-import ideaIconUrl from '../MUSCLEDEX-ICONS/Idea.svg';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
@@ -1265,7 +1264,32 @@ async function renderRoute() {
         <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
         <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>
       </div>
-      <button type="button" class="food-dex-action-button" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">${materialIconMarkup('more_horiz')}</button>
+      <button type="button" class="food-dex-action-button food-dex-retro-menu" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">
+        <span class="food-dex-retro-window" aria-hidden="true">
+          <svg viewBox="0 0 62 55" preserveAspectRatio="none">
+            <defs>
+              <mask id="food-dex-menu-window-cutout" maskUnits="userSpaceOnUse">
+                <rect width="62" height="55" fill="#fff"/>
+                <rect x="7" y="21" width="43" height="23" rx="5" fill="#000"/>
+              </mask>
+            </defs>
+            <rect class="food-dex-retro-window-shadow" x="6" y="5" width="53" height="47" rx="7" fill="#7560E6" mask="url(#food-dex-menu-window-cutout)"/>
+            <g class="food-dex-retro-window-front">
+              <rect x="2" y="2" width="54" height="47" rx="7" fill="#F2A5DA" stroke="#8968FF" stroke-width="2.3" mask="url(#food-dex-menu-window-cutout)"/>
+              <path d="M9 2h40a7 7 0 0 1 7 7v8H2V9a7 7 0 0 1 7-7Z" fill="#AEEBFA"/>
+              <path d="M2 17h54" fill="none" stroke="#8968FF" stroke-width="2.3"/>
+              <path d="M31 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
+              <rect x="38" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
+              <path d="m46 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
+              <rect class="food-dex-retro-window-inside" x="7" y="21" width="43" height="23" rx="5"/>
+              <rect x="7" y="21" width="43" height="23" rx="5" fill="none" stroke="#8968FF" stroke-width="1.8"/>
+              <circle cx="22" cy="32.5" r="1.7" fill="#111"/>
+              <circle cx="28.5" cy="32.5" r="1.7" fill="#111"/>
+              <circle cx="35" cy="32.5" r="1.7" fill="#111"/>
+            </g>
+          </svg>
+        </span>
+      </button>
       <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Food-Dex schließen">${materialIconMarkup('close')}</a>`;
     foodActions.querySelector('[data-food-menu]').onclick = () => {
       const panel = foodActions.querySelector('.food-dex-action-popover');
@@ -1289,15 +1313,15 @@ async function renderRoute() {
           <strong>FOODDEX</strong>
         </div>
         <button type="button" class="food-dex-info-button" data-food-info aria-expanded="false" aria-controls="food-dex-info" aria-label="FoodDex erklären">
-          <img src="${ideaIconUrl}" alt="" aria-hidden="true">
+          <span class="food-dex-info-chevron" aria-hidden="true"></span>
         </button>`;
       const infoBox = document.createElement('section');
       infoBox.id = 'food-dex-info';
       infoBox.className = 'food-dex-info-box';
       infoBox.hidden = true;
       infoBox.innerHTML = `
-        <p>Im <b>FOODDEX</b> sammelst du eigene Rezepte und Rezeptideen aus Bildern, Links oder Videos.</p>
-        <p>Ordne Einträge über Tags wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> ein, lege Unter-Dex an und finde passende Mahlzeiten später schnell über Filter und Suche wieder.</p>`;
+        <p>Im <b>FOODDEX</b> sammelst du <b>eigene Rezepte und Rezeptideen</b> aus Bildern, Links oder Videos.</p>
+        <p>Ordne Einträge über <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> ein, lege <b>Unter-Dex</b> an und finde passende Mahlzeiten später schnell über <b>Filter und Suche</b> wieder.</p>`;
       foodContent.prepend(intro);
       intro.after(infoBox);
       intro.querySelector('[data-food-info]').onclick = (event) => {
