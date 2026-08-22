@@ -4344,7 +4344,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-intro{
   display:flex;grid-template-columns:none;align-items:center;justify-content:space-between;gap:12px;
-  box-shadow:none!important;
+  border:0!important;box-shadow:none!important;
 }
 .food-dex-intro-text{display:grid;min-width:0;gap:3px}
 .food-dex-info-button{
@@ -4354,12 +4354,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-info-button img{
   display:block;width:40px;height:40px;object-fit:contain;
-  filter:drop-shadow(2.5px 2.5px 0 #000);
-  transition:transform .08s ease,filter .08s ease;
+  filter:none;
+  transition:transform .08s ease;
 }
 .food-dex-info-button:active img{
-  transform:translate(2.5px,2.5px);
-  filter:none;
+  transform:scale(.92);
 }
 .food-dex-info-box{
   margin:-7px 3px 18px;padding:14px 15px;border:2px solid #000;border-radius:14px;
