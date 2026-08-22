@@ -4379,35 +4379,40 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-retro-menu{
-  overflow:visible;padding:0;border:0;background:transparent;box-shadow:none!important;
+  overflow:hidden;padding:0;border:2px solid #000;border-radius:13px;
+  background:rgba(255,255,255,.27);box-shadow:0 3.5px 0 #000!important;
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
+  backdrop-filter:blur(6.65px) saturate(1.25);
 }
-.food-dex-page .food-dex-retro-menu:active{transform:none;box-shadow:none!important}
-.food-dex-window-symbol{position:relative;display:block;width:55px;height:55px;pointer-events:none}
-.food-dex-window-shadow{
-  position:absolute;z-index:0;left:2.5px;right:2.5px;bottom:.5px;height:8px;
-  border-radius:0 0 12px 12px;background:#000;
+.food-dex-page .food-dex-retro-menu:active{transform:translateY(2px);box-shadow:0 1.5px 0 #000!important}
+.food-dex-window-symbol{position:relative;display:block;width:48px;height:48px;pointer-events:none}
+.food-dex-window-shadow{display:none}
+.food-dex-window-face{
+  position:absolute;z-index:1;inset:0;overflow:hidden;border-radius:10px;
 }
-.food-dex-window-face{position:absolute;z-index:1;inset:1px 3px 4px;transition:transform 70ms ease-out}
+.food-dex-window-face::after{content:none}
 .food-dex-window-shape{position:absolute!important;z-index:2;inset:0;display:block!important;width:100%!important;height:100%!important}
 .food-dex-window-shape>svg{display:block;width:100%!important;height:100%!important;overflow:visible}
 .food-dex-window-shape svg path{
-  fill:#fff!important;stroke:#000!important;stroke-width:2px!important;
-  vector-effect:non-scaling-stroke;paint-order:stroke fill;
+  fill:#fff!important;stroke:none!important;
 }
 .food-dex-window-glass{
   position:absolute;z-index:1;background:rgba(255,255,255,.27);
   -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
   backdrop-filter:blur(6.65px) saturate(1.25);
 }
-.food-dex-window-glass-main{left:10.2%;top:29%;width:79.6%;height:57.4%;border-radius:3px}
-.food-dex-window-glass-dot{top:13.5%;width:8.2%;aspect-ratio:1;border-radius:50%}
-.food-dex-window-glass-dot.dot-one{left:11.7%}
-.food-dex-window-glass-dot.dot-two{left:23.5%}
-.food-dex-window-glass-dot.dot-three{left:35.3%}
-.food-dex-window-menu-dots{position:absolute;z-index:3;left:50%;top:57.5%;display:flex;gap:4px;transform:translate(-50%,-50%)}
+.food-dex-window-aperture{
+  position:absolute;z-index:3;left:21%;top:40%;width:58%;height:34%;
+  display:grid;place-items:center;overflow:hidden;border:0;border-radius:3px;background:transparent;
+}
+.food-dex-window-glass-main{position:relative;width:100%;height:100%;border:0;border-radius:3px}
+.food-dex-window-glass-dot{top:15%;width:5.5%;aspect-ratio:1;border:0;border-radius:50%}
+.food-dex-window-glass-dot.dot-one{left:15%}
+.food-dex-window-glass-dot.dot-two{left:27%}
+.food-dex-window-glass-dot.dot-three{left:39%}
+.food-dex-window-menu-dots{position:absolute;z-index:4;left:50%;top:57.5%;display:flex;gap:4px;transform:translate(-50%,-50%)}
 .food-dex-window-menu-dots i{display:block;width:4px;height:4px;border-radius:50%;background:#111}
-.food-dex-retro-menu:active .food-dex-window-face{transform:translateY(3.5px)}
-.food-dex-retro-menu:active .food-dex-window-shadow{opacity:0}
+.food-dex-retro-menu:active .food-dex-window-face{transform:none}
 .food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
 
 /* Einheitlicher FoodDex-Abschluss: alle harten Schatten stehen exakt 3,5 px

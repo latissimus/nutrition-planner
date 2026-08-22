@@ -1268,7 +1268,7 @@ async function renderRoute() {
         <span class="food-dex-window-symbol" aria-hidden="true">
           <span class="food-dex-window-shadow"></span>
           <span class="food-dex-window-face">
-            <span class="food-dex-window-glass food-dex-window-glass-main"></span>
+            <span class="food-dex-window-aperture"><span class="food-dex-window-glass food-dex-window-glass-main"></span></span>
             <span class="food-dex-window-glass food-dex-window-glass-dot dot-one"></span>
             <span class="food-dex-window-glass food-dex-window-glass-dot dot-two"></span>
             <span class="food-dex-window-glass food-dex-window-glass-dot dot-three"></span>
