@@ -4345,9 +4345,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 2.5px 0 #000}
 .food-dex-page .dex-inhaltskarte:active{box-shadow:0 1px 0 #000}
 .food-dex-page .dex-inhaltskarte-vorschau{
-  box-sizing:border-box;width:calc(100% - 8px);height:calc(56% - 4px)!important;
-  flex-basis:calc(56% - 4px)!important;margin:4px 4px 0;
-  border:2px solid #000;border-radius:15px 15px 9px 9px;box-shadow:none!important;
+  box-sizing:border-box;width:calc(100% + 4px);max-width:none;
+  height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
+  border:2px solid #000;border-radius:22px 22px 10px 10px;box-shadow:none!important;
 }
 .food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 2px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
