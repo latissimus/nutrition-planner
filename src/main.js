@@ -1240,7 +1240,7 @@ async function renderRoute() {
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
     });
-    mountCategoryChrome(view, route, 'FoodDex', {
+    mountCategoryChrome(view, route, 'FOODDEX', {
       pageLookScope: route, pageLookPattern: 'triangles',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
