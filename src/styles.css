@@ -4380,18 +4380,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-retro-menu{
   overflow:hidden;padding:0;border:2px solid #000;border-radius:13px;
-  background:rgba(255,255,255,.27);box-shadow:0 3.5px 0 #000!important;
-  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
-  backdrop-filter:blur(6.65px) saturate(1.25);
+  background:#fff;box-shadow:0 3.5px 0 #000!important;
 }
 .food-dex-page .food-dex-retro-menu:active{transform:translateY(2px);box-shadow:0 1.5px 0 #000!important}
 .food-dex-window-symbol{position:relative;display:block;width:48px;height:48px;pointer-events:none}
 .food-dex-window-shadow{display:none}
 .food-dex-window-face{
-  position:absolute;z-index:1;inset:0;overflow:hidden;border-radius:10px;
+  position:absolute;z-index:1;inset:0;overflow:hidden;border-radius:10px;background:#fff;
 }
 .food-dex-window-face::after{content:none}
-.food-dex-window-shape{position:absolute!important;z-index:2;inset:0;display:block!important;width:100%!important;height:100%!important}
+.food-dex-window-shape{display:none!important}
 .food-dex-window-shape>svg{display:block;width:100%!important;height:100%!important;overflow:visible}
 .food-dex-window-shape svg path{
   fill:#fff!important;stroke:none!important;
@@ -4402,15 +4400,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   backdrop-filter:blur(6.65px) saturate(1.25);
 }
 .food-dex-window-aperture{
-  position:absolute;z-index:3;left:21%;top:40%;width:58%;height:34%;
-  display:grid;place-items:center;overflow:hidden;border:0;border-radius:3px;background:transparent;
+  position:absolute;z-index:3;left:8%;top:29%;width:84%;height:62%;
+  display:block;overflow:hidden;border:0;border-radius:4px;
+  background:rgba(107,63,196,.68);
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
+  backdrop-filter:blur(6.65px) saturate(1.25);
 }
-.food-dex-window-glass-main{position:relative;width:100%;height:100%;border:0;border-radius:3px}
-.food-dex-window-glass-dot{top:15%;width:5.5%;aspect-ratio:1;border:0;border-radius:50%}
-.food-dex-window-glass-dot.dot-one{left:15%}
-.food-dex-window-glass-dot.dot-two{left:27%}
-.food-dex-window-glass-dot.dot-three{left:39%}
-.food-dex-window-menu-dots{position:absolute;z-index:4;left:50%;top:57.5%;display:flex;gap:4px;transform:translate(-50%,-50%)}
+.food-dex-window-glass-main{display:none}
+.food-dex-window-glass-dot{top:10.5%;width:12%;aspect-ratio:1;border:0;border-radius:50%;background:rgba(107,63,196,.55)}
+.food-dex-window-glass-dot.dot-one{left:10%}
+.food-dex-window-glass-dot.dot-two{left:26%}
+.food-dex-window-glass-dot.dot-three{left:42%}
+.food-dex-window-menu-dots{
+  position:absolute;z-index:4;left:50%;top:60%;display:flex;align-items:center;gap:5px;
+  min-width:27px;min-height:19px;padding:0 6px;border:0;border-radius:7px;
+  background:rgba(255,255,255,.43);
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.2);
+  backdrop-filter:blur(6.65px) saturate(1.2);
+  transform:translate(-50%,-50%);
+}
 .food-dex-window-menu-dots i{display:block;width:4px;height:4px;border-radius:50%;background:#111}
 .food-dex-retro-menu:active .food-dex-window-face{transform:none}
 .food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
