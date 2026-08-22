@@ -4143,14 +4143,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-chrome-bg:#FDEB9E;
 }
 .food-dex-page{
-  --food-display:"Archivo Black",sans-serif;
+  --food-display:"Nunito",sans-serif;
   --food-heading:"Outfit",sans-serif;
   --food-body:"DM Sans",sans-serif;
   --food-mono:"Space Mono",monospace;
   font-family:var(--food-body);
 }
 .food-dex-page .kategorie-kopftitel strong{
-  font-family:var(--food-display);font-size:clamp(25px,6.2vw,32px);font-weight:400;
+  font-family:var(--food-display);font-size:clamp(25px,6.2vw,32px);font-weight:900;
   line-height:.95;letter-spacing:-.035em;text-transform:uppercase;
 }
 .food-dex-page .kategorie-kopftitel small{

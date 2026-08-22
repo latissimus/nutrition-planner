@@ -14,7 +14,7 @@ import '@fontsource/figtree/latin-800.css';
 // Food-Dex typography: open-source display, heading, body and technical faces.
 // These are loaded once here and scoped to .food-dex-page in styles.css so the
 // rest of MUSCLE-DEX keeps its established typography.
-import '@fontsource/archivo-black/latin-400.css';
+import '@fontsource/nunito/latin-900.css';
 import '@fontsource/outfit/latin.css';
 import '@fontsource/dm-sans/latin.css';
 import '@fontsource/space-mono/latin.css';
