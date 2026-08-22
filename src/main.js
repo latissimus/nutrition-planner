@@ -1294,7 +1294,11 @@ async function renderRoute() {
           </svg>
         </span>
       </button>
-      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Food-Dex schließen">${materialIconMarkup('close')}</a>`;
+      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">
+        <svg class="food-dex-return-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M19 7v4H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21V7z"/>
+        </svg>
+      </a>`;
     foodActions.querySelector('[data-food-menu]').onclick = () => {
       const panel = foodActions.querySelector('.food-dex-action-popover');
       const open = panel.hidden;
