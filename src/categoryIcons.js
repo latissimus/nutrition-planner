@@ -430,7 +430,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
-      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${actions.hideAppearanceIcon ? 'Farbe &amp; Tapete ändern' : 'Icon &amp; Farbe ändern'}</span></button>
+      ${actions.hideAppearance ? '' : `<button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${actions.hideAppearanceIcon ? 'Farbe &amp; Tapete ändern' : 'Icon &amp; Farbe ändern'}</span></button>`}
       ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
@@ -511,7 +511,11 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   container.classList.add('hat-kategoriefarbe', 'dex-fixkopf');
   container.style.setProperty('--ordner', options.color || categoryColor(route));
   const lookScope = options.pageLookScope || options.inheritedPageLookScope || route;
-  const look = pageLook(lookScope, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
+  const look = options.fixedPageLook || pageLook(
+    lookScope,
+    options.pageLookColor || options.color || categoryColor(route),
+    options.pageLookPattern || 'drops',
+  );
   container.dataset.dexMuster = look.pattern;
   const wallpaper = pagePatterns.find(([id]) => id === look.pattern)?.[2];
   container.classList.toggle('dex-tapete-datei', Boolean(wallpaper));

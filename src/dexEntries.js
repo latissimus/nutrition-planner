@@ -667,7 +667,7 @@ function filterFoodEntries(entries, filter) {
   return entries;
 }
 
-function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.', hasChildren = false, hideEmpty = false) {
+function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ein Rezept, ein Bild oder einen Link ab.', hasChildren = false, hideEmpty = false, emptyTitle = 'Leerer Dex') {
   const favorites = entries.filter((entry) => entry.favorite);
   const regular = entries.filter((entry) => !entry.favorite);
   const ownRecipes = regular.filter((entry) => entry.entry_type === 'note' && entry.root_key === 'food-log' && entry.food_kind === 'recipe');
@@ -687,13 +687,14 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
   if (hasChildren) return '';
   if (hideEmpty) return '';
   return `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
-      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
+      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>${escapeHtml(emptyTitle)}</strong>
       <span>${emptyText}</span></div></section>`;
 }
 
 export async function renderDexEntries(container, {
   userId, rootKey, collectionId = null, routineId, color, signal, onChanged,
   foodFilters = rootKey === 'food-log', trainingFilters = rootKey === 'training', hasChildren = false, hideEmpty = false,
+  emptyTitle = 'Leerer Dex',
 } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
@@ -711,7 +712,7 @@ export async function renderDexEntries(container, {
       const foodEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
       const visibleEntries = trainingFilters ? filterTrainingEntries(foodEntries, activeTrainingFilter) : foodEntries;
       const hasMore = entries.length < total;
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, hasChildren, hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, hasChildren, hideEmpty, emptyTitle)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
       vorschaubilderEinblenden(slot);
       slot.querySelectorAll('.dex-eintrag-gruppe').forEach((group) => {
         if (!group.querySelector('.dex-inhaltskarte')) group.remove();
