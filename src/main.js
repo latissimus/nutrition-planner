@@ -1276,7 +1276,7 @@ async function renderRoute() {
                 <rect x="1" y="1" width="50" height="50" rx="12"/>
               </clipPath>
             </defs>
-            <rect class="food-dex-retro-window-shadow" x="1" y="4" width="50" height="50" rx="12" fill="#000" mask="url(#food-dex-menu-window-cutout)"/>
+            <rect class="food-dex-retro-window-shadow" x="1" y="4.5" width="50" height="50" rx="12" fill="#000" mask="url(#food-dex-menu-window-cutout)"/>
             <g class="food-dex-retro-window-front">
               <rect x="1" y="1" width="50" height="50" rx="12" fill="#F2A5DA" mask="url(#food-dex-menu-window-cutout)"/>
               <path d="M1 1h50v17H1z" fill="#AEEBFA" clip-path="url(#food-dex-menu-window-clip)"/>
@@ -1294,11 +1294,7 @@ async function renderRoute() {
           </svg>
         </span>
       </button>
-      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">
-        <svg class="food-dex-return-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M19 7v4H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21V7z"/>
-        </svg>
-      </a>`;
+      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">${materialIconMarkup('keyboard_return')}</a>`;
     foodActions.querySelector('[data-food-menu]').onclick = () => {
       const panel = foodActions.querySelector('.food-dex-action-popover');
       const open = panel.hidden;

@@ -4396,7 +4396,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-retro-menu:active .food-dex-retro-window-front{transform:translateY(3px)}
 .food-dex-retro-menu:active .food-dex-retro-window-shadow{opacity:0}
 .food-dex-retro-window-inside{fill:transparent}
-.food-dex-return-icon{display:block;width:26px!important;height:26px!important;fill:currentColor}
+.food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
+
+/* Einheitlicher FoodDex-Abschluss: alle harten Schatten stehen exakt 3,5 px
+   unter ihren Flaechen. Die Infokarte erhaelt wieder dieselbe Kontur. */
+.food-dex-intro{
+  margin-bottom:26px;border:2px solid #000!important;box-shadow:0 3.5px 0 #000!important;
+}
+.food-dex-info-box{margin-bottom:26px}
+.food-dex-page .dex-inhaltskarte{box-shadow:0 3.5px 0 #000}
+.food-dex-page .dex-inhaltskarte:active{box-shadow:0 1.5px 0 #000}
+.food-dex-page .food-dex-action-button{box-shadow:0 3.5px 0 #000}
+.food-dex-page .food-dex-action-button:active{box-shadow:0 1.5px 0 #000}
+.food-dex-page .food-dex-action-popover{box-shadow:0 3.5px 0 #000}
 .seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
 .seite-zurueck{animation:seiteZurueck .4s cubic-bezier(.32,.72,0,1) both}
 .seite-raus-rechts{animation:seiteRausRechts .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
