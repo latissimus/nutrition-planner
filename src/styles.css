@@ -4399,7 +4399,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-window-glass-dot.dot-one{left:10%}
 .food-dex-window-glass-dot.dot-two{left:26%}
 .food-dex-window-glass-dot.dot-three{left:42%}
-.food-dex-window-menu-dots{display:none}
+.food-dex-window-menu-dots{
+  position:absolute;z-index:4;left:50%;top:58%;display:flex;align-items:center;gap:5px;
+  padding:0;border:0;background:transparent;transform:translate(-50%,-50%);
+}
+.food-dex-window-menu-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#111}
 .food-dex-retro-menu:active .food-dex-window-face{transform:none}
 .food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
 
