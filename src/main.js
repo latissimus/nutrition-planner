@@ -1282,8 +1282,29 @@ async function renderRoute() {
     if (foodContent) {
       const intro = document.createElement('section');
       intro.className = 'food-dex-intro';
-      intro.innerHTML = `<small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small><strong>FOODDEX</strong><p>Rezeptideen, Cheat-Meals und Mahlzeiten an einem Ort.</p>`;
+      intro.innerHTML = `
+        <div class="food-dex-intro-text">
+          <small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small>
+          <strong>FOODDEX</strong>
+        </div>
+        <button type="button" class="food-dex-info-button" data-food-info aria-expanded="false" aria-controls="food-dex-info" aria-label="FoodDex erklären">
+          ${materialIconMarkup('info')}
+        </button>`;
+      const infoBox = document.createElement('section');
+      infoBox.id = 'food-dex-info';
+      infoBox.className = 'food-dex-info-box';
+      infoBox.hidden = true;
+      infoBox.innerHTML = `
+        <p>Im <b>FOODDEX</b> sammelst du eigene Rezepte und Rezeptideen aus Bildern, Links oder Videos.</p>
+        <p>Ordne Einträge über Tags wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> ein, lege Unter-Dex an und finde passende Mahlzeiten später schnell über Filter und Suche wieder.</p>`;
       foodContent.prepend(intro);
+      intro.after(infoBox);
+      intro.querySelector('[data-food-info]').onclick = (event) => {
+        const button = event.currentTarget;
+        const open = infoBox.hidden;
+        infoBox.hidden = !open;
+        button.setAttribute('aria-expanded', String(open));
+      };
     }
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
