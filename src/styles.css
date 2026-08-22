@@ -4348,12 +4348,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-intro-text{display:grid;min-width:0;gap:3px}
 .food-dex-info-button{
-  display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;
-  border:2px solid #000;border-radius:50%;background:var(--food-page-purple);color:#fff;
-  box-shadow:none;
+  display:grid;place-items:center;width:48px;height:48px;flex:0 0 48px;padding:2px;
+  border:0;border-radius:0;background:transparent;color:#000;box-shadow:none;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
-.food-dex-info-button .material-svg,.food-dex-info-button svg{display:block;width:23px;height:23px}
-.food-dex-info-button svg,.food-dex-info-button svg *{fill:currentColor!important}
+.food-dex-info-button img{
+  display:block;width:40px;height:40px;object-fit:contain;
+  filter:drop-shadow(2.5px 2.5px 0 #000);
+  transition:transform .08s ease,filter .08s ease;
+}
+.food-dex-info-button:active img{
+  transform:translate(2.5px,2.5px);
+  filter:none;
+}
 .food-dex-info-box{
   margin:-7px 3px 18px;padding:14px 15px;border:2px solid #000;border-radius:14px;
   background:#fff;color:#111;font:600 12px/1.55 var(--tech);box-shadow:none;

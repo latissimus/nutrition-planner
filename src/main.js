@@ -19,6 +19,7 @@ import '@fontsource/lexend-exa/latin-900.css';
 import '@fontsource/outfit/latin.css';
 import '@fontsource/dm-sans/latin.css';
 import '@fontsource/space-mono/latin.css';
+import ideaIconUrl from '../MUSCLEDEX-ICONS/Idea.svg';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
@@ -1288,7 +1289,7 @@ async function renderRoute() {
           <strong>FOODDEX</strong>
         </div>
         <button type="button" class="food-dex-info-button" data-food-info aria-expanded="false" aria-controls="food-dex-info" aria-label="FoodDex erklären">
-          ${materialIconMarkup('info')}
+          <img src="${ideaIconUrl}" alt="" aria-hidden="true">
         </button>`;
       const infoBox = document.createElement('section');
       infoBox.id = 'food-dex-info';
