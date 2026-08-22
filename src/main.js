@@ -1273,7 +1273,7 @@ async function renderRoute() {
             <span class="food-dex-window-glass food-dex-window-glass-dot dot-two"></span>
             <span class="food-dex-window-glass food-dex-window-glass-dot dot-three"></span>
             ${materialIconMarkup('window', 'food-dex-window-shape')}
-            <span class="food-dex-window-menu-dots"><i></i><i></i><i></i></span>
+            <span class="food-dex-window-menu-label">MENÜ</span>
           </span>
         </span>
       </button>

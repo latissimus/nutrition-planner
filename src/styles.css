@@ -4397,7 +4397,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:absolute;display:block;z-index:3;background:var(--food-page-purple);border:0;
 }
 .food-dex-window-aperture{
-  display:block;position:absolute;z-index:3;left:9%;top:33%;width:82%;height:50%;
+  display:block;position:absolute;z-index:3;left:9%;top:30%;width:82%;height:56%;
   overflow:hidden;border:0;border-radius:4px;background:var(--food-page-purple);
 }
 .food-dex-window-glass-main{display:none}
@@ -4405,11 +4405,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-window-glass-dot.dot-one{left:4.32px}
 .food-dex-window-glass-dot.dot-two{left:11.04px}
 .food-dex-window-glass-dot.dot-three{left:17.76px}
-.food-dex-window-menu-dots{
-  position:absolute;z-index:4;left:50%;top:58%;display:flex;align-items:center;gap:3px;
-  padding:0;border:0;background:transparent;transform:translate(-50%,-50%);
+.food-dex-window-menu-label{
+  position:absolute;z-index:4;left:50%;top:58%;transform:translate(-50%,-50%);
+  color:#fff;font:700 7px/1 "Space Mono",monospace;letter-spacing:.02em;
+  white-space:nowrap;
 }
-.food-dex-window-menu-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#fff}
 .food-dex-retro-menu:active .food-dex-window-face{transform:none}
 .food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
 
