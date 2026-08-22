@@ -4259,6 +4259,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-image:var(--food-vozzy-pattern)!important;
   background-size:190px 150px!important;
 }
+
+/* Fine spacing and shadow pass for the Food-Dex grid. */
+.food-dex-page .dex-inhaltskarte{
+  box-shadow:0 3px 0 #000;
+}
+.food-dex-page .dex-inhaltskarte:active{box-shadow:0 1px 0 #000}
+.food-dex-page .dex-inhaltskarte-vorschau{
+  height:56%!important;flex-basis:56%!important;
+  border-bottom:2px solid #000;box-shadow:none!important;filter:none!important;
+}
+.food-dex-page .dex-inhaltskarte-body{
+  padding:7px 10px 8px;gap:7px;
+}
+.food-dex-page .dex-inhaltskarte strong{margin:0;line-height:1.12}
+.food-dex-page .dex-inhaltskarte-text{margin:0;line-height:1.25}
+.food-dex-page .food-dex-action-button{box-shadow:0 3px 0 #000}
+.food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
+.food-dex-page .food-dex-action-popover{box-shadow:0 3px 0 #000}
 :root[data-dex-muster] body,
 :root[data-dex-muster] #app,
 :root[data-dex-muster] #view{background-color:transparent!important;background-image:none!important}
