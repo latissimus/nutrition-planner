@@ -4143,7 +4143,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-chrome-bg:#FDEB9E;
 }
 .food-dex-page{
-  --food-display:"Bebas Neue",sans-serif;
+  --food-display:"Archivo Black",sans-serif;
   --food-heading:"Outfit",sans-serif;
   --food-body:"DM Sans",sans-serif;
   --food-mono:"Space Mono",monospace;
@@ -4162,7 +4162,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2,
   .unter-sammlung strong,.dex-inhaltskarte strong,.kategorie-kopfknopf,
-  .food-filter-chip,[data-food-filter]){font-family:var(--food-heading);}
+  .food-filter-chip,[data-food-filter]){font-family:var(--food-heading);font-weight:700;}
 .food-dex-page :is(.dex-inhaltskarte-text,.unter-sammlung small,.sammlung-leer strong,
   .sammlung-leer span,.dex-mehr-laden small){font-family:var(--food-body);}
 

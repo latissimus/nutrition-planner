@@ -19,6 +19,7 @@
     "audio:generate-binaural": "node scripts/generate-binaural-audio.mjs"
   },
   "dependencies": {
+    "@fontsource/archivo-black": "^5.3.0",
     "@fontsource/bebas-neue": "^5.3.0",
     "@fontsource/dm-sans": "^5.3.0",
     "@fontsource/figtree": "^5.3.0",
