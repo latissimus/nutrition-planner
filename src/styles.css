@@ -4401,10 +4401,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:hidden;border:0;border-radius:4px;background:var(--food-page-purple);
 }
 .food-dex-window-glass-main{display:none}
-.food-dex-window-glass-dot{top:5px;width:6.8px;height:6.8px;border:0;border-radius:50%}
-.food-dex-window-glass-dot.dot-one{left:3.8px}
-.food-dex-window-glass-dot.dot-two{left:10.5px}
-.food-dex-window-glass-dot.dot-three{left:17.2px}
+.food-dex-window-glass-dot{top:5.6px;width:5.4px;height:5.4px;border:0;border-radius:50%}
+.food-dex-window-glass-dot.dot-one{left:4.2px}
+.food-dex-window-glass-dot.dot-two{left:11.1px}
+.food-dex-window-glass-dot.dot-three{left:18px}
 .food-dex-window-menu-label{
   position:absolute;z-index:4;left:50%;top:58%;transform:translate(-50%,-50%);
   color:#fff;font:800 7px/1 "Outfit",sans-serif;letter-spacing:.04em;
