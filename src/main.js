@@ -11,13 +11,6 @@ import '@fontsource/figtree/latin-500.css';
 import '@fontsource/figtree/latin-600.css';
 import '@fontsource/figtree/latin-700.css';
 import '@fontsource/figtree/latin-800.css';
-// FOOD-DEX-Pilot: lokal gebundelte Schriften fuer den ruhigeren Vozzy-Look.
-// Dadurch bleibt die Typografie auch in der installierten PWA offline stabil.
-import '@fontsource/space-grotesk/latin-700.css';
-import '@fontsource/inter/latin-400.css';
-import '@fontsource/inter/latin-600.css';
-import '@fontsource/space-mono/latin-400.css';
-import '@fontsource/space-mono/latin-700.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
@@ -1229,7 +1222,6 @@ async function renderRoute() {
     });
   } else if (route === 'food-log') {
     setSeite('food-log');
-    view.classList.add('food-dex-pilot');
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
@@ -1240,9 +1232,7 @@ async function renderRoute() {
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
     });
     mountCategoryChrome(view, route, 'Food-Dex', {
-      color: '#FF3483',
-      fixedPageLook: { color: '#FFE59D', pattern: 'wallpaper-pizza' },
-      hideAppearance: true,
+      pageLookScope: route, pageLookPattern: 'triangles',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
@@ -1257,8 +1247,7 @@ async function renderRoute() {
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
     await renderDexEntries(view, {
-      userId: foodOwnerId, rootKey: 'food-log', color: '#FF3483', signal, hasChildren: children.length > 0,
-      emptyTitle: 'Noch nichts serviert',
+      userId: foodOwnerId, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
