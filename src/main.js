@@ -1282,7 +1282,7 @@ async function renderRoute() {
     if (foodContent) {
       const intro = document.createElement('section');
       intro.className = 'food-dex-intro';
-      intro.innerHTML = `<span>FOOD</span><strong>FOODDEX</strong><p>Rezeptideen, Cheat-Meals und Mahlzeiten an einem Ort.</p><small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small>`;
+      intro.innerHTML = `<small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small><strong>FOODDEX</strong><p>Rezeptideen, Cheat-Meals und Mahlzeiten an einem Ort.</p>`;
       foodContent.prepend(intro);
     }
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
