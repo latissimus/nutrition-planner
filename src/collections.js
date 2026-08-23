@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, bindWallpaperLongPress, colorIsDark, dexEditorColors, materialIconMarkup, pageLook, pagePatterns, setPageLookPattern,
+  availableCategoryIcons, bindWallpaperLongPress, colorIsDark, dexEditorColors, materialIconMarkup, pageLook, pagePatterns, setPageLookColor, setPageLookPattern,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -175,7 +175,10 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     button.disabled = true;
     try {
       const saved = await saveCollection(userId, { rootKey, parentId, name: input.value, color, iconKey }, existing);
-      if (!isSubDex && saved?.id) setPageLookPattern(`collection-${saved.id}`, pattern);
+      if (!isSubDex && saved?.id) {
+        setPageLookColor(`collection-${saved.id}`, color);
+        setPageLookPattern(`collection-${saved.id}`, pattern);
+      }
       close();
       toast(existing ? 'Dex aktualisiert' : (isSubDex ? 'Unter-Dex erstellt' : 'Dex erstellt'));
       await onSaved?.(saved);

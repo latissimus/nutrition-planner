@@ -3618,6 +3618,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 }
 .kategorie-scrollinhalt>:first-child{margin-top:0}
 .kategorie-kopftitel{min-width:0;text-align:left;padding-left:3px}
+.dex-fixkopf .kategorie-kopftitel{color:var(--dex-ink,var(--text))}
 .kategorie-kopftitel strong{
   display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-size:clamp(17px,4.8vw,21px);font-weight:800;line-height:1;
@@ -4316,7 +4317,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-text-stroke:.18px currentColor;
   text-rendering:geometricPrecision;
 }
-.food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:#fff;border-color:#000}
+.food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:var(--dex-ink,#fff);border-color:#000}
 .food-dex-page .food-dex-filter button{background:#fff;border-width:2px;box-shadow:0 2px 0 #000}
 .food-dex-page .food-dex-filter button:active{transform:translateY(1px);box-shadow:0 1px 0 #000}
 .food-dex-page .food-dex-filter button{
@@ -4432,13 +4433,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Food-Dex final overrides (kept after the generic wallpaper cascade). */
 :root[data-seite="food-log"]:not([data-theme="dark"]){
-  --food-page-purple:#6B3FC4;
-  --food-vozzy-pattern:url("../MUSCLEDEX-TAPETEN/Pizza.svg");
-  background-color:var(--food-page-purple)!important;
+  --food-page-purple:var(--dex-seitenfarbe,#6B3FC4);
+  --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Pizza.svg"));
+  background-color:var(--dex-seitenfarbe,var(--food-page-purple))!important;
   background-image:none!important;
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) body{
-  background-color:var(--food-page-purple)!important;
+  background-color:var(--dex-seitenfarbe,var(--food-page-purple))!important;
   background-image:none!important;
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) #app,
@@ -4450,7 +4451,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page::before{
   content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
-  background:#fff;opacity:.08;
+  background:var(--dex-ink,#fff);opacity:.08;
   -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
   -webkit-mask-size:360px auto;mask-size:360px auto;
   -webkit-mask-position:center top;mask-position:center top;
@@ -4592,12 +4593,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-feature-settings:"zero" 1!important;
   opacity:1!important;
 }
-.food-dex-scroll-title{
-  display:grid;gap:9px;margin:0 2px 25px;color:#000;
-}
-.food-dex-page.food-dex-dunkler-hintergrund .food-dex-scroll-title{
-  color:#fff;
-}
+.food-dex-scroll-title{display:grid;gap:9px;margin:0 2px 25px;color:var(--dex-ink,#000)}
 .food-dex-scroll-title strong{
   display:block;font-family:"Work Sans",sans-serif;font-size:clamp(30px,8.9vw,39px);
   font-weight:900;line-height:.94;letter-spacing:-.045em;text-transform:none;
@@ -4840,11 +4836,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
   /* Externe SVG-Tapeten haben oft eine sehr grosse Zeichenflaeche. Eine feste
      Kachelbreite macht sie auf Smartphones sichtbar und konsistent mit den
-     eingebauten Mustern. Die Theme-Variable gleicht den sehr unterschiedlichen
-     Kontrast schwarzer Motive auf hellem Creme und tiefem Navy aus. */
-  background-image:linear-gradient(color-mix(in srgb,var(--bg) var(--tapeten-schleier),transparent),color-mix(in srgb,var(--bg) var(--tapeten-schleier),transparent)),var(--dex-tapete)!important;
-  background-size:auto,360px auto!important;background-repeat:repeat!important;
+     eingebauten Mustern. Die SVG wird als Maske gezeichnet, damit die Tapete
+     automatisch schwarz oder weiss zur Lesbarkeit der Dex-Farbe passt. */
+  position:relative;isolation:isolate;background-image:none!important;
 }
+.dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+  background:var(--dex-ink,#000);opacity:.08;
+  -webkit-mask-image:var(--dex-tapete);mask-image:var(--dex-tapete);
+  -webkit-mask-size:360px auto;mask-size:360px auto;
+  -webkit-mask-position:center top;mask-position:center top;
+  -webkit-mask-repeat:repeat;mask-repeat:repeat;
+}
+.dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt>*{position:relative;z-index:1}
 
 /* Im Darkmode liegt die feste Tapete exakt in der zweiten Zeile der App-Shell:
    unterhalb des Kopfbereichs, aber hinter dem scrollenden Inhalt. Damit bleibt
@@ -4862,6 +4866,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei>.wrap::before{display:none}
 :root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt{
   grid-row:2;grid-column:1;position:relative;z-index:1;background-image:none!important;
 }

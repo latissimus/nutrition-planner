@@ -102,6 +102,8 @@ export function categoryColor(route) {
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#B1E7FF');
 }
 
+const readableInkFor = (color) => (colorIsDark(color) ? '#FFFFFF' : '#111111');
+
 const wallpaperPatterns = Object.entries(wallpaperModules).map(([path, url]) => {
   const file = path.split('/').at(-1).replace(/\.svg$/i, '');
   const id = `wallpaper-${file.toLocaleLowerCase('de').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')}`;
@@ -183,13 +185,35 @@ export function setPageLookPattern(scope, pattern) {
   return valid;
 }
 
+export function setPageLookColor(scope, color) {
+  const normalized = String(color || '').toUpperCase();
+  setPreference(pageColorKey(scope), normalized);
+  return normalized;
+}
+
 export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
+  const fallback = fallbackColor || '#F2EBE0';
   return {
-    color: getPreference(pageColorKey(scope), fallbackColor || '#F2EBE0'),
+    color: getPreference(pageColorKey(scope), fallback).toUpperCase(),
     // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
     // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.
     pattern: normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
   };
+}
+
+function writeRootPageLook(look) {
+  const root = document.documentElement;
+  root.style.setProperty('--dex-seitenfarbe', look.color);
+  root.style.setProperty('--dex-ink', readableInkFor(look.color));
+  root.style.setProperty('--bg', look.color);
+  root.style.setProperty('--app-bg', look.color);
+  root.style.setProperty('--app-content-bg', look.color);
+  root.style.setProperty('--app-chrome-bg', look.color);
+  root.style.setProperty('--food-page-purple', look.color);
+  root.dataset.dexMuster = look.pattern;
+  const wallpaper = pagePatterns.find(([id]) => id === look.pattern)?.[2];
+  if (wallpaper) root.style.setProperty('--dex-tapete', `url("${String(wallpaper).replaceAll('"', '\\"')}")`);
+  else root.style.removeProperty('--dex-tapete');
 }
 
 export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
@@ -198,12 +222,7 @@ export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
     deferredPageLook = look;
     return look;
   }
-  const root = document.documentElement;
-  // Die Dex-Farbe bleibt fuer Register, Iconflaeche und Eintragsstreifen
-  // zustaendig. Die Tapete darf den globalen Seitenhintergrund nicht
-  // umfaerben; sie steuert hier deshalb ausschliesslich das Muster.
-  root.style.removeProperty('--dex-seitenfarbe');
-  delete root.dataset.dexMuster;
+  writeRootPageLook(look);
   return look;
 }
 
@@ -221,9 +240,7 @@ export function commitPendingPageLook() {
   deferPageLook = false;
   deferredPageLook = null;
   if (!look) return;
-  const root = document.documentElement;
-  root.style.removeProperty('--dex-seitenfarbe');
-  delete root.dataset.dexMuster;
+  writeRootPageLook(look);
 }
 
 function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
@@ -350,13 +367,13 @@ function iconPicker(route, onChange) {
 
 function appearancePicker(route, onChange, { hideIcon = false } = {}) {
   let selectedIcon = getPreference(storageKey(route), defaults[route]);
-  let selectedColor = categoryColor(route).toUpperCase();
+  let selectedColor = pageLook(route, categoryColor(route), 'drops').color.toUpperCase();
   let selectedPattern = pageLook(route, selectedColor, 'drops').pattern;
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="dex-appearance-form">
-      <h3>Farbe</h3>
+      <h3>Hintergrundfarbe</h3>
       <div class="sammlung-editor-farben">${dexEditorColors.map((color) => `<button type="button" data-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
       ${hideIcon ? '' : `<h3>Icon</h3>
       <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>`}
@@ -391,12 +408,13 @@ function appearancePicker(route, onChange, { hideIcon = false } = {}) {
     const emoji = emojiInput?.value.trim() || '';
     if (!hideIcon) setPreference(storageKey(route), emoji ? `emoji:${emoji}` : selectedIcon);
     setPreference(colorKey(route), selectedColor);
+    setPageLookColor(route, selectedColor);
     setPageLookPattern(route, selectedPattern);
     applyPageLook(route, selectedColor, selectedPattern);
     notifyAppearanceChanged(route);
     closeSheet(backdrop);
     onChange?.();
-    toast(hideIcon ? 'Farbe und Tapete geändert.' : 'Icon und Farbe geändert.');
+    toast(hideIcon ? 'Farbe und Tapete geändert.' : 'Icon, Farbe und Tapete geändert.');
   };
   if (emojiInput) emojiInput.oninput = () => {
     if (!emojiInput.value.trim()) return;
@@ -430,7 +448,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
-      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${actions.hideAppearanceIcon ? 'Farbe &amp; Tapete ändern' : 'Icon &amp; Farbe ändern'}</span></button>
+      <button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${actions.hideAppearanceIcon ? 'Farbe &amp; Tapete ändern' : 'Icon, Farbe &amp; Tapete ändern'}</span></button>
       ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
@@ -509,10 +527,17 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const wrap = container.querySelector(':scope > .wrap');
   if (!wrap) return;
   container.classList.add('hat-kategoriefarbe', 'dex-fixkopf');
-  container.style.setProperty('--ordner', options.color || categoryColor(route));
   const lookScope = options.pageLookScope || options.inheritedPageLookScope || route;
-  const look = pageLook(lookScope, options.pageLookColor || options.color || categoryColor(route), options.pageLookPattern || 'drops');
+  const fallbackColor = options.pageLookColor || options.color || categoryColor(route);
+  const look = applyPageLook(lookScope, fallbackColor, options.pageLookPattern || 'drops');
+  const ink = readableInkFor(look.color);
+  container.style.setProperty('--dex-seitenfarbe', look.color);
+  container.style.setProperty('--dex-ink', ink);
+  container.style.setProperty('--ordner', look.color);
+  container.style.setProperty('--ordner-ink', ink);
+  container.style.setProperty('--food-page-purple', look.color);
   container.dataset.dexMuster = look.pattern;
+  container.classList.toggle('dex-dunkler-hintergrund', colorIsDark(look.color));
   const wallpaper = pagePatterns.find(([id]) => id === look.pattern)?.[2];
   container.classList.toggle('dex-tapete-datei', Boolean(wallpaper));
   if (wallpaper) container.style.setProperty('--dex-tapete', `url("${String(wallpaper).replaceAll('"', '\\"')}")`);
@@ -535,7 +560,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
     <button class="kategorie-kopfknopf kategorie-plus" type="button" aria-label="Eintrag in ${safeTitle} ablegen">${materialIcon('place_item')}</button>
     <button class="kategorie-kopfknopf" type="button" data-category-settings aria-label="Einstellungen für ${safeTitle}">${materialIcon('build')}</button>
     <a class="kategorie-kopfknopf kategorie-schliessen" href="${closeHref}" aria-label="${safeTitle} schließen">${materialIcon('close')}</a>`;
-  bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(options.color || categoryColor(route)));
+  bar.querySelector('.kategorie-plus')?.classList.toggle('kontrast-weiss', colorIsDark(look.color));
   wrap.insertBefore(bar, content);
   // options.onPlus umgeht das Link/Notiz/Bild-Menue vollstaendig: Dex-Typen,
   // die keine Bookmarks sammeln (z. B. die Einkaufsliste), oeffnen darueber

@@ -40,7 +40,7 @@ import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, setPageLookPattern, settingsSheet,
+  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
@@ -687,9 +687,10 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
     const meta = zaehlerText(route, zaehler[route])
       || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
     const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
+    const dexFarbe = pageLook(route, categoryColor(route), 'drops').color || categoryColor(route);
     return dexOrdnerKarte({
       href: `#${route}`, route, titel, meta, iconInhalt,
-      farbe: categoryColor(route),
+      farbe: dexFarbe,
     });
   }).join('');
 }
@@ -1259,7 +1260,7 @@ async function renderRoute() {
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
     view.classList.add('food-dex-page');
-    view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe('#6B3FC4'));
+    view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(pageLook('food-log', categoryColor('food-log'), 'triangles').color));
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
       ${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
