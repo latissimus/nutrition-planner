@@ -16,7 +16,6 @@ import '@fontsource/figtree/latin-800.css';
 // rest of MUSCLE-DEX keeps its established typography.
 import '@fontsource/nunito/latin-900.css';
 import '@fontsource/lexend-exa/latin-900.css';
-import '@fontsource/work-sans/latin-900.css';
 import '@fontsource/outfit/latin.css';
 import '@fontsource/dm-sans/latin.css';
 import '@fontsource/space-mono/latin.css';

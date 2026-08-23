@@ -1,3 +1,18 @@
+@font-face{
+  font-family:"Work Sans";
+  src:url('../Work_Sans/WorkSans-VariableFont_wght.ttf') format('truetype');
+  font-style:normal;
+  font-weight:100 900;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Work Sans";
+  src:url('../Work_Sans/WorkSans-Italic-VariableFont_wght.ttf') format('truetype');
+  font-style:italic;
+  font-weight:100 900;
+  font-display:swap;
+}
+
 /* ============================================================
    MUSCLE-DEX — Design-Tokens
 
@@ -4213,8 +4228,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-intro strong{
   font-family:"Work Sans",sans-serif!important;
   font-weight:900!important;
-  letter-spacing:.02em;
-  -webkit-text-stroke:0;
+  letter-spacing:-.045em;
+  -webkit-text-stroke:.18px currentColor;
+  text-rendering:geometricPrecision;
 }
 .food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:#fff;border-color:#000}
 .food-dex-page .food-dex-filter button{background:#fff;border-width:2px;box-shadow:0 2px 0 #000}
