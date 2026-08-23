@@ -6071,23 +6071,3 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   bottom:calc(100% + 12px)!important;
   transform:none!important;
 }
-
-/* FoodDex Karten-Text: minimal mehr Atem unten, ohne das 2-Spalten-Raster zu
-   veraendern. Quelle/Autor wird ruhiger als der Titel gesetzt. */
-.food-dex-page .dex-inhaltskarte-body{
-  padding:8px 11px 15px!important;
-  gap:7px!important;
-}
-.food-dex-page .dex-inhaltskarte strong{
-  font-size:13.5px!important;
-  font-weight:800!important;
-  line-height:1.15!important;
-  letter-spacing:-.032em!important;
-}
-.food-dex-page .dex-inhaltskarte-text{
-  font-size:10.5px!important;
-  font-weight:500!important;
-  line-height:1.32!important;
-  letter-spacing:-.015em!important;
-  color:color-mix(in srgb,#111 66%,transparent)!important;
-}
