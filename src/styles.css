@@ -4202,7 +4202,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-intro strong{font:900 21px/.95 "Outfit",sans-serif;letter-spacing:.01em}
 .food-dex-intro p{margin:0;color:#5f5b67;font:500 12px/1.35 "DM Sans",sans-serif}
 .food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:#fff;border-color:#000}
-.food-dex-page .food-dex-filter button{background:#fff;border-width:2px;box-shadow:none}
+.food-dex-page .food-dex-filter button{background:#fff;border-width:2px;box-shadow:0 2px 0 #000}
+.food-dex-page .food-dex-filter button:active{transform:translateY(1px);box-shadow:0 1px 0 #000}
 .food-dex-page .dex-inhaltskarte{
   border-radius:24px;background:#fff;box-shadow:0 8px 0 #000;
 }
