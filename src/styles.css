@@ -6109,10 +6109,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .kategorie-sheet>header h2,
 .kategorie-sheet>header h3{
   font-family:"Work Sans",var(--ui),sans-serif!important;
-  font-size:20px!important;
-  font-weight:850!important;
-  line-height:1.05!important;
-  letter-spacing:-.055em!important;
+  font-size:19px!important;
+  font-weight:800!important;
+  line-height:1.08!important;
+  letter-spacing:-.04em!important;
 }
 .kategorie-sheet>header small{
   font-family:"Work Sans",var(--ui),sans-serif!important;
@@ -6140,10 +6140,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   legend
 ){
   font-family:"Work Sans",var(--ui),sans-serif!important;
-  font-size:11px!important;
-  font-weight:850!important;
-  line-height:1.15!important;
-  letter-spacing:.045em!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:1.2!important;
+  letter-spacing:.025em!important;
   text-transform:uppercase!important;
 }
 .kategorie-sheet :is(
@@ -6156,6 +6156,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-size:16px!important;
   font-weight:520!important;
   letter-spacing:-.025em!important;
+}
+.kategorie-sheet :is(input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),select,.input){
+  min-height:52px!important;
+}
+.kategorie-sheet textarea.input{
+  min-height:104px!important;
+  padding-block:13px!important;
 }
 .kategorie-sheet :is(input,textarea,.input)::placeholder{
   font-weight:480!important;
@@ -6182,8 +6189,35 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .kategorie-sheet .sheet-list-icon,
 .kategorie-sheet .sheet-list-icon svg{
-  width:23px!important;
-  height:23px!important;
+  width:25px!important;
+  height:25px!important;
+}
+.kategorie-sheet .dex-entry-file{
+  min-height:170px!important;
+  border-width:2px!important;
+  border-color:#000!important;
+  background:color-mix(in srgb,var(--dex-seitenfarbe,#492426) 72%,#fff)!important;
+  color:var(--dex-ink,#fff)!important;
+}
+.kategorie-sheet .dex-entry-file :is(.material-svg,svg,svg *){
+  color:var(--dex-ink,#fff)!important;
+  fill:var(--dex-ink,#fff)!important;
+}
+.kategorie-sheet .dex-entry-file strong{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:16px!important;
+  font-weight:760!important;
+  letter-spacing:-.03em!important;
+}
+.kategorie-sheet .dex-entry-file small{
+  color:color-mix(in srgb,var(--dex-ink,#fff) 70%,transparent)!important;
+  font-size:11px!important;
+  font-weight:650!important;
+}
+.kategorie-sheet .dex-entry-urlfeld{
+  min-height:60px!important;
+  border-width:2px!important;
+  box-shadow:none!important;
 }
 .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   min-height:54px!important;
