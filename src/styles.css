@@ -4551,6 +4551,58 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-button{box-shadow:0 3.5px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1.5px 0 #000}
 .food-dex-page .food-dex-action-popover{box-shadow:0 3.5px 0 #000}
+
+/* FoodDex ohne separate Titelkarte: Der echte Kopfbereich traegt Titel und
+   Metadaten, die Erklaerung lebt im Aktionsmenue. */
+.food-dex-page .kategorie-kopf{
+  display:grid!important;
+  color:#000!important;
+}
+.food-dex-page.food-dex-dunkler-hintergrund .kategorie-kopf{
+  color:#fff!important;
+}
+.food-dex-page .kategorie-kopftitel strong,
+.food-dex-page .kategorie-kopftitel small{
+  color:currentColor!important;
+}
+.food-dex-page .kategorie-kopftitel small{
+  font-family:var(--tech)!important;
+  font-variant-numeric:slashed-zero!important;
+  font-feature-settings:"zero" 1!important;
+  opacity:1!important;
+}
+.food-dex-info-dialog-overlay{
+  position:fixed;z-index:180;inset:0;display:grid;place-items:center;
+  padding:calc(20px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom));
+  background:rgba(5,10,24,.82);
+}
+.food-dex-info-dialog{
+  position:relative;width:min(430px,100%);padding:20px 18px 18px;
+  border:2px solid #000;border-radius:22px;background:#fff;color:#111;
+  box-shadow:0 3.5px 0 #000;
+}
+.food-dex-info-dialog h2{
+  margin:0 52px 14px 0;font:900 28px/.95 "Work Sans",sans-serif;
+  letter-spacing:-.045em;
+}
+.food-dex-info-dialog p{
+  margin:0;color:#586274;font:400 13px/1.55 var(--tech);
+}
+.food-dex-info-dialog p+p{margin-top:12px}
+.food-dex-info-dialog b{color:#111;font-weight:700}
+.food-dex-info-dialog-close{
+  position:absolute;right:13px;top:13px;display:grid;place-items:center;
+  width:44px;height:44px;padding:0;border:0;background:transparent;color:#000;
+}
+.food-dex-info-dialog-close .material-svg,
+.food-dex-info-dialog-close svg{width:26px!important;height:26px!important}
+
+[data-theme="dark"] .food-dex-info-dialog{
+  background:var(--surface);color:var(--ink);border-color:var(--ink);box-shadow:0 3.5px 0 var(--shadow);
+}
+[data-theme="dark"] .food-dex-info-dialog p{color:var(--muted)}
+[data-theme="dark"] .food-dex-info-dialog b{color:var(--ink)}
+[data-theme="dark"] .food-dex-info-dialog-close{color:var(--ink)}
 .seite-vor{animation:seiteVor .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}
 .seite-zurueck{animation:seiteZurueck .4s cubic-bezier(.32,.72,0,1) both}
 .seite-raus-rechts{animation:seiteRausRechts .4s cubic-bezier(.32,.72,0,1) both;box-shadow:-9px 0 18px rgba(0,0,0,.16)}

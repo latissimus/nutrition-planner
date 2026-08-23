@@ -1259,6 +1259,7 @@ async function renderRoute() {
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
     view.classList.add('food-dex-page');
+    view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe('#6B3FC4'));
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
       ${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -1267,7 +1268,7 @@ async function renderRoute() {
     });
     mountCategoryChrome(view, route, 'Fooddex', {
       pageLookScope: route, pageLookPattern: 'triangles',
-      meta: `${children.length} Unter-Dex`,
+      meta: `0 Einträge · ${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
       onAddImage: () => openEntry('image'),
@@ -1282,11 +1283,34 @@ async function renderRoute() {
     const foodBar = view.querySelector('.kategorie-kopf');
     const foodAdd = foodBar?.querySelector('.kategorie-plus');
     const foodSettings = foodBar?.querySelector('[data-category-settings]');
+    const openFoodInfo = () => {
+      const existing = document.querySelector('[data-food-info-dialog]');
+      if (existing) existing.remove();
+      const overlay = document.createElement('div');
+      overlay.className = 'food-dex-info-dialog-overlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('data-food-info-dialog', '');
+      overlay.innerHTML = `
+        <section class="food-dex-info-dialog">
+          <button type="button" class="food-dex-info-dialog-close" data-close aria-label="Info schließen">${materialIconMarkup('close')}</button>
+          <h2>Fooddex</h2>
+          <p>Im <b>Fooddex</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
+          <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
+          <p>Unter-Dex helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>
+        </section>`;
+      const close = () => overlay.remove();
+      overlay.addEventListener('click', (event) => {
+        if (event.target === overlay || event.target.closest('[data-close]')) close();
+      });
+      document.body.append(overlay);
+    };
     const foodActions = document.createElement('div');
     foodActions.innerHTML = foodDexActionsMarkup({
       panelAttributes: 'role="menu" aria-label="Food-Dex Aktionen"',
       panelContent: `
         <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
+        <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('idea')}<span>Info</span></button>
         <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>`,
       menuAttributes: 'data-food-menu',
       closeHref: '#home',
@@ -1301,39 +1325,12 @@ async function renderRoute() {
       foodActionBar.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
     };
     foodActionBar.querySelector('[data-food-action="add"]').onclick = () => { foodActionBar.querySelector('.food-dex-action-popover').hidden = true; foodAdd?.click(); };
+    foodActionBar.querySelector('[data-food-action="info"]').onclick = () => { foodActionBar.querySelector('.food-dex-action-popover').hidden = true; openFoodInfo(); };
     foodActionBar.querySelector('[data-food-action="edit"]').onclick = () => { foodActionBar.querySelector('.food-dex-action-popover').hidden = true; foodSettings?.click(); };
     foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
     foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
     foodBar?.querySelector('.kategorie-schliessen')?.setAttribute('aria-hidden', 'true');
     view.appendChild(foodActionBar);
-    const foodContent = view.querySelector('.kategorie-scrollinhalt');
-    if (foodContent) {
-      const intro = document.createElement('section');
-      intro.className = 'food-dex-intro';
-      intro.innerHTML = `
-        <div class="food-dex-intro-text">
-          <small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small>
-          <strong>FOODDEX</strong>
-        </div>
-        <button type="button" class="food-dex-info-button" data-food-info aria-expanded="false" aria-controls="food-dex-info" aria-label="FoodDex erklären">
-          <span class="food-dex-info-chevron" aria-hidden="true"></span>
-        </button>`;
-      const infoBox = document.createElement('section');
-      infoBox.id = 'food-dex-info';
-      infoBox.className = 'food-dex-info-box';
-      infoBox.hidden = true;
-      infoBox.innerHTML = `
-        <p>Im <b>FOODDEX</b> sammelst du <b>eigene Rezepte und Rezeptideen</b> aus Bildern, Links oder Videos.</p>
-        <p>Ordne Einträge über <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> ein, lege <b>Unter-Dex</b> an und finde passende Mahlzeiten später schnell über <b>Filter und Suche</b> wieder.</p>`;
-      foodContent.prepend(intro);
-      intro.after(infoBox);
-      intro.querySelector('[data-food-info]').onclick = (event) => {
-        const button = event.currentTarget;
-        const open = infoBox.hidden;
-        infoBox.hidden = !open;
-        button.setAttribute('aria-expanded', String(open));
-      };
-    }
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
@@ -1343,8 +1340,6 @@ async function renderRoute() {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
-        const introMeta = view.querySelector('[data-food-meta]');
-        if (introMeta) introMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
