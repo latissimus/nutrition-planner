@@ -6088,3 +6088,144 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   bottom:calc(100% + 12px)!important;
   transform:none!important;
 }
+
+/* ============================================================
+   Overlay-/Menü-Finish
+   Gemeinsame visuelle Sprache fuer alle Dex-Sheets: Work Sans, kompaktere
+   Labels, bottom-only Schatten wie im neuen FoodDex und Primaeraktionen in
+   der aktuellen Dex-Farbe mit automatischer Kontrastschrift.
+   ============================================================ */
+.kategorie-sheet{
+  border-width:2px!important;
+  border-radius:22px!important;
+  box-shadow:0 3.5px 0 #000!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  letter-spacing:-.02em;
+}
+.kategorie-sheet>header{
+  min-height:44px;
+  margin-bottom:18px!important;
+}
+.kategorie-sheet>header h2,
+.kategorie-sheet>header h3{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:20px!important;
+  font-weight:850!important;
+  line-height:1.05!important;
+  letter-spacing:-.055em!important;
+}
+.kategorie-sheet>header small{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  letter-spacing:.02em!important;
+}
+.kategorie-sheet>header button{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  min-height:44px!important;
+}
+.kategorie-sheet>header button :is(.material-svg,svg){
+  width:25px!important;
+  height:25px!important;
+}
+.kategorie-sheet :is(
+  .dex-entry-field>span,
+  .rem-field>span,
+  .sammlung-editor-label,
+  form>h3,
+  .dex-appearance-form>h3,
+  .nutrition-field>span,
+  legend
+){
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  line-height:1.15!important;
+  letter-spacing:.045em!important;
+  text-transform:uppercase!important;
+}
+.kategorie-sheet :is(
+  input,
+  textarea,
+  select,
+  .input
+){
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:16px!important;
+  font-weight:520!important;
+  letter-spacing:-.025em!important;
+}
+.kategorie-sheet :is(input,textarea,.input)::placeholder{
+  font-weight:480!important;
+}
+.kategorie-sheet .sheet-menue>button{
+  grid-template-columns:34px minmax(0,1fr)!important;
+  gap:12px!important;
+  min-height:62px!important;
+  padding:10px 2px!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:15px!important;
+  font-weight:760!important;
+  line-height:1.1!important;
+  letter-spacing:-.035em!important;
+}
+.kategorie-sheet .sheet-menue>button small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:11px!important;
+  font-weight:560!important;
+  line-height:1.25!important;
+  letter-spacing:-.02em!important;
+}
+.kategorie-sheet .sheet-list-icon,
+.kategorie-sheet .sheet-list-icon svg{
+  width:23px!important;
+  height:23px!important;
+}
+.kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  min-height:54px!important;
+  border-width:2px!important;
+  border-radius:13px!important;
+  box-shadow:0 3.5px 0 #000!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:14px!important;
+  font-weight:850!important;
+  font-style:normal!important;
+  line-height:1.05!important;
+  letter-spacing:-.025em!important;
+  text-transform:uppercase!important;
+}
+.kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save):active{
+  transform:translateY(2px)!important;
+  box-shadow:0 1.5px 0 #000!important;
+}
+.kategorie-sheet :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  background:var(--dex-seitenfarbe,#492426)!important;
+  color:var(--dex-ink,#fff)!important;
+  border-color:#000!important;
+}
+.kategorie-sheet :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(.material-svg,svg,svg *){
+  color:var(--dex-ink,#fff)!important;
+  fill:var(--dex-ink,#fff)!important;
+}
+.sammlung-editor-farben button.aktiv,
+.sammlung-editor-icons button.aktiv,
+.sammlung-editor-tapeten button.aktiv{
+  box-shadow:0 3.5px 0 #000!important;
+  transform:none!important;
+}
+.kategorie-sheet :is(.sammlung-editor-farben button,.sammlung-editor-icons button,.sammlung-editor-tapeten button){
+  border-width:2px!important;
+}
+:root[data-theme="dark"] .kategorie-sheet{
+  box-shadow:0 3.5px 0 var(--app-hard-shadow,#43516E)!important;
+}
+:root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  box-shadow:0 3.5px 0 var(--app-hard-shadow,#43516E)!important;
+}
+:root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save):active{
+  box-shadow:0 1.5px 0 var(--app-hard-shadow,#43516E)!important;
+}
