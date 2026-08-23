@@ -40,7 +40,7 @@ import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookPattern, settingsSheet,
+  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
@@ -242,7 +242,27 @@ function fehlertext(error) {
 function setSeite(name) {
   document.documentElement.dataset.seite = name;
   delete document.documentElement.dataset.dexMuster;
-  document.documentElement.style.removeProperty('--dex-seitenfarbe');
+  ['--dex-seitenfarbe', '--dex-ink', '--dex-tapete', '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg', '--food-page-purple']
+    .forEach((property) => document.documentElement.style.removeProperty(property));
+}
+
+function dexLookAusAnsichtWiederherstellen(node) {
+  if (!node) return;
+  const color = node.style.getPropertyValue('--dex-seitenfarbe').trim();
+  if (!color) return;
+  const root = document.documentElement;
+  const ink = node.style.getPropertyValue('--dex-ink').trim() || '#111111';
+  root.style.setProperty('--dex-seitenfarbe', color);
+  root.style.setProperty('--dex-ink', ink);
+  root.style.setProperty('--bg', color);
+  root.style.setProperty('--app-bg', color);
+  root.style.setProperty('--app-content-bg', color);
+  root.style.setProperty('--app-chrome-bg', color);
+  root.style.setProperty('--food-page-purple', color);
+  const wallpaper = node.style.getPropertyValue('--dex-tapete').trim();
+  if (wallpaper) root.style.setProperty('--dex-tapete', wallpaper);
+  else root.style.removeProperty('--dex-tapete');
+  if (node.dataset.dexMuster) root.dataset.dexMuster = node.dataset.dexMuster;
 }
 
 function meldung(slot, text, art) {
@@ -595,6 +615,7 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
   routeAbortController = gemerkt.controller;
   aktiveRoute = route;
   setSeite(gemerkt.seite || (route === 'home' ? 'home' : route.startsWith('entry/') || route.startsWith('collection/') ? 'collection' : route));
+  dexLookAusAnsichtWiederherstellen(gemerkt.node);
 
   if (!aktuell) return true;
   aktuell.removeAttribute('id');
@@ -763,13 +784,17 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
     setPreference(`muscledex:kategorie-farbe:${route}`, color);
     setPreference(`muscledex:kategorie-icon:${route}`, `emoji:${emoji}`);
+    setPageLookColor(route, color);
     setPageLookPattern(route, pattern);
   });
   try {
     const neu = await saveCollection(userId, {
       rootKey: 'home', parentId: null, name: 'Neu', color: '#FF06B7', iconKey: 'emoji:🆕',
     });
-    if (neu?.id) setPageLookPattern(`collection-${neu.id}`, 'wallpaper-blitz');
+    if (neu?.id) {
+      setPageLookColor(`collection-${neu.id}`, '#FF06B7');
+      setPageLookPattern(`collection-${neu.id}`, 'wallpaper-blitz');
+    }
   } catch (error) {
     if (!signal?.aborted) console.warn('Standard-Dex konnte nicht angelegt werden:', error.message);
   }
