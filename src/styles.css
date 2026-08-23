@@ -4208,6 +4208,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-intro strong{
   font-family:"Lexend Exa",sans-serif!important;
   font-weight:900!important;
+  /* Die kleine mobile Darstellung wirkt sonst sichtbar leichter als die
+     Google-Fonts-Vorschau derselben 900er-Schnittstelle. */
+  -webkit-text-stroke:.22px currentColor;
+  text-rendering:geometricPrecision;
 }
 .food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:#fff;border-color:#000}
 .food-dex-page .food-dex-filter button{background:#fff;border-width:2px;box-shadow:0 2px 0 #000}
