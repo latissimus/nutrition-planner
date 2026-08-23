@@ -4337,7 +4337,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte strong{font-size:14px;line-height:1.15}
 .food-dex-page .dex-inhaltskarte-text{font-size:11px;line-height:1.25}
 .food-dex-floating-actions{
-  position:fixed;z-index:70;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));
+  position:fixed!important;z-index:70!important;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));
   display:grid;justify-items:end;gap:9px;
 }
 .food-dex-action-button{
@@ -4456,7 +4456,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page>*{
+:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page>*:not(.food-dex-floating-actions){
   position:relative;z-index:1;
 }
 .food-dex-intro-meta{
