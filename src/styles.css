@@ -1,11 +1,3 @@
-@font-face{
-  font-family:"Tanker";
-  src:url('./assets/Tanker-Regular.otf') format('opentype');
-  font-style:normal;
-  font-weight:400;
-  font-display:swap;
-}
-
 /* ============================================================
    MUSCLE-DEX — Design-Tokens
 
@@ -4211,7 +4203,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-intro p{margin:0;color:#5f5b67;font:500 12px/1.35 "DM Sans",sans-serif}
 
 /* Einheitliche Dex-Titel: Kategorie-Köpfe verwenden Lexend Exa 900.
-   Der sichtbare FoodDex-Titel nutzt die separat eingebundene Tanker-Schrift. */
+   Der sichtbare FoodDex-Titel nutzt Work Sans 900. */
 .kategorie-kopf .kategorie-kopftitel strong{
   font-family:"Lexend Exa",sans-serif!important;
   font-weight:900!important;
@@ -4219,8 +4211,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-rendering:geometricPrecision;
 }
 .food-dex-intro strong{
-  font-family:"Tanker",sans-serif!important;
-  font-weight:400!important;
+  font-family:"Work Sans",sans-serif!important;
+  font-weight:900!important;
   letter-spacing:.02em;
   -webkit-text-stroke:0;
 }
