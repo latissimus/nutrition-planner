@@ -1307,7 +1307,7 @@ async function renderRoute() {
       intro.innerHTML = `
         <div class="food-dex-intro-text">
           <small class="food-dex-intro-meta" data-food-meta>0 Einträge · ${children.length} Unter-Dex</small>
-          <strong>FOODDEX</strong>
+          <strong>FoodDex</strong>
         </div>
         <button type="button" class="food-dex-info-button" data-food-info aria-expanded="false" aria-controls="food-dex-info" aria-label="FoodDex erklären">
           <span class="food-dex-info-chevron" aria-hidden="true"></span>
