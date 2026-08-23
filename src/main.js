@@ -265,6 +265,25 @@ function dexLookAusAnsichtWiederherstellen(node) {
   if (node.dataset.dexMuster) root.dataset.dexMuster = node.dataset.dexMuster;
 }
 
+function dexLookAufAnsichtUebertragen(node, ziel) {
+  if (!node || !ziel) return;
+  [
+    '--dex-seitenfarbe',
+    '--dex-ink',
+    '--dex-tapete',
+    '--bg',
+    '--app-bg',
+    '--app-content-bg',
+    '--app-chrome-bg',
+    '--food-page-purple',
+  ].forEach((property) => {
+    const value = node.style.getPropertyValue(property).trim();
+    if (value) ziel.style.setProperty(property, value);
+  });
+  if (node.dataset.dexMuster) ziel.dataset.dexMuster = node.dataset.dexMuster;
+  ziel.classList.toggle('dex-tapete-datei', Boolean(node.style.getPropertyValue('--dex-tapete').trim()));
+}
+
 function meldung(slot, text, art) {
   slot.replaceChildren();
   const node = document.createElement('div');
@@ -1191,6 +1210,8 @@ async function renderRoute() {
     // the detail view instead of briefly falling back to the neutral cream
     // collection background while the entry query is loading.
     const sourceView = app.querySelector(':scope > .view-alt');
+    dexLookAusAnsichtWiederherstellen(sourceView);
+    dexLookAufAnsichtUebertragen(sourceView, view);
     if (sourceView) {
       for (const property of ['backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat']) {
         if (sourceView.style[property]) view.style[property] = sourceView.style[property];
@@ -1210,6 +1231,7 @@ async function renderRoute() {
   // selben Takt wie das Entfernen dieser Ansicht gesetzt werden; andernfalls
   // verliert sie vorher kurz ihre seitenspezifische Typografie.
   const homeStilBeimTauschSetzen = route === 'home' && Boolean(app.querySelector(':scope > .view-alt'));
+  if (homeStilBeimTauschSetzen) view.classList.add('home-transition-view');
   // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
   // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
   // die Animation ihn zurueck an den Start reisst.
@@ -1404,9 +1426,11 @@ async function renderRoute() {
   } else if (route.startsWith('entry/')) {
     // Keep the originating Dex surface during the transition. In particular,
     // restore Food-Dex before the async entry load so the new page never
-    // renders one frame with the neutral cream collection background.
+    // renders one frame with the neutral cream collection background or the
+    // Food-Dex default pizza wallpaper.
     if (vorherigeRoute === 'food-log' || document.documentElement.dataset.seite === 'food-log') {
-      setSeite('food-log');
+      document.documentElement.dataset.seite = 'food-log';
+      dexLookAusAnsichtWiederherstellen(app.querySelector(':scope > .view-alt'));
     }
     const { mountDexEntryDetail } = await entryDetailModule();
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });

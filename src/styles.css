@@ -4039,6 +4039,14 @@ body{overscroll-behavior:none}
 .app-shell>.view-cache{display:none!important}
 .app-shell>.view-alt-zurueck{z-index:3;will-change:transform}
 .app-shell>.view-neu{z-index:2;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);background-color:var(--dex-seitenfarbe,var(--bg))}
+.app-shell>.view-neu.home-transition-view{
+  background-color:#F2EBE0!important;
+  background-image:none!important;
+}
+:root[data-theme="dark"] .app-shell>.view-neu.home-transition-view{
+  background-color:#101A2B!important;
+  background-image:none!important;
+}
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Seitliche Einschub-Animation: neue Seite kommt beim Oeffnen eines Dex von
@@ -4266,6 +4274,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
   font-family:"Work Sans",sans-serif;
   font-weight:600;
+  color:var(--dex-ink,#000);
 }
 .food-dex-page :is(.dex-inhaltskarte-text,.unter-sammlung small,.sammlung-leer strong,
   .sammlung-leer span,.dex-mehr-laden small){font-family:var(--food-body);}
