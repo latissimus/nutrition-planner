@@ -350,6 +350,12 @@ function renderAuth() {
         navigationZuruecksetzen('home');
         if (location.hash !== '#home') history.replaceState(null, '', '#home');
         await signIn(email, password);
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData?.session) {
+          session = sessionData.session;
+          syncInterfaceSounds();
+          render();
+        }
       } else {
         // Auch wenn Supabase eine E-Mail-Bestätigung verlangt, soll der
         // spätere Einstieg nicht einen alten Hash (z. B. einen geöffneten
@@ -1585,11 +1591,12 @@ if (!supabaseKonfiguriert) {
     if (event === 'TOKEN_REFRESHED') return;
     if (event === 'SIGNED_IN' && bisherigeUserId === session?.user?.id && profile) return;
     const preferenceUserId = session?.user?.id || '';
-    setTimeout(async () => {
-      if (preferenceUserId) await loadUserPreferences(preferenceUserId);
-      syncInterfaceSounds();
-      if ((session?.user?.id || '') !== preferenceUserId) return;
-      render();
-    }, 0);
+    syncInterfaceSounds();
+    render();
+    if (preferenceUserId) {
+      loadUserPreferences(preferenceUserId)
+        .then(() => { syncInterfaceSounds(); })
+        .catch(() => {});
+    }
   });
 }
