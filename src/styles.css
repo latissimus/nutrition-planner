@@ -5713,8 +5713,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
   display:block!important;
-  width:min(100%,620px)!important;
-  max-width:620px!important;
+  width:min(calc(100% - 8px),604px)!important;
+  max-width:604px!important;
   max-height:none!important;
   margin:0 auto!important;
   overflow:visible!important;
@@ -5767,4 +5767,56 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="food-log"]:not([data-theme="dark"]) #view{
   background-color:var(--food-page-purple)!important;
   background-image:none!important;
+}
+
+/* Entry detail polish: match the calmer FoodDex card rhythm and keep all
+   colour-filled controls readable on light and dark Dex colours. */
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt{
+  gap:20px!important;
+  padding:28px 22px 30px!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt h1{
+  font-family:"Work Sans",sans-serif!important;
+  font-weight:800!important;
+  line-height:1.02!important;
+  margin:0!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt>p,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-notiztext{
+  margin:0!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft{
+  background:var(--eintrag-farbe)!important;
+  border:2px solid #000!important;
+  color:#000!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft span,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft b{
+  color:currentColor!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf.dex-detail-dunkel .dex-detail-popup .dex-detail-herkunft{
+  color:#fff!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-link{
+  min-height:56px!important;
+  border:2px solid #000!important;
+  border-radius:13px!important;
+  background:var(--eintrag-farbe)!important;
+  box-shadow:0 3.5px 0 #000!important;
+  color:#000!important;
+  font-family:"Work Sans",sans-serif!important;
+  font-style:normal!important;
+  font-weight:800!important;
+  letter-spacing:0!important;
+  text-transform:uppercase!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-link:active{
+  transform:translateY(2px)!important;
+  box-shadow:0 1.5px 0 #000!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf.dex-detail-dunkel .dex-detail-popup .dex-detail-link{
+  color:#fff!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-tags{
+  padding-top:2px!important;
 }

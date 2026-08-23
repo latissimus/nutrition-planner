@@ -278,9 +278,8 @@ function detailMarkup(entry) {
         ${ingredients}
         ${entry.note ? `<div class="dex-detail-notiztext">${renderNoteHtml(entry.note)}</div>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span></div>`}
-        ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}
+        ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer"><span>Link aufrufen</span></a>` : ''}
         <section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>
-        <footer>MUSCLE-DEX</footer>
         </div>
       </article>
     </div>
