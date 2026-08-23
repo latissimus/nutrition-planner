@@ -3520,7 +3520,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   min-height:100%;box-sizing:border-box;padding:112px 10px calc(42px + env(safe-area-inset-bottom));
   overflow-x:hidden;overflow-y:auto;background:transparent;
 }
-.dex-detail-floating-actions{bottom:calc(10px + env(safe-area-inset-bottom));}
+.dex-detail-floating-actions{bottom:calc(4px + env(safe-area-inset-bottom));}
 .dex-detail-floating-actions .dex-detail-popup-menü{
   position:absolute;right:0;bottom:calc(100% + 10px);top:auto;display:grid;min-width:220px;
   padding:7px;border:2px solid #000;border-radius:14px;
@@ -4337,7 +4337,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte strong{font-size:14px;line-height:1.15}
 .food-dex-page .dex-inhaltskarte-text{font-size:11px;line-height:1.25}
 .food-dex-floating-actions{
-  position:fixed!important;z-index:70!important;right:16px;bottom:calc(10px + env(safe-area-inset-bottom));
+  position:fixed!important;z-index:70!important;right:16px;bottom:calc(4px + env(safe-area-inset-bottom));
   display:grid;justify-items:end;gap:9px;
 }
 .food-dex-action-button{
