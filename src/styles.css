@@ -5989,3 +5989,47 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   line-height:1!important;
   letter-spacing:-.015em!important;
 }
+
+/* FoodDex Aktionsmenü: gleiche Materialität wie die Karten, aber kompakt und
+   eindeutig bedienbar. */
+.food-dex-page .food-dex-action-popover,
+.food-dex-entry-view .food-dex-action-popover{
+  min-width:224px!important;
+  padding:6px!important;
+  border-width:2px!important;
+  border-radius:16px!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+.food-dex-page .food-dex-action-popover button,
+.food-dex-entry-view .food-dex-action-popover button{
+  display:grid!important;
+  grid-template-columns:24px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:46px!important;
+  padding:9px 11px!important;
+  border-radius:10px!important;
+  color:#111!important;
+  font-family:"Work Sans",sans-serif!important;
+  font-size:13px!important;
+  font-weight:760!important;
+  line-height:1.1!important;
+  letter-spacing:-.025em!important;
+}
+.food-dex-page .food-dex-action-popover button+button,
+.food-dex-entry-view .food-dex-action-popover button+button{
+  border-top:1.5px solid #000!important;
+}
+.food-dex-page .food-dex-action-popover button:active,
+.food-dex-entry-view .food-dex-action-popover button:active{
+  background:rgba(0,0,0,.055)!important;
+}
+.food-dex-page .food-dex-action-popover .material-svg,
+.food-dex-page .food-dex-action-popover svg,
+.food-dex-entry-view .food-dex-action-popover .material-svg,
+.food-dex-entry-view .food-dex-action-popover svg{
+  width:19px!important;
+  height:19px!important;
+  margin:auto!important;
+  fill:currentColor!important;
+}
