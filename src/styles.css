@@ -4206,7 +4206,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    FoodDex-Kopf verwendet dieselbe markante Lexend-Exa-Schrift. */
 .kategorie-kopf .kategorie-kopftitel strong,
 .food-dex-intro strong{
-  font-family:"Lexend Exa",sans-serif!important;
+  font-family:"ANTON"!important;
   font-weight:900!important;
 }
 .food-dex-page .food-dex-filter button.aktiv{background:var(--food-page-purple);color:#fff;border-color:#000}
