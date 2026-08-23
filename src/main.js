@@ -1267,7 +1267,7 @@ async function renderRoute() {
       <button type="button" class="food-dex-action-button food-dex-retro-menu" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">
         <span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       </button>
-      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">${materialIconMarkup('keyboard_return')}</a>`;
+      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">${materialIconMarkup('close')}</a>`;
     foodActions.querySelector('[data-food-menu]').onclick = () => {
       const panel = foodActions.querySelector('.food-dex-action-popover');
       const open = panel.hidden;
