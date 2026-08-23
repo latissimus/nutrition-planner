@@ -249,22 +249,22 @@ function detailMarkup(entry) {
   const trainingMeta = entry.root_key === 'training' && entry.training_class && entry.training_class !== 'unset'
     ? `<div class="dex-detail-foodmeta"><span>${escapeHtml(trainingLabels[entry.training_class] || entry.training_class)}</span></div>` : '';
   const ingredients = ingredientsSection(entry);
-  const contrastClass = colorIsDark(entry.color) ? ' dex-detail-dunkel' : '';
+  // Food-Dex cards use the page accent rather than the legacy yellow entry
+  // register colour. Other Dex retain their configured entry colour.
+  const popupColor = entry.root_key === 'food-log' ? '#6B3FC4' : entry.color;
+  const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
   return `<div class="dex-detail-overlay${contrastClass}" role="dialog" aria-modal="true" aria-label="Eintrag anzeigen">
-    <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(entry.color)}">
-      <header class="dex-detail-popup-kopf">
-        <span class="dex-detail-popup-typ">${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'TONAUFNAHME' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</span>
-        <div class="dex-detail-popup-aktionen">
-          <button class="dex-detail-knopf dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü">${materialIconMarkup('more_horiz')}</button>
-          <a class="dex-detail-knopf dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
-        </div>
+    <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
+      <div class="dex-detail-popup-aktionen">
+        <button class="food-dex-action-button food-dex-retro-menu dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü"><span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
+        <a class="food-dex-action-button food-dex-action-close dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
         <div class="dex-detail-popup-menü" data-entry-menu-panel hidden>
           <button type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}">${materialIconMarkup('favorite')}<span>${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}</span></button>
           ${entry.url ? `<button type="button" data-entry-refresh>${materialIconMarkup('refresh')}<span>Vorschau aktualisieren</span></button>` : ''}
           <button type="button" data-entry-edit>${materialIconMarkup('build')}<span>Bearbeiten</span></button>
           <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>
         </div>
-      </header>
+      </div>
       ${media}
       <div class="dex-detail-inhalt">
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}

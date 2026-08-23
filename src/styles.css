@@ -3465,26 +3465,25 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .dex-detail-overlay{
   position:fixed;inset:0;z-index:900;display:grid;place-items:center;
   padding:max(18px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));
-  box-sizing:border-box;background:rgba(0,0,0,.72);overflow:auto;
+  box-sizing:border-box;background:color-mix(in srgb,var(--bg) 68%,#000);overflow:hidden;
   font-family:"Work Sans",sans-serif;
 }
 .dex-detail-popup{
-  position:relative;width:min(100%,620px);max-height:calc(100dvh - 36px);margin:0;
-  overflow:auto;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
-  background:var(--surface);box-shadow:var(--hart);font-family:"Work Sans",sans-serif;
+  position:relative;width:min(100%,620px);max-height:calc(100dvh - 24px);margin:0;
+  overflow:auto;border:2px solid #000;border-radius:42px 42px 30px 30px;
+  background:var(--surface);box-shadow:0 3px 0 #000;font-family:"Work Sans",sans-serif;
 }
-.dex-detail-popup-kopf{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;min-height:62px;padding:12px 14px;background:var(--surface);border-bottom:1px solid color-mix(in srgb,var(--ink) 14%,transparent)}
-.dex-detail-popup-typ{font:700 12px/1 "Work Sans",sans-serif;letter-spacing:.09em;color:var(--muted)}
-.dex-detail-popup-aktionen{display:flex;align-items:center;gap:8px}
-.dex-detail-popup .dex-detail-knopf{width:44px;height:44px;border-radius:var(--r);background:var(--surface);box-shadow:var(--hart-klein)}
-.dex-detail-menu-trigger .material-svg,.dex-detail-popup-schliessen .material-svg{width:24px;height:24px}
-.dex-detail-popup-menü{position:absolute;right:14px;top:62px;display:grid;min-width:220px;padding:7px;border:var(--karten-bw) solid var(--ink);border-radius:14px;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:var(--hart);}
+.dex-detail-popup-aktionen{position:absolute;z-index:8;top:16px;right:16px;display:flex;align-items:center;gap:8px}
+.dex-detail-popup-aktionen .food-dex-action-button{width:52px;height:52px;box-sizing:border-box;border:2px solid #000;border-radius:13px;box-shadow:0 3.5px 0 #000}
+.dex-detail-popup-aktionen .food-dex-action-button:active{transform:translateY(2px);box-shadow:0 1.5px 0 #000}
+.dex-detail-popup-aktionen .food-dex-action-close .material-svg,.dex-detail-popup-aktionen .food-dex-action-close svg{width:26px;height:26px;fill:#000}
+.dex-detail-popup-menü{position:absolute;right:0;top:60px;display:grid;min-width:220px;padding:7px;border:2px solid #000;border-radius:14px;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 3px 0 #000;}
 .dex-detail-popup-menü[hidden]{display:none}
 .dex-detail-popup-menü button{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 10px;border:0;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:transparent;color:var(--text);font:650 14px/1.15 "Work Sans",sans-serif;text-align:left}
 .dex-detail-popup-menü button:last-child{border-bottom:0}
 .dex-detail-popup-menü button:active{transform:translateY(1px)}
 .dex-detail-popup-menü .material-svg,.dex-detail-popup-menü svg{width:20px;height:20px;fill:currentColor}
-.dex-detail-popup>.dex-detail-bild,.dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau,.dex-detail-popup>.dex-detail-provider,.dex-detail-popup>.dex-detail-audio{margin:18px 18px 0;width:calc(100% - 36px);border:var(--karten-bw) solid var(--ink);border-radius:30px;overflow:hidden;box-sizing:border-box}
+.dex-detail-popup>.dex-detail-bild,.dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau,.dex-detail-popup>.dex-detail-provider,.dex-detail-popup>.dex-detail-audio{margin:0;width:100%;border:0;border-bottom:2px solid #000;border-radius:38px 38px 16px 16px;overflow:hidden;box-sizing:border-box}
 .dex-detail-popup>.dex-detail-bild{background:var(--surface2)}
 .dex-detail-popup .dex-detail-bild img{width:100%;height:min(58dvh,520px);max-height:none;object-fit:cover;border:0;border-radius:inherit}
 .dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau{aspect-ratio:4/3}
