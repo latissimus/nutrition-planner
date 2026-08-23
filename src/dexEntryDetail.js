@@ -254,19 +254,6 @@ function detailMarkup(entry) {
   const popupColor = entry.root_key === 'food-log' ? '#6B3FC4' : entry.color;
   const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
   return `<div class="dex-detail-overlay dex-detail-fixkopf${contrastClass}" role="main" aria-label="Eintrag anzeigen">
-    <div class="dex-detail-steuerung kategorie-kopf dex-detail-eigener-kopf">
-      <div class="kategorie-kopftitel"><strong>${escapeHtml(entry.dex_name || 'MUSCLE-DEX')}</strong></div>
-      <div class="dex-detail-popup-aktionen">
-        <button class="food-dex-action-button food-dex-retro-menu dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü"><span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
-        <a class="food-dex-action-button food-dex-action-close dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
-        <div class="dex-detail-popup-menü" data-entry-menu-panel hidden>
-          <button type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}">${materialIconMarkup('favorite')}<span>${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}</span></button>
-          ${entry.url ? `<button type="button" data-entry-refresh>${materialIconMarkup('refresh')}<span>Vorschau aktualisieren</span></button>` : ''}
-          <button type="button" data-entry-edit>${materialIconMarkup('build')}<span>Bearbeiten</span></button>
-          <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>
-        </div>
-      </div>
-    </div>
     <div class="dex-detail-scrollinhalt">
       <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
         ${media}
@@ -282,6 +269,16 @@ function detailMarkup(entry) {
         <footer>MUSCLE-DEX</footer>
         </div>
       </article>
+    </div>
+    <div class="food-dex-floating-actions dex-detail-floating-actions">
+      <div class="dex-detail-popup-menü" data-entry-menu-panel hidden>
+          <button type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}">${materialIconMarkup('favorite')}<span>${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}</span></button>
+          ${entry.url ? `<button type="button" data-entry-refresh>${materialIconMarkup('refresh')}<span>Vorschau aktualisieren</span></button>` : ''}
+          <button type="button" data-entry-edit>${materialIconMarkup('build')}<span>Bearbeiten</span></button>
+          <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>
+      </div>
+        <button class="food-dex-action-button food-dex-retro-menu dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü"><span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
+        <a class="food-dex-action-button food-dex-action-close dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
     </div>
   </div>`;
 }

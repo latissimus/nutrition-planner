@@ -3512,29 +3512,22 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
    in the same fixed head row as every Dex; only the detail content scrolls
    underneath it. */
 .dex-detail-overlay.dex-detail-fixkopf{
-  position:relative;inset:auto;width:100%;height:100%;min-height:100%;display:grid;
-  grid-template-rows:auto minmax(0,1fr);place-items:stretch;padding:0;box-sizing:border-box;
+  position:relative;inset:auto;width:100%;height:100%;min-height:100%;display:block;
+  box-sizing:border-box;
   overflow:hidden;background:transparent;animation:none;z-index:auto;
 }
-.dex-detail-eigener-kopf{
-  grid-template-columns:minmax(0,1fr) auto;gap:9px;
-  margin:0;padding:8px 10px 8px;background:var(--bg);z-index:20;
-}
-.dex-detail-eigener-kopf .kategorie-kopftitel strong{font-family:"Work Sans",sans-serif;font-weight:900}
-.dex-detail-eigener-kopf .dex-detail-popup-aktionen{
-  position:relative;top:auto;right:auto;display:flex;align-items:center;gap:9px;
-}
-.dex-detail-eigener-kopf .dex-detail-popup-aktionen .food-dex-action-button{
-  width:44px;height:44px;border-radius:var(--r);box-shadow:var(--hart-klein);
-}
-.dex-detail-eigener-kopf .dex-detail-popup-aktionen .food-dex-action-button:active{
-  box-shadow:none;transform:translate(2px,2px);
-}
-.dex-detail-eigener-kopf .dex-detail-popup-menü{top:58px;right:0}
 .dex-detail-scrollinhalt{
-  padding:68px 10px calc(42px + env(safe-area-inset-bottom));
+  min-height:100%;box-sizing:border-box;padding:112px 10px calc(42px + env(safe-area-inset-bottom));
   overflow-x:hidden;overflow-y:auto;background:transparent;
 }
+.dex-detail-floating-actions{bottom:calc(104px + env(safe-area-inset-bottom));}
+.dex-detail-floating-actions .dex-detail-popup-menü{
+  position:absolute;right:0;bottom:calc(100% + 10px);top:auto;display:grid;min-width:220px;
+  padding:7px;border:2px solid #000;border-radius:14px;
+  background:color-mix(in srgb,var(--surface) 82%,transparent);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 3px 0 #000;
+}
+.dex-detail-floating-actions .dex-detail-popup-menü[hidden]{display:none}
 .dex-detail-scrollinhalt .dex-detail-popup{
   width:min(100%,620px);max-width:620px;max-height:none;margin:0 auto;
   overflow:visible;border-radius:42px 42px 30px 30px;

@@ -1351,10 +1351,12 @@ async function renderRoute() {
     if (!item) { location.hash = 'home'; return; }
     await mountCustomCollection(view, item, signal);
   } else if (route.startsWith('entry/')) {
-    // Keep the originating Dex surface during the detail transition. Resetting
-    // to the generic collection theme here causes a one-frame cream flash
-    // before the overlay is mounted (especially noticeable in Food-Dex).
-    // The detail view applies its own fallback only when opened directly.
+    // Keep the originating Dex surface during the transition. In particular,
+    // restore Food-Dex before the async entry load so the new page never
+    // renders one frame with the neutral cream collection background.
+    if (vorherigeRoute === 'food-log' || document.documentElement.dataset.seite === 'food-log') {
+      setSeite('food-log');
+    }
     const { mountDexEntryDetail } = await entryDetailModule();
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
