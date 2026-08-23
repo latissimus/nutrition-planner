@@ -5690,10 +5690,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inset:auto!important;
   display:block!important;
   width:100%!important;
-  height:auto!important;
-  min-height:100%!important;
+  height:100%!important;
+  min-height:0!important;
   padding:0!important;
-  overflow:visible!important;
+  overflow:hidden!important;
   background:transparent!important;
   animation:none!important;
   z-index:auto!important;
@@ -5701,11 +5701,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt{
   display:block!important;
   width:100%!important;
-  height:auto!important;
-  min-height:100%!important;
+  height:100%!important;
+  min-height:0!important;
   box-sizing:border-box!important;
-  overflow:visible!important;
-  padding:76px 10px calc(42px + env(safe-area-inset-bottom))!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding:12px 17px calc(42px + env(safe-area-inset-bottom))!important;
   background:transparent!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
@@ -5715,17 +5718,32 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   max-height:none!important;
   margin:0 auto!important;
   overflow:visible!important;
-  padding-top:54px!important;
+  padding-top:60px!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions{
   position:fixed!important;
-  right:16px!important;
-  bottom:calc(76px + env(safe-area-inset-bottom))!important;
   z-index:70!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions .food-dex-action-button{
   width:52px!important;
   height:52px!important;
+}
+
+/* Medien liegen wie im Vozzy-Vorbild als eigene, sauber eingefasste Flaeche
+   in der Karte: gleiche Rundung an allen vier Ecken, echte 2-px-Kontur und
+   keinerlei eigener Schatten. */
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-bild,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-video,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-linkvorschau,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-provider,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-audio{
+  width:calc(100% - 28px)!important;
+  margin:0 14px!important;
+  border:2px solid #000!important;
+  border-radius:28px!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transform:none!important;
 }
 
 /* Die FoodDex-Detailseite verwendet exakt dieselbe helle Pizza-Tapete wie
