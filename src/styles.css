@@ -4215,7 +4215,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .kategorie-kopf .kategorie-kopftitel strong{
   font-family:"Lexend Exa",sans-serif!important;
   font-weight:900!important;
-  -webkit-text-stroke:.22px currentColor;
+  -webkit-text-stroke:.26px currentColor;
   text-rendering:geometricPrecision;
 }
 .food-dex-intro strong{
