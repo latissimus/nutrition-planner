@@ -4337,7 +4337,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte strong{font-size:14px;line-height:1.15}
 .food-dex-page .dex-inhaltskarte-text{font-size:11px;line-height:1.25}
 .food-dex-floating-actions{
-  position:fixed;z-index:70;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));
+  position:fixed;z-index:70;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));
   display:grid;justify-items:end;gap:9px;
 }
 
@@ -4347,7 +4347,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-detail-fixkopf ~ .food-dex-floating-actions,
 .food-dex-entry-view .food-dex-floating-actions{
   position:fixed!important;
-  inset:auto 16px calc(104px + env(safe-area-inset-bottom)) auto!important;
+  inset:auto 16px calc(76px + env(safe-area-inset-bottom)) auto!important;
   z-index:90!important;
   transform:none!important;
   translate:none!important;
