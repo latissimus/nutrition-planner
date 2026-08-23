@@ -1142,6 +1142,13 @@ async function renderRoute() {
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
   const vorherigeSeite = document.documentElement.dataset.seite || '';
+  // Entry pages must inherit the surface that was visible in the originating
+  // Dex before the new view is created.  This is especially important for the
+  // Food-Dex: renderChrome copies the current page background to the outgoing
+  // view, while the new view reads the freshly selected root token.
+  if (route.startsWith('entry/') && vorherigeRoute === 'food-log') {
+    setSeite('food-log');
+  }
   if (richtung === 'gleich') vorherigerController?.abort();
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
@@ -1153,6 +1160,17 @@ async function renderRoute() {
         ? 'zurueck'
         : 'hart';
   const view = renderChrome(transition);
+  if (route.startsWith('entry/')) {
+    // Carry the rendered surface (including a selected wallpaper) over to
+    // the detail view instead of briefly falling back to the neutral cream
+    // collection background while the entry query is loading.
+    const sourceView = app.querySelector(':scope > .view-alt');
+    if (sourceView) {
+      for (const property of ['backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat']) {
+        if (sourceView.style[property]) view.style[property] = sourceView.style[property];
+      }
+    }
+  }
   if (richtung === 'vor') {
     const ausgehend = app.querySelector(':scope > .view-alt');
     if (ausgehend) ansichtsCache.set(vorherigeRoute, {

@@ -5679,3 +5679,53 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page .kategorie-scrollinhalt{
   background-image:none!important;
 }
+
+/* Entry detail page: use one real scroll viewport, just like a Dex.  The
+   detail page intentionally has no separate header row; its two controls are
+   the same fixed action pair used by Food-Dex.  Keep these rules last so the
+   older modal/grid rules cannot reintroduce a phantom first row or move the
+   controls upward. */
+.dex-detail-overlay.dex-detail-fixkopf{
+  position:relative!important;
+  inset:auto!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  padding:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  animation:none!important;
+  z-index:auto!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding:150px 10px calc(42px + env(safe-area-inset-bottom))!important;
+  background:transparent!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
+  display:block!important;
+  width:min(100%,620px)!important;
+  max-width:620px!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  overflow:visible!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions{
+  position:fixed!important;
+  right:16px!important;
+  bottom:calc(104px + env(safe-area-inset-bottom))!important;
+  z-index:70!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions .food-dex-action-button{
+  width:52px!important;
+  height:52px!important;
+}
