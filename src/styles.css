@@ -5929,3 +5929,63 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:999px!important;
   box-shadow:0 3.5px 0 #000!important;
 }
+
+/* Detailkarte Paket 4: etwas mehr Vozzy-Ruhe, aber weiterhin MUSCLEDEX.
+   Der Titel bleibt fett, frisst aber weniger Raum; Meta/Tags und Text folgen
+   derselben Work-Sans-Hierarchie wie die FoodDex-Karten. */
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt h1{
+  font-size:clamp(27px,7.1vw,48px)!important;
+  font-weight:780!important;
+  letter-spacing:-.055em!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt>p,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-notiztext{
+  color:color-mix(in srgb,var(--text) 82%,transparent)!important;
+  font-family:"Work Sans",sans-serif!important;
+  font-size:15.5px!important;
+  font-weight:500!important;
+  line-height:1.48!important;
+  letter-spacing:-.018em!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft{
+  gap:9px!important;
+  padding:12px 13px!important;
+  border-radius:13px!important;
+  font-family:"Work Sans",sans-serif!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft b{
+  font-family:"Work Sans",sans-serif!important;
+  font-size:8.5px!important;
+  font-weight:850!important;
+  letter-spacing:.075em!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft span{
+  font-family:"Work Sans",sans-serif!important;
+  font-size:11.5px!important;
+  font-weight:600!important;
+  line-height:1.25!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-link{
+  font-size:13px!important;
+  font-weight:650!important;
+  letter-spacing:.01em!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-tags h2{
+  font-family:"Work Sans",sans-serif!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  letter-spacing:.055em!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-foodmeta,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-tags>div{
+  gap:9px!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-foodmeta span,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-tags span{
+  padding:7px 11px!important;
+  font-family:"Work Sans",sans-serif!important;
+  font-size:11px!important;
+  font-weight:750!important;
+  line-height:1!important;
+  letter-spacing:-.015em!important;
+}
