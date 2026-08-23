@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { categoryColor, materialIconMarkup } from './categoryIcons.js';
+import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine } from './dexEntries.js';
 import { noteEditorMarkup, mountNoteEditors, readNote, renderNoteHtml, noteToText } from './richText.js';
 import { toast } from './toast.js';
@@ -249,21 +249,24 @@ function detailMarkup(entry) {
   const trainingMeta = entry.root_key === 'training' && entry.training_class && entry.training_class !== 'unset'
     ? `<div class="dex-detail-foodmeta"><span>${escapeHtml(trainingLabels[entry.training_class] || entry.training_class)}</span></div>` : '';
   const ingredients = ingredientsSection(entry);
-  return `<div class="wrap pad-bottom dex-detail-seite dex-detail-fixkopf">
-    <nav class="dex-detail-steuerung" aria-label="Eintrag bedienen">
-      <a class="dex-detail-knopf" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
-      <span></span>
-      <button class="dex-detail-knopf dex-detail-favorit${entry.favorite ? ' aktiv' : ''}" type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}" aria-label="${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}">${materialIconMarkup('favorite')}</button>
-      ${entry.url ? `<button class="dex-detail-knopf" type="button" data-entry-refresh aria-label="Vorschau neu laden">${materialIconMarkup('refresh')}</button>` : ''}
-      <button class="dex-detail-knopf" type="button" data-entry-edit aria-label="Eintrag bearbeiten">${materialIconMarkup('build')}</button>
-      <button class="dex-detail-knopf" type="button" data-entry-share aria-label="Eintrag teilen">${materialIconMarkup('upload_file')}</button>
-    </nav>
-    <div class="dex-detail-scrollinhalt">
-    <article class="dex-detail-karte" style="--eintrag-farbe:${escapeHtml(entry.color)}">
-      <span class="dex-detail-streifen" aria-hidden="true"></span>
+  const contrastClass = colorIsDark(entry.color) ? ' dex-detail-dunkel' : '';
+  return `<div class="dex-detail-overlay${contrastClass}" role="dialog" aria-modal="true" aria-label="Eintrag anzeigen">
+    <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(entry.color)}">
+      <header class="dex-detail-popup-kopf">
+        <span class="dex-detail-popup-typ">${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'TONAUFNAHME' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</span>
+        <div class="dex-detail-popup-aktionen">
+          <button class="dex-detail-knopf dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü">${materialIconMarkup('more_horiz')}</button>
+          <a class="dex-detail-knopf dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
+        </div>
+        <div class="dex-detail-popup-menü" data-entry-menu-panel hidden>
+          <button type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}">${materialIconMarkup('favorite')}<span>${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}</span></button>
+          ${entry.url ? `<button type="button" data-entry-refresh>${materialIconMarkup('refresh')}<span>Vorschau aktualisieren</span></button>` : ''}
+          <button type="button" data-entry-edit>${materialIconMarkup('build')}<span>Bearbeiten</span></button>
+          <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>
+        </div>
+      </header>
       ${media}
       <div class="dex-detail-inhalt">
-        <small>${entry.entry_type === 'routine' ? 'ROUTINE' : entry.entry_type === 'audio' ? 'TONAUFNAHME' : entry.entry_type === 'note' ? 'NOTIZ' : entry.entry_type === 'image' ? 'BILD' : embed ? 'VIDEO' : 'LINK'}</small>
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
         ${trainingMeta}
@@ -275,7 +278,6 @@ function detailMarkup(entry) {
         <footer>MUSCLE-DEX</footer>
       </div>
     </article>
-    </div>
   </div>`;
 }
 
@@ -284,7 +286,27 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   if (signal?.aborted) return;
   if (!entry) { location.hash = 'home'; return; }
   container.innerHTML = detailMarkup(entry);
-  container.querySelector('[data-entry-favorite]').onclick = async (event) => {
+  const overlay = container.querySelector('.dex-detail-overlay');
+  overlay?.addEventListener('click', (event) => {
+    if (event.target === overlay) location.hash = backHref(entry).slice(1);
+  });
+  const onEscape = (event) => {
+    if (event.key === 'Escape' && document.body.contains(overlay)) {
+      location.hash = backHref(entry).slice(1);
+      window.removeEventListener('keydown', onEscape);
+    }
+  };
+  window.addEventListener('keydown', onEscape);
+  const menuTrigger = container.querySelector('[data-entry-menu]');
+  const menuPanel = container.querySelector('[data-entry-menu-panel]');
+  menuTrigger?.addEventListener('click', () => {
+    const open = menuPanel?.hasAttribute('hidden');
+    if (!menuPanel) return;
+    menuPanel.toggleAttribute('hidden', !open);
+    menuTrigger.setAttribute('aria-expanded', String(open));
+  });
+  const favoriteButton = container.querySelector('[data-entry-favorite]');
+  favoriteButton.onclick = async (event) => {
     const button = event.currentTarget;
     const favorite = button.getAttribute('aria-pressed') !== 'true';
     button.disabled = true;

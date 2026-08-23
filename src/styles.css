@@ -3458,6 +3458,52 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
 .tuck-fach.violet{--ordner:var(--fe-blurple)}
+
+/* Entry detail: compact Vozzy-style popup over the current Dex.  The route
+   remains addressable (and therefore keeps native back/swipe navigation),
+   while the detail itself is a true overlay over the cached Dex view. */
+.dex-detail-overlay{
+  position:fixed;inset:0;z-index:900;display:grid;place-items:center;
+  padding:max(18px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));
+  box-sizing:border-box;background:rgba(0,0,0,.72);overflow:auto;
+  font-family:"Work Sans",sans-serif;
+}
+.dex-detail-popup{
+  position:relative;width:min(100%,620px);max-height:calc(100dvh - 36px);margin:0;
+  overflow:auto;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);
+  background:var(--surface);box-shadow:var(--hart);font-family:"Work Sans",sans-serif;
+}
+.dex-detail-popup-kopf{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;min-height:62px;padding:12px 14px;background:var(--surface);border-bottom:1px solid color-mix(in srgb,var(--ink) 14%,transparent)}
+.dex-detail-popup-typ{font:700 12px/1 "Work Sans",sans-serif;letter-spacing:.09em;color:var(--muted)}
+.dex-detail-popup-aktionen{display:flex;align-items:center;gap:8px}
+.dex-detail-popup .dex-detail-knopf{width:44px;height:44px;border-radius:var(--r);background:var(--surface);box-shadow:var(--hart-klein)}
+.dex-detail-menu-trigger .material-svg,.dex-detail-popup-schliessen .material-svg{width:24px;height:24px}
+.dex-detail-popup-menü{position:absolute;right:14px;top:62px;display:grid;min-width:220px;padding:7px;border:var(--karten-bw) solid var(--ink);border-radius:14px;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:var(--hart);}
+.dex-detail-popup-menü[hidden]{display:none}
+.dex-detail-popup-menü button{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 10px;border:0;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:transparent;color:var(--text);font:650 14px/1.15 "Work Sans",sans-serif;text-align:left}
+.dex-detail-popup-menü button:last-child{border-bottom:0}
+.dex-detail-popup-menü button:active{transform:translateY(1px)}
+.dex-detail-popup-menü .material-svg,.dex-detail-popup-menü svg{width:20px;height:20px;fill:currentColor}
+.dex-detail-popup>.dex-detail-bild,.dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau,.dex-detail-popup>.dex-detail-provider,.dex-detail-popup>.dex-detail-audio{margin:18px 18px 0;width:calc(100% - 36px);border:var(--karten-bw) solid var(--ink);border-radius:30px;overflow:hidden;box-sizing:border-box}
+.dex-detail-popup>.dex-detail-bild{background:var(--surface2)}
+.dex-detail-popup .dex-detail-bild img{width:100%;height:min(58dvh,520px);max-height:none;object-fit:cover;border:0;border-radius:inherit}
+.dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau{aspect-ratio:4/3}
+.dex-detail-popup>.dex-detail-video-instagram{aspect-ratio:9/16}
+.dex-detail-popup .dex-detail-inhalt{gap:16px;padding:24px 22px 28px}
+.dex-detail-popup .dex-detail-inhalt h1{font-family:"Work Sans",sans-serif;font-weight:900;font-size:clamp(30px,8vw,62px);line-height:.98;letter-spacing:-.04em}
+.dex-detail-popup .dex-detail-inhalt>p,.dex-detail-popup .dex-detail-notiztext{font-family:"Work Sans",sans-serif;font-size:17px;line-height:1.45;color:var(--text)}
+.dex-detail-popup .dex-detail-foodmeta span,.dex-detail-popup .dex-detail-tags span{background:var(--eintrag-farbe);border-color:var(--ink);font-family:"Work Sans",sans-serif;font-weight:700;color:#000}
+.dex-detail-popup .dex-detail-link{background:var(--eintrag-farbe)!important;color:#000!important;border-color:var(--ink)!important}
+.dex-detail-popup .dex-detail-link .material-svg,.dex-detail-popup .dex-detail-link svg{fill:currentColor!important}
+.dex-detail-dunkel .dex-detail-foodmeta span,.dex-detail-dunkel .dex-detail-tags span,.dex-detail-dunkel .dex-detail-link{color:#fff!important}
+.dex-detail-dunkel .dex-detail-link .material-svg,.dex-detail-dunkel .dex-detail-link svg{fill:#fff!important}
+.dex-detail-popup .dex-detail-herkunft{font-family:"Work Sans",sans-serif}
+.dex-detail-popup footer{font-family:"Work Sans",sans-serif}
+@media(max-width:520px){
+  .dex-detail-overlay{padding-inline:10px}
+  .dex-detail-popup>.dex-detail-bild,.dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau,.dex-detail-popup>.dex-detail-provider,.dex-detail-popup>.dex-detail-audio{margin-inline:12px;width:calc(100% - 24px);border-radius:24px}
+  .dex-detail-popup .dex-detail-inhalt{padding-inline:17px}
+}
 .tuck-fach.blue{--ordner:var(--fe-blue)}
 .tuck-fach.gelb{--ordner:var(--fe-yellow)}
 .tuck-fach.gruen{--ordner:var(--fe-green)}
