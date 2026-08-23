@@ -45,6 +45,7 @@ import {
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
 } from './collections.js';
+import { foodDexActionsMarkup } from './foodDexActions.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -1276,28 +1277,29 @@ async function renderRoute() {
     const foodAdd = foodBar?.querySelector('.kategorie-plus');
     const foodSettings = foodBar?.querySelector('[data-category-settings]');
     const foodActions = document.createElement('div');
-    foodActions.className = 'food-dex-floating-actions';
-    foodActions.innerHTML = `
-      <div class="food-dex-action-popover" hidden role="menu" aria-label="Food-Dex Aktionen">
+    foodActions.innerHTML = foodDexActionsMarkup({
+      panelAttributes: 'role="menu" aria-label="Food-Dex Aktionen"',
+      panelContent: `
         <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
-        <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>
-      </div>
-      <button type="button" class="food-dex-action-button food-dex-retro-menu" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">
-        <span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      </button>
-      <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">${materialIconMarkup('close')}</a>`;
-    foodActions.querySelector('[data-food-menu]').onclick = () => {
-      const panel = foodActions.querySelector('.food-dex-action-popover');
+        <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>`,
+      menuAttributes: 'data-food-menu',
+      closeHref: '#home',
+      menuLabel: 'Food-Dex Menü',
+      closeLabel: 'Zurück zur Übersicht',
+    });
+    const foodActionBar = foodActions.firstElementChild;
+    foodActionBar.querySelector('[data-food-menu]').onclick = () => {
+      const panel = foodActionBar.querySelector('.food-dex-action-popover');
       const open = panel.hidden;
       panel.hidden = !open;
-      foodActions.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
+      foodActionBar.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
     };
-    foodActions.querySelector('[data-food-action="add"]').onclick = () => { foodActions.querySelector('.food-dex-action-popover').hidden = true; foodAdd?.click(); };
-    foodActions.querySelector('[data-food-action="edit"]').onclick = () => { foodActions.querySelector('.food-dex-action-popover').hidden = true; foodSettings?.click(); };
+    foodActionBar.querySelector('[data-food-action="add"]').onclick = () => { foodActionBar.querySelector('.food-dex-action-popover').hidden = true; foodAdd?.click(); };
+    foodActionBar.querySelector('[data-food-action="edit"]').onclick = () => { foodActionBar.querySelector('.food-dex-action-popover').hidden = true; foodSettings?.click(); };
     foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
     foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
     foodBar?.querySelector('.kategorie-schliessen')?.setAttribute('aria-hidden', 'true');
-    view.appendChild(foodActions);
+    view.appendChild(foodActionBar);
     const foodContent = view.querySelector('.kategorie-scrollinhalt');
     if (foodContent) {
       const intro = document.createElement('section');

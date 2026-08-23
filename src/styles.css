@@ -5718,15 +5718,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   max-height:none!important;
   margin:0 auto!important;
   overflow:visible!important;
-  padding-top:60px!important;
-}
-.dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions{
-  position:fixed!important;
-  z-index:70!important;
-}
-.dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions .food-dex-action-button{
-  width:52px!important;
-  height:52px!important;
+  padding-top:14px!important;
 }
 
 /* Medien liegen wie im Vozzy-Vorbild als eigene, sauber eingefasste Flaeche
@@ -5745,28 +5737,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   filter:none!important;
   transform:none!important;
 }
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-bild img{
+  display:block!important;
+  width:100%!important;
+  height:clamp(200px,32dvh,320px)!important;
+  max-height:320px!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-linkvorschau{
+  height:clamp(200px,32dvh,320px)!important;
+  max-height:320px!important;
+  overflow:hidden!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-linkvorschau img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
 
 /* Die FoodDex-Detailseite verwendet exakt dieselbe helle Pizza-Tapete wie
    der zugehörige Dex. Die Ebene bleibt am Viewport fixiert, während die
    Eintragskarte im normalen App-Shell-Scroller darunter vorbeiläuft. */
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-entry-page{
-  isolation:isolate;
-}
 :root[data-seite="food-log"]:not([data-theme="dark"]),
 :root[data-seite="food-log"]:not([data-theme="dark"]) body,
 :root[data-seite="food-log"]:not([data-theme="dark"]) #app,
 :root[data-seite="food-log"]:not([data-theme="dark"]) #view{
   background-color:var(--food-page-purple)!important;
   background-image:none!important;
-}
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-entry-page::before{
-  content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
-  background:#fff;opacity:.08;
-  -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
-  -webkit-mask-size:360px auto;mask-size:360px auto;
-  -webkit-mask-position:center top;mask-position:center top;
-  -webkit-mask-repeat:repeat;mask-repeat:repeat;
-}
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-entry-page>*{
-  position:relative;z-index:1;
 }

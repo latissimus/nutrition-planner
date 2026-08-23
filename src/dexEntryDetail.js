@@ -7,6 +7,7 @@ import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
 import { dexStoragePath } from './storagePaths.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged } from './realtime.js';
+import { foodDexActionsMarkup } from './foodDexActions.js';
 
 const BUCKET = 'dex-entries';
 const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,ingredient_items,created_at,updated_at';
@@ -253,8 +254,20 @@ function detailMarkup(entry) {
   // register colour. Other Dex retain their configured entry colour.
   const popupColor = entry.root_key === 'food-log' ? '#6B3FC4' : entry.color;
   const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
-  const pageClass = entry.root_key === 'food-log' ? ' food-dex-entry-page' : '';
-  return `<div class="dex-detail-overlay dex-detail-fixkopf${pageClass}${contrastClass}" role="main" aria-label="Eintrag anzeigen">
+  const actions = foodDexActionsMarkup({
+    panelAttributes: 'data-entry-menu-panel role="menu" aria-label="Eintragsaktionen"',
+    panelContent: `
+      <button type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}">${materialIconMarkup('favorite')}<span>${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}</span></button>
+      ${entry.url ? `<button type="button" data-entry-refresh>${materialIconMarkup('refresh')}<span>Vorschau aktualisieren</span></button>` : ''}
+      <button type="button" data-entry-edit>${materialIconMarkup('build')}<span>Bearbeiten</span></button>
+      <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>`,
+    menuAttributes: 'data-entry-menu',
+    closeAttributes: 'data-entry-close',
+    closeHref: backHref(entry),
+    menuLabel: 'Eintragsmenü',
+    closeLabel: 'Eintrag schließen',
+  });
+  return `<div class="dex-detail-overlay dex-detail-fixkopf${contrastClass}" role="main" aria-label="Eintrag anzeigen">
     <div class="dex-detail-scrollinhalt">
       <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
         ${media}
@@ -271,17 +284,8 @@ function detailMarkup(entry) {
         </div>
       </article>
     </div>
-    <div class="food-dex-floating-actions dex-detail-floating-actions">
-      <div class="dex-detail-popup-menü" data-entry-menu-panel hidden>
-          <button type="button" data-entry-favorite data-no-interface-sound aria-pressed="${entry.favorite ? 'true' : 'false'}">${materialIconMarkup('favorite')}<span>${entry.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'}</span></button>
-          ${entry.url ? `<button type="button" data-entry-refresh>${materialIconMarkup('refresh')}<span>Vorschau aktualisieren</span></button>` : ''}
-          <button type="button" data-entry-edit>${materialIconMarkup('build')}<span>Bearbeiten</span></button>
-          <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>
-      </div>
-        <button class="food-dex-action-button food-dex-retro-menu dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü"><span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
-        <a class="food-dex-action-button food-dex-action-close dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
-    </div>
-  </div>`;
+  </div>
+  ${actions}`;
 }
 
 export async function mountDexEntryDetail(container, { userId, id, signal }) {
@@ -294,6 +298,10 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   // collection/cream fallback.
   if (entry.root_key === 'food-log') {
     document.documentElement.dataset.seite = 'food-log';
+    // Die Aktionsleiste und Tapete werden damit aus exakt denselben Regeln
+    // wie im FoodDex selbst gezeichnet. Nur die Menüaktionen unterscheiden
+    // sich inhaltlich.
+    container.classList.add('food-dex-page', 'food-dex-entry-view');
   }
   container.innerHTML = detailMarkup(entry);
   const overlay = container.querySelector('.dex-detail-overlay');
