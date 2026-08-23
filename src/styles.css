@@ -4457,6 +4457,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
+:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
+  display:none!important;
+}
 :root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page>*:not(.food-dex-floating-actions){
   position:relative;z-index:1;
 }
