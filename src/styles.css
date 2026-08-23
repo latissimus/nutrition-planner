@@ -4340,6 +4340,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:fixed;z-index:70;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));
   display:grid;justify-items:end;gap:9px;
 }
+
+/* The entry controls are viewport controls, never part of the card's
+   scrollable content.  Keep this explicit because the detail route may be
+   animated inside a transformed view during navigation. */
+.dex-detail-fixkopf ~ .food-dex-floating-actions,
+.food-dex-entry-view .food-dex-floating-actions{
+  position:fixed!important;
+  inset:auto 16px calc(104px + env(safe-area-inset-bottom)) auto!important;
+  z-index:90!important;
+  transform:none!important;
+  translate:none!important;
+}
 .food-dex-action-button{
   display:grid;place-items:center;width:52px;height:52px;padding:0;border:2px solid #000;
   border-radius:13px;background:#fff;color:#000;box-shadow:0 5px 0 #000;text-decoration:none;
