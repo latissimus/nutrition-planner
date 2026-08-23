@@ -11,6 +11,7 @@ export const supabase = supabaseKonfiguriert
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
+        lock: async (_name, _acquireTimeout, fn) => fn(),
       },
     })
   : null;
