@@ -4554,12 +4554,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* FoodDex ohne separate Titelkarte: Der echte Kopfbereich traegt Titel und
    Metadaten, die Erklaerung lebt im Aktionsmenue. */
-.food-dex-page .kategorie-kopf{
-  display:grid!important;
-  color:#000!important;
+.food-dex-page.dex-fixkopf>.wrap{
+  display:block!important;height:100%!important;min-height:0!important;
 }
-.food-dex-page.food-dex-dunkler-hintergrund .kategorie-kopf{
-  color:#fff!important;
+.food-dex-page .kategorie-kopf{display:none!important}
+.food-dex-page .kategorie-scrollinhalt{
+  height:100%!important;min-height:0!important;padding-top:12px!important;
 }
 .food-dex-page .kategorie-kopftitel strong,
 .food-dex-page .kategorie-kopftitel small{
@@ -4570,6 +4570,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:slashed-zero!important;
   font-feature-settings:"zero" 1!important;
   opacity:1!important;
+}
+.food-dex-scroll-title{
+  display:grid;gap:7px;margin:0 2px 24px;color:#000;
+}
+.food-dex-page.food-dex-dunkler-hintergrund .food-dex-scroll-title{
+  color:#fff;
+}
+.food-dex-scroll-title strong{
+  display:block;font-family:"Work Sans",sans-serif;font-size:clamp(34px,10vw,44px);
+  font-weight:900;line-height:.9;letter-spacing:-.055em;text-transform:none;
+  -webkit-text-stroke:.18px currentColor;text-rendering:geometricPrecision;
+}
+.food-dex-scroll-title small{
+  display:block;font-family:var(--tech);font-size:12px;font-weight:700;line-height:1.25;
+  letter-spacing:0;font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
+  color:currentColor;
 }
 .food-dex-info-dialog-overlay{
   position:fixed;z-index:180;inset:0;display:grid;place-items:center;

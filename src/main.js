@@ -1331,6 +1331,15 @@ async function renderRoute() {
     foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
     foodBar?.querySelector('.kategorie-schliessen')?.setAttribute('aria-hidden', 'true');
     view.appendChild(foodActionBar);
+    const foodContent = view.querySelector('.kategorie-scrollinhalt');
+    if (foodContent) {
+      const titleBlock = document.createElement('section');
+      titleBlock.className = 'food-dex-scroll-title';
+      titleBlock.innerHTML = `
+        <strong>Fooddex</strong>
+        <small data-food-scroll-meta>0 Einträge · ${children.length} Unter-Dex</small>`;
+      foodContent.prepend(titleBlock);
+    }
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
@@ -1340,6 +1349,8 @@ async function renderRoute() {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        const scrollMeta = view.querySelector('[data-food-scroll-meta]');
+        if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
