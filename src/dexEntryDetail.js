@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import { applyPageLook, categoryColor, colorIsDark, materialIconMarkup, pageLook } from './categoryIcons.js';
 import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine } from './dexEntries.js';
 import { noteEditorMarkup, mountNoteEditors, readNote, renderNoteHtml, noteToText } from './richText.js';
 import { toast } from './toast.js';
@@ -227,7 +227,36 @@ async function shareEntry(entry) {
   }
 }
 
-function detailMarkup(entry) {
+async function rootCollectionScope(userId, collectionId, signal) {
+  if (!collectionId) return null;
+  let currentId = collectionId;
+  let root = null;
+  for (let depth = 0; currentId && depth < 8; depth += 1) {
+    let query = supabase.from('collections')
+      .select('id,parent_id,color,root_key')
+      .eq('id', currentId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (signal) query = query.abortSignal(signal);
+    const { data, error } = await query;
+    if (error) throw error;
+    if (!data) break;
+    root = data;
+    currentId = data.parent_id;
+  }
+  return root ? { scope: `collection-${root.id}`, color: root.color || categoryColor(root.root_key) } : null;
+}
+
+async function entryPageLook(entry, userId, signal) {
+  const collectionScope = await rootCollectionScope(userId, entry.collection_id, signal);
+  if (collectionScope) {
+    return { ...pageLook(collectionScope.scope, collectionScope.color, 'drops'), scope: collectionScope.scope };
+  }
+  const fallbackPattern = entry.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops';
+  return { ...pageLook(entry.root_key, categoryColor(entry.root_key), fallbackPattern), scope: entry.root_key };
+}
+
+function detailMarkup(entry, look) {
   const embed = videoEmbedUrl(entry.url);
   const provider = videoProvider(entry.url);
   const media = entry.entry_type === 'audio' && entry.audio_url
@@ -252,7 +281,7 @@ function detailMarkup(entry) {
   const ingredients = ingredientsSection(entry);
   // Food-Dex cards use the page accent rather than the legacy yellow entry
   // register colour. Other Dex retain their configured entry colour.
-  const popupColor = entry.root_key === 'food-log' ? '#6B3FC4' : entry.color;
+  const popupColor = look?.color || categoryColor(entry.root_key);
   const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
   const actions = foodDexActionsMarkup({
     panelAttributes: 'data-entry-menu-panel role="menu" aria-label="Eintragsaktionen"',
@@ -302,7 +331,16 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
     // sich inhaltlich.
     container.classList.add('food-dex-page', 'food-dex-entry-view');
   }
-  container.innerHTML = detailMarkup(entry);
+  const look = await entryPageLook(entry, userId, signal);
+  if (signal?.aborted) return;
+  applyPageLook(look.scope, look.color, look.pattern);
+  container.style.setProperty('--dex-seitenfarbe', look.color);
+  container.style.setProperty('--dex-ink', colorIsDark(look.color) ? '#FFFFFF' : '#111111');
+  container.style.setProperty('--food-page-purple', look.color);
+  container.dataset.dexMuster = look.pattern;
+  const wallpaper = look.pattern?.startsWith('wallpaper-') ? look.pattern : '';
+  if (wallpaper) container.classList.add('dex-tapete-datei');
+  container.innerHTML = detailMarkup(entry, look);
   const overlay = container.querySelector('.dex-detail-overlay');
   const onEscape = (event) => {
     if (event.key === 'Escape' && document.body.contains(overlay)) {
