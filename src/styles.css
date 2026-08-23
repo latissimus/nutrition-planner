@@ -5935,9 +5935,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Der Titel bleibt fett, frisst aber weniger Raum; Meta/Tags und Text folgen
    derselben Work-Sans-Hierarchie wie die FoodDex-Karten. */
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt h1{
-  font-size:clamp(27px,7.1vw,48px)!important;
-  font-weight:780!important;
-  letter-spacing:-.055em!important;
+  font-size:clamp(25px,6.55vw,43px)!important;
+  font-weight:760!important;
+  letter-spacing:-.05em!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt>p,
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-notiztext{
