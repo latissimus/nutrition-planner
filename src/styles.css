@@ -3507,6 +3507,44 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   .dex-detail-popup>.dex-detail-bild,.dex-detail-popup>.dex-detail-video,.dex-detail-popup>.dex-detail-linkvorschau,.dex-detail-popup>.dex-detail-provider,.dex-detail-popup>.dex-detail-audio{margin-inline:12px;width:calc(100% - 24px);border-radius:24px}
   .dex-detail-popup .dex-detail-inhalt{padding-inline:17px}
 }
+
+/* Entry details are a full Dex page (not a modal sheet).  The controls stay
+   in the same fixed head row as every Dex; only the detail content scrolls
+   underneath it. */
+.dex-detail-overlay.dex-detail-fixkopf{
+  position:relative;inset:auto;width:100%;height:100%;min-height:100%;display:grid;
+  grid-template-rows:auto minmax(0,1fr);place-items:stretch;padding:0;box-sizing:border-box;
+  overflow:hidden;background:transparent;animation:none;z-index:auto;
+}
+.dex-detail-eigener-kopf{
+  grid-template-columns:minmax(0,1fr) auto;gap:9px;
+  margin:0;padding:8px 10px 8px;background:var(--bg);z-index:20;
+}
+.dex-detail-eigener-kopf .kategorie-kopftitel strong{font-family:"Work Sans",sans-serif;font-weight:900}
+.dex-detail-eigener-kopf .dex-detail-popup-aktionen{
+  position:relative;top:auto;right:auto;display:flex;align-items:center;gap:9px;
+}
+.dex-detail-eigener-kopf .dex-detail-popup-aktionen .food-dex-action-button{
+  width:44px;height:44px;border-radius:var(--r);box-shadow:var(--hart-klein);
+}
+.dex-detail-eigener-kopf .dex-detail-popup-aktionen .food-dex-action-button:active{
+  box-shadow:none;transform:translate(2px,2px);
+}
+.dex-detail-eigener-kopf .dex-detail-popup-menü{top:58px;right:0}
+.dex-detail-scrollinhalt{
+  padding:68px 10px calc(42px + env(safe-area-inset-bottom));
+  overflow-x:hidden;overflow-y:auto;background:transparent;
+}
+.dex-detail-scrollinhalt .dex-detail-popup{
+  width:min(100%,620px);max-width:620px;max-height:none;margin:0 auto;
+  overflow:visible;border-radius:42px 42px 30px 30px;
+  box-shadow:0 3px 0 #000;
+}
+.dex-detail-scrollinhalt .dex-detail-popup>.dex-detail-bild,
+.dex-detail-scrollinhalt .dex-detail-popup>.dex-detail-video,
+.dex-detail-scrollinhalt .dex-detail-popup>.dex-detail-linkvorschau,
+.dex-detail-scrollinhalt .dex-detail-popup>.dex-detail-provider,
+.dex-detail-scrollinhalt .dex-detail-popup>.dex-detail-audio{border-radius:38px 38px 16px 16px}
 .tuck-fach.blue{--ordner:var(--fe-blue)}
 .tuck-fach.gelb{--ordner:var(--fe-yellow)}
 .tuck-fach.gruen{--ordner:var(--fe-green)}

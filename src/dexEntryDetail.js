@@ -253,8 +253,9 @@ function detailMarkup(entry) {
   // register colour. Other Dex retain their configured entry colour.
   const popupColor = entry.root_key === 'food-log' ? '#6B3FC4' : entry.color;
   const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
-  return `<div class="dex-detail-overlay${contrastClass}" role="dialog" aria-modal="true" aria-label="Eintrag anzeigen">
-    <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
+  return `<div class="dex-detail-overlay dex-detail-fixkopf${contrastClass}" role="main" aria-label="Eintrag anzeigen">
+    <div class="dex-detail-steuerung kategorie-kopf dex-detail-eigener-kopf">
+      <div class="kategorie-kopftitel"><strong>${escapeHtml(entry.dex_name || 'MUSCLE-DEX')}</strong></div>
       <div class="dex-detail-popup-aktionen">
         <button class="food-dex-action-button food-dex-retro-menu dex-detail-menu-trigger" type="button" data-entry-menu aria-expanded="false" aria-label="Eintragsmenü"><span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
         <a class="food-dex-action-button food-dex-action-close dex-detail-popup-schliessen" href="${backHref(entry)}" aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
@@ -265,8 +266,11 @@ function detailMarkup(entry) {
           <button type="button" data-entry-share>${materialIconMarkup('upload_file')}<span>Teilen</span></button>
         </div>
       </div>
-      ${media}
-      <div class="dex-detail-inhalt">
+    </div>
+    <div class="dex-detail-scrollinhalt">
+      <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
+        ${media}
+        <div class="dex-detail-inhalt">
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
         ${foodMeta}
         ${trainingMeta}
@@ -276,8 +280,9 @@ function detailMarkup(entry) {
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer">${materialIconMarkup('arrow_forward_ios')}<span>Link aufrufen</span></a>` : ''}
         <section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>
         <footer>MUSCLE-DEX</footer>
-      </div>
-    </article>
+        </div>
+      </article>
+    </div>
   </div>`;
 }
 
@@ -286,18 +291,14 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   if (signal?.aborted) return;
   if (!entry) { location.hash = 'home'; return; }
 
-  // Entry routes are rendered in their own view, but visually remain an
-  // overlay over the originating Dex. Keep the originating page token active
-  // so the viewport (including the iOS safe-area) never falls back to the
-  // neutral collection/cream background while the popup is mounted.
+  // Keep the originating page token active so the full entry page (including
+  // the iOS safe-area) uses the same Dex background instead of the neutral
+  // collection/cream fallback.
   if (entry.root_key === 'food-log') {
     document.documentElement.dataset.seite = 'food-log';
   }
   container.innerHTML = detailMarkup(entry);
   const overlay = container.querySelector('.dex-detail-overlay');
-  overlay?.addEventListener('click', (event) => {
-    if (event.target === overlay) location.hash = backHref(entry).slice(1);
-  });
   const onEscape = (event) => {
     if (event.key === 'Escape' && document.body.contains(overlay)) {
       location.hash = backHref(entry).slice(1);
