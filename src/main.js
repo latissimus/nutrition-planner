@@ -1310,7 +1310,7 @@ async function renderRoute() {
       panelAttributes: 'role="menu" aria-label="Food-Dex Aktionen"',
       panelContent: `
         <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
-        <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('idea')}<span>Info</span></button>
+        <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>Info</span></button>
         <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>`,
       menuAttributes: 'data-food-menu',
       closeHref: '#home',
