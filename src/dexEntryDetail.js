@@ -253,7 +253,8 @@ function detailMarkup(entry) {
   // register colour. Other Dex retain their configured entry colour.
   const popupColor = entry.root_key === 'food-log' ? '#6B3FC4' : entry.color;
   const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
-  return `<div class="dex-detail-overlay dex-detail-fixkopf${contrastClass}" role="main" aria-label="Eintrag anzeigen">
+  const pageClass = entry.root_key === 'food-log' ? ' food-dex-entry-page' : '';
+  return `<div class="dex-detail-overlay dex-detail-fixkopf${pageClass}${contrastClass}" role="main" aria-label="Eintrag anzeigen">
     <div class="dex-detail-scrollinhalt">
       <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
         ${media}

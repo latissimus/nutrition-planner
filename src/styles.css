@@ -5690,10 +5690,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inset:auto!important;
   display:block!important;
   width:100%!important;
-  height:100%!important;
+  height:auto!important;
   min-height:100%!important;
   padding:0!important;
-  overflow:hidden!important;
+  overflow:visible!important;
   background:transparent!important;
   animation:none!important;
   z-index:auto!important;
@@ -5701,14 +5701,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt{
   display:block!important;
   width:100%!important;
-  height:100%!important;
-  min-height:0!important;
+  height:auto!important;
+  min-height:100%!important;
   box-sizing:border-box!important;
-  overflow-x:hidden!important;
-  overflow-y:auto!important;
-  overscroll-behavior:contain!important;
-  -webkit-overflow-scrolling:touch!important;
-  padding:150px 10px calc(42px + env(safe-area-inset-bottom))!important;
+  overflow:visible!important;
+  padding:76px 10px calc(42px + env(safe-area-inset-bottom))!important;
   background:transparent!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
@@ -5718,14 +5715,40 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   max-height:none!important;
   margin:0 auto!important;
   overflow:visible!important;
+  padding-top:54px!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions{
   position:fixed!important;
   right:16px!important;
-  bottom:calc(104px + env(safe-area-inset-bottom))!important;
+  bottom:calc(76px + env(safe-area-inset-bottom))!important;
   z-index:70!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-floating-actions .food-dex-action-button{
   width:52px!important;
   height:52px!important;
+}
+
+/* Die FoodDex-Detailseite verwendet exakt dieselbe helle Pizza-Tapete wie
+   der zugehörige Dex. Die Ebene bleibt am Viewport fixiert, während die
+   Eintragskarte im normalen App-Shell-Scroller darunter vorbeiläuft. */
+:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-entry-page{
+  isolation:isolate;
+}
+:root[data-seite="food-log"]:not([data-theme="dark"]),
+:root[data-seite="food-log"]:not([data-theme="dark"]) body,
+:root[data-seite="food-log"]:not([data-theme="dark"]) #app,
+:root[data-seite="food-log"]:not([data-theme="dark"]) #view{
+  background-color:var(--food-page-purple)!important;
+  background-image:none!important;
+}
+:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-entry-page::before{
+  content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
+  background:#fff;opacity:.08;
+  -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
+  -webkit-mask-size:360px auto;mask-size:360px auto;
+  -webkit-mask-position:center top;mask-position:center top;
+  -webkit-mask-repeat:repeat;mask-repeat:repeat;
+}
+:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-entry-page>*{
+  position:relative;z-index:1;
 }
