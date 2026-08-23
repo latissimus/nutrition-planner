@@ -4380,11 +4380,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .food-dex-action-popover{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-retro-menu{
   overflow:hidden;padding:0;border:2px solid #000;border-radius:13px;
-  background:#000;box-shadow:0 3.5px 0 #000!important;
-  -webkit-backdrop-filter:blur(7px) saturate(1.2);
-  backdrop-filter:blur(7px) saturate(1.2);
+  background:#fff;box-shadow:0 3.5px 0 #000!important;
 }
 .food-dex-page .food-dex-retro-menu:active{transform:translateY(2px);box-shadow:0 1.5px 0 #000!important}
+.food-dex-more-dots{display:flex;align-items:center;justify-content:center;gap:4px}
+.food-dex-more-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#000}
 .food-dex-window-symbol{position:relative;display:block;width:48px;height:48px;pointer-events:none}
 .food-dex-window-shadow{display:none}
 .food-dex-window-face{

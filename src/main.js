@@ -1265,17 +1265,7 @@ async function renderRoute() {
         <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>Food-Dex bearbeiten</span></button>
       </div>
       <button type="button" class="food-dex-action-button food-dex-retro-menu" data-food-menu aria-expanded="false" aria-label="Food-Dex Menü">
-        <span class="food-dex-window-symbol" aria-hidden="true">
-          <span class="food-dex-window-shadow"></span>
-          <span class="food-dex-window-face">
-            <span class="food-dex-window-aperture"><span class="food-dex-window-glass food-dex-window-glass-main"></span></span>
-            <span class="food-dex-window-glass food-dex-window-glass-dot dot-one"></span>
-            <span class="food-dex-window-glass food-dex-window-glass-dot dot-two"></span>
-            <span class="food-dex-window-glass food-dex-window-glass-dot dot-three"></span>
-            ${materialIconMarkup('window', 'food-dex-window-shape')}
-            <span class="food-dex-window-menu-label">MENÜ</span>
-          </span>
-        </span>
+        <span class="food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       </button>
       <a class="food-dex-action-button food-dex-action-close" href="#home" aria-label="Zurück zur Übersicht">${materialIconMarkup('keyboard_return')}</a>`;
     foodActions.querySelector('[data-food-menu]').onclick = () => {
