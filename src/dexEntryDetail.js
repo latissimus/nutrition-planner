@@ -285,6 +285,14 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   const entry = await loadEntry(userId, id, signal);
   if (signal?.aborted) return;
   if (!entry) { location.hash = 'home'; return; }
+
+  // Entry routes are rendered in their own view, but visually remain an
+  // overlay over the originating Dex. Keep the originating page token active
+  // so the viewport (including the iOS safe-area) never falls back to the
+  // neutral collection/cream background while the popup is mounted.
+  if (entry.root_key === 'food-log') {
+    document.documentElement.dataset.seite = 'food-log';
+  }
   container.innerHTML = detailMarkup(entry);
   const overlay = container.querySelector('.dex-detail-overlay');
   overlay?.addEventListener('click', (event) => {

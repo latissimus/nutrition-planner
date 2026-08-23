@@ -3463,9 +3463,13 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
    remains addressable (and therefore keeps native back/swipe navigation),
    while the detail itself is a true overlay over the cached Dex view. */
 .dex-detail-overlay{
-  position:fixed;inset:0;z-index:900;display:grid;place-items:center;
-  padding:max(18px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));
-  box-sizing:border-box;background:color-mix(in srgb,var(--bg) 68%,#000);overflow:hidden;
+  /* Same full-screen modal layer as the Dex-edit sheet.  Do not derive this
+     colour from --bg: entry routes temporarily use the generic collection
+     token and that caused a cream flash over Food-Dex's purple page. */
+  position:fixed;left:0;top:0;width:100vw;height:100vh;height:100lvh;z-index:1000;
+  display:grid;place-items:center;padding:22px;box-sizing:border-box;
+  background:rgba(0,0,0,.68);overflow:hidden;overscroll-behavior:contain;
+  animation:overlayAbdunkeln .28s ease-out both;
   font-family:"Work Sans",sans-serif;
 }
 .dex-detail-popup{
@@ -4463,6 +4467,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-sizing:border-box;width:calc(100% + 4px);max-width:none;
   height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
   border:2px solid #000;border-radius:22px 22px 10px 10px;box-shadow:none!important;
+  /* While a remote preview is loading, show the Dex surface rather than the
+     global cream token. Once the image arrives it covers this colour. */
+  background:var(--food-page-purple)!important;
 }
 .food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 3px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1px 0 #000}
