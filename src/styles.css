@@ -4182,6 +4182,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2,
   .unter-sammlung strong,.dex-inhaltskarte strong,.kategorie-kopfknopf,
   .food-filter-chip,[data-food-filter]){font-family:var(--food-heading);font-weight:700;}
+.food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
+  font-family:"Work Sans",sans-serif;
+  font-weight:600;
+}
 .food-dex-page :is(.dex-inhaltskarte-text,.unter-sammlung small,.sammlung-leer strong,
   .sammlung-leer span,.dex-mehr-laden small){font-family:var(--food-body);}
 
