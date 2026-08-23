@@ -6008,21 +6008,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   gap:10px!important;
   min-height:46px!important;
   padding:9px 11px!important;
-  border-radius:10px!important;
+  border-radius:0!important;
   color:#111!important;
   font-family:"Work Sans",sans-serif!important;
-  font-size:13px!important;
+  font-size:13.5px!important;
   font-weight:760!important;
   line-height:1.1!important;
   letter-spacing:-.025em!important;
 }
 .food-dex-page .food-dex-action-popover button+button,
 .food-dex-entry-view .food-dex-action-popover button+button{
-  border-top:1.5px solid #000!important;
+  border-top:1px solid #000!important;
 }
 .food-dex-page .food-dex-action-popover button:active,
 .food-dex-entry-view .food-dex-action-popover button:active{
-  background:rgba(0,0,0,.055)!important;
+  background:transparent!important;
 }
 .food-dex-page .food-dex-action-popover .material-svg,
 .food-dex-page .food-dex-action-popover svg,
