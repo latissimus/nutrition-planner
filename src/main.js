@@ -700,12 +700,14 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
     if (collectionId) {
       const item = itemsById?.get(collectionId);
       if (!item) return null;
+      const isSubDex = Boolean(item.parent_id) || item.root_key !== 'home';
       // Kein onCreateSub hier: "Unter-Dex erstellen" gibt es bewusst nur im
       // Dex selbst (ueber dessen eigenen "+"-Knopf), nicht per Long-Press von
       // aussen auf die Kachel des uebergeordneten Dex.
       return () => settingsSheet(`collection-${item.id}`, refresh, {
+        disableAppearance: isSubDex,
         onRename: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
-        onEditAppearance: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
+        onEditAppearance: isSubDex ? null : () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
         onDelete: async () => {
           if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
           try { await deleteCollection(userId, item); toast('Dex gelöscht'); refresh(); }
@@ -977,12 +979,18 @@ async function mountCustomCollection(container, item, signal) {
     if (!parent || signal?.aborted) break;
     lookRoot = parent;
   }
+  const inheritsSystemDexLook = item.root_key !== 'home';
+  const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
+  const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
+  const inheritedPattern = inheritsSystemDexLook
+    ? pageLook(item.root_key, inheritedColor, item.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops').pattern
+    : pageLook(`collection-${lookRoot.id}`, inheritedColor, 'drops').pattern;
   const ownerId = item.user_id || session.user.id;
   const children = await loadCollections(ownerId, { rootKey: item.root_key, parentId: item.id, signal });
   if (signal?.aborted) return;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
-    ${collectionGridMarkup(children)}
+    ${collectionGridMarkup(children, { inheritedColor })}
     ${dexEntriesSlotMarkup()}
   </div>`;
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
@@ -992,10 +1000,11 @@ async function mountCustomCollection(container, item, signal) {
   });
   mountCategoryChrome(container, `collection-${item.id}`, item.name, {
     backHref,
-    color: item.color,
-    pageLookScope: lookRoot.id === item.id ? `collection-${lookRoot.id}` : null,
-    inheritedPageLookScope: `collection-${lookRoot.id}`,
-    pageLookColor: lookRoot.color,
+    color: inheritedColor,
+    pageLookScope: inheritedLookScope,
+    inheritedPageLookScope: inheritedLookScope,
+    pageLookColor: inheritedColor,
+    pageLookPattern: inheritedPattern,
     meta: `${children.length} Unter-Dex`,
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
@@ -1009,7 +1018,8 @@ async function mountCustomCollection(container, item, signal) {
     onRename: () => openCollectionEditor({
       userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
-    onEditAppearance: () => openCollectionEditor({
+    disableAppearance: Boolean(item.parent_id) || item.root_key !== 'home',
+    onEditAppearance: (item.parent_id || item.root_key !== 'home') ? null : () => openCollectionEditor({
       userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
     onSelect: () => startDexSelection(container, {
@@ -1031,7 +1041,7 @@ async function mountCustomCollection(container, item, signal) {
   }));
   await renderDexEntries(container, {
     userId: ownerId, rootKey: item.root_key, collectionId: item.id,
-    color: item.color, signal, hasChildren: children.length > 0,
+    color: inheritedColor, signal, hasChildren: children.length > 0,
     onChanged: (entries, total) => {
       if (!Array.isArray(entries)) return;
       const meta = container.querySelector('.kategorie-kopftitel small');
@@ -1302,7 +1312,7 @@ async function renderRoute() {
     view.classList.add('food-dex-page');
     view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(pageLook('food-log', categoryColor('food-log'), 'triangles').color));
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
-      ${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
+      ${collectionGridMarkup(children, { inheritedColor: categoryColor('food-log') })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
@@ -1398,7 +1408,7 @@ async function renderRoute() {
   } else if (route === 'training') {
     setSeite('training');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING-DEX</h1></div>${collectionGridMarkup(children)}${dexEntriesSlotMarkup()}</div>`;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING-DEX</h1></div>${collectionGridMarkup(children, { inheritedColor: categoryColor('training') })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
     mountCategoryChrome(view, route, 'TRAINING-DEX', {

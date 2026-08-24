@@ -244,13 +244,29 @@ async function rootCollectionScope(userId, collectionId, signal) {
     root = data;
     currentId = data.parent_id;
   }
-  return root ? { scope: `collection-${root.id}`, color: root.color || categoryColor(root.root_key) } : null;
+  if (!root) return null;
+  if (root.root_key && root.root_key !== 'home') {
+    const fallbackPattern = root.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops';
+    return {
+      scope: root.root_key,
+      color: categoryColor(root.root_key),
+      fallbackPattern,
+    };
+  }
+  return {
+    scope: `collection-${root.id}`,
+    color: root.color || categoryColor(root.root_key),
+    fallbackPattern: 'drops',
+  };
 }
 
 async function entryPageLook(entry, userId, signal) {
   const collectionScope = await rootCollectionScope(userId, entry.collection_id, signal);
   if (collectionScope) {
-    return { ...pageLook(collectionScope.scope, collectionScope.color, 'drops'), scope: collectionScope.scope };
+    return {
+      ...pageLook(collectionScope.scope, collectionScope.color, collectionScope.fallbackPattern || 'drops'),
+      scope: collectionScope.scope,
+    };
   }
   const fallbackPattern = entry.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops';
   return { ...pageLook(entry.root_key, categoryColor(entry.root_key), fallbackPattern), scope: entry.root_key };

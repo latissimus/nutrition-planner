@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import {
-  availableCategoryIcons, bindWallpaperLongPress, colorIsDark, dexEditorColors, materialIconMarkup, pageLook, pagePatterns, setPageLookColor, setPageLookPattern,
+  availableCategoryIcons, categoryColor, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
 
@@ -50,10 +50,31 @@ function darkCollectionColor(color) {
   return (r * 299 + g * 587 + b * 114) / 1000 < 135;
 }
 
-export function collectionCardMarkup(item, count = 0) {
-  return `<div class="tuck-fach dex-ordner-testfach unter-sammlung${darkCollectionColor(item.color) ? ' dex-ordner-dunkel' : ''}" style="--ordner:${item.color}">
-    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}" data-collection-id="${item.id}">
-      <svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
+function isSubDexItem(item) {
+  return Boolean(item?.parent_id) || item?.root_key !== 'home';
+}
+
+function collectionDisplayColor(item, inheritedColor) {
+  if (isSubDexItem(item)) return inheritedColor || categoryColor(item.root_key) || item.color;
+  return item.color || inheritedColor || COLLECTION_COLORS[0];
+}
+
+export function collectionCardMarkup(item, count = 0, options = {}) {
+  const subDex = isSubDexItem(item);
+  const color = collectionDisplayColor(item, options.inheritedColor);
+  const icon = subDex ? '' : `<span class="dex-ordner-kartenicon" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>`;
+  const folderSvg = subDex
+    ? `<svg class="dex-ordner-form dex-unterdex-form" viewBox="0 0 512 360" aria-hidden="true">
+        <g transform="translate(-3.716 -31.537)">
+          <g transform="matrix(1.6455 0 0 .892494 -194.467 56.537)">
+            <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
+          </g>
+          <g transform="matrix(1 0 0 .928157 3.732 -10.793)">
+            <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
+          </g>
+        </g>
+      </svg>`
+    : `<svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
         <g transform="translate(.016 13.463)">
           <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
             <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
@@ -63,21 +84,24 @@ export function collectionCardMarkup(item, count = 0) {
           </g>
           <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
         </g>
-      </svg>
+      </svg>`;
+  return `<div class="tuck-fach dex-ordner-testfach unter-sammlung${subDex ? ' dex-unterdex-fach' : ''}${darkCollectionColor(color) ? ' dex-ordner-dunkel' : ''}" style="--ordner:${color}">
+    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="#collection/${item.id}" data-collection-id="${item.id}">
+      ${folderSvg}
       <span class="dex-ordner-inhalt">
         <span class="dex-datensatz-meta"><b>${count}</b><span>${count === 1 ? 'Eintrag' : 'Einträge'}</span></span>
         <h2>${escapeHtml(item.name)}</h2>
       </span>
-      <span class="dex-ordner-kartenicon" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
+      ${icon}
     </a>
   </div>`;
 }
 
-export function collectionGridMarkup(items) {
+export function collectionGridMarkup(items, options = {}) {
   if (!items.length) return '';
   return `<section class="unter-sammlungen-block">
     <h2>Unter-Dex (${items.length})</h2>
-    <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item)).join('')}</div>
+    <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item, 0, options)).join('')}</div>
   </section>`;
 }
 
@@ -87,8 +111,8 @@ export async function saveCollection(userId, values, existing = null) {
     parent_id: values.parentId || null,
     root_key: values.rootKey,
     name: values.name.trim(),
-    color: values.color,
-    icon_key: values.iconKey,
+    color: values.color || existing?.color || categoryColor(values.rootKey) || COLLECTION_COLORS[0],
+    icon_key: values.iconKey || existing?.icon_key || 'create_new_folder',
   };
   if (!payload.name) throw new Error('Bitte einen Namen eintragen.');
   const query = supabase.from('collections');
@@ -111,11 +135,10 @@ function closeEditor(backdrop) {
 }
 
 export function openCollectionEditor({ userId, rootKey, parentId = null, existing = null, onSaved }) {
-  const selectedColor = existing?.color || COLLECTION_COLORS[0];
+  const selectedColor = existing?.color || categoryColor(rootKey) || COLLECTION_COLORS[0];
   const selectedIcon = existing?.icon_key || COLLECTION_ICONS.find((icon) => icon === 'create_new_folder') || COLLECTION_ICONS[0];
-  const isSubDex = Boolean(parentId || existing?.parent_id);
-  const patternScope = existing?.id ? `collection-${existing.id}` : null;
-  const selectedPattern = patternScope ? pageLook(patternScope, selectedColor, 'drops').pattern : 'drops';
+  const isSubDex = Boolean(parentId || existing?.parent_id) || rootKey !== 'home';
+  const showIconPicker = !isSubDex;
   const editorTitle = existing ? 'Dex bearbeiten' : (isSubDex ? 'Neuer Unter-Dex' : 'Neuer Dex');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sammlung-editor-backdrop';
@@ -125,34 +148,19 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     <form data-collection-form>
       <div class="sammlung-editor-label"><label for="collection-name">Name</label><span data-name-count>${existing?.name?.length || 0}/40</span></div>
       <input class="input" id="collection-name" maxlength="40" required placeholder="z. B. Low Carb" value="${escapeHtml(existing?.name || '')}">
-      <h3>Farbe</h3>
-      <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((color) => `<button type="button" data-pick-color="${color}" class="${color === selectedColor ? 'aktiv ' : ''}${colorIsDark(color) ? 'farbe-dunkel' : ''}" style="--farbe:${color}" aria-label="Farbe ${color}"></button>`).join('')}</div>
-      ${!isSubDex ? `<h3>Tapete</h3><div class="sammlung-editor-tapeten">${pagePatterns.map(([id, label, url]) => `<button type="button" data-pick-pattern="${id}" class="${id === selectedPattern ? 'aktiv' : ''}" aria-label="Tapete ${label}"><i data-muster="${id}"${url ? ` class="tapete-datei" style="--tapeten-vorschau:url(&quot;${escapeHtml(url)}&quot;)"` : ''}></i></button>`).join('')}</div>` : ''}
-      <h3>Icon</h3>
-      <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
-      <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>
-        <input id="collection-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
-      </label>
+      ${showIconPicker ? `<h3>Icon</h3>
+        <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
+        <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>
+          <input id="collection-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
+        </label>` : ''}
       <button class="btn btn-primary btn-block sammlung-editor-speichern" type="submit">${existing ? 'Änderungen speichern' : (isSubDex ? 'Unter-Dex erstellen' : 'Dex erstellen')}</button>
     </form>
   </section>`;
   let color = selectedColor;
   let iconKey = selectedIcon;
-  let pattern = selectedPattern;
-  bindWallpaperLongPress(backdrop);
   const close = () => closeEditor(backdrop);
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
-    const colorButton = event.target.closest('[data-pick-color]');
-    if (colorButton) {
-      color = colorButton.dataset.pickColor;
-      backdrop.querySelectorAll('[data-pick-color]').forEach((button) => button.classList.toggle('aktiv', button === colorButton));
-    }
-    const patternButton = event.target.closest('[data-pick-pattern]');
-    if (patternButton) {
-      pattern = patternButton.dataset.pickPattern;
-      backdrop.querySelectorAll('[data-pick-pattern]').forEach((button) => button.classList.toggle('aktiv', button === patternButton));
-    }
     const iconButton = event.target.closest('[data-pick-icon]');
     if (iconButton) {
       iconKey = iconButton.dataset.pickIcon;
@@ -163,7 +171,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   const input = backdrop.querySelector('#collection-name');
   const emojiInput = backdrop.querySelector('#collection-emoji');
   input.oninput = () => { backdrop.querySelector('[data-name-count]').textContent = `${input.value.length}/40`; };
-  emojiInput.oninput = () => {
+  if (emojiInput) emojiInput.oninput = () => {
     const emoji = emojiInput.value.trim();
     if (!emoji) return;
     iconKey = `emoji:${emoji}`;
@@ -175,10 +183,6 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     button.disabled = true;
     try {
       const saved = await saveCollection(userId, { rootKey, parentId, name: input.value, color, iconKey }, existing);
-      if (!isSubDex && saved?.id) {
-        setPageLookColor(`collection-${saved.id}`, color);
-        setPageLookPattern(`collection-${saved.id}`, pattern);
-      }
       close();
       toast(existing ? 'Dex aktualisiert' : (isSubDex ? 'Unter-Dex erstellt' : 'Dex erstellt'));
       await onSaved?.(saved);
