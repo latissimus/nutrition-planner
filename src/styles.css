@@ -2877,9 +2877,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-unterdex-fach .dex-ordner-inhalt{left:18px;right:18px;bottom:38px;gap:4px}
 .dex-ordner-inhalt h2{
   margin:0;font-family:"Work Sans",var(--ui),sans-serif;font-size:15px;font-style:normal;
-  font-weight:900;letter-spacing:-.045em;line-height:.98;text-transform:uppercase;
+  font-weight:800;letter-spacing:-.045em;line-height:.98;text-transform:uppercase;
 }
-.dex-unterdex-fach .dex-ordner-inhalt h2{font-size:14px;font-weight:800}
+.dex-unterdex-fach .dex-ordner-inhalt h2{font-size:14px;font-weight:700}
 .dex-ordner-inhalt .dex-datensatz-meta{
   gap:4px;font-family:var(--tech),"Space Mono",monospace;
   font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
@@ -2907,7 +2907,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
-.dex-ordner-test:active{transform:translateY(2px)}
+.tuck-karte.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 
