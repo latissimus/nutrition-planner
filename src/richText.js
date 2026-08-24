@@ -78,7 +78,12 @@ export function noteEditorMarkup(id, value = '', { placeholder = '', required = 
 
 function updateToolbar(toolbar) {
   const state = (cmd) => { try { return document.queryCommandState(cmd); } catch { return false; } };
-  const istH3 = () => { try { return (document.queryCommandValue('formatBlock') || '').toLowerCase() === 'h3'; } catch { return false; } };
+  const istH3 = () => {
+    const area = toolbar.closest('[data-rte]')?.querySelector('[data-rte-area]');
+    const block = currentEditableBlock(area);
+    if (block) return block.tagName === 'H3';
+    try { return String(document.queryCommandValue('formatBlock') || '').replace(/[<>]/g, '').toLowerCase() === 'h3'; } catch { return false; }
+  };
   toolbar.querySelectorAll('[data-rte-cmd]').forEach((btn) => {
     const cmd = btn.dataset.rteCmd;
     const aktiv = cmd === 'bold' ? state('bold')
@@ -87,6 +92,61 @@ function updateToolbar(toolbar) {
           : cmd === 'heading' ? istH3() : false;
     btn.classList.toggle('aktiv', aktiv);
   });
+}
+
+function selectionInside(area) {
+  if (!area || typeof window === 'undefined') return null;
+  const selection = window.getSelection?.();
+  if (!selection || !selection.rangeCount) return null;
+  const node = selection.anchorNode;
+  return node && area.contains(node) ? selection : null;
+}
+
+function currentEditableBlock(area) {
+  const selection = selectionInside(area);
+  if (!selection) return null;
+  let node = selection.anchorNode;
+  if (node?.nodeType === 3) node = node.parentElement;
+  while (node && node !== area) {
+    if (['P', 'H3', 'DIV', 'LI'].includes(node.tagName) && node.parentElement === area) return node;
+    if (['P', 'H3', 'DIV', 'LI'].includes(node.tagName) && node.closest('[data-rte-area]') === area) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
+function placeCaretAtEnd(element) {
+  if (!element || typeof window === 'undefined') return;
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  const selection = window.getSelection?.();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+function execHeadingFallback(toHeading) {
+  try {
+    document.execCommand('formatBlock', false, toHeading ? '<h3>' : '<p>');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function toggleHeading(area) {
+  area.focus();
+  const block = currentEditableBlock(area);
+  if (!block || block.tagName === 'LI') {
+    if (!execHeadingFallback(true)) return;
+    return;
+  }
+
+  const next = document.createElement(block.tagName === 'H3' ? 'p' : 'h3');
+  while (block.firstChild) next.appendChild(block.firstChild);
+  if (!next.childNodes.length) next.appendChild(document.createElement('br'));
+  block.replaceWith(next);
+  placeCaretAtEnd(next);
 }
 
 // Bindet die Format-Leisten in `root` an ihre contenteditable-Felder.
@@ -106,10 +166,7 @@ export function mountNoteEditors(root) {
       if (cmd === 'bold') document.execCommand('bold');
       else if (cmd === 'underline') document.execCommand('underline');
       else if (cmd === 'list') document.execCommand('insertUnorderedList');
-      else if (cmd === 'heading') {
-        const istH3 = (() => { try { return (document.queryCommandValue('formatBlock') || '').toLowerCase() === 'h3'; } catch { return false; } })();
-        document.execCommand('formatBlock', false, istH3 ? 'p' : 'h3');
-      }
+      else if (cmd === 'heading') toggleHeading(area);
       updateToolbar(toolbar);
     });
     const sync = () => updateToolbar(toolbar);

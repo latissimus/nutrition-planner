@@ -4098,14 +4098,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-leer-symbol{position:relative;width:120px;height:88px;margin-bottom:5px}
 .dex-leer-symbol i{
   position:absolute;left:34px;top:5px;width:52px;height:58px;border:2px solid var(--ink);
-  border-radius:6px;background:var(--surface);box-shadow:4px 4px 0 var(--ordner,var(--fe-pink));
+  border-radius:6px;background:var(--surface);box-shadow:0 3.5px 0 var(--ink);
   animation:dexAblegen 2.6s ease-in-out infinite;
 }
 .dex-leer-symbol i::before,.dex-leer-symbol i::after{content:"";position:absolute;left:9px;right:9px;height:2px;background:var(--muted)}
 .dex-leer-symbol i::before{top:15px}.dex-leer-symbol i::after{top:25px}
 .dex-leer-symbol b{
   position:absolute;z-index:2;left:13px;right:13px;bottom:8px;height:20px;
-  border:2px solid var(--ink);border-radius:5px;background:var(--surface);box-shadow:3px 3px 0 var(--ink);
+  border:2px solid var(--ink);border-radius:5px;background:var(--surface);box-shadow:0 3.5px 0 var(--ink);
 }
 .sammlung-leer .material-svg,.sammlung-leer svg{width:55px;height:55px;fill:currentColor;opacity:.58}
 .sammlung-leer strong{color:var(--text);font-size:21px}
