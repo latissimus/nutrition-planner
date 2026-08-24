@@ -3420,8 +3420,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-detail-foodmeta{display:flex;flex-wrap:wrap;gap:7px;margin-top:-3px}
 .dex-detail-foodmeta span{padding:7px 10px;border:1px solid var(--ink);border-radius:999px;background:color-mix(in srgb,var(--eintrag-farbe) 28%,var(--surface));font-size:11px;font-weight:800}
 .dex-detail-herkunft{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;padding:11px;border:1px solid var(--ink);border-radius:10px;background:var(--surface2)}
-.dex-detail-herkunft span{min-width:0;color:var(--muted);font-size:10px;line-height:1.25;overflow-wrap:anywhere}
-.dex-detail-herkunft b{display:block;margin-bottom:3px;color:var(--text);font-size:9px;letter-spacing:.05em;text-transform:uppercase}
+.dex-detail-herkunft span{min-width:0;color:var(--muted);font-family:var(--tech);font-size:10px;line-height:1.25;font-variant-numeric:slashed-zero;overflow-wrap:anywhere}
+.dex-detail-herkunft b{display:block;margin-bottom:3px;color:var(--text);font-family:var(--tech);font-size:9px;letter-spacing:.05em;text-transform:uppercase}
 .dex-detail-link{display:flex;box-sizing:border-box;align-items:center;justify-content:center;gap:10px;width:100%;max-width:100%;min-width:0;min-height:58px;overflow:hidden;text-decoration:none}
 .dex-detail-link .material-svg,.dex-detail-link svg{width:20px;height:20px;fill:#fff!important}
 .dex-detail-tags{padding-top:3px}.dex-detail-tags h2{margin:0 0 9px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
@@ -5956,8 +5956,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Der Titel bleibt fett, frisst aber weniger Raum; Meta/Tags und Text folgen
    derselben Work-Sans-Hierarchie wie die FoodDex-Karten. */
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt h1{
-  font-size:clamp(25px,6.55vw,43px)!important;
-  font-weight:760!important;
+  font-size:clamp(23px,6.05vw,39px)!important;
+  font-weight:700!important;
   letter-spacing:-.05em!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt>p,
@@ -5973,19 +5973,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   gap:9px!important;
   padding:12px 13px!important;
   border-radius:13px!important;
-  font-family:"Work Sans",sans-serif!important;
+  font-family:var(--tech)!important;
+  font-variant-numeric:slashed-zero!important;
+  font-feature-settings:"zero" 1!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft b{
-  font-family:"Work Sans",sans-serif!important;
+  font-family:var(--tech)!important;
   font-size:8.5px!important;
-  font-weight:850!important;
-  letter-spacing:.075em!important;
+  font-weight:700!important;
+  letter-spacing:.08em!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft span{
-  font-family:"Work Sans",sans-serif!important;
-  font-size:11.5px!important;
-  font-weight:600!important;
+  font-family:var(--tech)!important;
+  font-size:12px!important;
+  font-weight:700!important;
   line-height:1.25!important;
+  letter-spacing:0!important;
+  font-variant-numeric:slashed-zero!important;
+  font-feature-settings:"zero" 1!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-link{
   font-size:13px!important;
