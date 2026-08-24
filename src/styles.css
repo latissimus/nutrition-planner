@@ -2856,7 +2856,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-ordner-form{
   position:absolute;inset:0;width:100%;height:100%;overflow:visible;
-  filter:drop-shadow(4px 4px 0 #000);
+  filter:drop-shadow(0 3.5px 0 #000);
 }
 .dex-ordner-form path{stroke:#000}
 .dex-ordner-rueckblatt{stroke-width:4.35px}
@@ -2874,14 +2874,18 @@ button,a,[role="button"],summary{touch-action:manipulation;
   position:absolute;z-index:2;left:18px;right:43px;bottom:28px;
   display:flex;flex-direction:column;gap:5px;color:var(--text);
 }
-.dex-unterdex-fach .dex-ordner-inhalt{left:18px;right:18px;bottom:30px;gap:4px}
+.dex-unterdex-fach .dex-ordner-inhalt{left:18px;right:18px;bottom:38px;gap:4px}
 .dex-ordner-inhalt h2{
-  margin:0;font-family:var(--display);font-size:15px;font-style:var(--h-style);
-  font-weight:var(--h-weight);line-height:1;text-transform:uppercase;
+  margin:0;font-family:"Work Sans",var(--ui),sans-serif;font-size:15px;font-style:normal;
+  font-weight:900;letter-spacing:-.045em;line-height:.98;text-transform:uppercase;
 }
-.dex-ordner-inhalt .dex-datensatz-meta{gap:4px;font-family:var(--ui)}
-.dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px}
-.dex-ordner-inhalt .dex-datensatz-meta span{font-size:10px}
+.dex-unterdex-fach .dex-ordner-inhalt h2{font-size:14px;font-weight:800}
+.dex-ordner-inhalt .dex-datensatz-meta{
+  gap:4px;font-family:var(--tech),"Space Mono",monospace;
+  font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
+}
+.dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px;font-weight:700;line-height:1}
+.dex-ordner-inhalt .dex-datensatz-meta span{font-size:10.5px;font-weight:700;line-height:1.1}
 .dex-ordner-kartenicon{
   position:absolute;z-index:2;left:52%;right:auto;top:16px;transform:translateX(-50%);
   display:grid;place-items:center;width:27px;height:27px;color:#000;
@@ -2903,7 +2907,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
-.dex-ordner-test:active{transform:translate(2px,2px)}
+.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 
@@ -5349,7 +5353,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Dex-Ordner und Auswahlmodus: Konturen und Versatz duerfen auf Navy nicht
    verschwinden; der Schatten folgt deshalb demselben gedeckten Stahlblau. */
 :root[data-theme="dark"] .dex-ordner-form{
-  filter:drop-shadow(4px 4px 0 #43516E);
+  filter:drop-shadow(0 3.5px 0 #43516E);
 }
 :root[data-theme="dark"] .dex-ordner-test:active .dex-ordner-form{
   filter:none;

@@ -711,7 +711,8 @@ export async function renderDexEntries(container, {
       const foodEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
       const visibleEntries = trainingFilters ? filterTrainingEntries(foodEntries, activeTrainingFilter) : foodEntries;
       const hasMore = entries.length < total;
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, hasChildren, hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
+      const filterIstLeer = (foodFilters && activeFilter !== 'all') || (trainingFilters && activeTrainingFilter !== 'all');
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, filterIstLeer ? false : hasChildren, filterIstLeer ? false : hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
       const filterBar = slot.querySelector('.food-dex-filter');
       if (filterBar && filterScrollLeft != null) {
         filterBar.scrollLeft = filterScrollLeft;

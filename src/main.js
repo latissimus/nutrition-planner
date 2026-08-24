@@ -988,7 +988,7 @@ function installFoodDexChrome(view, {
   title = 'Fooddex',
   meta = '0 Einträge · 0 Unter-Dex',
   closeHref = '#home',
-  editLabel = 'Food-Dex bearbeiten',
+  editLabel = 'Fooddex bearbeiten',
 } = {}) {
   const foodBar = view.querySelector('.kategorie-kopf');
   const foodAdd = foodBar?.querySelector('.kategorie-plus');
@@ -998,7 +998,7 @@ function installFoodDexChrome(view, {
     panelAttributes: 'role="menu" aria-label="Food-Dex Aktionen"',
     panelContent: `
       <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
-      <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>Info</span></button>
+      <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>Fooddex-Info</span></button>
       <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>${escapeHtml(editLabel)}</span></button>`,
     menuAttributes: 'data-food-menu',
     closeHref: escapeHtml(closeHref),
@@ -1420,7 +1420,7 @@ async function renderRoute() {
       title: 'Fooddex',
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       closeHref: '#home',
-      editLabel: 'Food-Dex bearbeiten',
+      editLabel: 'Fooddex bearbeiten',
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
