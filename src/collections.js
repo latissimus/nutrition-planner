@@ -3,6 +3,7 @@ import {
   availableCategoryIcons, categoryColor, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
 import { toast } from './toast.js';
+import unterdexSvgRaw from '../Unterdex.svg?raw';
 
 export const COLLECTION_COLORS = dexEditorColors;
 
@@ -11,6 +12,11 @@ export const COLLECTION_ICONS = availableCategoryIcons.map((icon) => icon.id);
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+
+const unterdexFolderSvg = unterdexSvgRaw
+  .replace(/<\?xml[^>]*>\s*/i, '')
+  .replace(/<!DOCTYPE[^>]*>\s*/i, '')
+  .replace('<svg ', '<svg class="dex-ordner-form dex-unterdex-form" aria-hidden="true" ');
 
 export async function loadCollections(userId, { rootKey, parentId = null, signal } = {}) {
   let query = supabase.from('collections')
@@ -64,16 +70,7 @@ export function collectionCardMarkup(item, count = 0, options = {}) {
   const color = collectionDisplayColor(item, options.inheritedColor);
   const icon = subDex ? '' : `<span class="dex-ordner-kartenicon" aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>`;
   const folderSvg = subDex
-    ? `<svg class="dex-ordner-form dex-unterdex-form" viewBox="0 0 512 360" aria-hidden="true">
-        <g transform="translate(-3.716 -31.537)">
-          <g transform="matrix(1.6455 0 0 .892494 -194.467 56.537)">
-            <path class="dex-ordner-rueckblatt" d="M400 40.19C400 18.009 388.569 0 374.489 0H155.511C141.431 0 130 18.009 130 40.19v124.557c0 22.182 11.431 40.191 25.511 40.191h218.978c14.08 0 25.511-18.009 25.511-40.191V40.19Z"/>
-          </g>
-          <g transform="matrix(1 0 0 .928157 3.732 -10.793)">
-            <path class="dex-ordner-front" d="M60 153.744s172.262.297 220-.071c26.551-.206 38.281-36.535 70-38.013l110-.013c19.077-.457 36.626 15.931 36.246 34.353l-.477 210c-.833 23.409-23.198 45.854-45.769 46.537l-380-.552c-27.553 1.004-53.616-20.966-54.284-45.985l.016-170c1.739-24.913 22.434-36.723 44.268-36.256Z"/>
-          </g>
-        </g>
-      </svg>`
+    ? unterdexFolderSvg
     : `<svg class="dex-ordner-form" viewBox="0 0 512 450" aria-hidden="true">
         <g transform="translate(.016 13.463)">
           <g transform="matrix(1.6455 0 0 1.04448 -198.199 50)">
