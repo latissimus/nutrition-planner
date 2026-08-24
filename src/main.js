@@ -791,7 +791,7 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   setPreference('muscledex:sichtbare-sammlungen', order);
   setPreference('muscledex:coin-dex-sichtbar', true);
   const looks = {
-    'food-log': ['#FFE59D', 'wallpaper-pizza', '🍕'],
+    'food-log': ['#FBE7A3', 'wallpaper-pizza', '🍕'],
     reminders: ['#525CEB', 'wallpaper-burger', '🍔'],
     sleep: ['#001454', 'wallpaper-moon', '😴'],
     shopping: ['#00E0BA', 'wallpaper-brokkoli', '🛒'],

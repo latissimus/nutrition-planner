@@ -40,11 +40,14 @@ const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 let deferredPageLook = null;
 let deferPageLook = false;
 const defaultColors = {
-  body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#91008D',
+  body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#FBE7A3',
   recipes: '#007DCC', training: '#525CEB', habits: '#245953',
   shopping: '#FFCF00',
   sleep: '#001454',
   coins: '#05BDE8',
+};
+const fixedSystemColors = {
+  'food-log': '#FBE7A3',
 };
 const colorGroups = [
   ['DEX-Farben', [
@@ -97,6 +100,7 @@ export function colorIsDark(color) {
 }
 
 export function categoryColor(route) {
+  if (fixedSystemColors[route]) return fixedSystemColors[route];
   const saved = getPreference(colorKey(route));
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#B1E7FF');
@@ -192,9 +196,10 @@ export function setPageLookColor(scope, color) {
 }
 
 export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
-  const fallback = fallbackColor || '#F2EBE0';
+  const fixedColor = fixedSystemColors[scope];
+  const fallback = fixedColor || fallbackColor || '#F2EBE0';
   return {
-    color: getPreference(pageColorKey(scope), fallback).toUpperCase(),
+    color: fixedColor || getPreference(pageColorKey(scope), fallback).toUpperCase(),
     // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
     // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.
     pattern: normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
