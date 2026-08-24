@@ -4627,6 +4627,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:.015em;font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
   color:currentColor;opacity:.92;
 }
+.food-dex-page .sammlung-leer strong{
+  font-family:"Work Sans",sans-serif;
+  font-size:21px;
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-.035em;
+}
+.food-dex-page .sammlung-leer span{
+  font-family:var(--tech);
+  font-size:13px;
+  font-weight:700;
+  line-height:1.4;
+  letter-spacing:.01em;
+  font-variant-numeric:slashed-zero;
+  font-feature-settings:"zero" 1;
+}
 .food-dex-page .food-dex-filter{
   gap:10px;
   margin-bottom:28px;
