@@ -4325,7 +4325,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte-vorschau{
   box-sizing:border-box;width:calc(100% + 4px);max-width:none;
   height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
-  border:2px solid #000;border-radius:22px 22px 10px 10px;box-shadow:none!important;
+  border:2px solid #000;border-radius:18px 18px 10px 10px;box-shadow:none!important;
   /* While a remote preview is loading, show the Dex surface rather than the
      global cream token. Once the image arrives it covers this colour. */
   background:var(--food-page-purple)!important;
