@@ -4620,10 +4620,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-feature-settings:"zero" 1!important;
   opacity:1!important;
 }
-.food-dex-scroll-title{display:grid;gap:9px;margin:0 2px 25px;color:var(--dex-ink,#000)}
+.food-dex-scroll-title{display:grid;gap:10px;margin:0 2px 25px;color:var(--dex-ink,#000)}
 .food-dex-scroll-title strong{
-  display:block;font-family:"Work Sans",sans-serif;font-size:clamp(28px,8.2vw,36px);
-  font-weight:900;line-height:.94;letter-spacing:-.045em;text-transform:none;
+  display:block;font-family:"Work Sans",sans-serif;font-size:clamp(26px,7.35vw,32px);
+  font-weight:900;line-height:.96;letter-spacing:-.045em;text-transform:none;
   -webkit-text-stroke:0;text-rendering:geometricPrecision;
 }
 .food-dex-scroll-title small{
