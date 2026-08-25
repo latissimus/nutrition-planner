@@ -2871,7 +2871,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-unterdex-form .dex-ordner-rueckblatt{stroke-width:4.84px}
 .dex-unterdex-form .dex-ordner-front{stroke-width:6.67px}
 .dex-ordner-inhalt{
-  position:absolute;z-index:2;left:18px;right:43px;bottom:28px;
+  position:absolute;z-index:2;left:18px;right:43px;bottom:30px;
   display:flex;flex-direction:column;gap:5px;color:var(--text);
 }
 .dex-unterdex-fach .dex-ordner-inhalt{left:18px;right:18px;bottom:38px;gap:4px}
@@ -2881,11 +2881,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-unterdex-fach .dex-ordner-inhalt h2{font-size:14px;font-weight:700}
 .dex-ordner-inhalt .dex-datensatz-meta{
-  gap:4px;font-family:var(--tech),"Space Mono",monospace;
+  gap:4px;font-family:var(--tech),"Space Mono",monospace;line-height:1.25;
   font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
 }
-.dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px;font-weight:700;line-height:1}
-.dex-ordner-inhalt .dex-datensatz-meta span{font-size:10.5px;font-weight:700;line-height:1.1}
+.dex-ordner-inhalt .dex-datensatz-meta b{font-size:17px;font-weight:700;line-height:1.2}
+.dex-ordner-inhalt .dex-datensatz-meta span{font-size:10.5px;font-weight:700;line-height:1.2}
 .dex-ordner-kartenicon{
   position:absolute;z-index:2;left:52%;right:auto;top:16px;transform:translateX(-50%);
   display:grid;place-items:center;width:27px;height:27px;color:#000;
