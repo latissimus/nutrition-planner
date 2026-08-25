@@ -4266,6 +4266,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --food-mono:"Space Mono",monospace;
   font-family:var(--food-body);
 }
+:root[data-seite="food-log"] .app-kopf .nav-av{
+  background:var(--surface)!important;
+}
+:root[data-seite="food-log"] .app-kopf .nav-av img,
+:root[data-seite="food-log"] .app-kopf .nav-av span{
+  background:var(--surface);
+}
 .food-dex-page .kategorie-kopftitel strong{
   font-family:var(--food-display);font-size:clamp(19px,5.6vw,19px);font-weight:900;
   line-height:.95;letter-spacing:-0.1em;text-transform:none;
