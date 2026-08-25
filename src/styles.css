@@ -6141,20 +6141,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin:18px 2px 24px!important;
 }
 .food-dex-page .unter-sammlungen-grid{
-  gap:14px!important;
+  column-gap:8px!important;
+  row-gap:12px!important;
 }
 .food-dex-page .dex-unterdex-fach{
-  min-height:108px!important;
+  min-height:112px!important;
 }
 .food-dex-page .dex-unterdex-form{
-  height:108px!important;
+  height:112px!important;
   inset:4px 0 auto!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt{
   left:16px!important;
   right:16px!important;
-  bottom:30px!important;
-  gap:3px!important;
+  bottom:40px!important;
+  gap:4px!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt h2{
   font-size:13px!important;
