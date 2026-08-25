@@ -1031,7 +1031,13 @@ function installFoodDexChrome(view, {
   view.appendChild(foodActionBar);
 
   const foodContent = view.querySelector('.kategorie-scrollinhalt');
-  if (foodContent && !foodContent.querySelector(':scope > .food-dex-scroll-title')) {
+  const existingTitle = foodContent?.querySelector(':scope > .food-dex-scroll-title');
+  if (existingTitle) {
+    const titleNode = existingTitle.querySelector('strong');
+    const metaNode = existingTitle.querySelector('[data-food-scroll-meta]');
+    if (titleNode) titleNode.textContent = title;
+    if (metaNode) metaNode.textContent = meta;
+  } else if (foodContent) {
     const titleBlock = document.createElement('section');
     titleBlock.className = 'food-dex-scroll-title';
     titleBlock.innerHTML = `
@@ -1063,8 +1069,9 @@ async function mountCustomCollection(container, item, signal) {
     container.classList.add('food-dex-page');
     container.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(inheritedColor));
   }
+  const collectionTitleMarkup = foodDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
-    <div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>
+    ${collectionTitleMarkup}
     ${collectionGridMarkup(children, { inheritedColor })}
     ${dexEntriesSlotMarkup()}
   </div>`;
