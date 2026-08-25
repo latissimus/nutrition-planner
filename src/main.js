@@ -768,6 +768,43 @@ async function eigeneDexStatistik(userId, roots, signal) {
   return result;
 }
 
+async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
+  if (!roots.length) return new Map();
+  let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
+  let entriesQuery = supabase.from('dex_entries').select('collection_id').eq('user_id', userId).eq('root_key', rootKey);
+  if (signal) { collectionsQuery = collectionsQuery.abortSignal(signal); entriesQuery = entriesQuery.abortSignal(signal); }
+  const [{ data: collections, error: collectionError }, { data: entries, error: entryError }] = await Promise.all([collectionsQuery, entriesQuery]);
+  if (collectionError) throw collectionError;
+  if (entryError) throw entryError;
+  const childrenByParent = new Map();
+  (collections || []).forEach((item) => {
+    if (!item.parent_id) return;
+    const list = childrenByParent.get(item.parent_id) || [];
+    list.push(item.id);
+    childrenByParent.set(item.parent_id, list);
+  });
+  const entryCount = new Map();
+  (entries || []).forEach(({ collection_id: id }) => {
+    if (id) entryCount.set(id, (entryCount.get(id) || 0) + 1);
+  });
+  const result = new Map();
+  roots.forEach((root) => {
+    const descendants = [];
+    const queue = [...(childrenByParent.get(root.id) || [])];
+    while (queue.length) {
+      const id = queue.shift();
+      descendants.push(id);
+      queue.push(...(childrenByParent.get(id) || []));
+    }
+    const ids = [root.id, ...descendants];
+    result.set(root.id, {
+      children: descendants.length,
+      entries: ids.reduce((sum, id) => sum + (entryCount.get(id) || 0), 0),
+    });
+  });
+  return result;
+}
+
 // Neue Konten starten mit derselben klaren Reihenfolge und Farb-/Emoji-Sprache
 // wie die aktuelle MUSCLE-DEX-Startseite. Die Initialisierung ist bewusst
 // einmalig und überschreibt keine bestehenden persönlichen Einstellungen.
@@ -1064,6 +1101,8 @@ async function mountCustomCollection(container, item, signal) {
   const ownerId = item.user_id || session.user.id;
   const children = await loadCollections(ownerId, { rootKey: item.root_key, parentId: item.id, signal });
   if (signal?.aborted) return;
+  const childStats = await dexSammlungsStatistik(ownerId, item.root_key, children, signal);
+  if (signal?.aborted) return;
   setSeite(foodDexSkin ? 'food-log' : 'collection');
   if (foodDexSkin) {
     container.classList.add('food-dex-page');
@@ -1072,7 +1111,7 @@ async function mountCustomCollection(container, item, signal) {
   const collectionTitleMarkup = foodDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     ${collectionTitleMarkup}
-    ${collectionGridMarkup(children, { inheritedColor })}
+    ${collectionGridMarkup(children, { inheritedColor, counts: childStats })}
     ${dexEntriesSlotMarkup()}
   </div>`;
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
@@ -1401,10 +1440,12 @@ async function renderRoute() {
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
     const foodOwnerId = foodSpace.ownerId;
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
+    const childStats = await dexSammlungsStatistik(foodOwnerId, 'food-log', children, signal);
+    if (signal?.aborted) return;
     view.classList.add('food-dex-page');
     view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(pageLook('food-log', categoryColor('food-log'), 'triangles').color));
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
-      ${collectionGridMarkup(children, { inheritedColor: categoryColor('food-log') })}${dexEntriesSlotMarkup()}</div>`;
+      ${collectionGridMarkup(children, { inheritedColor: categoryColor('food-log'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
@@ -1446,7 +1487,9 @@ async function renderRoute() {
   } else if (route === 'training') {
     setSeite('training');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING-DEX</h1></div>${collectionGridMarkup(children, { inheritedColor: categoryColor('training') })}${dexEntriesSlotMarkup()}</div>`;
+    const childStats = await dexSammlungsStatistik(session.user.id, 'training', children, signal);
+    if (signal?.aborted) return;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING-DEX</h1></div>${collectionGridMarkup(children, { inheritedColor: categoryColor('training'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
     mountCategoryChrome(view, route, 'TRAINING-DEX', {

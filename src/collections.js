@@ -106,9 +106,10 @@ export function collectionCardMarkup(item, count = 0, options = {}) {
 
 export function collectionGridMarkup(items, options = {}) {
   if (!items.length) return '';
+  const counts = options.counts || new Map();
   return `<section class="unter-sammlungen-block">
     <h2>Unter-Dex (${items.length})</h2>
-    <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item, 0, options)).join('')}</div>
+    <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item, counts.get(item.id)?.entries || 0, options)).join('')}</div>
   </section>`;
 }
 
