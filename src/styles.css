@@ -6132,6 +6132,49 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:none!important;
 }
 
+/* FoodDex Feinschliff: Unter-Dex kompakter, Abschnittstitel ruhiger und genug
+   Scroll-Luft, damit die schwebenden Buttons keine Karten hart verdecken. */
+.food-dex-page .kategorie-scrollinhalt{
+  padding-bottom:calc(156px + env(safe-area-inset-bottom))!important;
+}
+.food-dex-page .unter-sammlungen-block{
+  margin:18px 2px 24px!important;
+}
+.food-dex-page .unter-sammlungen-grid{
+  gap:14px!important;
+}
+.food-dex-page .dex-unterdex-fach{
+  min-height:108px!important;
+}
+.food-dex-page .dex-unterdex-form{
+  height:108px!important;
+  inset:4px 0 auto!important;
+}
+.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt{
+  left:16px!important;
+  right:16px!important;
+  bottom:30px!important;
+  gap:3px!important;
+}
+.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt h2{
+  font-size:13px!important;
+  font-weight:650!important;
+  letter-spacing:-.04em!important;
+}
+.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta b{
+  font-size:15px!important;
+}
+.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta span{
+  font-size:9.5px!important;
+}
+.food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
+  margin-bottom:14px!important;
+  font-size:16px!important;
+  font-weight:650!important;
+  line-height:1.02!important;
+  letter-spacing:-.025em!important;
+}
+
 /* ============================================================
    Overlay-/Menü-Finish
    Gemeinsame visuelle Sprache fuer alle Dex-Sheets: Work Sans, kompaktere
