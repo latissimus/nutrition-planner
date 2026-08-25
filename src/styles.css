@@ -6138,35 +6138,55 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:calc(156px + env(safe-area-inset-bottom))!important;
 }
 .food-dex-page .unter-sammlungen-block{
-  margin:18px 2px 24px!important;
+  margin:18px 0 22px!important;
 }
 .food-dex-page .unter-sammlungen-grid{
-  column-gap:8px!important;
-  row-gap:12px!important;
+  display:flex!important;
+  grid-template-columns:none!important;
+  gap:10px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  overscroll-behavior-x:contain!important;
+  -webkit-overflow-scrolling:touch;
+  margin-inline:-2px!important;
+  padding:4px 2px 8px!important;
+  scroll-padding-inline:2px;
+  scrollbar-width:none;
+}
+.food-dex-page .unter-sammlungen-grid::-webkit-scrollbar{
+  display:none;
 }
 .food-dex-page .dex-unterdex-fach{
-  min-height:112px!important;
+  flex:0 0 142px!important;
+  width:142px!important;
+  min-width:142px!important;
+  min-height:92px!important;
+}
+.food-dex-page .dex-unterdex-fach .dex-ordner-test{
+  min-height:92px!important;
+  height:92px!important;
 }
 .food-dex-page .dex-unterdex-form{
-  height:112px!important;
-  inset:4px 0 auto!important;
+  height:92px!important;
+  inset:0 0 auto!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt{
-  left:16px!important;
-  right:16px!important;
-  bottom:40px!important;
-  gap:4px!important;
+  left:12px!important;
+  right:12px!important;
+  bottom:16px!important;
+  gap:2px!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt h2{
-  font-size:13px!important;
+  font-size:12px!important;
   font-weight:650!important;
   letter-spacing:-.04em!important;
+  line-height:1!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta b{
-  font-size:15px!important;
+  font-size:13px!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta span{
-  font-size:9.5px!important;
+  font-size:8.5px!important;
 }
 .food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
   margin-bottom:14px!important;
