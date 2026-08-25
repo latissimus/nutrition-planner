@@ -6138,7 +6138,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:calc(156px + env(safe-area-inset-bottom))!important;
 }
 .food-dex-page .unter-sammlungen-block{
-  margin:18px 0 22px!important;
+  margin:18px -18px 22px!important;
 }
 .food-dex-page .unter-sammlungen-grid{
   display:flex!important;
@@ -6148,9 +6148,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow-y:hidden!important;
   overscroll-behavior-x:contain!important;
   -webkit-overflow-scrolling:touch;
-  margin-inline:-2px!important;
-  padding:4px 2px 8px!important;
-  scroll-padding-inline:2px;
+  margin-inline:0!important;
+  padding:4px 18px 8px!important;
+  scroll-padding-inline:18px;
   scrollbar-width:none;
 }
 .food-dex-page .unter-sammlungen-grid::-webkit-scrollbar{
@@ -6171,7 +6171,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inset:0 0 auto!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-inhalt{
-  left:12px!important;
+  left:18px!important;
   right:12px!important;
   bottom:16px!important;
   gap:2px!important;
