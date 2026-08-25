@@ -11,13 +11,8 @@ import '@fontsource/figtree/latin-500.css';
 import '@fontsource/figtree/latin-600.css';
 import '@fontsource/figtree/latin-700.css';
 import '@fontsource/figtree/latin-800.css';
-// Food-Dex typography: open-source display, heading, body and technical faces.
-// These are loaded once here and scoped to .food-dex-page in styles.css so the
-// rest of MUSCLE-DEX keeps its established typography.
-import '@fontsource/nunito/latin-900.css';
-import '@fontsource/lexend-exa/latin-900.css';
-import '@fontsource/outfit/latin.css';
-import '@fontsource/dm-sans/latin.css';
+// Dex typography: Work Sans is bundled locally via styles.css; Space Mono
+// stays loaded for technical/meta values with slashed zeroes.
 import '@fontsource/space-mono/latin.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
@@ -1444,7 +1439,7 @@ async function renderRoute() {
     if (signal?.aborted) return;
     view.classList.add('food-dex-page');
     view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(pageLook('food-log', categoryColor('food-log'), 'triangles').color));
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>FOOD-DEX</h1></div>
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
       ${collectionGridMarkup(children, { inheritedColor: categoryColor('food-log'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
