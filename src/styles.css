@@ -5900,7 +5900,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   grid-template-columns:50px!important;
   justify-items:end!important;
   align-items:end!important;
-  gap:16px!important;
+  gap:10px!important;
   inline-size:50px!important;
 }
 .food-dex-page .food-dex-action-button,
@@ -5965,7 +5965,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .unter-sammlungen-grid{
   display:flex!important;
   grid-template-columns:none!important;
-  gap:10px!important;
+  gap:16px!important;
   overflow-x:auto!important;
   overflow-y:hidden!important;
   overscroll-behavior-x:contain!important;
@@ -5979,9 +5979,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:none;
 }
 .food-dex-page .dex-unterdex-fach{
-  flex:0 0 142px!important;
-  width:142px!important;
-  min-width:142px!important;
+  flex:0 0 131px!important;
+  width:131px!important;
+  min-width:131px!important;
   min-height:92px!important;
 }
 .food-dex-page .dex-unterdex-fach .dex-ordner-test{
