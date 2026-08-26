@@ -1562,7 +1562,9 @@ async function renderRoute() {
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
   const neuerHintergrund = getComputedStyle(document.body);
-  const lookFarbe = neuerHintergrund.backgroundColor;
+  const lookFarbe = homeStilBeimTauschSetzen
+    ? (document.documentElement.dataset.theme === 'dark' ? '#101A2B' : '#F2EBE0')
+    : neuerHintergrund.backgroundColor;
   // Die Tapete liegt im scrollbaren Dex-Inhalt und ist damit Teil derselben
   // animierten Ebene wie Karten und Texte. Auf #view selbst bleibt nur die
   // unveraenderte App-Hintergrundfarbe; sonst wuerde das Muster beim Slide
