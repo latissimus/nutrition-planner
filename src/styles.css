@@ -5900,7 +5900,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   grid-template-columns:50px!important;
   justify-items:end!important;
   align-items:end!important;
-  gap:10px!important;
+  gap:16px!important;
   inline-size:50px!important;
 }
 .food-dex-page .food-dex-action-button,
