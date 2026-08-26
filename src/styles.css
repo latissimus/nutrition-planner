@@ -4325,7 +4325,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-page .dex-inhaltskarte-vorschau{
   box-sizing:border-box;width:calc(100% + 4px);max-width:none;
   height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
-  border:2px solid #000;border-radius:16px 16px 10px 10px;box-shadow:none!important;
+  border:2px solid #000;border-radius:var(--r-karte) var(--r-karte) 10px 10px;box-shadow:none!important;
   /* While a remote preview is loading, show the Dex surface rather than the
      global cream token. Once the image arrives it covers this colour. */
   background:var(--food-page-purple)!important;
@@ -4355,7 +4355,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   line-height:1.28;
   letter-spacing:-.02em;
 }
-.food-dex-page .food-dex-action-button{border-width:2px;box-shadow:0 3.5px 0 #000}
+.food-dex-page .food-dex-action-button{border:2px solid #000;box-shadow:0 3.5px 0 #000}
 .food-dex-page .food-dex-action-button:active{box-shadow:0 1.5px 0 #000}
 .food-dex-page .food-dex-action-popover{
   position:absolute;right:0;bottom:calc(100% + 12px);
@@ -5840,19 +5840,27 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-page .food-dex-action-popover button,
 .food-dex-entry-view .food-dex-action-popover button{
+  appearance:none!important;
+  -webkit-appearance:none!important;
   display:grid!important;
   grid-template-columns:24px minmax(0,1fr)!important;
   align-items:center!important;
+  justify-content:start!important;
+  justify-items:start!important;
   gap:10px!important;
+  width:100%!important;
   min-height:46px!important;
   padding:9px 11px!important;
+  border:0!important;
   border-radius:0!important;
+  background:#fff!important;
   color:#111!important;
   font-family:"Work Sans",sans-serif!important;
   font-size:13.5px!important;
   font-weight:760!important;
   line-height:1.1!important;
   letter-spacing:-.025em!important;
+  text-align:left!important;
 }
 .food-dex-page .food-dex-action-popover button+button,
 .food-dex-entry-view .food-dex-action-popover button+button{
@@ -5890,6 +5898,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .food-dex-page .food-dex-action-button,
 .food-dex-entry-view .food-dex-action-button{
+  box-sizing:border-box!important;
   display:grid!important;
   place-items:center!important;
   padding:0!important;
@@ -5897,7 +5906,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   min-width:50px!important;
   height:50px!important;
   min-height:50px!important;
-  border-width:2px!important;
+  border:2px solid #000!important;
   border-radius:13px!important;
   background:#fff!important;
   color:#000!important;
