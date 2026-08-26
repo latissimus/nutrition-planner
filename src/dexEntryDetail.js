@@ -345,7 +345,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
     // Die Aktionsleiste und Tapete werden damit aus exakt denselben Regeln
     // wie im FoodDex selbst gezeichnet. Nur die Menüaktionen unterscheiden
     // sich inhaltlich.
-    container.classList.add('food-dex-page', 'food-dex-entry-view');
+    container.classList.add('neo-dex-page', 'food-dex-page', 'neo-dex-entry-view', 'food-dex-entry-view');
   }
   const look = await entryPageLook(entry, userId, signal);
   if (signal?.aborted) return;

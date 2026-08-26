@@ -1016,7 +1016,7 @@ function openFoodDexInfoDialog() {
   document.body.append(overlay);
 }
 
-function installFoodDexChrome(view, {
+function installNeoDexChrome(view, {
   title = 'Fooddex',
   meta = '0 Einträge · 0 Unter-Dex',
   closeHref = '#home',
@@ -1039,31 +1039,31 @@ function installFoodDexChrome(view, {
   });
   const foodActionBar = foodActions.firstElementChild;
   foodActionBar.querySelector('[data-food-menu]').onclick = () => {
-    const panel = foodActionBar.querySelector('.food-dex-action-popover');
+    const panel = foodActionBar.querySelector('.neo-dex-action-popover');
     const open = panel.hidden;
     panel.hidden = !open;
     foodActionBar.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
   };
   foodActionBar.querySelector('[data-food-action="add"]').onclick = () => {
-    foodActionBar.querySelector('.food-dex-action-popover').hidden = true;
+    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
     foodAdd?.click();
   };
   foodActionBar.querySelector('[data-food-action="info"]').onclick = () => {
-    foodActionBar.querySelector('.food-dex-action-popover').hidden = true;
+    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
     openFoodDexInfoDialog();
   };
   foodActionBar.querySelector('[data-food-action="edit"]').onclick = () => {
-    foodActionBar.querySelector('.food-dex-action-popover').hidden = true;
+    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
     foodSettings?.click();
   };
   foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
   foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
   foodBar?.querySelector('.kategorie-schliessen')?.setAttribute('aria-hidden', 'true');
-  view.querySelector('.food-dex-floating-actions')?.remove();
+  view.querySelector('.neo-dex-floating-actions,.food-dex-floating-actions')?.remove();
   view.appendChild(foodActionBar);
 
   const foodContent = view.querySelector('.kategorie-scrollinhalt');
-  const existingTitle = foodContent?.querySelector(':scope > .food-dex-scroll-title');
+  const existingTitle = foodContent?.querySelector(':scope > .neo-dex-scroll-title, :scope > .food-dex-scroll-title');
   if (existingTitle) {
     const titleNode = existingTitle.querySelector('strong');
     const metaNode = existingTitle.querySelector('[data-food-scroll-meta]');
@@ -1071,7 +1071,7 @@ function installFoodDexChrome(view, {
     if (metaNode) metaNode.textContent = meta;
   } else if (foodContent) {
     const titleBlock = document.createElement('section');
-    titleBlock.className = 'food-dex-scroll-title';
+    titleBlock.className = 'neo-dex-scroll-title food-dex-scroll-title';
     titleBlock.innerHTML = `
       <strong>${escapeHtml(title)}</strong>
       <small data-food-scroll-meta>${escapeHtml(meta)}</small>`;
@@ -1100,7 +1100,7 @@ async function mountCustomCollection(container, item, signal) {
   if (signal?.aborted) return;
   setSeite(foodDexSkin ? 'food-log' : 'collection');
   if (foodDexSkin) {
-    container.classList.add('food-dex-page');
+    container.classList.add('neo-dex-page', 'food-dex-page');
     container.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(inheritedColor));
   }
   const collectionTitleMarkup = foodDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
@@ -1151,7 +1151,7 @@ async function mountCustomCollection(container, item, signal) {
     },
   });
   if (foodDexSkin) {
-    installFoodDexChrome(container, {
+    installNeoDexChrome(container, {
       title: item.name,
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       closeHref: backHref,
@@ -1437,7 +1437,7 @@ async function renderRoute() {
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
     const childStats = await dexSammlungsStatistik(foodOwnerId, 'food-log', children, signal);
     if (signal?.aborted) return;
-    view.classList.add('food-dex-page');
+    view.classList.add('neo-dex-page', 'food-dex-page');
     view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(pageLook('food-log', categoryColor('food-log'), 'triangles').color));
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
       ${collectionGridMarkup(children, { inheritedColor: categoryColor('food-log'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
@@ -1459,7 +1459,7 @@ async function renderRoute() {
     });
     // Food-Dex gets a compact Vozzy-inspired header: the primary actions live
     // in one small floating menu so the two-column entry grid has more room.
-    installFoodDexChrome(view, {
+    installNeoDexChrome(view, {
       title: 'Fooddex',
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       closeHref: '#home',

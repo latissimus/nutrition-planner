@@ -633,7 +633,7 @@ const foodFilterDefinitions = [
 ];
 
 function foodFiltersMarkup(active = 'all') {
-  return `<nav class="food-dex-filter" aria-label="Food-Dex filtern">${foodFilterDefinitions.map(([key, label]) =>
+  return `<nav class="neo-dex-filter food-dex-filter" aria-label="Food-Dex filtern">${foodFilterDefinitions.map(([key, label]) =>
     `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
 }
 
@@ -651,7 +651,7 @@ function trainingFiltersMarkup(entries, active = 'all') {
     if (!custom.some((item) => item.toLocaleLowerCase('de') === value.toLocaleLowerCase('de'))) custom.push(value);
   });
   const definitions = [...trainingFilterDefinitions, ...custom.sort((a, b) => a.localeCompare(b, 'de')).map((label) => [label, label])];
-  return `<nav class="food-dex-filter training-dex-filter" aria-label="Training filtern">${definitions.map(([key, label]) =>
+  return `<nav class="neo-dex-filter food-dex-filter training-dex-filter" aria-label="Training filtern">${definitions.map(([key, label]) =>
     `<button type="button" data-training-filter="${escapeHtml(key)}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${escapeHtml(label)}</button>`).join('')}</nav>`;
 }
 
@@ -713,7 +713,7 @@ export async function renderDexEntries(container, {
       const hasMore = entries.length < total;
       const filterIstLeer = (foodFilters && activeFilter !== 'all') || (trainingFilters && activeTrainingFilter !== 'all');
       slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, filterIstLeer ? false : hasChildren, filterIstLeer ? false : hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
-      const filterBar = slot.querySelector('.food-dex-filter');
+      const filterBar = slot.querySelector('.neo-dex-filter,.food-dex-filter');
       if (filterBar && filterScrollLeft != null) {
         filterBar.scrollLeft = filterScrollLeft;
         requestAnimationFrame(() => { filterBar.scrollLeft = filterScrollLeft; });
@@ -724,14 +724,14 @@ export async function renderDexEntries(container, {
       });
       slot.querySelectorAll('[data-food-filter]').forEach((button) => {
         button.onclick = () => {
-          const filterScrollLeft = button.closest('.food-dex-filter')?.scrollLeft ?? 0;
+          const filterScrollLeft = button.closest('.neo-dex-filter,.food-dex-filter')?.scrollLeft ?? 0;
           activeFilter = button.dataset.foodFilter;
           paint({ filterScrollLeft });
         };
       });
       slot.querySelectorAll('[data-training-filter]').forEach((button) => {
         button.onclick = () => {
-          const filterScrollLeft = button.closest('.food-dex-filter')?.scrollLeft ?? 0;
+          const filterScrollLeft = button.closest('.neo-dex-filter,.food-dex-filter')?.scrollLeft ?? 0;
           activeTrainingFilter = button.dataset.trainingFilter;
           paint({ filterScrollLeft });
         };

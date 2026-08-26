@@ -3453,18 +3453,18 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 
 /* FOOD-LOG: eine kompakte, horizontal scrollbare Klassifizierung. Die
    freie Tag-Suche bleibt davon unabhaengig. */
-.food-dex-filter{
+:is(.neo-dex-filter,.food-dex-filter){
   position:relative;z-index:auto;display:flex;gap:8px;
   width:100vw;max-width:100vw;box-sizing:border-box;
   margin:0 calc(50% - 50vw) 22px;padding:8px 16px 11px;
   overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:transparent;
 }
-.food-dex-filter::-webkit-scrollbar{display:none}
-.food-dex-filter button{
+:is(.neo-dex-filter,.food-dex-filter)::-webkit-scrollbar{display:none}
+:is(.neo-dex-filter,.food-dex-filter) button{
   flex:0 0 auto;min-height:34px;padding:7px 12px;border:1px solid var(--ink);border-radius:999px;
   background:var(--surface);color:var(--text);font:800 11px/1 var(--ui);white-space:nowrap;
 }
-.food-dex-filter button.aktiv{background:#492426;color:#fff}
+:is(.neo-dex-filter,.food-dex-filter) button.aktiv{background:#492426;color:#fff}
 @media(max-width:380px){.food-entry-meta{grid-template-columns:1fr}}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
@@ -3489,9 +3489,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   background:var(--surface);box-shadow:0 3px 0 #000;font-family:"Work Sans",sans-serif;
 }
 .dex-detail-popup-aktionen{position:absolute;z-index:8;top:16px;right:16px;display:flex;align-items:center;gap:8px}
-.dex-detail-popup-aktionen .food-dex-action-button{width:52px;height:52px;box-sizing:border-box;border:2px solid #000;border-radius:13px;box-shadow:0 3.5px 0 #000}
-.dex-detail-popup-aktionen .food-dex-action-button:active{transform:translateY(2px);box-shadow:0 1.5px 0 #000}
-.dex-detail-popup-aktionen .food-dex-action-close .material-svg,.dex-detail-popup-aktionen .food-dex-action-close svg{width:26px;height:26px;fill:#000}
+.dex-detail-popup-aktionen :is(.neo-dex-action-button,.food-dex-action-button){width:52px;height:52px;box-sizing:border-box;border:2px solid #000;border-radius:13px;box-shadow:0 3.5px 0 #000}
+.dex-detail-popup-aktionen :is(.neo-dex-action-button,.food-dex-action-button):active{transform:translateY(2px);box-shadow:0 1.5px 0 #000}
+.dex-detail-popup-aktionen :is(.neo-dex-action-close,.food-dex-action-close) .material-svg,.dex-detail-popup-aktionen :is(.neo-dex-action-close,.food-dex-action-close) svg{width:26px;height:26px;fill:#000}
 .dex-detail-popup-menü{position:absolute;right:0;top:60px;display:grid;min-width:220px;padding:7px;border:2px solid #000;border-radius:14px;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 3px 0 #000;}
 .dex-detail-popup-menü[hidden]{display:none}
 .dex-detail-popup-menü button{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 10px;border:0;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:transparent;color:var(--text);font:650 14px/1.15 "Work Sans",sans-serif;text-align:left}
@@ -4243,7 +4243,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Karten, Floating-Actions, Detailansicht und Unter-Dex-Leiste stehen in den
    finalen Blöcken weiter unten, damit keine alten Zwischenstände mehr die
    Kaskade verwässern. */
-.food-dex-page{
+:is(.neo-dex-page,.food-dex-page){
   --food-page-purple:var(--dex-seitenfarbe,#FBE7A3);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Pizza.svg"));
   font-family:"Work Sans",var(--ui),sans-serif;
@@ -4255,28 +4255,28 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="food-log"] .app-kopf .nav-av span{
   background:var(--surface);
 }
-.food-dex-page .dex-inhaltskarte-kopf small,
-.food-dex-page .dex-inhaltskarte-meta,
-.food-dex-page .dex-inhaltskarte-fuss,
-.food-dex-page .sammlung-leer span{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-kopf small,
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-meta,
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-fuss,
+:is(.neo-dex-page,.food-dex-page) .sammlung-leer span{
   font-family:var(--tech);font-weight:400;letter-spacing:0;
 }
-.food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
+:is(.neo-dex-page,.food-dex-page) :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
   font-family:"Work Sans",var(--ui),sans-serif;
   font-weight:600;
   color:var(--dex-ink,#000);
 }
-.food-dex-page :is(.dex-inhaltskarte strong,.food-filter-chip,[data-food-filter]){
+:is(.neo-dex-page,.food-dex-page) :is(.dex-inhaltskarte strong,.food-filter-chip,[data-food-filter]){
   font-family:"Work Sans",var(--ui),sans-serif;
 }
 
 /* Food-Dex entries are intentionally clean: no category colour strip at the
    top of the card.  Keep the preview itself and its border unchanged. */
-.food-dex-page .dex-inhaltskarte-streifen,
-.food-dex-page .dex-inhaltskarte.tiktok-foto-post .dex-inhaltskarte-streifen{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-streifen,
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte.tiktok-foto-post .dex-inhaltskarte-streifen{
   display:none!important;height:0!important;flex-basis:0!important;
 }
-.food-dex-page .kategorie-plus,.food-dex-page [data-category-settings],.food-dex-page .kategorie-schliessen{visibility:hidden;pointer-events:none}
+:is(.neo-dex-page,.food-dex-page) .kategorie-plus,:is(.neo-dex-page,.food-dex-page) [data-category-settings],:is(.neo-dex-page,.food-dex-page) .kategorie-schliessen{visibility:hidden;pointer-events:none}
 .seitenmuster-auswahl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .seitenmuster-auswahl button{display:flex;align-items:center;gap:9px;min-height:54px;padding:8px;border:2px solid var(--ink);border-radius:12px;background:var(--surface);font:800 13px/1 var(--ui)}
 .seitenmuster-auswahl button.aktiv{background:color-mix(in srgb,var(--ordner) 28%,var(--surface))}
@@ -4303,10 +4303,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="food-log"]:not([data-theme="dark"]) #view{
   background-color:transparent!important;background-image:none!important;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page){
   isolation:isolate;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page::before{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)::before{
   content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
   background:var(--dex-ink,#fff);opacity:.08;
   -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
@@ -4314,15 +4314,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page).dex-tapete-datei .kategorie-scrollinhalt::before{
   display:none!important;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page>*:not(.food-dex-floating-actions){
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
   position:relative;z-index:1;
 }
-.food-dex-page .dex-inhaltskarte{border-width:2px;box-shadow:0 3.5px 0 #000}
-.food-dex-page .dex-inhaltskarte:active{box-shadow:0 1.5px 0 #000}
-.food-dex-page .dex-inhaltskarte-vorschau{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{border-width:2px;box-shadow:0 3.5px 0 #000}
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte:active{box-shadow:0 1.5px 0 #000}
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   box-sizing:border-box;width:calc(100% + 4px);max-width:none;
   height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
   border:2px solid #000;border-radius:var(--r-karte) var(--r-karte) 10px 10px;box-shadow:none!important;
@@ -4330,73 +4330,73 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      global cream token. Once the image arrives it covers this colour. */
   background:var(--food-page-purple)!important;
 }
-.food-dex-page .dex-foto-post-vorschau img{
+:is(.neo-dex-page,.food-dex-page) .dex-foto-post-vorschau img{
   object-fit:cover!important;
   object-position:center center!important;
 }
-.food-dex-page .dex-inhaltskarte-body{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-body{
   padding:8px 11px 10px;
   gap:6px;
 }
-.food-dex-page .dex-inhaltskarte-link{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-link{
   min-height:0!important;
 }
-.food-dex-page .dex-inhaltskarte strong{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte strong{
   font-family:"Work Sans",sans-serif;
   font-size:13.5px;
   font-weight:800;
   line-height:1.13;
   letter-spacing:-.035em;
 }
-.food-dex-page .dex-inhaltskarte-text{
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-text{
   font-family:"Work Sans",sans-serif;
   font-size:11px;
   font-weight:500;
   line-height:1.28;
   letter-spacing:-.02em;
 }
-.food-dex-more-dots{display:flex;align-items:center;justify-content:center;gap:4px}
-.food-dex-more-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#000}
-.food-dex-action-close .material-svg,.food-dex-action-close .material-svg svg{width:26px!important;height:26px!important}
+:is(.neo-dex-more-dots,.food-dex-more-dots){display:flex;align-items:center;justify-content:center;gap:4px}
+:is(.neo-dex-more-dots,.food-dex-more-dots) i{display:block;width:5px;height:5px;border-radius:50%;background:#000}
+:is(.neo-dex-action-close,.food-dex-action-close) .material-svg,:is(.neo-dex-action-close,.food-dex-action-close) .material-svg svg{width:26px!important;height:26px!important}
 
 /* FoodDex ohne separate Titelkarte: Der echte Kopfbereich traegt Titel und
    Metadaten, die Erklaerung lebt im Aktionsmenue. */
-.food-dex-page.dex-fixkopf>.wrap{
+:is(.neo-dex-page,.food-dex-page).dex-fixkopf>.wrap{
   display:block!important;height:100%!important;min-height:0!important;
 }
-.food-dex-page .kategorie-kopf{display:none!important}
-.food-dex-page .kategorie-scrollinhalt{
+:is(.neo-dex-page,.food-dex-page) .kategorie-kopf{display:none!important}
+:is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
   height:100%!important;min-height:0!important;padding-top:12px!important;
 }
-.food-dex-page .kategorie-kopftitel strong,
-.food-dex-page .kategorie-kopftitel small{
+:is(.neo-dex-page,.food-dex-page) .kategorie-kopftitel strong,
+:is(.neo-dex-page,.food-dex-page) .kategorie-kopftitel small{
   color:currentColor!important;
 }
-.food-dex-page .kategorie-kopftitel small{
+:is(.neo-dex-page,.food-dex-page) .kategorie-kopftitel small{
   font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero!important;
   font-feature-settings:"zero" 1!important;
   opacity:1!important;
 }
-.food-dex-scroll-title{display:grid;gap:10px;margin:0 2px 25px;color:var(--dex-ink,#000)}
-.food-dex-scroll-title strong{
+:is(.neo-dex-scroll-title,.food-dex-scroll-title){display:grid;gap:10px;margin:0 2px 25px;color:var(--dex-ink,#000)}
+:is(.neo-dex-scroll-title,.food-dex-scroll-title) strong{
   display:block;font-family:"Work Sans",sans-serif;font-size:clamp(26px,7.35vw,32px);
   font-weight:900;line-height:.96;letter-spacing:-.045em;text-transform:none;
   -webkit-text-stroke:0;text-rendering:geometricPrecision;
 }
-.food-dex-scroll-title small{
+:is(.neo-dex-scroll-title,.food-dex-scroll-title) small{
   display:block;font-family:var(--tech);font-size:12px;font-weight:700;line-height:1.35;
   letter-spacing:.015em;font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
   color:currentColor;opacity:.92;
 }
-.food-dex-page .sammlung-leer strong{
+:is(.neo-dex-page,.food-dex-page) .sammlung-leer strong{
   font-family:"Work Sans",sans-serif;
   font-size:21px;
   font-weight:800;
   line-height:1.05;
   letter-spacing:-.035em;
 }
-.food-dex-page .sammlung-leer span{
+:is(.neo-dex-page,.food-dex-page) .sammlung-leer span{
   font-family:var(--tech);
   font-size:13px;
   font-weight:700;
@@ -4405,12 +4405,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:slashed-zero;
   font-feature-settings:"zero" 1;
 }
-.food-dex-page .food-dex-filter{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter){
   gap:10px;
   margin-bottom:28px;
   padding:9px 18px 13px;
 }
-.food-dex-page .food-dex-filter button{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
   min-height:36px;
   padding:8px 13px;
   border-width:2px;
@@ -4421,11 +4421,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   line-height:1;
   letter-spacing:-.02em;
 }
-.food-dex-page .food-dex-filter button.aktiv{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
   background:var(--food-page-purple)!important;
   color:var(--dex-ink,#000)!important;
 }
-.food-dex-page .food-dex-filter button:active{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button:active{
   transform:translateY(2px);
   box-shadow:0 1.5px 0 #000;
 }
@@ -5179,10 +5179,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .routine-delete{
   border-color:var(--dark-danger)!important;color:var(--dark-danger)!important;background:var(--surface)!important;
 }
-:root[data-theme="dark"] :is(.btn-primary,.rem-speichern,.rem-push-test,.rem-push-activate,.coin-reward-actions .coin-redeem,.food-dex-filter button.aktiv,.einkauf-tag-chip.aktiv,.such-tag-liste button.aktiv,.rem-erledigt-btn.ist-aktiv){
+:root[data-theme="dark"] :is(.btn-primary,.rem-speichern,.rem-push-test,.rem-push-activate,.coin-reward-actions .coin-redeem,:is(.neo-dex-filter,.food-dex-filter) button.aktiv,.einkauf-tag-chip.aktiv,.such-tag-liste button.aktiv,.rem-erledigt-btn.ist-aktiv){
   background:var(--dark-action)!important;color:var(--dark-action-ink)!important;border-color:var(--dark-action)!important;
 }
-:root[data-theme="dark"] :is(.btn-primary,.rem-speichern,.rem-push-test,.rem-push-activate,.coin-reward-actions .coin-redeem,.food-dex-filter button.aktiv,.einkauf-tag-chip.aktiv,.such-tag-liste button.aktiv,.rem-erledigt-btn.ist-aktiv) :is(.material-svg,svg,svg *){
+:root[data-theme="dark"] :is(.btn-primary,.rem-speichern,.rem-push-test,.rem-push-activate,.coin-reward-actions .coin-redeem,:is(.neo-dex-filter,.food-dex-filter) button.aktiv,.einkauf-tag-chip.aktiv,.such-tag-liste button.aktiv,.rem-erledigt-btn.ist-aktiv) :is(.material-svg,svg,svg *){
   color:var(--dark-action-ink)!important;fill:var(--dark-action-ink)!important;
 }
 :root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb{background:var(--dark-action)}
@@ -5602,7 +5602,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* FoodDex draws its single Pizza wallpaper through the white 20%-mask above.
    Suppress the generic wallpaper layer so the original dark SVG cannot be
    rendered a second time underneath it. */
-:root[data-seite="food-log"]:not([data-theme="dark"]) .food-dex-page .kategorie-scrollinhalt{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
   background-image:none!important;
 }
 
@@ -5823,16 +5823,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* FoodDex Aktionsmenü: gleiche Materialität wie die Karten, aber kompakt und
    eindeutig bedienbar. */
-.food-dex-page .food-dex-action-popover,
-.food-dex-entry-view .food-dex-action-popover{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover),
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover){
   min-width:224px!important;
   padding:6px!important;
   border-width:2px!important;
   border-radius:16px!important;
   box-shadow:0 3.5px 0 #000!important;
 }
-.food-dex-page .food-dex-action-popover button,
-.food-dex-entry-view .food-dex-action-popover button{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button,
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button{
   appearance:none!important;
   -webkit-appearance:none!important;
   display:grid!important;
@@ -5855,18 +5855,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:-.025em!important;
   text-align:left!important;
 }
-.food-dex-page .food-dex-action-popover button+button,
-.food-dex-entry-view .food-dex-action-popover button+button{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button+button,
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button+button{
   border-top:1px solid #000!important;
 }
-.food-dex-page .food-dex-action-popover button:active,
-.food-dex-entry-view .food-dex-action-popover button:active{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button:active,
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button:active{
   background:transparent!important;
 }
-.food-dex-page .food-dex-action-popover .material-svg,
-.food-dex-page .food-dex-action-popover svg,
-.food-dex-entry-view .food-dex-action-popover .material-svg,
-.food-dex-entry-view .food-dex-action-popover svg{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) .material-svg,
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) svg,
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) .material-svg,
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) svg{
   width:19px!important;
   height:19px!important;
   margin:auto!important;
@@ -5876,8 +5876,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* FoodDex Floating-Actions: feste Geometrie fuer Seite und Detailansicht.
    Das Menue liegt absolut ueber den Buttons und darf die Button-Spalte beim
    Oeffnen nicht verschieben. */
-.food-dex-page .food-dex-floating-actions,
-.food-dex-entry-view .food-dex-floating-actions{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-floating-actions,.food-dex-floating-actions),
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-floating-actions,.food-dex-floating-actions){
   position:fixed!important;
   z-index:70!important;
   right:20px!important;
@@ -5889,8 +5889,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   gap:10px!important;
   inline-size:50px!important;
 }
-.food-dex-page .food-dex-action-button,
-.food-dex-entry-view .food-dex-action-button{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-button,.food-dex-action-button),
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button){
   box-sizing:border-box!important;
   display:grid!important;
   place-items:center!important;
@@ -5908,18 +5908,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:none;
   -webkit-tap-highlight-color:transparent;
 }
-.food-dex-page .food-dex-action-button :is(.material-svg,svg,svg *),
-.food-dex-entry-view .food-dex-action-button :is(.material-svg,svg,svg *){
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *),
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *){
   color:currentColor!important;
   fill:currentColor!important;
 }
-.food-dex-page .food-dex-action-button:active,
-.food-dex-entry-view .food-dex-action-button:active{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-button,.food-dex-action-button):active,
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button):active{
   transform:translateY(2px)!important;
   box-shadow:0 1.5px 0 #000!important;
 }
-.food-dex-page .food-dex-action-popover,
-.food-dex-entry-view .food-dex-action-popover{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover),
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover){
   position:absolute!important;
   z-index:2!important;
   display:grid!important;
@@ -5935,20 +5935,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   bottom:calc(100% + 12px)!important;
   transform:none!important;
 }
-.food-dex-page .food-dex-action-popover[hidden],
-.food-dex-entry-view .food-dex-action-popover[hidden]{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover)[hidden],
+:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover)[hidden]{
   display:none!important;
 }
 
 /* FoodDex Feinschliff: Unter-Dex kompakter, Abschnittstitel ruhiger und genug
    Scroll-Luft, damit die schwebenden Buttons keine Karten hart verdecken. */
-.food-dex-page .kategorie-scrollinhalt{
+:is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
   padding-bottom:calc(156px + env(safe-area-inset-bottom))!important;
 }
-.food-dex-page .unter-sammlungen-block{
+:is(.neo-dex-page,.food-dex-page) .unter-sammlungen-block{
   margin:18px 0 22px!important;
 }
-.food-dex-page .unter-sammlungen-grid{
+:is(.neo-dex-page,.food-dex-page) .unter-sammlungen-grid{
   display:flex!important;
   grid-template-columns:none!important;
   gap:16px!important;
@@ -5961,42 +5961,42 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   scroll-padding-inline:18px;
   scrollbar-width:none;
 }
-.food-dex-page .unter-sammlungen-grid::-webkit-scrollbar{
+:is(.neo-dex-page,.food-dex-page) .unter-sammlungen-grid::-webkit-scrollbar{
   display:none;
 }
-.food-dex-page .dex-unterdex-fach{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach{
   flex:0 0 131px!important;
   width:131px!important;
   min-width:131px!important;
   min-height:92px!important;
 }
-.food-dex-page .dex-unterdex-fach .dex-ordner-test{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach .dex-ordner-test{
   min-height:92px!important;
   height:92px!important;
 }
-.food-dex-page .dex-unterdex-form{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-form{
   height:92px!important;
   inset:0 0 auto!important;
 }
-.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach .dex-ordner-inhalt{
   left:18px!important;
   right:12px!important;
   bottom:16px!important;
   gap:2px!important;
 }
-.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt h2{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach .dex-ordner-inhalt h2{
   font-size:12px!important;
   font-weight:650!important;
   letter-spacing:-.04em!important;
   line-height:1!important;
 }
-.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta b{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta b{
   font-size:13px!important;
 }
-.food-dex-page .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta span{
+:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach .dex-ordner-inhalt .dex-datensatz-meta span{
   font-size:8.5px!important;
 }
-.food-dex-page :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
+:is(.neo-dex-page,.food-dex-page) :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
   margin-bottom:14px!important;
   font-size:16px!important;
   font-weight:650!important;
