@@ -258,13 +258,21 @@ async function rootCollectionScope(userId, collectionId, signal) {
   return {
     scope: `collection-${root.id}`,
     color: root.color || categoryColor(root.root_key),
-    fallbackPattern: 'drops',
+    fallbackPattern: 'setometer-triangles',
+    fixedCustomLook: true,
   };
 }
 
 async function entryPageLook(entry, userId, signal) {
   const collectionScope = await rootCollectionScope(userId, entry.collection_id, signal);
   if (collectionScope) {
+    if (collectionScope.fixedCustomLook) {
+      return {
+        scope: collectionScope.scope,
+        color: collectionScope.color,
+        pattern: 'setometer-triangles',
+      };
+    }
     return {
       ...pageLook(collectionScope.scope, collectionScope.color, collectionScope.fallbackPattern || 'drops'),
       scope: collectionScope.scope,
@@ -344,8 +352,8 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   // Keep the originating page token active so the full entry page (including
   // the iOS safe-area) uses the same Dex background instead of the neutral
   // collection/cream fallback.
-  if (['food-log', 'training'].includes(entry.root_key)) {
-    document.documentElement.dataset.seite = entry.root_key;
+  if (['food-log', 'training', 'home'].includes(entry.root_key)) {
+    document.documentElement.dataset.seite = entry.root_key === 'home' ? 'custom-dex' : entry.root_key;
     // Die Aktionsleiste und Tapete werden damit aus exakt denselben Regeln
     // wie im FoodDex selbst gezeichnet. Nur die Menüaktionen unterscheiden
     // sich inhaltlich.

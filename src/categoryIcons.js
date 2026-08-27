@@ -119,8 +119,14 @@ const wallpaperPatterns = Object.entries(wallpaperModules).map(([path, url]) => 
   return [id, file.replaceAll('_', ' '), url];
 }).sort((a, b) => a[1].localeCompare(b[1], 'de'));
 
+// Dasselbe kleine Dreieckraster wie im LOGMAN Set-O-Meter. Anders als die
+// dekorative Dreieck.svg bleibt dieses Motiv ruhig und regelmaessig. Als
+// einfarbige Maske kann es je nach Dex-Farbe schwarz oder weiss erscheinen.
+const setOMeterTriangles = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23000'/%3E%3C/svg%3E";
+
 export const pagePatterns = [
   ...wallpaperPatterns,
+  ['setometer-triangles', 'Set-O-Meter-Dreiecke', setOMeterTriangles],
   ['none', 'Ohne Muster'],
 ];
 const defaultPagePattern = wallpaperPatterns[0]?.[0] || 'none';

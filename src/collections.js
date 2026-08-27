@@ -147,6 +147,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   const selectedIcon = existing?.icon_key || COLLECTION_ICONS.find((icon) => icon === 'create_new_folder') || COLLECTION_ICONS[0];
   const isSubDex = Boolean(parentId || existing?.parent_id) || rootKey !== 'home';
   const showIconPicker = !isSubDex;
+  const showColorPicker = !isSubDex;
   const editorTitle = existing ? 'Dex bearbeiten' : (isSubDex ? 'Neuer Unter-Dex' : 'Neuer Dex');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sammlung-editor-backdrop';
@@ -156,6 +157,8 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     <form data-collection-form>
       <div class="sammlung-editor-label"><label for="collection-name">Name</label><span data-name-count>${existing?.name?.length || 0}/40</span></div>
       <input class="input" id="collection-name" maxlength="40" required placeholder="z. B. Low Carb" value="${escapeHtml(existing?.name || '')}">
+      ${showColorPicker ? `<h3>Farbe</h3>
+        <div class="sammlung-editor-farben">${COLLECTION_COLORS.map((value) => `<button type="button" data-pick-color="${value}" class="${value.toUpperCase() === selectedColor.toUpperCase() ? 'aktiv ' : ''}${darkCollectionColor(value) ? 'farbe-dunkel' : ''}" style="--farbe:${value}" aria-label="Farbe ${value}"></button>`).join('')}</div>` : ''}
       ${showIconPicker ? `<h3>Icon</h3>
         <div class="sammlung-editor-icons">${COLLECTION_ICONS.map((icon) => `<button type="button" data-pick-icon="${icon}" class="${icon === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon}">${materialIconMarkup(icon)}</button>`).join('')}</div>
         <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>
@@ -169,6 +172,12 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   const close = () => closeEditor(backdrop);
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
+    const colorButton = event.target.closest('[data-pick-color]');
+    if (colorButton) {
+      color = colorButton.dataset.pickColor;
+      backdrop.querySelectorAll('[data-pick-color]').forEach((button) => button.classList.toggle('aktiv', button === colorButton));
+      return;
+    }
     const iconButton = event.target.closest('[data-pick-icon]');
     if (iconButton) {
       iconKey = iconButton.dataset.pickIcon;
