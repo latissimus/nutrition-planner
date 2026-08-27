@@ -2908,7 +2908,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
 .eigene-sammlung .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#111!important}
-.eigene-sammlung.dex-ordner-dunkel .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#fff!important}
 .tuck-karte.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
