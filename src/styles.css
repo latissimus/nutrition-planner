@@ -4419,6 +4419,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:slashed-zero;
   font-feature-settings:"zero" 1;
 }
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer span{
+  color:#fff;
+}
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter){
   gap:10px;
   margin-bottom:28px;

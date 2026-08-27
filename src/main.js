@@ -35,7 +35,7 @@ import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
+  applyPageLook, categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, mainDexFolderSvg, openCollectionEditor, saveCollection,
@@ -1492,6 +1492,10 @@ async function renderRoute() {
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
   } else if (route === 'training') {
     setSeite('training');
+    // A collection mutation remounts this route while the Supabase request is
+    // still pending. Paint the fixed Trainingdex surface immediately so the
+    // shared template fallback (#FBE7A3) can never flash in that gap.
+    applyPageLook('training', categoryColor('training'), 'wallpaper-dumbbell');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
     const childStats = await dexSammlungsStatistik(session.user.id, 'training', children, signal);
     if (signal?.aborted) return;
