@@ -691,7 +691,8 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
       // aussen auf die Kachel des uebergeordneten Dex.
       return () => settingsSheet(`collection-${item.id}`, refresh, {
         disableAppearance: isSubDex,
-        onRename: () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
+        appearanceLabel: isSubDex ? undefined : 'Icon ändern/umbenennen',
+        onRename: isSubDex ? () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }) : null,
         onEditAppearance: isSubDex ? null : () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
         onDelete: async () => {
           if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
@@ -1104,6 +1105,7 @@ function installNeoDexChrome(view, {
 async function mountCustomCollection(container, item, signal) {
   const customDexSkin = item.root_key === 'home';
   const neoDexSkin = ['food-log', 'training', 'home'].includes(item.root_key);
+  const isSubDex = Boolean(item.parent_id) || item.root_key !== 'home';
   const foodDexSkin = item.root_key === 'food-log';
   const trainingDexSkin = item.root_key === 'training';
   let lookRoot = item;
@@ -1162,11 +1164,12 @@ async function mountCustomCollection(container, item, signal) {
     onCreateSub: () => openCollectionEditor({
       userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.id, onSaved: refresh,
     }),
-    onRename: () => openCollectionEditor({
+    appearanceLabel: isSubDex ? undefined : 'Icon ändern/umbenennen',
+    onRename: isSubDex ? () => openCollectionEditor({
       userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
-    }),
-    disableAppearance: Boolean(item.parent_id) || item.root_key !== 'home',
-    onEditAppearance: (item.parent_id || item.root_key !== 'home') ? null : () => openCollectionEditor({
+    }) : null,
+    disableAppearance: isSubDex,
+    onEditAppearance: isSubDex ? null : () => openCollectionEditor({
       userId: item.user_id || session.user.id, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh,
     }),
     onSelect: () => startDexSelection(container, {

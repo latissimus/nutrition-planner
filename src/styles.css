@@ -2907,8 +2907,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
-.eigene-sammlung .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#111}
-.eigene-sammlung.dex-ordner-dunkel .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#fff}
+.eigene-sammlung .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#111!important}
+.eigene-sammlung.dex-ordner-dunkel .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#fff!important}
 .tuck-karte.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
@@ -6267,4 +6267,90 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-intro>span{
   color:color-mix(in srgb,var(--dex-ink,#fff) 78%,transparent);
+}
+
+/* Meal-Log Feinschliff: eine Tapete, streifenlose Karten und ausschliesslich
+   senkrechte Schatten wie bei den uebrigen Dex-Karten. */
+:root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt::before{
+  display:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.mahl-zeitblock,.nutrition-card,.mahl-status,.mahl-wasserkarte){
+  border-width:2px!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock::before,
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-stripe{
+  display:none!important;
+}
+
+/* Die Mahlzeiten-Info ist ein ruhiges Inline-Akkordeon. Der Chevron dreht
+   sich mit dem Zustand; nur die eigentliche Bearbeitung bleibt im Sheet. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info{
+  width:28px;height:28px;margin-left:4px;border:0;border-radius:0;
+  background:transparent!important;color:var(--ink);box-shadow:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info svg{
+  width:19px;height:19px;transition:transform .18s ease;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info[aria-expanded="true"] svg{
+  transform:rotate(180deg);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel[hidden]{display:none!important}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
+  padding:12px 14px;border-bottom:1px solid var(--app-divider);
+  background:color-mix(in srgb,var(--ordner) 9%,var(--surface));
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel p{
+  margin:0;color:var(--muted);font:500 12px/1.45 "Work Sans",var(--ui),sans-serif;
+  white-space:pre-wrap;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel button{
+  min-height:38px;padding:7px 10px;border:1.5px solid #000;border-radius:9px;
+  background:var(--ordner);color:var(--dex-ink,#fff);box-shadow:0 3px 0 #000;
+  font:700 11px/1 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel button:active{
+  transform:translateY(2px);box-shadow:0 1px 0 #000;
+}
+
+/* Alle bereits farbcodierten Meal-Log-Elemente greifen auf dieselbe feste
+   Indigo-Akzentfarbe und deren berechneten Kontrasttext zurueck. */
+:root[data-seite="reminders"] :is(
+  .rem-speichern,.rem-eigenes-emoji .btn,.rem-push-test,.rem-push-activate,
+  .rem-erledigt-btn.ist-aktiv,.nutrition-search-results>button>span.nutrition-food-platzhalter,
+  .nutrition-product-slot-icon,.mahl-wasser-icon
+){
+  background:var(--ordner)!important;color:var(--dex-ink,#fff)!important;
+}
+:root[data-seite="reminders"] :is(.rem-row-dot,.rem-row-dot[data-type="supplement"],.rem-row-dot[data-type="drink"],.rem-row-dot[data-type="body"]){
+  background:var(--ordner)!important;
+}
+:root[data-seite="reminders"] :is(.rem-switch input:checked~.rem-switch-thumb,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.nutrition-tracking-toggle input:checked+.nutrition-switch-track){
+  background:var(--ordner)!important;
+}
+:root[data-seite="reminders"] .nutrition-portionen button.aktiv{
+  background:var(--ordner)!important;border-color:#000!important;color:var(--dex-ink,#fff)!important;
+}
+
+/* Work Sans traegt Hierarchie und Fliesstext; technische Zeiten und Werte
+   bleiben in Space Mono. */
+:root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt{
+  font-family:"Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .mahl-zeitblock>header h2,.nutrition-period h3,.nutrition-card h2,.nutrition-card h3,
+  .rem-row-titel b,.nutrition-entry b,.nutrition-tracking-toggle b
+){
+  font-family:"Work Sans",var(--ui),sans-serif!important;font-style:normal!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.mahl-zeitblock>header h2,.nutrition-period h3,.nutrition-card h2,.nutrition-card h3){
+  font-weight:700!important;letter-spacing:-.02em!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .mahl-slot-zeit input,.rem-row-zeit,.nutrition-balance strong,.nutrition-ring>span,
+  .nutrition-macros small,.nutrition-entry>strong
+){
+  font-family:"Space Mono",var(--tech),monospace!important;
+  font-variant-numeric:slashed-zero tabular-nums;font-feature-settings:"zero" 1;
 }

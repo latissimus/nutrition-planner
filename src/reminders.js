@@ -626,7 +626,7 @@ function reminderGroups(reminders, completions) {
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     return `<section class="mahl-zeitblock">
       <header class="mahl-slot-kopf">
-        <div class="mahl-slot-titel"><h2>${title}</h2>${slotReminder ? `<button type="button" class="mahl-slot-info${(slotReminder.metadata?.notiz || '').trim() ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Info zu ${title}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>` : ''}</div>
+        <div class="mahl-slot-titel"><h2>${title}</h2>${slotReminder ? `<button type="button" class="mahl-slot-info${(slotReminder.metadata?.notiz || '').trim() ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Info zu ${title} aufklappen" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>` : ''}</div>
         ${slotReminder ? `<div class="mahl-slot-rechts">
           <label class="mahl-mini-switch" aria-label="${title} aktivieren">
             <input type="checkbox" data-slot-active data-slot-key="${slotReminder._key || slotReminder.id}"${slotReminder.active ? ' checked' : ''}>
@@ -635,6 +635,10 @@ function reminderGroups(reminders, completions) {
           <label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>
         </div>` : ''}
       </header>
+      ${slotReminder ? `<div class="mahl-slot-info-panel" data-slot-info-panel="${slotReminder._key || slotReminder.id}" hidden>
+        <p>${(slotReminder.metadata?.notiz || '').trim() ? escapeHtml(slotReminder.metadata.notiz) : 'Noch keine Info für diese Mahlzeit hinterlegt.'}</p>
+        <button type="button" data-slot-info-edit data-slot-key="${slotReminder._key || slotReminder.id}">Info bearbeiten</button>
+      </div>` : ''}
       <div class="mahl-timeline"><div data-period-reminders>${rows.length
         ? rows.map((reminder) => reminderRowMarkup(reminder, completionByReminder.get(reminder.id))).join('')
         : '<p class="mahl-leerzeile" data-reminder-empty>Noch keine Einträge</p>'}</div>
@@ -741,7 +745,6 @@ export async function mountReminders(container, { session, signal }) {
         <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
       </div>
       <section class="mahl-intro">
-        <b>TAGESPLAN</b>
         <span>Kalorien, Mahlzeiten, Supplements und Trinkintervalle an einem Ort.</span>
       </section>
       <div data-nutrition-root></div>
@@ -1164,13 +1167,23 @@ export async function mountReminders(container, { session, signal }) {
   };
 
   list.addEventListener('click', (event) => {
+    const editButton = event.target.closest('[data-slot-info-edit]');
+    if (editButton) {
+      event.preventDefault();
+      const reminder = reminders.find((r) => (r._key || r.id) === editButton.dataset.slotKey);
+      if (reminder) openSlotInfo(reminder);
+      return;
+    }
     const infoButton = event.target.closest('[data-slot-info]');
     if (!infoButton) return;
     event.preventDefault();
     event.stopPropagation();
-    const key = infoButton.dataset.slotKey;
-    const reminder = reminders.find((r) => (r._key || r.id) === key);
-    if (reminder) openSlotInfo(reminder);
+    const panel = list.querySelector(`[data-slot-info-panel="${infoButton.dataset.slotKey}"]`);
+    if (!panel) return;
+    const open = panel.hidden;
+    panel.hidden = !open;
+    infoButton.setAttribute('aria-expanded', String(open));
+    infoButton.setAttribute('aria-label', `Info ${open ? 'zuklappen' : 'aufklappen'}`);
   });
 
   bindLongPress(list, '.rem-row:not([data-type="drink"])', (row) => {

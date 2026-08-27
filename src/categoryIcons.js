@@ -448,7 +448,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
-      ${showAppearance ? `<button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>Icon ändern</span></button>` : ''}
+      ${showAppearance ? `<button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${escapeHtml(actions.appearanceLabel || 'Icon ändern')}</span></button>` : ''}
       ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
       ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
