@@ -5962,17 +5962,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:60px!important;
   height:60px!important;
   overflow:visible!important;
+  filter:none!important;
+}
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary)>.material-svg>svg .add-surface{
+  fill:var(--dex-seitenfarbe,var(--food-page-purple))!important;
+  stroke:none!important;
   filter:drop-shadow(0 3.5px 0 #000)!important;
 }
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary)>.material-svg>svg path{
-  fill:var(--dex-seitenfarbe,var(--food-page-purple))!important;
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary)>.material-svg>svg path:not(.add-surface){
+  fill:#000!important;
   stroke:#000!important;
+  filter:none!important;
 }
 :is(.neo-dex-page,.food-dex-page) .neo-dex-action-button.neo-dex-action-primary:active,
 :is(.neo-dex-page,.food-dex-page) .food-dex-action-button.food-dex-action-primary:active{
   box-shadow:none!important;
 }
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary):active>.material-svg>svg{
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary):active>.material-svg>svg .add-surface{
   filter:drop-shadow(0 1.5px 0 #000)!important;
 }
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *),
