@@ -6462,6 +6462,155 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   }
 }
 
+/* Tatsächliche COIN-DEX-Übertragung statt bloßer Stilzitate. */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
+  display:grid;
+  grid-template-columns:82px minmax(0,1fr);
+  align-items:center;
+  gap:17px;
+  margin-bottom:18px;
+  padding:18px;
+  border:2px solid #111;
+  border-radius:18px;
+  background:color-mix(in srgb,var(--ordner) 12%,#fff);
+  color:#111;
+  box-shadow:0 3.5px 0 #000;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring{
+  width:76px;
+  height:76px;
+  margin:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value{
+  display:grid;
+  min-width:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value small{
+  color:#111;
+  font:800 11px/1.1 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.08em;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value strong{
+  margin-top:3px;
+  color:#111;
+  font-family:var(--tech);
+  font-size:clamp(36px,11vw,48px);
+  font-weight:800;
+  line-height:.98;
+  font-variant-numeric:tabular-nums;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value b{
+  margin-top:3px;
+  color:#111;
+  font:750 13px/1.1 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.035em;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview{
+  display:block;
+  margin-bottom:14px;
+  overflow:hidden;
+  border:1.5px solid #111;
+  border-radius:15px;
+  background:#fff;
+  color:#111;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 15px;
+  cursor:pointer;
+  list-style:none;
+  background:color-mix(in srgb,var(--ordner) 8%,#fff);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary::-webkit-details-marker{
+  display:none;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary>span{
+  display:grid;
+  gap:3px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary b{
+  font:750 16px/1.1 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary small{
+  color:#626978;
+  font-family:var(--tech);
+  font-size:11px;
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary .material-svg,
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary svg{
+  width:19px;
+  height:19px;
+  fill:#111;
+  transition:transform .18s ease;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview[open]>summary .material-svg{
+  transform:rotate(90deg);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview-body{
+  border-top:1px solid rgba(0,0,0,.18);
+  background:#fff;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview .nutrition-day-nav{
+  border-bottom:1px solid rgba(0,0,0,.16);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-adaptive-teaser{
+  min-height:0;
+  margin:0 0 18px;
+  padding:14px 15px;
+  border:0;
+  border-radius:14px;
+  background:color-mix(in srgb,var(--ordner) 17%,#fff);
+  box-shadow:none;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-adaptive-teaser>i{
+  border:0;
+  background:transparent;
+  color:#111;
+}
+
+/* Mahlzeiten entsprechen den flachen Belohnungskarten des COIN-DEX. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock{
+  border:1.5px solid #111!important;
+  border-radius:15px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+  background:#fff;
+}
+
+/* Die globale Dex-Geometrie ist hier stimmiger als die testweise verkleinerte
+   Variante und bleibt mit den übrigen System-Dex konsistent. */
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-floating-actions,.food-dex-floating-actions){
+  right:20px!important;
+  grid-template-columns:50px!important;
+  gap:10px!important;
+  inline-size:50px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-action-button,.food-dex-action-button){
+  width:50px!important;
+  min-width:50px!important;
+  height:50px!important;
+  min-height:50px!important;
+  border-radius:13px!important;
+}
+@media(max-width:370px){
+  :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
+    grid-template-columns:70px minmax(0,1fr);
+    gap:13px;
+    padding:15px;
+  }
+  :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring{
+    width:68px;
+    height:68px;
+  }
+}
+
 /* Die im Gerätebild sichtbaren Restwerte: Aktionskacheln,
    Supplement-Dosierungen und die komplette Nährwertzeile. */
 :root[data-seite="reminders"] :is(

@@ -162,32 +162,38 @@ function summaryMarkup(state, date) {
   const dayStatus = state.dayStatus?.excluded
     ? 'Sondertag'
     : state.dayStatus?.complete ? 'Vollständig' : 'Noch offen';
-  return `<section class="nutrition-card" data-nutrition-card style="--ordner-ink:${ordnerInk}">
-    <div class="nutrition-stripe"></div>
-    ${trackingToggleMarkup(true)}
-    <header class="nutrition-day-nav">
-      <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag" class="nutrition-day-nav-prev">${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
-      <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
-      <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
-    </header>
-    <div class="nutrition-balance">
-      <div><small>${target ? (over ? 'ÜBER ZIEL' : 'NOCH OFFEN') : 'HEUTE'}</small><strong>${target ? decimal(over || remaining) : decimal(kcal)} <i>kcal</i></strong></div>
-      <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
-    </div>
-    <div class="nutrition-macros">
-      ${[['Protein', protein], ['Carbs', carbs], ['Fett', fat]].map(([label, value]) => `<div><span><b>${label}</b><small>${decimal(value)} g</small></span></div>`).join('')}
-    </div>
-    <div class="nutrition-quick-actions">
-      <button type="button" data-open-nutrition-calculator>
-        <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
-        ${materialIconMarkup('edit')}
-      </button>
-      <button type="button" data-open-nutrition-day-status>
-        <span><small>PROTOKOLL</small><b>${dayStatus}</b></span>
-        ${materialIconMarkup('select_check_box')}
-      </button>
-    </div>
+  return `${trackingToggleMarkup(true)}
+  <section class="nutrition-coin-hero" data-nutrition-card style="--ordner-ink:${ordnerInk}">
+    <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
+    <span class="nutrition-coin-hero-value">
+      <small>${target ? (over ? 'ÜBER ZIEL' : 'NOCH OFFEN') : 'HEUTE PROTOKOLLIERT'}</small>
+      <strong>${target ? decimal(over || remaining) : decimal(kcal)}</strong>
+      <b>KCAL</b>
+    </span>
   </section>
+  <details class="nutrition-coin-overview">
+    <summary><span><b>TAGESÜBERSICHT</b><small>${dateLabel(date)} · ${dateFromKey(date).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
+    <div class="nutrition-coin-overview-body">
+      <header class="nutrition-day-nav">
+        <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag" class="nutrition-day-nav-prev">${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
+        <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
+        <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
+      </header>
+      <div class="nutrition-macros">
+        ${[['Protein', protein], ['Carbs', carbs], ['Fett', fat]].map(([label, value]) => `<div><span><b>${label}</b><small>${decimal(value)} g</small></span></div>`).join('')}
+      </div>
+      <div class="nutrition-quick-actions">
+        <button type="button" data-open-nutrition-calculator>
+          <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
+          ${materialIconMarkup('edit')}
+        </button>
+        <button type="button" data-open-nutrition-day-status>
+          <span><small>PROTOKOLL</small><b>${dayStatus}</b></span>
+          ${materialIconMarkup('select_check_box')}
+        </button>
+      </div>
+    </div>
+  </details>
     <button class="nutrition-adaptive-teaser" type="button" data-open-nutrition-adaptive>
       <span><b>Kalorien-Kalibrierung</b><small>${escapeHtml(adaptiveStatusText(adaptive.result))}</small></span>
       <i aria-hidden="true">i</i>
