@@ -6460,13 +6460,85 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
     font-size:14px!important;
   }
-  :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch-track{
-    width:34px;
+}
+
+/* Korrekturen nach der Geräteprüfung: Mahlzeitennamen gehören zur
+   Marken-Hierarchie, technische Werte dagegen ausnahmslos zur Mono-Ebene. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:16px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  letter-spacing:-.015em!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch-track{
+  flex:0 0 38px;
+  width:38px;
+  min-width:38px;
+  height:22px;
+  min-height:22px;
+  aspect-ratio:auto;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch-track::after{
+  width:16px;
+  min-width:16px;
+  height:16px;
+  min-height:16px;
+  aspect-ratio:1;
+  border-radius:50%;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+  transform:translateX(16px);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+  width:72px;
+  height:30px!important;
+  min-height:30px!important;
+  color:#555c69!important;
+  font-family:"Space Mono",var(--tech),monospace!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:30px!important;
+  font-variant-numeric:slashed-zero tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input::-webkit-date-and-time-value{
+  height:30px!important;
+  line-height:30px!important;
+}
+
+/* Sheets werden direkt an body gehängt und lagen deshalb außerhalb der
+   bisherigen Meal-Log-Kaskade. Diese Regel deckt Seite und Overlays ab. */
+:root[data-seite="reminders"] :is(
+  .mahl-slot-zeit input,.rem-row-zeit,.nutrition-day-nav small,
+  .nutrition-balance strong,.nutrition-balance strong i,
+  .nutrition-ring>span,.nutrition-ring>span small,.nutrition-macros small,
+  .nutrition-entry>strong,.nutrition-entry-head>strong,
+  .nutrition-calculation b,.nutrition-calculation i,
+  .nutrition-product-result b,.nutrition-product-result span,
+  .nutrition-product-head span,.nutrition-portionen small,
+  .nutrition-search-results strong,.nutrition-recent strong,.nutrition-recent small,
+  .nutrition-adaptive-values b,.nutrition-unit-field input,.nutrition-unit-field i,
+  .nutrition-gram-picker,.nutrition-gram-input>i,
+  .nutrition-anzahl-row>.input,.nutrition-anzahl-row>b,
+  .nutrition-period-inline>header b,.mahl-status b,.mahl-wasserkarte b
+){
+  font-family:"Space Mono",var(--tech),monospace!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
+:root[data-seite="reminders"] :is(.meal-log-dex-page,.nutrition-sheet,.reminder-overlay) input:is(
+  [type="time"],[type="date"],[type="number"],[inputmode="numeric"],[inputmode="decimal"]
+){
+  font-family:"Space Mono",var(--tech),monospace!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
+@media(max-width:390px){
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
+    font-size:15px!important;
   }
-  :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch-track::after{
-    width:16px;
-  }
-  :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
-    transform:translateX(12px);
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-rechts{
+    gap:7px;
   }
 }
