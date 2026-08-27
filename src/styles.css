@@ -6235,6 +6235,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Module erhalten; Tapete, Titel und Bedienung folgen dem gemeinsamen Skin. */
 :root[data-seite="reminders"],
 :root[data-seite="reminders"] body{
+  --tech:"Space Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --food-page-purple:var(--dex-seitenfarbe,#525CEB);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Burger.svg"));
   background-color:var(--dex-seitenfarbe,#525CEB)!important;
@@ -6459,6 +6460,112 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   }
   :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
     font-size:14px!important;
+  }
+}
+
+/* Die im Gerätebild sichtbaren Restwerte: Aktionskacheln,
+   Supplement-Dosierungen und die komplette Nährwertzeile. */
+:root[data-seite="reminders"] :is(
+  .nutrition-quick-actions b,
+  .nutrition-entry-head .rem-row-titel>small,
+  .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-titel>small:not(.rem-row-art),
+  .nutrition-period>header span,
+  .nutrition-form-hint,
+  .nutrition-product-head small,
+  .nutrition-own-select small
+){
+  font-family:"Space Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
+:root[data-seite="reminders"] .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-titel>small:not(.rem-row-art),
+:root[data-seite="reminders"] .nutrition-entry-head .rem-row-titel>small{
+  font-size:12px!important;
+  font-weight:400!important;
+  line-height:1.35!important;
+}
+
+/* Die Tagesübersicht bleibt vollständig, nimmt aber deutlich weniger Höhe
+   ein und erhält eine klarere, FAQ-artige vertikale Hierarchie. */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-tracking-toggle{
+  min-height:62px;
+  padding:10px 18px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav{
+  padding:8px 16px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav button{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav small{
+  margin-top:5px;
+  font-size:12px;
+  font-weight:400;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-balance{
+  grid-template-columns:minmax(0,1fr) 82px;
+  padding:14px 18px 11px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-balance strong{
+  font-size:29px;
+  line-height:1;
+  letter-spacing:-.035em;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-ring{
+  width:76px;
+  height:76px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-ring>span{
+  font-size:15px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-macros{
+  gap:8px;
+  padding:0 18px 11px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-macros>div{
+  padding:8px 10px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-quick-actions{
+  gap:8px;
+  padding:0 18px 12px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-quick-actions>button{
+  min-height:58px;
+  padding:9px 11px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-adaptive-teaser{
+  min-height:64px;
+  padding:10px 18px 12px;
+}
+
+/* In der Mahlzeitenzeile bekommen alle vier Elemente einen verlässlichen
+   Platz; so wird weder der Toggle noch die Uhrzeit vom Chevron gequetscht. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+  grid-template-columns:minmax(0,1fr) auto 30px;
+  gap:12px;
+  padding-right:14px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-rechts{
+  flex:0 0 auto;
+  gap:12px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit{
+  flex:0 0 72px;
+  width:72px;
+}
+@media(max-width:390px){
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+    gap:8px;
+    padding-right:10px;
+  }
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-rechts{
+    gap:7px;
+  }
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit,
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+    width:68px;
   }
 }
 
