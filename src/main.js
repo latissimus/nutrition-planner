@@ -1457,7 +1457,7 @@ async function renderRoute() {
     });
     installNeoDexChrome(view, {
       title: 'Meal-Log',
-      meta: reminderActions?.meta || '0 Zeitfenster',
+      meta: reminderActions?.meta || '5 Mahlzeiten',
       closeHref: '#home',
       editLabel: 'Meal-Log bearbeiten',
       infoKind: 'meal',

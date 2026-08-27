@@ -6348,8 +6348,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
   .mahl-slot-zeit input,.rem-row-zeit,.nutrition-balance strong,.nutrition-ring>span,
-  .nutrition-macros small,.nutrition-entry>strong
+  .nutrition-macros small,.nutrition-entry>strong,.nutrition-entry-head>strong,
+  .nutrition-calculation b,.nutrition-calculation i,.nutrition-product-result b,
+  .nutrition-product-result span,.nutrition-product-head span,.nutrition-portionen small,
+  .nutrition-search-results strong,.nutrition-recent strong,.nutrition-recent small,
+  .nutrition-adaptive-values b,.nutrition-unit-field input,.nutrition-unit-field i,
+  .nutrition-gram-picker,.nutrition-gram-input>i,.nutrition-anzahl-row>.input,
+  .nutrition-anzahl-row>b,.nutrition-day-nav small,.mahl-status b,.mahl-wasserkarte b
 ){
+  font-family:"Space Mono",var(--tech),monospace!important;
+  font-variant-numeric:slashed-zero tabular-nums;font-feature-settings:"zero" 1;
+}
+:root[data-seite="reminders"] .meal-log-dex-page input:is([type="time"],[type="date"],[type="number"],[inputmode="numeric"],[inputmode="decimal"]){
   font-family:"Space Mono",var(--tech),monospace!important;
   font-variant-numeric:slashed-zero tabular-nums;font-feature-settings:"zero" 1;
 }

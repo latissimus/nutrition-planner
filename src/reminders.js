@@ -113,14 +113,6 @@ const mealSlotForReminder = (item) => {
   return 'dinner';
 };
 
-function mealLogMeta(reminders = []) {
-  const slots = new Set();
-  reminders.filter((item) => item.active).forEach((item) => {
-    if (item.type === 'drink') slots.add('drink');
-    else slots.add(mealSlotForReminder(item));
-  });
-  return `${slots.size} ${slots.size === 1 ? 'Zeitfenster' : 'Zeitfenster'}`;
-}
 const einheitLabel = (value) => ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' })[value] || value;
 
 function nextDrinkSlot(reminder, now) {
@@ -744,9 +736,6 @@ export async function mountReminders(container, { session, signal }) {
         </div>
         <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
       </div>
-      <section class="mahl-intro">
-        <span>Kalorien, Mahlzeiten, Supplements und Trinkintervalle an einem Ort.</span>
-      </section>
       <div data-nutrition-root></div>
       <section data-reminders-card>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
@@ -764,7 +753,7 @@ export async function mountReminders(container, { session, signal }) {
     list.innerHTML = reminderGroups(reminders, completions);
     nutritionActions?.renderIntegrated?.();
     const meta = container.querySelector('[data-food-scroll-meta]');
-    if (meta) meta.textContent = mealLogMeta(reminders);
+    if (meta) meta.textContent = '5 Mahlzeiten';
   };
   const rerenderRow = (key) => {
     const row = list.querySelector(`[data-reminder-key="${key}"]`);
@@ -1250,7 +1239,7 @@ export async function mountReminders(container, { session, signal }) {
   await nutritionPromise;
   nutritionActions?.renderIntegrated?.();
   return {
-    meta: mealLogMeta(reminders),
+    meta: '5 Mahlzeiten',
     openAddMenu() {
       document.querySelector('.mahl-add-backdrop')?.remove();
       const backdrop = document.createElement('div');
