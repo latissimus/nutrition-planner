@@ -6696,6 +6696,177 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:tabular-nums!important;
   font-feature-settings:normal!important;
 }
+
+/* Meal-Log Finalhierarchie: ein Hauptstatus, danach flache Informationen.
+   Keine Kacheln in der Kachel und keine dauerhaft sichtbare Systemeinstellung. */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-tracking-control{
+  display:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-card{
+  margin-bottom:12px!important;
+  background:color-mix(in srgb,var(--ordner) 5%,#fff)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav{
+  min-height:50px;
+  padding:6px 14px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav button{
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav b{
+  font-size:14px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-day-nav small{
+  margin-top:2px;
+  font-size:11px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-balance{
+  padding:15px 18px 14px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-macros{
+  gap:0;
+  padding:0;
+  border-top:1px solid var(--app-divider);
+  border-bottom:1px solid var(--app-divider);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-macros>div{
+  padding:11px 14px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-macros>div+div{
+  border-left:1px solid var(--app-divider);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-quick-actions{
+  gap:0;
+  padding:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-quick-actions>button{
+  min-height:58px;
+  padding:10px 16px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-quick-actions>button+button{
+  border-left:1px solid var(--app-divider);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-adaptive-teaser{
+  width:100%;
+  min-height:66px;
+  margin:0 0 14px;
+  padding:11px 16px;
+  border:1.5px solid #111;
+  border-radius:15px;
+  background:#fff;
+  box-shadow:none;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-adaptive-teaser>i{
+  width:34px;
+  height:34px;
+  font-size:18px;
+}
+
+/* Mahlzeitenkopf: Uhrzeit ist Meta unter dem Namen. Rechts stehen nur noch
+   der unverzerrte Aktiv-Schalter und der Aufklapp-Chevron. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+  grid-template-columns:minmax(0,1fr) auto 28px;
+  gap:12px;
+  min-height:66px;
+  padding:9px 13px 9px 17px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-titel{
+  display:grid;
+  align-content:center;
+  gap:3px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit{
+  display:block;
+  width:76px;
+  min-height:18px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+  width:76px;
+  height:18px!important;
+  min-height:18px!important;
+  padding:0;
+  color:#626978!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  line-height:18px!important;
+  text-align:left;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input::-webkit-date-and-time-value{
+  height:18px!important;
+  line-height:18px!important;
+  text-align:left;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-rechts{
+  gap:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info{
+  width:28px;
+  height:36px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info svg{
+  width:20px;
+  height:20px;
+}
+
+/* Innen ist jede Mahlzeit eine zusammenhängende Liste. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-timeline .rem-row-head,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry>.nutrition-entry-head{
+  min-height:60px;
+  padding-top:9px;
+  padding-bottom:9px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-timeline .rem-row+
+.rem-row,
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-entry+
+.nutrition-entry{
+  border-top:1px solid rgba(0,0,0,.14);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-period-inline{
+  border-top:1px solid rgba(0,0,0,.14);
+}
+
+/* Die etablierte Dreierleiste bleibt erhalten, überdeckt im datenreichen
+   Meal-Log aber weniger Inhalt. */
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-floating-actions,.food-dex-floating-actions){
+  right:12px!important;
+  grid-template-columns:46px!important;
+  gap:8px!important;
+  inline-size:46px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-action-button,.food-dex-action-button){
+  width:46px!important;
+  min-width:46px!important;
+  height:46px!important;
+  min-height:46px!important;
+  border-radius:12px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg){
+  width:20px!important;
+  height:20px!important;
+}
+@media(max-width:390px){
+  :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+    gap:8px;
+    padding-left:14px;
+    padding-right:9px;
+  }
+  :root[data-seite="reminders"] .meal-log-dex-page .nutrition-balance{
+    padding-inline:14px;
+  }
+  :root[data-seite="reminders"] .meal-log-dex-page .nutrition-macros>div{
+    padding-inline:10px;
+  }
+}
 :root[data-seite="reminders"] :is(.meal-log-dex-page,.nutrition-sheet,.reminder-overlay) input:is(
   [type="time"],[type="date"],[type="number"],[inputmode="numeric"],[inputmode="decimal"]
 ){

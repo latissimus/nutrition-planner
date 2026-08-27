@@ -144,18 +144,12 @@ function progress(value, target) { return target ? Math.min(100, Math.max(0, val
 function nutritionEnabled(state) { return state.settings?.tracking_enabled !== false; }
 
 function trackingToggleMarkup(enabled) {
-  return `<label class="nutrition-tracking-toggle">
-    <span><b>Kalorien zählen</b><small>Konkrete Mahlzeiten und Makros protokollieren</small></span>
-    <input type="checkbox" data-nutrition-enabled${enabled ? ' checked' : ''}>
-    <i class="nutrition-switch-track" aria-hidden="true"></i>
-  </label>`;
+  return `<input class="nutrition-tracking-control" type="checkbox" data-nutrition-enabled${enabled ? ' checked' : ''} hidden>`;
 }
 
 function summaryMarkup(state, date) {
   const enabled = nutritionEnabled(state);
-  if (!enabled) return `<section class="nutrition-card nutrition-card-compact" data-nutrition-card>
-    <div class="nutrition-stripe"></div>${trackingToggleMarkup(false)}
-  </section>`;
+  if (!enabled) return trackingToggleMarkup(false);
   const kcal = rounded(total(state.entries, 'energy_kcal'));
   const protein = rounded(total(state.entries, 'protein_g'));
   const carbs = rounded(total(state.entries, 'carbs_g'));
@@ -193,11 +187,11 @@ function summaryMarkup(state, date) {
         ${materialIconMarkup('select_check_box')}
       </button>
     </div>
+  </section>
     <button class="nutrition-adaptive-teaser" type="button" data-open-nutrition-adaptive>
       <span><b>Kalorien-Kalibrierung</b><small>${escapeHtml(adaptiveStatusText(adaptive.result))}</small></span>
       <i aria-hidden="true">i</i>
-    </button>
-  </section>`;
+    </button>`;
 }
 
 function adaptiveModel(state, calculated, target) {

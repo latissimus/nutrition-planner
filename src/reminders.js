@@ -618,13 +618,14 @@ function reminderGroups(reminders, completions) {
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
     return `<section class="mahl-zeitblock">
       <header class="mahl-slot-kopf">
-        <div class="mahl-slot-titel"><h2>${title}</h2></div>
+        <div class="mahl-slot-titel"><h2>${title}</h2>
+          ${slotReminder ? `<label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
+        </div>
         ${slotReminder ? `<div class="mahl-slot-rechts">
           <label class="mahl-mini-switch" aria-label="${title} aktivieren">
             <input type="checkbox" data-slot-active data-slot-key="${slotReminder._key || slotReminder.id}"${slotReminder.active ? ' checked' : ''}>
             <i class="mahl-mini-switch-track" aria-hidden="true"></i>
           </label>
-          <label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>
         </div>
         <button type="button" class="mahl-slot-info${(slotReminder.metadata?.notiz || '').trim() ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Info zu ${title} aufklappen" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 9 7 7 7-7"/></svg></button>` : ''}
       </header>
