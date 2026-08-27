@@ -5938,42 +5938,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-tap-highlight-color:transparent;
 }
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary){
-  position:relative!important;
-  justify-self:start!important;
-  overflow:visible!important;
-  border:0!important;
-  background:transparent!important;
+  background:var(--dex-seitenfarbe,var(--food-page-purple))!important;
   color:var(--dex-ink,#000)!important;
-  box-shadow:none!important;
-}
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary)>.material-svg{
-  position:absolute!important;
-  left:0!important;
-  top:50%!important;
-  display:block!important;
-  width:60px!important;
-  height:60px!important;
-  overflow:visible!important;
-  transform:translateY(-50%)!important;
-  line-height:0!important;
-}
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary)>.material-svg>svg{
-  display:block!important;
-  width:60px!important;
-  height:60px!important;
-  overflow:visible!important;
-  filter:drop-shadow(0 3.5px 0 #000)!important;
-}
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary)>.material-svg>svg path{
-  fill:var(--dex-seitenfarbe,var(--food-page-purple))!important;
-  stroke:#000!important;
-}
-:is(.neo-dex-page,.food-dex-page) .neo-dex-action-button.neo-dex-action-primary:active,
-:is(.neo-dex-page,.food-dex-page) .food-dex-action-button.food-dex-action-primary:active{
-  box-shadow:none!important;
-}
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary):active>.material-svg>svg{
-  filter:drop-shadow(0 1.5px 0 #000)!important;
 }
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *),
 :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *){
