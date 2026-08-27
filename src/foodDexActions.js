@@ -7,6 +7,9 @@ import { materialIconMarkup } from './categoryIcons.js';
 export function foodDexActionsMarkup({
   panelContent,
   panelAttributes = '',
+  primaryContent = '',
+  primaryAttributes = '',
+  primaryLabel = 'Eintrag hinzufügen',
   menuAttributes = '',
   closeAttributes = '',
   closeHref,
@@ -17,6 +20,7 @@ export function foodDexActionsMarkup({
     <div class="neo-dex-action-popover food-dex-action-popover" hidden ${panelAttributes}>
       ${panelContent}
     </div>
+    ${primaryContent ? `<button type="button" class="neo-dex-action-button neo-dex-action-primary food-dex-action-button food-dex-action-primary" ${primaryAttributes} aria-label="${primaryLabel}">${primaryContent}</button>` : ''}
     <button type="button" class="neo-dex-action-button neo-dex-retro-menu food-dex-action-button food-dex-retro-menu" ${menuAttributes} aria-expanded="false" aria-label="${menuLabel}">
       <span class="neo-dex-more-dots food-dex-more-dots" aria-hidden="true"><i></i><i></i><i></i></span>
     </button>

@@ -1037,9 +1037,11 @@ function installNeoDexChrome(view, {
   foodActions.innerHTML = foodDexActionsMarkup({
     panelAttributes: `role="menu" aria-label="${escapeHtml(title)} Aktionen"`,
     panelContent: `
-      <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
       <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>${escapeHtml(title)}-Info</span></button>
       <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>${escapeHtml(editLabel)}</span></button>`,
+    primaryContent: materialIconMarkup('place_item'),
+    primaryAttributes: 'data-food-action="add"',
+    primaryLabel: `Eintrag in ${escapeHtml(title)} hinzufügen`,
     menuAttributes: 'data-food-menu',
     closeHref: escapeHtml(closeHref),
     menuLabel: `${escapeHtml(title)} Menü`,
@@ -1053,7 +1055,6 @@ function installNeoDexChrome(view, {
     foodActionBar.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
   };
   foodActionBar.querySelector('[data-food-action="add"]').onclick = () => {
-    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
     foodAdd?.click();
   };
   foodActionBar.querySelector('[data-food-action="info"]').onclick = () => {

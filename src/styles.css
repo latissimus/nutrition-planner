@@ -4423,7 +4423,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-feature-settings:"zero" 1;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer span{
-  color:#fff;
+  color:rgba(255,255,255,.86);
+}
+:root[data-seite="training"] :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
+  color:rgba(255,255,255,.86)!important;
 }
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter){
   gap:10px;
@@ -5933,6 +5937,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:none;
   -webkit-tap-highlight-color:transparent;
 }
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary){
+  background:var(--dex-seitenfarbe,var(--food-page-purple))!important;
+  color:var(--dex-ink,#000)!important;
+}
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *),
 :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *){
   color:currentColor!important;
@@ -5968,7 +5976,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* FoodDex Feinschliff: Unter-Dex kompakter, Abschnittstitel ruhiger und genug
    Scroll-Luft, damit die schwebenden Buttons keine Karten hart verdecken. */
 :is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
-  padding-bottom:calc(156px + env(safe-area-inset-bottom))!important;
+  padding-bottom:calc(216px + env(safe-area-inset-bottom))!important;
 }
 :is(.neo-dex-page,.food-dex-page) .unter-sammlungen-block{
   margin:18px 0 22px!important;
