@@ -2907,6 +2907,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
 .dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
+.eigene-sammlung .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#111}
+.eigene-sammlung.dex-ordner-dunkel .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#fff}
 .tuck-karte.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
 .tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
@@ -4333,7 +4335,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   opacity:.06;
 }
 :root[data-seite="custom-dex"] :is(.neo-dex-page,.food-dex-page)::before{
-  opacity:.07;
+  opacity:.05;
   -webkit-mask-size:26px 26px;mask-size:26px 26px;
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page).dex-tapete-datei .kategorie-scrollinhalt::before,

@@ -723,15 +723,18 @@ function sammlungsKarten(daten = sammlungen, zaehler = {}) {
 }
 
 function eigeneSammlungsKarten(items, stats = new Map()) {
-  return items.map((item) => dexOrdnerKarte({
-    href: `#collection/${item.id}`,
-    titel: escapeHtml(item.name),
-    meta: `<b>${stats.get(item.id)?.entries || 0}</b><span>Einträge · ${stats.get(item.id)?.children || 0} Unter-Dex</span>`,
-    iconInhalt: collectionIconMarkup(item.icon_key),
-    farbe: item.color,
-    eigene: true,
-    collectionId: item.id,
-  })).join('');
+  return items.map((item) => {
+    const count = stats.get(item.id)?.entries || 0;
+    return dexOrdnerKarte({
+      href: `#collection/${item.id}`,
+      titel: escapeHtml(item.name),
+      meta: `<b>${count}</b><span>${count === 1 ? 'Eintrag' : 'Einträge'}</span>`,
+      iconInhalt: collectionIconMarkup(item.icon_key),
+      farbe: item.color,
+      eigene: true,
+      collectionId: item.id,
+    });
+  }).join('');
 }
 
 async function eigeneDexStatistik(userId, roots, signal) {
@@ -955,7 +958,7 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
     container.querySelectorAll('[data-collection-id]').forEach((karte) => {
       const meta = karte.querySelector('.dex-datensatz-meta');
       const stat = stats.get(karte.dataset.collectionId);
-      if (meta && stat) meta.innerHTML = `<b>${stat.entries}</b><span>Einträge · ${stat.children} Unter-Dex</span>`;
+      if (meta && stat) meta.innerHTML = `<b>${stat.entries}</b><span>${stat.entries === 1 ? 'Eintrag' : 'Einträge'}</span>`;
     });
   };
   const lokaleZaehlungsAenderung = () => { aktualisiereHomeZaehler().catch(() => {}); };
