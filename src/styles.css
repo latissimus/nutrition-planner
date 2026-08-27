@@ -6235,7 +6235,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Module erhalten; Tapete, Titel und Bedienung folgen dem gemeinsamen Skin. */
 :root[data-seite="reminders"],
 :root[data-seite="reminders"] body{
-  --tech:"Space Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --food-page-purple:var(--dex-seitenfarbe,#525CEB);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Burger.svg"));
   background-color:var(--dex-seitenfarbe,#525CEB)!important;
@@ -6334,7 +6333,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* Work Sans traegt Hierarchie und Fliesstext; technische Zeiten und Werte
-   bleiben in Space Mono. */
+   verwenden exakt denselben Technik-Font wie der COIN-DEX. */
 :root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt{
   font-family:"Work Sans",var(--ui),sans-serif;
 }
@@ -6357,11 +6356,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .nutrition-gram-picker,.nutrition-gram-input>i,.nutrition-anzahl-row>.input,
   .nutrition-anzahl-row>b,.nutrition-day-nav small,.mahl-status b,.mahl-wasserkarte b
 ){
-  font-family:"Space Mono",var(--tech),monospace!important;
+  font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero tabular-nums;font-feature-settings:"zero" 1;
 }
 :root[data-seite="reminders"] .meal-log-dex-page input:is([type="time"],[type="date"],[type="number"],[inputmode="numeric"],[inputmode="decimal"]){
-  font-family:"Space Mono",var(--tech),monospace!important;
+  font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero tabular-nums;font-feature-settings:"zero" 1;
 }
 
@@ -6397,7 +6396,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
   margin:0;
   color:#111!important;
-  font-family:"Space Mono",var(--tech),monospace!important;
+  font-family:var(--tech)!important;
   font-size:16px!important;
   font-weight:400!important;
   line-height:1.3!important;
@@ -6436,7 +6435,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel p{
   color:#626978;
-  font-family:"Space Mono",var(--tech),monospace;
+  font-family:var(--tech);
   font-size:12px;
   font-weight:400;
   line-height:1.55;
@@ -6474,7 +6473,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .nutrition-product-head small,
   .nutrition-own-select small
 ){
-  font-family:"Space Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace!important;
+  font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero tabular-nums!important;
   font-feature-settings:"zero" 1!important;
 }
@@ -6602,7 +6601,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   height:30px!important;
   min-height:30px!important;
   color:#555c69!important;
-  font-family:"Space Mono",var(--tech),monospace!important;
+  font-family:var(--tech)!important;
   font-size:13px!important;
   font-weight:700!important;
   line-height:30px!important;
@@ -6630,14 +6629,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .nutrition-anzahl-row>.input,.nutrition-anzahl-row>b,
   .nutrition-period-inline>header b,.mahl-status b,.mahl-wasserkarte b
 ){
-  font-family:"Space Mono",var(--tech),monospace!important;
+  font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero tabular-nums!important;
   font-feature-settings:"zero" 1!important;
 }
 :root[data-seite="reminders"] :is(.meal-log-dex-page,.nutrition-sheet,.reminder-overlay) input:is(
   [type="time"],[type="date"],[type="number"],[inputmode="numeric"],[inputmode="decimal"]
 ){
-  font-family:"Space Mono",var(--tech),monospace!important;
+  font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero tabular-nums!important;
   font-feature-settings:"zero" 1!important;
 }
@@ -6648,4 +6647,59 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-rechts{
     gap:7px;
   }
+}
+
+/* COIN-DEX als Kartenreferenz: eine hervorgehobene Tagesbilanz mit hartem,
+   rein senkrechtem Schatten; die wiederholten Mahlzeiten bleiben flacher. */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-card{
+  border:2px solid #111!important;
+  border-radius:18px!important;
+  background:color-mix(in srgb,var(--ordner) 7%,#fff)!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-tagesplan{
+  gap:12px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock{
+  border:1.5px solid #111!important;
+  border-radius:15px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+  min-height:64px;
+  padding-top:8px;
+  padding-bottom:8px;
+}
+
+/* Exakt die Zahlenfamilie des COIN-DEX. Wichtig: kein Webfont namens
+   "Space Mono" – COIN-DEX nutzt var(--tech), auf iOS ui-monospace/SF Mono
+   mit der charakteristischen gestrichenen Null. */
+:root[data-seite="reminders"] :is(
+  .mahl-slot-zeit input,.rem-row-zeit,
+  .nutrition-day-nav small,.nutrition-balance strong,.nutrition-balance strong i,
+  .nutrition-ring>span,.nutrition-ring>span small,.nutrition-macros small,
+  .nutrition-quick-actions b,.nutrition-entry-head>strong,
+  .nutrition-entry-head .rem-row-titel>small,
+  .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-titel>small:not(.rem-row-art),
+  .nutrition-calculation b,.nutrition-calculation i,
+  .nutrition-product-result b,.nutrition-product-result span,
+  .nutrition-product-head span,.nutrition-product-head small,
+  .nutrition-portionen small,.nutrition-search-results strong,
+  .nutrition-recent strong,.nutrition-recent small,.nutrition-adaptive-values b,
+  .nutrition-unit-field input,.nutrition-unit-field i,.nutrition-gram-picker,
+  .nutrition-gram-input>i,.nutrition-anzahl-row>.input,.nutrition-anzahl-row>b,
+  .nutrition-period-inline>header b,.nutrition-period>header span,
+  .mahl-status b,.mahl-wasserkarte b,.nutrition-own-select small
+){
+  font-family:var(--tech)!important;
+  font-variant-numeric:tabular-nums!important;
+  font-feature-settings:normal!important;
+}
+:root[data-seite="reminders"] :is(.meal-log-dex-page,.nutrition-sheet,.reminder-overlay) input:is(
+  [type="time"],[type="date"],[type="number"],[inputmode="numeric"],[inputmode="decimal"]
+){
+  font-family:var(--tech)!important;
+  font-variant-numeric:tabular-nums!important;
+  font-feature-settings:normal!important;
 }
