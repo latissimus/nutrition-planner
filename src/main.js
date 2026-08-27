@@ -463,7 +463,7 @@ const sammlungen = [
   ['body', 'KÖRPERWERTE', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MEAL-LOG', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Fooddex', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
-  ['training', 'TRAINING-DEX', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
+  ['training', 'Trainingdex', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
   ['sleep', 'SLEEP-LOG', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
@@ -820,7 +820,7 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
     sleep: ['#001454', 'wallpaper-moon', '😴'],
     shopping: ['#00E0BA', 'wallpaper-brokkoli', '🛒'],
     habits: ['#8C00FF', 'wallpaper-wolke', '🧠'],
-    training: ['#006E7F', 'wallpaper-dumbbell', '💪🏻'],
+    training: ['#215E61', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#8CA9FF', 'wallpaper-measure', '📐'],
     coins: ['#00A8FF', 'wallpaper-game', '🎮'],
   };
@@ -993,7 +993,16 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
 
 const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">DEX-Einträge werden geladen …</div></div>';
 
-function openFoodDexInfoDialog() {
+function openNeoDexInfoDialog(kind = 'food') {
+  const training = kind === 'training';
+  const title = training ? 'Trainingdex' : 'Fooddex';
+  const copy = training
+    ? `<p>Im <b>Trainingdex</b> sammelst du <b>Übungen</b>, <b>Trainingswissen</b>, Links, Bilder, Videos und Tonaufnahmen an einem Ort.</p>
+      <p>Mit Klassen wie <b>Übungen</b>, <b>Regeneration</b>, <b>Tipps</b> oder <b>Verletzung</b> findest du relevante Inhalte schnell wieder.</p>
+      <p>Unter-Dex helfen dir, Trainingsbereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
+    : `<p>Im <b>Fooddex</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
+      <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
+      <p>Unter-Dex helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
   const existing = document.querySelector('[data-food-info-dialog]');
   if (existing) existing.remove();
   const overlay = document.createElement('div');
@@ -1004,10 +1013,8 @@ function openFoodDexInfoDialog() {
   overlay.innerHTML = `
     <section class="food-dex-info-dialog">
       <button type="button" class="food-dex-info-dialog-close" data-close aria-label="Info schließen">${materialIconMarkup('close')}</button>
-      <h2>Fooddex</h2>
-      <p>Im <b>Fooddex</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
-      <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
-      <p>Unter-Dex helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>
+      <h2>${title}</h2>
+      ${copy}
     </section>`;
   const close = () => overlay.remove();
   overlay.addEventListener('click', (event) => {
@@ -1021,16 +1028,17 @@ function installNeoDexChrome(view, {
   meta = '0 Einträge · 0 Unter-Dex',
   closeHref = '#home',
   editLabel = 'Fooddex bearbeiten',
+  infoKind = 'food',
 } = {}) {
   const foodBar = view.querySelector('.kategorie-kopf');
   const foodAdd = foodBar?.querySelector('.kategorie-plus');
   const foodSettings = foodBar?.querySelector('[data-category-settings]');
   const foodActions = document.createElement('div');
   foodActions.innerHTML = foodDexActionsMarkup({
-    panelAttributes: 'role="menu" aria-label="Food-Dex Aktionen"',
+    panelAttributes: `role="menu" aria-label="${escapeHtml(title)} Aktionen"`,
     panelContent: `
       <button type="button" data-food-action="add" role="menuitem">${materialIconMarkup('place_item')}<span>Eintrag hinzufügen</span></button>
-      <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>Fooddex-Info</span></button>
+      <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>${escapeHtml(title)}-Info</span></button>
       <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>${escapeHtml(editLabel)}</span></button>`,
     menuAttributes: 'data-food-menu',
     closeHref: escapeHtml(closeHref),
@@ -1050,7 +1058,7 @@ function installNeoDexChrome(view, {
   };
   foodActionBar.querySelector('[data-food-action="info"]').onclick = () => {
     foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
-    openFoodDexInfoDialog();
+    openNeoDexInfoDialog(infoKind);
   };
   foodActionBar.querySelector('[data-food-action="edit"]').onclick = () => {
     foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
@@ -1080,7 +1088,9 @@ function installNeoDexChrome(view, {
 }
 
 async function mountCustomCollection(container, item, signal) {
+  const neoDexSkin = ['food-log', 'training'].includes(item.root_key);
   const foodDexSkin = item.root_key === 'food-log';
+  const trainingDexSkin = item.root_key === 'training';
   let lookRoot = item;
   while (lookRoot.parent_id) {
     const parent = await getCollection(session.user.id, lookRoot.parent_id, signal);
@@ -1091,19 +1101,19 @@ async function mountCustomCollection(container, item, signal) {
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
   const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
   const inheritedPattern = inheritsSystemDexLook
-    ? pageLook(item.root_key, inheritedColor, item.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops').pattern
+    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : trainingDexSkin ? 'wallpaper-dumbbell' : 'drops').pattern
     : pageLook(`collection-${lookRoot.id}`, inheritedColor, 'drops').pattern;
   const ownerId = item.user_id || session.user.id;
   const children = await loadCollections(ownerId, { rootKey: item.root_key, parentId: item.id, signal });
   if (signal?.aborted) return;
   const childStats = await dexSammlungsStatistik(ownerId, item.root_key, children, signal);
   if (signal?.aborted) return;
-  setSeite(foodDexSkin ? 'food-log' : 'collection');
-  if (foodDexSkin) {
+  setSeite(neoDexSkin ? item.root_key : 'collection');
+  if (neoDexSkin) {
     container.classList.add('neo-dex-page', 'food-dex-page');
     container.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(inheritedColor));
   }
-  const collectionTitleMarkup = foodDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
+  const collectionTitleMarkup = neoDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     ${collectionTitleMarkup}
     ${collectionGridMarkup(children, { inheritedColor, counts: childStats })}
@@ -1150,12 +1160,13 @@ async function mountCustomCollection(container, item, signal) {
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
   });
-  if (foodDexSkin) {
+  if (neoDexSkin) {
     installNeoDexChrome(container, {
       title: item.name,
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       closeHref: backHref,
       editLabel: `${item.name} bearbeiten`,
+      infoKind: trainingDexSkin ? 'training' : 'food',
     });
   }
   bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
@@ -1484,16 +1495,25 @@ async function renderRoute() {
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
     const childStats = await dexSammlungsStatistik(session.user.id, 'training', children, signal);
     if (signal?.aborted) return;
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite"><div class="seitenkopf"><h1>TRAINING-DEX</h1></div>${collectionGridMarkup(children, { inheritedColor: categoryColor('training'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    view.classList.add('neo-dex-page', 'food-dex-page');
+    view.classList.toggle('food-dex-dunkler-hintergrund', true);
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: categoryColor('training'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
-    mountCategoryChrome(view, route, 'TRAINING-DEX', {
-      pageLookScope: route, pageLookPattern: 'drops',
+    mountCategoryChrome(view, route, 'Trainingdex', {
+      pageLookScope: route, pageLookPattern: 'wallpaper-dumbbell',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
       onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: 'training', onChanged: refresh }),
+    });
+    installNeoDexChrome(view, {
+      title: 'Trainingdex',
+      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      closeHref: '#home',
+      editLabel: 'Trainingdex bearbeiten',
+      infoKind: 'training',
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
@@ -1503,6 +1523,8 @@ async function renderRoute() {
       onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        const scrollMeta = view.querySelector('[data-food-scroll-meta]');
+        if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
       },
     });
   } else if (route.startsWith('collection/')) {
@@ -1510,12 +1532,14 @@ async function renderRoute() {
     if (!item) { location.hash = 'home'; return; }
     await mountCustomCollection(view, item, signal);
   } else if (route.startsWith('entry/')) {
-    // Keep the originating Dex surface during the transition. In particular,
-    // restore Food-Dex before the async entry load so the new page never
-    // renders one frame with the neutral cream collection background or the
-    // Food-Dex default pizza wallpaper.
-    if (vorherigeRoute === 'food-log' || document.documentElement.dataset.seite === 'food-log') {
-      document.documentElement.dataset.seite = 'food-log';
+    // Keep the originating Dex surface during the transition. This prevents
+    // both template Dex from flashing the neutral collection background or a
+    // fallback wallpaper while the entry is loaded asynchronously.
+    const activeTemplateDex = ['food-log', 'training'].find((dex) => (
+      vorherigeRoute === dex || document.documentElement.dataset.seite === dex
+    ));
+    if (activeTemplateDex) {
+      document.documentElement.dataset.seite = activeTemplateDex;
       dexLookAusAnsichtWiederherstellen(app.querySelector(':scope > .view-alt'));
     }
     const { mountDexEntryDetail } = await entryDetailModule();

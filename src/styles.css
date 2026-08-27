@@ -4248,11 +4248,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Pizza.svg"));
   font-family:"Work Sans",var(--ui),sans-serif;
 }
-:root[data-seite="food-log"] .app-kopf .nav-av{
+:root[data-seite="food-log"] .app-kopf .nav-av,
+:root[data-seite="training"] .app-kopf .nav-av{
   background:var(--surface)!important;
 }
 :root[data-seite="food-log"] .app-kopf .nav-av img,
-:root[data-seite="food-log"] .app-kopf .nav-av span{
+:root[data-seite="food-log"] .app-kopf .nav-av span,
+:root[data-seite="training"] .app-kopf .nav-av img,
+:root[data-seite="training"] .app-kopf .nav-av span{
   background:var(--surface);
 }
 :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-kopf small,
@@ -4289,24 +4292,30 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .seite-fade-warten{opacity:0}
 
 /* Food-Dex final overrides (kept after the generic wallpaper cascade). */
-:root[data-seite="food-log"]:not([data-theme="dark"]){
+:root[data-seite="food-log"]:not([data-theme="dark"]),
+:root[data-seite="training"]:not([data-theme="dark"]){
   --food-page-purple:var(--dex-seitenfarbe,#FBE7A3);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Pizza.svg"));
   background-color:var(--dex-seitenfarbe,var(--food-page-purple))!important;
   background-image:none!important;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) body{
+:root[data-seite="food-log"]:not([data-theme="dark"]) body,
+:root[data-seite="training"]:not([data-theme="dark"]) body{
   background-color:var(--dex-seitenfarbe,var(--food-page-purple))!important;
   background-image:none!important;
 }
 :root[data-seite="food-log"]:not([data-theme="dark"]) #app,
-:root[data-seite="food-log"]:not([data-theme="dark"]) #view{
+:root[data-seite="food-log"]:not([data-theme="dark"]) #view,
+:root[data-seite="training"]:not([data-theme="dark"]) #app,
+:root[data-seite="training"]:not([data-theme="dark"]) #view{
   background-color:transparent!important;background-image:none!important;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page){
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page),
+:root[data-seite="training"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page){
   isolation:isolate;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)::before{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)::before,
+:root[data-seite="training"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)::before{
   content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
   background:var(--dex-ink,#fff);opacity:.08;
   -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
@@ -4314,10 +4323,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page).dex-tapete-datei .kategorie-scrollinhalt::before{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page).dex-tapete-datei .kategorie-scrollinhalt::before,
+:root[data-seite="training"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page).dex-tapete-datei .kategorie-scrollinhalt::before{
   display:none!important;
 }
-:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
+:root[data-seite="training"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
   position:relative;z-index:1;
 }
 :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{border-width:2px;box-shadow:0 3.5px 0 #000}
@@ -5605,7 +5616,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* FoodDex draws its single Pizza wallpaper through the white 20%-mask above.
    Suppress the generic wallpaper layer so the original dark SVG cannot be
    rendered a second time underneath it. */
-:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
+:root[data-seite="food-log"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt,
+:root[data-seite="training"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
   background-image:none!important;
 }
 
@@ -5696,7 +5708,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="food-log"]:not([data-theme="dark"]),
 :root[data-seite="food-log"]:not([data-theme="dark"]) body,
 :root[data-seite="food-log"]:not([data-theme="dark"]) #app,
-:root[data-seite="food-log"]:not([data-theme="dark"]) #view{
+:root[data-seite="food-log"]:not([data-theme="dark"]) #view,
+:root[data-seite="training"]:not([data-theme="dark"]),
+:root[data-seite="training"]:not([data-theme="dark"]) body,
+:root[data-seite="training"]:not([data-theme="dark"]) #app,
+:root[data-seite="training"]:not([data-theme="dark"]) #view{
   background-color:var(--food-page-purple)!important;
   background-image:none!important;
 }

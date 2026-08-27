@@ -58,7 +58,7 @@ async function loadEntry(userId, id, signal) {
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Food-Dex', training: 'Training-Dex', reminders: 'Meal-Log', body: 'Körperwerte', habits: 'Routinen', sleep: 'Sleep-Log' };
+  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'Fooddex', training: 'Trainingdex', reminders: 'Meal-Log', body: 'Körperwerte', habits: 'Routinen', sleep: 'Sleep-Log' };
   data.dex_name = rootNames[data.root_key] || 'MUSCLE-DEX';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
@@ -246,7 +246,9 @@ async function rootCollectionScope(userId, collectionId, signal) {
   }
   if (!root) return null;
   if (root.root_key && root.root_key !== 'home') {
-    const fallbackPattern = root.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops';
+    const fallbackPattern = root.root_key === 'food-log'
+      ? 'wallpaper-pizza'
+      : root.root_key === 'training' ? 'wallpaper-dumbbell' : 'drops';
     return {
       scope: root.root_key,
       color: categoryColor(root.root_key),
@@ -268,7 +270,9 @@ async function entryPageLook(entry, userId, signal) {
       scope: collectionScope.scope,
     };
   }
-  const fallbackPattern = entry.root_key === 'food-log' ? 'wallpaper-pizza' : 'drops';
+  const fallbackPattern = entry.root_key === 'food-log'
+    ? 'wallpaper-pizza'
+    : entry.root_key === 'training' ? 'wallpaper-dumbbell' : 'drops';
   return { ...pageLook(entry.root_key, categoryColor(entry.root_key), fallbackPattern), scope: entry.root_key };
 }
 
@@ -340,8 +344,8 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   // Keep the originating page token active so the full entry page (including
   // the iOS safe-area) uses the same Dex background instead of the neutral
   // collection/cream fallback.
-  if (entry.root_key === 'food-log') {
-    document.documentElement.dataset.seite = 'food-log';
+  if (['food-log', 'training'].includes(entry.root_key)) {
+    document.documentElement.dataset.seite = entry.root_key;
     // Die Aktionsleiste und Tapete werden damit aus exakt denselben Regeln
     // wie im FoodDex selbst gezeichnet. Nur die Menüaktionen unterscheiden
     // sich inhaltlich.

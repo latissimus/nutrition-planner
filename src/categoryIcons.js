@@ -41,13 +41,18 @@ let deferredPageLook = null;
 let deferPageLook = false;
 const defaultColors = {
   body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#FBE7A3',
-  recipes: '#007DCC', training: '#525CEB', habits: '#245953',
+  recipes: '#007DCC', training: '#215E61', habits: '#245953',
   shopping: '#FFCF00',
   sleep: '#001454',
   coins: '#05BDE8',
 };
 const fixedSystemColors = {
   'food-log': '#FBE7A3',
+  training: '#215E61',
+};
+const fixedSystemPatterns = {
+  'food-log': 'wallpaper-pizza',
+  training: 'wallpaper-dumbbell',
 };
 const colorGroups = [
   ['DEX-Farben', [
@@ -197,12 +202,13 @@ export function setPageLookColor(scope, color) {
 
 export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   const fixedColor = fixedSystemColors[scope];
+  const fixedPattern = fixedSystemPatterns[scope];
   const fallback = fixedColor || fallbackColor || '#F2EBE0';
   return {
     color: fixedColor || getPreference(pageColorKey(scope), fallback).toUpperCase(),
     // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
     // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.
-    pattern: normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
+    pattern: fixedPattern || normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
   };
 }
 
