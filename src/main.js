@@ -1039,7 +1039,7 @@ function installNeoDexChrome(view, {
     panelContent: `
       <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>${escapeHtml(title)}-Info</span></button>
       <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>${escapeHtml(editLabel)}</span></button>`,
-    primaryContent: materialIconMarkup('place_item'),
+    primaryContent: materialIconMarkup('add'),
     primaryAttributes: 'data-food-action="add"',
     primaryLabel: `Eintrag in ${escapeHtml(title)} hinzufügen`,
     menuAttributes: 'data-food-menu',
