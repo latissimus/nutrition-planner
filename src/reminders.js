@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { availableCategoryIcons, materialIconMarkup, categoryColor } from './categoryIcons.js';
+import { availableCategoryIcons, materialIconMarkup, categoryColor, pageLook } from './categoryIcons.js';
 import {
   activatePush,
   browserPushSubscriptionExists,
@@ -112,6 +112,15 @@ const mealSlotForReminder = (item) => {
   if (minutes < 18 * 60) return 'snack_afternoon';
   return 'dinner';
 };
+
+function mealLogMeta(reminders = []) {
+  const slots = new Set();
+  reminders.filter((item) => item.active).forEach((item) => {
+    if (item.type === 'drink') slots.add('drink');
+    else slots.add(mealSlotForReminder(item));
+  });
+  return `${slots.size} ${slots.size === 1 ? 'Zeitfenster' : 'Zeitfenster'}`;
+}
 const einheitLabel = (value) => ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' })[value] || value;
 
 function nextDrinkSlot(reminder, now) {
@@ -721,7 +730,7 @@ export function chooseReminderIcon(current, onSelected, { hostBackdrop = null } 
 export async function mountReminders(container, { session, signal }) {
   const userId = session.user.id;
   // Gewählte Dex-Ordnerfarbe (wie die Kartenstreifen) für die Platzhalter-Felder der Einträge.
-  container.style.setProperty('--ordner', categoryColor('reminders'));
+  container.style.setProperty('--ordner', pageLook('reminders', categoryColor('reminders'), 'wallpaper-burger').color);
   container.innerHTML = `
     <div class="wrap pad-bottom">
       <div class="seitenkopf">
@@ -751,6 +760,8 @@ export async function mountReminders(container, { session, signal }) {
   const rerender = () => {
     list.innerHTML = reminderGroups(reminders, completions);
     nutritionActions?.renderIntegrated?.();
+    const meta = container.querySelector('[data-food-scroll-meta]');
+    if (meta) meta.textContent = mealLogMeta(reminders);
   };
   const rerenderRow = (key) => {
     const row = list.querySelector(`[data-reminder-key="${key}"]`);
@@ -1226,6 +1237,7 @@ export async function mountReminders(container, { session, signal }) {
   await nutritionPromise;
   nutritionActions?.renderIntegrated?.();
   return {
+    meta: mealLogMeta(reminders),
     openAddMenu() {
       document.querySelector('.mahl-add-backdrop')?.remove();
       const backdrop = document.createElement('div');

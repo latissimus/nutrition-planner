@@ -6230,3 +6230,41 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save):active{
   box-shadow:0 1.5px 0 var(--app-hard-shadow,#43516E)!important;
 }
+
+/* Meal-Log nutzt denselben vollflaechigen Dex-Rahmen wie Food- und
+   Trainingdex. Seine breiten Zeitfenster bleiben als funktionsspezifische
+   Module erhalten; Tapete, Titel und Bedienung folgen dem gemeinsamen Skin. */
+:root[data-seite="reminders"],
+:root[data-seite="reminders"] body{
+  --food-page-purple:var(--dex-seitenfarbe,#525CEB);
+  --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Burger.svg"));
+  background-color:var(--dex-seitenfarbe,#525CEB)!important;
+  background-image:none!important;
+}
+:root[data-seite="reminders"] :is(#app,#view){
+  background-color:transparent!important;
+  background-image:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page{
+  isolation:isolate;
+}
+:root[data-seite="reminders"] .meal-log-dex-page::before{
+  content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
+  background:var(--dex-ink,#fff);opacity:.07;
+  -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
+  -webkit-mask-size:360px auto;mask-size:360px auto;
+  -webkit-mask-position:center top;mask-position:center top;
+  -webkit-mask-repeat:repeat;mask-repeat:repeat;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt{
+  background-image:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
+  position:relative;z-index:1;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-intro{
+  color:var(--dex-ink,#fff);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-intro>span{
+  color:color-mix(in srgb,var(--dex-ink,#fff) 78%,transparent);
+}

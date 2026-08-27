@@ -999,8 +999,13 @@ const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries>
 function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const training = kind === 'training';
   const custom = kind === 'custom';
-  const title = custom ? (customTitle || 'Eigener Dex') : training ? 'Trainingdex' : 'Fooddex';
-  const copy = custom
+  const meal = kind === 'meal';
+  const title = custom ? (customTitle || 'Eigener Dex') : meal ? 'Meal-Log' : training ? 'Trainingdex' : 'Fooddex';
+  const copy = meal
+    ? `<p>Im <b>Meal-Log</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
+      <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>
+      <p>Über den Hinzufügen-Button erfasst du Lebensmittel oder ergänzt deine Planung.</p>`
+    : custom
     ? `<p>In <b>${escapeHtml(title)}</b> sammelst du eigene Notizen, Links, Bilder und Tonaufnahmen an einem Ort.</p>
       <p>Mit <b>Tags</b> und <b>Unter-Dex</b> strukturierst du die Inhalte so, wie es für dein Thema sinnvoll ist.</p>
       <p>Die Farbe kannst du am Haupt-Dex ändern. Unter-Dex übernehmen den Look automatisch.</p>`
@@ -1440,11 +1445,19 @@ async function renderRoute() {
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
   } else if (route === 'reminders') {
     setSeite('reminders');
+    view.classList.add('neo-dex-page', 'food-dex-page', 'meal-log-dex-page');
     const { mountReminders } = await remindersModule();
     const reminderActions = await mountReminders(view, { session, profile, signal });
-    mountCategoryChrome(view, route, 'MEAL-LOG', {
-      pageLookScope: route, pageLookPattern: 'bones',
+    mountCategoryChrome(view, route, 'Meal-Log', {
+      pageLookScope: route, pageLookPattern: 'wallpaper-burger',
       onPlus: () => reminderActions?.openAddMenu?.(),
+    });
+    installNeoDexChrome(view, {
+      title: 'Meal-Log',
+      meta: reminderActions?.meta || '0 Zeitfenster',
+      closeHref: '#home',
+      editLabel: 'Meal-Log bearbeiten',
+      infoKind: 'meal',
     });
   } else if (route === 'shopping') {
     setSeite('shopping');

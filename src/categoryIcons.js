@@ -49,10 +49,12 @@ const defaultColors = {
 const fixedSystemColors = {
   'food-log': '#FBE7A3',
   training: '#215E61',
+  reminders: '#525CEB',
 };
 const fixedSystemPatterns = {
   'food-log': 'wallpaper-pizza',
   training: 'wallpaper-dumbbell',
+  reminders: 'wallpaper-burger',
 };
 const colorGroups = [
   ['DEX-Farben', [
