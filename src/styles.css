@@ -7326,31 +7326,37 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
 }
 
-/* Frühstück dient als kontrollierter Prototyp fuer die neue Mahlzeitenkarte:
-   Hero-Kontur und -Schatten treffen auf die Informationshierarchie der
-   Tagesuebersicht. Die anderen Mahlzeiten bleiben bis zur Abnahme unberuehrt. */
+/* Frühstück dient als kontrollierter Prototyp fuer die neue Mahlzeitenkarte.
+   Es bleibt eine flache Liste: kein Kartenschatten, ein kompakter Kopf und
+   technische Metadaten klar getrennt vom Mahlzeitennamen. */
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast{
   overflow:hidden;
   border:2px solid var(--ink)!important;
   border-radius:18px!important;
   background:var(--surface)!important;
   color:var(--ink)!important;
-  box-shadow:0 3.5px 0 #000!important;
+  box-shadow:none!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast>header{
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto 28px;
+  grid-template-columns:minmax(0,1fr) 50px;
   align-items:center;
-  gap:12px;
+  gap:14px;
   min-height:0;
-  padding:14px 15px;
+  padding:12px 15px 11px;
   border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
   background:color-mix(in srgb,var(--ordner) 8%,var(--surface));
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-titel{
   display:grid;
   align-content:center;
-  gap:2px;
+  gap:3px;
+  min-width:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-heading{
+  display:flex;
+  align-items:center;
+  gap:7px;
   min-width:0;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast>header h2{
@@ -7367,42 +7373,120 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:76px;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
-  height:17px!important;
-  min-height:17px!important;
+  display:block;
+  height:18px!important;
+  min-height:18px!important;
   padding:0!important;
   border:0!important;
+  -webkit-appearance:none;
+  appearance:none;
   background:transparent!important;
   color:var(--muted)!important;
   box-shadow:none!important;
   font-family:var(--tech)!important;
-  font-size:11px!important;
+  font-size:12px!important;
   font-weight:600!important;
-  line-height:17px!important;
+  line-height:18px!important;
   font-variant-numeric:tabular-nums!important;
   text-align:left!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-date-and-time-value{
-  height:17px!important;
-  line-height:17px!important;
+  height:18px!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:18px!important;
   text-align:left!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-calendar-picker-indicator{
+  display:none;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-rechts{
+  display:flex;
+  justify-content:flex-end;
+  width:50px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-mini-switch-track{
+  width:50px!important;
+  min-width:50px!important;
+  height:30px!important;
+  min-height:30px!important;
+  flex-basis:50px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-mini-switch-track::after{
+  top:4.5px!important;
+  left:4px!important;
+  width:21px!important;
+  min-width:21px!important;
+  height:21px!important;
+  min-height:21px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+  transform:translateX(21px)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit{
   display:grid;
   place-items:center;
-  width:28px;
-  height:36px;
+  flex:0 0 24px;
+  width:24px;
+  height:24px;
   margin:0;
   padding:0;
-  color:var(--ink)!important;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info svg{
-  width:19px;
-  height:19px;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-panel{
-  border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
+  border:1.5px solid var(--ink);
+  border-radius:50%;
   background:var(--surface);
+  color:var(--ink)!important;
+  box-shadow:none;
+  font:700 15px/1 Georgia,serif;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit.hat-info{
+  background:var(--ordner)!important;
+  color:#fff!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit:active{
+  transform:translateY(1px);
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline{
   background:var(--surface)!important;
+}
+
+/* Supplement-Zeilen bleiben bewusst kompakter als Lebensmittel. Bild/Icon
+   und Text beginnen trotzdem auf derselben Achse. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .rem-row[data-type="supplement"]>.rem-row-head{
+  grid-template-columns:48px minmax(0,1fr);
+  min-height:54px;
+  padding:7px 15px;
+  column-gap:12px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .rem-row[data-type="supplement"] .rem-row-emoji{
+  display:grid;
+  place-items:center;
+  width:48px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry>.nutrition-entry-head{
+  grid-template-columns:48px minmax(0,1fr) auto;
+  min-height:70px;
+  padding:9px 15px;
+  column-gap:12px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry .nutrition-entry-icon,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry-bild{
+  width:48px;
+  height:48px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry .rem-row-titel>small{
+  display:-webkit-box;
+  overflow:hidden;
+  white-space:normal;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  font-size:10.5px!important;
+  line-height:1.25!important;
+}
+
+/* Exakt die feine gestrichelte LOGMAN-FAQ-Sektionslinie. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline .rem-row+.rem-row,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry+.nutrition-entry,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-period-inline{
+  border-top:1.25px dashed var(--ink);
 }

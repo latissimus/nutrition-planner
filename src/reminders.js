@@ -616,9 +616,15 @@ function reminderGroups(reminders, completions) {
   const timeline = periods.map(([period, title, fallbackIcon, start, end]) => {
     const slotReminder = reminders.find((item) => item.type === 'meal' && mealSlotForReminder(item) === period);
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
+    const isBreakfast = period === 'breakfast';
+    const note = (slotReminder?.metadata?.notiz || '').trim();
+    const slotKey = slotReminder?._key || slotReminder?.id;
     return `<section class="mahl-zeitblock mahl-zeitblock-${period}">
       <header class="mahl-slot-kopf">
-        <div class="mahl-slot-titel"><h2>${title}</h2>
+        <div class="mahl-slot-titel">
+          <div class="mahl-slot-heading"><h2>${title}</h2>
+            ${slotReminder && isBreakfast ? `<button type="button" class="mahl-slot-info mahl-slot-info-edit${note ? ' hat-info' : ''}" data-slot-info-edit data-slot-key="${slotKey}" aria-label="Info zu ${title} bearbeiten"><span aria-hidden="true">i</span></button>` : ''}
+          </div>
           ${slotReminder ? `<label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
         </div>
         ${slotReminder ? `<div class="mahl-slot-rechts">
@@ -627,10 +633,10 @@ function reminderGroups(reminders, completions) {
             <i class="mahl-mini-switch-track" aria-hidden="true"></i>
           </label>
         </div>
-        <button type="button" class="mahl-slot-info${(slotReminder.metadata?.notiz || '').trim() ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Info zu ${title} aufklappen" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 9 7 7 7-7"/></svg></button>` : ''}
+        ${!isBreakfast ? `<button type="button" class="mahl-slot-info${note ? ' hat-info' : ''}" data-slot-info data-slot-key="${slotKey}" aria-label="Info zu ${title} aufklappen" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 9 7 7 7-7"/></svg></button>` : ''}` : ''}
       </header>
-      ${slotReminder ? `<div class="mahl-slot-info-panel" data-slot-info-panel="${slotReminder._key || slotReminder.id}" hidden>
-        <p>${(slotReminder.metadata?.notiz || '').trim() ? escapeHtml(slotReminder.metadata.notiz) : 'Noch keine Info für diese Mahlzeit hinterlegt.'}</p>
+      ${slotReminder && !isBreakfast ? `<div class="mahl-slot-info-panel" data-slot-info-panel="${slotKey}" hidden>
+        <p>${note ? escapeHtml(slotReminder.metadata.notiz) : 'Noch keine Info für diese Mahlzeit hinterlegt.'}</p>
         <button type="button" data-slot-info-edit data-slot-key="${slotReminder._key || slotReminder.id}">Info bearbeiten</button>
       </div>` : ''}
       <div class="mahl-timeline"><div data-period-reminders>${rows.length
