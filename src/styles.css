@@ -7522,3 +7522,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-period-inline{
   border-top:1.25px dashed var(--ink);
 }
+
+/* Mahlzeiten-Info nutzt exakt dieselbe Textstufe wie die Dex-Erklärungen.
+   Titel und Speichern bleiben bewusst UI-Elemente in Work Sans. */
+:root[data-seite="reminders"] .slot-info-overlay [data-slot-info-form] :is(.rem-field>span,.rem-mahlzeit-notiz,p){
+  font-family:var(--tech)!important;
+  font-size:11.5px!important;
+  font-weight:400!important;
+  line-height:1.45!important;
+  letter-spacing:0!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+:root[data-seite="reminders"] .slot-info-overlay [data-slot-info-form] :is(b,strong){
+  font-family:inherit!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+}

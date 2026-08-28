@@ -1144,6 +1144,7 @@ export async function mountReminders(container, { session, signal }) {
         </label>
         <button type="submit" class="btn btn-primary rem-speichern">Speichern</button>
       </form>`);
+    backdrop.classList.add('slot-info-overlay');
     const form = backdrop.querySelector('[data-slot-info-form]');
     const textarea = form.querySelector('[data-slot-info-note]');
     requestAnimationFrame(() => textarea.focus({ preventScroll: true }));
