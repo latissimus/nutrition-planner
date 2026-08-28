@@ -7346,3 +7346,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-left:var(--dex-content-gutter)!important;
   padding-right:var(--dex-content-gutter)!important;
 }
+
+/* Overlays schweben bereits durch die abgedunkelte Rueckflaeche eindeutig
+   ueber dem Inhalt. Ihre Menueflaechen brauchen deshalb nur die Kontur und
+   keinen zusaetzlichen harten Kartenschatten. */
+:is(
+  .kategorie-sheet,
+  .food-dex-info-dialog,
+  .dex-detail-popup-menü,
+  .neo-dex-action-popover,
+  .food-dex-action-popover
+){
+  box-shadow:none!important;
+}
