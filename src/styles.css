@@ -7250,3 +7250,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ink);
   fill:var(--ink);
 }
+
+/* Einheitliche Dex-Erklärtexte. Fooddex, Trainingdex, eigene Dex und
+   Meal-Log teilen sich den Dialog; die Kalibrierung nutzt dieselbe Stufe
+   inline. Werte entsprechen dem LOGMAN-Fortschrittsfeld. */
+:is(.food-dex-info-dialog p,.nutrition-calibration-help){
+  font-family:var(--tech)!important;
+  font-size:11.5px!important;
+  font-weight:400!important;
+  line-height:1.45!important;
+  letter-spacing:0!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+:is(.food-dex-info-dialog p,.nutrition-calibration-help) b{
+  font-family:inherit;
+  font-weight:700!important;
+}
