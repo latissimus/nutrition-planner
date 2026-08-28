@@ -7279,3 +7279,70 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:min(calc(100% - 14px),604px);
   margin-inline:auto;
 }
+
+/* ============================================================
+   Gemeinsamer Dex-Inhaltsrahmen
+   Die Detailkarte definiert mit 21px den verbindlichen mobilen Rand. Alle
+   standardisierten Dex-Ansichten verwenden dieselbe Achse, ohne vollbreite
+   horizontale Leisten ihrer Scroll-Funktion zu berauben.
+   ============================================================ */
+:root{
+  --dex-content-gutter:21px;
+  --dex-content-max:604px;
+}
+
+/* Der generische Dex-Scrollbereich liegt durch den 12px-Wrap bereits 12px
+   vom Viewportrand entfernt. Neun weitere Pixel pro Seite ergeben 21px. */
+:is(.neo-dex-page,.food-dex-page) :is(
+  .neo-dex-scroll-title,
+  .food-dex-scroll-title,
+  .dex-eintraege
+){
+  box-sizing:border-box;
+  width:min(calc(100% - 18px),var(--dex-content-max));
+  margin-inline:auto;
+}
+:is(.neo-dex-page,.food-dex-page) .dex-eintraege{
+  margin-top:24px;
+  margin-bottom:8px;
+}
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltsgrid{
+  padding-inline:0;
+}
+
+/* Unter-Dex bleiben horizontal scrollbar. Die Leiste reicht bis an beide
+   Displaykanten, der erste und letzte Ordner rasten jedoch am 21px-Rand ein. */
+:is(.neo-dex-page,.food-dex-page) .unter-sammlungen-block>h2{
+  margin-left:9px;
+  margin-right:9px;
+}
+:is(.neo-dex-page,.food-dex-page) .unter-sammlungen-grid{
+  width:100vw!important;
+  max-width:100vw!important;
+  box-sizing:border-box!important;
+  margin-inline:calc(50% - 50vw)!important;
+  padding-left:var(--dex-content-gutter)!important;
+  padding-right:var(--dex-content-gutter)!important;
+  scroll-padding-inline:var(--dex-content-gutter)!important;
+}
+
+/* Chip-Leisten folgen derselben Start- und Endachse, können aber weiterhin
+   über die volle Displaybreite bewegt werden. */
+:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter){
+  padding-left:var(--dex-content-gutter)!important;
+  padding-right:var(--dex-content-gutter)!important;
+  scroll-padding-inline:var(--dex-content-gutter)!important;
+}
+
+/* Standardisierte Sheets und Info-Overlays stehen auf kleinen Displays
+   bündig zu Detail- und Dex-Karten. Ihre bisherigen Maximalbreiten bleiben
+   auf Tablets und Desktop erhalten. */
+.kategorie-sheet-backdrop{
+  box-sizing:border-box;
+  padding:var(--dex-content-gutter)!important;
+}
+.food-dex-info-dialog-overlay{
+  box-sizing:border-box;
+  padding-left:var(--dex-content-gutter)!important;
+  padding-right:var(--dex-content-gutter)!important;
+}
