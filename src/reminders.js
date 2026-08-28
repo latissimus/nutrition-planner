@@ -625,7 +625,7 @@ function reminderGroups(reminders, completions) {
           <div class="mahl-slot-heading"><h2>${title}</h2>
             ${slotReminder && isBreakfast ? `<button type="button" class="som-info-knopf mahl-slot-info mahl-slot-info-edit${note ? ' hat-info' : ''}" data-slot-info-edit data-slot-key="${slotKey}" aria-label="Info zu ${title} bearbeiten">i</button>` : ''}
           </div>
-          ${slotReminder ? `<label class="mahl-slot-zeit">${isBreakfast ? `<span class="mahl-slot-zeit-anzeige" aria-hidden="true">${escapeHtml(slotReminder.time)}</span>` : ''}<input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
+          ${slotReminder ? `<label class="mahl-slot-zeit">${isBreakfast ? `<span class="mahl-slot-zeit-anzeige" aria-hidden="true">${escapeHtml(String(slotReminder.time || '').slice(0, 5))}</span>` : ''}<input type="time" value="${escapeHtml(String(slotReminder.time || '').slice(0, 5))}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
         </div>
         ${slotReminder ? `<div class="mahl-slot-rechts">
           <label class="mahl-mini-switch" aria-label="${title} aktivieren">
@@ -1237,7 +1237,7 @@ export async function mountReminders(container, { session, signal }) {
     const previousTime = reminder.time;
     reminder.time = timeInput.value || reminder.time;
     const visibleTime = timeInput.closest('.mahl-slot-zeit')?.querySelector('.mahl-slot-zeit-anzeige');
-    if (visibleTime) visibleTime.textContent = reminder.time;
+    if (visibleTime) visibleTime.textContent = String(reminder.time).slice(0, 5);
     reminder.active = true;
     try {
       if (!wasActive) await ensureReminderPush();
@@ -1248,7 +1248,7 @@ export async function mountReminders(container, { session, signal }) {
     } catch {
       reminder.time = previousTime;
       timeInput.value = previousTime;
-      if (visibleTime) visibleTime.textContent = previousTime;
+      if (visibleTime) visibleTime.textContent = String(previousTime).slice(0, 5);
       toast('Uhrzeit konnte nicht gespeichert werden');
     } finally {
       if (timeInput.isConnected) timeInput.disabled = false;
@@ -1262,7 +1262,11 @@ export async function mountReminders(container, { session, signal }) {
     openAddMenu() {
       document.querySelector('.mahl-add-backdrop')?.remove();
       const backdrop = document.createElement('div');
+      const color = categoryColor('reminders');
       backdrop.className = 'kategorie-sheet-backdrop mahl-add-backdrop offen';
+      backdrop.style.setProperty('--ordner', color);
+      backdrop.style.setProperty('--dex-seitenfarbe', color);
+      backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
         <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         ${nutritionActions?.isEnabled?.() ? `<section class="mahl-add-gruppe">

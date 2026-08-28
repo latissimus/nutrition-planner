@@ -7523,9 +7523,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-top:1.25px dashed var(--ink);
 }
 
-/* Mahlzeiten-Info nutzt exakt dieselbe Textstufe wie die Dex-Erklärungen.
-   Titel und Speichern bleiben bewusst UI-Elemente in Work Sans. */
-:root[data-seite="reminders"] .slot-info-overlay [data-slot-info-form] :is(.rem-field>span,.rem-mahlzeit-notiz,p){
+/* Im Mahlzeiten-Infoeditor ist nur der eigentliche Notiztext technisch.
+   Titel, Feldlabel und Speichern folgen wie alle anderen Sheets Work Sans. */
+:root[data-seite="reminders"] .slot-info-overlay .rem-mahlzeit-notiz{
   font-family:var(--tech)!important;
   font-size:11.5px!important;
   font-weight:400!important;
@@ -7534,8 +7534,57 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
 }
-:root[data-seite="reminders"] .slot-info-overlay [data-slot-info-form] :is(b,strong){
+:root[data-seite="reminders"] .slot-info-overlay .rem-mahlzeit-notiz :is(b,strong){
   font-family:inherit!important;
   font-weight:700!important;
   letter-spacing:0!important;
+}
+
+/* Verbindliche Typografie der Frühstückskarte: Work Sans für Namen und
+   Hierarchie, SF Mono nur für Uhrzeit, Mengen, Makros und kcal. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast :is(
+  .mahl-slot-heading h2,
+  .rem-row-titel>b,
+  .rem-row-art,
+  .mahl-leerzeile
+){
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-style:normal!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast :is(
+  .mahl-slot-zeit-anzeige,
+  .nutrition-entry-head .rem-row-titel>small,
+  .nutrition-entry-head>strong,
+  .rem-row[data-type="supplement"] .rem-row-titel>small:not(.rem-row-art)
+){
+  font-family:var(--tech)!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
+/* Alle Meal-Log-Sheets teilen dieselbe Menütypografie. Spezifische alte
+   Reminder- und Nutrition-Schriften dürfen diese Basis nicht überschreiben. */
+:root[data-seite="reminders"] :is(.reminder-overlay,.nutrition-overlay,.mahl-add-backdrop) .kategorie-sheet,
+:root[data-seite="reminders"] :is(.reminder-overlay,.nutrition-overlay,.mahl-add-backdrop) .kategorie-sheet :is(
+  h2,h3,p,label,legend,input,textarea,select,button,b,strong,small,span
+){
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-style:normal!important;
+}
+:root[data-seite="reminders"] :is(.reminder-overlay,.nutrition-overlay,.mahl-add-backdrop) .kategorie-sheet :is(
+  .btn-primary,.rem-speichern
+){
+  background:var(--dex-seitenfarbe,var(--ordner,#525CEB))!important;
+  border-color:#000!important;
+  color:var(--dex-ink,#fff)!important;
+}
+
+/* Bewusste Ausnahme der gemeinsamen Overlay-Regel. */
+:root[data-seite="reminders"] .slot-info-overlay .rem-mahlzeit-notiz{
+  font-family:var(--tech)!important;
+  font-size:11.5px!important;
+  font-weight:400!important;
+  line-height:1.45!important;
+  letter-spacing:0!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
 }
