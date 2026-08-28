@@ -7325,3 +7325,87 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ){
   box-shadow:none!important;
 }
+
+/* Mahlzeitenkarten verwenden dieselbe flache Kartenfamilie wie die
+   Tagesuebersicht: identische Kontur und Rundung, getoenter Kopf, Work Sans
+   fuer die Hierarchie und die Uhrzeit als ruhige technische Metazeile. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock{
+  overflow:hidden;
+  border:1.5px solid var(--ink)!important;
+  border-radius:15px!important;
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  box-shadow:none!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto 28px;
+  align-items:center;
+  gap:12px;
+  min-height:0;
+  padding:14px 15px;
+  border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
+  background:color-mix(in srgb,var(--ordner) 8%,var(--surface));
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-titel{
+  display:grid;
+  align-content:center;
+  gap:2px;
+  min-width:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
+  margin:0;
+  color:var(--ink)!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:16px!important;
+  font-weight:700!important;
+  line-height:normal!important;
+  letter-spacing:0!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+  width:76px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+  height:17px!important;
+  min-height:17px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:var(--muted)!important;
+  box-shadow:none!important;
+  font-family:var(--tech)!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  line-height:17px!important;
+  font-variant-numeric:tabular-nums!important;
+  text-align:left!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input::-webkit-date-and-time-value{
+  height:17px!important;
+  line-height:17px!important;
+  text-align:left!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info{
+  display:grid;
+  place-items:center;
+  width:28px;
+  height:36px;
+  margin:0;
+  padding:0;
+  color:var(--ink)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info svg{
+  width:19px;
+  height:19px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel{
+  border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
+  background:var(--surface);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-timeline{
+  background:var(--surface)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken>header{
+  grid-template-columns:minmax(0,1fr);
+}

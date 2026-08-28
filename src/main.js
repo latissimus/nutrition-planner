@@ -1051,7 +1051,6 @@ function installNeoDexChrome(view, {
   foodActions.innerHTML = foodDexActionsMarkup({
     panelAttributes: `role="menu" aria-label="${escapeHtml(title)} Aktionen"`,
     panelContent: `
-      ${infoKind === 'meal' ? `<button type="button" data-food-action="tracking" role="menuitem">${materialIconMarkup('monitor_weight')}<span>Kalorienzählung umstellen</span></button>` : ''}
       <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>${escapeHtml(title)}-Info</span></button>
       <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>${escapeHtml(editLabel)}</span></button>`,
     primaryContent: materialIconMarkup('place_item'),
@@ -1071,11 +1070,6 @@ function installNeoDexChrome(view, {
   };
   foodActionBar.querySelector('[data-food-action="add"]').onclick = () => {
     foodAdd?.click();
-  };
-  const trackingAction = foodActionBar.querySelector('[data-food-action="tracking"]');
-  if (trackingAction) trackingAction.onclick = () => {
-    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
-    view.querySelector('[data-nutrition-enabled]')?.click();
   };
   foodActionBar.querySelector('[data-food-action="info"]').onclick = () => {
     foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
