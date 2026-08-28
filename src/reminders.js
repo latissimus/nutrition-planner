@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { availableCategoryIcons, materialIconMarkup, categoryColor, pageLook } from './categoryIcons.js';
+import { availableCategoryIcons, materialIconMarkup, categoryColor, colorIsDark, pageLook } from './categoryIcons.js';
 import {
   activatePush,
   browserPushSubscriptionExists,
@@ -623,9 +623,9 @@ function reminderGroups(reminders, completions) {
       <header class="mahl-slot-kopf">
         <div class="mahl-slot-titel">
           <div class="mahl-slot-heading"><h2>${title}</h2>
-            ${slotReminder && isBreakfast ? `<button type="button" class="mahl-slot-info mahl-slot-info-edit${note ? ' hat-info' : ''}" data-slot-info-edit data-slot-key="${slotKey}" aria-label="Info zu ${title} bearbeiten"><span aria-hidden="true">i</span></button>` : ''}
+            ${slotReminder && isBreakfast ? `<button type="button" class="som-info-knopf mahl-slot-info mahl-slot-info-edit${note ? ' hat-info' : ''}" data-slot-info-edit data-slot-key="${slotKey}" aria-label="Info zu ${title} bearbeiten">i</button>` : ''}
           </div>
-          ${slotReminder ? `<label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
+          ${slotReminder ? `<label class="mahl-slot-zeit">${isBreakfast ? `<span class="mahl-slot-zeit-anzeige" aria-hidden="true">${escapeHtml(slotReminder.time)}</span>` : ''}<input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}
         </div>
         ${slotReminder ? `<div class="mahl-slot-rechts">
           <label class="mahl-mini-switch" aria-label="${title} aktivieren">
@@ -659,7 +659,11 @@ function reminderGroups(reminders, completions) {
 function reminderOverlay(markup) {
   document.querySelector('.reminder-overlay')?.remove();
   const backdrop = document.createElement('div');
+  const color = categoryColor('reminders');
   backdrop.className = 'kategorie-sheet-backdrop reminder-overlay offen';
+  backdrop.style.setProperty('--ordner', color);
+  backdrop.style.setProperty('--dex-seitenfarbe', color);
+  backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
   backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true">${markup}</section>`;
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-reminder-overlay-close]')) backdrop.remove();
@@ -1229,7 +1233,10 @@ export async function mountReminders(container, { session, signal }) {
     if (!reminder) return;
     timeInput.disabled = true;
     const wasActive = reminder.active;
+    const previousTime = reminder.time;
     reminder.time = timeInput.value || reminder.time;
+    const visibleTime = timeInput.closest('.mahl-slot-zeit')?.querySelector('.mahl-slot-zeit-anzeige');
+    if (visibleTime) visibleTime.textContent = reminder.time;
     reminder.active = true;
     try {
       if (!wasActive) await ensureReminderPush();
@@ -1238,6 +1245,9 @@ export async function mountReminders(container, { session, signal }) {
       startReminderLoop(userId);
       toast('Uhrzeit gespeichert');
     } catch {
+      reminder.time = previousTime;
+      timeInput.value = previousTime;
+      if (visibleTime) visibleTime.textContent = previousTime;
       toast('Uhrzeit konnte nicht gespeichert werden');
     } finally {
       if (timeInput.isConnected) timeInput.disabled = false;

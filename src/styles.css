@@ -7331,7 +7331,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    technische Metadaten klar getrennt vom Mahlzeitennamen. */
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast{
   overflow:hidden;
-  border:2px solid var(--ink)!important;
+  border:0!important;
   border-radius:18px!important;
   background:var(--surface)!important;
   color:var(--ink)!important;
@@ -7370,31 +7370,53 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit,
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
-  width:76px;
+  width:82px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit{
+  position:relative;
+  display:block;
+  min-height:20px;
+  margin:0;
+  text-align:left;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit-anzeige{
+  display:block;
+  color:var(--muted);
+  font-family:var(--tech);
+  font-size:13px;
+  font-weight:600;
+  line-height:20px;
+  font-variant-numeric:tabular-nums;
+  text-align:left;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
+  position:absolute;
+  inset:0;
+  z-index:1;
   display:block;
-  height:18px!important;
-  min-height:18px!important;
+  height:20px!important;
+  min-height:20px!important;
   padding:0!important;
   border:0!important;
   -webkit-appearance:none;
   appearance:none;
   background:transparent!important;
-  color:var(--muted)!important;
+  color:transparent!important;
   box-shadow:none!important;
   font-family:var(--tech)!important;
-  font-size:12px!important;
+  font-size:13px!important;
   font-weight:600!important;
-  line-height:18px!important;
+  line-height:20px!important;
   font-variant-numeric:tabular-nums!important;
+  opacity:0;
   text-align:left!important;
+  cursor:pointer;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-date-and-time-value{
-  height:18px!important;
+  height:20px!important;
   margin:0!important;
   padding:0!important;
-  line-height:18px!important;
+  line-height:20px!important;
   text-align:left!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-calendar-picker-indicator{
@@ -7426,9 +7448,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit{
   display:grid;
   place-items:center;
-  flex:0 0 24px;
-  width:24px;
-  height:24px;
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
   margin:0;
   padding:0;
   border:1.5px solid var(--ink);
@@ -7436,7 +7458,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--surface);
   color:var(--ink)!important;
   box-shadow:none;
-  font:700 15px/1 Georgia,serif;
+  font-family:var(--tech);
+  font-size:13px;
+  font-weight:800;
+  font-style:normal;
+  line-height:1;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit::after{
+  display:none!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit.hat-info{
   background:var(--ordner)!important;
@@ -7447,6 +7476,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline{
   background:var(--surface)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline .rem-row{
+  border-bottom:0;
 }
 
 /* Supplement-Zeilen bleiben bewusst kompakter als Lebensmittel. Bild/Icon
