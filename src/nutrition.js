@@ -159,9 +159,6 @@ function summaryMarkup(state, date) {
   const over = Math.max(0, kcal - target);
   const adaptive = adaptiveModel(state, calculated, target);
   const ordnerInk = colorIsDark(categoryColor('reminders')) ? '#fff' : '#000';
-  const dayStatus = state.dayStatus?.excluded
-    ? 'Sondertag'
-    : state.dayStatus?.complete ? 'Vollständig' : 'Noch offen';
   return `${trackingToggleMarkup(true)}
   <section class="nutrition-coin-hero" data-nutrition-card style="--ordner-ink:${ordnerInk}">
     <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
@@ -179,27 +176,21 @@ function summaryMarkup(state, date) {
     <p><b>Aktueller Stand:</b> ${escapeHtml(adaptiveStatusText(adaptive.result))}</p>
     ${adaptive.result.eligible ? '<button class="nutrition-calibration-more" type="button" data-open-nutrition-adaptive>Vorschlag im Detail ansehen</button>' : ''}
   </div>
-  <details class="nutrition-coin-overview">
-    <summary><span><b>TAGESÜBERSICHT</b><small>${dateLabel(date)} · ${dateFromKey(date).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
-    <div class="nutrition-coin-overview-body">
-      <header class="nutrition-day-nav">
+  <details class="coin-verdienst nutrition-coin-overview">
+    <summary><span><b>Tagesübersicht</b><small>${dateLabel(date)} · ${dateFromKey(date).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right')}</summary>
+    <div class="coin-verdienst-inhalt nutrition-coin-overview-body">
+      <header class="nutrition-overview-day">
         <button type="button" data-nutrition-day="-1" aria-label="Vorheriger Tag" class="nutrition-day-nav-prev">${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
         <div><b>${dateLabel(date)}</b><small>${dateFromKey(date).toLocaleDateString('de-DE')}</small></div>
         <button type="button" data-nutrition-day="1" aria-label="Nächster Tag"${date >= localDateKey() ? ' disabled' : ''}>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</button>
       </header>
-      <div class="nutrition-macros">
-        ${[['Protein', protein], ['Carbs', carbs], ['Fett', fat]].map(([label, value]) => `<div><span><b>${label}</b><small>${decimal(value)} g</small></span></div>`).join('')}
+      <div class="nutrition-overview-macros">
+        ${[['Protein', protein], ['Carbs', carbs], ['Fett', fat]].map(([label, value]) => `<span><small>${label}</small><b>${decimal(value)} g</b></span>`).join('')}
       </div>
-      <div class="nutrition-quick-actions">
-        <button type="button" data-open-nutrition-calculator>
-          <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
-          ${materialIconMarkup('edit')}
-        </button>
-        <button type="button" data-open-nutrition-day-status>
-          <span><small>PROTOKOLL</small><b>${dayStatus}</b></span>
-          ${materialIconMarkup('select_check_box')}
-        </button>
-      </div>
+      <button class="nutrition-overview-target" type="button" data-open-nutrition-calculator>
+        <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
+        ${materialIconMarkup('edit')}
+      </button>
     </div>
   </details>`;
 }
@@ -927,37 +918,6 @@ export async function mountNutrition(container, { userId, signal }) {
     bindCalculatorForm(backdrop.querySelector('[data-nutrition-settings-form]'), backdrop);
   };
 
-  const openDayStatus = () => {
-    const status = state.dayStatus || {};
-    const backdrop = createOverlay(`<header><div><small>${escapeHtml(dateLabel(date).toUpperCase())}</small><h2>Protokollstatus</h2></div><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-      <form class="nutrition-form" data-nutrition-day-status-form>
-        <div class="nutrition-day-quality">
-          <label><input type="checkbox" data-nutrition-day-complete${status.complete ? ' checked' : ''}><span>Tag vollständig protokolliert</span></label>
-          <label><input type="checkbox" data-nutrition-day-excluded${status.excluded ? ' checked' : ''}><span>Sondertag aus Kalibrierung ausschließen</span></label>
-          <select class="input" data-nutrition-exclude-reason${status.excluded ? '' : ' disabled'} aria-label="Grund für ausgeschlossenen Sondertag">
-            ${[['','Grund auswählen'],['Krankheit','Krankheit'],['Reise','Reise'],['Außergewöhnliche Mahlzeiten','Außergewöhnliche Mahlzeiten'],['Unvollständiges Protokoll','Unvollständiges Protokoll'],['Anderer Sondertag','Anderer Sondertag']].map(([value, label]) => `<option value="${value}"${status.exclude_reason === value ? ' selected' : ''}>${label}</option>`).join('')}
-          </select>
-          <small>Ein Sondertag wird bei der Kalibrierung übersprungen. Er verschlechtert deine Datenqualität nicht und löst keine Anpassung aus.</small>
-        </div>
-        <button class="btn btn-primary btn-block" type="submit">Status speichern</button>
-      </form>`, 'nutrition-day-status-overlay');
-    const form = backdrop.querySelector('[data-nutrition-day-status-form]');
-    const excluded = form.querySelector('[data-nutrition-day-excluded]');
-    const reason = form.querySelector('[data-nutrition-exclude-reason]');
-    excluded.onchange = () => { reason.disabled = !excluded.checked; };
-    form.onsubmit = async (event) => {
-      event.preventDefault(); const submit = event.submitter; submit.disabled = true;
-      const complete = form.querySelector('[data-nutrition-day-complete]').checked;
-      const isExcluded = excluded.checked;
-      const excludeReason = isExcluded ? reason.value || 'Anderer Sondertag' : '';
-      const { error } = await supabase.from('nutrition_day_status').upsert({
-        user_id: userId, log_date: date, complete, excluded: isExcluded, exclude_reason: excludeReason,
-      }, { onConflict: 'user_id,log_date' });
-      if (error) { submit.disabled = false; return toast('Protokollstatus konnte nicht gespeichert werden'); }
-      backdrop.remove(); toast('Protokollstatus gespeichert'); await refresh();
-    };
-  };
-
   const openAdaptive = () => {
     const { calculated, target } = nutritionTarget(state);
     const model = adaptiveModel(state, calculated, target);
@@ -1002,7 +962,6 @@ export async function mountNutrition(container, { userId, signal }) {
       render();
     };
     container.querySelector('[data-open-nutrition-calculator]')?.addEventListener('click', openCalculator);
-    container.querySelector('[data-open-nutrition-day-status]')?.addEventListener('click', openDayStatus);
     container.querySelector('[data-toggle-nutrition-calibration]')?.addEventListener('click', (event) => {
       const button = event.currentTarget;
       const help = container.querySelector('[data-nutrition-calibration-help]');

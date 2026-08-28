@@ -7089,3 +7089,164 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
     gap:11px;
   }
 }
+
+/* Tagesübersicht: geschlossener Kopf exakt nach der zweiten COIN-DEX-Karte;
+   geöffnet eine ruhige Gruppe statt mehrerer umrandeter Tabellenzellen. */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview{
+  display:block;
+  margin:0 0 18px;
+  padding:0;
+  overflow:hidden;
+  border:1.5px solid var(--ink);
+  border-radius:15px;
+  background:var(--surface);
+  color:var(--ink);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 15px;
+  cursor:pointer;
+  list-style:none;
+  background:color-mix(in srgb,var(--ordner) 8%,var(--surface));
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary>span{
+  display:grid;
+  gap:2px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary b{
+  font-family:var(--ui);
+  font-size:16px;
+  font-weight:700;
+  line-height:normal;
+  text-transform:uppercase;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary small{
+  color:var(--muted);
+  font-family:var(--ui);
+  font-size:11px;
+  font-weight:600;
+  line-height:normal;
+  font-variant-numeric:normal;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary :is(.material-svg,svg){
+  width:19px;
+  height:19px;
+  color:var(--ink);
+  fill:var(--ink);
+  transition:transform .18s ease;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview[open]>summary .material-svg{
+  transform:rotate(90deg);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview-body{
+  display:grid;
+  gap:13px;
+  padding:16px 15px 15px;
+  border-top:0;
+  background:var(--surface);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day{
+  display:grid;
+  grid-template-columns:36px minmax(0,1fr) 36px;
+  align-items:center;
+  gap:10px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day>div{
+  display:grid;
+  place-items:center;
+  gap:2px;
+  min-width:0;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day b{
+  font:700 14px/1.1 var(--ui);
+  text-transform:uppercase;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day small{
+  color:var(--muted);
+  font:600 11px/1.1 var(--tech);
+  font-variant-numeric:tabular-nums;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day button{
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  padding:0;
+  border:1.5px solid var(--ink);
+  border-radius:10px;
+  background:var(--surface);
+  color:var(--ink);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day button:disabled{
+  opacity:.28;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day button:first-child .material-svg{
+  transform:rotate(180deg);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-day button :is(.material-svg,svg){
+  width:18px;
+  height:18px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-macros{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-macros>span{
+  display:grid;
+  gap:3px;
+  min-width:0;
+  padding:10px 9px;
+  border:0;
+  border-radius:10px;
+  background:color-mix(in srgb,var(--ordner) 10%,var(--surface));
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-macros small{
+  overflow:hidden;
+  color:var(--muted);
+  font:700 10px/1.1 var(--ui);
+  text-overflow:ellipsis;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-macros b{
+  color:var(--ink);
+  font:700 14px/1.15 var(--tech);
+  font-variant-numeric:tabular-nums;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-target{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+  min-height:54px;
+  padding:10px 13px;
+  border:0;
+  border-radius:10px;
+  background:color-mix(in srgb,var(--ordner) 17%,var(--surface));
+  color:var(--ink);
+  text-align:left;
+  box-shadow:none;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-target>span{
+  display:grid;
+  gap:2px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-target small{
+  color:var(--muted);
+  font:700 10px/1.1 var(--ui);
+  letter-spacing:.05em;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-target b{
+  color:var(--ink);
+  font:700 14px/1.15 var(--tech);
+  font-variant-numeric:tabular-nums;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-overview-target :is(.material-svg,svg){
+  width:20px;
+  height:20px;
+  color:var(--ink);
+  fill:var(--ink);
+}
