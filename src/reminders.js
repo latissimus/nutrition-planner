@@ -616,7 +616,7 @@ function reminderGroups(reminders, completions) {
   const timeline = periods.map(([period, title, fallbackIcon, start, end]) => {
     const slotReminder = reminders.find((item) => item.type === 'meal' && mealSlotForReminder(item) === period);
     const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
-    return `<section class="mahl-zeitblock">
+    return `<section class="mahl-zeitblock mahl-zeitblock-${period}">
       <header class="mahl-slot-kopf">
         <div class="mahl-slot-titel"><h2>${title}</h2>
           ${slotReminder ? `<label class="mahl-slot-zeit"><input type="time" value="${escapeHtml(slotReminder.time)}" data-slot-time data-slot-key="${slotReminder._key || slotReminder.id}" aria-label="Uhrzeit für ${title}"></label>` : ''}

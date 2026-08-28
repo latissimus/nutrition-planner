@@ -7326,18 +7326,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
 }
 
-/* Mahlzeitenkarten verwenden dieselbe flache Kartenfamilie wie die
-   Tagesuebersicht: identische Kontur und Rundung, getoenter Kopf, Work Sans
-   fuer die Hierarchie und die Uhrzeit als ruhige technische Metazeile. */
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock{
+/* Frühstück dient als kontrollierter Prototyp fuer die neue Mahlzeitenkarte:
+   Hero-Kontur und -Schatten treffen auf die Informationshierarchie der
+   Tagesuebersicht. Die anderen Mahlzeiten bleiben bis zur Abnahme unberuehrt. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast{
   overflow:hidden;
-  border:1.5px solid var(--ink)!important;
-  border-radius:15px!important;
+  border:2px solid var(--ink)!important;
+  border-radius:18px!important;
   background:var(--surface)!important;
   color:var(--ink)!important;
-  box-shadow:none!important;
+  box-shadow:0 3.5px 0 #000!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast>header{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto 28px;
   align-items:center;
@@ -7347,13 +7347,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
   background:color-mix(in srgb,var(--ordner) 8%,var(--surface));
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-titel{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-titel{
   display:grid;
   align-content:center;
   gap:2px;
   min-width:0;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast>header h2{
   margin:0;
   color:var(--ink)!important;
   font-family:"Work Sans",var(--ui),sans-serif!important;
@@ -7362,11 +7362,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   line-height:normal!important;
   letter-spacing:0!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit,
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
   width:76px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
   height:17px!important;
   min-height:17px!important;
   padding:0!important;
@@ -7381,12 +7381,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:tabular-nums!important;
   text-align:left!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input::-webkit-date-and-time-value{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-date-and-time-value{
   height:17px!important;
   line-height:17px!important;
   text-align:left!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info{
   display:grid;
   place-items:center;
   width:28px;
@@ -7395,17 +7395,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding:0;
   color:var(--ink)!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info svg{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info svg{
   width:19px;
   height:19px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-panel{
   border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
   background:var(--surface);
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-timeline{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline{
   background:var(--surface)!important;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken>header{
-  grid-template-columns:minmax(0,1fr);
 }
