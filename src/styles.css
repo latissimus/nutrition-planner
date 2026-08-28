@@ -6288,31 +6288,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:28px;height:28px;margin-left:4px;border:0;border-radius:0;
   background:transparent!important;color:var(--ink);box-shadow:none!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info svg{
-  width:19px;height:19px;transition:transform .18s ease;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info[aria-expanded="true"] svg{
-  transform:rotate(180deg);
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel[hidden]{display:none!important}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel{
-  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
-  padding:12px 14px;border-bottom:1px solid var(--app-divider);
-  background:color-mix(in srgb,var(--ordner) 9%,var(--surface));
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel p{
-  margin:0;color:var(--muted);font:500 12px/1.45 "Work Sans",var(--ui),sans-serif;
-  white-space:pre-wrap;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel button{
-  min-height:38px;padding:7px 10px;border:1.5px solid #000;border-radius:9px;
-  background:var(--ordner);color:var(--dex-ink,#fff);box-shadow:0 3px 0 #000;
-  font:700 11px/1 "Work Sans",var(--ui),sans-serif;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel button:active{
-  transform:translateY(2px);box-shadow:0 1px 0 #000;
-}
-
 /* Alle bereits farbcodierten Meal-Log-Elemente greifen auf dieselbe feste
    Indigo-Akzentfarbe und deren berechneten Kontrasttext zurueck. */
 :root[data-seite="reminders"] :is(
@@ -6418,30 +6393,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin:0;
   color:#111!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info svg{
-  width:22px;
-  height:22px;
-}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info.hat-info,
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info:hover{
   background:transparent!important;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel{
-  grid-template-columns:minmax(0,1fr);
-  gap:12px;
-  padding:16px 18px 18px;
-  border-bottom:1.5px solid #111;
-  background:#f7f7f7;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel p{
-  color:#626978;
-  font-family:var(--tech);
-  font-size:12px;
-  font-weight:400;
-  line-height:1.55;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-slot-info-panel button{
-  justify-self:start;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(.mahl-timeline,.nutrition-period-inline){
   background:#fff!important;
@@ -7326,10 +7280,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
 }
 
-/* Frühstück dient als kontrollierter Prototyp fuer die neue Mahlzeitenkarte.
-   Es bleibt eine flache Liste: kein Kartenschatten, ein kompakter Kopf und
-   technische Metadaten klar getrennt vom Mahlzeitennamen. */
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast{
+/* Gemeinsamer Standard aller Meal-Log-Karten. Sie bleiben flache Listen:
+   kein Kartenschatten, kompakte Köpfe und technische Metadaten klar
+   getrennt von den Mahlzeitennamen. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock{
   overflow:hidden;
   border:0!important;
   border-radius:18px!important;
@@ -7337,7 +7291,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ink)!important;
   box-shadow:none!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast>header{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
   display:grid;
   grid-template-columns:minmax(0,1fr) 50px;
   align-items:center;
@@ -7347,19 +7301,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom:1px solid color-mix(in srgb,var(--ink) 16%,transparent);
   background:color-mix(in srgb,var(--ordner) 8%,var(--surface));
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-titel{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-titel{
   display:grid;
   align-content:center;
   gap:3px;
   min-width:0;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-heading{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-heading{
   display:flex;
   align-items:center;
   gap:7px;
   min-width:0;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast>header h2{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header h2{
   margin:0;
   color:var(--ink)!important;
   font-family:"Work Sans",var(--ui),sans-serif!important;
@@ -7368,18 +7322,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   line-height:normal!important;
   letter-spacing:0!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit,
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit input{
   width:82px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit{
   position:relative;
   display:block;
   min-height:20px;
   margin:0;
   text-align:left;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit-anzeige{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit-anzeige{
   display:block;
   color:var(--muted);
   font-family:var(--tech);
@@ -7389,7 +7343,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:tabular-nums;
   text-align:left;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit input{
   position:absolute;
   inset:0;
   z-index:1;
@@ -7412,29 +7366,29 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-align:left!important;
   cursor:pointer;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-date-and-time-value{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit input::-webkit-date-and-time-value{
   height:20px!important;
   margin:0!important;
   padding:0!important;
   line-height:20px!important;
   text-align:left!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-zeit input::-webkit-calendar-picker-indicator{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-zeit input::-webkit-calendar-picker-indicator{
   display:none;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-rechts{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-rechts{
   display:flex;
   justify-content:flex-end;
   width:50px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-mini-switch-track{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-mini-switch-track{
   width:50px!important;
   min-width:50px!important;
   height:30px!important;
   min-height:30px!important;
   flex-basis:50px!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-mini-switch-track::after{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-mini-switch-track::after{
   top:4.5px!important;
   left:4px!important;
   width:21px!important;
@@ -7442,10 +7396,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   height:21px!important;
   min-height:21px!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   transform:translateX(21px)!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-info-edit{
   display:grid;
   place-items:center;
   flex:0 0 26px;
@@ -7464,48 +7418,48 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-style:normal;
   line-height:1;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit::after{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-info-edit::after{
   display:none!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit.hat-info{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-info-edit.hat-info{
   background:var(--ordner)!important;
   color:#fff!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-slot-info-edit:active{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-info-edit:active{
   transform:translateY(1px);
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-timeline{
   background:var(--surface)!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline .rem-row{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-timeline .rem-row{
   border-bottom:0;
 }
 
 /* Supplement-Zeilen bleiben bewusst kompakter als Lebensmittel. Bild/Icon
-   und Text beginnen trotzdem auf derselben Achse. */
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .rem-row[data-type="supplement"]>.rem-row-head{
+   und Text beginnen in allen Mahlzeitenkarten trotzdem auf derselben Achse. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"]>.rem-row-head{
   grid-template-columns:48px minmax(0,1fr);
   min-height:54px;
   padding:7px 15px;
   column-gap:12px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .rem-row[data-type="supplement"] .rem-row-emoji{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-emoji{
   display:grid;
   place-items:center;
   width:48px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry>.nutrition-entry-head{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry>.nutrition-entry-head{
   grid-template-columns:48px minmax(0,1fr) auto;
   min-height:70px;
   padding:9px 15px;
   column-gap:12px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry .nutrition-entry-icon,
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry-bild{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry .nutrition-entry-icon,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry-bild{
   width:48px;
   height:48px;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry .rem-row-titel>small{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry .rem-row-titel>small{
   display:-webkit-box;
   overflow:hidden;
   white-space:normal;
@@ -7517,9 +7471,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* Exakt die feine gestrichelte LOGMAN-FAQ-Sektionslinie. */
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .mahl-timeline .rem-row+.rem-row,
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-entry+.nutrition-entry,
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast .nutrition-period-inline{
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-timeline .rem-row+.rem-row,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry+.nutrition-entry,
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-period-inline{
   border-top:1.25px dashed var(--ink);
 }
 
@@ -7540,9 +7494,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:0!important;
 }
 
-/* Verbindliche Typografie der Frühstückskarte: Work Sans für Namen und
+/* Verbindliche Typografie aller Meal-Log-Karten: Work Sans für Namen und
    Hierarchie, SF Mono nur für Uhrzeit, Mengen, Makros und kcal. */
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast :is(
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock :is(
   .mahl-slot-heading h2,
   .rem-row-titel>b,
   .rem-row-art,
@@ -7551,7 +7505,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-family:"Work Sans",var(--ui),sans-serif!important;
   font-style:normal!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock-breakfast :is(
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock :is(
   .mahl-slot-zeit-anzeige,
   .nutrition-entry-head .rem-row-titel>small,
   .nutrition-entry-head>strong,
