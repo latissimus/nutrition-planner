@@ -7023,3 +7023,50 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:tabular-nums!important;
   font-feature-settings:normal!important;
 }
+
+/* Kalorien-Kalibrierung: exakt das aufklappbare LOGMAN-Infomuster. */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
+  grid-template-columns:82px minmax(0,1fr) 34px;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
+  width:34px;
+  height:34px;
+  border-color:#111;
+  background:var(--ordner);
+  color:var(--ordner-ink,#fff);
+  box-shadow:none;
+  cursor:pointer;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info:active{
+  transform:translateY(1px);
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help{
+  margin:-10px 0 14px;
+  background:#fff;
+  color:#626978;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help b{
+  color:#111;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help[hidden]{
+  display:none;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-more{
+  margin:1px 0 0;
+  padding:0;
+  border:0;
+  border-bottom:1px solid currentColor;
+  border-radius:0;
+  background:transparent;
+  color:#111;
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:700;
+  line-height:1.45;
+}
+@media(max-width:370px){
+  :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
+    grid-template-columns:68px minmax(0,1fr) 34px;
+    gap:11px;
+  }
+}

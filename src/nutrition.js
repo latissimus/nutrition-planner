@@ -170,7 +170,15 @@ function summaryMarkup(state, date) {
       <strong>${target ? decimal(over || remaining) : decimal(kcal)}</strong>
       <b>KCAL</b>
     </span>
+    <button class="som-info-knopf nutrition-calibration-info" type="button" data-toggle-nutrition-calibration aria-expanded="false" aria-controls="nutrition-calibration-help" aria-label="Kalorien-Kalibrierung erklären">i</button>
   </section>
+  <div class="som-kurzhilfe nutrition-calibration-help" id="nutrition-calibration-help" data-nutrition-calibration-help hidden>
+    <p>Die <b>Kalorien-Kalibrierung</b> verknüpft deine vollständig protokollierten Ernährungstage mit deinem geglätteten Gewichtstrend. Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden dabei nicht überbewertet.</p>
+    <p>Aussagekräftig wird die Entwicklung erst über mehrere vergleichbare Wochen. Nach mindestens <b>21 Tagen</b> kann MUSCLEDEX einschätzen, ob dein bisheriges Kalorienziel zu deinem tatsächlichen Verlauf passt.</p>
+    <p>Ein Vorschlag verändert dein Ziel <b>niemals automatisch</b>. Du entscheidest selbst, ob du ihn übernimmst.</p>
+    <p><b>Aktueller Stand:</b> ${escapeHtml(adaptiveStatusText(adaptive.result))}</p>
+    ${adaptive.result.eligible ? '<button class="nutrition-calibration-more" type="button" data-open-nutrition-adaptive>Vorschlag im Detail ansehen</button>' : ''}
+  </div>
   <details class="nutrition-coin-overview">
     <summary><span><b>TAGESÜBERSICHT</b><small>${dateLabel(date)} · ${dateFromKey(date).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary>
     <div class="nutrition-coin-overview-body">
@@ -193,11 +201,7 @@ function summaryMarkup(state, date) {
         </button>
       </div>
     </div>
-  </details>
-    <button class="nutrition-adaptive-teaser" type="button" data-open-nutrition-adaptive>
-      <span><b>Kalorien-Kalibrierung</b><small>${escapeHtml(adaptiveStatusText(adaptive.result))}</small></span>
-      <i aria-hidden="true">i</i>
-    </button>`;
+  </details>`;
 }
 
 function adaptiveModel(state, calculated, target) {
@@ -999,6 +1003,14 @@ export async function mountNutrition(container, { userId, signal }) {
     };
     container.querySelector('[data-open-nutrition-calculator]')?.addEventListener('click', openCalculator);
     container.querySelector('[data-open-nutrition-day-status]')?.addEventListener('click', openDayStatus);
+    container.querySelector('[data-toggle-nutrition-calibration]')?.addEventListener('click', (event) => {
+      const button = event.currentTarget;
+      const help = container.querySelector('[data-nutrition-calibration-help]');
+      if (!help) return;
+      const willOpen = help.hidden;
+      help.hidden = !willOpen;
+      button.setAttribute('aria-expanded', String(willOpen));
+    });
     container.querySelector('[data-open-nutrition-adaptive]')?.addEventListener('click', openAdaptive);
     container.querySelectorAll('[data-nutrition-day]').forEach((button) => {
       button.onclick = async () => {
