@@ -7447,6 +7447,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:grid;
   place-items:center;
   width:48px;
+  color:#000;
+  opacity:1;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-emoji .reminder-svg svg{
+  color:#000;
+  opacity:1;
+  filter:brightness(0);
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry>.nutrition-entry-head{
   grid-template-columns:48px minmax(0,1fr) auto;
