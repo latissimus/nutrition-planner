@@ -608,7 +608,7 @@ function reminderRowMarkup(reminder, completion) {
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
   const commonAttrs = `data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}`;
   const head = `
-    <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminder.type === 'supplement' ? 'pill' : reminderIconValue(reminder))}</span>
+    <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminderIconValue(reminder))}</span>
     <span class="rem-row-titel">
       <b>${escapeHtml(reminder.label)}</b>
       <small class="rem-row-art">${reminder.type === 'supplement' ? 'SUPPLEMENT' : reminder.type === 'drink' ? 'TRINKEN' : 'MAHLZEIT'}</small>
