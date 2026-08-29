@@ -7604,6 +7604,47 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-block:6px!important;
 }
 
+/* JetBrains Mono ist in Regular sichtbar feiner als die zuvor verwendete
+   Apple-Schrift. Kleine technische Werte erhalten deshalb den echten
+   Medium-Schnitt; große Statuszahlen behalten ihre bestehende Hierarchie. */
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-entry-head .rem-row-titel>small,
+  .rem-row[data-type="supplement"] .rem-row-titel>small:not(.rem-row-art)
+){
+  font-weight:500!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-overview>summary small,
+  .nutrition-day-nav small,
+  .mahl-slot-zeit-anzeige,
+  .mahl-trinken .rem-row[data-type="drink"] .rem-row-titel>small:not(.rem-row-art)
+){
+  font-weight:600!important;
+}
+
+/* Meal-Log-Erklärung und Kalorien-Kalibrierung teilen exakt dieselbe
+   Infotypografie: ruhiges Grau, identischer Absatzrhythmus und Medium als
+   neues lesbares Grundgewicht. Hervorhebungen bleiben klar Bold. */
+:is(.food-dex-info-dialog,.nutrition-calibration-help) p{
+  margin:0!important;
+  color:#586274!important;
+  font-family:var(--tech)!important;
+  font-size:11.5px!important;
+  font-weight:500!important;
+  line-height:1.45!important;
+  letter-spacing:0!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+:is(.food-dex-info-dialog,.nutrition-calibration-help) p+p{
+  margin-top:13px!important;
+}
+:is(.food-dex-info-dialog,.nutrition-calibration-help) p b{
+  color:#111!important;
+  font-family:inherit!important;
+  font-weight:700!important;
+}
+
 /* Trinken: Start und Ende bleiben klar getrennt, das Intervall bekommt
    darunter die volle Formularbreite. */
 :root[data-seite="reminders"] :is(.meal-log-dex-page,.reminder-overlay) .rem-trinkzeiten{
