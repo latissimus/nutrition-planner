@@ -222,19 +222,23 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   };
 }
 
-function writeRootPageLook(look) {
-  const root = document.documentElement;
-  root.style.setProperty('--dex-seitenfarbe', look.color);
-  root.style.setProperty('--dex-ink', readableInkFor(look.color));
-  root.style.setProperty('--bg', look.color);
-  root.style.setProperty('--app-bg', look.color);
-  root.style.setProperty('--app-content-bg', look.color);
-  root.style.setProperty('--app-chrome-bg', look.color);
-  root.style.setProperty('--food-page-purple', look.color);
-  root.dataset.dexMuster = look.pattern;
+function writePageLook(target, look) {
+  target.style.setProperty('--dex-seitenfarbe', look.color);
+  target.style.setProperty('--dex-ink', readableInkFor(look.color));
+  target.style.setProperty('--bg', look.color);
+  target.style.setProperty('--app-bg', look.color);
+  target.style.setProperty('--app-content-bg', look.color);
+  target.style.setProperty('--app-chrome-bg', look.color);
+  target.style.setProperty('--food-page-purple', look.color);
+  target.dataset.dexMuster = look.pattern;
   const wallpaper = pagePatterns.find(([id]) => id === look.pattern)?.[2];
-  if (wallpaper) root.style.setProperty('--dex-tapete', `url("${String(wallpaper).replaceAll('"', '\\"')}")`);
-  else root.style.removeProperty('--dex-tapete');
+  if (wallpaper) target.style.setProperty('--dex-tapete', `url("${String(wallpaper).replaceAll('"', '\\"')}")`);
+  else target.style.removeProperty('--dex-tapete');
+  return Boolean(wallpaper);
+}
+
+function writeRootPageLook(look) {
+  writePageLook(document.documentElement, look);
 }
 
 export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
@@ -244,6 +248,16 @@ export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
     return look;
   }
   writeRootPageLook(look);
+  return look;
+}
+
+// Bereitet eine noch unsichtbare Zielansicht vor, ohne den Look der aktuell
+// sichtbaren Seite umzuschalten. Das ist insbesondere bei dynamisch geladenen
+// Dex wichtig: Die Tapete kann bereits rasterisiert werden, während Daten und
+// Code-Chunk laden, und erscheint danach gemeinsam mit dem Inhalt.
+export function primePageLook(target, scope, fallbackColor, fallbackPattern = 'drops') {
+  const look = pageLook(scope, fallbackColor, fallbackPattern);
+  if (target) target.classList.toggle('dex-tapete-datei', writePageLook(target, look));
   return look;
 }
 
