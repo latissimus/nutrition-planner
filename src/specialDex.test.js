@@ -35,7 +35,8 @@ describe('Special-Dex-Vorlage', () => {
       body: { append: vi.fn() },
     });
     vi.stubGlobal('requestAnimationFrame', (callback) => callback());
-    createSpecialDexOverlay({ markup: '<p>Info</p>' });
+    createSpecialDexOverlay({ markup: '<p>Info</p>', ariaLabel: 'Dex-Info' });
+    expect(backdrop.innerHTML).toContain('aria-label="Dex-Info"');
     listeners.click({ target: { closest: () => true } });
     listeners.keydown({ key: 'Escape' });
     expect(backdrop.remove).toHaveBeenCalledTimes(2);

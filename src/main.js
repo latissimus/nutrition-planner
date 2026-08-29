@@ -1001,8 +1001,13 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const training = kind === 'training';
   const custom = kind === 'custom';
   const meal = kind === 'meal';
-  const title = custom ? (customTitle || 'Eigener Dex') : meal ? 'Meal-Log' : training ? 'Trainingdex' : 'Fooddex';
-  const copy = meal
+  const sleep = kind === 'sleep';
+  const title = custom ? (customTitle || 'Eigener Dex') : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : 'Fooddex';
+  const copy = sleep
+    ? `<p>Im <b>Sleep-Log</b> planst du deinen Schlafrhythmus und hältst morgens <b>Schlafdauer</b>, <b>Qualität</b> und <b>Energie</b> fest.</p>
+      <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden erst aus mehreren vergleichbaren Check-ins abgeleitet.</p>
+      <p>Die Auswertung zeigt beobachtete Zusammenhänge und ersetzt keine medizinische Diagnose.</p>`
+    : meal
     ? `<p>Im <b>Meal-Log</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
       <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>
       <p>Über den Hinzufügen-Button erfasst du Lebensmittel oder ergänzt deine Planung.</p>`
@@ -1043,6 +1048,7 @@ function installNeoDexChrome(view, {
   closeHref = '#home',
   editLabel = 'Fooddex bearbeiten',
   infoKind = 'food',
+  onEdit = null,
 } = {}) {
   const foodBar = view.querySelector('.kategorie-kopf');
   const foodAdd = foodBar?.querySelector('.kategorie-plus');
@@ -1077,7 +1083,8 @@ function installNeoDexChrome(view, {
   };
   foodActionBar.querySelector('[data-food-action="edit"]').onclick = () => {
     foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
-    foodSettings?.click();
+    if (onEdit) onEdit();
+    else foodSettings?.click();
   };
   foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
   foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
@@ -1610,7 +1617,14 @@ async function renderRoute() {
     setSeite('sleep');
     prepareSpecialDexPage(view, 'sleep');
     const { mountSleepDex } = await sleepModule();
-    await mountSleepDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
+    const sleepActions = await mountSleepDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
+    installNeoDexChrome(view, {
+      title: 'Sleep-Log',
+      meta: sleepActions?.meta || 'Schlaf planen',
+      editLabel: 'Schlafplan bearbeiten',
+      infoKind: 'sleep',
+      onEdit: () => sleepActions?.openPlan?.(),
+    });
   } else {
     mountHome(view, signal);
   }

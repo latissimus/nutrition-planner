@@ -5371,12 +5371,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 /* SLEEP ------------------------------------------------------------------- */
 :root[data-seite="sleep"] .kategorie-scrollinhalt{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
-.sleep-dex-page [data-sleep-content]{display:grid;gap:12px;padding:8px 0 24px}
-.sleep-tonight,.sleep-section{position:relative;overflow:hidden;width:100%;margin:0;background:var(--surface);border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);box-shadow:var(--hart-klein)}
-.sleep-tonight::before,.sleep-section::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:7px;background:var(--ordner)}
-.sleep-tonight{display:grid;grid-template-columns:42px minmax(0,1fr) 48px;align-items:center;gap:12px;padding:21px 16px 16px;background:color-mix(in srgb,var(--ordner) 15%,var(--surface))}
-.sleep-tonight{background:transparent;border:0;box-shadow:none;border-radius:0}
-.sleep-tonight::before{display:none}
+.sleep-dex-page [data-sleep-content]{display:grid}
+.sleep-tonight,.sleep-section{position:relative;overflow:hidden;width:100%;margin:0}
+.sleep-tonight{display:grid;align-items:center}
 .sleep-card-icon,.sleep-section-title>.material-svg{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}
 .sleep-card-icon svg,.sleep-section-title>.material-svg svg{display:block;width:21px;height:21px;fill:currentColor}
 .sleep-tonight small,.sleep-tonight strong,.sleep-tonight span{display:block}
@@ -5385,7 +5382,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-tonight span{font-size:13px;color:var(--muted);line-height:1.35}
 .sleep-tonight button{display:grid;place-items:center;width:48px;height:48px;padding:0;border:var(--karten-bw) solid var(--ink);border-radius:13px;background:var(--surface);color:var(--ink);box-shadow:var(--hart-klein)}
 .sleep-tonight button .material-icon{width:23px;height:23px}
-.sleep-section{padding:21px 16px 16px}
+.sleep-section{padding:16px}
 .sleep-section>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
 /* Nachttisch-Wecker: Karte unter „Heute Nacht". */
 .wecker-card{position:relative;overflow:hidden;width:100%;margin:0;padding:16px;background:var(--surface);border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);box-shadow:var(--hart-klein)}
@@ -5472,7 +5469,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Die kleinen Monospace-Ziffern wirken optisch höher als die große Zahl im
    COIN-DEX. Auf Home und in SLEEP werden reine Werte deshalb leicht
    vertikal verdichtet, ohne Schriftgröße oder Tippflächen zu verändern. */
-:is(.coin-kopfstand strong,.dex-ordner-inhalt .dex-datensatz-meta b,.sleep-tonight strong,.sleep-latest b,.sleep-latest small,.sleep-stats strong,.sleep-month b,.sleep-history span b,.sleep-history span small,.sleep-history button>strong){display:inline-block;transform:scaleY(.9);transform-origin:center}
+:is(.coin-kopfstand strong,.dex-ordner-inhalt .dex-datensatz-meta b){display:inline-block;transform:scaleY(.9);transform-origin:center}
 .sleep-editor input:is([type="date"],[type="time"])::-webkit-datetime-edit-fields-wrapper{transform:scaleY(.9);transform-origin:center}
 .sleep-rating{margin:0;padding:0;border:0}.sleep-rating legend,.sleep-tags legend{margin-bottom:7px;font-size:11px;font-weight:850;text-transform:uppercase}.sleep-rating>div{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.sleep-rating input,.sleep-tags input{position:absolute;opacity:0}.sleep-rating span{display:grid;place-items:center;min-height:48px;border:1.5px solid var(--ink);border-radius:11px;background:var(--surface);font-size:23px}.sleep-rating input:checked+span{background:color-mix(in srgb,var(--ordner) 35%,var(--surface));box-shadow:var(--shadow-sm)}
 .sleep-tags{margin:0;padding:0;border:0}.sleep-tags>div{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}.sleep-tags label span{display:flex;align-items:center;min-height:38px;padding:7px 10px;border:1.5px solid var(--ink);border-radius:999px;background:var(--surface);font-size:11px;font-weight:750}.sleep-tags input:checked+span{background:var(--ordner);color:#fff}.sleep-tags>.input{height:48px}
@@ -7420,6 +7417,204 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:0!important;
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
+}
+
+/* ============================================================
+   SLEEP-LOG AUF DER SPECIAL-DEX-VORLAGE
+   Breite ruhige Karten, ein klarer Hero und dieselbe Typografie wie
+   Meal-Log. Schlafspezifische Diagramme und Routinen bleiben eigenständig.
+   ============================================================ */
+:root[data-seite="sleep"] .sleep-dex-page{
+  --special-dex-hero-bg:color-mix(in srgb,var(--ordner) 8%,#fff);
+  --special-dex-card-bg:#fff;
+  color:#111;
+}
+:root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{
+  display:grid;
+  gap:18px;
+  padding:8px 12px calc(112px + env(safe-area-inset-bottom));
+}
+:root[data-seite="sleep"] .sleep-tonight,
+:root[data-seite="sleep"] .sleep-section{
+  margin:0;
+  color:#111;
+}
+:root[data-seite="sleep"] .sleep-tonight::before,
+:root[data-seite="sleep"] .sleep-section::before{
+  display:none!important;
+}
+:root[data-seite="sleep"] .sleep-tonight{
+  grid-template-columns:44px minmax(0,1fr) 46px;
+  gap:13px;
+  min-height:142px;
+  padding:20px 17px;
+  overflow:visible;
+}
+:root[data-seite="sleep"] .sleep-tonight .sleep-card-icon,
+:root[data-seite="sleep"] .sleep-section-title>.material-svg{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:var(--ordner);
+  color:var(--ordner-ink,#fff);
+}
+:root[data-seite="sleep"] .sleep-tonight small{
+  color:#655f5b;
+  font:750 10px/1.2 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.07em;
+}
+:root[data-seite="sleep"] .sleep-tonight strong{
+  margin:5px 0 6px;
+  font:700 clamp(23px,6.4vw,31px)/1.05 var(--tech);
+  font-variant-numeric:tabular-nums slashed-zero;
+  letter-spacing:-.035em;
+  transform:none;
+}
+:root[data-seite="sleep"] .sleep-tonight span{
+  color:#655f5b;
+  font:500 12px/1.42 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] .sleep-tonight button{
+  width:46px;
+  height:46px;
+  border:1.5px solid #111;
+  border-radius:12px;
+  background:#fff;
+  color:#111;
+  box-shadow:0 3.5px 0 #000;
+}
+:root[data-seite="sleep"] .sleep-tonight button:active{
+  transform:translateY(3.5px);
+  box-shadow:none;
+}
+:root[data-seite="sleep"] .sleep-section{
+  padding:16px;
+  border:1.5px solid #111;
+  border-radius:15px;
+  background:#fff;
+  box-shadow:none;
+}
+:root[data-seite="sleep"] .sleep-section.special-dex-list-card{
+  padding:0;
+  border:0;
+  border-radius:18px;
+}
+:root[data-seite="sleep"] .sleep-section.special-dex-list-card>header{
+  padding:16px 16px 4px;
+}
+:root[data-seite="sleep"] .sleep-section>header{
+  margin-bottom:14px;
+}
+:root[data-seite="sleep"] .sleep-section>header h2{
+  margin:0;
+  font:800 16px/1.15 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:-.015em;
+  text-transform:none;
+}
+:root[data-seite="sleep"] .sleep-section>header>small,
+:root[data-seite="sleep"] .sleep-insights>header>small{
+  color:#6b6561;
+  font:500 10px/1.35 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] :is(
+  .sleep-latest b,.sleep-latest small,.sleep-stats strong,
+  .sleep-month b,.sleep-month small,.sleep-history span b,
+  .sleep-history span small,.sleep-history button>strong,
+  .sleep-routine small
+){
+  font-family:var(--tech)!important;
+  font-variant-numeric:tabular-nums slashed-zero;
+  transform:none;
+}
+:root[data-seite="sleep"] .sleep-latest{
+  min-height:76px;
+  border:1px solid #d8d5d2;
+  border-radius:12px;
+  background:#f7f6f4;
+}
+:root[data-seite="sleep"] .sleep-latest b{
+  font-size:13px;
+  font-weight:700;
+}
+:root[data-seite="sleep"] .sleep-latest small{
+  font-size:9px;
+  font-weight:500;
+}
+:root[data-seite="sleep"] .sleep-routine{
+  padding:9px 14px;
+  border-bottom:1px dashed #9d9995;
+}
+:root[data-seite="sleep"] .sleep-routine b{
+  font:750 14px/1.2 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] .sleep-stats>div{
+  padding:13px 8px;
+  border-radius:12px;
+  background:color-mix(in srgb,var(--ordner) 8%,#fff);
+}
+:root[data-seite="sleep"] .sleep-stats strong{
+  font-size:13px;
+  font-weight:700;
+}
+:root[data-seite="sleep"] .sleep-stats small{
+  color:#655f5b;
+  font:600 9px/1.25 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] .sleep-chart-empty,
+:root[data-seite="sleep"] .sleep-empty{
+  border:1px dashed #9d9995;
+  border-radius:12px;
+  background:transparent;
+  color:#655f5b;
+  font:500 12px/1.48 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] .sleep-insights p{
+  background:color-mix(in srgb,var(--ordner) 7%,#fff);
+  color:#111;
+  font:500 12px/1.48 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] .sleep-history button{
+  min-height:66px;
+  padding:11px 16px;
+  border-bottom:1px dashed #9d9995;
+}
+:root[data-seite="sleep"] .sleep-history button>em{
+  color:var(--ordner);
+  font:700 10px/1 var(--tech);
+  letter-spacing:.04em;
+}
+
+:root[data-seite="sleep"] .special-dex-overlay .sleep-editor,
+:root[data-seite="sleep"] .special-dex-overlay .sleep-action-card{
+  color:#111;
+  font-family:"Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="sleep"] .special-dex-overlay .sleep-editor :is(h2,label,legend,select,button,textarea),
+:root[data-seite="sleep"] .special-dex-overlay .sleep-action-card :is(h2,b,small,button){
+  font-family:"Work Sans",var(--ui),sans-serif;
+  font-style:normal;
+}
+:root[data-seite="sleep"] .special-dex-overlay .sleep-editor input:is([type="date"],[type="time"],[type="number"]),
+:root[data-seite="sleep"] .special-dex-overlay .sleep-plan-grid>b{
+  font-family:var(--tech)!important;
+  font-variant-numeric:tabular-nums slashed-zero;
+}
+:root[data-seite="sleep"] .special-dex-overlay .btn-primary{
+  border-color:#000!important;
+  background:var(--ordner)!important;
+  color:var(--ordner-ink,#fff)!important;
+}
+:root[data-seite="sleep"] .special-dex-overlay .sleep-tags input:checked+span,
+:root[data-seite="sleep"] .special-dex-overlay .sleep-rating input:checked+span{
+  border-color:#000;
+  background:var(--ordner);
+  color:var(--ordner-ink,#fff);
+  box-shadow:none;
+}
+@media(max-width:380px){
+  :root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{padding-inline:10px}
+  :root[data-seite="sleep"] .sleep-tonight{grid-template-columns:38px minmax(0,1fr) 44px;padding-inline:13px}
+  :root[data-seite="sleep"] .sleep-tonight .sleep-card-icon{width:36px;height:36px}
 }
 
 /* ============================================================

@@ -2,7 +2,8 @@ import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
 import { setRoutineCompletion } from './routineCompletion.js';
-import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
+import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
+import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { toast } from './toast.js';
 import { playInterfaceSound } from './uiSounds.js';
 
@@ -118,11 +119,13 @@ async function loadState(userId, signal) {
 function closeOverlay(backdrop) { backdrop?.remove(); }
 
 function planEditor({ userId, state, onSaved }) {
-  const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop';
-  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
   const byDay = new Map(state.schedules.map((item) => [item.weekday, item]));
-  backdrop.innerHTML = `<section class="kategorie-sheet sleep-editor" role="dialog" aria-modal="true" aria-label="Schlafplan bearbeiten">
+  const backdrop = createSpecialDexOverlay({
+    colorScope: 'sleep',
+    sheetClassName: 'sleep-editor',
+    closeSelector: '[data-sheet-close]',
+    ariaLabel: 'Schlafplan bearbeiten',
+    markup: `
     <header><h2>Schlafplan</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-sleep-plan-form>
       <div class="sleep-plan-grid"><span>Tag</span><span>Schlafen</span><span>Aufstehen</span><span>Aktiv</span>
@@ -135,9 +138,8 @@ function planEditor({ userId, state, onSaved }) {
         <label class="sleep-setting-switch"><span>Morgen-Check-in erinnern</span><input type="checkbox" data-morning-reminder${state.settings.morning_reminder ? ' checked' : ''}><span class="sleep-switch-track" aria-hidden="true"></span></label>
       </div>
       <button class="btn btn-primary btn-block" type="submit">Schlafplan speichern</button>
-    </form>
-  </section>`;
-  backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeOverlay(backdrop); };
+    </form>`,
+  });
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault();
     const submit = event.submitter; submit.disabled = true;
@@ -161,7 +163,6 @@ function planEditor({ userId, state, onSaved }) {
     if (settingsResult.error || scheduleResult.error) { toast('Schlafplan konnte nicht gespeichert werden.'); submit.disabled = false; return; }
     closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlafplan gespeichert'); await onSaved?.();
   };
-  document.body.append(backdrop);
 }
 
 function ratingField(name, label, value, symbols) {
@@ -174,10 +175,12 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
   const schedule = state.schedules.find((item) => item.weekday === (wakeDay + 6) % 7) || state.schedules[0];
   const selectedTags = new Set(existing?.tags || []);
   const customTags = [...selectedTags].filter((tag) => !TAGS.includes(tag));
-  const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop';
-  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
-  backdrop.innerHTML = `<section class="kategorie-sheet sleep-editor sleep-checkin-editor" role="dialog" aria-modal="true" aria-label="Morgen-Check-in">
+  const backdrop = createSpecialDexOverlay({
+    colorScope: 'sleep',
+    sheetClassName: 'sleep-editor sleep-checkin-editor',
+    closeSelector: '[data-sheet-close]',
+    ariaLabel: 'Morgen-Check-in',
+    markup: `
     <header><div><small>+3 MUSCLE-COINS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-sleep-checkin-form>
       <label class="dex-entry-field"><span>Datum</span><input class="input" type="date" data-sleep-date value="${date}" required></label>
@@ -189,9 +192,8 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
       <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" rows="3" maxlength="1000" data-sleep-note placeholder="Was war anders als sonst?">${escapeHtml(existing?.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block" type="submit" data-no-interface-sound>Check-in speichern</button>
       ${existing ? '<button class="btn btn-block sleep-delete" type="button" data-sleep-delete>Eintrag löschen</button>' : ''}
-    </form>
-  </section>`;
-  backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) closeOverlay(backdrop); };
+    </form>`,
+  });
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault();
     const submit = event.submitter; submit.disabled = true;
@@ -219,17 +221,19 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
     if (error) return toast('Eintrag konnte nicht gelöscht werden.');
     closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlaf-Eintrag gelöscht'); await onSaved?.();
   });
-  document.body.append(backdrop);
 }
 
 function actionsMenu({ userId, state, onSaved }) {
-  const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop';
-  backdrop.style.setProperty('--ordner', categoryColor('sleep'));
-  backdrop.innerHTML = `<section class="kategorie-sheet sleep-action-card" role="dialog" aria-modal="true" aria-label="SLEEP ergänzen"><header><h2>SLEEP</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button><button type="button" data-sleep-action="routines">${materialIconMarkup('self_improvement')}<span><b>Abendroutine</b><small>Meditation und Routinen öffnen</small></span></button></div></section>`;
+  const backdrop = createSpecialDexOverlay({
+    colorScope: 'sleep',
+    sheetClassName: 'sleep-action-card',
+    closeSelector: '[data-sheet-close]',
+    ariaLabel: 'Sleep-Log ergänzen',
+    markup: `<header><h2>Sleep-Log</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button><button type="button" data-sleep-action="routines">${materialIconMarkup('self_improvement')}<span><b>Abendroutine</b><small>Meditation und Routinen öffnen</small></span></button></div>`,
+  });
   const close = () => closeOverlay(backdrop);
-  backdrop.onclick = (event) => {
-    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
+  backdrop.addEventListener('click', (event) => {
+    if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return;
     const action = event.target.closest('[data-sleep-action]')?.dataset.sleepAction;
     if (!action) return;
     close();
@@ -237,8 +241,7 @@ function actionsMenu({ userId, state, onSaved }) {
     if (action === 'plan') planEditor({ userId, state, onSaved });
     if (action === 'sound') openSleepSoundTimer();
     if (action === 'routines') location.hash = 'habits';
-  };
-  document.body.append(backdrop);
+  });
 }
 
 function planForTonight(schedules, now = new Date()) {
@@ -282,29 +285,29 @@ function render(container, userId, state, refresh) {
   const duration = tonight ? sleepDurationMinutes(tonight.bedtime, tonight.wake_time) : 0;
   const content = container.querySelector('[data-sleep-content]');
   content.innerHTML = `
-    <section class="sleep-tonight">
+    <section class="sleep-tonight ${SPECIAL_DEX_CLASSES.hero}">
       <div class="sleep-card-icon">${materialIconMarkup('dark_mode')}</div><div><small>HEUTE NACHT</small><strong>${tonight?.active ? `${String(tonight.bedtime).slice(0, 5)} → ${String(tonight.wake_time).slice(0, 5)}` : 'Kein Plan'}</strong><span>${tonight?.active ? `${durationLabel(duration)} · ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Für diese Nacht ist der Plan pausiert.'}</span></div>
       <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('build')}</button>
     </section>
-    <section class="sleep-section">
+    <section class="sleep-section ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('coffee')}<h2>Morgen-Check-in</h2></div></header>
       ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : '<div class="sleep-empty">Noch kein Morgen-Check-in. Dein erster Eintrag bringt 3 MUSCLE-COINS.</div>'}
     </section>
-    <section class="sleep-section">
+    <section class="sleep-section ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
       <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
       <div class="sleep-routines">${state.routines.length ? state.routines.map((routine) => routineMarkup(routine, state.completed.has(routine.id))).join('') : '<div class="sleep-empty">Lege im ROUTINEN-DEX eine Abendroutine oder Meditation an.</div>'}</div>
     </section>
-    <section class="sleep-section sleep-progress">
+    <section class="sleep-section sleep-progress ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('chart')}<h2>7-Tage-Verlauf</h2></div><small>${week.length} von 7 Nächten</small></header>
       <div class="sleep-stats"><div><strong>${summary.averageMinutes ? durationLabel(summary.averageMinutes) : '–'}</strong><small>Ø Schlaf</small></div><div><strong>${summary.averageQuality ? summary.averageQuality.toFixed(1).replace('.', ',') : '–'}</strong><small>Ø Qualität</small></div><div><strong>${summary.consistencyMinutes || '–'}${summary.consistencyMinutes ? ' min' : ''}</strong><small>Abweichung</small></div></div>
       ${chartMarkup(week)}
       <div class="sleep-month"><span><b>30-Tage-Blick</b><small>${month.length} Check-ins</small></span><span><b>${monthSummary.averageMinutes ? durationLabel(monthSummary.averageMinutes) : '–'}</b><small>Ø Schlaf</small></span><span><b>${bestStreak(state.logs)} Tage</b><small>Beste Serie</small></span></div>
     </section>
-    <section class="sleep-section sleep-insights">
+    <section class="sleep-section sleep-insights ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Deine Zusammenhänge</h2></div><small>Beobachtete Trends, keine medizinischen Ursachen</small></header>
       <div>${trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
     </section>
-    ${state.logs.length ? `<section class="sleep-section sleep-history"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
+    ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 
   content.querySelector('[data-edit-sleep-plan]').onclick = () => planEditor({ userId, state, onSaved: refresh });
   content.querySelectorAll('[data-edit-sleep-log]').forEach((button) => { button.onclick = () => checkinEditor({ userId, state, existing: state.logs.find((log) => log.id === button.dataset.editSleepLog), onSaved: refresh }); });
@@ -322,19 +325,31 @@ function render(container, userId, state, refresh) {
 
 export async function mountSleepDex(container, { userId, signal, mountChrome }) {
   const color = categoryColor('sleep');
-  container.innerHTML = `<div class="wrap pad-bottom sleep-dex-page"><div class="seitenkopf"><h1>SLEEP</h1></div><div data-sleep-content><div class="daten-laden">Schlafdaten werden geladen …</div></div></div>`;
+  container.innerHTML = `<div class="wrap pad-bottom sleep-dex-page ${SPECIAL_DEX_CLASSES.page}"><div data-sleep-content><div class="daten-laden">Schlafdaten werden geladen …</div></div></div>`;
   let state = await loadState(userId, signal);
   if (signal?.aborted) return;
+  let refreshVersion = 0;
   const refresh = async () => {
-    state = await loadState(userId, signal);
-    if (!signal?.aborted) render(container, userId, state, refresh);
+    const version = ++refreshVersion;
+    const nextState = await loadState(userId, signal);
+    if (signal?.aborted || version !== refreshVersion) return;
+    state = nextState;
+    render(container, userId, state, refresh);
+    const meta = container.querySelector('[data-food-scroll-meta]');
+    if (meta) meta.textContent = state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen';
   };
-  mountChrome(container, 'sleep', 'SLEEP-LOG', {
-    color, pageLookScope: 'sleep', pageLookPattern: 'drops',
+  mountChrome(container, 'sleep', 'Sleep-Log', {
+    color, pageLookScope: 'sleep', pageLookPattern: 'wallpaper-moon',
     meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
     onPlus: () => actionsMenu({ userId, state, onSaved: refresh }),
   });
   render(container, userId, state, refresh);
-  subscribeToTableChanges({ table: 'sleep_logs', signal, onChange: refresh, onError: () => {} });
-  subscribeToTableChanges({ table: 'sleep_schedules', signal, onChange: refresh, onError: () => {} });
+  subscribeToTablesChanges({
+    tables: ['sleep_logs', 'sleep_schedules', 'sleep_settings', 'routines', 'routine_completions'],
+    signal, onChange: refresh, onError: () => {},
+  });
+  return {
+    meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
+    openPlan: () => planEditor({ userId, state, onSaved: refresh }),
+  };
 }

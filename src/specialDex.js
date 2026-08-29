@@ -22,6 +22,7 @@ export function createSpecialDexOverlay({
   closeSelector = '[data-close]',
   colorScope = 'reminders',
   replaceSelector = '',
+  ariaLabel = '',
 } = {}) {
   if (replaceSelector) document.querySelector(replaceSelector)?.remove();
   const backdrop = document.createElement('div');
@@ -31,7 +32,8 @@ export function createSpecialDexOverlay({
   backdrop.style.setProperty('--dex-seitenfarbe', color);
   backdrop.style.setProperty('--ordner-ink', colorIsDark(color) ? '#fff' : '#111');
   backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
-  backdrop.innerHTML = `<section class="kategorie-sheet ${SPECIAL_DEX_CLASSES.sheet} ${sheetClassName}" role="dialog" aria-modal="true">${markup}</section>`;
+  const labelAttribute = ariaLabel ? ` aria-label="${String(ariaLabel).replaceAll('&', '&amp;').replaceAll('"', '&quot;')}"` : '';
+  backdrop.innerHTML = `<section class="kategorie-sheet ${SPECIAL_DEX_CLASSES.sheet} ${sheetClassName}" role="dialog" aria-modal="true"${labelAttribute}>${markup}</section>`;
   backdrop.addEventListener('click', (event) => {
     if (event.target === backdrop || event.target.closest(closeSelector)) backdrop.remove();
   });
