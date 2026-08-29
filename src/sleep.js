@@ -286,14 +286,14 @@ function render(container, userId, state, refresh) {
   const content = container.querySelector('[data-sleep-content]');
   content.innerHTML = `
     <section class="sleep-tonight ${SPECIAL_DEX_CLASSES.hero}">
-      <div class="sleep-card-icon">${materialIconMarkup('dark_mode')}</div><div><small>HEUTE NACHT</small><strong>${tonight?.active ? `${String(tonight.bedtime).slice(0, 5)} → ${String(tonight.wake_time).slice(0, 5)}` : 'Kein Plan'}</strong><span>${tonight?.active ? `${durationLabel(duration)} · ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Für diese Nacht ist der Plan pausiert.'}</span></div>
-      <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('build')}</button>
+      <div class="sleep-tonight-copy"><small>HEUTE NACHT</small>${tonight?.active ? `<div class="sleep-tonight-times"><strong>${String(tonight.bedtime).slice(0, 5)}</strong><i aria-hidden="true">→</i><strong>${String(tonight.wake_time).slice(0, 5)}</strong></div>` : '<strong class="sleep-tonight-empty">Kein Plan</strong>'}<span>${tonight?.active ? `${durationLabel(duration)} · ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Für diese Nacht ist der Plan pausiert.'}</span></div>
+      <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('edit')}</button>
     </section>
-    <section class="sleep-section ${SPECIAL_DEX_CLASSES.card}">
+    <section class="sleep-section sleep-checkin ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('coffee')}<h2>Morgen-Check-in</h2></div></header>
       ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : '<div class="sleep-empty">Noch kein Morgen-Check-in. Dein erster Eintrag bringt 3 MUSCLE-COINS.</div>'}
     </section>
-    <section class="sleep-section ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
+    <section class="sleep-section sleep-routine-section ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
       <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
       <div class="sleep-routines">${state.routines.length ? state.routines.map((routine) => routineMarkup(routine, state.completed.has(routine.id))).join('') : '<div class="sleep-empty">Lege im ROUTINEN-DEX eine Abendroutine oder Meditation an.</div>'}</div>
     </section>

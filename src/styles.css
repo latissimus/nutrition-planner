@@ -4414,6 +4414,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.neo-dex-page,.food-dex-page) .kategorie-scrollinhalt{
   height:100%!important;min-height:0!important;padding-top:12px!important;
 }
+.special-dex-page .kategorie-scrollinhalt{
+  height:100%!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  padding-top:12px!important;
+  -webkit-overflow-scrolling:touch;
+}
 :is(.neo-dex-page,.food-dex-page) .kategorie-kopftitel strong,
 :is(.neo-dex-page,.food-dex-page) .kategorie-kopftitel small{
   color:currentColor!important;
@@ -7444,13 +7451,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:none!important;
 }
 :root[data-seite="sleep"] .sleep-tonight{
-  grid-template-columns:44px minmax(0,1fr) 46px;
-  gap:13px;
-  min-height:142px;
-  padding:20px 17px;
+  display:block;
+  min-height:154px;
+  padding:20px 17px 18px;
   overflow:visible;
 }
-:root[data-seite="sleep"] .sleep-tonight .sleep-card-icon,
 :root[data-seite="sleep"] .sleep-section-title>.material-svg{
   width:38px;
   height:38px;
@@ -7465,22 +7470,46 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   gap:0;
 }
 :root[data-seite="sleep"] .sleep-tonight small{
+  padding-right:58px;
   color:#655f5b;
   font:750 10px/1.2 "Work Sans",var(--ui),sans-serif;
   letter-spacing:.07em;
 }
 :root[data-seite="sleep"] .sleep-tonight strong{
-  margin:5px 0 6px;
-  font:700 clamp(23px,6.4vw,31px)/1.05 var(--tech);
+  margin:0;
+  font:800 clamp(36px,11vw,48px)/.98 var(--tech);
   font-variant-numeric:tabular-nums slashed-zero;
-  letter-spacing:-.035em;
+  letter-spacing:-.065em;
   transform:none;
+}
+:root[data-seite="sleep"] .sleep-tonight-times{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:7px;
+  margin:14px 0 9px;
+  padding-right:2px;
+  white-space:nowrap;
+}
+:root[data-seite="sleep"] .sleep-tonight-times i{
+  flex:0 0 auto;
+  color:#111;
+  font:750 clamp(19px,5.5vw,24px)/1 "Work Sans",var(--ui),sans-serif;
+  font-style:normal;
+}
+:root[data-seite="sleep"] .sleep-tonight-empty{
+  display:block;
+  margin:15px 0 10px!important;
+  letter-spacing:-.045em!important;
 }
 :root[data-seite="sleep"] .sleep-tonight span{
   color:#655f5b;
   font:500 12px/1.42 "Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="sleep"] .sleep-tonight button{
+  position:absolute;
+  top:17px;
+  right:17px;
   width:46px;
   height:46px;
   border:1.5px solid #111;
@@ -7495,10 +7524,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="sleep"] .sleep-section{
   padding:16px;
-  border:1.5px solid #111;
+  border:0;
   border-radius:15px;
   background:#fff;
   box-shadow:none;
+}
+:root[data-seite="sleep"] .sleep-section.sleep-checkin{
+  border:1.5px solid #111;
 }
 :root[data-seite="sleep"] .sleep-section.special-dex-list-card{
   padding:0;
@@ -7619,8 +7651,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 @media(max-width:380px){
   :root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{padding-inline:10px}
-  :root[data-seite="sleep"] .sleep-tonight{grid-template-columns:38px minmax(0,1fr) 44px;padding-inline:13px}
-  :root[data-seite="sleep"] .sleep-tonight .sleep-card-icon{width:36px;height:36px}
+  :root[data-seite="sleep"] .sleep-tonight{padding-inline:13px}
+  :root[data-seite="sleep"] .sleep-tonight button{right:13px}
+  :root[data-seite="sleep"] .sleep-tonight-times{gap:4px}
 }
 
 /* ============================================================
