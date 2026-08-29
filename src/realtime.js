@@ -70,3 +70,24 @@ export function subscribeToTableChanges({ table, signal, onChange, onError }) {
   signal?.addEventListener('abort', close, { once: true });
   return close;
 }
+
+// Verwandte Tabellen teilen genau einen Refresh-Koordinator. So löst ein
+// Schreibvorgang, der mehrere Realtime-Ereignisse erzeugt, nur einen Reload
+// der Ansicht aus und niemals parallele Vollabfragen pro Tabelle.
+export function subscribeToTablesChanges({ tables = [], signal, onChange, onError, delay = 90 }) {
+  const uniqueTables = [...new Set(tables.filter(Boolean))];
+  if (!supabase || !uniqueTables.length || typeof onChange !== 'function' || signal?.aborted) return () => {};
+  const refresh = createRealtimeRefresh(onChange, { delay, onError });
+  const channels = uniqueTables.map((table) => supabase.channel(`muscledex:${table}:${zufallsId()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table }, () => refresh.request())
+    .subscribe());
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    refresh.stop();
+    channels.forEach((channel) => supabase.removeChannel(channel));
+  };
+  signal?.addEventListener('abort', close, { once: true });
+  return close;
+}

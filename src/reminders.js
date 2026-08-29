@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { availableCategoryIcons, materialIconMarkup, categoryColor, colorIsDark, pageLook } from './categoryIcons.js';
+import { availableCategoryIcons, materialIconMarkup, categoryColor, pageLook } from './categoryIcons.js';
 import {
   activatePush,
   browserPushSubscriptionExists,
@@ -16,6 +16,7 @@ import {
   shouldStartLocalReminderLoop, supplementGroupTitle, supplementNotificationTag,
 } from './notificationDelivery.js';
 import { mountNutrition } from './nutrition.js';
+import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { bindLongPress } from './longPress.js';
 import { notifyHomeCountsChanged } from './realtime.js';
 
@@ -668,7 +669,7 @@ function reminderGroups(reminders, completions) {
     const rows = timed.filter((item) => supplementSlotForReminder(item) === period);
     const note = (slotReminder?.metadata?.notiz || '').trim();
     const slotKey = slotReminder?._key || slotReminder?.id;
-    return `<section class="mahl-zeitblock mahl-zeitblock-${period}">
+    return `<section class="mahl-zeitblock mahl-zeitblock-${period} ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
       <header class="mahl-slot-kopf">
         <div class="mahl-slot-titel">
           <div class="mahl-slot-heading"><h2>${title}</h2>
@@ -691,7 +692,7 @@ function reminderGroups(reminders, completions) {
       </div>
     </section>`;
   }).join('');
-  const water = `<section class="mahl-zeitblock mahl-trinken">
+  const water = `<section class="mahl-zeitblock mahl-trinken ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
     <header><h2>TRINKEN</h2></header>
     <div class="mahl-timeline">${drink
       ? reminderRowMarkup(drink, completionByReminder.get(drink.id))
@@ -702,19 +703,13 @@ function reminderGroups(reminders, completions) {
 }
 
 function reminderOverlay(markup) {
-  document.querySelector('.reminder-overlay')?.remove();
-  const backdrop = document.createElement('div');
-  const color = categoryColor('reminders');
-  backdrop.className = 'kategorie-sheet-backdrop reminder-overlay offen';
-  backdrop.style.setProperty('--ordner', color);
-  backdrop.style.setProperty('--dex-seitenfarbe', color);
-  backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
-  backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true">${markup}</section>`;
-  backdrop.onclick = (event) => {
-    if (event.target === backdrop || event.target.closest('[data-reminder-overlay-close]')) backdrop.remove();
-  };
-  document.body.append(backdrop);
-  return backdrop;
+  return createSpecialDexOverlay({
+    markup,
+    className: 'reminder-overlay offen',
+    sheetClassName: 'sammlung-editor',
+    closeSelector: '[data-reminder-overlay-close]',
+    replaceSelector: '.reminder-overlay',
+  });
 }
 
 function choosePeriod(type, onSelected) {
@@ -787,13 +782,6 @@ export async function mountReminders(container, { session, signal }) {
   container.style.setProperty('--ordner', pageLook('reminders', categoryColor('reminders'), 'wallpaper-burger').color);
   container.innerHTML = `
     <div class="wrap pad-bottom">
-      <div class="seitenkopf">
-        <div class="seitenkopf-text">
-          <span class="seitenkopf-kicker">Erinnerungen</span>
-          <h1 class="section-title">Wecker</h1>
-        </div>
-        <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
-      </div>
       <div data-nutrition-root></div>
       <section data-reminders-card>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
@@ -843,6 +831,11 @@ export async function mountReminders(container, { session, signal }) {
   // nicht bei jedem Tastenanschlag ein Roundtrip macht.
   const saveTimers = new Map();
   const dirtyPatches = new Map();
+  signal?.addEventListener('abort', () => {
+    saveTimers.forEach((timer) => clearTimeout(timer));
+    saveTimers.clear();
+    dirtyPatches.clear();
+  }, { once: true });
   const scheduleSave = (key) => {
     if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
     saveTimers.set(key, setTimeout(() => flushSave(key), AUTOSAVE_MS));
@@ -1235,7 +1228,7 @@ export async function mountReminders(container, { session, signal }) {
     const key = row.dataset.reminderKey;
     const reminder = reminders.find((r) => (r._key || r.id) === key);
     return reminder ? () => openReminderSheet(reminder) : null;
-  });
+  }, { signal });
 
   list.addEventListener('change', async (event) => {
     const slotSwitch = event.target.closest('[data-slot-active]');
@@ -1303,14 +1296,12 @@ export async function mountReminders(container, { session, signal }) {
   return {
     meta: '5 Mahlzeiten',
     openAddMenu() {
-      document.querySelector('.mahl-add-backdrop')?.remove();
-      const backdrop = document.createElement('div');
-      const color = categoryColor('reminders');
-      backdrop.className = 'kategorie-sheet-backdrop mahl-add-backdrop offen';
-      backdrop.style.setProperty('--ordner', color);
-      backdrop.style.setProperty('--dex-seitenfarbe', color);
-      backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
-      backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
+      const backdrop = createSpecialDexOverlay({
+        className: 'mahl-add-backdrop offen',
+        sheetClassName: 'mahl-add-sheet',
+        closeSelector: '[data-close]',
+        replaceSelector: '.mahl-add-backdrop',
+        markup: `
         <header><h2>Eintrag hinzufügen</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         ${nutritionActions?.isEnabled?.() ? `<section class="mahl-add-gruppe">
           <div class="sheet-menue mahl-add-unterpunkte">
@@ -1324,8 +1315,8 @@ export async function mountReminders(container, { session, signal }) {
         <div class="sheet-menue">
           <button type="button" data-add-type="supplement">${iconMarkup('supplement')}<span>Supplement</span></button>
           <button type="button" data-add-type="drink">${iconMarkup('drink')}<span>Trinkplan</span></button>
-        </div>
-      </section>`;
+        </div>`,
+      });
       backdrop.onclick = (event) => {
         if (event.target === backdrop || event.target.closest('[data-close]')) return backdrop.remove();
         const type = event.target.closest('[data-add-type]')?.dataset.addType;

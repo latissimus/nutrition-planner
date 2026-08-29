@@ -1,12 +1,13 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { materialIconMarkup, categoryColor, colorIsDark } from './categoryIcons.js';
-import { subscribeToTableChanges } from './realtime.js';
+import { subscribeToTablesChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
 import { blsSuche, preloadBls } from './blsFoods.js';
 import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp, initialEnergyEstimate, weightTrendSummary } from './bodyComposition.js';
 import { performanceTrend } from './logmanImport.js';
+import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
@@ -44,11 +45,34 @@ export function calculateEnergyNeed(input) { return initialEnergyEstimate(input)
 
 function total(entries, field) { return entries.reduce((sum, item) => sum + number(item[field]), 0); }
 
-async function loadNutrition(userId, date, signal) {
+async function loadNutritionCore(userId, date, signal) {
   let settingsQuery = supabase.from('nutrition_settings').select('*').eq('user_id', userId).maybeSingle();
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
-  let recentQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(40);
   let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false });
+  let latestWeightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(1);
+  if (signal) {
+    settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
+    ownQuery = ownQuery.abortSignal(signal);
+    latestWeightQuery = latestWeightQuery.abortSignal(signal);
+  }
+  const [settings, entries, own, latestWeight] = await Promise.all([
+    settingsQuery, logQuery, ownQuery, latestWeightQuery,
+  ]);
+  const error = settings.error || entries.error || own.error || latestWeight.error;
+  if (error) throw error;
+  const entryList = entries.data || [];
+  const signed = await signImagePaths(entryList.map((entry) => entry.product_snapshot?.image_path));
+  if (signed.size) entryList.forEach((entry) => {
+    const path = entry.product_snapshot?.image_path;
+    if (path && signed.has(path)) entry.product_snapshot.image_url = signed.get(path);
+  });
+  return {
+    settings: settings.data || {}, entries: entryList, ownProducts: own.data || [],
+    latestWeight: number(latestWeight.data?.[0]?.kg),
+  };
+}
+
+async function loadNutritionCalibration(userId, date, signal) {
   let weightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: true }).limit(90);
   let historyQuery = supabase.from('nutrition_log_entries').select('log_date,energy_kcal').eq('user_id', userId)
     .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
@@ -60,27 +84,18 @@ async function loadNutrition(userId, date, signal) {
   let sleepQuery = supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(42);
   let checkinQuery = supabase.from('bodycomp_checkins').select('checkin_date,recovery').eq('user_id', userId).order('checkin_date').limit(42);
   if (signal) {
-    settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
-    recentQuery = recentQuery.abortSignal(signal); ownQuery = ownQuery.abortSignal(signal); weightQuery = weightQuery.abortSignal(signal);
+    weightQuery = weightQuery.abortSignal(signal);
     historyQuery = historyQuery.abortSignal(signal); dayStatusQuery = dayStatusQuery.abortSignal(signal);
     skinfoldQuery = skinfoldQuery.abortSignal(signal); waistQuery = waistQuery.abortSignal(signal);
     performanceQuery = performanceQuery.abortSignal(signal); sleepQuery = sleepQuery.abortSignal(signal); checkinQuery = checkinQuery.abortSignal(signal);
   }
-  const [settings, entries, recent, own, weight, history, dayStatus, skinfolds, waists, performance, sleep, checkins] = await Promise.all([
-    settingsQuery, logQuery, recentQuery, ownQuery, weightQuery, historyQuery, dayStatusQuery,
+  const [weight, history, dayStatus, skinfolds, waists, performance, sleep, checkins] = await Promise.all([
+    weightQuery, historyQuery, dayStatusQuery,
     skinfoldQuery, waistQuery, performanceQuery, sleepQuery, checkinQuery,
   ]);
-  const error = settings.error || entries.error || recent.error || own.error || weight.error || history.error || dayStatus.error
+  const error = weight.error || history.error || dayStatus.error
     || skinfolds.error || waists.error || performance.error || sleep.error || checkins.error;
   if (error) throw error;
-  // Übernommene Rezeptbilder liegen als privater Storage-Pfad im Snapshot; für
-  // die Anzeige eine frische signierte URL erzeugen (die alte ist längst abgelaufen).
-  const entryList = entries.data || [];
-  const signed = await signImagePaths(entryList.map((entry) => entry.product_snapshot?.image_path));
-  if (signed.size) entryList.forEach((entry) => {
-    const path = entry.product_snapshot?.image_path;
-    if (path && signed.has(path)) entry.product_snapshot.image_url = signed.get(path);
-  });
   const kcalByDate = new Map();
   (history.data || []).forEach((entry) => kcalByDate.set(entry.log_date, (kcalByDate.get(entry.log_date) || 0) + number(entry.energy_kcal)));
   const statusByDate = new Map((dayStatus.data || []).map((item) => [item.log_date, item]));
@@ -91,12 +106,19 @@ async function loadNutrition(userId, date, signal) {
   }
   const weights = (weight.data || []).map((item) => ({ date: item.gemessen_am, kg: number(item.kg) }));
   return {
-    settings: settings.data || {}, entries: entryList, recent: recent.data || [], ownProducts: own.data || [],
-    latestWeight: number(weights.at(-1)?.kg), weights, historyDays,
+    weights, historyDays,
     dayStatus: statusByDate.get(date) || { complete: false, excluded: false, exclude_reason: '' },
     skinfolds: skinfolds.data || [], waists: waists.data || [], performance: performance.data || [],
     sleep: sleep.data || [], bodyCheckins: checkins.data || [],
   };
+}
+
+async function loadNutrition(userId, date, signal) {
+  const [core, calibration] = await Promise.all([
+    loadNutritionCore(userId, date, signal),
+    loadNutritionCalibration(userId, date, signal),
+  ]);
+  return { ...core, ...calibration };
 }
 
 function recoveryDirection(state) {
@@ -160,7 +182,7 @@ function summaryMarkup(state, date) {
   const adaptive = adaptiveModel(state, calculated, target);
   const ordnerInk = colorIsDark(categoryColor('reminders')) ? '#fff' : '#000';
   return `${trackingToggleMarkup(true)}
-  <section class="nutrition-coin-hero" data-nutrition-card style="--ordner-ink:${ordnerInk}">
+  <section class="nutrition-coin-hero ${SPECIAL_DEX_CLASSES.hero}" data-nutrition-card style="--ordner-ink:${ordnerInk}">
     <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>
     <span class="nutrition-coin-hero-value">
       <small>${target ? (over ? 'ÜBER ZIEL' : 'NOCH OFFEN') : 'HEUTE PROTOKOLLIERT'}</small>
@@ -176,7 +198,7 @@ function summaryMarkup(state, date) {
     <p><b>Aktueller Stand:</b> ${escapeHtml(adaptiveStatusText(adaptive.result))}</p>
     ${adaptive.result.eligible ? '<button class="nutrition-calibration-more" type="button" data-open-nutrition-adaptive>Vorschlag im Detail ansehen</button>' : ''}
   </div>
-  <details class="coin-verdienst nutrition-coin-overview">
+  <details class="coin-verdienst nutrition-coin-overview ${SPECIAL_DEX_CLASSES.card}">
     <summary><span><b>Tagesübersicht</b><small>${dateLabel(date)} · ${dateFromKey(date).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right')}</summary>
     <div class="coin-verdienst-inhalt nutrition-coin-overview-body">
       <header class="nutrition-overview-day">
@@ -287,18 +309,12 @@ function periodEntriesMarkup(entries, period) {
 }
 
 function createOverlay(markup, className = '') {
-  const backdrop = document.createElement('div');
-  backdrop.className = `kategorie-sheet-backdrop nutrition-overlay ${className}`.trim();
-  // Gewählte Dex-Ordnerfarbe (MEAL-LOG = Route „reminders") für die Platzhalter-Felder.
-  const color = categoryColor('reminders');
-  backdrop.style.setProperty('--ordner', color);
-  backdrop.style.setProperty('--ordner-ink', colorIsDark(color) ? '#fff' : '#000');
-  backdrop.innerHTML = `<section class="kategorie-sheet nutrition-sheet" role="dialog" aria-modal="true">${markup}</section>`;
-  backdrop.addEventListener('click', (event) => {
-    if (event.target === backdrop || event.target.closest('[data-nutrition-close]')) backdrop.remove();
+  return createSpecialDexOverlay({
+    markup,
+    className: `nutrition-overlay ${className}`,
+    sheetClassName: 'nutrition-sheet',
+    closeSelector: '[data-nutrition-close]',
   });
-  document.body.append(backdrop);
-  return backdrop;
 }
 
 function periodSelect(selected = 'breakfast') {
@@ -576,18 +592,6 @@ export function pickFoodIngredient(onPick) {
   });
 }
 
-function recentEditor({ recent, date, onSave }) {
-  const unique = [...new Map(recent.map((item) => [`${item.name}:${item.amount}:${item.unit}`, item])).values()].slice(0, 16);
-  const backdrop = createOverlay(`<header><h2>Zuletzt verwendet</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="nutrition-recent">${unique.length ? unique.map((item, index) => `<button type="button" data-recent-index="${index}"><span><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} ${item.unit === 'portion' ? 'Portion' : 'g'}</small></span><strong>${decimal(item.energy_kcal)} kcal</strong></button>`).join('') : '<p>Noch keine früheren Einträge.</p>'}</div>`);
-  backdrop.querySelector('.nutrition-recent').onclick = async (event) => {
-    const index = event.target.closest('[data-recent-index]')?.dataset.recentIndex; if (index == null) return;
-    const old = unique[Number(index)];
-    const saved = await onSave({ ...old, id: undefined, user_id: undefined, created_at: undefined, log_date: date, product: null });
-    if (saved) backdrop.remove();
-  };
-}
-
 // Rezept- und Log-Bilder liegen im privaten dex-entries-Bucket und werden für
 // die Anzeige kurzlebig signiert (1 h). Liefert eine Map path → signierte URL.
 const DEX_BUCKET = 'dex-entries';
@@ -757,29 +761,16 @@ function openNutritionAction(action, context) {
   if (action === 'search') searchEditor(context);
   if (action === 'recipe') recipeEditor(context);
   if (action === 'manual') ownProductsEditor(context);
-  if (action === 'recent') recentEditor(context);
-}
-
-function addMenu(context) {
-  const backdrop = createOverlay(`<header><h2>Mahlzeit eintragen</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <div class="sheet-menue nutrition-add-menu">
-      <button type="button" data-nutrition-action="scan">${materialIconMarkup('photo_camera')}<span><b>Barcode scannen</b><small>Verpacktes Produkt erkennen</small></span></button>
-      <button type="button" data-nutrition-action="search">${materialIconMarkup('search')}<span><b>Lebensmittel suchen</b><small>Grundnahrungsmittel und Produkte</small></span></button>
-      <button type="button" data-nutrition-action="recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Eigenes Rezept aus dem Food-Dex übernehmen</small></span></button>
-      <button type="button" data-nutrition-action="manual">${materialIconMarkup('edit')}<span><b>Eigenes Lebensmittel</b><small>Kalorien und Makros selbst eintragen</small></span></button>
-      <button type="button" data-nutrition-action="recent">${materialIconMarkup('calendar_meal')}<span><b>Zuletzt verwendet</b><small>Frühere Mahlzeit wiederholen</small></span></button>
-    </div>`);
-  backdrop.querySelector('.nutrition-add-menu').onclick = (event) => {
-    const action = event.target.closest('[data-nutrition-action]')?.dataset.nutritionAction; if (!action) return;
-    backdrop.remove();
-    openNutritionAction(action, context);
-  };
 }
 
 export async function mountNutrition(container, { userId, signal }) {
   let date = localDateKey();
   let automaticToday = true;
-  let state = { settings: {}, entries: [], recent: [], ownProducts: [], latestWeight: 0 };
+  let state = {
+    settings: {}, entries: [], ownProducts: [], latestWeight: 0,
+    weights: [], historyDays: [], skinfolds: [], waists: [], performance: [], sleep: [], bodyCheckins: [],
+    dayStatus: { complete: false, excluded: false, exclude_reason: '' },
+  };
   const deleteEntryById = async (id) => {
     const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);
     if (error) { toast('Eintrag konnte nicht gelöscht werden'); return false; }
@@ -825,7 +816,31 @@ export async function mountNutrition(container, { userId, signal }) {
     });
   };
   const render = () => { container.innerHTML = summaryMarkup(state, date); bind(); renderIntegrated(); };
-  const refresh = async () => { state = await loadNutrition(userId, date, signal); if (!signal?.aborted) render(); };
+  let refreshVersion = 0;
+  let refreshPromise = null;
+  let refreshPending = false;
+  const runRefresh = async () => {
+    const version = ++refreshVersion;
+    const nextState = await loadNutrition(userId, date, signal);
+    if (signal?.aborted || version !== refreshVersion) return;
+    state = nextState;
+    render();
+  };
+  const refresh = async () => {
+    if (refreshPromise) {
+      refreshPending = true;
+      return refreshPromise;
+    }
+    refreshPromise = runRefresh();
+    try { await refreshPromise; }
+    finally {
+      refreshPromise = null;
+      if (refreshPending && !signal?.aborted) {
+        refreshPending = false;
+        await refresh();
+      }
+    }
+  };
   const saveEntry = async (payload) => {
     try {
       let productId = payload.product_id || null;
@@ -980,21 +995,39 @@ export async function mountNutrition(container, { userId, signal }) {
     });
   }
   container.innerHTML = '<section class="nutrition-card"><p class="nutrition-empty">Kalorien werden geladen …</p></section>';
-  try { await refresh(); }
-  catch (error) { container.innerHTML = `<section class="nutrition-card"><p class="nutrition-empty">Kalorien-Log konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section>`; }
-  subscribeToTableChanges({ table: 'nutrition_log_entries', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'nutrition_settings', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'nutrition_products', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'nutrition_day_status', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'weights', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'skinfolds', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'waist_measurements', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'logman_performance', signal, onChange: refresh });
-  subscribeToTableChanges({ table: 'bodycomp_checkins', signal, onChange: refresh });
+  const initialVersion = ++refreshVersion;
+  try {
+    const core = await loadNutritionCore(userId, date, signal);
+    if (!signal?.aborted && initialVersion === refreshVersion) {
+      state = { ...state, ...core };
+      render();
+    }
+  } catch (error) {
+    container.innerHTML = `<section class="nutrition-card"><p class="nutrition-empty">Kalorien-Log konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section>`;
+  }
+  try {
+    const calibration = await loadNutritionCalibration(userId, date, signal);
+    if (!signal?.aborted && initialVersion === refreshVersion) {
+      state = { ...state, ...calibration };
+      render();
+    }
+  } catch (error) {
+    // Die Tagesansicht bleibt nutzbar, auch wenn historische Kalibrierungsdaten
+    // vorübergehend nicht erreichbar sind.
+    console.warn('Kalorien-Kalibrierung konnte nicht geladen werden', error);
+  }
+  subscribeToTablesChanges({
+    tables: [
+      'nutrition_log_entries', 'nutrition_settings', 'nutrition_products', 'nutrition_day_status',
+      'weights', 'skinfolds', 'waist_measurements', 'logman_performance', 'bodycomp_checkins',
+    ],
+    signal,
+    onChange: refresh,
+  });
   bindLongPress(container.closest('.wrap') || container.parentElement, '[data-nutrition-entry]', (element) => {
     const entry = state.entries.find((item) => item.id === element.dataset.nutritionEntry);
     return entry ? () => editEntry(entry) : null;
-  });
+  }, { signal });
   const dayWatcher = setInterval(() => {
     const today = localDateKey();
     if (!automaticToday || date === today || signal?.aborted) return;
@@ -1004,7 +1037,6 @@ export async function mountNutrition(container, { userId, signal }) {
   return {
     isEnabled: () => nutritionEnabled(state),
     renderIntegrated,
-    openAddMenu: () => addMenu({ date, userId, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
-    openAction: (action) => openNutritionAction(action, { date, userId, recent: state.recent, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
+    openAction: (action) => openNutritionAction(action, { date, userId, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
   };
 }

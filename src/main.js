@@ -40,6 +40,7 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, mainDexFolderSvg, openCollectionEditor, saveCollection,
 } from './collections.js';
 import { foodDexActionsMarkup } from './foodDexActions.js';
+import { prepareSpecialDexPage } from './specialDex.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -1426,9 +1427,11 @@ async function renderRoute() {
     });
   } else if (route === 'coins') {
     setSeite('coins');
+    prepareSpecialDexPage(view, 'coin-dex');
     await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
   } else if (route === 'body') {
     setSeite('body');
+    prepareSpecialDexPage(view, 'body');
     const { mountBodyMetrics } = await bodyMetricsModule();
     await mountBodyMetrics(view, {
       session,
@@ -1448,6 +1451,7 @@ async function renderRoute() {
   } else if (route === 'reminders') {
     setSeite('reminders');
     view.classList.add('neo-dex-page', 'food-dex-page', 'meal-log-dex-page');
+    prepareSpecialDexPage(view, 'meal-log');
     const { mountReminders } = await remindersModule();
     const reminderActions = await mountReminders(view, { session, profile, signal });
     mountCategoryChrome(view, route, 'Meal-Log', {
@@ -1463,6 +1467,7 @@ async function renderRoute() {
     });
   } else if (route === 'shopping') {
     setSeite('shopping');
+    prepareSpecialDexPage(view, 'shopping');
     const { mountShoppingList } = await shoppingModule();
     const shoppingActions = await mountShoppingList(view, { session, signal });
     mountCategoryChrome(view, route, 'EINKAUF', {
@@ -1581,6 +1586,7 @@ async function renderRoute() {
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     setSeite('habits');
+    prepareSpecialDexPage(view, 'routines');
     const { mountRoutines } = await routinesModule();
     const routineActions = await mountRoutines(view, { session, signal });
     mountCategoryChrome(view, route, 'ROUTINEN', {
@@ -1602,6 +1608,7 @@ async function renderRoute() {
     }
   } else if (route === 'sleep') {
     setSeite('sleep');
+    prepareSpecialDexPage(view, 'sleep');
     const { mountSleepDex } = await sleepModule();
     await mountSleepDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
   } else {
