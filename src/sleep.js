@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { categoryColor, materialIconMarkup } from './categoryIcons.js';
+import { materialIconMarkup } from './categoryIcons.js';
 import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
 import { setRoutineCompletion } from './routineCompletion.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
@@ -328,8 +328,7 @@ function render(container, userId, state, refresh) {
   });
 }
 
-export async function mountSleepDex(container, { userId, signal, mountChrome }) {
-  const color = categoryColor('sleep');
+export async function mountSleepDex(container, { userId, signal }) {
   container.innerHTML = `<div class="wrap pad-bottom sleep-dex-page"><div data-sleep-content><div class="daten-laden">Schlafdaten werden geladen …</div></div></div>`;
   let state = await loadState(userId, signal);
   if (signal?.aborted) return;
@@ -343,11 +342,6 @@ export async function mountSleepDex(container, { userId, signal, mountChrome }) 
     const meta = container.querySelector('[data-food-scroll-meta]');
     if (meta) meta.textContent = state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen';
   };
-  mountChrome(container, 'sleep', 'Sleep-Log', {
-    color, pageLookScope: 'sleep', pageLookPattern: 'wallpaper-moon',
-    meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
-    onPlus: () => actionsMenu({ userId, state, onSaved: refresh }),
-  });
   render(container, userId, state, refresh);
   subscribeToTablesChanges({
     tables: ['sleep_logs', 'sleep_schedules', 'sleep_settings', 'routines', 'routine_completions'],
@@ -355,6 +349,7 @@ export async function mountSleepDex(container, { userId, signal, mountChrome }) 
   });
   return {
     meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
+    openAddMenu: () => actionsMenu({ userId, state, onSaved: refresh }),
     openPlan: () => planEditor({ userId, state, onSaved: refresh }),
   };
 }

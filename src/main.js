@@ -34,7 +34,7 @@ import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  applyPageLook, categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, primePageLook, setPageLookColor, setPageLookPattern, settingsSheet,
+  applyPageLook, categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, mainDexFolderSvg, openCollectionEditor, saveCollection,
@@ -1615,14 +1615,15 @@ async function renderRoute() {
     }
   } else if (route === 'sleep') {
     setSeite('sleep');
+    view.classList.add('neo-dex-page', 'food-dex-page', 'sleep-log-dex-page');
     prepareSpecialDexPage(view, 'sleep');
-    // Der Sleep-Look muss vor dem dynamischen Modul und vor dem ersten
-    // Supabase-Roundtrip auf der noch unsichtbaren Zielansicht feststehen.
-    // Dadurch wird die SVG-Tapete rechtzeitig rasterisiert, ohne die noch
-    // sichtbare Ausgangsseite vorzeitig dunkelblau einzufaerben.
-    primePageLook(view, 'sleep', categoryColor('sleep'), 'wallpaper-moon');
     const { mountSleepDex } = await sleepModule();
-    const sleepActions = await mountSleepDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
+    const sleepActions = await mountSleepDex(view, { userId: session.user.id, signal });
+    mountCategoryChrome(view, route, 'Sleep-Log', {
+      pageLookScope: route,
+      pageLookPattern: 'wallpaper-moon',
+      onPlus: () => sleepActions?.openAddMenu?.(),
+    });
     installNeoDexChrome(view, {
       title: 'Sleep-Log',
       meta: sleepActions?.meta || 'Schlaf planen',

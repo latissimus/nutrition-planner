@@ -255,12 +255,6 @@ export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
 // sichtbaren Seite umzuschalten. Das ist insbesondere bei dynamisch geladenen
 // Dex wichtig: Die Tapete kann bereits rasterisiert werden, während Daten und
 // Code-Chunk laden, und erscheint danach gemeinsam mit dem Inhalt.
-export function primePageLook(target, scope, fallbackColor, fallbackPattern = 'drops') {
-  const look = pageLook(scope, fallbackColor, fallbackPattern);
-  if (target) target.classList.toggle('dex-tapete-datei', writePageLook(target, look));
-  return look;
-}
-
 export function deferNextPageLook(value = true) {
   deferPageLook = value;
   if (value) deferredPageLook = null;
