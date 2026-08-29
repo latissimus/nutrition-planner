@@ -59,14 +59,37 @@ const HINWEISE = [
   ['vor-schlafen', 'Vor dem Schlafen'],
 ];
 
+// Supplement-Symbole werden bewusst aus der Einheit abgeleitet. Die IDs
+// entsprechen direkt den erwarteten Dateinamen im MUSCLEDEX-ICONS-Ordner.
+const SUPPLEMENT_ICON_BY_UNIT = new Map([
+  ['Kapsel', 'kapsel'],
+  ['Tablette', 'tablette'],
+  ['Tropfen', 'tropfen'],
+  ['ml', 'flüssigkeit'],
+  ['g', 'pulver'],
+  ['mg', 'pulver'],
+  ['µg', 'pulver'],
+  ['TL', 'pulver'],
+  ['EL', 'pulver'],
+  ['IE', 'sonstiges'],
+  ['', 'sonstiges'],
+]);
+
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
+const supplementIconId = (unit = '') => SUPPLEMENT_ICON_BY_UNIT.get(String(unit).trim()) || 'sonstiges';
+
 function reminderIconValue(reminder) {
+  if (reminder.type === 'drink') return 'water_drop';
+  if (reminder.type === 'supplement') {
+    const iconId = supplementIconId(reminder.metadata?.einheit);
+    return availableCategoryIcons.some((icon) => icon.id === iconId) ? iconId : 'pill';
+  }
   if (reminder.metadata?.icon) return reminder.metadata.icon;
   if (reminder.metadata?.emoji) return `emoji:${reminder.metadata.emoji}`;
-  return reminder.type === 'supplement' ? 'pill' : reminder.type === 'drink' ? 'water_drop' : 'fastfood';
+  return 'fastfood';
 }
 
 function notificationSymbol(reminder) {
@@ -79,7 +102,10 @@ function notificationSymbol(reminder) {
     if (slot === 'dinner') return '🥩';
     if (slot === 'snack_morning' || slot === 'snack_afternoon') return '🌰';
   }
-  return ({ fastfood: '🍔', pill: '💊', water_drop: '💧', bedtime: '🌙' })[value] || '◆';
+  return ({
+    fastfood: '🍔', pill: '💊', kapsel: '💊', tablette: '💊', pulver: '🥄',
+    tropfen: '💧', flüssigkeit: '🧴', sonstiges: '◆', water_drop: '💧', bedtime: '🌙',
+  })[value] || '◆';
 }
 
 export function reminderIconMarkup(value, className = '') {
@@ -532,7 +558,9 @@ function reminderBodyMarkup(reminder, completion) {
     </div>`;
   }
   return `<div class="rem-row-body">
-    <div class="rem-name-reihe">
+    ${isDrink ? `<label class="rem-field"><span>Name</span>
+      <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
+    </label>` : `<div class="rem-name-reihe">
       <div class="rem-field rem-icon-field"><span>Icon</span>
         <button type="button" class="rem-icon-waehler" data-reminder-icon-open aria-label="Icon auswählen">${reminderIconMarkup(reminderIconValue(reminder))}</button>
         <input type="hidden" data-icon-value value="${escapeHtml(reminderIconValue(reminder))}">
@@ -540,8 +568,8 @@ function reminderBodyMarkup(reminder, completion) {
       <label class="rem-field"><span>Name</span>
         <input class="input" data-label maxlength="120" value="${escapeHtml(reminder.label)}">
       </label>
-    </div>
-    <div class="rem-field-reihe">
+    </div>`}
+    <div class="rem-field-reihe${isDrink ? ' rem-trinkzeiten' : ''}">
       <label class="rem-field"><span>Start</span>
         <input class="input" data-time type="time" value="${zeit}">
       </label>
@@ -833,15 +861,16 @@ export async function mountReminders(container, { session, signal }) {
     if (activeInput) patch.active = activeInput.checked;
     if (row.dataset.type === 'drink') {
       patch.metadata = {
-        icon: body.querySelector('[data-icon-value]')?.value || reminderIconValue({ type: 'drink', metadata: {} }),
+        icon: 'water_drop',
         bis: body.querySelector('[data-end]')?.value || '21:00',
         intervall_minuten: Number(body.querySelector('[data-interval]')?.value || 120),
       };
     } else if (row.dataset.type === 'supplement') {
+      const einheit = body.querySelector('[data-einheit]')?.value || '';
       patch.metadata = {
-        icon: 'pill',
+        icon: supplementIconId(einheit),
         dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
-        einheit: body.querySelector('[data-einheit]')?.value || '',
+        einheit,
         hinweis: body.querySelector('[data-hinweis]')?.value || '',
       };
     } else {

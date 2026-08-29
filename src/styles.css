@@ -7488,6 +7488,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
 }
+
+/* Trinken: Start und Ende bleiben klar getrennt, das Intervall bekommt
+   darunter die volle Formularbreite. */
+:root[data-seite="reminders"] :is(.meal-log-dex-page,.reminder-overlay) .rem-trinkzeiten{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:16px;
+  row-gap:14px;
+}
+:root[data-seite="reminders"] :is(.meal-log-dex-page,.reminder-overlay) .rem-trinkzeiten>.rem-field:last-child{
+  grid-column:1/-1;
+}
 :root[data-seite="reminders"] .slot-info-overlay .rem-mahlzeit-notiz :is(b,strong){
   font-family:inherit!important;
   font-weight:700!important;
