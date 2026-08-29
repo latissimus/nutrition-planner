@@ -5381,8 +5381,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-dex-page [data-sleep-content]{display:grid}
 .sleep-tonight,.sleep-section{position:relative;overflow:hidden;width:100%;margin:0}
 .sleep-tonight{display:grid;align-items:center}
-.sleep-card-icon,.sleep-section-title>.material-svg{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}
-.sleep-card-icon svg,.sleep-section-title>.material-svg svg{display:block;width:21px;height:21px;fill:currentColor}
+.sleep-section-title>.material-svg{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}
+.sleep-section-title>.material-svg svg{display:block;width:21px;height:21px;fill:currentColor}
 .sleep-tonight small,.sleep-tonight strong,.sleep-tonight span{display:block}
 .sleep-tonight small{font-size:11px;font-weight:850;letter-spacing:.08em;color:var(--muted)}
 .sleep-tonight strong{margin:3px 0;font-family:var(--ui);font-size:clamp(24px,7vw,34px);font-stretch:normal;font-variant-numeric:tabular-nums;line-height:1.05;letter-spacing:-.02em}
@@ -5391,46 +5391,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-tonight button .material-icon{width:23px;height:23px}
 .sleep-section{padding:16px}
 .sleep-section>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
-/* Nachttisch-Wecker: Karte unter „Heute Nacht". */
-.wecker-card{position:relative;overflow:hidden;width:100%;margin:0;padding:16px;background:var(--surface);border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);box-shadow:var(--hart-klein)}
-.wecker-card::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:7px;background:var(--ordner)}
-.wecker-card-info{display:grid;grid-template-columns:36px minmax(0,1fr) 44px;align-items:center;gap:12px;margin-bottom:13px}
-.wecker-card-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 28%,var(--surface));color:var(--ink)}
-.wecker-card-icon svg{display:block;width:21px;height:21px;fill:currentColor}
-.wecker-card-info>div{min-width:0}
-.wecker-card-info>div small{display:block;font-size:11px;font-weight:850;letter-spacing:.08em;color:var(--muted)}
-.wecker-card-info>div strong{display:block;margin:2px 0;font-size:18px;font-variant-numeric:tabular-nums}
-.wecker-card-info>div span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
-.wecker-einstellungen{display:grid;place-items:center;width:44px;height:44px;padding:0;border:var(--karten-bw) solid var(--ink);border-radius:12px;background:var(--surface);color:var(--ink);box-shadow:var(--hart-klein)}
-.wecker-einstellungen svg{width:21px;height:21px;fill:currentColor}
-/* Einstell-Sheet */
-.wecker-editor{display:grid;gap:16px}
-.wecker-sound-liste{display:grid;gap:6px}
-.wecker-sound-zeile{display:grid;grid-template-columns:auto minmax(0,1fr) 40px;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--app-outline);border-radius:10px;background:var(--app-field)}
-.wecker-sound-zeile input[type="radio"]{width:18px;height:18px;accent-color:var(--ordner)}
-.wecker-sound-zeile span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700}
-.wecker-vorschau{display:grid;place-items:center;width:36px;height:36px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);color:var(--ink)}
-.wecker-vorschau svg{width:18px;height:18px;fill:currentColor}
-.wecker-leer{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
-.wecker-tage{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
-.wecker-tag{min-width:0;height:40px;padding:0;border:1px solid var(--app-outline);border-radius:9px;background:var(--app-field);color:var(--ink);font:800 12px/1 var(--ui)}
-.wecker-tag.aktiv{border-color:#000;background:var(--ordner);color:#fff}
-/* Vollbild-Nachttisch (Overlay) */
-.wecker-overlay{position:fixed;inset:0;z-index:4000;display:grid;place-items:center;background:#000;color:#fff;touch-action:none}
-.wecker-overlay-inner{display:grid;justify-items:center;gap:18px;width:100%;max-width:420px;padding:32px;text-align:center;transition:opacity .4s ease}
-.wecker-overlay-inner[data-phase="warten"]{opacity:.4}
-.wecker-overlay-inner[data-phase="alarm"]{opacity:1;animation:wecker-puls 1s ease-in-out infinite}
-@keyframes wecker-puls{0%,100%{opacity:1}50%{opacity:.72}}
-.wecker-aus{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:14px;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff}
-.wecker-aus svg{width:22px;height:22px;fill:currentColor}
-.wecker-uhr{font:800 clamp(64px,22vw,120px)/1 var(--ui);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.wecker-next{font-size:15px;font-weight:700;color:rgba(255,255,255,.72);letter-spacing:.02em}
-.wecker-alarm-aktionen{display:grid;gap:10px;width:100%;margin-top:8px}
-.wecker-overlay-inner[data-phase="warten"] .wecker-alarm-aktionen{display:none}
-.wecker-hinweis{margin:0;font-size:12px;color:rgba(255,255,255,.5);line-height:1.4}
-.wecker-overlay-inner[data-phase="alarm"] .wecker-hinweis{display:none}
-.wecker-stop{background:#fff;color:#000;border-color:#fff}
-.wecker-snooze{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.32)}
 .sleep-section-title{display:flex;align-items:center;min-width:0;gap:10px}
 .sleep-section>header h2{margin:0;font-family:var(--display);font-size:19px;line-height:1.1;text-transform:uppercase}
 .sleep-section>header>a,.sleep-section>header>button{min-height:38px;padding:7px 11px;border:1.5px solid var(--ink);border-radius:10px;background:var(--surface);color:var(--ink);font:800 12px/1 var(--ui);text-decoration:none}
@@ -5455,7 +5415,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-editor form{display:grid;gap:14px}.sleep-plan-grid{display:grid;grid-template-columns:30px minmax(0,102px) minmax(0,102px) 52px;justify-content:space-between;gap:6px;align-items:center}
 .sleep-plan-grid>span{font-size:9px;font-weight:850;text-transform:uppercase;color:var(--muted);text-align:center}.sleep-plan-grid>b{font-family:var(--ui);font-size:12px;text-align:center}.sleep-plan-grid .input{display:block;box-sizing:border-box;width:100%!important;min-width:0!important;max-width:102px!important;height:46px;padding:0 4px;text-align:center;-webkit-appearance:none;appearance:none}
 .sleep-mini-switch{position:relative;display:grid;place-items:center;width:52px;height:44px}.sleep-mini-switch input{position:absolute;opacity:0;pointer-events:none}.sleep-mini-switch span{position:relative;display:block;box-sizing:border-box;width:42px;height:26px;border:1.5px solid var(--ink);border-radius:99px;background:color-mix(in srgb,var(--ink) 13%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 14%,transparent)}.sleep-mini-switch span::after{content:"";position:absolute;z-index:1;top:3px;left:3px;box-sizing:border-box;width:18px;height:18px;border:1px solid var(--ink);border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.28);opacity:1;transition:transform .15s}.sleep-mini-switch input:checked+span{background:var(--ordner,#001454);box-shadow:none}.sleep-mini-switch input:checked+span::after{transform:translateX(16px);background:#fff}
-.sleep-reminder-switches{display:grid;gap:8px}.sleep-setting-switch{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 54px;align-items:center;gap:12px;min-height:52px;padding:4px 0;cursor:pointer}.sleep-setting-switch>span:first-child{font-size:14px;font-weight:750}.sleep-setting-switch input{position:absolute;opacity:0;pointer-events:none}.sleep-setting-switch .sleep-switch-track{position:relative;display:block;box-sizing:border-box;width:50px;height:30px;border:1.5px solid var(--ink);border-radius:99px;background:color-mix(in srgb,var(--ink) 13%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 14%,transparent)}.sleep-setting-switch .sleep-switch-track::after{content:"";position:absolute;z-index:1;top:3px;left:3px;box-sizing:border-box;width:21px;height:21px;border:1px solid var(--ink);border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.28);opacity:1;transition:transform .16s}.sleep-setting-switch input:checked+.sleep-switch-track{background:var(--ordner,#001454);box-shadow:none}.sleep-setting-switch input:checked+.sleep-switch-track::after{transform:translateX(19px);background:#fff}.sleep-editor-note{margin:0;color:var(--muted);font-size:11px;line-height:1.4}
+.sleep-reminder-switches{display:grid;gap:8px}.sleep-setting-switch{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 54px;align-items:center;gap:12px;min-height:52px;padding:4px 0;cursor:pointer}.sleep-setting-switch>span:first-child{font-size:14px;font-weight:750}.sleep-setting-switch input{position:absolute;opacity:0;pointer-events:none}.sleep-setting-switch .sleep-switch-track{position:relative;display:block;box-sizing:border-box;width:50px;height:30px;border:1.5px solid var(--ink);border-radius:99px;background:color-mix(in srgb,var(--ink) 13%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 14%,transparent)}.sleep-setting-switch .sleep-switch-track::after{content:"";position:absolute;z-index:1;top:3px;left:3px;box-sizing:border-box;width:21px;height:21px;border:1px solid var(--ink);border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.28);opacity:1;transition:transform .16s}.sleep-setting-switch input:checked+.sleep-switch-track{background:var(--ordner,#001454);box-shadow:none}.sleep-setting-switch input:checked+.sleep-switch-track::after{transform:translateX(19px);background:#fff}
 .sleep-time-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.sleep-time-pair .dex-entry-field{min-width:0}.sleep-time-pair .input{display:block;box-sizing:border-box;width:100%!important;min-width:0!important;max-width:100%!important;height:52px;padding-inline:6px;text-align:center;-webkit-appearance:none;appearance:none}.sleep-checkin-editor input[type="date"]{display:block;box-sizing:border-box;width:100%!important;min-width:0!important;max-width:100%!important;height:52px;padding-inline:8px;-webkit-appearance:none;appearance:none}
 .sleep-editor input:is([type="date"],[type="time"]){position:relative;text-align:center!important;text-align-last:center!important;font-family:var(--ui);font-stretch:normal;font-variant-numeric:tabular-nums}
 .sleep-editor input:is([type="date"],[type="time"])::-webkit-date-and-time-value,.sleep-editor input:is([type="date"],[type="time"])::-webkit-datetime-edit{display:flex;align-items:center;justify-content:center;width:100%;height:100%;margin:0;padding:0;text-align:center}
@@ -5472,7 +5432,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-action-card .sheet-menue button{grid-template-columns:38px minmax(0,1fr)}.sleep-action-card .sheet-menue button>span b,.sleep-action-card .sheet-menue button>span small{display:block}.sleep-action-card .sheet-menue button>span small{margin-top:2px;color:var(--muted);font-size:10px}
 .sleep-sound-backdrop{padding:calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px)}.sleep-sound-timer{width:min(100%,520px);margin:auto;padding:16px}.sleep-sound-timer>header>div small{display:block;color:var(--muted);font-size:10px;font-weight:850}.sleep-sound-timer .meditation-time{display:block;margin:17px 0;text-align:center}.sleep-sound-timer .routine-duration{margin:14px 0}.sleep-sound-timer .meditation-volume{margin:12px 0}
 :root[data-theme="dark"] .sleep-tonight{background:color-mix(in srgb,var(--ordner) 23%,var(--surface))}:root[data-theme="dark"] .sleep-tags input:checked+span{color:#fff}
-@media(max-width:380px){.sleep-tonight{grid-template-columns:36px minmax(0,1fr) 44px;gap:9px;padding-inline:12px}.sleep-card-icon{width:34px;height:34px}.sleep-tonight button{width:44px;height:44px}.sleep-tonight strong{font-size:23px}.sleep-stats strong{font-size:13px}.sleep-plan-grid{grid-template-columns:25px minmax(0,90px) minmax(0,90px) 48px;gap:4px}.sleep-plan-grid .input{max-width:90px!important;font-size:12px}.sleep-time-pair{grid-template-columns:1fr}.sleep-rating span{font-size:20px}}
+@media(max-width:380px){.sleep-tonight{grid-template-columns:36px minmax(0,1fr) 44px;gap:9px;padding-inline:12px}.sleep-tonight button{width:44px;height:44px}.sleep-tonight strong{font-size:23px}.sleep-stats strong{font-size:13px}.sleep-plan-grid{grid-template-columns:25px minmax(0,90px) minmax(0,90px) 48px;gap:4px}.sleep-plan-grid .input{max-width:90px!important;font-size:12px}.sleep-time-pair{grid-template-columns:1fr}.sleep-rating span{font-size:20px}}
 
 /* Mahlzeiten: dieselbe kompakte Kartenhierarchie wie im SLEEP-DEX. */
 .mahl-zeitblock>header{min-height:54px;padding:8px 14px}

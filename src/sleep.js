@@ -30,9 +30,15 @@ export function sleepDurationMinutes(bedtime, wakeTime) {
 const durationLabel = (minutes) => `${Math.floor(minutes / 60)} h ${pad(minutes % 60)} min`;
 const mean = (values) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 
-function scheduleDeviationLabel(log, schedules = []) {
+export function sleepScheduleWeekday(sleepDate) {
+  if (!sleepDate) return null;
+  const wakeDay = new Date(`${sleepDate}T12:00:00`).getDay();
+  return (wakeDay + 6) % 7;
+}
+
+export function scheduleDeviationLabel(log, schedules = []) {
   if (!log?.sleep_date || !log?.bedtime) return '';
-  const weekday = new Date(`${log.sleep_date}T12:00:00`).getDay();
+  const weekday = sleepScheduleWeekday(log.sleep_date);
   const schedule = schedules.find((item) => Number(item.weekday) === weekday && item.active);
   if (!schedule?.bedtime) return 'Kein aktiver Schlafplan für diesen Wochentag';
   let difference = timeToMinutes(log.bedtime) - timeToMinutes(schedule.bedtime);
@@ -112,15 +118,26 @@ async function ensureSleepData(userId, signal) {
 }
 
 async function loadState(userId, signal) {
-  const sleep = await ensureSleepData(userId, signal);
   let logsQuery = supabase.from('sleep_logs').select('*').eq('user_id', userId).order('sleep_date', { ascending: false }).limit(90);
   if (signal) logsQuery = logsQuery.abortSignal(signal);
-  const { data: logs, error: logsError } = await logsQuery;
+  const [sleep, { data: logs, error: logsError }] = await Promise.all([
+    ensureSleepData(userId, signal),
+    logsQuery,
+  ]);
   if (logsError) throw logsError;
   return { ...sleep, logs: logs || [] };
 }
 
 function closeOverlay(backdrop) { backdrop?.remove(); }
+
+export async function saveSleepPlan(userId, settings, schedules, client = supabase) {
+  const settingsResult = await client.from('sleep_settings').upsert(settings).select();
+  if (settingsResult.error) return { error: settingsResult.error };
+  const scheduleResult = await client.from('sleep_schedules')
+    .upsert(schedules, { onConflict: 'user_id,weekday' })
+    .select();
+  return { error: scheduleResult.error || null };
+}
 
 function planEditor({ userId, state, onSaved }) {
   const byDay = new Map(state.schedules.map((item) => [item.weekday, item]));
@@ -146,7 +163,8 @@ function planEditor({ userId, state, onSaved }) {
   });
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault();
-    const submit = event.submitter; submit.disabled = true;
+    const submit = event.submitter;
+    if (submit) submit.disabled = true;
     const settings = {
       user_id: userId,
       wind_down_minutes: Number(backdrop.querySelector('[data-wind-down]').value),
@@ -160,11 +178,12 @@ function planEditor({ userId, state, onSaved }) {
       wake_time: backdrop.querySelector(`[data-wake="${weekday}"]`).value,
       active: backdrop.querySelector(`[data-day-active="${weekday}"]`).checked,
     }));
-    const [settingsResult, scheduleResult] = await Promise.all([
-      supabase.from('sleep_settings').upsert(settings).select(),
-      supabase.from('sleep_schedules').upsert(schedules, { onConflict: 'user_id,weekday' }).select(),
-    ]);
-    if (settingsResult.error || scheduleResult.error) { toast('Schlafplan konnte nicht gespeichert werden.'); submit.disabled = false; return; }
+    const { error } = await saveSleepPlan(userId, settings, schedules);
+    if (error) {
+      toast('Schlafplan konnte nicht gespeichert werden.');
+      if (submit) submit.disabled = false;
+      return;
+    }
     closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlafplan gespeichert'); await onSaved?.();
   };
 }
@@ -175,8 +194,7 @@ function ratingField(name, label, value, symbols) {
 
 function checkinEditor({ userId, state, existing = null, onSaved }) {
   const date = existing?.sleep_date || localDate();
-  const wakeDay = new Date(`${date}T12:00:00`).getDay();
-  const schedule = state.schedules.find((item) => item.weekday === (wakeDay + 6) % 7) || state.schedules[0];
+  const schedule = state.schedules.find((item) => item.weekday === sleepScheduleWeekday(date)) || state.schedules[0];
   const selectedTags = new Set(existing?.tags || []);
   const customTags = [...selectedTags].filter((tag) => !TAGS.includes(tag));
   const backdrop = createSpecialDexOverlay({
@@ -200,7 +218,8 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
   });
   backdrop.querySelector('form').onsubmit = async (event) => {
     event.preventDefault();
-    const submit = event.submitter; submit.disabled = true;
+    const submit = event.submitter;
+    if (submit) submit.disabled = true;
     const presets = [...backdrop.querySelectorAll('.sleep-tags input[type="checkbox"]:checked')].map((input) => input.value);
     const custom = backdrop.querySelector('[data-custom-tags]').value.split(',').map((tag) => tag.trim()).filter(Boolean);
     const payload = {
@@ -215,7 +234,11 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
       note: backdrop.querySelector('[data-sleep-note]').value.trim(),
     };
     const result = await supabase.from('sleep_logs').upsert(payload, { onConflict: 'user_id,sleep_date' }).select().single();
-    if (result.error) { toast('Check-in konnte nicht gespeichert werden.'); submit.disabled = false; return; }
+    if (result.error) {
+      toast('Check-in konnte nicht gespeichert werden.');
+      if (submit) submit.disabled = false;
+      return;
+    }
     closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
     playInterfaceSound('bonus', { retrigger: 'restart' });
   };

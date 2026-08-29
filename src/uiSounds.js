@@ -99,7 +99,6 @@ function cueForControl(control) {
   }
   if (control.matches('input[type="radio"],select')) return 'hover';
   const description = controlDescription(control);
-  if (control.matches('[data-sleep-routine-check]')) return 'hover';
   // Der COIN-DEX ist die Belohnungszentrale und erhält deshalb den eigenen
   // Arcade-Achievement-Cue statt des gewöhnlichen Navigationsklangs.
   if (control.matches('a[href="#coins"]')) return 'achievement';
