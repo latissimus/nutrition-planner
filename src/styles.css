@@ -5437,19 +5437,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-section>header>small{max-width:48%;color:var(--muted);font-size:10px;line-height:1.3;text-align:right}
 .sleep-insights>header{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;align-items:start}
 .sleep-insights>header>small{max-width:none;padding-left:46px;text-align:left}
-.sleep-latest{display:grid;grid-template-columns:1.2fr 1fr 1fr 38px;align-items:center;width:100%;min-height:72px;padding:11px 10px;border:0;border-radius:12px;background:var(--app-field);color:var(--ink);text-align:left}
-.sleep-latest-cell{min-width:0;padding:0 8px;border-right:1px solid var(--app-divider)}
-.sleep-latest-cell:nth-child(3){border-right:0}
-.sleep-latest>.material-svg{padding:0;border:0}
-.sleep-latest b,.sleep-latest small{display:block}.sleep-latest b{font-size:15px}.sleep-latest small{margin-top:2px;color:var(--muted);font-size:10px}
-.sleep-latest .material-icon{width:18px;height:18px}
 .sleep-empty{padding:18px;border-radius:12px;background:var(--app-field);color:var(--muted);font-size:13px;line-height:1.4;text-align:center}
-.sleep-routines{display:grid;gap:8px}
-.sleep-routine{display:grid;grid-template-columns:44px 32px minmax(0,1fr) 44px;align-items:center;gap:8px;min-height:62px;padding:8px;border-bottom:1px solid var(--app-divider)}
-.sleep-routine:last-child{border-bottom:0}.sleep-routine>button{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:transparent;color:var(--ink)}
-.sleep-routine>button>span{display:grid;place-items:center;width:27px;height:27px;border:2px solid var(--ink);border-radius:50%}
-.sleep-routine.erledigt>button>span{background:var(--ordner);color:#fff}.sleep-routine>i{font-style:normal;font-size:23px;text-align:center}
-.sleep-routine p{min-width:0;margin:0}.sleep-routine b,.sleep-routine small{display:block}.sleep-routine b{font-size:14px}.sleep-routine small{margin-top:2px;color:var(--muted);font-size:11px}
 .sleep-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sleep-stats>div{min-width:0;padding:12px 8px;border-radius:11px;background:var(--app-field);text-align:center}
 .sleep-stats strong,.sleep-stats small{display:block}.sleep-stats strong{font-family:var(--ui);font-stretch:normal;font-variant-numeric:tabular-nums;font-size:15px;letter-spacing:0;white-space:nowrap}.sleep-stats small{margin-top:3px;color:var(--muted);font-size:9px}
 .sleep-chart{display:block;width:100%;height:auto;margin-top:14px;overflow:visible}.sleep-chart line{stroke:var(--app-divider);stroke-width:2}.sleep-chart polyline{fill:none;stroke:var(--ordner);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.sleep-chart circle{fill:var(--surface);stroke:var(--ink);stroke-width:2.5}
@@ -6172,6 +6160,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:560!important;
   line-height:1.25!important;
   letter-spacing:-.02em!important;
+}
+.kategorie-sheet .sheet-menue>button>.material-svg{
+  display:grid!important;
+  place-items:center!important;
+  align-self:center!important;
+  justify-self:center!important;
+  width:34px!important;
+  height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:0!important;
+}
+.kategorie-sheet .sheet-menue>button>.material-svg>svg{
+  display:block!important;
+  width:24px!important;
+  height:24px!important;
+  margin:auto!important;
+  flex:none!important;
 }
 .kategorie-sheet .sheet-list-icon,
 .kategorie-sheet .sheet-list-icon svg{
@@ -7477,7 +7483,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{
   display:grid;
   gap:18px;
-  padding:8px 12px calc(216px + env(safe-area-inset-bottom));
+  padding:0 12px calc(216px + env(safe-area-inset-bottom));
 }
 :root[data-seite="sleep"] .sleep-tonight,
 :root[data-seite="sleep"] .sleep-section{
@@ -7612,15 +7618,109 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .sleep-analysis-help[hidden]{
   display:none;
 }
+:root[data-seite="sleep"] .sleep-checkin-overview{
+  display:block;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  border:1.5px solid #111;
+  border-radius:15px;
+  background:#fff;
+  color:#111;
+  box-shadow:none;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:78px;
+  padding:14px 15px;
+  list-style:none;
+  cursor:pointer;
+  background:color-mix(in srgb,var(--ordner) 8%,#fff);
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary::-webkit-details-marker{
+  display:none;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary>span{
+  display:grid;
+  min-width:0;
+  gap:4px;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary b{
+  color:#111;
+  font:800 16px/1.15 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:-.015em;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary small{
+  overflow:hidden;
+  color:#655f5b;
+  font:600 11px/1.3 var(--tech);
+  font-variant-numeric:tabular-nums slashed-zero;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary>.material-svg{
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  transition:transform .18s ease;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview[open]>summary>.material-svg{
+  transform:rotate(90deg);
+}
+:root[data-seite="sleep"] .sleep-checkin-overview-body{
+  display:grid;
+  gap:13px;
+  padding:16px;
+  border-top:1px solid color-mix(in srgb,#111 15%,transparent);
+}
+:root[data-seite="sleep"] .sleep-checkin-values{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+:root[data-seite="sleep"] .sleep-checkin-values>span{
+  display:grid;
+  gap:5px;
+  min-width:0;
+  padding:12px 9px;
+  border-radius:11px;
+  background:color-mix(in srgb,var(--ordner) 8%,#fff);
+}
+:root[data-seite="sleep"] .sleep-checkin-values small,
+:root[data-seite="sleep"] .sleep-plan-comparison small{
+  color:#655f5b;
+  font:750 9px/1.2 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+:root[data-seite="sleep"] .sleep-checkin-values b{
+  overflow:hidden;
+  color:#111;
+  font:700 15px/1.1 var(--tech);
+  font-variant-numeric:tabular-nums slashed-zero;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+:root[data-seite="sleep"] .sleep-plan-comparison{
+  display:grid;
+  gap:5px;
+  padding:13px 14px;
+  border-radius:11px;
+  background:color-mix(in srgb,var(--ordner) 12%,#fff);
+}
+:root[data-seite="sleep"] .sleep-plan-comparison b{
+  color:#111;
+  font:650 12px/1.4 var(--tech);
+}
 :root[data-seite="sleep"] .sleep-section{
   padding:16px;
   border:0;
   border-radius:15px;
   background:#fff;
   box-shadow:none;
-}
-:root[data-seite="sleep"] .sleep-section.sleep-checkin{
-  border:1.5px solid #111;
 }
 :root[data-seite="sleep"] .sleep-section.special-dex-list-card{
   padding:0;
@@ -7645,27 +7745,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font:500 10px/1.35 "Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="sleep"] :is(
-  .sleep-latest b,.sleep-latest small,.sleep-stats strong,
+  .sleep-stats strong,
   .sleep-month b,.sleep-month small,.sleep-history span b,
-  .sleep-history span small,.sleep-history button>strong,
-  .sleep-routine small
+  .sleep-history span small,.sleep-history button>strong
 ){
   font-family:var(--tech)!important;
   font-variant-numeric:tabular-nums slashed-zero;
   transform:none;
-}
-:root[data-seite="sleep"] .sleep-latest{
-  grid-template-columns:1.2fr 1fr 1fr;
-  min-height:76px;
-  border:1px solid #d8d5d2;
-  border-radius:12px;
-  background:#f7f6f4;
-}
-:root[data-seite="sleep"] .sleep-latest-deviation{
-  margin:9px 2px 0;
-  color:#655f5b;
-  font:600 10px/1.35 var(--tech);
-  font-variant-numeric:tabular-nums slashed-zero;
 }
 :root[data-seite="sleep"] .sleep-checkin-empty{
   display:grid;
@@ -7680,21 +7766,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .sleep-checkin-empty span{
   color:#655f5b;
   font:500 11px/1.45 "Work Sans",var(--ui),sans-serif;
-}
-:root[data-seite="sleep"] .sleep-latest b{
-  font-size:13px;
-  font-weight:700;
-}
-:root[data-seite="sleep"] .sleep-latest small{
-  font-size:9px;
-  font-weight:500;
-}
-:root[data-seite="sleep"] .sleep-routine{
-  padding:9px 14px;
-  border-bottom:1px dashed #9d9995;
-}
-:root[data-seite="sleep"] .sleep-routine b{
-  font:750 14px/1.2 "Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="sleep"] .sleep-stats>div{
   padding:13px 8px;

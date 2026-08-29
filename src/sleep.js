@@ -1,7 +1,6 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
-import { openMeditationTimer, openSleepSoundTimer } from './meditationTimer.js';
-import { setRoutineCompletion } from './routineCompletion.js';
+import { openSleepSoundTimer } from './meditationTimer.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { toast } from './toast.js';
@@ -30,18 +29,17 @@ export function sleepDurationMinutes(bedtime, wakeTime) {
 
 const durationLabel = (minutes) => `${Math.floor(minutes / 60)} h ${pad(minutes % 60)} min`;
 const mean = (values) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
-const qualityLabel = (value) => ['–', 'Sehr schlecht', 'Schlecht', 'Okay', 'Gut', 'Sehr gut'][value] || '–';
 
 function scheduleDeviationLabel(log, schedules = []) {
   if (!log?.sleep_date || !log?.bedtime) return '';
   const weekday = new Date(`${log.sleep_date}T12:00:00`).getDay();
   const schedule = schedules.find((item) => Number(item.weekday) === weekday && item.active);
-  if (!schedule?.bedtime) return 'Für diese Nacht war kein Schlafplan aktiv';
+  if (!schedule?.bedtime) return 'Kein aktiver Schlafplan für diesen Wochentag';
   let difference = timeToMinutes(log.bedtime) - timeToMinutes(schedule.bedtime);
   if (difference > 720) difference -= 1440;
   if (difference < -720) difference += 1440;
-  if (Math.abs(difference) < 5) return 'Schlafenszeit entsprach deinem Plan';
-  return `${Math.abs(difference)} min ${difference > 0 ? 'später' : 'früher'} als geplant`;
+  if (Math.abs(difference) < 5) return 'Schlafenszeit wie im Schlafplan';
+  return `Schlafenszeit ${Math.abs(difference)} min ${difference > 0 ? 'später' : 'früher'} als im Schlafplan`;
 }
 
 export function calculateSleepSummary(logs = []) {
@@ -116,16 +114,10 @@ async function ensureSleepData(userId, signal) {
 async function loadState(userId, signal) {
   const sleep = await ensureSleepData(userId, signal);
   let logsQuery = supabase.from('sleep_logs').select('*').eq('user_id', userId).order('sleep_date', { ascending: false }).limit(90);
-  let routinesQuery = supabase.from('routines').select('*').eq('user_id', userId).eq('period', 'evening').eq('active', true).order('position');
-  let completionsQuery = supabase.from('routine_completions').select('routine_id').eq('user_id', userId).eq('completed_on', localDate());
-  if (signal) {
-    logsQuery = logsQuery.abortSignal(signal); routinesQuery = routinesQuery.abortSignal(signal); completionsQuery = completionsQuery.abortSignal(signal);
-  }
-  const [{ data: logs, error: logsError }, { data: routines, error: routinesError }, { data: completions, error: completionsError }] = await Promise.all([logsQuery, routinesQuery, completionsQuery]);
+  if (signal) logsQuery = logsQuery.abortSignal(signal);
+  const { data: logs, error: logsError } = await logsQuery;
   if (logsError) throw logsError;
-  if (routinesError) throw routinesError;
-  if (completionsError) throw completionsError;
-  return { ...sleep, logs: logs || [], routines: routines || [], completed: new Set((completions || []).map((item) => item.routine_id)) };
+  return { ...sleep, logs: logs || [] };
 }
 
 function closeOverlay(backdrop) { backdrop?.remove(); }
@@ -241,7 +233,7 @@ function actionsMenu({ userId, state, onSaved }) {
     sheetClassName: 'sleep-action-card',
     closeSelector: '[data-sheet-close]',
     ariaLabel: 'Sleep-Log ergänzen',
-    markup: `<header><h2>Sleep-Log</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button><button type="button" data-sleep-action="routines">${materialIconMarkup('self_improvement')}<span><b>Abendroutine</b><small>Meditation und Routinen öffnen</small></span></button></div>`,
+    markup: `<header><h2>Sleep-Log</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button></div>`,
   });
   const close = () => closeOverlay(backdrop);
   backdrop.addEventListener('click', (event) => {
@@ -252,7 +244,6 @@ function actionsMenu({ userId, state, onSaved }) {
     if (action === 'checkin') checkinEditor({ userId, state, onSaved });
     if (action === 'plan') planEditor({ userId, state, onSaved });
     if (action === 'sound') openSleepSoundTimer();
-    if (action === 'routines') location.hash = 'habits';
   });
 }
 
@@ -267,11 +258,6 @@ function chartMarkup(logs) {
   const min = Math.min(...durations, 360); const max = Math.max(...durations, 600); const range = Math.max(60, max - min);
   const coordinates = durations.map((value, index) => `${10 + (index / (durations.length - 1)) * 280},${100 - ((value - min) / range) * 80}`).join(' ');
   return `<svg class="sleep-chart" viewBox="0 0 300 120" role="img" aria-label="Schlafdauer der letzten ${points.length} Nächte"><line x1="10" y1="100" x2="290" y2="100"></line><polyline points="${coordinates}"></polyline>${coordinates.split(' ').map((point) => { const [x, y] = point.split(','); return `<circle cx="${x}" cy="${y}" r="4"></circle>`; }).join('')}</svg>`;
-}
-
-function routineMarkup(routine, completed) {
-  const icon = String(routine.icon || '').replace(/^emoji:/, '') || '✓';
-  return `<article class="sleep-routine${completed ? ' erledigt' : ''}" data-sleep-routine="${routine.id}"><button type="button" data-sleep-routine-check aria-label="${escapeHtml(routine.name)} ${completed ? 'wieder öffnen' : 'erledigen'}"><span>${completed ? materialIconMarkup('check_small') : ''}</span></button><i>${escapeHtml(icon)}</i><p><b>${escapeHtml(routine.name)}</b><small>${routine.time ? String(routine.time).slice(0, 5) : 'Abends'}${routine.duration_minutes ? ` · ${routine.duration_minutes} min` : ''}</small></p>${routine.template_type === 'meditation' && routine.duration_minutes ? `<button type="button" data-sleep-meditation aria-label="Meditation starten">${materialIconMarkup('play_arrow')}</button>` : ''}</article>`;
 }
 
 function bestStreak(logs) {
@@ -309,14 +295,12 @@ function render(container, userId, state, refresh) {
       <p>Die Ergebnisse beschreiben beobachtete Muster und <b>keine medizinischen Ursachen</b>. Einzelne Nächte werden deshalb nicht überbewertet.</p>
       <p><b>Aktueller Stand:</b> ${state.logs.length ? `${state.logs.length} Check-in${state.logs.length === 1 ? '' : 's'} gespeichert${state.logs.length < 6 ? ` · noch ${6 - state.logs.length} bis zur ersten Zusammenhangsanalyse` : ''}` : 'Noch keine Check-ins gespeichert'}</p>
     </div>
-    <section class="sleep-section sleep-checkin ${SPECIAL_DEX_CLASSES.card}">
-      <header><div class="sleep-section-title"><h2>Letzter Check-in</h2></div></header>
-      ${latest ? `<div class="sleep-latest"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span></div><p class="sleep-latest-deviation">${escapeHtml(latestDeviation)}</p>` : `<div class="sleep-empty sleep-checkin-empty"><b>Noch kein Morgen-Check-in</b><span>Über den Hinzufügen-Button kannst du deinen ersten Check-in eintragen.</span></div>`}
-    </section>
-    <section class="sleep-section sleep-routine-section ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
-      <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
-      <div class="sleep-routines">${state.routines.length ? state.routines.map((routine) => routineMarkup(routine, state.completed.has(routine.id))).join('') : '<div class="sleep-empty">Lege im ROUTINEN-DEX eine Abendroutine oder Meditation an.</div>'}</div>
-    </section>
+    <details class="sleep-checkin-overview ${SPECIAL_DEX_CLASSES.card}">
+      <summary><span><b>Letzter Check-in</b><small>${latest ? `${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })} · ${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}` : 'Noch kein Check-in gespeichert'}</small></span>${materialIconMarkup('chevron_right')}</summary>
+      <div class="sleep-checkin-overview-body">
+        ${latest ? `<div class="sleep-checkin-values"><span><small>Schlafenszeit</small><b>${String(latest.bedtime).slice(0, 5)}</b></span><span><small>Qualität</small><b>${latest.quality}/5</b></span><span><small>Energie</small><b>${latest.energy}/5</b></span></div><div class="sleep-plan-comparison"><small>VERGLEICH MIT DEM SCHLAFPLAN</small><b>${escapeHtml(latestDeviation)}</b></div>` : '<div class="sleep-empty sleep-checkin-empty"><b>Noch kein Morgen-Check-in</b><span>Über den Hinzufügen-Button kannst du deinen ersten Check-in eintragen.</span></div>'}
+      </div>
+    </details>
     <section class="sleep-section sleep-progress ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('chart')}<h2>7-Tage-Verlauf</h2></div><small>${week.length} von 7 Nächten</small></header>
       <div class="sleep-stats"><div><strong>${summary.averageMinutes ? durationLabel(summary.averageMinutes) : '–'}</strong><small>Ø Schlaf</small></div><div><strong>${summary.averageQuality ? summary.averageQuality.toFixed(1).replace('.', ',') : '–'}</strong><small>Ø Qualität</small></div><div><strong>${summary.consistencyMinutes || '–'}${summary.consistencyMinutes ? ' min' : ''}</strong><small>Abweichung</small></div></div>
@@ -336,16 +320,6 @@ function render(container, userId, state, refresh) {
     event.currentTarget.setAttribute('aria-expanded', String(open));
   });
   content.querySelectorAll('[data-edit-sleep-log]').forEach((button) => { button.onclick = () => checkinEditor({ userId, state, existing: state.logs.find((log) => log.id === button.dataset.editSleepLog), onSaved: refresh }); });
-  content.querySelector('.sleep-routines')?.addEventListener('click', async (event) => {
-    const row = event.target.closest('[data-sleep-routine]');
-    const routine = state.routines.find((item) => item.id === row?.dataset.sleepRoutine);
-    if (!routine) return;
-    if (event.target.closest('[data-sleep-meditation]')) return openMeditationTimer({ userId, routine, onCompleted: refresh });
-    if (!event.target.closest('[data-sleep-routine-check]')) return;
-    const completed = state.completed.has(routine.id);
-    try { await setRoutineCompletion({ routineId: routine.id, completed: !completed }); await refresh(); }
-    catch { toast('Routine konnte nicht aktualisiert werden.'); }
-  });
 }
 
 export async function mountSleepDex(container, { userId, signal }) {
@@ -364,7 +338,7 @@ export async function mountSleepDex(container, { userId, signal }) {
   };
   render(container, userId, state, refresh);
   subscribeToTablesChanges({
-    tables: ['sleep_logs', 'sleep_schedules', 'sleep_settings', 'routines', 'routine_completions'],
+    tables: ['sleep_logs', 'sleep_schedules', 'sleep_settings'],
     signal, onChange: refresh, onError: () => {},
   });
   return {
