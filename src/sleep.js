@@ -32,6 +32,18 @@ const durationLabel = (minutes) => `${Math.floor(minutes / 60)} h ${pad(minutes 
 const mean = (values) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 const qualityLabel = (value) => ['–', 'Sehr schlecht', 'Schlecht', 'Okay', 'Gut', 'Sehr gut'][value] || '–';
 
+function scheduleDeviationLabel(log, schedules = []) {
+  if (!log?.sleep_date || !log?.bedtime) return '';
+  const weekday = new Date(`${log.sleep_date}T12:00:00`).getDay();
+  const schedule = schedules.find((item) => Number(item.weekday) === weekday && item.active);
+  if (!schedule?.bedtime) return 'Für diese Nacht war kein Schlafplan aktiv';
+  let difference = timeToMinutes(log.bedtime) - timeToMinutes(schedule.bedtime);
+  if (difference > 720) difference -= 1440;
+  if (difference < -720) difference += 1440;
+  if (Math.abs(difference) < 5) return 'Schlafenszeit entsprach deinem Plan';
+  return `${Math.abs(difference)} min ${difference > 0 ? 'später' : 'früher'} als geplant`;
+}
+
 export function calculateSleepSummary(logs = []) {
   if (!logs.length) return { averageMinutes: 0, averageQuality: 0, averageEnergy: 0, consistencyMinutes: 0 };
   const bedtimes = logs.map((log) => {
@@ -283,16 +295,23 @@ function render(container, userId, state, refresh) {
   const latest = state.logs[0];
   const trends = analyzeSleepTrends(state.logs.slice(0, 30));
   const duration = tonight ? sleepDurationMinutes(tonight.bedtime, tonight.wake_time) : 0;
+  const latestDeviation = scheduleDeviationLabel(latest, state.schedules);
   const content = container.querySelector('[data-sleep-content]');
   content.innerHTML = `
     <section class="sleep-tonight ${SPECIAL_DEX_CLASSES.hero}">
       <div class="sleep-duration-ring" style="--sleep-progress:${Math.min(360, (duration / 720) * 360)}deg"><span>${tonight?.active ? `${Math.floor(duration / 60)}:${pad(duration % 60)}<small>DAUER</small>` : '–<small>PAUSIERT</small>'}</span></div>
       <span class="sleep-tonight-value"><small>HEUTE NACHT</small><strong>${tonight?.active ? String(tonight.bedtime).slice(0, 5) : '–'}</strong><b>${tonight?.active ? `BIS ${String(tonight.wake_time).slice(0, 5)}` : 'KEIN PLAN'}</b></span>
-      <button type="button" data-edit-sleep-plan aria-label="Schlafzeiten bearbeiten">${materialIconMarkup('alarm')}</button>
+      <button class="som-info-knopf nutrition-calibration-info sleep-analysis-info" type="button" data-toggle-sleep-analysis aria-expanded="false" aria-controls="sleep-analysis-help" aria-label="Schlafauswertung erklären">i</button>
     </section>
+    <div class="som-kurzhilfe nutrition-calibration-help sleep-analysis-help" id="sleep-analysis-help" data-sleep-analysis-help hidden>
+      <p>Der <b>7-Tage-Verlauf</b> verwendet deine bis zu sieben neuesten vollständigen Morgen-Check-ins. Schlafdauer und Qualität sind Mittelwerte; die Abweichung zeigt, wie weit deine Schlafenszeiten durchschnittlich von deinem eigenen Rhythmus entfernt lagen.</p>
+      <p>Für <b>persönliche Zusammenhänge</b> betrachtet MUSCLEDEX bis zu 30 Check-ins. Ein Tag oder eine Gewohnheit wird erst verglichen, wenn jeweils mindestens drei Nächte mit und ohne diesen Einfluss vorliegen und der Unterschied deutlich genug ist.</p>
+      <p>Die Ergebnisse beschreiben beobachtete Muster und <b>keine medizinischen Ursachen</b>. Einzelne Nächte werden deshalb nicht überbewertet.</p>
+      <p><b>Aktueller Stand:</b> ${state.logs.length ? `${state.logs.length} Check-in${state.logs.length === 1 ? '' : 's'} gespeichert${state.logs.length < 6 ? ` · noch ${6 - state.logs.length} bis zur ersten Zusammenhangsanalyse` : ''}` : 'Noch keine Check-ins gespeichert'}</p>
+    </div>
     <section class="sleep-section sleep-checkin ${SPECIAL_DEX_CLASSES.card}">
-      <header><div class="sleep-section-title">${materialIconMarkup('coffee')}<h2>Morgen-Check-in</h2></div></header>
-      ${latest ? `<div class="sleep-latest"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span><button type="button" data-add-sleep-log aria-label="Morgen-Check-in hinzufügen">${materialIconMarkup('add')}</button></div>` : `<button class="sleep-empty sleep-empty-action" type="button" data-add-sleep-log>${materialIconMarkup('add')}<span>Ersten Morgen-Check-in hinzufügen · +3 MUSCLE-COINS</span></button>`}
+      <header><div class="sleep-section-title"><h2>Letzter Check-in</h2></div></header>
+      ${latest ? `<div class="sleep-latest"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span></div><p class="sleep-latest-deviation">${escapeHtml(latestDeviation)}</p>` : `<div class="sleep-empty sleep-checkin-empty"><b>Noch kein Morgen-Check-in</b><span>Über den Hinzufügen-Button kannst du deinen ersten Check-in eintragen.</span></div>`}
     </section>
     <section class="sleep-section sleep-routine-section ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
       <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
@@ -310,10 +329,11 @@ function render(container, userId, state, refresh) {
     </section>
     ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 
-  content.querySelector('[data-edit-sleep-plan]').onclick = () => planEditor({ userId, state, onSaved: refresh });
-  content.querySelector('[data-add-sleep-log]')?.addEventListener('click', () => {
-    const today = state.logs.find((log) => log.sleep_date === localDate()) || null;
-    checkinEditor({ userId, state, existing: today, onSaved: refresh });
+  content.querySelector('[data-toggle-sleep-analysis]')?.addEventListener('click', (event) => {
+    const help = content.querySelector('[data-sleep-analysis-help]');
+    const open = help.hasAttribute('hidden');
+    help.toggleAttribute('hidden', !open);
+    event.currentTarget.setAttribute('aria-expanded', String(open));
   });
   content.querySelectorAll('[data-edit-sleep-log]').forEach((button) => { button.onclick = () => checkinEditor({ userId, state, existing: state.logs.find((log) => log.id === button.dataset.editSleepLog), onSaved: refresh }); });
   content.querySelector('.sleep-routines')?.addEventListener('click', async (event) => {

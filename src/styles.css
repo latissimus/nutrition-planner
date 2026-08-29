@@ -7584,6 +7584,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .sleep-tonight button:active{
   transform:scale(.94);
 }
+:root[data-seite="sleep"] .sleep-tonight .sleep-analysis-info{
+  width:34px;
+  height:34px;
+  border:1.5px solid #141414;
+  border-radius:50%;
+  background:var(--ordner);
+  color:#fff;
+  font-family:var(--tech);
+  font-size:13px;
+  font-weight:800;
+  font-style:normal;
+  line-height:1;
+}
+:root[data-seite="sleep"] .sleep-analysis-help{
+  margin:-10px 0 0;
+  padding:10px 11px;
+  border:1.5px solid #141414;
+  border-radius:7px;
+  background:#fff;
+  color:#141414;
+  font-family:var(--tech);
+  font-size:11.5px;
+  font-weight:400;
+  line-height:1.45;
+}
+:root[data-seite="sleep"] .sleep-analysis-help[hidden]{
+  display:none;
+}
 :root[data-seite="sleep"] .sleep-section{
   padding:16px;
   border:0;
@@ -7627,44 +7655,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:none;
 }
 :root[data-seite="sleep"] .sleep-latest{
+  grid-template-columns:1.2fr 1fr 1fr;
   min-height:76px;
   border:1px solid #d8d5d2;
   border-radius:12px;
   background:#f7f6f4;
 }
-:root[data-seite="sleep"] .sleep-latest>button{
+:root[data-seite="sleep"] .sleep-latest-deviation{
+  margin:9px 2px 0;
+  color:#655f5b;
+  font:600 10px/1.35 var(--tech);
+  font-variant-numeric:tabular-nums slashed-zero;
+}
+:root[data-seite="sleep"] .sleep-checkin-empty{
   display:grid;
-  place-items:center;
-  width:34px;
-  height:34px;
-  padding:0;
-  border:1.5px solid #111;
-  border-radius:50%;
-  background:var(--ordner);
-  color:var(--ordner-ink,#fff);
+  gap:5px;
+  padding:15px;
+  text-align:left;
 }
-:root[data-seite="sleep"] .sleep-latest>button :is(.material-svg,svg,svg *){
-  width:19px;
-  height:19px;
-  color:currentColor;
-  fill:currentColor;
+:root[data-seite="sleep"] .sleep-checkin-empty b{
+  color:#111;
+  font:750 13px/1.25 "Work Sans",var(--ui),sans-serif;
 }
-:root[data-seite="sleep"] .sleep-latest>button:active{
-  transform:scale(.94);
-}
-:root[data-seite="sleep"] .sleep-empty-action{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  width:100%;
-  cursor:pointer;
-}
-:root[data-seite="sleep"] .sleep-empty-action .material-svg,
-:root[data-seite="sleep"] .sleep-empty-action svg{
-  width:19px;
-  height:19px;
-  fill:currentColor;
+:root[data-seite="sleep"] .sleep-checkin-empty span{
+  color:#655f5b;
+  font:500 11px/1.45 "Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="sleep"] .sleep-latest b{
   font-size:13px;
