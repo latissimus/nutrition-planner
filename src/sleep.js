@@ -344,6 +344,5 @@ export async function mountSleepDex(container, { userId, signal }) {
   return {
     meta: state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen',
     openAddMenu: () => actionsMenu({ userId, state, onSaved: refresh }),
-    openPlan: () => planEditor({ userId, state, onSaved: refresh }),
   };
 }

@@ -1627,9 +1627,8 @@ async function renderRoute() {
     installNeoDexChrome(view, {
       title: 'Sleep-Log',
       meta: sleepActions?.meta || 'Schlaf planen',
-      editLabel: 'Schlafplan bearbeiten',
+      editLabel: 'Sleep-Log bearbeiten',
       infoKind: 'sleep',
-      onEdit: () => sleepActions?.openPlan?.(),
     });
   } else {
     mountHome(view, signal);
