@@ -5437,7 +5437,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sleep-section>header>small{max-width:48%;color:var(--muted);font-size:10px;line-height:1.3;text-align:right}
 .sleep-insights>header{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;align-items:start}
 .sleep-insights>header>small{max-width:none;padding-left:46px;text-align:left}
-.sleep-latest{display:grid;grid-template-columns:1.2fr 1fr 1fr 22px;align-items:center;width:100%;min-height:72px;padding:11px 10px;border:0;border-radius:12px;background:var(--app-field);color:var(--ink);text-align:left}
+.sleep-latest{display:grid;grid-template-columns:1.2fr 1fr 1fr 38px;align-items:center;width:100%;min-height:72px;padding:11px 10px;border:0;border-radius:12px;background:var(--app-field);color:var(--ink);text-align:left}
 .sleep-latest-cell{min-width:0;padding:0 8px;border-right:1px solid var(--app-divider)}
 .sleep-latest-cell:nth-child(3){border-right:0}
 .sleep-latest>.material-svg{padding:0;border:0}
@@ -7436,6 +7436,33 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --special-dex-card-bg:#fff;
   color:#111;
 }
+:root[data-seite="sleep"] .special-dex-page[data-special-dex="sleep"]{
+  isolation:isolate;
+}
+:root[data-seite="sleep"] .special-dex-page[data-special-dex="sleep"]::before{
+  content:"";
+  position:fixed;
+  z-index:0;
+  inset:0;
+  pointer-events:none;
+  background:var(--dex-ink,#fff);
+  opacity:.08;
+  -webkit-mask-image:var(--dex-tapete);
+  mask-image:var(--dex-tapete);
+  -webkit-mask-size:360px auto;
+  mask-size:360px auto;
+  -webkit-mask-position:center top;
+  mask-position:center top;
+  -webkit-mask-repeat:repeat;
+  mask-repeat:repeat;
+}
+:root[data-seite="sleep"] .special-dex-page[data-special-dex="sleep"]>*{
+  position:relative;
+  z-index:1;
+}
+:root[data-seite="sleep"] .special-dex-page[data-special-dex="sleep"] .kategorie-scrollinhalt::before{
+  display:none!important;
+}
 :root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{
   display:grid;
   gap:18px;
@@ -7539,6 +7566,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ordner-ink,#fff);
   box-shadow:none;
 }
+:root[data-seite="sleep"] .sleep-tonight button :is(.material-svg,svg,svg *){
+  color:var(--ordner-ink,#fff)!important;
+  fill:var(--ordner-ink,#fff)!important;
+}
 :root[data-seite="sleep"] .sleep-tonight button:active{
   transform:scale(.94);
 }
@@ -7589,6 +7620,40 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:1px solid #d8d5d2;
   border-radius:12px;
   background:#f7f6f4;
+}
+:root[data-seite="sleep"] .sleep-latest>button{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1.5px solid #111;
+  border-radius:50%;
+  background:var(--ordner);
+  color:var(--ordner-ink,#fff);
+}
+:root[data-seite="sleep"] .sleep-latest>button :is(.material-svg,svg,svg *){
+  width:19px;
+  height:19px;
+  color:currentColor;
+  fill:currentColor;
+}
+:root[data-seite="sleep"] .sleep-latest>button:active{
+  transform:scale(.94);
+}
+:root[data-seite="sleep"] .sleep-empty-action{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  width:100%;
+  cursor:pointer;
+}
+:root[data-seite="sleep"] .sleep-empty-action .material-svg,
+:root[data-seite="sleep"] .sleep-empty-action svg{
+  width:19px;
+  height:19px;
+  fill:currentColor;
 }
 :root[data-seite="sleep"] .sleep-latest b{
   font-size:13px;

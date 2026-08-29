@@ -288,11 +288,11 @@ function render(container, userId, state, refresh) {
     <section class="sleep-tonight ${SPECIAL_DEX_CLASSES.hero}">
       <div class="sleep-duration-ring" style="--sleep-progress:${Math.min(360, (duration / 720) * 360)}deg"><span>${tonight?.active ? `${Math.floor(duration / 60)}:${pad(duration % 60)}<small>DAUER</small>` : '–<small>PAUSIERT</small>'}</span></div>
       <span class="sleep-tonight-value"><small>HEUTE NACHT</small><strong>${tonight?.active ? String(tonight.bedtime).slice(0, 5) : '–'}</strong><b>${tonight?.active ? `BIS ${String(tonight.wake_time).slice(0, 5)}` : 'KEIN PLAN'}</b></span>
-      <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('edit')}</button>
+      <button type="button" data-edit-sleep-plan aria-label="Schlafzeiten bearbeiten">${materialIconMarkup('alarm')}</button>
     </section>
     <section class="sleep-section sleep-checkin ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('coffee')}<h2>Morgen-Check-in</h2></div></header>
-      ${latest ? `<button class="sleep-latest" type="button" data-edit-sleep-log="${latest.id}"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span>${materialIconMarkup('chevron_right')}</button>` : '<div class="sleep-empty">Noch kein Morgen-Check-in. Dein erster Eintrag bringt 3 MUSCLE-COINS.</div>'}
+      ${latest ? `<div class="sleep-latest"><span class="sleep-latest-cell"><b>${new Date(`${latest.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${durationLabel(sleepDurationMinutes(latest.bedtime, latest.wake_time))}</small></span><span class="sleep-latest-cell"><b>${latest.quality}/5</b><small>${qualityLabel(latest.quality)}</small></span><span class="sleep-latest-cell"><b>${latest.energy}/5</b><small>Energie</small></span><button type="button" data-add-sleep-log aria-label="Morgen-Check-in hinzufügen">${materialIconMarkup('add')}</button></div>` : `<button class="sleep-empty sleep-empty-action" type="button" data-add-sleep-log>${materialIconMarkup('add')}<span>Ersten Morgen-Check-in hinzufügen · +3 MUSCLE-COINS</span></button>`}
     </section>
     <section class="sleep-section sleep-routine-section ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}">
       <header><div class="sleep-section-title">${materialIconMarkup('self_improvement')}<h2>Abendroutinen</h2></div></header>
@@ -311,6 +311,10 @@ function render(container, userId, state, refresh) {
     ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 
   content.querySelector('[data-edit-sleep-plan]').onclick = () => planEditor({ userId, state, onSaved: refresh });
+  content.querySelector('[data-add-sleep-log]')?.addEventListener('click', () => {
+    const today = state.logs.find((log) => log.sleep_date === localDate()) || null;
+    checkinEditor({ userId, state, existing: today, onSaved: refresh });
+  });
   content.querySelectorAll('[data-edit-sleep-log]').forEach((button) => { button.onclick = () => checkinEditor({ userId, state, existing: state.logs.find((log) => log.id === button.dataset.editSleepLog), onSaved: refresh }); });
   content.querySelector('.sleep-routines')?.addEventListener('click', async (event) => {
     const row = event.target.closest('[data-sleep-routine]');
@@ -326,7 +330,7 @@ function render(container, userId, state, refresh) {
 
 export async function mountSleepDex(container, { userId, signal, mountChrome }) {
   const color = categoryColor('sleep');
-  container.innerHTML = `<div class="wrap pad-bottom sleep-dex-page ${SPECIAL_DEX_CLASSES.page}"><div data-sleep-content><div class="daten-laden">Schlafdaten werden geladen …</div></div></div>`;
+  container.innerHTML = `<div class="wrap pad-bottom sleep-dex-page"><div data-sleep-content><div class="daten-laden">Schlafdaten werden geladen …</div></div></div>`;
   let state = await loadState(userId, signal);
   if (signal?.aborted) return;
   let refreshVersion = 0;
