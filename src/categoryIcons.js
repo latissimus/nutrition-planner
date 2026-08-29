@@ -43,14 +43,14 @@ const defaultColors = {
   body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#FBE7A3',
   recipes: '#007DCC', training: '#215E61', habits: '#245953',
   shopping: '#FFCF00',
-  sleep: '#001454',
+  sleep: '#333D6D',
   coins: '#05BDE8',
 };
 const fixedSystemColors = {
   'food-log': '#FBE7A3',
   training: '#215E61',
   reminders: '#525CEB',
-  sleep: '#001454',
+  sleep: '#333D6D',
 };
 const fixedSystemPatterns = {
   'food-log': 'wallpaper-pizza',

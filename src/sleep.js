@@ -286,7 +286,8 @@ function render(container, userId, state, refresh) {
   const content = container.querySelector('[data-sleep-content]');
   content.innerHTML = `
     <section class="sleep-tonight ${SPECIAL_DEX_CLASSES.hero}">
-      <div class="sleep-tonight-copy"><small>HEUTE NACHT</small>${tonight?.active ? `<div class="sleep-tonight-times"><strong>${String(tonight.bedtime).slice(0, 5)}</strong><i aria-hidden="true">→</i><strong>${String(tonight.wake_time).slice(0, 5)}</strong></div>` : '<strong class="sleep-tonight-empty">Kein Plan</strong>'}<span>${tonight?.active ? `${durationLabel(duration)} · ${state.settings.wind_down_minutes} min vorher runterfahren` : 'Für diese Nacht ist der Plan pausiert.'}</span></div>
+      <div class="sleep-duration-ring" style="--sleep-progress:${Math.min(360, (duration / 720) * 360)}deg"><span>${tonight?.active ? `${Math.floor(duration / 60)}:${pad(duration % 60)}<small>DAUER</small>` : '–<small>PAUSIERT</small>'}</span></div>
+      <span class="sleep-tonight-value"><small>HEUTE NACHT</small><strong>${tonight?.active ? String(tonight.bedtime).slice(0, 5) : '–'}</strong><b>${tonight?.active ? `BIS ${String(tonight.wake_time).slice(0, 5)}` : 'KEIN PLAN'}</b></span>
       <button type="button" data-edit-sleep-plan aria-label="Schlafplan bearbeiten">${materialIconMarkup('edit')}</button>
     </section>
     <section class="sleep-section sleep-checkin ${SPECIAL_DEX_CLASSES.card}">

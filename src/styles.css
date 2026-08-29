@@ -7451,9 +7451,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:none!important;
 }
 :root[data-seite="sleep"] .sleep-tonight{
-  display:block;
-  min-height:154px;
-  padding:20px 17px 18px;
+  display:grid;
+  grid-template-columns:82px minmax(0,1fr) 40px;
+  align-items:center;
+  gap:17px;
+  min-height:0;
+  padding:18px;
   overflow:visible;
 }
 :root[data-seite="sleep"] .sleep-section-title>.material-svg{
@@ -7469,58 +7472,75 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .sleep-section-title{
   gap:0;
 }
-:root[data-seite="sleep"] .sleep-tonight small{
-  padding-right:58px;
-  color:#655f5b;
-  font:750 10px/1.2 "Work Sans",var(--ui),sans-serif;
-  letter-spacing:.07em;
+:root[data-seite="sleep"] .sleep-duration-ring{
+  position:relative;
+  display:grid;
+  place-items:center;
+  width:76px;
+  height:76px;
+  border-radius:50%;
+  background:conic-gradient(var(--ordner) var(--sleep-progress),color-mix(in srgb,#111 12%,#fff) 0);
 }
-:root[data-seite="sleep"] .sleep-tonight strong{
-  margin:0;
-  font:800 clamp(36px,11vw,48px)/.98 var(--tech);
+:root[data-seite="sleep"] .sleep-duration-ring::after{
+  content:"";
+  position:absolute;
+  inset:9px;
+  border-radius:50%;
+  background:#fff;
+}
+:root[data-seite="sleep"] .sleep-duration-ring>span{
+  position:relative;
+  z-index:1;
+  color:#111;
+  font:750 15px/1 var(--tech);
   font-variant-numeric:tabular-nums slashed-zero;
-  letter-spacing:-.065em;
+  text-align:center;
+}
+:root[data-seite="sleep"] .sleep-duration-ring small{
+  display:block;
+  margin-top:4px;
+  color:#655f5b;
+  font:700 8px/1 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.05em;
+}
+:root[data-seite="sleep"] .sleep-tonight-value{
+  display:grid;
+  min-width:0;
+}
+:root[data-seite="sleep"] .sleep-tonight-value small{
+  color:#111;
+  font:800 11px/1.1 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.08em;
+}
+:root[data-seite="sleep"] .sleep-tonight-value strong{
+  margin-top:3px;
+  color:#111;
+  font-family:var(--tech);
+  font-size:clamp(36px,11vw,48px);
+  font-weight:800;
+  line-height:.98;
+  font-variant-numeric:tabular-nums slashed-zero;
+  letter-spacing:-.055em;
   transform:none;
 }
-:root[data-seite="sleep"] .sleep-tonight-times{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:7px;
-  margin:14px 0 9px;
-  padding-right:2px;
-  white-space:nowrap;
-}
-:root[data-seite="sleep"] .sleep-tonight-times i{
-  flex:0 0 auto;
+:root[data-seite="sleep"] .sleep-tonight-value b{
+  margin-top:4px;
   color:#111;
-  font:750 clamp(19px,5.5vw,24px)/1 "Work Sans",var(--ui),sans-serif;
-  font-style:normal;
-}
-:root[data-seite="sleep"] .sleep-tonight-empty{
-  display:block;
-  margin:15px 0 10px!important;
-  letter-spacing:-.045em!important;
-}
-:root[data-seite="sleep"] .sleep-tonight span{
-  color:#655f5b;
-  font:500 12px/1.42 "Work Sans",var(--ui),sans-serif;
+  font:750 13px/1.1 "Work Sans",var(--ui),sans-serif;
+  letter-spacing:.035em;
 }
 :root[data-seite="sleep"] .sleep-tonight button{
-  position:absolute;
-  top:17px;
-  right:17px;
-  width:46px;
-  height:46px;
+  position:static;
+  width:40px;
+  height:40px;
   border:1.5px solid #111;
-  border-radius:12px;
-  background:#fff;
-  color:#111;
-  box-shadow:0 3.5px 0 #000;
+  border-radius:50%;
+  background:var(--ordner);
+  color:var(--ordner-ink,#fff);
+  box-shadow:none;
 }
 :root[data-seite="sleep"] .sleep-tonight button:active{
-  transform:translateY(3.5px);
-  box-shadow:none;
+  transform:scale(.94);
 }
 :root[data-seite="sleep"] .sleep-section{
   padding:16px;
@@ -7651,9 +7671,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 @media(max-width:380px){
   :root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{padding-inline:10px}
-  :root[data-seite="sleep"] .sleep-tonight{padding-inline:13px}
-  :root[data-seite="sleep"] .sleep-tonight button{right:13px}
-  :root[data-seite="sleep"] .sleep-tonight-times{gap:4px}
+  :root[data-seite="sleep"] .sleep-tonight{grid-template-columns:72px minmax(0,1fr) 38px;gap:12px;padding:15px}
+  :root[data-seite="sleep"] .sleep-duration-ring{width:68px;height:68px}
+  :root[data-seite="sleep"] .sleep-tonight button{width:38px;height:38px}
 }
 
 /* ============================================================

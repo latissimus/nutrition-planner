@@ -821,7 +821,7 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   const looks = {
     'food-log': ['#FBE7A3', 'wallpaper-pizza', '🍕'],
     reminders: ['#525CEB', 'wallpaper-burger', '🍔'],
-    sleep: ['#001454', 'wallpaper-moon', '😴'],
+    sleep: ['#333D6D', 'wallpaper-moon', '😴'],
     shopping: ['#00E0BA', 'wallpaper-brokkoli', '🛒'],
     habits: ['#8C00FF', 'wallpaper-wolke', '🧠'],
     training: ['#215E61', 'wallpaper-dumbbell', '💪🏻'],
