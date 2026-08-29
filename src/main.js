@@ -11,9 +11,8 @@ import '@fontsource/figtree/latin-500.css';
 import '@fontsource/figtree/latin-600.css';
 import '@fontsource/figtree/latin-700.css';
 import '@fontsource/figtree/latin-800.css';
-// Dex typography: Work Sans is bundled locally via styles.css; Space Mono
-// stays loaded for technical/meta values with slashed zeroes.
-import '@fontsource/space-mono/latin.css';
+// Dex typography is bundled locally via styles.css: Work Sans for the UI,
+// JetBrains Mono (OFL 1.1) for technical values and metadata.
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';

@@ -13,87 +13,19 @@
   font-display:swap;
 }
 @font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-Light.otf') format('opentype');
+  font-family:"JetBrains Mono";
+  src:url('../JetBrainsMono/fonts/variable/JetBrainsMono[wght].ttf') format('truetype');
   font-style:normal;
-  font-weight:300;
+  font-weight:100 800;
+  font-feature-settings:"zero" 1;
   font-display:swap;
 }
 @font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-Regular.otf') format('opentype');
-  font-style:normal;
-  font-weight:400;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-Medium.otf') format('opentype');
-  font-style:normal;
-  font-weight:500;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-Semibold.otf') format('opentype');
-  font-style:normal;
-  font-weight:600;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-Bold.otf') format('opentype');
-  font-style:normal;
-  font-weight:700;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-Heavy.otf') format('opentype');
-  font-style:normal;
-  font-weight:800 900;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-LightItalic.otf') format('opentype');
+  font-family:"JetBrains Mono";
+  src:url('../JetBrainsMono/fonts/variable/JetBrainsMono-Italic[wght].ttf') format('truetype');
   font-style:italic;
-  font-weight:300;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-RegularItalic.otf') format('opentype');
-  font-style:italic;
-  font-weight:400;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-MediumItalic.otf') format('opentype');
-  font-style:italic;
-  font-weight:500;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-SemiboldItalic.otf') format('opentype');
-  font-style:italic;
-  font-weight:600;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-BoldItalic.otf') format('opentype');
-  font-style:italic;
-  font-weight:700;
-  font-display:swap;
-}
-@font-face{
-  font-family:"SF Mono Local";
-  src:url('../SF_Mono/SF-Mono-HeavyItalic.otf') format('opentype');
-  font-style:italic;
-  font-weight:800 900;
+  font-weight:100 800;
+  font-feature-settings:"zero" 1;
   font-display:swap;
 }
 
@@ -129,11 +61,10 @@
    lokalen Alternativen decken iOS, Android, macOS und Windows ab. */
 @font-face{
   font-family:"MUSCLEDEX Ziffern";
-  src:url('../SF_Mono/SF-Mono-Regular.otf') format('opentype'),
-      local("SFMono-Regular"),local("SF Mono"),local("Menlo"),
-      local("Roboto Mono"),local("Droid Sans Mono"),local("Consolas");
+  src:url('../JetBrainsMono/fonts/variable/JetBrainsMono[wght].ttf') format('truetype');
   font-style:normal;
   font-weight:100 900;
+  font-feature-settings:"zero" 1;
   font-display:swap;
   unicode-range:U+0030-0039;
 }
@@ -259,7 +190,7 @@
      Monospace-Schrift des Geräts. In MUSCLE-DEX bleibt sie bewusst ein
      eigener Akzent, damit Navigation und Fließtext weiterhin ruhig in
      Figtree gesetzt werden. */
-  --tech:"SF Mono Local","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --tech:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 
 /* ============================================================
@@ -6845,9 +6776,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:8px;
 }
 
-/* Exakt die Zahlenfamilie des COIN-DEX. Wichtig: kein Webfont namens
-   "Space Mono" – COIN-DEX nutzt var(--tech), auf iOS ui-monospace/SF Mono
-   mit der charakteristischen gestrichenen Null. */
+/* Exakt die Zahlenfamilie des COIN-DEX. JetBrains Mono wird lokal unter OFL
+   ausgeliefert; die OpenType-Variante `zero` erzeugt die gestrichene Null. */
 :root[data-seite="reminders"] :is(
   .mahl-slot-zeit input,.rem-row-zeit,
   .nutrition-day-nav small,.nutrition-balance strong,.nutrition-balance strong i,
@@ -6867,7 +6797,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ){
   font-family:var(--tech)!important;
   font-variant-numeric:tabular-nums!important;
-  font-feature-settings:normal!important;
+  font-feature-settings:"zero" 1!important;
 }
 
 /* Meal-Log Finalhierarchie: ein Hauptstatus, danach flache Informationen.
@@ -7026,7 +6956,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ){
   font-family:var(--tech)!important;
   font-variant-numeric:tabular-nums!important;
-  font-feature-settings:normal!important;
+  font-feature-settings:"zero" 1!important;
 }
 
 /* Kalorien-Kalibrierung: exakt das aufklappbare LOGMAN-Infomuster. */
@@ -7686,7 +7616,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* Trinken folgt derselben Typohierarchie wie die Mahlzeiten: Work Sans fuer
-   Bezeichnungen, SF Mono nur fuer die technischen Zeit- und Intervallwerte.
+   Bezeichnungen, JetBrains Mono nur fuer technische Zeit- und Intervallwerte.
    Die Werte sind bewusst nicht mehr in der zu leichten Standardstaerke. */
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken .rem-row[data-type="drink"] .rem-row-titel>small:not(.rem-row-art){
   color:#555c69;
@@ -7726,7 +7656,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* Verbindliche Typografie aller Meal-Log-Karten: Work Sans für Namen und
-   Hierarchie, SF Mono nur für Uhrzeit, Mengen, Makros und kcal. */
+   Hierarchie, JetBrains Mono nur für Uhrzeit, Mengen, Makros und kcal. */
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock :is(
   .mahl-slot-heading h2,
   .rem-row-titel>b,
