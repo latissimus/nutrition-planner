@@ -1,7 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import webpush from 'npm:web-push@3.6.7';
 import {
-  DELIVERY_GRACE_MINUTES, localDate, scheduledOccurrence, snoozeOccurrence,
+  DELIVERY_GRACE_MINUTES, scheduledOccurrence, scheduledOffsetOccurrence, snoozeOccurrence,
   type ScheduledOccurrence,
 } from './schedule.ts';
 
@@ -48,6 +48,13 @@ type Completion = {
   snoozed_until: string | null;
 };
 
+type DueReminder = {
+  reminder: Reminder;
+  occurrence: ScheduledOccurrence;
+  kind: 'reminder' | 'supplement-group';
+  supplements?: Reminder[];
+};
+
 function json(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -79,6 +86,7 @@ function unitLabel(value: string) {
 
 function isConfiguredSupplement(reminder: Reminder) {
   return reminder.type === 'supplement'
+    && !reminder.metadata?.deleted
     && (reminder.active || !/^Supplement (AM|PM)$/i.test(String(reminder.label || '').trim()));
 }
 
@@ -94,23 +102,44 @@ function minutesFromTime(time?: string) {
   const [h, m] = String(time || '00:00').split(':').map((part) => Number(part));
   return (Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0);
 }
-function mealPeriod(reminder: Reminder): [number, number] | null {
+function mealSlot(reminder: Reminder): string {
   const slot = String(reminder.metadata?.meal_slot || '').toLowerCase();
-  const bySlot = PERIODS.find(([key]) => key === slot);
-  if (bySlot) return [bySlot[1], bySlot[2]];
+  if (PERIODS.some(([key]) => key === slot)) return slot;
   const t = minutesFromTime(reminder.time);
   const byTime = PERIODS.find(([, start, end]) => t >= start && t < end);
-  return byTime ? [byTime[1], byTime[2]] : null;
-}
-// Nur Supplements in derselben Periode wie die Mahlzeit ergänzen deren Push.
-function hasSupplementsInPeriod(reminder: Reminder, reminders: Reminder[]) {
-  const range = mealPeriod(reminder);
-  if (!range) return false;
-  return reminders.some((item) => isConfiguredSupplement(item)
-    && minutesFromTime(item.time) >= range[0] && minutesFromTime(item.time) < range[1]);
+  return byTime?.[0] || 'breakfast';
 }
 
-function notification(reminder?: Reminder, reminders: Reminder[] = []) {
+function supplementSlot(reminder: Reminder) {
+  return String(reminder.metadata?.meal_slot || '').toLowerCase() || mealSlot(reminder);
+}
+
+function supplementGroupTitle(slot: string) {
+  return ({
+    breakfast: 'Morgen-Supplements',
+    snack_morning: 'Vormittags-Supplements',
+    lunch: 'Mittagssupplements',
+    snack_afternoon: 'Nachmittags-Supplements',
+    dinner: 'Abend-Supplements',
+  } as Record<string, string>)[slot] || 'Supplements';
+}
+
+function supplementGroupNotification(meal: Reminder, supplements: Reminder[]) {
+  const body = supplements.map((supplement) => {
+    const dosis = String(supplement.metadata?.dosis || '').trim();
+    const einheit = String(supplement.metadata?.einheit || '').trim();
+    const amount = dosis && einheit ? `${dosis} ${unitLabel(einheit)}` : dosis || unitLabel(einheit);
+    return amount ? `${supplement.label} (${amount})` : supplement.label;
+  }).join(' · ');
+  return {
+    title: `💊 ${supplementGroupTitle(mealSlot(meal))}`,
+    body: body || 'Supplement-Stack checken.',
+    tag: `nutrition-${meal.id}-supplements`,
+    url: meal.route || '#reminders',
+  };
+}
+
+function notification(reminder?: Reminder) {
   if (!reminder) {
     return {
       title: 'Test erfolgreich',
@@ -129,9 +158,8 @@ function notification(reminder?: Reminder, reminders: Reminder[] = []) {
   };
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    const hasSupplements = hasSupplementsInPeriod(reminder, reminders);
     return {
-      title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & 💊 Supps' : ''}`,
+      title: `${notificationSymbol(reminder)} ${reminder.label}`,
       body: note || bodies.meal,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#reminders',
@@ -236,15 +264,31 @@ async function dispatchDue() {
   if (reminderError) throw reminderError;
   if (profileError) throw profileError;
 
+  const allReminders = (reminders || []) as Reminder[];
   const zones = new Map((profiles || []).map((profile) => [profile.id, profile.zeitzone || 'UTC']));
-  const remindersById = new Map<string, Reminder>((reminders || []).map((r: Reminder) => [r.id, r]));
+  const remindersById = new Map<string, Reminder>(allReminders.map((r) => [r.id, r]));
 
-  // 1. Regulär zeitplan-fällige Reminders. Supplements feuern KEINEN eigenen
-  // Push – sie erscheinen nur als „& 💊 Supps" im Push ihrer Mahlzeit-Kategorie.
-  const scheduled = ((reminders || []) as Reminder[]).flatMap((reminder) => {
+  // 1. Regulär zeitplan-fällige Reminders. Supplements werden separat und
+  // gesammelt zehn Minuten nach ihrem Mahlzeitenblock geplant.
+  const scheduled: DueReminder[] = allReminders.flatMap((reminder) => {
     const occurrence = scheduledOccurrence(reminder, zones.get(reminder.user_id) || 'UTC', now);
-    return reminder.active && reminder.type !== 'supplement' && occurrence ? [{ reminder, occurrence }] : [];
+    return reminder.active && reminder.type !== 'supplement' && occurrence
+      ? [{ reminder, occurrence, kind: 'reminder' as const }] : [];
   });
+  const supplementGroups: DueReminder[] = allReminders
+    .filter((reminder) => reminder.active && reminder.type === 'meal')
+    .flatMap((meal) => {
+      const supplements = allReminders.filter((item) => item.user_id === meal.user_id
+        && isConfiguredSupplement(item)
+        && supplementSlot(item) === mealSlot(meal));
+      if (!supplements.length) return [];
+      const occurrence = scheduledOffsetOccurrence(
+        meal, zones.get(meal.user_id) || 'UTC', now, 10,
+      );
+      return occurrence ? [{
+        reminder: meal, occurrence, kind: 'supplement-group' as const, supplements,
+      }] : [];
+    });
 
   // 2. Reminders deren Snooze in dieser Minute abgelaufen ist (unabhängig von reminder.time)
   const { data: expiredSnoozes, error: snoozeError } = await admin
@@ -255,17 +299,21 @@ async function dispatchDue() {
     .gte('snoozed_until', new Date(now.getTime() - DELIVERY_GRACE_MINUTES * 60_000).toISOString())
     .lte('snoozed_until', now.toISOString());
   if (snoozeError) throw snoozeError;
-  const dueFromSnooze: { reminder: Reminder; occurrence: ScheduledOccurrence }[] = [];
+  const dueFromSnooze: DueReminder[] = [];
   for (const row of (expiredSnoozes || []) as { reminder_id: string; user_id: string; date: string; snoozed_until: string }[]) {
     const reminder = remindersById.get(row.reminder_id);
-    if (reminder?.active && reminder.type !== 'supplement') dueFromSnooze.push({ reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date) });
+    if (reminder?.active && reminder.type !== 'supplement') dueFromSnooze.push({
+      reminder, occurrence: snoozeOccurrence(row.snoozed_until, row.date), kind: 'reminder',
+    });
   }
 
-  const dueMap = new Map<string, { reminder: Reminder; occurrence: ScheduledOccurrence }>();
-  for (const item of scheduled) dueMap.set(item.reminder.id, item);
+  const dueMap = new Map<string, DueReminder>();
+  for (const item of [...scheduled, ...supplementGroups]) {
+    dueMap.set(`${item.kind}:${item.reminder.id}`, item);
+  }
   // Ein abgelaufener Snooze hat Vorrang vor einem gleichzeitig faelligen
   // normalen Zeitplan derselben Erinnerung.
-  for (const item of dueFromSnooze) dueMap.set(item.reminder.id, item);
+  for (const item of dueFromSnooze) dueMap.set(`reminder:${item.reminder.id}`, item);
   const due = [...dueMap.values()];
   if (!due.length) return json({ ok: true, due: 0, sent: 0 });
 
@@ -296,9 +344,11 @@ async function dispatchDue() {
   }
 
   let sent = 0;
-  for (const { reminder, occurrence } of due) {
+  for (const { reminder, occurrence, kind, supplements = [] } of due) {
     const date = occurrence.localDate;
-    const completion = completionByKey.get(`${reminder.id}:${date}`);
+    const completion = kind === 'reminder'
+      ? completionByKey.get(`${reminder.id}:${date}`)
+      : undefined;
 
     // Bereits heute erledigt → skip
     if (completion?.completed_at) continue;
@@ -320,7 +370,10 @@ async function dispatchDue() {
       if (claimError) throw claimError;
 
       try {
-        await send(subscription, notification(reminder, reminders as Reminder[]));
+        const payload = kind === 'supplement-group'
+          ? supplementGroupNotification(reminder, supplements)
+          : notification(reminder);
+        await send(subscription, payload);
         sent += 1;
         await admin
           .from('push_deliveries')

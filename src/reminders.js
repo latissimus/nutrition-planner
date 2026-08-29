@@ -12,7 +12,8 @@ import {
   syncPushSubscription,
 } from './push.js';
 import {
-  reminderNotificationTag, shouldReuseReminderLoop, shouldStartLocalReminderLoop,
+  reminderIsDueAfterOffset, reminderNotificationTag, shouldReuseReminderLoop,
+  shouldStartLocalReminderLoop, supplementGroupTitle, supplementNotificationTag,
 } from './notificationDelivery.js';
 import { mountNutrition } from './nutrition.js';
 import { bindLongPress } from './longPress.js';
@@ -139,6 +140,18 @@ const mealSlotForReminder = (item) => {
   return 'dinner';
 };
 
+const supplementSlotForReminder = (item) => item.metadata?.meal_slot || mealSlotForReminder(item);
+
+const isConfiguredSupplement = (item) => item.type === 'supplement'
+  && !item.metadata?.deleted
+  && (item.active || !/^Supplement (AM|PM)$/i.test(String(item.label || '').trim()));
+
+const supplementsForMeal = (meal, reminders) => {
+  const slot = mealSlotForReminder(meal);
+  return reminders.filter((item) => isConfiguredSupplement(item)
+    && supplementSlotForReminder(item) === slot);
+};
+
 const einheitLabel = (value) => ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' })[value] || value;
 
 function nextDrinkSlot(reminder, now) {
@@ -155,30 +168,20 @@ function hinweisLabel(value) {
   return paar && paar[0] ? paar[1] : '';
 }
 
-// Perioden der Tages-Timeline (Minuten ab Mitternacht) – identisch zu reminderGroups.
-const PERIOD_RANGES = {
-  breakfast: [0, 9 * 60 + 45],
-  snack_morning: [9 * 60 + 45, 12 * 60],
-  lunch: [12 * 60, 15 * 60],
-  snack_afternoon: [15 * 60, 18 * 60],
-  dinner: [18 * 60, 24 * 60],
-};
-// Supplements gehören über ihre Uhrzeit zu genau einer Mahlzeit-Kategorie. Nur
-// Supps in derselben Periode wie die Mahlzeit ergänzen deren Push mit „& 💊 Supps".
-function hasSupplementsInPeriod(reminder, reminders) {
-  const range = PERIOD_RANGES[mealSlotForReminder(reminder)];
-  if (!range) return false;
-  const [start, end] = range;
-  return reminders.some((item) => item.type === 'supplement'
-    && (item.active || !/^Supplement (AM|PM)$/i.test(String(item.label || '').trim()))
-    && minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
-}
-
-function notificationText(reminder, reminders = []) {
+function notificationText(reminder) {
   if (reminder.type === 'meal') {
     const note = String(reminder.metadata?.notiz || '').trim();
-    const hasSupplements = hasSupplementsInPeriod(reminder, reminders);
-    return { title: `${notificationSymbol(reminder)} ${reminder.label}${hasSupplements ? ' & 💊 Supps' : ''}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
+  }
+  if (reminder.type === 'supplement-group') {
+    const supplements = reminder.metadata?.supplements || [];
+    const body = supplements.map((item) => {
+      const dosis = String(item.metadata?.dosis || '').trim();
+      const einheit = String(item.metadata?.einheit || '').trim();
+      const amount = dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit);
+      return amount ? `${item.label} (${amount})` : item.label;
+    }).join(' · ');
+    return { title: `💊 ${supplementGroupTitle(reminder.metadata?.meal_slot)}`, body: body || 'Supplement-Stack checken.' };
   }
   if (reminder.type === 'supplement') {
     const dosis = String(reminder.metadata?.dosis || '').trim();
@@ -345,12 +348,12 @@ async function ensureDefaults(userId, signal) {
   return [...current, ...(data ?? [])].filter((reminder) => !reminder.metadata?.deleted);
 }
 
-async function maybeNotify(reminder, slot, now, userId, reminders = []) {
+async function maybeNotify(reminder, slot, now, userId) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   const key = `nutrition-reminder:${userId}:${reminder.id}:${dateKey(now)}:${slot}`;
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
-  const text = notificationText(reminder, reminders);
+  const text = notificationText(reminder);
   const worker = await navigator.serviceWorker?.ready;
   if (!worker) return;
   await worker.showNotification(text.title, {
@@ -358,7 +361,9 @@ async function maybeNotify(reminder, slot, now, userId, reminders = []) {
     // Derselbe Tag wie beim serverseitigen Web Push: Sollte ein alter lokaler
     // Timer ausnahmsweise noch einen Tick schaffen, ersetzt iOS die Meldung,
     // statt zwei identische Benachrichtigungen nebeneinander zu zeigen.
-    tag: reminderNotificationTag(reminder.id),
+    tag: reminder.type === 'supplement-group'
+      ? supplementNotificationTag(reminder.metadata?.meal_reminder_id)
+      : reminderNotificationTag(reminder.id),
     data: {
       url: reminder.route || '#reminders',
       reminderId: reminder.id,
@@ -374,11 +379,28 @@ async function tickReminders(userId) {
   const now = new Date();
   const today = now.getDay();
   const currentMinute = minuteKey(now);
-  // Supplements haben KEINEN eigenen Push – sie erscheinen nur als „& 💊 Supps"
-  // im Push ihrer Mahlzeit-Kategorie. Deshalb hier ausschließen.
+  // Normale Mahlzeiten, Trinkintervalle usw. feuern zu ihrer eigenen Zeit.
   reminders.filter((reminder) => reminder.active && reminder.type !== 'supplement' && (reminder.weekdays || WEEKDAYS).includes(today)).forEach((reminder) => {
     const slot = reminder.type === 'drink' ? nextDrinkSlot(reminder, now) : reminder.time?.slice(0, 5);
-    if (slot === currentMinute) maybeNotify(reminder, slot, now, userId, reminders);
+    if (slot === currentMinute) maybeNotify(reminder, slot, now, userId);
+  });
+  // Alle Supplements eines Mahlzeitenblocks werden zehn Minuten nach dessen
+  // Uhrzeit in genau einer Meldung zusammengefasst. Der Ursprungstag wird aus
+  // `now - 10 min` ermittelt, damit auch Mahlzeiten kurz vor Mitternacht stimmen.
+  reminders.filter((reminder) => reminder.active && reminder.type === 'meal').forEach((meal) => {
+    const supplements = supplementsForMeal(meal, reminders);
+    if (!supplements.length || !reminderIsDueAfterOffset(meal, now, 10)) return;
+    const grouped = {
+      id: `${meal.id}:supplements`,
+      type: 'supplement-group',
+      route: meal.route,
+      metadata: {
+        meal_reminder_id: meal.id,
+        meal_slot: mealSlotForReminder(meal),
+        supplements,
+      },
+    };
+    maybeNotify(grouped, currentMinute, now, userId);
   });
 }
 
@@ -606,7 +628,7 @@ function reminderRowMarkup(reminder, completion) {
   const badge = statusBadge(completion);
   const dimmed = completion?.completed_at ? ' ist-erledigt' : '';
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
-  const commonAttrs = `data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}`;
+  const commonAttrs = `data-reminder-key="${key}" data-type="${reminder.type}"${['meal', 'supplement'].includes(reminder.type) ? ` data-meal-slot="${reminder.type === 'supplement' ? supplementSlotForReminder(reminder) : mealSlotForReminder(reminder)}"` : ''}`;
   const head = `
     <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminderIconValue(reminder))}</span>
     <span class="rem-row-titel">
@@ -643,7 +665,7 @@ function reminderGroups(reminders, completions) {
     .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
   const timeline = periods.map(([period, title, fallbackIcon, start, end]) => {
     const slotReminder = reminders.find((item) => item.type === 'meal' && mealSlotForReminder(item) === period);
-    const rows = timed.filter((item) => minutesFromTime(item.time) >= start && minutesFromTime(item.time) < end);
+    const rows = timed.filter((item) => supplementSlotForReminder(item) === period);
     const note = (slotReminder?.metadata?.notiz || '').trim();
     const slotKey = slotReminder?._key || slotReminder?.id;
     return `<section class="mahl-zeitblock mahl-zeitblock-${period}">
@@ -869,6 +891,7 @@ export async function mountReminders(container, { session, signal }) {
       const einheit = body.querySelector('[data-einheit]')?.value || '';
       patch.metadata = {
         icon: supplementIconId(einheit),
+        meal_slot: row.dataset.mealSlot || 'breakfast',
         dosis: body.querySelector('[data-dosis]')?.value.trim() || '',
         einheit,
         hinweis: body.querySelector('[data-hinweis]')?.value || '',
@@ -949,6 +972,7 @@ export async function mountReminders(container, { session, signal }) {
 
   const createReminder = async (type, period = '') => {
     const times = { breakfast: '08:00', snack_morning: '10:30', lunch: '13:00', snack_afternoon: '16:30', dinner: '19:00' };
+    const mealForPeriod = reminders.find((item) => item.type === 'meal' && mealSlotForReminder(item) === period);
     // Default-Namen unter den Supplements eindeutig halten, damit zwei neue
     // Supplements (auch im selben Slot) nicht am Unique-Index kollidieren –
     // umbenannt wird ohnehin direkt danach.
@@ -961,9 +985,13 @@ export async function mountReminders(container, { session, signal }) {
     const neu = {
       id: null, _key: `new:${crypto.randomUUID()}`, type,
       label,
-      time: type === 'drink' ? '09:00' : (times[period] || '08:00'),
+      time: type === 'drink' ? '09:00' : (mealForPeriod?.time || times[period] || '08:00'),
       weekdays: WEEKDAYS, active: type === 'supplement',
-      metadata: { icon: type === 'supplement' ? 'pill' : type === 'drink' ? 'water_drop' : 'fastfood' }, route: '#reminders',
+      metadata: {
+        icon: type === 'supplement' ? 'pill' : type === 'drink' ? 'water_drop' : 'fastfood',
+        ...(type === 'supplement' && period ? { meal_slot: period } : {}),
+      },
+      route: '#reminders',
     };
     reminders.push(neu);
     try {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  localDate, scheduledOccurrence, snoozeOccurrence,
+  localDate, scheduledOccurrence, scheduledOffsetOccurrence, snoozeOccurrence,
 } from './schedule.ts';
 
 const reminder = (values = {}) => ({
@@ -61,5 +61,24 @@ describe('Push-Zeitplanung', () => {
       localDate: '2026-08-12',
       occurrenceKey: 'snooze:2026-08-12T14:00:00.000Z',
     });
+  });
+
+  it('plant den Supplement-Sammelpush zehn Minuten nach der Mahlzeit', () => {
+    expect(scheduledOffsetOccurrence(
+      reminder(), 'Europe/Berlin', new Date('2026-08-12T06:10:20Z'), 10,
+    )).toEqual({
+      scheduledFor: '2026-08-12T06:10:00.000Z',
+      localDate: '2026-08-12',
+      occurrenceKey: 'schedule:2026-08-12:0480:offset:10',
+    });
+  });
+
+  it('prueft bei einem Supplement-Push nach Mitternacht den Mahlzeiten-Tag', () => {
+    const sundayMeal = reminder({ time: '23:55', weekdays: [0] });
+    const occurrence = scheduledOffsetOccurrence(
+      sundayMeal, 'Europe/Berlin', new Date('2026-08-09T22:05:00Z'), 10,
+    );
+    expect(occurrence?.localDate).toBe('2026-08-09');
+    expect(occurrence?.scheduledFor).toBe('2026-08-09T22:05:00.000Z');
   });
 });

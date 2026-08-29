@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  reminderNotificationTag, shouldReuseReminderLoop, shouldStartLocalReminderLoop,
+  reminderIsDueAfterOffset, reminderNotificationTag, shouldReuseReminderLoop,
+  shouldStartLocalReminderLoop, supplementGroupTitle, supplementNotificationTag,
 } from './notificationDelivery.js';
 
 describe('Erinnerungs-Zustellweg', () => {
@@ -24,6 +25,19 @@ describe('Erinnerungs-Zustellweg', () => {
 
   it('verwendet fuer lokalen und serverseitigen Versand denselben Tag', () => {
     expect(reminderNotificationTag('abc')).toBe('nutrition-abc');
+    expect(supplementNotificationTag('abc')).toBe('nutrition-abc-supplements');
+  });
+
+  it('benennt die Supplement-Gruppen nach ihrem Mahlzeitenblock', () => {
+    expect(supplementGroupTitle('breakfast')).toBe('Morgen-Supplements');
+    expect(supplementGroupTitle('lunch')).toBe('Mittagssupplements');
+    expect(supplementGroupTitle('dinner')).toBe('Abend-Supplements');
+  });
+
+  it('leitet den Supplement-Termin zehn Minuten von der Mahlzeit ab', () => {
+    const meal = { time: '08:00', weekdays: [6] };
+    expect(reminderIsDueAfterOffset(meal, new Date(2026, 7, 29, 8, 10), 10)).toBe(true);
+    expect(reminderIsDueAfterOffset(meal, new Date(2026, 7, 29, 8, 9), 10)).toBe(false);
   });
 
   it('verwendet den alten Loop nur ohne erzwungenen Push-Wechsel weiter', () => {

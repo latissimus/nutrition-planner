@@ -88,6 +88,37 @@ export function scheduledOccurrence(
   return null;
 }
 
+/**
+ * Liefert einen Termin, der relativ zu einer normalen Erinnerung liegt. Die
+ * Wochentage werden dabei am Ursprungstermin geprueft, nicht am (eventuell
+ * ueber Mitternacht verschobenen) Folgetermin.
+ */
+export function scheduledOffsetOccurrence(
+  reminder: ScheduledReminder,
+  timeZone: string,
+  now: Date,
+  offsetMinutes: number,
+  graceMinutes = DELIVERY_GRACE_MINUTES,
+): ScheduledOccurrence | null {
+  const offset = Math.max(0, Math.trunc(offsetMinutes));
+  const currentMinute = new Date(now);
+  currentMinute.setUTCSeconds(0, 0);
+  for (let delay = 0; delay <= Math.max(0, graceMinutes); delay += 1) {
+    const dueCandidate = new Date(currentMinute.getTime() - delay * 60_000);
+    const originCandidate = new Date(dueCandidate.getTime() - offset * 60_000);
+    const originParts = localParts(originCandidate, timeZone);
+    if (!matchesMinute(reminder, originParts)) continue;
+    const date = `${originParts.year}-${originParts.month}-${originParts.day}`;
+    const plannedMinute = String(originParts.hour * 60 + originParts.minute).padStart(4, '0');
+    return {
+      scheduledFor: dueCandidate.toISOString(),
+      localDate: date,
+      occurrenceKey: `schedule:${date}:${plannedMinute}:offset:${offset}`,
+    };
+  }
+  return null;
+}
+
 export function snoozeOccurrence(snoozedUntil: string, date: string): ScheduledOccurrence {
   const scheduled = new Date(snoozedUntil);
   scheduled.setUTCSeconds(0, 0);
@@ -98,4 +129,3 @@ export function snoozeOccurrence(snoozedUntil: string, date: string): ScheduledO
     occurrenceKey: `snooze:${scheduledFor}`,
   };
 }
-

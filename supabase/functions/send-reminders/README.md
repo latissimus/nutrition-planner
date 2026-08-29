@@ -17,3 +17,9 @@ nach und verwendet dessen stabilen `occurrence_key`, sodass derselbe Termin
 trotzdem nur einmal pro registriertem Geraet zugestellt wird. Das gilt auch
 fuer Trinkintervalle, Snooze und die doppelte lokale Stunde beim Wechsel zur
 Winterzeit.
+
+Supplements besitzen keinen eigenen einstellbaren Zeitpunkt. Alle aktiven
+Supplements eines Mahlzeitenblocks werden in einer gemeinsamen Meldung exakt
+zehn Minuten nach der aktuellen Uhrzeit dieser Mahlzeit versendet. Die normale
+Mahlzeitenmeldung bleibt davon getrennt. Die Push-Payloads enthalten bewusst
+keine Aktionsbuttons.
