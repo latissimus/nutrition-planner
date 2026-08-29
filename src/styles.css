@@ -7506,6 +7506,41 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] :is(.meal-log-dex-page,.reminder-overlay) .rem-trinkzeiten>.rem-field:last-child{
   grid-column:1/-1;
 }
+
+/* Trinken folgt derselben Typohierarchie wie die Mahlzeiten: Work Sans fuer
+   Bezeichnungen, SF Mono nur fuer die technischen Zeit- und Intervallwerte.
+   Die Werte sind bewusst nicht mehr in der zu leichten Standardstaerke. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken .rem-row[data-type="drink"] .rem-row-titel>small:not(.rem-row-art){
+  color:#555c69;
+  font-family:var(--tech)!important;
+  font-size:12.5px!important;
+  font-weight:600!important;
+  line-height:1.25!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken .rem-row[data-type="drink"] .rem-row-zeit{
+  color:#111;
+  font-family:var(--tech)!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
+:root[data-seite="reminders"] :is(.meal-log-dex-page,.reminder-overlay) .rem-trinkzeiten .rem-field>span{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.04em!important;
+}
+:root[data-seite="reminders"] :is(.meal-log-dex-page,.reminder-overlay) .rem-trinkzeiten :is(input[type="time"],select){
+  font-family:var(--tech)!important;
+  font-size:13.5px!important;
+  font-weight:650!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
 :root[data-seite="reminders"] .slot-info-overlay .rem-mahlzeit-notiz :is(b,strong){
   font-family:inherit!important;
   font-weight:700!important;
