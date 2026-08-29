@@ -7483,7 +7483,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{
   display:grid;
   gap:18px;
-  padding:0 12px calc(216px + env(safe-area-inset-bottom));
+  padding:0 12px;
 }
 :root[data-seite="sleep"] .sleep-tonight,
 :root[data-seite="sleep"] .sleep-section{
