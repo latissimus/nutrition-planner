@@ -729,6 +729,7 @@ function choosePeriod(type, onSelected) {
       <button type="button" data-period="snack_afternoon"><span>Snack nachmittags</span></button>
       <button type="button" data-period="dinner"><span>Abendessen</span></button>
     </div>`);
+  backdrop.classList.add('rem-period-overlay');
   backdrop.querySelector('.rem-period-menu').onclick = (event) => {
     const period = event.target.closest('[data-period]')?.dataset.period;
     if (!period) return;
@@ -1310,9 +1311,8 @@ export async function mountReminders(container, { session, signal }) {
       backdrop.style.setProperty('--dex-seitenfarbe', color);
       backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
       backdrop.innerHTML = `<section class="kategorie-sheet mahl-add-sheet" role="dialog" aria-modal="true">
-        <header><h2>MAHLZEITEN</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+        <header><h2>Eintrag hinzufügen</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         ${nutritionActions?.isEnabled?.() ? `<section class="mahl-add-gruppe">
-          <h3>${materialIconMarkup('Pizza neu')}<span>Mahlzeit eintragen</span></h3>
           <div class="sheet-menue mahl-add-unterpunkte">
             <button type="button" data-add-type="nutrition:scan">${materialIconMarkup('photo_camera')}<span><b>Barcode</b><small>Produkt scannen</small></span></button>
             <button type="button" data-add-type="nutrition:search">${materialIconMarkup('search')}<span><b>Suche</b><small>Lebensmittel finden</small></span></button>
