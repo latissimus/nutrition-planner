@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<div id="s">working…</div>
+<script>
+async function render(size){
+  const txt = await fetch('/__home-icon-src.svg').then(r=>r.text());
+  // Explizite Pixelmasse statt width/height="100%", damit der Rasterizer
+  // deterministisch in der Zielgroesse zeichnet.
+  const sized = txt.replace(/width="100%"/, `width="${size}"`).replace(/height="100%"/, `height="${size}"`);
+  const blob = new Blob([sized], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image(); img.width=size; img.height=size;
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url;});
+  const c = document.createElement('canvas'); c.width=size; c.height=size;
+  const ctx = c.getContext('2d'); ctx.drawImage(img,0,0,size,size);
+  URL.revokeObjectURL(url);
+  return c.toDataURL('image/png');
+}
+window.__gen = async () => {
+  const out = {};
+  for (const s of [180,192,512]) out[s] = await render(s);
+  window.__ICONS = out;
+  document.getElementById('s').textContent = 'DONE '+Object.keys(out).join(',');
+  return true;
+};
+window.__gen();
+</script></body></html>

@@ -7059,16 +7059,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:700!important;
 }
 
-/* Meal-Log und Eintragsdetail teilen exakt dieselbe Kartenbreite. Der
-   scrollende Dex-Inhalt startet 14px vom Displayrand; weitere 7px pro Seite
-   ergeben die 21px Seitenabstand der Detailkarte. Die Breite wird an den zwei
-   Hauptbereichen gesetzt, damit Hero, Tagesuebersicht, Hilfetext und alle
-   Mahlzeitenkarten dauerhaft auf derselben Achse bleiben. */
+/* Meal-Log und Eintragsdetail teilen exakt dieselbe Kartenbreite. Der äußere
+   .wrap bringt bereits 12px Seitenabstand mit; weitere 9px pro Seite ergeben
+   die verbindlichen 21px. Nach Aufbau des Dex sind beide Hauptbereiche
+   direkte Kinder des im Wrap liegenden Scrollbereichs. */
 :root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt>
 :is([data-nutrition-root],[data-reminders-card]){
   box-sizing:border-box;
-  width:min(calc(100% - 14px),604px);
+  width:min(calc(100% - 18px),604px);
   margin-inline:auto;
+}
+
+/* Hero, Tagesübersicht und Mahlzeiten folgen demselben vertikalen Raster. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-tagesplan{
+  gap:18px;
 }
 
 /* ============================================================

@@ -13,22 +13,39 @@ export async function registriereServiceWorker() {
   }
   // Relativ zur Seite, weil GitHub Pages die App in einem Unterordner ausliefert.
   const registration = await navigator.serviceWorker.register('./sw.js');
-  let reloadGestartet = false;
-  const aktivieren = (worker) => {
+  let neuerWorker = registration.waiting || null;
+  let wechselGestartet = false;
+
+  const updateButton = document.createElement('button');
+  updateButton.type = 'button';
+  updateButton.className = 'pwa-update-button';
+  updateButton.innerHTML = '<b>Update verfügbar</b><small>Jetzt aktualisieren</small>';
+  updateButton.hidden = true;
+  document.body.append(updateButton);
+
+  const anzeigen = (worker) => {
     if (!worker || !navigator.serviceWorker.controller) return;
-    worker.postMessage({ typ: 'skip-waiting' });
+    neuerWorker = worker;
+    updateButton.hidden = false;
   };
-  aktivieren(registration.waiting);
+  anzeigen(registration.waiting);
   registration.addEventListener('updatefound', () => {
     const worker = registration.installing;
     worker?.addEventListener('statechange', () => {
-      if (worker.state === 'installed') aktivieren(worker);
+      if (worker.state === 'installed') anzeigen(worker);
     });
   });
+
+  updateButton.onclick = () => {
+    if (!neuerWorker) return;
+    wechselGestartet = true;
+    updateButton.disabled = true;
+    updateButton.querySelector('small').textContent = 'Wird installiert …';
+    neuerWorker.postMessage({ typ: 'skip-waiting' });
+  };
+
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (reloadGestartet) return;
-    reloadGestartet = true;
-    location.reload();
+    if (wechselGestartet) location.reload();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') registration.update().catch(() => {});

@@ -1,12 +1,6 @@
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
-let ersetztVorherigeVersion = false;
-self.addEventListener('install', () => {
-  ersetztVorherigeVersion = Boolean(self.registration.active);
-  self.skipWaiting();
-});
-
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')));
@@ -30,12 +24,7 @@ registerRoute(
 self.addEventListener('message', (event) => {
   if (event.data?.typ === 'skip-waiting') self.skipWaiting();
 });
-self.addEventListener('activate', (event) => event.waitUntil((async () => {
-  await self.clients.claim();
-  if (!ersetztVorherigeVersion) return;
-  const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-  await Promise.all(windows.map((client) => client.navigate(client.url)));
-})()));
+self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
 
 self.addEventListener('push', (event) => {
   let daten = {};
