@@ -211,6 +211,14 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       <details class="card mess-neu body-settings-card special-dex-list-card"><summary>Messung & Daten verwalten</summary><div class="body-settings-content"><h3>Erinnerung für Hautfaltenmessung</h3><div data-skinfold-settings></div><button class="phase-reset" type="button" data-delete-measurements>Messdaten zurücksetzen</button></div></details>
     </div>`;
     bind();
+    requestAnimationFrame(() => {
+      const head = container.querySelector('.body-data-card-head');
+      if (!head || getComputedStyle(head).display === 'flex') return;
+      const reloadKey = `muscledex:body-css-reload:${__BUILD_TIME__}`;
+      if (sessionStorage.getItem(reloadKey)) return;
+      sessionStorage.setItem(reloadKey, '1');
+      location.reload();
+    });
   };
 
   const render = async () => {
