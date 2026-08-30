@@ -7438,9 +7438,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt::before{display:none!important}
 :root[data-seite="body"] .body-metrics-wrap>.kategorie-scrollinhalt{
-  display:grid;
-  gap:12px;
-  padding-inline:7px;
   padding-bottom:calc(112px + env(safe-area-inset-bottom));
   background:transparent!important;
 }
@@ -7705,17 +7702,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt{
   box-sizing:border-box;
   display:block!important;
-  padding-inline:12px!important;
+  padding-inline:0!important;
   padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
   background:transparent!important;
 }
 :root[data-seite="body"] .body-log-dex-page .body-metrics-wrap{
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
-  gap:18px!important;
+  gap:12px!important;
   width:100%!important;
   margin:0!important;
-  padding:0!important;
+  padding:0 19px!important;
 }
 :root[data-seite="body"] .body-summary-hero{
   box-sizing:border-box!important;
