@@ -132,6 +132,8 @@
 
   --mq-h:34px;
   --brand-outline:#000000;
+  --brand-card-bg:#17224C;   /* Navy-Karte hinter dem MUSCLEDEX-Schriftzug */
+  --brand-card-mark:#F1ECDE; /* helles Abwaerts-Dreieck auf der Karte */
   --sil-filter:none;
 
   /* Tuckii misst auf dem iPhone 14 (390 pt Breite) rund 3 pt Rand, 4 pt harten
@@ -237,6 +239,8 @@
   /* Logo: Das gedeckte Navy verschwindet auf dunklem Grund, die Kontur waere
      weg. Dunkles Blau bleibt als Kontur, ist aber vom Hintergrund abgesetzt. */
   --brand-outline:#0A1330;
+  --brand-card-bg:#22346E;   /* im Dunkelmodus etwas aufgehellt, damit die Karte
+                                nicht mit dem Hintergrund verschmilzt */
   /* Silhouette weiss: die saubere Umkehrung von "dunkle Form auf hellem Grund".
      brightness(0) faerbt das PNG schwarz und laesst die Transparenz stehen,
      invert(1) macht daraus Weiss – so bleibt es bei einer Bilddatei. */
@@ -2401,6 +2405,10 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 .kopf-logo{
   display:block;width:clamp(138px,39vw,154px);height:auto;
   max-height:62px;object-fit:contain;object-position:left center}
+/* Generierter SVG-Schriftzug im Kopf/Login: Groesse ueber font-size, da
+   .brand-svg mit width:5.3em skaliert (font-size x 5.3 = Breite). */
+.kopf-marke .brand{font-size:clamp(24px,7vw,28px)}
+.auth-marke .brand{font-size:min(11.7vw,43px)}
 #view{min-height:calc(100dvh - 70px)}
 
 @media(max-width:520px){
