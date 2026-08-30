@@ -15,10 +15,14 @@ const icons = Object.entries(modules).filter(([path]) => !hiddenPickerFiles.has(
   const file = path.split('/').at(-1);
   const id = file.replace(/_24dp.*$/i, '').replace(/\.svg$/i, '').normalize('NFC').toLocaleLowerCase('de');
   const title = id.replaceAll('_', ' ');
+  // SVGs mit dem Suffix "-color.svg" behalten ihre selbst definierten
+  // Farben. Alle anderen Icons duerfen weiterhin durch das jeweilige UI
+  // schwarz bzw. weiss eingefaerbt werden.
+  const originalColors = /-color\.svg$/i.test(file);
   // Einige Icons (z. B. Lebensmittel.svg) tragen einen XML-Prolog + DOCTYPE,
   // der beim Einfügen per innerHTML stört – deshalb entfernen.
   const bereinigt = String(svg).replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
-  return { id, title, svg: bereinigt };
+  return { id, title, svg: bereinigt, originalColors };
 }).sort((a, b) => a.title.localeCompare(b.title, 'de'));
 export const availableCategoryIcons = icons;
 // Groß-/Kleinschreibung egal: die IDs werden beim Laden kleingeschrieben.
@@ -309,7 +313,8 @@ function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
 
 function materialIcon(id, className = '') {
   const icon = iconById(id);
-  return icon ? `<span class="material-svg ${className}">${icon.svg}</span>` : '';
+  const originalColorClass = icon?.originalColors ? ' icon-originalfarben' : '';
+  return icon ? `<span class="material-svg ${className}${originalColorClass}">${icon.svg}</span>` : '';
 }
 
 export const materialIconMarkup = materialIcon;
@@ -324,7 +329,7 @@ export function categoryIconMarkup(route, className = 'kategorie-svg') {
   }
   const icon = iconById(value);
   if (!icon) return '';
-  return `<span class="${className}" data-category-icon="${route}" title="${icon.title}">${icon.svg}</span>`;
+  return `<span class="${className}${icon.originalColors ? ' icon-originalfarben' : ''}" data-category-icon="${route}" title="${icon.title}">${icon.svg}</span>`;
 }
 
 function sheet(markup) {
@@ -366,7 +371,7 @@ function iconPicker(route, onChange) {
     <header><h2>Kategorie-Icon ändern</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <h3 class="icon-picker-titel">Icons</h3>
     <div class="icon-auswahl">
-      ${icons.map((icon) => `<button class="icon-option${icon.id === current ? ' aktiv' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
+      ${icons.map((icon) => `<button class="icon-option${icon.id === current ? ' aktiv' : ''}${icon.originalColors ? ' icon-originalfarben' : ''}" data-icon-id="${icon.id}" aria-label="${icon.title}">${icon.svg}<span>${icon.title}</span></button>`).join('')}
     </div>
     <form class="emoji-eigen" data-emoji-form>
       <label for="eigenes-emoji">Eigenes Emoji</label>
@@ -401,7 +406,7 @@ function appearancePicker(route, onChange, { hideIcon = false } = {}) {
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="dex-appearance-form">
       ${hideIcon ? '<p class="sheet-hinweis">Für diesen Dex gibt es keine Icon-Einstellung.</p>' : `<h3>Icon</h3>
-      <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>`}
+      <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv ' : ''}${icon.originalColors ? 'icon-originalfarben' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>`}
       ${hideIcon ? '' : `<label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
         <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
       </label>`}

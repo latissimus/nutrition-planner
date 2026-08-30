@@ -2906,23 +2906,27 @@ button,a,[role="button"],summary{touch-action:manipulation;
   position:absolute;z-index:2;left:52%;right:auto;top:16px;transform:translateX(-50%);
   display:grid;place-items:center;width:27px;height:27px;color:#000;
 }
-.dex-ordner-kartenicon .muscledex-sammlungsicon,
-.dex-ordner-kartenicon .muscledex-sammlungsicon svg{
+.dex-ordner-kartenicon .muscledex-sammlungsicon:not(.icon-originalfarben),
+.dex-ordner-kartenicon .muscledex-sammlungsicon:not(.icon-originalfarben) svg{
   display:block;width:25px;height:25px;fill:#000!important;
 }
-.dex-ordner-kartenicon .muscledex-sammlungsicon svg *{fill:#000!important}
+.dex-ordner-kartenicon .muscledex-sammlungsicon.icon-originalfarben,
+.dex-ordner-kartenicon .muscledex-sammlungsicon.icon-originalfarben svg{
+  display:block;width:25px;height:25px;
+}
+.dex-ordner-kartenicon .muscledex-sammlungsicon:not(.icon-originalfarben) svg *{fill:#000!important}
 .dex-ordner-kartenicon .dex-emoji,
 .dex-ordner-kartenicon .kategorie-emoji{
   width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
   font-size:28px;line-height:1;
 }
 .dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
-.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg,
-.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg,
-.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg svg *,
-.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon,
-.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg,
-.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon svg *{color:#fff!important;fill:#fff!important}
+.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben),
+.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben) svg,
+.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben) svg *,
+.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon:not(.icon-originalfarben),
+.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon:not(.icon-originalfarben) svg,
+.dex-ordner-dunkel .dex-ordner-kartenicon .muscledex-sammlungsicon:not(.icon-originalfarben) svg *{color:#fff!important;fill:#fff!important}
 .eigene-sammlung .dex-ordner-inhalt :is(h2,.dex-datensatz-meta b,.dex-datensatz-meta span){color:#111!important}
 .tuck-karte.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
@@ -4184,13 +4188,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#000;font-size:22px;font-weight:900}
 .sammlung-editor-farben button.aktiv.farbe-dunkel::after{color:#fff}
 .sammlung-editor-icons button{display:grid;place-items:center;background:var(--surface)}
-.sammlung-editor-icons .material-svg,.sammlung-editor-icons svg{width:24px;height:24px;fill:#000}
-.sammlung-editor-icons .material-svg svg *,
-.icon-auswahl .material-svg svg *,
-.icon-auswahl button svg *{fill:#000!important;color:#000!important}
-.sammlung-editor-icons .material-svg svg [stroke],
-.icon-auswahl .material-svg svg [stroke],
-.icon-auswahl button svg [stroke]{stroke:#000!important}
+.sammlung-editor-icons .material-svg:not(.icon-originalfarben),
+.sammlung-editor-icons .material-svg:not(.icon-originalfarben) svg,
+.sammlung-editor-icons button:not(.icon-originalfarben)>svg{width:24px;height:24px;fill:#000}
+.sammlung-editor-icons .icon-originalfarben svg{width:24px;height:24px}
+.sammlung-editor-icons .material-svg:not(.icon-originalfarben) svg *,
+.sammlung-editor-icons button:not(.icon-originalfarben)>svg *,
+.icon-auswahl .material-svg:not(.icon-originalfarben) svg *,
+.icon-auswahl button:not(.icon-originalfarben)>svg *{fill:#000!important;color:#000!important}
+.sammlung-editor-icons .material-svg:not(.icon-originalfarben) svg [stroke],
+.sammlung-editor-icons button:not(.icon-originalfarben)>svg [stroke],
+.icon-auswahl .material-svg:not(.icon-originalfarben) svg [stroke],
+.icon-auswahl button:not(.icon-originalfarben)>svg [stroke]{stroke:#000!important}
 .sammlung-emoji-eigen{display:grid;gap:7px;margin-top:20px;font-size:13px;font-weight:800;
   letter-spacing:.07em;text-transform:uppercase}
 .sammlung-emoji-eigen input{width:100%;min-height:52px;padding:0 13px;border:1.5px solid #000;
@@ -4347,7 +4356,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
 :root[data-seite="training"]:not([data-theme="dark"]) :is(.neo-dex-page,.food-dex-page)::before{
-  opacity:.06;
+  opacity:.10;
 }
 :root[data-seite="custom-dex"] :is(.neo-dex-page,.food-dex-page)::before{
   opacity:.05;
@@ -7423,7 +7432,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inset:0;
   pointer-events:none;
   background:var(--dex-ink,#fff);
-  opacity:.08;
+  opacity:.10;
   -webkit-mask-image:var(--food-vozzy-pattern);
   mask-image:var(--food-vozzy-pattern);
   -webkit-mask-size:360px auto;
