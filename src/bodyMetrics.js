@@ -140,8 +140,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       ${skinfoldMarkup(state)}
       ${waistMarkup(state)}
       ${logmanMarkup(state)}
-      <details class="card mess-neu body-settings-card special-dex-list-card"><summary>Erinnerung für Hautfaltenmessung</summary><div data-skinfold-settings></div></details>
-      <button class="phase-reset" type="button" data-delete-measurements>Messdaten zurücksetzen</button>
+      <details class="card mess-neu body-settings-card special-dex-list-card"><summary>Messung & Daten verwalten</summary><div class="body-settings-content"><h3>Erinnerung für Hautfaltenmessung</h3><div data-skinfold-settings></div><button class="phase-reset" type="button" data-delete-measurements>Messdaten zurücksetzen</button></div></details>
     </div>`;
     bind();
   };
@@ -185,7 +184,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       markup: `<header><h2>Messung hinzufügen</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
         <div class="kategorie-sheet-menu body-add-menu">
           <button type="button" data-body-add="weight">${materialIconMarkup('monitor_weight')}<span><b>Gewicht</b><small>Neue Wiegung eintragen</small></span></button>
-          <button type="button" data-body-add="waist">${materialIconMarkup('straighten')}<span><b>Taillenumfang</b><small>Umfang dokumentieren</small></span></button>
+          <button type="button" data-body-add="waist">${materialIconMarkup('measuring_tape')}<span><b>Taillenumfang</b><small>Umfang dokumentieren</small></span></button>
           <button type="button" data-body-add="skinfold">${materialIconMarkup('body_fat')}<span><b>12-Falten-Messung</b><small>Geführte Messung starten</small></span></button>
           <button type="button" data-body-add="recovery">${materialIconMarkup('favorite')}<span><b>Erholungs-Check-in</b><small>Erholung, Stimmung und Hunger</small></span></button>
           <button type="button" data-body-add="logman">${materialIconMarkup('upload_file')}<span><b>LOGMAN-Import</b><small>Leistungsdaten ergänzen</small></span></button>
