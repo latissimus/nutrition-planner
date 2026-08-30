@@ -21,7 +21,17 @@ const icons = Object.entries(modules).filter(([path]) => !hiddenPickerFiles.has(
   const originalColors = /-color\.svg$/i.test(file);
   // Einige Icons (z. B. Lebensmittel.svg) tragen einen XML-Prolog + DOCTYPE,
   // der beim Einfügen per innerHTML stört – deshalb entfernen.
-  const bereinigt = String(svg).replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
+  let bereinigt = String(svg).replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
+  // Interne IDs pro Icon eindeutig machen. Serif exportiert eingebettete
+  // Bitmaps als <defs><image id="_Image1">, und mehrere solcher Icons auf
+  // derselben Seite (z. B. burgergta-color + pizzagta-color) würden sich
+  // gegenseitig durch dieselbe ID überschreiben – Browser nutzen dann für
+  // jedes <use xlink:href="#_Image1"> nur den ersten Treffer, und das
+  // spätere Icon zeigt entweder das falsche Bild oder gar nichts.
+  const idPrefix = `mdxi-${id.replace(/[^a-z0-9_-]/gi, '-')}-`;
+  bereinigt = bereinigt
+    .replace(/\sid="([^"]+)"/g, (_m, value) => ` id="${idPrefix}${value}"`)
+    .replace(/\s(xlink:href|href)="#([^"]+)"/g, (_m, attr, value) => ` ${attr}="#${idPrefix}${value}"`);
   return { id, title, svg: bereinigt, originalColors };
 }).sort((a, b) => a.title.localeCompare(b.title, 'de'));
 export const availableCategoryIcons = icons;
