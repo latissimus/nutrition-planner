@@ -7703,6 +7703,208 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-seite="body"] .body-log-hero-number>strong{font-size:clamp(38px,12vw,46px)}
 }
 
+/* Body-Log v2: bewusst vollständig isoliert. Der Kategorie-Chrome verschiebt
+   `.body-metrics-wrap` beim Mount in `.kategorie-scrollinhalt`; deshalb dürfen
+   Hero und Verlaufskarten weder von `.card` noch von `special-dex-*` abhängen. */
+:root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt{
+  box-sizing:border-box;
+  display:block!important;
+  padding-inline:12px!important;
+  padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+  background:transparent!important;
+}
+:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:18px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+:root[data-seite="body"] .body-summary-hero{
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:76px minmax(0,1fr) 34px!important;
+  align-items:center!important;
+  gap:14px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:116px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:17px!important;
+  overflow:hidden!important;
+  border:2px solid #111!important;
+  border-radius:18px!important;
+  background:color-mix(in srgb,var(--ordner) 8%,#fff)!important;
+  color:#111!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="body"] .body-summary-hero>*{
+  box-sizing:border-box!important;
+  position:relative!important;
+  inset:auto!important;
+  min-width:0!important;
+  margin:0!important;
+  transform:none!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-ring{
+  display:grid!important;
+  place-items:center!important;
+  width:76px!important;
+  height:76px!important;
+  aspect-ratio:auto!important;
+  border-radius:50%!important;
+  background:conic-gradient(var(--ordner) var(--body-progress),#dedede 0)!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-ring::after{
+  content:"";
+  grid-area:1/1;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#fff;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-ring>span{
+  z-index:1;
+  grid-area:1/1;
+  display:grid;
+  justify-items:center;
+  gap:2px;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-ring :is(b,small),
+:root[data-seite="body"] .body-summary-hero .body-log-hero-value :is(strong,b,span){
+  font-family:var(--tech)!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-ring b{font-size:15px;font-weight:800;line-height:1}
+:root[data-seite="body"] .body-summary-hero .body-log-ring small{font-size:8px;font-weight:700;line-height:1.1;letter-spacing:.04em}
+:root[data-seite="body"] .body-summary-hero .body-log-hero-value{
+  display:grid!important;
+  align-content:center!important;
+  gap:2px!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-hero-value>small{
+  font:800 11px/1.1 "Work Sans",var(--ui),sans-serif!important;
+  letter-spacing:.08em!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-hero-number{
+  display:flex!important;
+  align-items:baseline!important;
+  gap:6px!important;
+  min-width:0!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-hero-number>strong{
+  font-size:clamp(38px,11.5vw,48px)!important;
+  font-weight:800!important;
+  line-height:.96!important;
+  white-space:nowrap!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-hero-number>b{
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  text-transform:uppercase!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-log-hero-value>span{
+  margin-top:4px!important;
+  overflow:hidden!important;
+  color:#5e6268!important;
+  font-size:10.5px!important;
+  font-weight:700!important;
+  line-height:1.15!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+:root[data-seite="body"] .body-summary-hero .body-analysis-info{
+  display:grid!important;
+  place-items:center!important;
+  width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:0!important;
+  border:1.5px solid #111!important;
+  border-radius:50%!important;
+  background:var(--ordner)!important;
+  color:#111!important;
+  font:800 13px/1 var(--tech)!important;
+  box-shadow:none!important;
+}
+:root[data-seite="body"] .body-trend-panel{
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  visibility:visible!important;
+  opacity:1!important;
+  border:0!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  color:#111!important;
+  box-shadow:none!important;
+}
+:root[data-seite="body"] .body-trend-panel-head{
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+  min-height:74px!important;
+  margin:0!important;
+  padding:14px 18px!important;
+  border:0!important;
+  border-bottom:1px solid #ddd!important;
+  background:color-mix(in srgb,var(--ordner) 7%,#fff)!important;
+}
+:root[data-seite="body"] .body-trend-panel-head>span{display:grid!important;min-width:0!important;gap:4px!important}
+:root[data-seite="body"] .body-trend-panel-head b{
+  font:750 16px/1.2 "Work Sans",var(--ui),sans-serif!important;
+}
+:root[data-seite="body"] .body-trend-panel-head small{
+  overflow:hidden!important;
+  color:#60656f!important;
+  font:600 10.5px/1.3 var(--tech)!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+:root[data-seite="body"] .body-trend-panel-content{
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:150px!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:14px 18px 18px!important;
+  overflow:visible!important;
+  visibility:visible!important;
+  opacity:1!important;
+  border:0!important;
+  background:#fff!important;
+}
+:root[data-seite="body"] .body-trend-panel-content>.mini-title{
+  margin:0 0 12px!important;
+  font:750 13px/1.25 "Work Sans",var(--ui),sans-serif!important;
+  text-transform:none!important;
+}
+@media(max-width:370px){
+  :root[data-seite="body"] .body-summary-hero{
+    grid-template-columns:70px minmax(0,1fr) 32px!important;
+    gap:10px!important;
+    padding:15px!important;
+  }
+  :root[data-seite="body"] .body-summary-hero .body-log-ring{width:70px!important;height:70px!important}
+  :root[data-seite="body"] .body-summary-hero .body-log-ring::after{width:54px;height:54px}
+}
+
 /* ============================================================
    SLEEP-LOG AUF DER SPECIAL-DEX-VORLAGE
    Breite ruhige Karten, ein klarer Hero und dieselbe Typografie wie
