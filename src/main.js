@@ -680,6 +680,8 @@ function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eige
 // Baut fuer eine Kachel (eingebaute Kategorie ueber data-sammlung oder
 // eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
 function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
+  const infoKindFor = (route) => ({ reminders: 'meal', sleep: 'sleep', body: 'body', training: 'training', 'food-log': 'food', home: 'custom' }[route] || route);
+  const titleFor = (route) => sammlungen.find(([key]) => key === route)?.[1] || 'Dex';
   return (el) => {
     const collectionId = el.dataset.collectionId;
     if (collectionId) {
@@ -692,6 +694,8 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
       return () => settingsSheet(`collection-${item.id}`, refresh, {
         disableAppearance: isSubDex,
         appearanceLabel: isSubDex ? undefined : 'Icon ändern/umbenennen',
+        infoLabel: `${item.name}-Info`,
+        onInfo: () => openNeoDexInfoDialog(infoKindFor(item.root_key), item.name),
         onRename: isSubDex ? () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }) : null,
         onEditAppearance: isSubDex ? null : () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
         onDelete: async () => {
@@ -702,7 +706,14 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
       });
     }
     const route = el.dataset.sammlung;
-    if (route) return () => settingsSheet(route, refresh);
+    if (route) {
+      const title = titleFor(route);
+      return () => settingsSheet(route, refresh, {
+        infoLabel: `${title}-Info`,
+        onInfo: () => openNeoDexInfoDialog(infoKindFor(route), title),
+        appearanceLabel: `${title} bearbeiten`,
+      });
+    }
     return null;
   };
 }
@@ -921,8 +932,8 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
   }));
   if (container.querySelector('.dex-ordner-test')) showGestureHintOnce({
     key: 'dex-langer-tipp',
-    title: 'Dex schnell bearbeiten',
-    text: 'Halte einen Dex länger gedrückt, um seine Einstellungen zu öffnen.',
+    title: 'Dex-Info und Bearbeiten',
+    text: 'Halte einen Dex länger gedrückt, um die Info oder Bearbeitung zu öffnen.',
     gesture: 'hold',
   });
 
@@ -1003,7 +1014,9 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const meal = kind === 'meal';
   const sleep = kind === 'sleep';
   const body = kind === 'body';
-  const title = custom ? (customTitle || 'Eigener Dex') : body ? 'Body-Log' : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : 'Fooddex';
+  const shopping = kind === 'shopping';
+  const habits = kind === 'habits';
+  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'Body-Log' : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : shopping ? 'Einkauf' : habits ? 'Routinen' : 'Fooddex');
   const copy = body
     ? `<p>Im <b>Body-Log</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -1016,6 +1029,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     ? `<p>Im <b>Meal-Log</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
       <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>
       <p>Über den Hinzufügen-Button erfasst du Lebensmittel oder ergänzt deine Planung.</p>`
+    : shopping
+    ? `<p>Im <b>Einkaufs-Dex</b> sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
+    : habits
+    ? `<p>Im <b>Routinen-Dex</b> planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
     : custom
     ? `<p>In <b>${escapeHtml(title)}</b> sammelst du eigene Notizen, Links, Bilder und Tonaufnahmen an einem Ort.</p>
       <p>Mit <b>Tags</b> und <b>Unter-Dex</b> strukturierst du die Inhalte so, wie es für dein Thema sinnvoll ist.</p>
@@ -1051,45 +1068,21 @@ function installNeoDexChrome(view, {
   title = 'Fooddex',
   meta = '0 Einträge · 0 Unter-Dex',
   closeHref = '#home',
-  editLabel = 'Fooddex bearbeiten',
-  infoKind = 'food',
-  onEdit = null,
 } = {}) {
   const foodBar = view.querySelector('.kategorie-kopf');
   const foodAdd = foodBar?.querySelector('.kategorie-plus');
   const foodSettings = foodBar?.querySelector('[data-category-settings]');
   const foodActions = document.createElement('div');
   foodActions.innerHTML = foodDexActionsMarkup({
-    panelAttributes: `role="menu" aria-label="${escapeHtml(title)} Aktionen"`,
-    panelContent: `
-      <button type="button" data-food-action="info" role="menuitem">${materialIconMarkup('info')}<span>${escapeHtml(title)}-Info</span></button>
-      <button type="button" data-food-action="edit" role="menuitem">${materialIconMarkup('build')}<span>${escapeHtml(editLabel)}</span></button>`,
     primaryContent: materialIconMarkup('place_item'),
     primaryAttributes: 'data-food-action="add"',
     primaryLabel: `Eintrag in ${escapeHtml(title)} hinzufügen`,
-    menuAttributes: 'data-food-menu',
     closeHref: escapeHtml(closeHref),
-    menuLabel: `${escapeHtml(title)} Menü`,
     closeLabel: 'Zurück',
   });
   const foodActionBar = foodActions.firstElementChild;
-  foodActionBar.querySelector('[data-food-menu]').onclick = () => {
-    const panel = foodActionBar.querySelector('.neo-dex-action-popover');
-    const open = panel.hidden;
-    panel.hidden = !open;
-    foodActionBar.querySelector('[data-food-menu]').setAttribute('aria-expanded', String(open));
-  };
   foodActionBar.querySelector('[data-food-action="add"]').onclick = () => {
     foodAdd?.click();
-  };
-  foodActionBar.querySelector('[data-food-action="info"]').onclick = () => {
-    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
-    openNeoDexInfoDialog(infoKind, title);
-  };
-  foodActionBar.querySelector('[data-food-action="edit"]').onclick = () => {
-    foodActionBar.querySelector('.neo-dex-action-popover').hidden = true;
-    if (onEdit) onEdit();
-    else foodSettings?.click();
   };
   foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
   foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');

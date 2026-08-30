@@ -151,11 +151,6 @@ function bodyCompMarkup(state) {
   const weeks = allDates.length > 1 ? (day(allDates.at(-1)) - day(allDates[0])) / 7 : 0;
   const result = evaluateBodyComp({ weight, skinfoldDelta, waistDelta, performanceTrend: performance.direction, recoveryTrend: recovery, weeks });
   const thresholds = { stableLoss: -0.15, slowLoss: -0.5, stableGain: 0.15, slowGain: 0.3, ...(state.settings.bodycomp_thresholds || {}) };
-  const confidenceText = result.confidence === 'hoch'
-    ? 'Es liegen ein dichter Gewichtstrend und mehrere ergänzende, vergleichbare Datenquellen vor.'
-    : result.confidence === 'mittel'
-      ? 'Der Gewichtstrend ist brauchbar, aber mindestens eine ergänzende Datenquelle fehlt noch oder ist noch nicht bestätigt.'
-      : 'Zeitraum, Messhäufigkeit oder ergänzende Vergleichsdaten reichen noch nicht für eine belastbare Einordnung.';
   return `<details class="card bodycomp-status special-dex-wide-card" data-bodycomp-card>
     <summary><span><b>Körpertrend</b><small>${escapeHtml(result.message)}</small></span>${materialIconMarkup('chevron_right')}</summary>
     <div class="body-data-card-content">
@@ -168,16 +163,33 @@ function bodyCompMarkup(state) {
         <span>LOGMAN-Leistung <b>${performance.direction == null ? 'Import fehlt' : `${performance.percent > 0 ? '+' : ''}${display(performance.percent)} %`}</b></span>
         <span>Schlaf & Erholung <b>${recovery == null ? 'noch unklar' : recovery > 0 ? 'verbessert' : recovery < 0 ? 'verschlechtert' : 'stabil'}</b></span>
       </div>
-      ${infoDetails(`Vertrauensstufe: ${result.confidence}`, confidenceText)}
       <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
-      <details class="mess-neu"><summary>Orientierungsbereiche anpassen</summary><form class="body-threshold-form" data-bodycomp-thresholds><p>Die Grenzen sind Orientierung und keine biologische Exaktheit.</p><label><span>Stabil ab Verlust</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Langsame Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
+      <details class="mess-neu"><summary>Orientierungsbereiche anpassen</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>Der Body-Log vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
     </div>
   </details>`;
 }
 
 function logmanMarkup(state) {
   const trend = performanceTrend(state.performance);
-  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-logman-card open><summary><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content"><p>${state.performance.length ? `${state.performance.length} vergleichbare HEAVYS-/MIDDLES-Werte · Trend ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch keine LOGMAN-Leistungsdaten importiert.'}</p>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Importiert werden verwendetes Gewicht, Wiederholungen, geschätzte Maximalkraft, Volumen und die Anzahl vergleichbarer HEAVYS-/MIDDLES-Einheiten.`)}</div></details>`;
+  const baselines = new Map();
+  [...state.performance]
+    .sort((a, b) => a.performed_on.localeCompare(b.performed_on))
+    .forEach((row) => {
+      const key = `${row.category}:${String(row.exercise).toLowerCase()}`;
+      if (!baselines.has(key) && Number(row.estimated_1rm) > 0) baselines.set(key, Number(row.estimated_1rm));
+    });
+  const daily = [...state.performance.reduce((days, row) => {
+    const date = row.performed_on;
+    const value = Number(row.estimated_1rm || 0);
+    const baseline = baselines.get(`${row.category}:${String(row.exercise).toLowerCase()}`);
+    if (!date || !value || !baseline) return days;
+    const current = days.get(date) || { sum: 0, count: 0 };
+    current.sum += value / baseline * 100;
+    current.count += 1;
+    days.set(date, current);
+    return days;
+  }, new Map())].map(([datum, value]) => ({ datum, wert: value.sum / value.count }));
+  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-logman-card open><summary><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content">${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}</div></details>`;
 }
 
 export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal }) {
@@ -261,28 +273,28 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const skinfoldForm = overlay.querySelector('[data-skinfold-form]');
     if (skinfoldForm) {
       const updateSkinfold = () => {
-        const readings = {};
+        const values = {};
         skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => {
-          readings[input.dataset.fold] ||= [];
-          readings[input.dataset.fold][Number(input.dataset.reading)] = input.value;
+          const value = zahl(input.value);
+          if (value != null && value >= 0) values[input.dataset.fold] = value;
         });
-        const result = aggregateSkinfoldReadings(readings);
-        const total = summe(result.values);
-        const message = result.thirdNeeded ? `${result.thirdNeeded} Stelle(n) weichen deutlich ab – dort eine dritte Messung ergänzen.` : `${result.complete} von 12 Stellen vollständig · Messqualität ${result.quality}`;
+        const complete = Object.keys(values).length;
+        const total = summe(values);
+        const message = `${complete} von 12 Falten eingetragen`;
         skinfoldForm.querySelector('[data-skinfold-quality]').innerHTML = `${escapeHtml(message)}${total != null ? ` · <b>${display(total)} mm</b>` : ''}`;
-        skinfoldForm.querySelector('button[type="submit"]').disabled = result.complete !== 12 || result.thirdNeeded > 0;
-        return { result, readings };
+        skinfoldForm.querySelector('button[type="submit"]').disabled = complete !== 12;
+        return { values, complete };
       };
       skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
       skinfoldForm.onsubmit = async (event) => {
         event.preventDefault();
-        const { result, readings } = updateSkinfold();
-        if (result.complete !== 12) return;
+        const { values, complete } = updateSkinfold();
+        if (complete !== 12) return;
         const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
         const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
         const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
-        const quality = standardisiert && result.quality === 'hoch' ? 'hoch' : result.quality === 'hoch' ? 'mittel' : result.quality;
-        const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: result.values, messreihen: readings, messqualitaet: quality, standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' });
+        const readings = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, [value]]));
+        const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: values, messreihen: readings, messqualitaet: standardisiert ? 'standardisiert' : 'nicht standardisiert', standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' });
         if (error) return toast('Messung konnte nicht gespeichert werden');
         notifyHomeCountsChanged();
         if (isNew) notifyCoinBalanceChanged();

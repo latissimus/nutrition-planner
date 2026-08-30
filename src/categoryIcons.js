@@ -465,6 +465,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     <div class="sheet-griff" aria-hidden="true"></div>
     <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
+      ${actions.onInfo ? `<button data-action="info">${materialIcon('info', 'sheet-list-icon')}<span>${escapeHtml(actions.infoLabel || 'Dex-Info')}</span></button>` : ''}
       ${showAppearance ? `<button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${escapeHtml(actions.appearanceLabel || 'Icon ändern')}</span></button>` : ''}
       ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
@@ -476,6 +477,7 @@ export function settingsSheet(route, onChange, actions = {}) {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (!action) return;
     closeSheet(backdrop);
+    if (action === 'info') actions.onInfo?.();
     if (action === 'appearance') actions.onEditAppearance ? actions.onEditAppearance() : appearancePicker(route, onChange, { hideIcon: Boolean(actions.hideAppearanceIcon) });
     if (action === 'select') actions.onSelect?.();
     if (action === 'rename') actions.onRename?.();

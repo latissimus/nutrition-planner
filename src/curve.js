@@ -7,7 +7,7 @@ export function curveSvg(series, { height = 130, unit = '' } = {}) {
   const all = series.flatMap((item) => item.values);
   const longest = Math.max(0, ...series.map((item) => item.values.length));
   if (longest < 2) {
-    return `<div class="kurve-leer">Noch zu wenig Daten fuer einen Verlauf.<br>
+    return `<div class="kurve-leer">Noch zu wenig Daten für einen Verlauf.<br>
       <span>Ab der zweiten Messung erscheint hier die Kurve.</span></div>`;
   }
 
