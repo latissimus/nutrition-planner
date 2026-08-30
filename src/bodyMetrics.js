@@ -192,7 +192,7 @@ function logmanMarkup(state) {
   return `<section class="body-trend-panel" data-logman-card><header class="body-trend-panel-head"><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span></header><div class="body-trend-panel-content">${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}</div></section>`;
 }
 
-export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal }) {
+export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal, onRendered }) {
   const userId = session.user.id;
   let state;
   let activeRender = null;
@@ -211,6 +211,11 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       <details class="card mess-neu body-settings-card special-dex-list-card"><summary>Messung & Daten verwalten</summary><div class="body-settings-content"><h3>Erinnerung für Hautfaltenmessung</h3><div data-skinfold-settings></div><button class="phase-reset" type="button" data-delete-measurements>Messdaten zurücksetzen</button></div></details>
     </div>`;
     bind();
+    // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
+    // (Update-Hinweis mit eigenen Body-Log-Notizen) wieder anzuhängen und
+    // renderDexEntries darauf loszulassen. Sonst überlebt der Slot nur den
+    // ersten Mount, weil container.innerHTML alles wegwirft.
+    try { await onRendered?.(container); } catch { /* ignoriert */ }
   };
 
   const render = async () => {

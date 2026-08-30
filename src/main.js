@@ -1440,15 +1440,26 @@ async function renderRoute() {
     view.classList.add('neo-dex-page', 'food-dex-page', 'body-log-dex-page');
     prepareSpecialDexPage(view, 'body');
     const { mountBodyMetrics } = await bodyMetricsModule();
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    // Nach jedem bodyMetrics-Re-Render (jede DB-Änderung wischt das gesamte
+    // view.innerHTML weg) den dex-eintraege-Slot wieder anhängen und neu
+    // laden, sonst verschwindet der Bereich mit den eigenen Body-Log-Notizen
+    // nach der ersten Wiegung dauerhaft.
+    const rehydrateDexEntries = async () => {
+      const wrap = view.querySelector(':scope > .wrap');
+      if (!wrap) return;
+      if (!wrap.querySelector(':scope > [data-dex-entries]')) {
+        wrap.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
+      }
+      await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
+    };
     const bodyActions = await mountBodyMetrics(view, {
       session,
       profile,
       signal,
       onProfileUpdated: (aktuell) => { profile = aktuell; },
+      onRendered: rehydrateDexEntries,
     });
-    const bodyWrap = view.querySelector(':scope > .wrap');
-    bodyWrap?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
-    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
     mountCategoryChrome(view, route, 'Body-Log', {
       pageLookScope: route, pageLookPattern: 'wallpaper-measure',
@@ -1462,7 +1473,6 @@ async function renderRoute() {
       editLabel: 'Body-Log bearbeiten',
       infoKind: 'body',
     });
-    await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
   } else if (route === 'reminders') {
     setSeite('reminders');
     view.classList.add('neo-dex-page', 'food-dex-page', 'meal-log-dex-page');
