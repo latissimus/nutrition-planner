@@ -5,6 +5,8 @@ export const SPECIAL_DEX_CLASSES = Object.freeze({
   hero: 'special-dex-hero',
   card: 'special-dex-wide-card',
   listCard: 'special-dex-list-card',
+  content: 'special-dex-content',
+  stack: 'special-dex-stack',
   overlay: 'special-dex-overlay',
   sheet: 'special-dex-sheet',
 });

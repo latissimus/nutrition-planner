@@ -698,7 +698,7 @@ function reminderGroups(reminders, completions) {
       ? reminderRowMarkup(drink, completionByReminder.get(drink.id))
       : '<p class="mahl-leerzeile">Noch kein Trinkintervall</p>'}</div>
   </section>`;
-  return `<div class="mahl-tagesplan">${timeline}${water}</div>
+  return `<div class="mahl-tagesplan ${SPECIAL_DEX_CLASSES.stack}">${timeline}${water}</div>
     <button hidden data-add-reminder="supplement"></button><button hidden data-add-reminder="drink"></button>`;
 }
 
@@ -782,8 +782,8 @@ export async function mountReminders(container, { session, signal }) {
   container.style.setProperty('--ordner', pageLook('reminders', categoryColor('reminders'), 'wallpaper-burger').color);
   container.innerHTML = `
     <div class="wrap pad-bottom">
-      <div data-nutrition-root></div>
-      <section data-reminders-card>
+      <div class="${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}" data-nutrition-root></div>
+      <section class="${SPECIAL_DEX_CLASSES.content}" data-reminders-card>
         <div data-reminder-list class="reminder-list"><div class="daten-laden" role="status">Mahlzeiten werden geladen …</div></div>
       </section>
     </div>`;
