@@ -51,12 +51,14 @@ const defaultColors = {
   coins: '#05BDE8',
 };
 const fixedSystemColors = {
+  body: '#B1E7FF',
   'food-log': '#FBE7A3',
   training: '#215E61',
   reminders: '#525CEB',
   sleep: '#333D6D',
 };
 const fixedSystemPatterns = {
+  body: 'wallpaper-measure',
   'food-log': 'wallpaper-pizza',
   training: 'wallpaper-dumbbell',
   reminders: 'wallpaper-burger',

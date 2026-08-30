@@ -58,7 +58,7 @@ function coinEarningOverview() {
       ${group('Mobility', '🤸', [['5–10 min', 6], ['15–20 min', 10]])}
       ${group('Spaziergang', '🚶', [['15 min', 8], ['30 min', 12], ['45 min', 16], ['60 min', 20]])}
       ${group('Schlaf', '🌙', [['Morgen-Check-in', 3]])}
-      ${group('Körperwerte', '📈', [['Neue Messung', 1]])}
+      ${group('Body-Log', '📈', [['Neue Messung', 1]])}
       <div class="coin-verdienst-frei"><span>✨</span><p><b>Freie Routine</b><small>Beim Anlegen selbst zwischen 0 und 50 Coins festlegen. Standard: 5 Coins.</small></p></div>
     </div>
   </details>`;

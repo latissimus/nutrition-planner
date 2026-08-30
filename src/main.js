@@ -460,7 +460,7 @@ function avatarMarkup() {
 // Stand. Die Beschreibung steht bewusst nicht auf der Karte: Tuckii zeigt dort
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
-  ['body', 'KÖRPERWERTE', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
+  ['body', 'Body-Log', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MEAL-LOG', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'Fooddex', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'Trainingdex', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
@@ -825,7 +825,7 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
     shopping: ['#00E0BA', 'wallpaper-brokkoli', '🛒'],
     habits: ['#8C00FF', 'wallpaper-wolke', '🧠'],
     training: ['#215E61', 'wallpaper-dumbbell', '💪🏻'],
-    body: ['#8CA9FF', 'wallpaper-measure', '📐'],
+    body: ['#B1E7FF', 'wallpaper-measure', '📐'],
     coins: ['#00A8FF', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
@@ -1002,8 +1002,13 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const custom = kind === 'custom';
   const meal = kind === 'meal';
   const sleep = kind === 'sleep';
-  const title = custom ? (customTitle || 'Eigener Dex') : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : 'Fooddex';
-  const copy = sleep
+  const body = kind === 'body';
+  const title = custom ? (customTitle || 'Eigener Dex') : body ? 'Body-Log' : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : 'Fooddex';
+  const copy = body
+    ? `<p>Im <b>Body-Log</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
+      <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
+      <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und keine medizinische Diagnose.</p>`
+    : sleep
     ? `<p>Im <b>Sleep-Log</b> planst du deinen Schlafrhythmus und hältst morgens <b>Schlafdauer</b>, <b>Qualität</b> und <b>Energie</b> fest.</p>
       <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden erst aus mehreren vergleichbaren Check-ins abgeleitet.</p>
       <p>Die Auswertung zeigt beobachtete Zusammenhänge und ersetzt keine medizinische Diagnose.</p>`
@@ -1438,9 +1443,11 @@ async function renderRoute() {
     await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
   } else if (route === 'body') {
     setSeite('body');
+    applyPageLook('body', categoryColor('body'), 'wallpaper-measure');
+    view.classList.add('neo-dex-page', 'food-dex-page', 'body-log-dex-page');
     prepareSpecialDexPage(view, 'body');
     const { mountBodyMetrics } = await bodyMetricsModule();
-    await mountBodyMetrics(view, {
+    const bodyActions = await mountBodyMetrics(view, {
       session,
       profile,
       signal,
@@ -1450,9 +1457,17 @@ async function renderRoute() {
     bodyWrap?.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
-    mountCategoryChrome(view, route, 'KÖRPERWERTE', {
-      pageLookScope: route, pageLookPattern: 'triangles',
+    mountCategoryChrome(view, route, 'Body-Log', {
+      pageLookScope: route, pageLookPattern: 'wallpaper-measure',
+      onPlus: () => bodyActions?.openAddMenu?.(),
       onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
+    });
+    installNeoDexChrome(view, {
+      title: 'Body-Log',
+      meta: bodyActions?.meta || '0 Wiegungen',
+      closeHref: '#home',
+      editLabel: 'Body-Log bearbeiten',
+      infoKind: 'body',
     });
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
   } else if (route === 'reminders') {
