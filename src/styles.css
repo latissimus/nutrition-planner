@@ -7439,14 +7439,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt::before{display:none!important}
 :root[data-seite="body"] .body-metrics-wrap>.kategorie-scrollinhalt{
   display:grid;
-  gap:18px;
-  padding-inline:12px;
+  gap:12px;
+  padding-inline:7px;
   padding-bottom:calc(112px + env(safe-area-inset-bottom));
   background:transparent!important;
-}
-:root[data-seite="body"] .body-metrics-wrap>.kategorie-scrollinhalt>.food-dex-title-block{
-  margin-inline:-2px;
-  margin-bottom:24px;
 }
 :root[data-seite="body"] .body-log-hero{
   box-sizing:border-box;
