@@ -7555,6 +7555,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] :is(.bodycomp-status,.body-data-card)>summary>.material-svg{width:20px;height:20px;transition:transform .18s}
 :root[data-seite="body"] :is(.bodycomp-status,.body-data-card)[open]>summary>.material-svg{transform:rotate(90deg)}
 :root[data-seite="body"] .bodycomp-status{border:1.5px solid #111!important;background:color-mix(in srgb,var(--ordner) 8%,#fff)!important}
+:root[data-seite="body"] .bodycomp-status .body-data-card-content{padding:14px 15px 15px}
+:root[data-seite="body"] .bodycomp-status .bodycomp-message{
+  margin:0 0 12px;
+  font:750 14px/1.35 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-seite="body"] .bodycomp-status .body-data-card-content>p:not(.bodycomp-message){margin:0 0 12px;font-size:12px;line-height:1.45}
+:root[data-seite="body"] .bodycomp-sources{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+:root[data-seite="body"] .bodycomp-sources>span{min-height:54px;padding:9px 10px;border-radius:9px}
+:root[data-seite="body"] .bodycomp-sources>span:last-child:nth-child(odd){grid-column:1/-1}
+:root[data-seite="body"] .bodycomp-status :is(.body-info,.mess-neu)>summary{font-size:12px}
 :root[data-seite="body"] .body-data-card{border:0!important;background:#fff!important;box-shadow:none!important}
 :root[data-seite="body"] details.body-data-card{
   display:block!important;
