@@ -7159,25 +7159,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --special-dex-card-bg:var(--surface,#fff);
   --special-dex-hero-shadow:0 3.5px 0 #000;
 }
-.special-dex-page .special-dex-content{
-  box-sizing:border-box;
-  width:min(
-    calc(100% - var(--special-dex-inline) - var(--special-dex-inline)),
-    var(--special-dex-content-max)
-  );
-  margin-inline:auto;
-}
-.special-dex-page .special-dex-content+.special-dex-content{
-  margin-top:var(--special-dex-gap);
-}
-.special-dex-page .special-dex-stack{
-  display:grid;
-  gap:var(--special-dex-gap)!important;
-}
-.special-dex-page .special-dex-stack>
-:is(.special-dex-hero,.special-dex-wide-card){
-  margin-block:0!important;
-}
 .special-dex-page .special-dex-hero{
   width:100%;
   margin-inline:0;
@@ -7198,6 +7179,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:hidden;
   border:0;
   border-radius:var(--special-dex-radius);
+}
+.special-dex-page .special-dex-content{
+  box-sizing:border-box;
+  width:min(
+    calc(100% - var(--special-dex-inline) - var(--special-dex-inline)),
+    var(--special-dex-content-max)
+  );
+  margin-inline:auto;
+}
+.special-dex-page .special-dex-content+.special-dex-content{
+  margin-top:var(--special-dex-gap);
+}
+.special-dex-page .special-dex-stack{
+  display:grid;
+  gap:var(--special-dex-gap)!important;
+}
+.special-dex-page .special-dex-stack>
+:is(.special-dex-hero,.special-dex-wide-card){
+  margin-block:0!important;
 }
 .special-dex-overlay .special-dex-sheet{
   width:min(calc(100vw - 24px),520px);
@@ -7723,36 +7723,27 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
   background:transparent!important;
 }
-/* Wrap-Achse wie im Meal-Log: 12px Rand am .wrap, Karten liegen 7px weiter
-   innen (14px schmaler, mittig). Dadurch sitzen sie exakt auf der 19px-
-   Achse wie die Meal-Log-Karten, während der Wrap selbst bei 12px bleibt. */
+/* Die Breitenachse kommt ausschließlich aus der Special-Dex-Vorlage. */
 :root[data-seite="body"] .body-log-dex-page .body-metrics-wrap{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr)!important;
-  gap:12px!important;
+  display:block!important;
   width:100%!important;
   margin:0!important;
-  padding:0!important;
-}
-:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>:not(.kategorie-scrollinhalt),
-:root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt>*{
-  box-sizing:border-box;
-  width:min(calc(100% - 14px),604px);
-  margin-inline:auto;
+  padding-inline:12px!important;
+  padding-block:0!important;
 }
 :root[data-seite="body"] .body-summary-hero{
   box-sizing:border-box!important;
   position:relative!important;
   display:grid!important;
-  grid-template-columns:76px minmax(0,1fr) 34px!important;
+  grid-template-columns:82px minmax(0,1fr) 34px!important;
   align-items:center!important;
-  gap:14px!important;
+  gap:17px!important;
   width:100%!important;
   min-width:0!important;
-  min-height:116px!important;
+  min-height:0!important;
   height:auto!important;
   margin:0!important;
-  padding:17px!important;
+  padding:18px!important;
   overflow:hidden!important;
   border:2px solid #111!important;
   border-radius:18px!important;
@@ -7855,12 +7846,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-sizing:border-box!important;
   position:relative!important;
   display:block!important;
-  width:100%!important;
   min-width:0!important;
   height:auto!important;
   min-height:0!important;
   max-height:none!important;
-  margin:0!important;
   padding:0!important;
   overflow:hidden!important;
   visibility:visible!important;
@@ -7916,9 +7905,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 @media(max-width:370px){
   :root[data-seite="body"] .body-summary-hero{
-    grid-template-columns:70px minmax(0,1fr) 32px!important;
-    gap:10px!important;
-    padding:15px!important;
+    grid-template-columns:68px minmax(0,1fr) 34px!important;
+    gap:11px!important;
+    padding:18px!important;
   }
   :root[data-seite="body"] .body-summary-hero .body-log-ring{width:70px!important;height:70px!important}
   :root[data-seite="body"] .body-summary-hero .body-log-ring::after{width:54px;height:54px}
