@@ -7433,6 +7433,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="body"] :is(#app,#view){background:transparent!important}
 :root[data-seite="body"] .body-log-dex-page{
+  --special-dex-inline:24px;
   isolation:isolate;
   min-height:100dvh;
   background:#B1E7FF!important;
@@ -7723,13 +7724,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
   background:transparent!important;
 }
-/* Die Breitenachse kommt ausschließlich aus der Special-Dex-Vorlage. */
+/* Die Breitenachse kommt ausschließlich aus der Body-Special-Dex-Vorlage:
+   24px echter Viewport-Rand, unabhängig von der allgemeinen `.wrap`-Padding. */
+:root[data-seite="body"] .body-log-dex-page.dex-fixkopf>.wrap{
+  padding-inline:0!important;
+}
 :root[data-seite="body"] .body-log-dex-page .body-metrics-wrap{
   display:block!important;
   width:100%!important;
   margin:0!important;
-  padding-inline:12px!important;
+  padding-inline:0!important;
   padding-block:0!important;
+}
+:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content{
+  width:min(calc(100% - 48px),var(--special-dex-content-max))!important;
+  margin-inline:auto!important;
+}
+:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content+.special-dex-content{
+  margin-top:18px!important;
 }
 :root[data-seite="body"] .body-summary-hero{
   box-sizing:border-box!important;
@@ -7740,11 +7752,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   gap:17px!important;
   width:100%!important;
   min-width:0!important;
-  min-height:0!important;
+  min-height:118px!important;
   height:auto!important;
   margin:0!important;
   padding:18px!important;
-  overflow:hidden!important;
+  overflow:visible!important;
   border:2px solid #111!important;
   border-radius:18px!important;
   background:color-mix(in srgb,var(--ordner) 8%,#fff)!important;
@@ -7907,6 +7919,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-seite="body"] .body-summary-hero{
     grid-template-columns:68px minmax(0,1fr) 34px!important;
     gap:11px!important;
+    min-height:112px!important;
     padding:18px!important;
   }
   :root[data-seite="body"] .body-summary-hero .body-log-ring{width:70px!important;height:70px!important}
