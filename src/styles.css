@@ -132,6 +132,7 @@
 
   --mq-h:34px;
   --brand-outline:#000000;
+  --brand-pink:#FF69AE;      /* Logo-Pink wie im LOGMAN-Logo (weicher als --pink) */
   --brand-card-bg:#17224C;   /* Navy-Karte hinter dem MUSCLEDEX-Schriftzug */
   --brand-card-mark:#F1ECDE; /* helles Abwaerts-Dreieck auf der Karte */
   --sil-filter:none;

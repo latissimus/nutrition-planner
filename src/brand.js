@@ -48,7 +48,7 @@ export function brandSvg() {
      font-size="54" letter-spacing="-1.62" text-anchor="middle"
      stroke="var(--brand-outline)" stroke-width="5.2" stroke-linejoin="round">
     <text transform="translate(4.2,4.2)" fill="var(--brand-outline)">${path}</text>
-    <text fill="var(--pink)" paint-order="stroke fill">${path}</text>
+    <text fill="var(--brand-pink,#FF69AE)" paint-order="stroke fill">${path}</text>
   </g>
 </svg>`;
 }
