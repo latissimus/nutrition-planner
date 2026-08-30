@@ -7449,13 +7449,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-bottom:24px;
 }
 :root[data-seite="body"] .body-log-hero{
-  display:grid;
-  grid-template-columns:82px minmax(0,1fr) 34px;
-  align-items:center;
-  gap:17px;
-  min-height:0;
-  padding:18px;
+  box-sizing:border-box;
+  display:grid!important;
+  grid-template-columns:76px minmax(0,1fr) 34px!important;
+  align-items:center!important;
+  align-content:center!important;
+  gap:17px!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:116px!important;
+  max-height:none!important;
+  padding:18px!important;
+  overflow:hidden!important;
+  position:relative;
   color:#111;
+}
+:root[data-seite="body"] .body-log-hero>*{
+  position:relative!important;
+  inset:auto!important;
+  margin:0!important;
+  transform:none!important;
 }
 :root[data-seite="body"] .body-log-ring{
   display:grid;
@@ -7489,7 +7502,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="body"] .body-log-ring b{font-size:15px;font-weight:800}
 :root[data-seite="body"] .body-log-ring small{font-size:8px;font-weight:700;letter-spacing:.04em}
-:root[data-seite="body"] .body-log-hero-value{display:grid;min-width:0;align-content:center}
+:root[data-seite="body"] .body-log-hero-value{display:grid;min-width:0;align-self:center;align-content:center}
 :root[data-seite="body"] .body-log-hero-value>small{
   font-family:"Work Sans",var(--ui),sans-serif;
   font-size:10px;
@@ -7633,10 +7646,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-entry-sheet-skinfold{max-height:90dvh}
 
 @media(max-width:390px){
-  :root[data-seite="body"] .body-log-hero{grid-template-columns:68px minmax(0,1fr) 34px;gap:11px;padding:15px}
-  :root[data-seite="body"] .body-log-ring{width:68px}
-  :root[data-seite="body"] .body-log-ring::after{width:52px}
-  :root[data-seite="body"] .body-log-hero-value>strong{font-size:38px}
+  :root[data-seite="body"] .body-log-hero{
+    grid-template-columns:76px minmax(0,1fr) 34px!important;
+    gap:12px!important;
+    min-height:112px!important;
+    padding:16px!important;
+  }
+  :root[data-seite="body"] .body-log-hero-value>strong{font-size:clamp(38px,12vw,46px)}
 }
 
 /* ============================================================
