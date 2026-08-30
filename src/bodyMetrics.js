@@ -73,16 +73,57 @@ function bodyHeroMarkup(state) {
   </div>`;
 }
 
+function weightEntryMarkup() {
+  return `<form class="gew-eingabe body-entry-form" data-weight-form>
+    <label class="falte gew-feld"><span>Datum</span><span class="input gew-datum-eingabe"><input type="date" value="${heute()}" data-weight-date></span></label>
+    <label class="falte gew-feld"><span>Gewicht</span><span class="gew-wert-eingabe"><input class="input gew-in" type="text" inputmode="decimal" placeholder="84,2" data-weight-value><i>kg</i></span></label>
+    <button class="btn btn-primary" type="submit">Gewicht speichern</button>
+  </form>`;
+}
+
+function waistEntryMarkup() {
+  return `<form class="body-inline-form body-entry-form" data-waist-form>
+    <label><span>Datum</span><input class="input" type="date" value="${heute()}" data-waist-date></label>
+    <label><span>Taillenumfang</span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="90,0" data-waist-value><i>cm</i></span></label>
+    <label class="body-standard"><input type="checkbox" data-waist-standard><span>Unter standardisierten Bedingungen gemessen</span></label>
+    <button class="btn btn-primary" type="submit">Taillenumfang speichern</button>
+  </form>`;
+}
+
+function skinfoldEntryMarkup() {
+  return `<form class="body-entry-form" data-skinfold-form>
+    <p class="body-guide">Alle zwei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p>
+    <label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label>
+    <label class="body-standard"><input type="checkbox" data-skinfold-standard><span>Standardisierte Bedingungen eingehalten</span></label>
+    <div class="guided-fold-grid">${FALTEN.map(([key, label]) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" placeholder="1" data-fold="${key}" data-reading="0"><input class="input" type="text" inputmode="decimal" placeholder="2" data-fold="${key}" data-reading="1"><input class="input" type="text" inputmode="decimal" placeholder="3 bei Abweichung" data-fold="${key}" data-reading="2"></div></fieldset>`).join('')}</div>
+    <div class="falten-summe" data-skinfold-quality>Je Stelle zunächst zwei Messungen eintragen.</div>
+    <button class="btn btn-primary btn-block" type="submit" disabled>Messung speichern</button>
+  </form>`;
+}
+
+function recoveryEntryMarkup() {
+  return `<form class="body-checkin-form body-entry-form" data-bodycomp-checkin>
+    <label><span>Datum</span><input class="input" type="date" value="${heute()}" data-checkin-date></label>
+    ${[['recovery','Erholung'],['mood','Stimmung'],['hunger','Hunger']].map(([key, label]) => `<label><span>${label}</span><select class="input" data-checkin-${key}>${[1,2,3,4,5].map((value) => `<option value="${value}">${value} von 5</option>`).join('')}</select></label>`).join('')}
+    <div><label><input type="checkbox" data-checkin-illness> Krankheit</label><label><input type="checkbox" data-checkin-travel> Reise</label><label><input type="checkbox" data-checkin-unusual> außergewöhnliche Mahlzeiten</label></div>
+    <button class="btn btn-primary" type="submit">Check-in speichern</button>
+  </form>`;
+}
+
+function logmanEntryMarkup() {
+  return `<div class="body-entry-form"><p>Wähle einen JSON-Export aus LOGMAN. Vorhandene Werte desselben Tages werden aktualisiert.</p><label class="body-file-input"><span>LOGMAN-JSON-Export auswählen</span><input type="file" accept="application/json,.json" data-logman-import></label><p data-logman-status></p></div>`;
+}
+
 function weightMarkup(state) {
   const trend = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined); const latest = state.weights.at(-1);
   const interpretation = goalWeightInterpretation(trend, state.settings.goal || 'maintain');
-  return `<details class="card body-evidence-card body-data-card special-dex-wide-card" data-weight-card><summary><span><b>Gewichtsverlauf</b><small>${latest ? `${display(latest.kg)} kg · ${trend.confidence}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content">
+  return `<details class="card body-evidence-card body-data-card special-dex-wide-card" data-weight-card open><summary><span><b>Gewichtsverlauf</b><small>${latest ? `${display(latest.kg)} kg · ${trend.confidence}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content">
     ${latest ? `<div class="body-metric-grid"><span><small>HEUTE</small><b>${display(latest.kg)} kg</b></span><span><small>7-TAGE-SCHNITT</small><b>${display(trend.average7Kg)} kg</b></span><span><small>PRO WOCHE</small><b>${trend.weeklyKg > 0 ? '+' : ''}${display(trend.weeklyKg, 2)} kg · ${trend.weeklyPercent > 0 ? '+' : ''}${display(trend.weeklyPercent, 2)} %</b></span><span><small>28-TAGE-TREND</small><b>${trend.trend28Kg > 0 ? '+' : ''}${display(trend.trend28Kg, 2)} kg</b></span></div><p class="body-confidence">Vertrauensstufe: <b>${trend.confidence}</b> · ${display(trend.measurementsPerWeek)} Wiegungen pro Woche</p>` : '<p>Noch kein Gewicht eingetragen.</p>'}
     <p class="body-goal-status" data-tone="${interpretation.tone}"><b>${interpretation.label}</b><span>${interpretation.text}</span></p>
     <div>${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh' }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}</div>
     ${infoDetails('Warum bewertet MUSCLEDEX den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
     ${infoDetails('Wie oft wiegen?', BODY_EXPLANATIONS.weighingFrequency)}
-    <form class="gew-eingabe" data-weight-form><label class="falte gew-feld"><span>Datum</span><span class="input gew-datum-eingabe"><input type="date" value="${heute()}" data-weight-date></span></label><label class="falte gew-feld"><span>Gewicht</span><span class="gew-wert-eingabe"><input class="input gew-in" type="text" inputmode="decimal" placeholder="84,2" data-weight-value><i>kg</i></span></label><button class="btn btn-primary" type="submit">Speichern</button></form></div></details>`;
+  </div></details>`;
 }
 
 function skinfoldMarkup(state) {
@@ -90,17 +131,17 @@ function skinfoldMarkup(state) {
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
   const gapDays = latest && previous ? day(latest.gemessen_am) - day(previous.gemessen_am) : null;
   const comparable = latest && previous && latest.standardisiert && previous.standardisiert;
-  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-skinfold-card><summary><span><b>12-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content"><h2 class="section-title mini-title">12-Falten-Summe in mm – keine KFA-Schätzung</h2>
+  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-skinfold-card open><summary><span><b>12-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content"><h2 class="section-title mini-title">12-Falten-Summe in mm – keine KFA-Schätzung</h2>
     ${latest ? `<div class="mess-kopf"><span class="mess-label">Letzte Summe</span><div class="mess-wert">${display(latest.total)} <span>mm</span></div><div class="mess-datum">${datumKurz(latest.gemessen_am)} · Messqualität ${latest.messqualitaet || 'nicht dokumentiert'}${gapDays != null ? ` · ${gapDays} Tage seit der vorherigen Messung` : ''}</div></div><p class="body-confidence">Vollständigkeit: <b>${Object.keys(latest.falten || {}).length} von 12 Stellen</b> · Vergleichbarkeit: <b>${comparable ? 'standardisiert' : previous ? 'eingeschränkt' : 'noch kein Vergleich'}</b></p>` : '<p>Noch keine Hautfaltenmessung.</p>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     <div>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
-    <details class="mess-neu" data-skinfold-entry><summary>Geführte Messung</summary><form data-skinfold-form><p class="body-guide">Alle zwei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p><label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label><label class="body-standard"><input type="checkbox" data-skinfold-standard><span>Standardisierte Bedingungen eingehalten</span></label><div class="guided-fold-grid">${FALTEN.map(([key, label]) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" placeholder="1" data-fold="${key}" data-reading="0"><input class="input" type="text" inputmode="decimal" placeholder="2" data-fold="${key}" data-reading="1"><input class="input" type="text" inputmode="decimal" placeholder="3 bei Abweichung" data-fold="${key}" data-reading="2"></div></fieldset>`).join('')}</div><div class="falten-summe" data-skinfold-quality>Je Stelle zunächst zwei Messungen eintragen.</div><button class="btn btn-primary btn-block" type="submit" disabled>Messung speichern</button></form></details></div></details>`;
+  </div></details>`;
 }
 
 function waistMarkup(state) {
   const latest = state.waists.at(-1);
-  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-waist-card><summary><span><b>Taillenumfang</b><small>${latest ? `${display(latest.cm)} cm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content">${latest ? `<div class="mess-kopf"><span class="mess-label">Zuletzt</span><div class="mess-wert">${display(latest.cm)} <span>cm</span></div><div class="mess-datum">${datumKurz(latest.gemessen_am)}</div></div>` : '<p>Noch kein Taillenumfang eingetragen.</p>'}<div>${curveSvg([{ values: state.waists.map((row) => ({ datum: row.gemessen_am, wert: Number(row.cm) })), className: 'trend', points: true }], { unit: 'cm' })}</div>${infoDetails('Richtig messen', `${BODY_EXPLANATIONS.waist} Miss immer an derselben Position, stehend und nach entspannter Ausatmung.`)}<form class="body-inline-form" data-waist-form><input class="input" type="date" value="${heute()}" data-waist-date><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="90,0" data-waist-value><i>cm</i></span><label><input type="checkbox" data-waist-standard><span>standardisiert</span></label><button class="btn btn-primary" type="submit">Speichern</button></form></div></details>`;
+  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-waist-card open><summary><span><b>Taillenumfang</b><small>${latest ? `${display(latest.cm)} cm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content">${latest ? `<div class="mess-kopf"><span class="mess-label">Zuletzt</span><div class="mess-wert">${display(latest.cm)} <span>cm</span></div><div class="mess-datum">${datumKurz(latest.gemessen_am)}</div></div>` : '<p>Noch kein Taillenumfang eingetragen.</p>'}<div>${curveSvg([{ values: state.waists.map((row) => ({ datum: row.gemessen_am, wert: Number(row.cm) })), className: 'trend', points: true }], { unit: 'cm' })}</div>${infoDetails('Richtig messen', `${BODY_EXPLANATIONS.waist} Miss immer an derselben Position, stehend und nach entspannter Ausatmung.`)}</div></details>`;
 }
 
 function bodyCompMarkup(state) {
@@ -116,12 +157,30 @@ function bodyCompMarkup(state) {
     : result.confidence === 'mittel'
       ? 'Der Gewichtstrend ist brauchbar, aber mindestens eine ergänzende Datenquelle fehlt noch oder ist noch nicht bestätigt.'
       : 'Zeitraum, Messhäufigkeit oder ergänzende Vergleichsdaten reichen noch nicht für eine belastbare Einordnung.';
-  return `<details class="card bodycomp-status special-dex-wide-card" data-bodycomp-card><summary><span><b>Körpertrend</b><small>${escapeHtml(result.message)}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content"><span class="seitenkopf-kicker">Kombinierte Auswertung</span><h2>${state.settings.goal === 'bodycomp' ? 'BodyComp' : 'Körperzusammensetzung'}</h2><p class="bodycomp-message">${escapeHtml(result.message)}</p>${result.suggestion ? `<p>${escapeHtml(result.suggestion)}</p>` : ''}<div class="bodycomp-sources"><span>Gewicht <b>${weight.category || 'unklar'}</b></span><span>Faltensumme <b>${skinfoldDelta == null ? 'noch nicht bestätigt' : `${skinfoldDelta > 0 ? '+' : ''}${display(skinfoldDelta)} mm`}</b></span><span>Taille <b>${waistDelta == null ? 'noch nicht bestätigt' : `${waistDelta > 0 ? '+' : ''}${display(waistDelta)} cm`}</b></span><span>LOGMAN-Leistung <b>${performance.direction == null ? 'Import fehlt' : `${performance.percent > 0 ? '+' : ''}${display(performance.percent)} %`}</b></span><span>Schlaf & Erholung <b>${recovery == null ? 'noch unklar' : recovery > 0 ? 'verbessert' : recovery < 0 ? 'verschlechtert' : 'stabil'}</b></span></div>${infoDetails(`Vertrauensstufe: ${result.confidence}`, confidenceText)}<details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details><details class="mess-neu"><summary>Orientierungsbereiche anpassen</summary><form class="body-threshold-form" data-bodycomp-thresholds><p>Die Grenzen sind Orientierung und keine biologische Exaktheit.</p><label><span>Stabil ab Verlust</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Langsame Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details><details class="mess-neu" data-checkin-entry><summary>Erholung protokollieren</summary><form class="body-checkin-form" data-bodycomp-checkin><input class="input" type="date" value="${heute()}" data-checkin-date>${[['recovery','Erholung'],['mood','Stimmung'],['hunger','Hunger']].map(([key, label]) => `<label><span>${label}</span><select class="input" data-checkin-${key}>${[1,2,3,4,5].map((value) => `<option value="${value}">${value} von 5</option>`).join('')}</select></label>`).join('')}<div><label><input type="checkbox" data-checkin-illness> Krankheit</label><label><input type="checkbox" data-checkin-travel> Reise</label><label><input type="checkbox" data-checkin-unusual> außergewöhnliche Mahlzeiten</label></div><button class="btn btn-primary" type="submit">Check-in speichern</button></form></details></div></details>`;
+  return `<details class="card bodycomp-status special-dex-wide-card" data-bodycomp-card open>
+    <summary><span><b>Körpertrend</b><small>${escapeHtml(result.message)}</small></span>${materialIconMarkup('chevron_right')}</summary>
+    <div class="body-data-card-content">
+      <span class="seitenkopf-kicker">Kombinierte Auswertung</span>
+      <h2>${state.settings.goal === 'bodycomp' ? 'BodyComp' : 'Körperzusammensetzung'}</h2>
+      <p class="bodycomp-message">${escapeHtml(result.message)}</p>
+      ${result.suggestion ? `<p>${escapeHtml(result.suggestion)}</p>` : ''}
+      <div class="bodycomp-sources">
+        <span>Gewicht <b>${weight.category || 'unklar'}</b></span>
+        <span>Faltensumme <b>${skinfoldDelta == null ? 'noch nicht bestätigt' : `${skinfoldDelta > 0 ? '+' : ''}${display(skinfoldDelta)} mm`}</b></span>
+        <span>Taille <b>${waistDelta == null ? 'noch nicht bestätigt' : `${waistDelta > 0 ? '+' : ''}${display(waistDelta)} cm`}</b></span>
+        <span>LOGMAN-Leistung <b>${performance.direction == null ? 'Import fehlt' : `${performance.percent > 0 ? '+' : ''}${display(performance.percent)} %`}</b></span>
+        <span>Schlaf & Erholung <b>${recovery == null ? 'noch unklar' : recovery > 0 ? 'verbessert' : recovery < 0 ? 'verschlechtert' : 'stabil'}</b></span>
+      </div>
+      ${infoDetails(`Vertrauensstufe: ${result.confidence}`, confidenceText)}
+      <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
+      <details class="mess-neu" open><summary>Orientierungsbereiche anpassen</summary><form class="body-threshold-form" data-bodycomp-thresholds><p>Die Grenzen sind Orientierung und keine biologische Exaktheit.</p><label><span>Stabil ab Verlust</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Langsame Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
+    </div>
+  </details>`;
 }
 
 function logmanMarkup(state) {
   const trend = performanceTrend(state.performance);
-  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-logman-card><summary><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content"><p>${state.performance.length ? `${state.performance.length} vergleichbare HEAVYS-/MIDDLES-Werte · Trend ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch keine LOGMAN-Leistungsdaten importiert.'}</p>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Importiert werden verwendetes Gewicht, Wiederholungen, geschätzte Maximalkraft, Volumen und die Anzahl vergleichbarer HEAVYS-/MIDDLES-Einheiten.`)}<label class="body-file-input"><span>LOGMAN-JSON-Export auswählen</span><input type="file" accept="application/json,.json" data-logman-import></label><p data-logman-status></p></div></details>`;
+  return `<details class="card body-evidence-card body-data-card special-dex-list-card" data-logman-card open><summary><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-data-card-content"><p>${state.performance.length ? `${state.performance.length} vergleichbare HEAVYS-/MIDDLES-Werte · Trend ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch keine LOGMAN-Leistungsdaten importiert.'}</p>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Importiert werden verwendetes Gewicht, Wiederholungen, geschätzte Maximalkraft, Volumen und die Anzahl vergleichbarer HEAVYS-/MIDDLES-Einheiten.`)}</div></details>`;
 }
 
 export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal }) {
@@ -163,15 +222,122 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     }
   };
 
-  const openSection = (sectionSelector, nestedSelector, focusSelector) => {
-    const section = container.querySelector(sectionSelector);
-    if (section instanceof HTMLDetailsElement) section.open = true;
-    const nested = nestedSelector ? section?.querySelector(nestedSelector) : null;
-    if (nested instanceof HTMLDetailsElement) nested.open = true;
-    requestAnimationFrame(() => {
-      section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      section?.querySelector(focusSelector)?.focus({ preventScroll: true });
+  const entryOptions = {
+    weight: { title: 'Gewicht eintragen', markup: weightEntryMarkup },
+    waist: { title: 'Taillenumfang eintragen', markup: waistEntryMarkup },
+    skinfold: { title: '12-Falten-Messung', markup: skinfoldEntryMarkup },
+    recovery: { title: 'Erholung protokollieren', markup: recoveryEntryMarkup },
+    logman: { title: 'LOGMAN-Import', markup: logmanEntryMarkup },
+  };
+
+  const bindEntryOverlay = (overlay) => {
+    const closeAndRender = async () => { overlay.remove(); await render(); };
+    const weightForm = overlay.querySelector('[data-weight-form]');
+    if (weightForm) weightForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const kg = zahl(weightForm.querySelector('[data-weight-value]').value);
+      const date = weightForm.querySelector('[data-weight-date]').value;
+      if (!kg || kg <= 0 || kg >= 500) return toast('Bitte ein gültiges Gewicht eintragen');
+      const isNew = !state.weights.some((row) => row.gemessen_am === date);
+      const { error } = await supabase.from('weights').upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' });
+      if (error) return toast('Gewicht konnte nicht gespeichert werden');
+      notifyHomeCountsChanged();
+      if (isNew) notifyCoinBalanceChanged();
+      toast(isNew ? 'Gewicht gespeichert · +1 MUSCLE-COIN' : 'Gewicht aktualisiert');
+      await closeAndRender();
+    };
+
+    const waistForm = overlay.querySelector('[data-waist-form]');
+    if (waistForm) waistForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const cm = zahl(waistForm.querySelector('[data-waist-value]').value);
+      const date = waistForm.querySelector('[data-waist-date]').value;
+      if (!cm || cm < 30 || cm > 250) return toast('Bitte einen gültigen Taillenumfang eintragen');
+      const isNew = !state.waists.some((row) => row.gemessen_am === date);
+      const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' });
+      if (error) return toast('Taillenumfang konnte nicht gespeichert werden');
+      if (isNew) notifyCoinBalanceChanged();
+      toast(isNew ? 'Taillenumfang gespeichert · +1 MUSCLE-COIN' : 'Taillenumfang aktualisiert');
+      await closeAndRender();
+    };
+
+    const skinfoldForm = overlay.querySelector('[data-skinfold-form]');
+    if (skinfoldForm) {
+      const updateSkinfold = () => {
+        const readings = {};
+        skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => {
+          readings[input.dataset.fold] ||= [];
+          readings[input.dataset.fold][Number(input.dataset.reading)] = input.value;
+        });
+        const result = aggregateSkinfoldReadings(readings);
+        const total = summe(result.values);
+        const message = result.thirdNeeded ? `${result.thirdNeeded} Stelle(n) weichen deutlich ab – dort eine dritte Messung ergänzen.` : `${result.complete} von 12 Stellen vollständig · Messqualität ${result.quality}`;
+        skinfoldForm.querySelector('[data-skinfold-quality]').innerHTML = `${escapeHtml(message)}${total != null ? ` · <b>${display(total)} mm</b>` : ''}`;
+        skinfoldForm.querySelector('button[type="submit"]').disabled = result.complete !== 12 || result.thirdNeeded > 0;
+        return { result, readings };
+      };
+      skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
+      skinfoldForm.onsubmit = async (event) => {
+        event.preventDefault();
+        const { result, readings } = updateSkinfold();
+        if (result.complete !== 12) return;
+        const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
+        const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
+        const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
+        const quality = standardisiert && result.quality === 'hoch' ? 'hoch' : result.quality === 'hoch' ? 'mittel' : result.quality;
+        const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: result.values, messreihen: readings, messqualitaet: quality, standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' });
+        if (error) return toast('Messung konnte nicht gespeichert werden');
+        notifyHomeCountsChanged();
+        if (isNew) notifyCoinBalanceChanged();
+        toast(isNew ? '12-Falten-Summe gespeichert · +1 MUSCLE-COIN' : '12-Falten-Summe aktualisiert');
+        await closeAndRender();
+      };
+    }
+
+    const checkinForm = overlay.querySelector('[data-bodycomp-checkin]');
+    if (checkinForm) checkinForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const { error } = await supabase.from('bodycomp_checkins').upsert({ user_id: userId, checkin_date: form.querySelector('[data-checkin-date]').value, recovery: Number(form.querySelector('[data-checkin-recovery]').value), mood: Number(form.querySelector('[data-checkin-mood]').value), hunger: Number(form.querySelector('[data-checkin-hunger]').value), illness: form.querySelector('[data-checkin-illness]').checked, travel: form.querySelector('[data-checkin-travel]').checked, unusual_meals: form.querySelector('[data-checkin-unusual]').checked }, { onConflict: 'user_id,checkin_date' });
+      if (error) return toast('Check-in konnte nicht gespeichert werden');
+      toast('Erholung protokolliert');
+      await closeAndRender();
+    };
+
+    const importInput = overlay.querySelector('[data-logman-import]');
+    if (importInput) importInput.onchange = async (event) => {
+      const status = overlay.querySelector('[data-logman-status]');
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        const rows = parseLogmanExport(parsed).map((row) => ({ ...row, user_id: userId }));
+        if (!rows.length) throw new Error('Keine vergleichbaren HEAVYS-/MIDDLES-Werte gefunden.');
+        const { error } = await supabase.from('logman_performance').upsert(rows, { onConflict: 'user_id,performed_on,exercise,category' });
+        if (error) throw error;
+        status.textContent = `${rows.length} Leistungswerte importiert.`;
+        toast('LOGMAN-Leistung importiert');
+        await closeAndRender();
+      } catch (error) {
+        status.textContent = error.message || 'Import fehlgeschlagen.';
+      }
+    };
+    requestAnimationFrame(() => overlay.querySelector('input:not([type="checkbox"]),select')?.focus({ preventScroll: true }));
+  };
+
+  const openEntryOverlay = (kind) => {
+    const config = entryOptions[kind];
+    if (!config) return;
+    const overlay = createSpecialDexOverlay({
+      colorScope: 'body',
+      replaceSelector: '[data-body-entry-overlay]',
+      className: 'body-entry-overlay',
+      sheetClassName: `body-entry-sheet body-entry-sheet-${kind}`,
+      ariaLabel: config.title,
+      markup: `<header><h2>${config.title}</h2><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="body-entry-content">${config.markup()}</div>`,
     });
+    overlay.dataset.bodyEntryOverlay = '';
+    bindEntryOverlay(overlay);
   };
 
   const openAddMenu = () => {
@@ -191,18 +357,11 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         </div>`,
     });
     overlay.dataset.bodyAddOverlay = '';
-    const targets = {
-      weight: ['[data-weight-card]', '', '[data-weight-value]'],
-      waist: ['[data-waist-card]', '', '[data-waist-value]'],
-      skinfold: ['[data-skinfold-card]', '[data-skinfold-entry]', '[data-fold]'],
-      recovery: ['[data-bodycomp-card]', '[data-checkin-entry]', '[data-checkin-date]'],
-      logman: ['[data-logman-card]', '', '[data-logman-import]'],
-    };
     overlay.querySelectorAll('[data-body-add]').forEach((button) => {
       button.onclick = () => {
-        const target = targets[button.dataset.bodyAdd];
+        const kind = button.dataset.bodyAdd;
         overlay.remove();
-        if (target) openSection(...target);
+        openEntryOverlay(kind);
       };
     });
   };
@@ -215,17 +374,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       infoHelp.hidden = !open;
       infoButton.setAttribute('aria-expanded', String(open));
     };
-    const weightForm = container.querySelector('[data-weight-form]');
-    weightForm.onsubmit = async (event) => { event.preventDefault(); const kg = zahl(weightForm.querySelector('[data-weight-value]').value); const date = weightForm.querySelector('[data-weight-date]').value; if (!kg || kg <= 0 || kg >= 500) return toast('Bitte ein gültiges Gewicht eintragen'); const isNew = !state.weights.some((row) => row.gemessen_am === date); const { error } = await supabase.from('weights').upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' }); if (error) return toast('Gewicht konnte nicht gespeichert werden'); notifyHomeCountsChanged(); if (isNew) notifyCoinBalanceChanged(); toast(isNew ? 'Gewicht gespeichert · +1 MUSCLE-COIN' : 'Gewicht aktualisiert'); await render(); };
-    const skinfoldForm = container.querySelector('[data-skinfold-form]');
-    const updateSkinfold = () => { const readings = {}; skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { readings[input.dataset.fold] ||= []; readings[input.dataset.fold][Number(input.dataset.reading)] = input.value; }); const result = aggregateSkinfoldReadings(readings); const total = summe(result.values); const message = result.thirdNeeded ? `${result.thirdNeeded} Stelle(n) weichen deutlich ab – dort eine dritte Messung ergänzen.` : `${result.complete} von 12 Stellen vollständig · Messqualität ${result.quality}`; skinfoldForm.querySelector('[data-skinfold-quality]').innerHTML = `${escapeHtml(message)}${total != null ? ` · <b>${display(total)} mm</b>` : ''}`; skinfoldForm.querySelector('button[type="submit"]').disabled = result.complete !== 12 || result.thirdNeeded > 0; return { result, readings }; };
-    skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
-    skinfoldForm.onsubmit = async (event) => { event.preventDefault(); const { result, readings } = updateSkinfold(); if (result.complete !== 12) return; const date = skinfoldForm.querySelector('[data-skinfold-date]').value; const isNew = !state.skinfolds.some((row) => row.gemessen_am === date); const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked; const quality = standardisiert && result.quality === 'hoch' ? 'hoch' : result.quality === 'hoch' ? 'mittel' : result.quality; const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: result.values, messreihen: readings, messqualitaet: quality, standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' }); if (error) return toast('Messung konnte nicht gespeichert werden'); notifyHomeCountsChanged(); if (isNew) notifyCoinBalanceChanged(); toast(isNew ? '12-Falten-Summe gespeichert · +1 MUSCLE-COIN' : '12-Falten-Summe aktualisiert'); await render(); };
-    const waistForm = container.querySelector('[data-waist-form]');
-    waistForm.onsubmit = async (event) => { event.preventDefault(); const cm = zahl(waistForm.querySelector('[data-waist-value]').value); const date = waistForm.querySelector('[data-waist-date]').value; if (!cm || cm < 30 || cm > 250) return toast('Bitte einen gültigen Taillenumfang eintragen'); const isNew = !state.waists.some((row) => row.gemessen_am === date); const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' }); if (error) return toast('Taillenumfang konnte nicht gespeichert werden'); if (isNew) notifyCoinBalanceChanged(); toast(isNew ? 'Taillenumfang gespeichert · +1 MUSCLE-COIN' : 'Taillenumfang aktualisiert'); await render(); };
-    container.querySelector('[data-bodycomp-checkin]').onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const { error } = await supabase.from('bodycomp_checkins').upsert({ user_id: userId, checkin_date: form.querySelector('[data-checkin-date]').value, recovery: Number(form.querySelector('[data-checkin-recovery]').value), mood: Number(form.querySelector('[data-checkin-mood]').value), hunger: Number(form.querySelector('[data-checkin-hunger]').value), illness: form.querySelector('[data-checkin-illness]').checked, travel: form.querySelector('[data-checkin-travel]').checked, unusual_meals: form.querySelector('[data-checkin-unusual]').checked }, { onConflict: 'user_id,checkin_date' }); if (error) return toast('Check-in konnte nicht gespeichert werden'); toast('Erholung protokolliert'); await render(); };
     container.querySelector('[data-bodycomp-thresholds]').onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const stableLoss = zahl(form.querySelector('[data-threshold-stable-loss]').value); const slowLoss = zahl(form.querySelector('[data-threshold-slow-loss]').value); const stableGain = zahl(form.querySelector('[data-threshold-stable-gain]').value); const slowGain = zahl(form.querySelector('[data-threshold-slow-gain]').value); if (!(stableLoss > 0 && slowLoss > stableLoss && stableGain > 0 && slowGain > stableGain)) return toast('Bitte aufsteigende, positive Prozentgrenzen eintragen'); const bodycomp_thresholds = { stableLoss: -stableLoss, slowLoss: -slowLoss, stableGain, slowGain }; const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, bodycomp_thresholds }, { onConflict: 'user_id' }); if (error) return toast('Orientierungsbereiche konnten nicht gespeichert werden'); toast('Orientierungsbereiche gespeichert'); await render(); };
-    container.querySelector('[data-logman-import]').onchange = async (event) => { const status = container.querySelector('[data-logman-status]'); const file = event.target.files?.[0]; if (!file) return; try { const parsed = JSON.parse(await file.text()); const rows = parseLogmanExport(parsed).map((row) => ({ ...row, user_id: userId })); if (!rows.length) throw new Error('Keine vergleichbaren HEAVYS-/MIDDLES-Werte gefunden.'); const { error } = await supabase.from('logman_performance').upsert(rows, { onConflict: 'user_id,performed_on,exercise,category' }); if (error) throw error; status.textContent = `${rows.length} Leistungswerte importiert.`; toast('LOGMAN-Leistung importiert'); await render(); } catch (error) { status.textContent = error.message || 'Import fehlgeschlagen.'; } };
     const settings = container.querySelector('[data-skinfold-settings]');
     settings.innerHTML = `<div class="mess-einst"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;
     settings.querySelectorAll('input,select').forEach((field) => { field.onchange = async () => { const values = { falten_erinnerung: settings.querySelector('[data-reminder-active]').checked, falten_intervall_wochen: Number(settings.querySelector('[data-reminder-weeks]').value), falten_uhrzeit: settings.querySelector('[data-reminder-time]').value, zeitzone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin' }; const { error } = await supabase.from('profiles').update(values).eq('id', userId); if (error) return toast('Einstellung nicht gespeichert'); Object.assign(profile, values); onProfileUpdated?.(profile); toast('Erinnerung gespeichert'); }; });
