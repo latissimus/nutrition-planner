@@ -62,9 +62,9 @@ function bodyHeroMarkup(state) {
   const weeklyLabel = latest
     ? `${weekly > 0 ? '+' : ''}${display(weekly, 2)} kg pro Woche`
     : 'Noch keine Messung';
-  return `<div class="body-hero-stack ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}"><section class="body-summary-hero ${SPECIAL_DEX_CLASSES.hero}" style="--body-progress:${progress}%">
-    <div class="body-log-ring"><span><b>${latest ? display(trend.average7Kg) : '–'}</b><small>7-TAGE Ø</small></span></div>
-    <div class="body-log-hero-value"><small>AKTUELLES GEWICHT</small><div class="body-log-hero-number"><strong>${latest ? display(latest.kg) : '–'}</strong>${latest ? '<b>kg</b>' : ''}</div><span>${latest ? `Ø ${weeklyLabel}` : weeklyLabel}</span></div>
+  return `<div class="body-v2-stack ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}"><section class="body-v2-hero ${SPECIAL_DEX_CLASSES.hero}" style="--body-progress:${progress}%">
+    <div class="body-v2-ring"><span><b>${latest ? display(trend.average7Kg) : '–'}</b><small>7-TAGE Ø</small></span></div>
+    <div class="body-v2-hero-value"><small>AKTUELLES GEWICHT</small><div><strong>${latest ? display(latest.kg) : '–'}</strong>${latest ? '<b>kg</b>' : ''}</div><span>${latest ? weeklyLabel : 'Noch keine Messung'}</span></div>
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="Body-Log-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
@@ -117,30 +117,30 @@ function logmanEntryMarkup() {
 function weightMarkup(state) {
   const trend = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined); const latest = state.weights.at(-1);
   const interpretation = goalWeightInterpretation(trend, state.settings.goal || 'maintain');
-  return `<section class="body-trend-panel ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.card}" data-weight-card><header class="body-trend-panel-head"><span><b>Gewichtsverlauf</b><small>${latest ? `${display(latest.kg)} kg · ${state.weights.length} ${state.weights.length === 1 ? 'Messung' : 'Messungen'}` : 'Noch keine Messung'}</small></span></header><div class="body-trend-panel-content">
+  return `<details class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-weight-card open><summary><span><b>Gewichtsverlauf</b><small>${latest ? `${display(latest.kg)} kg · ${state.weights.length} ${state.weights.length === 1 ? 'Messung' : 'Messungen'}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-v2-card-body">
     ${latest ? `<div class="body-metric-grid"><span><small>AKTUELL</small><b>${display(latest.kg)} kg</b></span><span><small>7-TAGE-SCHNITT</small><b>${display(trend.average7Kg)} kg</b></span><span><small>PRO WOCHE</small><b>${trend.weeklyKg > 0 ? '+' : ''}${display(trend.weeklyKg, 2)} kg</b></span><span><small>28-TAGE-ÄNDERUNG</small><b>${trend.trend28Kg > 0 ? '+' : ''}${display(trend.trend28Kg, 2)} kg</b></span></div>` : '<div class="body-chart-empty"><b>Noch kein Gewicht</b><span>Trage über den Hinzufügen-Button deine erste Wiegung ein.</span></div>'}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Tageswerte und 7-Tage-Schnitt</small></header>
     <p class="body-goal-status" data-tone="${interpretation.tone}"><b>${interpretation.label}</b><span>${interpretation.text}</span></p>
     ${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh', points: true }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}</div>
     ${infoDetails('Warum bewertet MUSCLEDEX den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
     ${infoDetails('Wie oft wiegen?', BODY_EXPLANATIONS.weighingFrequency)}
-  </div></section>`;
+  </div></details>`;
 }
 
 function skinfoldMarkup(state) {
   const valid = state.skinfolds.filter((row) => row.total != null); const latest = valid.at(-1); const previous = valid.at(-2);
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
-  return `<section class="body-trend-panel ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.card}" data-skinfold-card><header class="body-trend-panel-head"><span><b>12-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-trend-panel-content"><h2 class="section-title mini-title">12-Falten-Summe in mm – keine KFA-Schätzung</h2>
+  return `<details class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card open><summary><span><b>12-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-v2-card-body"><h2 class="section-title mini-title">12-Falten-Summe in mm – keine KFA-Schätzung</h2>
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 12-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 12 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
-  </div></section>`;
+  </div></details>`;
 }
 
 function waistMarkup(state) {
   const latest = state.waists.at(-1);
-  return `<section class="body-trend-panel ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.card}" data-waist-card><header class="body-trend-panel-head"><span><b>Taillenumfang</b><small>${latest ? `${display(latest.cm)} cm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-trend-panel-content">${latest ? `<div class="body-latest-value"><small>LETZTER WERT</small><strong>${display(latest.cm)} <b>cm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch kein Taillenumfang</b><span>Trage über den Hinzufügen-Button deine erste Messung ein.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Taillenumfang in Zentimetern</small></header>${curveSvg([{ values: state.waists.map((row) => ({ datum: row.gemessen_am, wert: Number(row.cm) })), className: 'trend', points: true }], { unit: 'cm' })}</div>${infoDetails('Richtig messen', `${BODY_EXPLANATIONS.waist} Miss immer an derselben Position, stehend und nach entspannter Ausatmung.`)}</div></section>`;
+  return `<details class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-waist-card open><summary><span><b>Taillenumfang</b><small>${latest ? `${display(latest.cm)} cm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-v2-card-body">${latest ? `<div class="body-latest-value"><small>LETZTER WERT</small><strong>${display(latest.cm)} <b>cm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch kein Taillenumfang</b><span>Trage über den Hinzufügen-Button deine erste Messung ein.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Taillenumfang in Zentimetern</small></header>${curveSvg([{ values: state.waists.map((row) => ({ datum: row.gemessen_am, wert: Number(row.cm) })), className: 'trend', points: true }], { unit: 'cm' })}</div>${infoDetails('Richtig messen', `${BODY_EXPLANATIONS.waist} Miss immer an derselben Position, stehend und nach entspannter Ausatmung.`)}</div></details>`;
 }
 
 function bodyCompMarkup(state) {
@@ -151,9 +151,9 @@ function bodyCompMarkup(state) {
   const weeks = allDates.length > 1 ? (day(allDates.at(-1)) - day(allDates[0])) / 7 : 0;
   const result = evaluateBodyComp({ weight, skinfoldDelta, waistDelta, performanceTrend: performance.direction, recoveryTrend: recovery, weeks });
   const thresholds = { stableLoss: -0.15, slowLoss: -0.5, stableGain: 0.15, slowGain: 0.3, ...(state.settings.bodycomp_thresholds || {}) };
-  return `<details class="card bodycomp-status ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.card}" data-bodycomp-card>
-    <summary><span><b>Körpertrend</b><small>${escapeHtml(result.message)}</small></span>${materialIconMarkup('chevron_right')}</summary>
-    <div class="body-data-card-content">
+  return `<section class="body-v2-overview ${SPECIAL_DEX_CLASSES.content}" data-bodycomp-card>
+    <header><span><b>Körpertrend</b><small>${escapeHtml(result.message)}</small></span></header>
+    <div class="body-v2-card-body">
       <p class="bodycomp-message">${escapeHtml(result.message)}</p>
       ${result.suggestion ? `<p>${escapeHtml(result.suggestion)}</p>` : ''}
       <div class="bodycomp-sources">
@@ -166,7 +166,7 @@ function bodyCompMarkup(state) {
       <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
       <details class="mess-neu"><summary>Orientierungsbereiche anpassen</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>Der Body-Log vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
     </div>
-  </details>`;
+  </section>`;
 }
 
 function logmanMarkup(state) {
@@ -189,7 +189,7 @@ function logmanMarkup(state) {
     days.set(date, current);
     return days;
   }, new Map())].map(([datum, value]) => ({ datum, wert: value.sum / value.count }));
-  return `<section class="body-trend-panel ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.card}" data-logman-card><header class="body-trend-panel-head"><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span></header><div class="body-trend-panel-content">${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}</div></section>`;
+  return `<details class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-logman-card open><summary><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span>${materialIconMarkup('chevron_right')}</summary><div class="body-v2-card-body">${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}</div></details>`;
 }
 
 export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal, onRendered }) {
