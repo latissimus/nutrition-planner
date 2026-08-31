@@ -283,25 +283,3 @@ export function evaluateBodyComp({ weight, skinfoldDelta = null, waistDelta = nu
       : 'Kalorien zunächst unverändert lassen und in zwei Wochen erneut vergleichen.',
   };
 }
-
-export function aggregateSkinfoldReadings(readings = {}) {
-  const values = {};
-  let complete = 0;
-  let thirdNeeded = 0;
-  Object.entries(readings).forEach(([key, list]) => {
-    const valid = (list || []).map(numeric).filter((value) => value != null && value >= 0);
-    if (valid.length < 2) return;
-    const firstTwoDifference = Math.abs(valid[0] - valid[1]);
-    const needsThird = firstTwoDifference > Math.max(2, Math.min(valid[0], valid[1]) * 0.1);
-    if (needsThird && valid.length < 3) { thirdNeeded += 1; return; }
-    const used = needsThird ? valid.slice(0, 3).sort((a, b) => a - b)[1] : (valid[0] + valid[1]) / 2;
-    values[key] = rounded(used, 1);
-    complete += 1;
-  });
-  return {
-    values,
-    complete,
-    thirdNeeded,
-    quality: complete === 12 && thirdNeeded === 0 ? 'hoch' : complete >= 10 ? 'mittel' : 'niedrig',
-  };
-}

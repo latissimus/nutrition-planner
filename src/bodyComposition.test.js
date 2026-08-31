@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  BODY_EXPLANATIONS, adaptiveEnergyEstimate, aggregateSkinfoldReadings, confirmedTrendChange, evaluateBodyComp,
+  BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp,
   goalWeightInterpretation, initialEnergyEstimate, weightTrendSummary,
 } from './bodyComposition.js';
 
@@ -64,6 +64,22 @@ describe('adaptive Kalorienkalibrierung', () => {
 });
 
 describe('Körperrekomposition', () => {
+  it('bildet den 7-Tage-Schnitt und den 28-Tage-Trend aus echten Wiegungen', () => {
+    const weights = dates(28, (date, index) => ({ date, kg: 90 - index * 0.1 }));
+    const trend = weightTrendSummary(weights);
+    expect(trend.average7Kg).toBeCloseTo(87.6, 1);
+    expect(trend.weeklyKg).toBeCloseTo(-0.7, 1);
+    expect(trend.trend28Kg).toBeCloseTo(-2.5, 1);
+    expect(trend.confidence).toBe('hoch');
+    expect(trend.category).toBe('zu_schneller_verlust');
+  });
+
+  it('ordnet die prozentuale Gewichtsänderung anhand der Orientierungsbereiche ein', () => {
+    expect(weightTrendSummary(dates(28, (date, index) => ({ date, kg: 100 - index * 0.03 }))).category).toBe('langsamer_verlust');
+    expect(weightTrendSummary(dates(28, (date, index) => ({ date, kg: 100 - index * 0.2 }))).category).toBe('zu_schneller_verlust');
+    expect(weightTrendSummary(dates(28, (date, index) => ({ date, kg: 100 + index * 0.03 }))).category).toBe('langsame_zunahme');
+  });
+
   it('wertet sinkende Maße bei stabiler Leistung kombiniert als wahrscheinlichen Erfolg', () => {
     const result = evaluateBodyComp({
       weeks: 4, weight: { category: 'stabil', confidence: 'hoch' },
@@ -94,15 +110,6 @@ describe('Körperrekomposition', () => {
     expect(confirmedTrendChange([{ value: 100, standardisiert: true }, { value: 98, standardisiert: true }], (row) => row.value, 2)).toBeNull();
     expect(confirmedTrendChange([{ value: 100, standardisiert: true }, { value: 98, standardisiert: true }, { value: 96, standardisiert: true }], (row) => row.value, 2)).toBe(-4);
     expect(confirmedTrendChange([{ value: 100, standardisiert: true }, { value: 98, standardisiert: false }, { value: 96, standardisiert: true }], (row) => row.value, 2)).toBeNull();
-  });
-});
-
-describe('geführte Hautfaltenmessung', () => {
-  it('verlangt bei deutlicher Abweichung eine dritte Messung und speichert den Median', () => {
-    const incomplete = aggregateSkinfoldReadings({ kinn: [10, 14] });
-    expect(incomplete.thirdNeeded).toBe(1);
-    const complete = aggregateSkinfoldReadings({ kinn: [10, 14, 11] });
-    expect(complete.values.kinn).toBe(11);
   });
 });
 
