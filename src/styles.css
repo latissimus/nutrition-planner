@@ -7391,7 +7391,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="body"] :is(#app,#view){background:transparent!important}
 :root[data-seite="body"] .body-log-dex-page{
-  --special-dex-inline:24px;
+  --special-dex-inline:28px;
   isolation:isolate;
   min-height:100dvh;
   background:#B1E7FF!important;
@@ -7436,9 +7436,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-inline:0!important;
   padding-block:0!important;
 }
+:root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content{
-  width:min(calc(100% - 48px),var(--special-dex-content-max))!important;
+  box-sizing:border-box!important;
+  width:min(
+    calc(100% - var(--special-dex-inline) - var(--special-dex-inline)),
+    var(--special-dex-content-max)
+  )!important;
   margin-inline:auto!important;
+}
+:root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
+  margin-top:0!important;
+  margin-bottom:25px!important;
 }
 :root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content+.special-dex-content{
   margin-top:18px!important;
