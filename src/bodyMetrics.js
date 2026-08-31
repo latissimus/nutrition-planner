@@ -75,7 +75,7 @@ function bodyHeroMarkup(state) {
 
 function weightEntryMarkup() {
   return `<form class="gew-eingabe body-entry-form" data-weight-form>
-    <label class="falte gew-feld"><span>Datum</span><span class="input gew-datum-eingabe"><input type="date" value="${heute()}" data-weight-date></span></label>
+    <label class="falte gew-feld"><span>Datum</span><input class="input gew-datum-eingabe" type="date" value="${heute()}" data-weight-date></label>
     <label class="falte gew-feld"><span>Gewicht</span><span class="gew-wert-eingabe"><input class="input gew-in" type="text" inputmode="decimal" placeholder="84,2" data-weight-value><i>kg</i></span></label>
     <button class="btn btn-primary" type="submit">Gewicht speichern</button>
   </form>`;
