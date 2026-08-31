@@ -7678,8 +7678,36 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-chart-block>header>b{font:800 11px/1.2 "Work Sans",var(--ui),sans-serif;letter-spacing:.08em}
 :root[data-seite="body"] .body-chart-block>header>small{color:#666;font:600 9.5px/1.25 var(--tech);text-align:right}
 :root[data-seite="body"] .body-chart-block .kurve{min-height:116px}
-:root[data-seite="body"] .body-chart-block .k-linie.trend{stroke:var(--ordner)}
-:root[data-seite="body"] .body-chart-block .k-pt.trend{fill:var(--ordner)}
+:root[data-seite="body"] .body-chart-block .k-raster{
+  stroke:#d8d8d8!important;
+  stroke-width:2!important;
+}
+:root[data-seite="body"] .body-chart-block .k-linie.roh{
+  stroke:color-mix(in srgb,var(--ordner) 46%,#111)!important;
+  stroke-width:3!important;
+  opacity:.42!important;
+}
+:root[data-seite="body"] .body-chart-block .k-linie.trend{
+  stroke:var(--ordner)!important;
+  stroke-width:5!important;
+  opacity:1!important;
+}
+:root[data-seite="body"] .body-chart-block .k-pt{
+  fill:#fff!important;
+  stroke:#111!important;
+  stroke-width:2.5!important;
+}
+:root[data-seite="body"] .body-chart-block .k-achse{
+  fill:#666!important;
+  font:650 8.5px/1 var(--tech)!important;
+}
+:root[data-seite="body"] .body-chart-legend{
+  margin:8px 0 0!important;
+  color:#60656f!important;
+  font:500 10.5px/1.35 var(--tech)!important;
+  letter-spacing:0!important;
+}
+:root[data-seite="body"] .body-chart-legend b{color:#111;font-weight:800}
 :root[data-seite="body"] .body-chart-empty{display:grid;justify-items:center;gap:5px;padding:18px 12px;border-radius:11px;background:color-mix(in srgb,var(--ordner) 8%,#fff);text-align:center}
 :root[data-seite="body"] .body-chart-empty>b{font:750 14px/1.25 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .body-chart-empty>span{max-width:280px;color:#666;font:500 11px/1.4 var(--tech)}
@@ -7691,6 +7719,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-threshold-explanation{margin-bottom:14px;padding:12px;border-radius:10px;background:color-mix(in srgb,var(--ordner) 10%,#fff)}
 :root[data-seite="body"] .body-threshold-explanation>b{font:750 13px/1.25 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .body-threshold-explanation>p{margin:6px 0 0!important;color:#59606b;font:500 11px/1.45 var(--tech)}
+:root[data-seite="body"] .body-goal-status{
+  margin:10px 0!important;
+  padding:11px 12px!important;
+  border-left:0!important;
+  border-radius:11px!important;
+  background:color-mix(in srgb,var(--ordner) 10%,#fff)!important;
+}
+:root[data-seite="body"] .body-goal-status b{
+  color:#111!important;
+  font:800 13px/1.25 "Work Sans",var(--ui),sans-serif!important;
+}
+:root[data-seite="body"] .body-goal-status span{
+  color:#59606b!important;
+  font:500 11.5px/1.4 var(--tech)!important;
+}
 :root[data-seite="body"] .body-inner-details{
   margin-top:12px!important;
   border-top:1px dashed #a8a8a8!important;
@@ -7822,11 +7865,126 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overscroll-behavior:contain;
 }
 :root[data-seite="body"] .body-entry-content{display:grid;gap:14px}
-:root[data-seite="body"] .body-entry-form{display:grid;gap:14px;margin:0}
-:root[data-seite="body"] .body-entry-form label{font-family:"Work Sans",var(--ui),sans-serif;font-weight:700}
-:root[data-seite="body"] .body-entry-form :is(input,select,.falten-summe){font-family:var(--tech)!important}
-:root[data-seite="body"] .guided-fold-grid fieldset>div{grid-template-columns:minmax(0,1fr)}
-:root[data-seite="body"] .body-entry-form .btn-primary{width:100%;min-height:48px}
+:root[data-seite="body"] .body-entry-form{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:14px!important;
+  margin:0!important;
+}
+:root[data-seite="body"] .body-entry-form :is(label,.fld-l,.falte,.body-standard){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:7px!important;
+  margin:0!important;
+  color:#111!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:1.2!important;
+  letter-spacing:.015em!important;
+  text-transform:none!important;
+}
+:root[data-seite="body"] .body-entry-form .body-standard{
+  grid-template-columns:22px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:9px!important;
+  min-height:34px!important;
+}
+:root[data-seite="body"] .body-entry-form .body-standard input{
+  accent-color:var(--ordner)!important;
+}
+:root[data-seite="body"] .body-entry-form :is(input:not([type="checkbox"]):not([type="file"]),select,.input,.falten-summe){
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:48px!important;
+  height:48px!important;
+  margin:0!important;
+  padding:0 12px!important;
+  border:1.5px solid #111!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-family:var(--tech)!important;
+  font-size:15px!important;
+  font-weight:650!important;
+  line-height:48px!important;
+  text-align:center!important;
+  font-variant-numeric:slashed-zero tabular-nums!important;
+  font-feature-settings:"zero" 1!important;
+  -webkit-text-size-adjust:100%;
+  appearance:none;
+  -webkit-appearance:none;
+}
+:root[data-seite="body"] .body-entry-form input[type="date"]::-webkit-date-and-time-value,
+:root[data-seite="body"] .body-entry-form input[type="time"]::-webkit-date-and-time-value{
+  height:48px!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:48px!important;
+  text-align:center!important;
+}
+:root[data-seite="body"] .body-entry-form :is(input[type="date"],input[type="time"])::-webkit-calendar-picker-indicator{
+  opacity:0!important;
+}
+:root[data-seite="body"] .gew-datum-eingabe{
+  height:48px!important;
+  min-height:48px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+:root[data-seite="body"] .gew-datum-eingabe>input{
+  display:block!important;
+  width:100%!important;
+}
+:root[data-seite="body"] .gew-wert-eingabe i,
+:root[data-seite="body"] .nutrition-unit-field i{
+  right:13px!important;
+  color:#60656f!important;
+  font:800 11px/1 var(--tech)!important;
+  text-transform:none!important;
+}
+:root[data-seite="body"] .guided-fold-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:10px!important;
+  margin-top:0!important;
+}
+:root[data-seite="body"] .guided-fold-grid fieldset{
+  display:grid!important;
+  gap:7px!important;
+  margin:0!important;
+  padding:12px!important;
+  border:1.5px solid #111!important;
+  border-radius:12px!important;
+  background:color-mix(in srgb,var(--ordner) 7%,#fff)!important;
+}
+:root[data-seite="body"] .guided-fold-grid legend{
+  padding:0 4px!important;
+  font:800 12px/1.2 "Work Sans",var(--ui),sans-serif!important;
+  text-transform:none!important;
+  letter-spacing:0!important;
+}
+:root[data-seite="body"] .guided-fold-grid small{
+  min-height:0!important;
+  color:#59606b!important;
+  font:500 11px/1.35 var(--tech)!important;
+}
+:root[data-seite="body"] .guided-fold-grid fieldset>div{grid-template-columns:minmax(0,1fr)!important}
+:root[data-seite="body"] .body-entry-form .btn-primary{
+  width:100%!important;
+  min-height:50px!important;
+  border:1.5px solid #111!important;
+  border-radius:14px!important;
+  background:var(--ordner)!important;
+  color:#111!important;
+  font:900 13px/1.15 "Work Sans",var(--ui),sans-serif!important;
+  box-shadow:0 3px 0 #000!important;
+}
+:root[data-seite="body"] .body-entry-form .btn-primary:disabled{
+  opacity:.45!important;
+  box-shadow:none!important;
+}
 :root[data-seite="body"] .body-entry-sheet-skinfold{max-height:90dvh}
 @media(max-width:370px){
   :root[data-seite="body"] .body-v2-hero{

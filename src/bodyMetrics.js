@@ -122,7 +122,8 @@ function weightMarkup(state) {
     ${latest ? `<div class="body-metric-grid"><span><small>AKTUELL</small><b>${display(latest.kg)} kg</b></span><span><small>7-TAGE-SCHNITT</small><b>${display(trend.average7Kg)} kg</b></span><span><small>PRO WOCHE</small><b>${trend.weeklyKg > 0 ? '+' : ''}${display(trend.weeklyKg, 2)} kg</b></span><span><small>28-TAGE-ÄNDERUNG</small><b>${trend.trend28Kg > 0 ? '+' : ''}${display(trend.trend28Kg, 2)} kg</b></span></div>` : '<div class="body-chart-empty"><b>Noch kein Gewicht</b><span>Trage über den Hinzufügen-Button deine erste Wiegung ein.</span></div>'}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Tageswerte und 7-Tage-Schnitt</small></header>
     <p class="body-goal-status" data-tone="${interpretation.tone}"><b>${interpretation.label}</b><span>${interpretation.text}</span></p>
-    ${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh', points: true }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}</div>
+    ${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh', points: true }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}
+    <p class="body-chart-legend"><b>Punkte:</b> einzelne Wiegungen · <b>kräftige Linie:</b> geglätteter 7-Tage-Schnitt</p></div>
     ${infoDetails('Warum bewertet MUSCLEDEX den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
     ${infoDetails('Wie oft wiegen?', BODY_EXPLANATIONS.weighingFrequency)}
     <button class="body-reset-mini" type="button" data-reset-body="weights">Gewichtsverlauf zurücksetzen</button>
