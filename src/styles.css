@@ -7391,7 +7391,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="body"] :is(#app,#view){background:transparent!important}
 :root[data-seite="body"] .body-log-dex-page{
-  --special-dex-inline:28px;
+  --special-dex-inline:36px;
   isolation:isolate;
   min-height:100dvh;
   background:#B1E7FF!important;
