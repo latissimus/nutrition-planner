@@ -7917,6 +7917,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   appearance:none;
   -webkit-appearance:none;
 }
+:root[data-seite="body"] .body-entry-form :is(input:not([type="checkbox"]):not([type="file"]),select,.input):focus,
+:root[data-seite="body"] .body-entry-form :is(input:not([type="checkbox"]):not([type="file"]),select,.input):focus-visible{
+  outline:none!important;
+  border-color:var(--app-purple)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--app-purple) 18%,transparent)!important;
+}
 :root[data-seite="body"] .body-entry-form input[type="date"]::-webkit-date-and-time-value,
 :root[data-seite="body"] .body-entry-form input[type="time"]::-webkit-date-and-time-value{
   display:flex!important;
