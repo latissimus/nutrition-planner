@@ -9189,9 +9189,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:min(calc(100% - 72px),var(--special-dex-content-max,604px))!important;
   margin-inline:auto!important;
   padding:0!important;
+  overflow:visible!important;
 }
 :root[data-seite="shopping"] .shopping-page-heading,
-:root[data-seite="shopping"] .shopping-hero,
 :root[data-seite="shopping"] .einkauf-suche,
 :root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-tags-slot],
 :root[data-seite="shopping"] .shopping-dex-wrap .einkauf-kopfzeile,
@@ -9224,73 +9224,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dex-ink,#111)!important;
   opacity:.74;
 }
-:root[data-seite="shopping"] .shopping-hero{
-  display:grid!important;
-  align-items:center!important;
-  min-height:136px!important;
-  margin:0 0 18px!important;
-  padding:19px 24px!important;
-  border:2px solid var(--ink,#111)!important;
-  border-radius:18px!important;
-  background:color-mix(in srgb,var(--ordner) 8%,#fff)!important;
-  box-shadow:0 3.5px 0 #000!important;
-  color:#111!important;
-}
-:root[data-seite="shopping"] .shopping-hero-copy{
-  display:grid!important;
-  gap:8px!important;
-  width:100%!important;
-}
-:root[data-seite="shopping"] .shopping-hero-kicker{
-  font-family:"Work Sans",var(--ui),sans-serif!important;
-  font-size:13px!important;
-  font-weight:800!important;
-  line-height:1!important;
-  letter-spacing:.04em!important;
-}
-:root[data-seite="shopping"] .shopping-hero-number-row{
-  display:grid!important;
-  grid-template-columns:minmax(0,max-content) minmax(0,1fr)!important;
-  align-items:end!important;
-  gap:14px!important;
-}
-:root[data-seite="shopping"] .shopping-hero-number-row strong{
-  font-family:var(--tech,"JetBrains Mono",monospace)!important;
-  font-size:clamp(46px,15vw,60px)!important;
-  font-weight:700!important;
-  line-height:.86!important;
-  letter-spacing:0!important;
-}
-:root[data-seite="shopping"] .shopping-hero-number-row b{
-  padding-bottom:4px;
-  font-family:"Work Sans",var(--ui),sans-serif!important;
-  font-size:14px!important;
-  font-weight:800!important;
-  line-height:1.05!important;
-  letter-spacing:.02em!important;
-}
-:root[data-seite="shopping"] .shopping-hero-meta{
-  font-family:var(--tech,"JetBrains Mono",monospace)!important;
-  font-size:13.5px!important;
-  font-weight:600!important;
-  line-height:1.2!important;
-  color:var(--muted,#6b6870)!important;
-}
-:root[data-seite="shopping"] .shopping-progress{
-  width:100%!important;
-  max-width:none!important;
-  height:8px!important;
-  margin:2px 0 0!important;
-  border-radius:999px!important;
-  background:#dedede!important;
-  overflow:hidden!important;
-}
-:root[data-seite="shopping"] .shopping-progress i{
-  display:block!important;
-  height:100%!important;
-  border-radius:inherit!important;
-  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
-}
 :root[data-seite="shopping"] .einkauf-suche{
   display:grid!important;
   grid-template-columns:28px minmax(0,1fr) 34px!important;
@@ -9319,10 +9252,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-tags-slot]{
   margin:0 0 17px!important;
+  overflow:hidden!important;
+}
+:root[data-seite="shopping"] .einkauf-tags{
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
+  overflow:hidden!important;
 }
 :root[data-seite="shopping"] .einkauf-tag-scroll{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
   gap:8px!important;
   padding:1px 1px 4px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
 }
 :root[data-seite="shopping"] .einkauf-tag-chip{
   min-height:31px!important;

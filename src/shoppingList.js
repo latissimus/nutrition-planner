@@ -6,7 +6,6 @@ import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { resolveSharedSpace } from './sharing.js';
 import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
-import { SPECIAL_DEX_CLASSES } from './specialDex.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -266,21 +265,6 @@ export function groupBySection(items) {
     groups.get(key).push(item);
   });
   return [...groups.entries()];
-}
-
-function shoppingHeroMarkup(items = []) {
-  const total = items.length;
-  const erledigt = items.filter((item) => item.checked).length;
-  const offen = Math.max(0, total - erledigt);
-  const progress = total ? Math.round((erledigt / total) * 100) : 0;
-  return `<section class="${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.hero} shopping-hero" data-shopping-hero aria-label="Einkaufsfortschritt">
-    <div class="shopping-hero-copy">
-      <span class="shopping-hero-kicker">EINKAUFSFORTSCHRITT</span>
-      <div class="shopping-hero-number-row"><strong>${offen}</strong><b>ARTIKEL OFFEN</b></div>
-      <span class="shopping-hero-meta">${erledigt} von ${total} erledigt</span>
-      <div class="shopping-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}"><i style="width:${progress}%"></i></div>
-    </div>
-  </section>`;
 }
 
 // Alle Tags, die irgendein Artikel traegt – unabhaengig vom aktuellen Filter,
@@ -749,7 +733,6 @@ export async function mountShoppingList(container, { session, signal }) {
         <h1>Einkauf</h1>
         <span>Einkaufsliste</span>
       </header>
-      ${shoppingHeroMarkup([])}
       <label class="einkauf-suche">
         ${materialIconMarkup('search')}
         <input type="search" data-einkauf-suche placeholder="Einkauf durchsuchen" aria-label="Einkauf durchsuchen">
@@ -774,8 +757,6 @@ export async function mountShoppingList(container, { session, signal }) {
   const filter = { nurAusgewaehlt: false, activeTag: '', query: '' };
 
   function redraw() {
-    const hero = container.querySelector('[data-shopping-hero]');
-    if (hero) hero.outerHTML = shoppingHeroMarkup(items);
     const slot = container.querySelector('[data-einkauf-liste]');
     const sichtbar = sichtbareItems(items, filter);
     if (!items.length) {
