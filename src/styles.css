@@ -9122,7 +9122,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(
   .btn-primary,.routine-days button.aktiv,.routine-duration button.aktiv
 ){
-  border-color:#000!important;
+  border:2px solid #000!important;
   background:var(--ordner)!important;
   color:var(--ordner-ink,#fff)!important;
 }
