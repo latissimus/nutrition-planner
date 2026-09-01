@@ -1502,6 +1502,11 @@ async function renderRoute() {
       onPlus: () => shoppingActions?.openAddMenu?.(),
       onShare: shoppingActions?.isShared ? null : () => openShareSheet('shopping'),
     });
+    installNeoDexChrome(view, {
+      title: 'Einkauf',
+      meta: 'Einkaufsliste',
+      closeHref: '#home',
+    });
   } else if (route === 'food-log') {
     setSeite('food-log');
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);

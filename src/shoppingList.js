@@ -729,10 +729,6 @@ export async function mountShoppingList(container, { session, signal }) {
   container.classList.toggle('einkauf-dunkle-ordnerfarbe', colorIsDark(categoryColor('shopping')));
   container.innerHTML = `
     <div class="wrap pad-bottom shopping-dex-wrap">
-      <header class="shopping-page-heading">
-        <h1>Einkauf</h1>
-        <span>Einkaufsliste</span>
-      </header>
       <label class="einkauf-suche">
         ${materialIconMarkup('search')}
         <input type="search" data-einkauf-suche placeholder="Einkauf durchsuchen" aria-label="Einkauf durchsuchen">
