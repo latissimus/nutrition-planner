@@ -669,7 +669,7 @@ function recipeListMarkup(recipes) {
       <summary class="reminder-group-head">
         <span class="reminder-group-icon"><span class="material-svg">${iconMarkup('folder')}</span></span>
         <span><b>Rezepte aus Food-Dex</b></span>
-        <span class="reminder-group-chevron">⌄</span>
+        <span class="reminder-group-chevron" aria-hidden="true">${materialIconMarkup('chevron_right')}</span>
       </summary>
       <div class="reminder-group-list einkauf-rezepte-leer">Noch keine Rezepte im Food-Dex. Ein eigenes Rezept oder Rezeptlink dort anlegen, dann taucht er hier auf.</div>
     </details>`;
@@ -679,7 +679,7 @@ function recipeListMarkup(recipes) {
       <span class="reminder-group-icon"><span class="material-svg">${iconMarkup('folder')}</span></span>
       <span><b>Rezepte aus Food-Dex</b></span>
       <em>${recipes.length}</em>
-      <span class="reminder-group-chevron">⌄</span>
+      <span class="reminder-group-chevron" aria-hidden="true">${materialIconMarkup('chevron_right')}</span>
     </summary>
     <div class="reminder-group-list einkauf-rezepte-liste">
       ${recipes.map((rezept) => {
@@ -700,7 +700,7 @@ function sectionGroup(section, items) {
       <span class="reminder-group-icon" aria-hidden="true">${sectionIconMarkup(section)}</span>
       <span><b>${escapeHtml(section)}</b></span>
       <em>${ausgewaehlt}/${items.length}</em>
-      <span class="reminder-group-chevron" aria-hidden="true">⌄</span>
+      <span class="reminder-group-chevron" aria-hidden="true">${materialIconMarkup('chevron_right')}</span>
     </summary>
     <div class="reminder-group-list einkauf-liste">${items.map(itemRow).join('')}</div>
   </details>`;
