@@ -79,10 +79,7 @@ function routineStats(state) {
   const erledigt = heute.filter((item) => state.completed.has(item.id)).length;
   const offen = Math.max(0, heute.length - erledigt);
   const quote = heute.length ? Math.round(erledigt / heute.length * 100) : 0;
-  const completedDates = new Set((state.completionHistory || []).map((item) => item.completed_on));
-  let serie = 0;
-  for (let date = today(); completedDates.has(date); date = shiftedDate(date, -1)) serie += 1;
-  return { heute, erledigt, offen, quote, serie };
+  return { heute, erledigt, offen, quote };
 }
 
 function routineHeroMarkup(state) {
@@ -102,15 +99,6 @@ function routineHeroMarkup(state) {
       <p>Der Hero zeigt, wie viele für heute geplante Routinen noch offen sind. Der Ring zeigt den heutigen Fortschritt.</p>
       <p>Eine Routine kannst du durch Tippen auf den Kreis abhaken. Langes Drücken öffnet die Bearbeitung; bei Timer-Routinen startet der Play-Button den Timer.</p>
     </div>
-    <details class="routine-overview ${SPECIAL_DEX_CLASSES.card}">
-      <summary><span><b>Tagesübersicht</b><small>Heute · ${new Date(`${today()}T12:00:00`).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right')}</summary>
-      <div class="routine-overview-body">
-        <span><small>HEUTE</small><b>${stats.erledigt}/${stats.heute.length || 0}</b></span>
-        <span><small>OFFEN</small><b>${stats.offen}</b></span>
-        <span><small>GESAMT</small><b>${state.routines.length}</b></span>
-        <span><small>SERIE</small><b>${stats.serie} Tage</b></span>
-      </div>
-    </details>
   </div>`;
 }
 
