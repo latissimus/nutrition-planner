@@ -8786,9 +8786,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Routinen-Dex nach Meal-Log/Special-Dex-Vorlage. */
 :root[data-seite="habits"],
 :root[data-seite="habits"] body{
-  --food-page-purple:var(--dex-seitenfarbe,#8C00FF);
+  --food-page-purple:var(--dex-seitenfarbe,#9564DD);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Wolke.svg"));
-  background-color:var(--dex-seitenfarbe,#8C00FF)!important;
+  background-color:var(--dex-seitenfarbe,#9564DD)!important;
   background-image:none!important;
 }
 :root[data-seite="habits"] :is(#app,#view){

@@ -55,7 +55,7 @@ let deferredPageLook = null;
 let deferPageLook = false;
 const defaultColors = {
   body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#FBE7A3',
-  recipes: '#007DCC', training: '#215E61', habits: '#245953',
+  recipes: '#007DCC', training: '#215E61', habits: '#9564DD',
   shopping: '#FFCF00',
   sleep: '#333D6D',
   coins: '#05BDE8',
@@ -87,6 +87,7 @@ const colorGroups = [
     ['Dunkelviolett', '#450693'],
     ['Indigoblau', '#525CEB'],
     ['Dunkelgrün', '#245953'],
+    ['Routinen Violett', '#9564DD'],
     ['Petrol', '#006E7F'],
     ['Electric Violet', '#8C00FF'],
     ['Retro-Lavendel', '#9772FB'],
@@ -127,6 +128,9 @@ export function colorIsDark(color) {
 export function categoryColor(route) {
   if (fixedSystemColors[route]) return fixedSystemColors[route];
   const saved = getPreference(colorKey(route));
+  // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
+  // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
+  if (route === 'habits' && saved?.toUpperCase() === '#245953') return '#9564DD';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#B1E7FF');
 }
