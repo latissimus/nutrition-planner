@@ -1105,7 +1105,7 @@ export async function mountReminders(container, { session, signal }) {
     const title = reminder.type === 'supplement' ? 'Supplement' : 'Mahlzeit';
     const markup = `
       <header><h2>${title}</h2><button type="button" data-reminder-overlay-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-      <div class="rem-row rem-row-sheet" data-reminder-key="${key}" data-type="${reminder.type}"${reminder.type === 'meal' ? ` data-meal-slot="${mealSlotForReminder(reminder)}"` : ''}>
+      <div class="rem-row rem-row-sheet" data-reminder-key="${key}" data-type="${reminder.type}"${['meal', 'supplement'].includes(reminder.type) ? ` data-meal-slot="${reminder.type === 'supplement' ? supplementSlotForReminder(reminder) : mealSlotForReminder(reminder)}"` : ''}>
         ${reminderBodyMarkup(reminder, completions.find((c) => c.reminder_id === reminder.id))}
       </div>`;
     const backdrop = reminderOverlay(markup);

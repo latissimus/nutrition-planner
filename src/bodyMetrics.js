@@ -251,34 +251,48 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   };
 
   const bindEntryOverlay = (overlay) => {
-    const closeAndRender = async () => { overlay.remove(); await render(); };
+    const closeAndRender = async () => {
+      overlay.remove();
+      try { await render(); }
+      catch (error) { toast(error.message || 'Body-Log konnte nicht aktualisiert werden'); }
+    };
+    const withBusySubmit = async (form, action) => {
+      const submit = form.querySelector('button[type="submit"]');
+      if (submit) submit.disabled = true;
+      try { await action(); }
+      finally { if (submit?.isConnected) submit.disabled = false; }
+    };
     const weightForm = overlay.querySelector('[data-weight-form]');
     if (weightForm) weightForm.onsubmit = async (event) => {
       event.preventDefault();
-      const kg = zahl(weightForm.querySelector('[data-weight-value]').value);
-      const date = weightForm.querySelector('[data-weight-date]').value;
-      if (!kg || kg <= 0 || kg >= 500) return toast('Bitte ein gültiges Gewicht eintragen');
-      const isNew = !state.weights.some((row) => row.gemessen_am === date);
-      const { error } = await supabase.from('weights').upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' });
-      if (error) return toast('Gewicht konnte nicht gespeichert werden');
-      notifyHomeCountsChanged();
-      if (isNew) notifyCoinBalanceChanged();
-      toast(isNew ? 'Gewicht gespeichert · +1 MUSCLE-COIN' : 'Gewicht aktualisiert');
-      await closeAndRender();
+      await withBusySubmit(weightForm, async () => {
+        const kg = zahl(weightForm.querySelector('[data-weight-value]').value);
+        const date = weightForm.querySelector('[data-weight-date]').value;
+        if (!kg || kg <= 0 || kg >= 500) return toast('Bitte ein gültiges Gewicht eintragen');
+        const isNew = !state.weights.some((row) => row.gemessen_am === date);
+        const { error } = await supabase.from('weights').upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' });
+        if (error) return toast('Gewicht konnte nicht gespeichert werden');
+        notifyHomeCountsChanged();
+        if (isNew) notifyCoinBalanceChanged();
+        toast(isNew ? 'Gewicht gespeichert · +1 MUSCLE-COIN' : 'Gewicht aktualisiert');
+        await closeAndRender();
+      });
     };
 
     const waistForm = overlay.querySelector('[data-waist-form]');
     if (waistForm) waistForm.onsubmit = async (event) => {
       event.preventDefault();
-      const cm = zahl(waistForm.querySelector('[data-waist-value]').value);
-      const date = waistForm.querySelector('[data-waist-date]').value;
-      if (!cm || cm < 30 || cm > 250) return toast('Bitte einen gültigen Taillenumfang eintragen');
-      const isNew = !state.waists.some((row) => row.gemessen_am === date);
-      const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' });
-      if (error) return toast('Taillenumfang konnte nicht gespeichert werden');
-      if (isNew) notifyCoinBalanceChanged();
-      toast(isNew ? 'Taillenumfang gespeichert · +1 MUSCLE-COIN' : 'Taillenumfang aktualisiert');
-      await closeAndRender();
+      await withBusySubmit(waistForm, async () => {
+        const cm = zahl(waistForm.querySelector('[data-waist-value]').value);
+        const date = waistForm.querySelector('[data-waist-date]').value;
+        if (!cm || cm < 30 || cm > 250) return toast('Bitte einen gültigen Taillenumfang eintragen');
+        const isNew = !state.waists.some((row) => row.gemessen_am === date);
+        const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' });
+        if (error) return toast('Taillenumfang konnte nicht gespeichert werden');
+        if (isNew) notifyCoinBalanceChanged();
+        toast(isNew ? 'Taillenumfang gespeichert · +1 MUSCLE-COIN' : 'Taillenumfang aktualisiert');
+        await closeAndRender();
+      });
     };
 
     const skinfoldForm = overlay.querySelector('[data-skinfold-form]');
@@ -299,29 +313,33 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
       skinfoldForm.onsubmit = async (event) => {
         event.preventDefault();
-        const { values, complete } = updateSkinfold();
-        if (complete !== 12) return;
-        const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
-        const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
-        const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
-        const readings = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, [value]]));
-        const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: values, messreihen: readings, messqualitaet: standardisiert ? 'standardisiert' : 'nicht standardisiert', standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' });
-        if (error) return toast('Messung konnte nicht gespeichert werden');
-        notifyHomeCountsChanged();
-        if (isNew) notifyCoinBalanceChanged();
-        toast(isNew ? '12-Falten-Summe gespeichert · +1 MUSCLE-COIN' : '12-Falten-Summe aktualisiert');
-        await closeAndRender();
+        await withBusySubmit(skinfoldForm, async () => {
+          const { values, complete } = updateSkinfold();
+          if (complete !== 12) return;
+          const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
+          const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
+          const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
+          const readings = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, [value]]));
+          const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: values, messreihen: readings, messqualitaet: standardisiert ? 'standardisiert' : 'nicht standardisiert', standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' });
+          if (error) return toast('Messung konnte nicht gespeichert werden');
+          notifyHomeCountsChanged();
+          if (isNew) notifyCoinBalanceChanged();
+          toast(isNew ? '12-Falten-Summe gespeichert · +1 MUSCLE-COIN' : '12-Falten-Summe aktualisiert');
+          await closeAndRender();
+        });
       };
     }
 
     const checkinForm = overlay.querySelector('[data-bodycomp-checkin]');
     if (checkinForm) checkinForm.onsubmit = async (event) => {
       event.preventDefault();
-      const form = event.currentTarget;
-      const { error } = await supabase.from('bodycomp_checkins').upsert({ user_id: userId, checkin_date: form.querySelector('[data-checkin-date]').value, recovery: Number(form.querySelector('[data-checkin-recovery]').value), mood: Number(form.querySelector('[data-checkin-mood]').value), hunger: Number(form.querySelector('[data-checkin-hunger]').value), illness: form.querySelector('[data-checkin-illness]').checked, travel: form.querySelector('[data-checkin-travel]').checked, unusual_meals: form.querySelector('[data-checkin-unusual]').checked }, { onConflict: 'user_id,checkin_date' });
-      if (error) return toast('Check-in konnte nicht gespeichert werden');
-      toast('Erholung protokolliert');
-      await closeAndRender();
+      await withBusySubmit(checkinForm, async () => {
+        const form = event.currentTarget;
+        const { error } = await supabase.from('bodycomp_checkins').upsert({ user_id: userId, checkin_date: form.querySelector('[data-checkin-date]').value, recovery: Number(form.querySelector('[data-checkin-recovery]').value), mood: Number(form.querySelector('[data-checkin-mood]').value), hunger: Number(form.querySelector('[data-checkin-hunger]').value), illness: form.querySelector('[data-checkin-illness]').checked, travel: form.querySelector('[data-checkin-travel]').checked, unusual_meals: form.querySelector('[data-checkin-unusual]').checked }, { onConflict: 'user_id,checkin_date' });
+        if (error) return toast('Check-in konnte nicht gespeichert werden');
+        toast('Erholung protokolliert');
+        await closeAndRender();
+      });
     };
 
     const importInput = overlay.querySelector('[data-logman-import]');
@@ -428,7 +446,13 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   subscribeToTablesChanges({
     tables: ['weights', 'skinfolds', 'waist_measurements', 'bodycomp_checkins', 'logman_performance', 'nutrition_settings'],
     signal,
-    onChange: render,
+    onChange: () => {
+      if (document.querySelector('[data-body-entry-overlay]')) {
+        renderQueued = true;
+        return;
+      }
+      render();
+    },
   });
   return {
     meta: `${state?.weights?.length || 0} Wiegungen`,
