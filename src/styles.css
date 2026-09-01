@@ -7585,6 +7585,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:none!important;
 }
 :root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt::before{display:none!important}
+/* Das Tropfenmuster liegt als eigene Ebene über dem Body-Grund, damit es nicht
+   von der transparenten Scrollfläche oder dem Kategorie-Chrome verschluckt
+   wird. Inhalt bleibt darüber vollständig klick- und scrollbar. */
+:root[data-seite="body"] .body-log-dex-page{
+  background-image:none!important;
+}
+:root[data-seite="body"] .body-log-dex-page::before{
+  content:"";
+  display:block!important;
+  position:fixed;
+  z-index:0;
+  inset:0;
+  pointer-events:none;
+  background-image:var(--muster-tropfen);
+  background-size:112px;
+  background-repeat:repeat;
+  opacity:.9;
+}
+:root[data-seite="body"] .body-log-dex-page>*{position:relative;z-index:1}
 /* Body-Log v2: bewusst vollständig isoliert. Der Kategorie-Chrome verschiebt
    `.body-metrics-wrap` beim Mount in `.kategorie-scrollinhalt`; die äußere
    Geometrie läuft deshalb hier zentral über dieselben Special-Dex-Primitiven
