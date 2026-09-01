@@ -65,6 +65,7 @@ const fixedSystemColors = {
   'food-log': '#FBE7A3',
   training: '#215E61',
   reminders: '#525CEB',
+  habits: '#9564DD',
   sleep: '#333D6D',
 };
 const fixedSystemPatterns = {
@@ -126,6 +127,7 @@ export function colorIsDark(color) {
 }
 
 export function categoryColor(route) {
+  if (route === 'habits') return '#9564DD';
   if (fixedSystemColors[route]) return fixedSystemColors[route];
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
