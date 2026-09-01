@@ -7498,23 +7498,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   isolation:isolate;
   min-height:100dvh;
   background:#B1E7FF!important;
+  /* Dasselbe Tropfenmuster wie im LOGMAN-Fortschrittsbereich. */
+  background-image:linear-gradient(color-mix(in srgb,#B1E7FF 38%,transparent),color-mix(in srgb,#B1E7FF 38%,transparent)),var(--muster-tropfen)!important;
+  background-size:auto,112px!important;
+  background-repeat:repeat!important;
   color:#111;
   font-family:"Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="body"] .body-log-dex-page::before{
-  content:"";
-  position:fixed;
-  z-index:-1;
-  inset:0;
-  background:#111;
-  opacity:.1;
-  pointer-events:none;
-  -webkit-mask-image:var(--dex-tapete);
-  mask-image:var(--dex-tapete);
-  -webkit-mask-repeat:repeat;
-  mask-repeat:repeat;
-  -webkit-mask-size:112px auto;
-  mask-size:112px auto;
+  display:none!important;
 }
 :root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt::before{display:none!important}
 /* Body-Log v2: bewusst vollständig isoliert. Der Kategorie-Chrome verschiebt
