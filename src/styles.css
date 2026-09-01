@@ -7426,6 +7426,60 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:min(calc(100% - 72px),var(--special-dex-content-max,604px))!important;
   margin-inline:auto!important;
 }
+
+/* Einkauf nach der gemeinsamen Meal-Log/Special-Dex-Geometrie. Der Hero
+   ersetzt das unpassende Kreisdiagramm durch einen direkten Listenfortschritt. */
+:root[data-seite="shopping"] .shopping-dex-wrap{
+  box-sizing:border-box!important;
+  width:min(calc(100% - 72px),var(--special-dex-content-max,604px))!important;
+  margin-inline:auto!important;
+  padding-inline:0!important;
+  display:grid;
+  gap:18px;
+}
+:root[data-seite="shopping"] .shopping-dex-wrap .seitenkopf,
+:root[data-seite="shopping"] .shopping-dex-wrap .shopping-hero,
+:root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche,
+:root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-tags-slot],
+:root[data-seite="shopping"] .shopping-dex-wrap .einkauf-kopfzeile,
+:root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-liste]{
+  width:100%!important;
+  max-width:none!important;
+  margin-inline:0!important;
+}
+:root[data-seite="shopping"] .shopping-dex-wrap .seiten-einstieg{display:none!important}
+:root[data-seite="shopping"] .shopping-hero{
+  box-sizing:border-box;
+  min-height:152px;
+  padding:20px 24px;
+  display:flex;
+  align-items:center;
+  background:var(--special-dex-hero-bg,#fff);
+}
+:root[data-seite="shopping"] .shopping-hero-copy{width:100%;display:flex;flex-direction:column;gap:4px}
+:root[data-seite="shopping"] .shopping-hero-kicker,
+:root[data-seite="shopping"] .shopping-hero-number-row b{
+  font-family:"Work Sans",var(--ui),sans-serif;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+:root[data-seite="shopping"] .shopping-hero-kicker{font-size:13px}
+:root[data-seite="shopping"] .shopping-hero-number-row{display:flex;align-items:baseline;gap:14px}
+:root[data-seite="shopping"] .shopping-hero-number-row strong{
+  font-family:var(--tech,"JetBrains Mono",monospace);
+  font-size:58px;
+  line-height:.95;
+  font-weight:700;
+  letter-spacing:.01em;
+}
+:root[data-seite="shopping"] .shopping-hero-number-row b{font-size:14px}
+:root[data-seite="shopping"] .shopping-hero-meta{
+  font-family:var(--tech,"JetBrains Mono",monospace);
+  font-size:13px;
+  color:var(--muted,#6b6870);
+}
+:root[data-seite="shopping"] .shopping-progress{height:9px;margin-top:7px;border-radius:99px;background:#ddd;overflow:hidden;max-width:360px}
+:root[data-seite="shopping"] .shopping-progress i{display:block;height:100%;border-radius:inherit;background:var(--dex-seitenfarbe,var(--ordner,#525CEB));transition:width .25s ease}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="sleep"] .sleep-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
