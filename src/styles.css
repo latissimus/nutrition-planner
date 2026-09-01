@@ -7452,6 +7452,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after{
   background:#fff!important;
 }
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol :is(i,b){
+  background:transparent!important;
+  border-color:#fff!important;
+  box-shadow:0 3.5px 0 #fff!important;
+}
 
 :root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-sheet{
   overflow-x:clip!important;
@@ -8147,9 +8152,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:0;
   inset:0;
   pointer-events:none;
-  /* Helles Muster auf dem violetten Grund: sichtbar, aber bewusst ruhig. */
-  background:#fff;
-  opacity:.12;
+  background:var(--dex-ink,#fff);
+  opacity:.10;
   -webkit-mask-image:var(--food-vozzy-pattern);
   mask-image:var(--food-vozzy-pattern);
   -webkit-mask-size:360px auto;
@@ -8810,8 +8814,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:0;
   inset:0;
   pointer-events:none;
-  background:var(--dex-ink,#fff);
-  opacity:.10;
+  /* Helles Muster auf dem violetten Grund: sichtbar, aber bewusst ruhig. */
+  background:#fff;
+  opacity:.12;
   -webkit-mask-image:var(--food-vozzy-pattern);
   mask-image:var(--food-vozzy-pattern);
   -webkit-mask-size:360px auto;
