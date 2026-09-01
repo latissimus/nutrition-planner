@@ -8946,6 +8946,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   line-height:1.45;
 }
 :root[data-seite="habits"] .routine-info-help[hidden]{display:none}
+
+/* Informationskarten stehen als eigene Elemente im Special-Dex-Stack. Keine
+   negativen Außenabstände: So entsprechen beide Zwischenräume exakt dem
+   Body-Log-Standard (18px Stack-Gap). */
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help,
+:root[data-seite="sleep"] .sleep-analysis-help,
+:root[data-seite="habits"] .routine-info-help{
+  margin:0!important;
+}
 :root[data-seite="habits"] .routine-overview{
   display:block;
   overflow:hidden;
