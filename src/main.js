@@ -1611,10 +1611,11 @@ async function renderRoute() {
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
   } else if (route === 'habits') {
     setSeite('habits');
+    view.classList.add('neo-dex-page', 'food-dex-page', 'routine-dex-page');
     prepareSpecialDexPage(view, 'routines');
     const { mountRoutines } = await routinesModule();
     const routineActions = await mountRoutines(view, { session, signal });
-    mountCategoryChrome(view, route, 'ROUTINEN', {
+    mountCategoryChrome(view, route, 'Routinen', {
       pageLookScope: route, pageLookPattern: 'triangles',
       onPlus: () => routineActions?.openRoutineEditor?.(),
     });

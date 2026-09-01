@@ -11,6 +11,7 @@ import { setRoutineCompletion } from './routineCompletion.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged } from './realtime.js';
+import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -21,6 +22,15 @@ const periods = [
 ];
 const days = [['1', 'Mo'], ['2', 'Di'], ['3', 'Mi'], ['4', 'Do'], ['5', 'Fr'], ['6', 'Sa'], ['7', 'So']];
 const today = () => new Date().toLocaleDateString('sv-SE');
+const todayWeekday = () => {
+  const day = new Date().getDay();
+  return day === 0 ? 7 : day;
+};
+const shiftedDate = (date, offset) => {
+  const value = new Date(`${date}T12:00:00`);
+  value.setDate(value.getDate() + offset);
+  return value.toLocaleDateString('sv-SE');
+};
 const defaultMobilityExercises = [
   { name: 'Cat-Cow', prescription: '8–10 Wiederholungen' },
   { name: '90/90 Hip Switches', prescription: '8 pro Seite' },
@@ -45,18 +55,63 @@ function mobilityExerciseRowMarkup(item = { name: '', prescription: '' }) {
 }
 
 async function load(userId, signal) {
+  const date = today();
   let routinesQuery = supabase.from('routines').select('*').eq('user_id', userId).order('position');
-  let completionsQuery = supabase.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).eq('completed_on', today());
+  let completionsQuery = supabase.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', shiftedDate(date, -29)).lte('completed_on', date);
   if (signal) { routinesQuery = routinesQuery.abortSignal(signal); completionsQuery = completionsQuery.abortSignal(signal); }
   const [{ data: routines, error }, { data: completions, error: completionError }, attachments] = await Promise.all([
     routinesQuery, completionsQuery, loadDexEntries(userId, { rootKey: 'habits', signal }),
   ]);
   if (error) throw error;
   if (completionError) throw completionError;
+  const completedToday = (completions || []).filter((item) => item.completed_on === date);
   return {
-    routines: routines || [], completed: new Set((completions || []).map((item) => item.routine_id)),
+    routines: routines || [],
+    completed: new Set(completedToday.map((item) => item.routine_id)),
+    completionHistory: completions || [],
     attachments: (attachments || []).filter((entry) => entry.routine_id),
   };
+}
+
+function routineStats(state) {
+  const weekday = todayWeekday();
+  const heute = state.routines.filter((item) => item.weekdays?.includes(weekday));
+  const erledigt = heute.filter((item) => state.completed.has(item.id)).length;
+  const offen = Math.max(0, heute.length - erledigt);
+  const quote = heute.length ? Math.round(erledigt / heute.length * 100) : 0;
+  const completedDates = new Set((state.completionHistory || []).map((item) => item.completed_on));
+  let serie = 0;
+  for (let date = today(); completedDates.has(date); date = shiftedDate(date, -1)) serie += 1;
+  return { heute, erledigt, offen, quote, serie };
+}
+
+function routineHeroMarkup(state) {
+  const stats = routineStats(state);
+  return `<div class="${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack} routine-hero-stack">
+    <section class="routine-hero ${SPECIAL_DEX_CLASSES.hero}" style="--routine-progress:${stats.quote * 3.6}deg">
+      <div class="routine-progress-ring"><span><b>${stats.erledigt}/${stats.heute.length || 0}</b><small>HEUTE</small></span></div>
+      <span class="routine-hero-value">
+        <small>${stats.offen ? 'HEUTE OFFEN' : stats.heute.length ? 'HEUTE ERLEDIGT' : 'HEUTE GEPLANT'}</small>
+        <strong>${stats.offen}</strong>
+        <b>ROUTINEN</b>
+      </span>
+      <button class="som-info-knopf routine-info-button" type="button" data-toggle-routine-info aria-expanded="false" aria-controls="routine-info-help" aria-label="Routinen-Dex erklären">i</button>
+    </section>
+    <div class="som-kurzhilfe nutrition-calibration-help routine-info-help" id="routine-info-help" data-routine-info-help hidden>
+      <p>Der <b>Routinen-Dex</b> sammelt wiederkehrende Abläufe, die du im Alltag abhaken möchtest.</p>
+      <p>Der Hero zeigt, wie viele für heute geplante Routinen noch offen sind. Der Ring zeigt den heutigen Fortschritt.</p>
+      <p>Eine Routine kannst du durch Tippen auf den Kreis abhaken. Langes Drücken öffnet die Bearbeitung; bei Timer-Routinen startet der Play-Button den Timer.</p>
+    </div>
+    <details class="routine-overview ${SPECIAL_DEX_CLASSES.card}">
+      <summary><span><b>Tagesübersicht</b><small>Heute · ${new Date(`${today()}T12:00:00`).toLocaleDateString('de-DE')}</small></span>${materialIconMarkup('chevron_right')}</summary>
+      <div class="routine-overview-body">
+        <span><small>HEUTE</small><b>${stats.erledigt}/${stats.heute.length || 0}</b></span>
+        <span><small>OFFEN</small><b>${stats.offen}</b></span>
+        <span><small>GESAMT</small><b>${state.routines.length}</b></span>
+        <span><small>SERIE</small><b>${stats.serie} Tage</b></span>
+      </div>
+    </details>
+  </div>`;
 }
 
 function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
@@ -75,11 +130,13 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
   const defaultName = meditation ? 'Meditation' : selectedTemplate === 'mobility' ? 'Mobility' : selectedTemplate === 'walk' ? 'Spaziergang' : '';
   const defaultIcon = meditation ? 'emoji:🧘' : selectedTemplate === 'mobility' ? 'emoji:🤸' : selectedTemplate === 'walk' ? 'emoji:🚶' : 'emoji:✓';
   const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop routine-editor-backdrop';
+  backdrop.className = 'kategorie-sheet-backdrop special-dex-overlay routine-editor-backdrop';
   backdrop.style.setProperty('--ordner', categoryColor('habits'));
+  backdrop.style.setProperty('--dex-seitenfarbe', categoryColor('habits'));
   backdrop.style.setProperty('--ordner-ink', colorIsDark(categoryColor('habits')) ? '#fff' : '#000');
+  backdrop.style.setProperty('--dex-ink', colorIsDark(categoryColor('habits')) ? '#fff' : '#000');
   const selectedDays = new Set((existing?.weekdays || [1, 2, 3, 4, 5, 6, 7]).map(String));
-  backdrop.innerHTML = `<section class="kategorie-sheet routine-editor${selectedTemplate === 'custom' ? '' : ' routine-template-editor'}" role="dialog" aria-modal="true" aria-label="Routine ${existing ? 'bearbeiten' : 'hinzufügen'}">
+  backdrop.innerHTML = `<section class="kategorie-sheet special-dex-sheet routine-editor${selectedTemplate === 'custom' ? '' : ' routine-template-editor'}" role="dialog" aria-modal="true" aria-label="Routine ${existing ? 'bearbeiten' : 'hinzufügen'}">
     <header><h2>${existing ? 'Routine bearbeiten' : 'Neue Routine'}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-routine-form>
       <div class="routine-name-row">
@@ -328,17 +385,19 @@ function bindRoutineGestures(row, { onSwipeToggle, onLongPress }) {
 }
 
 function chooseRoutineTemplate(userId, onSaved) {
-  const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop routine-template-backdrop offen';
-  backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Routine auswählen">
-    <header><h2>Routine hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const backdrop = createSpecialDexOverlay({
+    className: 'routine-template-backdrop offen',
+    closeSelector: '[data-sheet-close]',
+    colorScope: 'habits',
+    ariaLabel: 'Routine auswählen',
+    markup: `<header><h2>Routine hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue routine-template-list">
       <button type="button" data-routine-template="meditation"><span class="routine-template-icon">🧘</span><span><b>Meditation</b><small>Timer, Atemhilfe und Sounds</small></span></button>
       <button type="button" data-routine-template="mobility"><span class="routine-template-icon">🤸</span><span><b>Mobility</b><small>Grundlage – Übungen folgen separat</small></span></button>
       <button type="button" data-routine-template="walk"><span class="routine-template-icon">🚶</span><span><b>Spaziergang</b><small>15, 30, 45 oder 60 Minuten</small></span></button>
       <button type="button" data-routine-template="custom">${materialIconMarkup('add')}<span><b>Neue Routine</b><small>Alles selbst festlegen</small></span></button>
-    </div>
-  </section>`;
+    </div>`,
+  });
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
@@ -350,15 +409,17 @@ function chooseRoutineTemplate(userId, onSaved) {
 }
 
 function chooseAttachment(item, userId, onSaved) {
-  const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop routine-attachment-backdrop offen';
-  backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Anhang hinzufügen">
-    <header><h2>Anhang hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const backdrop = createSpecialDexOverlay({
+    className: 'routine-attachment-backdrop offen',
+    closeSelector: '[data-sheet-close]',
+    colorScope: 'habits',
+    ariaLabel: 'Anhang hinzufügen',
+    markup: `<header><h2>Anhang hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue">
       <button type="button" data-routine-attachment="link">${materialIconMarkup('place_item')}<span>Link</span></button>
       <button type="button" data-routine-attachment="image">${materialIconMarkup('add_photo_alternate')}<span>Bild</span></button>
-    </div>
-  </section>`;
+    </div>`,
+  });
   const close = () => backdrop.remove();
   backdrop.onclick = (event) => {
     if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
@@ -375,8 +436,9 @@ function chooseAttachment(item, userId, onSaved) {
 
 export async function mountRoutines(container, { session, signal }) {
   const userId = session.user.id;
+  container.style.setProperty('--ordner', categoryColor('habits'));
   container.innerHTML = `<div class="wrap pad-bottom routinen-seite">
-    <div class="seitenkopf"><h1>ROUTINEN</h1></div>
+    <div data-routine-hero></div>
     <div class="routine-plan" data-routine-plan><div class="daten-laden">Routinen werden geladen …</div></div>
     <div class="dex-eintraege routine-notizen" data-dex-entries></div>
   </div>`;
@@ -399,6 +461,7 @@ export async function mountRoutines(container, { session, signal }) {
   };
   const paint = () => {
     const darkColor = colorIsDark(categoryColor('habits'));
+    container.querySelector('[data-routine-hero]').innerHTML = routineHeroMarkup(state);
     container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
       // In der Übersicht nach Uhrzeit sortieren (ohne Uhrzeit ans Ende).
       const zeitMinuten = (time) => {
@@ -408,10 +471,16 @@ export async function mountRoutines(container, { session, signal }) {
       };
       const items = state.routines.filter((item) => item.period === key)
         .slice().sort((a, b) => zeitMinuten(a.time) - zeitMinuten(b.time));
-      return `<section class="routine-zeitblock"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
+      return `<section class="routine-zeitblock ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
         ? items.map((item) => routineRow(item, state.completed.has(item.id), state.attachments.filter((entry) => entry.routine_id === item.id), darkColor)).join('')
         : '<p class="routine-zeitblock-leer">Noch keine Routine geplant.</p>'}</div></section>`;
     }).join('');
+    container.querySelector('[data-toggle-routine-info]')?.addEventListener('click', (event) => {
+      const help = container.querySelector('[data-routine-info-help]');
+      const open = help?.hasAttribute('hidden');
+      help?.toggleAttribute('hidden', !open);
+      event.currentTarget.setAttribute('aria-expanded', String(open));
+    });
     vorschaubilderEinblenden(container.querySelector('[data-routine-plan]'));
     container.querySelectorAll('.routine-row').forEach((row) => {
       const item = state.routines.find((routine) => routine.id === row.dataset.routineId);
