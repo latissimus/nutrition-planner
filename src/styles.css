@@ -7502,6 +7502,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] .shopping-progress{height:9px;margin-top:7px;border-radius:99px;background:#ddd;overflow:hidden;max-width:360px}
 :root[data-seite="shopping"] .shopping-progress i{display:block;height:100%;border-radius:inherit;background:var(--dex-seitenfarbe,var(--ordner,#525CEB));transition:width .25s ease}
+/* Wie die Meal-Log-Eintragskarten: Abteilungen bleiben ruhige weisse Flaechen
+   ohne zusaetzliche schwarze Aussenmauer; die Trennung erfolgt innen. */
+:root[data-seite="shopping"] .einkauf-gruppe{
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:var(--special-dex-radius,18px)!important;
+}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="sleep"] .sleep-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
@@ -7601,7 +7608,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-image:var(--muster-tropfen);
   background-size:112px;
   background-repeat:repeat;
-  opacity:.9;
+  opacity:.34;
 }
 :root[data-seite="body"] .body-log-dex-page>*{position:relative;z-index:1}
 /* Body-Log v2: bewusst vollständig isoliert. Der Kategorie-Chrome verschiebt
