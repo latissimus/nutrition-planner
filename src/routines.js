@@ -519,5 +519,8 @@ export async function mountRoutines(container, { session, signal }) {
     return () => editEntry(entry, refresh, { onDeleted: refresh });
   });
   maybePromptExternalMeditation({ userId, routines: state.routines, onCompleted: refresh });
-  return { openRoutineEditor: () => chooseRoutineTemplate(userId, refresh) };
+  return {
+    meta: `${state.routines.length} ${state.routines.length === 1 ? 'Routine' : 'Routinen'}`,
+    openRoutineEditor: () => chooseRoutineTemplate(userId, refresh),
+  };
 }

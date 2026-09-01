@@ -1619,6 +1619,13 @@ async function renderRoute() {
       pageLookScope: route, pageLookPattern: 'triangles',
       onPlus: () => routineActions?.openRoutineEditor?.(),
     });
+    installNeoDexChrome(view, {
+      title: 'Routinen',
+      meta: routineActions?.meta || '0 Routinen',
+      closeHref: '#home',
+      editLabel: 'Routinen bearbeiten',
+      infoKind: 'habits',
+    });
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', routineId: null, color: categoryColor('habits'), signal, hideEmpty: true });
     const pendingRoutineId = sessionStorage.getItem('muscledex:pending-routine-action');
     if (pendingRoutineId) {
