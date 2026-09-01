@@ -8939,6 +8939,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="habits"] .routine-info-help[hidden]{display:none}
 
+/* Rückwärtskompatibilität für bereits gecachte Routinen-Markups: Die
+   entfernte Tagesübersicht darf auf keinem Routinen-Stand mehr erscheinen. */
+:root[data-seite="habits"] .routine-overview{display:none!important}
+
 /* Informationskarten stehen als eigene Elemente im Special-Dex-Stack. Keine
    negativen Außenabstände: So entsprechen beide Zwischenräume exakt dem
    Body-Log-Standard (18px Stack-Gap). */
