@@ -7448,6 +7448,28 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-inline:0!important;
 }
 :root[data-seite="shopping"] .shopping-dex-wrap .seiten-einstieg{display:none!important}
+:root[data-seite="shopping"] .shopping-page-heading{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  padding:8px 2px 2px;
+  color:var(--dex-ink,#111);
+}
+:root[data-seite="shopping"] .shopping-page-heading h1{
+  margin:0;
+  font-family:var(--display,"Work Sans",sans-serif);
+  font-size:clamp(30px,8vw,38px);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.045em;
+}
+:root[data-seite="shopping"] .shopping-page-heading span{
+  font-family:var(--tech,"JetBrains Mono",monospace);
+  font-size:14px;
+  font-weight:500;
+  color:var(--dex-ink,#111);
+  opacity:.8;
+}
 :root[data-seite="shopping"] .shopping-hero{
   box-sizing:border-box;
   min-height:152px;

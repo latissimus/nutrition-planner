@@ -745,13 +745,10 @@ export async function mountShoppingList(container, { session, signal }) {
   container.classList.toggle('einkauf-dunkle-ordnerfarbe', colorIsDark(categoryColor('shopping')));
   container.innerHTML = `
     <div class="wrap pad-bottom shopping-dex-wrap">
-      <div class="seitenkopf">
-        <div class="seitenkopf-text">
-          <span class="seitenkopf-kicker">Einkaufsliste</span>
-          <h1 class="section-title">Einkauf</h1>
-        </div>
-        <a class="zurueck" href="#home"><span class="pf">←</span> Übersicht</a>
-      </div>
+      <header class="shopping-page-heading">
+        <h1>Einkauf</h1>
+        <span>Einkaufsliste</span>
+      </header>
       ${shoppingHeroMarkup([])}
       <label class="einkauf-suche">
         ${materialIconMarkup('search')}
