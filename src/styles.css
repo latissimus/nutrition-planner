@@ -9106,23 +9106,27 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#fff;
   border-top:1px dashed color-mix(in srgb,#111 30%,transparent);
 }
-:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop) .kategorie-sheet,
-:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop) .kategorie-sheet :is(
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet,
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(
   h2,h3,p,label,legend,input,textarea,select,button,b,strong,small,span
 ){
   font-family:"Work Sans",var(--ui),sans-serif!important;
   font-style:normal!important;
 }
-:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop) .kategorie-sheet :is(
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(
   input[type="time"],input[type="number"],.coin-zahlenfeld,output
 ){
   font-family:var(--tech)!important;
   font-variant-numeric:slashed-zero tabular-nums;
 }
-:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop) .kategorie-sheet :is(
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(
   .btn-primary,.routine-days button.aktiv,.routine-duration button.aktiv
 ){
   border-color:#000!important;
   background:var(--ordner)!important;
   color:var(--ordner-ink,#fff)!important;
+}
+:root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .btn-primary :is(.material-svg,svg,svg *){
+  color:var(--ordner-ink,#fff)!important;
+  fill:var(--ordner-ink,#fff)!important;
 }
