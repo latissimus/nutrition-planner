@@ -8831,6 +8831,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-inline:0!important;
   background-image:none!important;
 }
+:root[data-seite="habits"] .routine-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
+  display:none!important;
+}
 :root[data-seite="habits"] .routine-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="habits"] .routine-dex-page :is(.routine-hero-stack,.routine-plan,.routine-notizen){
   box-sizing:border-box!important;
