@@ -7453,7 +7453,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#fff!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol :is(i,b){
-  background:transparent!important;
+  background:var(--dex-seitenfarbe,var(--bg,#215E61))!important;
   border-color:#fff!important;
   box-shadow:0 3.5px 0 #fff!important;
 }
