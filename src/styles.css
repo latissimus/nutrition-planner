@@ -8147,8 +8147,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:0;
   inset:0;
   pointer-events:none;
-  background:var(--dex-ink,#fff);
-  opacity:.10;
+  /* Helles Muster auf dem violetten Grund: sichtbar, aber bewusst ruhig. */
+  background:#fff;
+  opacity:.12;
   -webkit-mask-image:var(--food-vozzy-pattern);
   mask-image:var(--food-vozzy-pattern);
   -webkit-mask-size:360px auto;
