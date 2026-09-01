@@ -9130,3 +9130,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ordner-ink,#fff)!important;
   fill:var(--ordner-ink,#fff)!important;
 }
+
+/* Timer-Ziffern: immer der lokale JetBrains-Mono-Schnitt mit Slashed Zero.
+   Die explizite Familie verhindert, dass ein übergeordneter Display-Font
+   oder ein Browser-Fallback die Countdown-Anzeige ersetzt. */
+:is(.timerfeld,.meditation-time){
+  font-family:"JetBrains Mono",var(--tech),ui-monospace,monospace!important;
+  font-variant-numeric:tabular-nums slashed-zero!important;
+  font-feature-settings:"zero" 1,"tnum" 1!important;
+}
