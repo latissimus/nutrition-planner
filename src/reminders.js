@@ -295,9 +295,40 @@ async function saveReminder(userId, reminder) {
   const request = reminder.id
     ? query.update(payload).eq('id', reminder.id).eq('user_id', userId)
     : query.insert(payload);
-  const { data, error } = await request
+  let { data, error } = await request
     .select('id, type, label, time, weekdays, active, metadata, route')
     .single();
+  if (error && reminder.type === 'supplement'
+    && (error.code === '23505' || String(error.message || '').includes('reminders_supplement_uniq'))) {
+    let existingQuery = query
+      .select('id, metadata')
+      .eq('user_id', userId)
+      .eq('type', 'supplement')
+      .eq('label', payload.label)
+      .eq('time', payload.time)
+      .limit(1);
+    if (reminder.id) existingQuery = existingQuery.neq('id', reminder.id);
+    const existing = await existingQuery.maybeSingle();
+    if (!existing.error && existing.data?.id) {
+      const updatePayload = {
+        ...payload,
+        active: true,
+        metadata: { ...(existing.data.metadata || {}), ...(payload.metadata || {}), deleted: false },
+      };
+      if (reminder.id && reminder.id !== existing.data.id) {
+        await query
+          .update({ active: false, metadata: { ...(reminder.metadata || {}), deleted: true } })
+          .eq('id', reminder.id)
+          .eq('user_id', userId);
+      }
+      ({ data, error } = await query
+        .update(updatePayload)
+        .eq('id', existing.data.id)
+        .eq('user_id', userId)
+        .select('id, type, label, time, weekdays, active, metadata, route')
+        .single());
+    }
+  }
   if (error) throw error;
   notifyHomeCountsChanged();
   return data;

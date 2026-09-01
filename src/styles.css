@@ -7402,6 +7402,79 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* ============================================================
+   Zusatz-Hotfix: Training-Leerzustand und Calculator-Button.
+   Die endgültige Special-Dex-Geometrie steht am Dateiende.
+   ============================================================ */
+:root[data-seite="reminders"] .meal-log-dex-page,
+:root[data-seite="sleep"] .sleep-dex-page,
+:root[data-seite="body"] .body-log-dex-page{
+  --special-dex-inline:36px!important;
+  --special-dex-gap:18px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page.dex-fixkopf>.wrap,
+:root[data-seite="sleep"] .sleep-log-dex-page.dex-fixkopf>.wrap,
+:root[data-seite="body"] .body-log-dex-page.dex-fixkopf>.wrap{
+  padding-inline:0!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="sleep"] .sleep-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="reminders"] .meal-log-dex-page .special-dex-content,
+:root[data-seite="sleep"] .sleep-dex-page [data-sleep-content],
+:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content{
+  box-sizing:border-box!important;
+  width:min(calc(100% - 72px),var(--special-dex-content-max,604px))!important;
+  margin-inline:auto!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="sleep"] .sleep-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
+  padding-left:0!important;
+  padding-right:0!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-tagesplan,
+:root[data-seite="sleep"] .sleep-dex-page [data-sleep-content],
+:root[data-seite="body"] .body-v2-stack{
+  gap:18px!important;
+}
+:root[data-seite="sleep"] .sleep-dex-page [data-sleep-content]{
+  padding-inline:0!important;
+}
+
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer,
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer :is(strong,span,.dex-leer-symbol,.dex-leer-symbol i,.dex-leer-symbol b){
+  color:#fff!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol :is(i,b){
+  border-color:#fff!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::before,
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after{
+  background:#fff!important;
+}
+
+:root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-sheet{
+  overflow-x:clip!important;
+  overflow-y:visible!important;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom))!important;
+}
+:root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-form{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow-x:clip!important;
+  overflow-y:visible!important;
+  padding-bottom:5px!important;
+}
+:root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-form>.btn-primary[type="submit"]{
+  margin-bottom:4px!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-form>.btn-primary[type="submit"]:active{
+  box-shadow:0 1.5px 0 #000!important;
+}
+
+/* ============================================================
    BODY-LOG
    Breite Special-Dex-Vorlage: Zahlen-Hero, eine gerahmte Übersicht und
    danach ruhige, flache Messkarten. Körperfett wird bewusst nicht geschätzt.
@@ -8688,4 +8761,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:0!important;
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
+}
+
+/* EOF-Special-Dex-Geometrie: muss nach allen Body/Sleep/Meal-Regeln kommen. */
+:root[data-seite="reminders"] .meal-log-dex-page,
+:root[data-seite="sleep"] .sleep-dex-page,
+:root[data-seite="body"] .body-log-dex-page{
+  --special-dex-inline:36px!important;
+  --special-dex-gap:18px!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="sleep"] .sleep-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="body"] .body-log-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+:root[data-seite="reminders"] .meal-log-dex-page .special-dex-content,
+:root[data-seite="sleep"] .sleep-dex-page [data-sleep-content],
+:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content{
+  box-sizing:border-box!important;
+  width:min(calc(100% - 72px),var(--special-dex-content-max,604px))!important;
+  margin-inline:auto!important;
+  padding-left:0!important;
+  padding-right:0!important;
 }
