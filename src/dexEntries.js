@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
 import { bindLongPress } from './longPress.js';
@@ -303,6 +303,12 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
   const ownRecipe = foodMode && type === 'note' && foodKind !== 'cheat_meal';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
+  const dexColor = categoryColor(rootKey || 'home');
+  const dexInk = colorIsDark(dexColor) ? '#fff' : '#111';
+  backdrop.style.setProperty('--ordner', dexColor);
+  backdrop.style.setProperty('--dex-seitenfarbe', dexColor);
+  backdrop.style.setProperty('--ordner-ink', dexInk);
+  backdrop.style.setProperty('--dex-ink', dexInk);
   backdrop.innerHTML = editorMarkup(type, { foodKind, foodMode, rootKey, entryLabel });
   let audioRecorder = null;
   let audioStream = null;

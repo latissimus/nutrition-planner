@@ -1,4 +1,4 @@
-import { materialIconMarkup } from './categoryIcons.js';
+import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
 import { setRoutineCompletion } from './routineCompletion.js';
 import { playRoutineSound } from './uiSounds.js';
@@ -424,6 +424,12 @@ export function openMeditationTimer({ userId, routine, onCompleted, mobilityExer
   };
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop meditation-timer-backdrop';
+  const dexColor = categoryColor('habits');
+  const dexInk = colorIsDark(dexColor) ? '#fff' : '#111';
+  backdrop.style.setProperty('--ordner', dexColor);
+  backdrop.style.setProperty('--dex-seitenfarbe', dexColor);
+  backdrop.style.setProperty('--ordner-ink', dexInk);
+  backdrop.style.setProperty('--dex-ink', dexInk);
   backdrop.innerHTML = `<section class="kategorie-sheet meditation-timer${isMeditation ? '' : ' routine-countdown'}" role="dialog" aria-modal="true" aria-label="${escapeHtml(timerLabel)}-Timer">
     <header><div><small>${timerLabel}</small><h2>${escapeHtml(routine.name)}</h2></div><button type="button" data-meditation-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     ${isMobility || routineSteps.length ? `<ol class="routine-timer-exercises" data-timer-visual aria-label="Ablauf">

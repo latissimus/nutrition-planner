@@ -9077,9 +9077,30 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--ordner)!important;
 }
 :root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach){
+  display:grid!important;
+  place-items:center!important;
+  box-sizing:border-box!important;
+  width:28px!important;
+  height:28px!important;
+  min-width:28px!important;
+  min-height:28px!important;
+  padding:0!important;
   border:1.5px solid #111;
   border-radius:50%;
   background:#fff;
+  color:#111;
+  line-height:0!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg){
+  display:block!important;
+  width:15.5px!important;
+  height:15.5px!important;
+  margin:0!important;
+  color:#111!important;
+  fill:#111!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(svg *){
+  fill:#111!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-anhaenge{
   background:#fff;
