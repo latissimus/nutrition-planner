@@ -9193,11 +9193,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow-x:hidden!important;
   overscroll-behavior-x:none!important;
 }
-:root[data-seite="shopping"] .einkauf-suche,
+:root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche{
+  box-sizing:border-box!important;
+  width:min(calc(100vw - 72px),var(--special-dex-content-max,604px))!important;
+  max-width:var(--special-dex-content-max,604px)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
 :root[data-seite="shopping"] .shopping-dex-wrap .einkauf-kopfzeile,
 :root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-liste]{
   box-sizing:border-box!important;
-  width:min(calc(100vw - 72px),var(--special-dex-content-max,604px))!important;
+  width:min(calc(100vw - 42px),var(--special-dex-content-max,604px))!important;
   max-width:var(--special-dex-content-max,604px)!important;
   margin-left:auto!important;
   margin-right:auto!important;
@@ -9215,7 +9221,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] .special-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
   box-sizing:border-box!important;
-  width:min(calc(100vw - 72px),var(--special-dex-content-max,604px))!important;
+  width:min(calc(100vw - 42px),var(--special-dex-content-max,604px))!important;
   margin-inline:auto!important;
   padding-left:0!important;
   padding-right:0!important;
@@ -9469,10 +9475,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-repeat:repeat!important;
   mask-repeat:repeat!important;
 }
-:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page>*,
-:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page>*{
+:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
+:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
   position:relative!important;
   z-index:1!important;
+}
+:root[data-seite="shopping"] .shopping-dex-page>:is(.neo-dex-floating-actions,.food-dex-floating-actions){
+  position:fixed!important;
+  left:auto!important;
+  right:20px!important;
+  inset-inline-start:auto!important;
+  inset-inline-end:20px!important;
+  margin:0!important;
 }
 :root[data-seite="shopping"] .shopping-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
   display:none!important;
