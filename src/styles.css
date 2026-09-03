@@ -9205,6 +9205,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .special-dex-page .kategorie-scrollinhalt{
   padding-inline:0!important;
 }
+:root[data-seite="shopping"] .special-dex-page .kategorie-scrollinhalt{
+  overflow-x:visible!important;
+}
 :root[data-seite="shopping"] .special-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
   box-sizing:border-box!important;
   width:min(calc(100vw - 72px),var(--special-dex-content-max,604px))!important;
@@ -9241,7 +9244,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-tags-slot]{
   width:100vw!important;
   max-width:100vw!important;
-  margin:0 calc(50% - 50vw) 17px!important;
+  margin:0 0 17px!important;
+  position:relative!important;
+  left:50%!important;
+  right:50%!important;
+  margin-left:-50vw!important;
+  margin-right:-50vw!important;
   overflow:visible!important;
   transform:none!important;
 }
@@ -9364,6 +9372,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transition:transform .16s ease!important;
   transform:rotate(90deg)!important;
 }
+:root[data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-head{
+  list-style:none!important;
+}
+:root[data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-head::-webkit-details-marker,
+:root[data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-head::marker,
+:root[data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-head::after{
+  display:none!important;
+  content:none!important;
+}
 :root[data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte):not([open]) .reminder-group-chevron{
   transform:rotate(0deg)!important;
 }
@@ -9419,13 +9436,38 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:700!important;
   line-height:1.2!important;
 }
-:root[data-seite="shopping"] .shopping-dex-page{
-  background-color:transparent!important;
-  background-image:inherit!important;
-  background-size:inherit!important;
-  background-position:inherit!important;
-  background-repeat:inherit!important;
-  background-attachment:fixed!important;
+:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page,
+:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page{
+  position:relative!important;
+  isolation:isolate!important;
+  background-color:var(--dex-seitenfarbe,var(--bg,#00E0BA))!important;
+  background-image:none!important;
+}
+:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page.dex-tapete-datei::before,
+:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page.dex-tapete-datei::before{
+  content:""!important;
+  position:absolute!important;
+  z-index:0!important;
+  inset:0!important;
+  pointer-events:none!important;
+  background:var(--dex-ink,#000)!important;
+  opacity:.08!important;
+  -webkit-mask-image:var(--dex-tapete)!important;
+  mask-image:var(--dex-tapete)!important;
+  -webkit-mask-size:360px auto!important;
+  mask-size:360px auto!important;
+  -webkit-mask-position:center top!important;
+  mask-position:center top!important;
+  -webkit-mask-repeat:repeat!important;
+  mask-repeat:repeat!important;
+}
+:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page>*,
+:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page>*{
+  position:relative!important;
+  z-index:1!important;
+}
+:root[data-seite="shopping"] .shopping-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
+  display:none!important;
 }
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop) .btn-primary{
   border:2px solid #000!important;
