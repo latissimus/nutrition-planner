@@ -9195,7 +9195,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche{
   box-sizing:border-box!important;
-  width:min(calc(100vw - 72px),var(--special-dex-content-max,604px))!important;
+  width:min(calc(100vw - 42px),var(--special-dex-content-max,604px))!important;
   max-width:var(--special-dex-content-max,604px)!important;
   margin-left:auto!important;
   margin-right:auto!important;
@@ -9450,15 +9450,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:700!important;
   line-height:1.2!important;
 }
-:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page,
-:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page{
-  position:relative!important;
+.app-shell>#view.shopping-dex-page,
+.app-shell>.view-neu.shopping-dex-page,
+.app-shell>.view-alt.shopping-dex-page{
   isolation:isolate!important;
   background-color:var(--dex-seitenfarbe,var(--bg,#00E0BA))!important;
   background-image:none!important;
 }
-:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page.dex-tapete-datei::before,
-:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page.dex-tapete-datei::before{
+.app-shell>#view.shopping-dex-page{position:relative!important}
+.app-shell>.view-neu.shopping-dex-page,
+.app-shell>.view-alt.shopping-dex-page{position:absolute!important}
+.app-shell>#view.shopping-dex-page.dex-tapete-datei::before,
+.app-shell>.view-neu.shopping-dex-page.dex-tapete-datei::before,
+.app-shell>.view-alt.shopping-dex-page.dex-tapete-datei::before{
   content:""!important;
   position:absolute!important;
   z-index:0!important;
@@ -9475,8 +9479,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-repeat:repeat!important;
   mask-repeat:repeat!important;
 }
-:root[data-seite="shopping"] .app-shell>#view.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
-:root[data-seite="shopping"] .app-shell>.view-neu.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
+.app-shell>#view.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
+.app-shell>.view-neu.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
+.app-shell>.view-alt.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
   position:relative!important;
   z-index:1!important;
 }
