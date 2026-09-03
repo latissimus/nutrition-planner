@@ -1680,9 +1680,19 @@ async function renderRoute() {
   // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
   // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
   const neuerHintergrund = getComputedStyle(document.body);
+  const neueAnsicht = getComputedStyle(view);
   const lookFarbe = homeStilBeimTauschSetzen
     ? (document.documentElement.dataset.theme === 'dark' ? '#101A2B' : '#F2EBE0')
-    : neuerHintergrund.backgroundColor;
+    // Bei einer SVG-Tapete sind body, #app und #view absichtlich transparent,
+    // damit das Muster im fertigen Dex bis in die iOS-Safe-Area reicht. Für
+    // den Einschub darf deshalb nicht `body.backgroundColor` verwendet werden:
+    // das wäre transparent und ließe den bereits umgeschalteten Root-Hintergrund
+    // stehen, während nur der Inhalt hereinfährt. Die Dex-Farbe liegt schon vor
+    // dem ersten Animationsframe als Custom Property auf der Zielansicht.
+    : neueAnsicht.getPropertyValue('--dex-seitenfarbe').trim()
+      || neueAnsicht.getPropertyValue('--bg').trim()
+      || getComputedStyle(document.documentElement).backgroundColor
+      || neuerHintergrund.backgroundColor;
   // Die Tapete liegt im scrollbaren Dex-Inhalt und ist damit Teil derselben
   // animierten Ebene wie Karten und Texte. Auf #view selbst bleibt nur die
   // unveraenderte App-Hintergrundfarbe; sonst wuerde das Muster beim Slide
