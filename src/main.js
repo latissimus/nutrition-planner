@@ -1492,7 +1492,9 @@ async function renderRoute() {
     });
   } else if (route === 'shopping') {
     setSeite('shopping');
+    applyPageLook('shopping', categoryColor('shopping'), 'drops');
     prepareSpecialDexPage(view, 'shopping');
+    view.classList.add('shopping-dex-page');
     const { mountShoppingList } = await shoppingModule();
     const shoppingActions = await mountShoppingList(view, { session, signal });
     mountCategoryChrome(view, route, 'EINKAUF', {

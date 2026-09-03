@@ -734,7 +734,7 @@ export async function mountShoppingList(container, { session, signal }) {
         <input type="search" data-einkauf-suche placeholder="Einkauf durchsuchen" aria-label="Einkauf durchsuchen">
         <button type="button" data-einkauf-suche-leeren aria-label="Suche leeren" hidden>${materialIconMarkup('close')}</button>
       </label>
-      <div data-einkauf-tags-slot></div>
+      <div class="einkauf-tags-fullbleed" data-einkauf-tags-slot></div>
       <div class="einkauf-kopfzeile">
         <span data-einkauf-status role="status" aria-live="polite">Wird geladen …</span>
         <div class="einkauf-kopf-aktionen">
