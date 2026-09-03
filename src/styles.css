@@ -9457,14 +9457,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:var(--dex-seitenfarbe,var(--bg,#00E0BA))!important;
   background-image:none!important;
 }
-.app-shell>#view.shopping-dex-page{position:relative!important}
-.app-shell>.view-neu.shopping-dex-page,
-.app-shell>.view-alt.shopping-dex-page{position:absolute!important}
-.app-shell>#view.shopping-dex-page.dex-tapete-datei::before,
-.app-shell>.view-neu.shopping-dex-page.dex-tapete-datei::before,
-.app-shell>.view-alt.shopping-dex-page.dex-tapete-datei::before{
+.shopping-dex-page.dex-tapete-datei::before{
   content:""!important;
-  position:absolute!important;
+  position:fixed!important;
   z-index:0!important;
   inset:0!important;
   pointer-events:none!important;
@@ -9479,9 +9474,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-repeat:repeat!important;
   mask-repeat:repeat!important;
 }
-.app-shell>#view.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
-.app-shell>.view-neu.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)),
-.app-shell>.view-alt.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
+.shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
   position:relative!important;
   z-index:1!important;
 }
@@ -9493,7 +9486,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inset-inline-end:20px!important;
   margin:0!important;
 }
-:root[data-seite="shopping"] .shopping-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
+.shopping-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before{
   display:none!important;
 }
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop) .btn-primary{

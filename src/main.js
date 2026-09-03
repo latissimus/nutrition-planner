@@ -1493,6 +1493,7 @@ async function renderRoute() {
   } else if (route === 'shopping') {
     setSeite('shopping');
     applyPageLook('shopping', categoryColor('shopping'), 'drops');
+    view.classList.add('neo-dex-page', 'food-dex-page');
     prepareSpecialDexPage(view, 'shopping');
     view.classList.add('shopping-dex-page');
     const { mountShoppingList } = await shoppingModule();
