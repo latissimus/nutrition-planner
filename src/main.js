@@ -35,7 +35,7 @@ import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import { startRoute as perfStart, mark as perfMark, finishRoute as perfFinish, abortRoute as perfAbort } from './perfOverlay.js';
 import {
-  applyPageLook, categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
+  applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, mainDexFolderSvg, openCollectionEditor, saveCollection,
@@ -297,11 +297,33 @@ function fehlertext(error) {
   return error?.message || 'Etwas ist schiefgelaufen.';
 }
 
-function setSeite(name) {
+/* Defer-Modus für setSeite: verändert sonst mitten im Mount die
+   html-Attribute (data-seite, CSS-Custom-Properties für Farben/Wallpaper) —
+   der Nutzer sieht dann bereits die neuen Chrome-Farben, während der
+   Inhalt noch lädt (»gestückelter Aufbau«). Zwischen beginSeiteDefer und
+   commitSeiteDefer wird nur der letzte Wunsch gepuffert und atomar mit
+   dem Sichtbarwerden der neuen Ansicht angewendet. */
+let seiteDeferAktiv = false;
+let seitePuffer = null;
+
+function beginSeiteDefer() { seiteDeferAktiv = true; seitePuffer = null; }
+function commitSeiteDefer() {
+  const gepuffert = seitePuffer;
+  seiteDeferAktiv = false;
+  seitePuffer = null;
+  if (gepuffert !== null) writeSeite(gepuffert);
+}
+
+function writeSeite(name) {
   document.documentElement.dataset.seite = name;
   delete document.documentElement.dataset.dexMuster;
   ['--dex-seitenfarbe', '--dex-ink', '--dex-tapete', '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg', '--food-page-purple']
     .forEach((property) => document.documentElement.style.removeProperty(property));
+}
+
+function setSeite(name) {
+  if (seiteDeferAktiv) { seitePuffer = name; return; }
+  writeSeite(name);
 }
 
 function dexLookAusAnsichtWiederherstellen(node) {
@@ -1667,6 +1689,13 @@ async function profilSicherLaden() {
 
 async function renderRoute() {
   const generation = ++renderGeneration;
+  /* Safety-Net: falls ein vorheriger renderRoute-Lauf durch einen Fehler
+     oder ein Redirect abgebrochen wurde, könnten setSeite/applyPageLook
+     noch im Defer-Modus stehen und stumm alle folgenden Aufrufe puffern.
+     Vor jedem neuen Lauf einmal committen – räumt harmlos auf, wenn
+     nichts gepuffert war, und rettet den Zustand sonst. */
+  commitSeiteDefer();
+  commitPageLookDefer();
   if (!supabaseKonfiguriert) return renderSetup();
   if (recovery) return renderRecovery();
   if (!session) return renderAuth();
@@ -1736,6 +1765,12 @@ async function renderRoute() {
   const transition = 'hart';
   const view = renderChrome(transition);
   perfMark('chrome');
+  /* Ab hier werden setSeite/applyPageLook nur noch gepuffert. Erst wenn
+     die neue Ansicht wirklich fertig ist, wenden wir beide atomar an —
+     zusammen mit dem Sichtbarwerden. Sonst sieht der Nutzer erst neue
+     Farben und Wallpaper, während der Inhalt noch lädt. */
+  beginSeiteDefer();
+  beginPageLookDefer();
   if (route.startsWith('entry/')) {
     // Carry the rendered surface (including a selected wallpaper) over to
     // the detail view instead of briefly falling back to the neutral cream
@@ -2045,10 +2080,17 @@ async function renderRoute() {
   // sofort wiederhergestellte Ansicht gelegt werden.
   if (generation !== renderGeneration || aktiveRoute !== vorherigeRoute && richtung === 'gleich') {
     view.remove();
+    commitSeiteDefer();
+    commitPageLookDefer();
     perfAbort();
     return;
   }
   perfMark('mount');
+  /* Chrome (html-Attribute + Custom Properties) und Shell zusammen anwenden,
+     kurz bevor die neue Ansicht sichtbar wird. So sieht der Nutzer einen
+     einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
+  commitSeiteDefer();
+  commitPageLookDefer();
   appDexShellAktualisieren(route, view, signal);
   perfMark('shell');
   // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.

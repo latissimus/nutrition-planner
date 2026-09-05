@@ -261,8 +261,33 @@ function writeRootPageLook(look) {
   writePageLook(document.documentElement, look);
 }
 
+/* Defer-Modus für den Router: applyPageLook malt sonst sofort in das
+   html-Element (Wallpaper, Dex-Farben) — mitten in den Mount hinein.
+   Der Nutzer sieht dann erst den neuen Hintergrund und erst 200 ms später
+   den passenden Inhalt (»gestückelter Aufbau«). Zwischen begin und commit
+   wird der letzte gewünschte Look nur gepuffert und in einem Zug mit dem
+   Sichtbarwerden der neuen Ansicht angewendet. */
+let pageLookDeferAktiv = false;
+let pageLookPuffer = null;
+
+export function beginPageLookDefer() {
+  pageLookDeferAktiv = true;
+  pageLookPuffer = null;
+}
+
+export function commitPageLookDefer() {
+  const gepuffert = pageLookPuffer;
+  pageLookDeferAktiv = false;
+  pageLookPuffer = null;
+  if (gepuffert) writeRootPageLook(gepuffert);
+}
+
 export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   const look = pageLook(scope, fallbackColor, fallbackPattern);
+  if (pageLookDeferAktiv) {
+    pageLookPuffer = look;
+    return look;
+  }
   writeRootPageLook(look);
   return look;
 }
