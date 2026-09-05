@@ -155,7 +155,6 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     <section class="coin-balance-card special-dex-hero">
       ${muscleCoinMarkup('coin-balance-symbol')}
       <span><small>DEIN KONTOSTAND</small><strong>${balance}</strong><b>MUSCLE-COINS</b></span>
-      <button type="button" class="som-info-knopf coin-balance-info" data-coin-info aria-label="Verdienstregeln anzeigen">i</button>
     </section>
     ${coinEarningOverview()}
     ${next ? `<section class="coin-next special-dex-wide-card"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} Coins</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
@@ -175,12 +174,6 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     notifyCoinBalanceChanged();
     toast('Belohnung eingelöst'); refresh();
   };
-  container.querySelector('[data-coin-info]')?.addEventListener('click', () => {
-    const overview = container.querySelector('[data-coin-earning-overview]');
-    if (!overview) return;
-    overview.open = !overview.open;
-    if (overview.open) overview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  });
   return {
     meta: `${(rewards || []).length} ${(rewards || []).length === 1 ? 'Belohnung' : 'Belohnungen'}`,
     openAddMenu: openRewardEditor,
