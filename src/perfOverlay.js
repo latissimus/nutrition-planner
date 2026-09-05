@@ -10,20 +10,20 @@
  * Werkzeug — hat keinen Einfluss auf die App, wenn nicht aktiviert.
  */
 
-const KEY = 'muscledex:perf';
-let aktiv = false;
+const KEY = 'muscledex:perf-aus';
+let versteckt = false;
 let overlay = null;
 let start = 0;
 let route = '';
 let marks = [];
 
 function istAktiv() {
-  if (aktiv) return true;
+  if (versteckt) return false;
   try {
     if (typeof window === 'undefined') return false;
-    if (window.location?.hash?.includes('perf')) return true;
-    return localStorage.getItem(KEY) === '1';
-  } catch { return false; }
+    // Nur ausgeschaltet, wenn Nutzer den × im Overlay geklickt hat.
+    return localStorage.getItem(KEY) !== '1';
+  } catch { return true; }
 }
 
 function ensureOverlay() {
@@ -32,15 +32,33 @@ function ensureOverlay() {
   overlay = document.createElement('div');
   overlay.setAttribute('data-perf-overlay', '');
   overlay.style.cssText = [
-    'position:fixed', 'z-index:2147483647', 'top:env(safe-area-inset-top,8px)',
-    'right:6px', 'left:6px', 'pointer-events:none',
+    'position:fixed', 'z-index:2147483647',
+    'top:calc(env(safe-area-inset-top,0px) + 4px)',
+    'right:6px', 'left:6px',
     'font:600 10px/1.25 ui-monospace,SFMono-Regular,Menlo,monospace',
-    'color:#fff', 'background:rgba(0,0,0,.82)', 'padding:6px 8px',
+    'color:#fff', 'background:rgba(0,0,0,.85)', 'padding:6px 8px 6px 8px',
     'border-radius:8px', 'max-height:40vh', 'overflow:hidden',
     'text-shadow:0 1px 1px #000',
+    'pointer-events:auto',
   ].join(';');
+  const zu = document.createElement('button');
+  zu.type = 'button';
+  zu.textContent = '×';
+  zu.setAttribute('aria-label', 'Perf-Overlay ausblenden');
+  zu.style.cssText = [
+    'position:absolute', 'top:2px', 'right:4px',
+    'width:22px', 'height:22px', 'border:0', 'background:transparent',
+    'color:#fff', 'font:900 18px/1 sans-serif', 'cursor:pointer',
+    'padding:0',
+  ].join(';');
+  zu.onclick = () => {
+    try { localStorage.setItem(KEY, '1'); } catch {}
+    versteckt = true;
+    overlay?.remove();
+    overlay = null;
+  };
+  overlay.append(zu);
   document.body.append(overlay);
-  aktiv = true;
   return overlay;
 }
 
@@ -83,7 +101,15 @@ export function finishRoute() {
       <span style="color:${farbe(m.label)};opacity:.6">${balken}</span>
     </div>`;
   }).join('');
-  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+  // Inhalte in einen inneren Container, damit der ×-Knopf oben rechts erhalten bleibt.
+  let inner = box.querySelector(':scope > [data-perf-inhalt]');
+  if (!inner) {
+    inner = document.createElement('div');
+    inner.setAttribute('data-perf-inhalt', '');
+    inner.style.paddingRight = '22px';
+    box.append(inner);
+  }
+  inner.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
     <b>${route}</b><span style="color:#FF69AE">Σ ${Math.round(gesamt)} ms</span>
   </div>${zeilen}`;
   start = 0;
