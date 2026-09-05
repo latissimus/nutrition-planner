@@ -10075,12 +10075,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 #app.dex-app-shell{
   --app-dex-header-h:64px;
-  --app-dex-dock-h:max(79px,calc(env(safe-area-inset-bottom) + 67px));
+  --app-dex-dock-bottom:max(6px,calc(env(safe-area-inset-bottom) - 6px));
 }
 #app.dex-app-shell>:is(#view,.view-alt,.view-neu){
   box-sizing:border-box!important;
   padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h))!important;
-  padding-bottom:var(--app-dex-dock-h)!important;
+  padding-bottom:0!important;
+}
+/* Die Seite läuft – wie beim LOGMAN – hinter der schwebenden Milchglasleiste
+   weiter. Nur der Inhalt bekommt unten genügend Scrollreserve, nicht die
+   komplette View eine zusätzliche deckende Fläche. */
+#app.dex-app-shell :is(.home-scrollinhalt,.dex-detail-scrollinhalt,.kategorie-scrollinhalt){
+  padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
 }
 .app-dex-header{
   position:absolute;
@@ -10146,8 +10152,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:85;
   inset:auto 0 0;
   box-sizing:border-box;
-  height:var(--app-dex-dock-h);
-  padding:8px 7px max(6px,calc(env(safe-area-inset-bottom) - 6px));
+  padding:8px 7px var(--app-dex-dock-bottom);
   background:transparent;
   color:#0A1330;
   overflow:hidden;
@@ -10170,7 +10175,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   right:0;
   bottom:0;
   left:0;
-  height:calc(max(6px,calc(env(safe-area-inset-bottom) - 6px)) + 9px);
+  height:calc(var(--app-dex-dock-bottom) + 9px);
   background:var(--dex-seitenfarbe,var(--bg));
   pointer-events:none;
 }
@@ -10179,7 +10184,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:1;
   box-sizing:border-box;
   width:min(100%,580px);
-  height:65px;
   margin-inline:auto;
   padding:5px;
   display:grid;
