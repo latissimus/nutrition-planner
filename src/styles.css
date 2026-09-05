@@ -4043,7 +4043,11 @@ body{overscroll-behavior:none}
    allgemeineren Breitenregeln und der Inhalt zieht sich auseinander. Der
    Knoten bleibt für Cache und Datenzustand erhalten, wird aber sofort
    unsichtbar, bis ihn die fertige Zielansicht ersetzt. */
-.app-shell>.view-alt-hart{z-index:1;visibility:hidden;pointer-events:none}
+/* Die alte Ansicht bleibt beim harten Wechsel SICHTBAR, bis die neue
+   komplett gemountet ist. So sieht der Nutzer nicht mehr die einzelnen
+   „…wird geladen“-Platzhalter, sondern nur die fertigen Endzustände. */
+.app-shell>.view-alt-hart{z-index:1;pointer-events:none}
+.app-shell>.view-neu.warten-auf-daten{visibility:hidden}
 .app-shell>.view-cache{display:none!important}
 .app-shell>.view-alt-zurueck{z-index:3;will-change:transform}
 .app-shell>.view-neu{z-index:2;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);background-color:var(--dex-seitenfarbe,var(--bg))}

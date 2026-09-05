@@ -895,7 +895,11 @@ function renderChrome(transition = 'hart') {
     bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
     view = document.createElement('main');
     view.id = 'view';
-    view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : transition === 'detail' ? ' seite-detail-warten' : ''}`;
+    /* `warten-auf-daten` hält die frische Ansicht unsichtbar, bis der Mount
+       vollständig fertig ist. Zusammen mit der jetzt sichtbaren alten Ansicht
+       (siehe styles.css) sieht der Nutzer keine „…wird geladen“-Zwischen­
+       zustände mehr; getauscht wird erst der fertige Endzustand. */
+    view.className = `view-neu warten-auf-daten${transition === 'vor' ? ' seite-vor-warten' : transition === 'detail' ? ' seite-detail-warten' : ''}`;
     app.append(view);
   } else {
     // Der feste Dex-Header und das untere Menüband gehören zur App-Schale,
@@ -904,6 +908,8 @@ function renderChrome(transition = 'hart') {
     app.querySelectorAll(':scope > main,:scope > .view-alt,:scope > .view-neu').forEach((node) => node.remove());
     view = document.createElement('main');
     view.id = 'view';
+    // Beim allerersten Mount (kein alter View im DOM) darf die Ansicht sofort
+    // sichtbar sein; sonst bliebe die App bis zum ersten Datenabruf schwarz.
     app.append(view);
   }
   // Jede Route beginnt in ihrem eigenen, einzigen Scrollcontainer oben. Das
@@ -2116,10 +2122,16 @@ async function renderRoute() {
     };
     nachEigenerSeitenanimation(alteSeite, 'seiteRausRechts', aufraeumen);
   } else {
-    app.querySelector(':scope > .view-alt')?.remove();
+    /* Zwei Frames Wartezeit, damit der Browser die fertig gemountete Ansicht
+       samt Hintergrund im Speicher rasterisiert, bevor sie sichtbar wird.
+       Ohne das würde die neue Ansicht mit weißer Fläche eingeblendet und
+       einen Frame später erst mit Inhalt gefüllt. */
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (aktiveRoute !== route && vorherigeRoute !== route) return;
+    app.querySelectorAll(':scope > .view-alt').forEach((node) => node.remove());
     if (richtung === 'gleich') vorherigerController?.abort();
     if (homeStilBeimTauschSetzen) setSeite('home');
-    view.classList.remove('view-neu');
+    view.classList.remove('view-neu', 'warten-auf-daten');
     entferneUebergangshintergrund();
   }
   const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
