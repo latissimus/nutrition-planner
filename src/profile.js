@@ -260,10 +260,10 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   interfaceSoundLabel.append(interfaceSoundCheckbox, interfaceSoundTrack, interfaceSoundText);
   darstellung.appendChild(interfaceSoundLabel);
 
-  const startseite = abschnitt(wrap, 'Startseite anpassen');
+  const startseite = abschnitt(wrap, 'Menüband anpassen');
   const startHinweis = document.createElement('p');
   startHinweis.className = 'profile-hinweis';
-  startHinweis.textContent = 'Lege fest, welche Dex-Einträge auf der Startseite und in der Suche erscheinen.';
+  startHinweis.textContent = 'Lege fest, welche Dex im unteren Menüband erscheinen und in welcher Reihenfolge sie angeordnet sind.';
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
     ['body', 'Body-Log'], ['reminders', 'MEAL-LOG'], ['food-log', 'Fooddex'],

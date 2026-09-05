@@ -10067,3 +10067,220 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--surface2);
   color:var(--muted);
 }
+
+/* ============================================================
+   FESTE DEX-APP-SCHALE
+   LOGMAN-Prinzip: Der aktive Dex wechselt innerhalb eines festen Rahmens.
+   Oben bleiben Marke und Kontoaktionen, unten Navigation und Eintragsmenü.
+   ============================================================ */
+#app.dex-app-shell{
+  --app-dex-header-h:64px;
+  --app-dex-dock-h:76px;
+}
+#app.dex-app-shell>:is(#view,.view-alt,.view-neu){
+  box-sizing:border-box!important;
+  padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h))!important;
+  padding-bottom:calc(env(safe-area-inset-bottom) + var(--app-dex-dock-h))!important;
+}
+.app-dex-header{
+  position:absolute;
+  z-index:85;
+  inset:0 0 auto;
+  box-sizing:border-box;
+  height:calc(env(safe-area-inset-top) + var(--app-dex-header-h));
+  padding-top:env(safe-area-inset-top);
+  background:var(--dex-seitenfarbe,var(--bg));
+  color:#0A1330;
+  --brand-outline:#0A1330;
+  --brand-card-bg:#0A1330;
+  --brand-card-mark:#F1ECDE;
+}
+.app-dex-header-inner{
+  box-sizing:border-box;
+  width:min(calc(100% - 40px),640px);
+  height:var(--app-dex-header-h);
+  margin-inline:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.app-dex-brand{
+  display:flex;
+  align-items:center;
+  min-width:0;
+  line-height:0;
+}
+.app-dex-brand .brand{font-size:clamp(19px,5.5vw,23px)}
+.app-dex-header-actions{display:flex;align-items:center;gap:7px;min-width:0}
+.app-dex-header .coin-kopfstand{color:currentColor}
+.app-dex-header .tuck-quadrat,
+.app-dex-header .nav-av{
+  width:42px;
+  min-width:42px;
+  height:42px;
+  border:2px solid #0A1330;
+  border-radius:12px;
+  background:#fff;
+  color:#0A1330;
+  box-shadow:0 3px 0 #0A1330;
+}
+.app-dex-header .tuck-quadrat{padding:0;place-items:center}
+.app-dex-header .tuck-quadrat :is(.material-svg,svg){width:21px;height:21px;margin:auto}
+.app-dex-header .nav-av{display:grid;place-items:center;text-decoration:none;overflow:hidden}
+
+.app-dex-dock{
+  position:absolute;
+  z-index:85;
+  inset:auto 0 0;
+  box-sizing:border-box;
+  height:calc(env(safe-area-inset-bottom) + var(--app-dex-dock-h));
+  padding:8px 16px calc(8px + env(safe-area-inset-bottom));
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 58px;
+  gap:9px;
+  background:#F6F2EA;
+  border-top:2px solid #0A1330;
+  box-shadow:0 -4px 0 rgba(10,19,48,.18);
+  color:#0A1330;
+}
+.app-dex-tabs{
+  min-width:0;
+  display:flex;
+  align-items:stretch;
+  gap:5px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  touch-action:pan-x;
+}
+.app-dex-tab{
+  box-sizing:border-box;
+  width:58px;
+  min-width:58px;
+  height:58px;
+  padding:4px 3px 3px;
+  display:grid;
+  grid-template-rows:34px 13px;
+  place-items:center;
+  gap:1px;
+  border:1.5px solid transparent;
+  border-radius:13px;
+  color:#0A1330;
+  text-decoration:none;
+  scroll-snap-align:center;
+}
+.app-dex-tab>span{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  font-size:25px;
+  line-height:1;
+}
+.app-dex-tab :is(.app-dex-tab-icon,.kategorie-svg,.sammlung-icon,svg){
+  display:block;
+  width:28px;
+  height:28px;
+  max-width:28px;
+  max-height:28px;
+}
+.app-dex-tab :is(.app-dex-tab-icon,.material-svg):not(.icon-originalfarben) :is(svg,svg *){
+  color:currentColor!important;
+  fill:currentColor!important;
+}
+.app-dex-tab small,
+.app-dex-menu small{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  color:currentColor;
+  font:750 8px/1 var(--ui);
+  letter-spacing:-.02em;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.app-dex-tab.aktiv{
+  border-color:#0A1330;
+  background:var(--app-dex-tab-color,var(--akzent));
+  box-shadow:0 2px 0 #0A1330;
+}
+.app-dex-menu{
+  box-sizing:border-box;
+  width:58px;
+  height:58px;
+  padding:5px 4px 4px;
+  display:grid;
+  grid-template-rows:34px 12px;
+  place-items:center;
+  gap:1px;
+  border:2px solid #0A1330;
+  border-radius:15px;
+  background:var(--brand-pink,#FF69AE);
+  color:#0A1330;
+  box-shadow:0 3px 0 #0A1330;
+}
+.app-dex-menu :is(.material-svg,svg){width:28px;height:28px;margin:auto;fill:currentColor}
+.app-dex-menu:active{transform:translateY(2px);box-shadow:0 1px 0 #0A1330}
+
+/* Haupt-Dex brauchen weder ihre wiederholte Seitenüberschrift noch die alte
+   seitliche Buttonspalte. Bei Unter-Dex bleibt der Zurückknopf erhalten. */
+#app.dex-app-shell:not(.dex-app-shell-unterdex) #view>:is(.neo-dex-floating-actions,.food-dex-floating-actions){display:none!important}
+#app.dex-app-shell.dex-app-shell-unterdex #view>:is(.neo-dex-floating-actions,.food-dex-floating-actions){
+  bottom:calc(94px + env(safe-area-inset-bottom))!important;
+}
+#app.dex-app-shell.dex-app-shell-unterdex #view>:is(.neo-dex-floating-actions,.food-dex-floating-actions) :is(.neo-dex-action-primary,.food-dex-action-primary){display:none!important}
+#app.dex-app-shell:not(.dex-app-shell-unterdex) #view :is(.neo-dex-scroll-title,.food-dex-scroll-title),
+#app.dex-app-shell:not(.dex-app-shell-unterdex) #view .shopping-page-heading,
+#app.dex-app-shell:not(.dex-app-shell-unterdex) #view .coin-dex-seite>.seitenkopf{
+  display:none!important;
+}
+
+:root[data-theme="dark"] .app-dex-header{
+  background:#101A2B;
+  color:#EDF0F6;
+  --brand-outline:#EDF0F6;
+  --brand-card-bg:#EDF0F6;
+  --brand-card-mark:#101A2B;
+}
+:root[data-theme="dark"]{
+  /* Im Darkmode ist die App-Fläche bewusst einheitlich tiefblau. Die
+     individuellen Dex-Farben bleiben in --dex-seitenfarbe erhalten und
+     markieren nur aktiven Tab und kontextbezogene Bedienelemente. */
+  --bg:#101A2B!important;
+  --app-bg:#101A2B!important;
+  --app-content-bg:#101A2B!important;
+  --app-chrome-bg:#101A2B!important;
+}
+:root[data-theme="dark"] .app-dex-header .tuck-quadrat,
+:root[data-theme="dark"] .app-dex-header .nav-av{
+  border-color:#697486;
+  background:#191C24;
+  color:#EDF0F6;
+  box-shadow:0 3px 0 #070B12;
+}
+:root[data-theme="dark"] .app-dex-dock{
+  border-color:#697486;
+  background:#101A2B;
+  color:#EDF0F6;
+  box-shadow:0 -3px 0 #070B12;
+}
+:root[data-theme="dark"] .app-dex-tab{color:#EDF0F6}
+:root[data-theme="dark"] .app-dex-tab.aktiv{
+  border-color:#EDF0F6;
+  color:#101A2B;
+  box-shadow:0 2px 0 #070B12;
+}
+:root[data-theme="dark"] .app-dex-menu{
+  border-color:#EDF0F6;
+  color:#101A2B;
+  box-shadow:0 3px 0 #070B12;
+}
+
+@media(max-width:390px){
+  .app-dex-header-inner{width:calc(100% - 24px)}
+  .app-dex-header-actions{gap:5px}
+  .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:36px;height:36px;flex-basis:36px}
+  .app-dex-dock{padding-inline:10px}
+}

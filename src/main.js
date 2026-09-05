@@ -170,6 +170,9 @@ let appRueckwaerts = false;
 let popstateNavigation = false;
 let erzwungenesRueckwaertsZiel = '';
 let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
+let appDockEigene = [];
+let appDockGeladen = false;
+let appDockCoinStand = null;
 
 const ansichtsCache = createLruCache({ limit: 10, onEvict: disposeViewEntry });
 
@@ -248,7 +251,10 @@ window.addEventListener('popstate', () => {
 document.addEventListener('click', (event) => {
   const link = event.target.closest('a[href^="#"]');
   if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  const ziel = link.getAttribute('href')?.slice(1) || 'home';
+  const angefragtesZiel = link.getAttribute('href')?.slice(1) || 'home';
+  const ziel = angefragtesZiel === 'home' && session
+    ? appLetzteDexRoute()
+    : angefragtesZiel;
   if (ziel.startsWith('entry/')) {
     document.documentElement.style.setProperty('--detail-origin-x', `${event.clientX}px`);
     document.documentElement.style.setProperty('--detail-origin-y', `${event.clientY}px`);
@@ -259,7 +265,7 @@ document.addEventListener('click', (event) => {
     // Navigationsstapel kennt Home dann nicht mehr als vorherige Ansicht.
     // Ein Dex-X ist trotzdem semantisch immer ein Rueckweg: Home wird frisch
     // aufgebaut, waehrend der aktuelle Dex wie gewohnt nach rechts ausfaehrt.
-    const istDexSchliessen = ziel === 'home' && link.matches([
+    const istDexSchliessen = angefragtesZiel === 'home' && link.matches([
       '.neo-dex-action-close',
       '.food-dex-action-close',
       '.kategorie-schliessen',
@@ -342,6 +348,7 @@ function meldung(slot, text, art) {
 
 function renderSetup() {
   app.classList.remove('app-shell');
+  appDexShellEntfernen();
   setSeite('setup');
   app.innerHTML = `
     <main class="setup-shell wrap">
@@ -373,6 +380,7 @@ function renderSetup() {
 
 function renderAuth() {
   app.classList.remove('app-shell');
+  appDexShellEntfernen();
   setSeite('auth');
   const login = authMode === 'login';
   app.innerHTML = `
@@ -464,6 +472,7 @@ function renderAuth() {
 
 function renderRecovery() {
   app.classList.remove('app-shell');
+  appDexShellEntfernen();
   setSeite('auth');
   app.innerHTML = `
     <main class="auth-shell">
@@ -526,6 +535,189 @@ const sichtbareSammlungen = () => {
   const nachRoute = new Map(sammlungen.map((sammlung) => [sammlung[0], sammlung]));
   return visibleCollectionRoutes().map((route) => nachRoute.get(route)).filter(Boolean);
 };
+
+const APP_DEX_ROUTES = new Set([...sammlungen.map(([route]) => route), 'coins']);
+const LETZTER_DEX_KEY = 'muscledex:letzter-dex';
+
+function appDexFallbackRoute() {
+  const sichtbar = sichtbareSammlungen();
+  return sichtbar.some(([route]) => route === 'reminders')
+    ? 'reminders'
+    : (sichtbar[0]?.[0] || (coinDexIsVisible() ? 'coins' : 'reminders'));
+}
+
+function appLetzteDexRoute() {
+  const fallback = appDexFallbackRoute();
+  const gespeichert = getPreference(LETZTER_DEX_KEY, fallback) || fallback;
+  if (gespeichert.startsWith('collection/')) {
+    const id = gespeichert.slice('collection/'.length);
+    return id && customCollectionIsVisible(id) ? gespeichert : fallback;
+  }
+  if (gespeichert === 'coins') return coinDexIsVisible() ? gespeichert : fallback;
+  return sichtbareSammlungen().some(([route]) => route === gespeichert) ? gespeichert : fallback;
+}
+
+function istAppHauptDex(route, view) {
+  if (APP_DEX_ROUTES.has(route)) return true;
+  return route.startsWith('collection/') && Boolean(view?.dataset.appDockRoute);
+}
+
+function appDexShellEntfernen() {
+  app.classList.remove('dex-app-shell', 'dex-app-shell-unterdex');
+  app.querySelector(':scope > .app-dex-header')?.remove();
+  app.querySelector(':scope > .app-dex-dock')?.remove();
+}
+
+function appDockTitel(route) {
+  if (route.startsWith('collection/')) {
+    return appDockEigene.find((item) => `collection/${item.id}` === route)?.name || 'Dex';
+  }
+  return sammlungen.find(([key]) => key === route)?.[1]
+    || (route === 'coins' ? 'Coin-Dex' : 'Dex');
+}
+
+function appDockEintraegeMarkup(aktiveDockRoute) {
+  const standard = sichtbareSammlungen().map(([route, titel]) => `
+    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
+       data-sammlung="${route}" style="--app-dex-tab-color:${escapeHtml(pageLook(route, categoryColor(route), 'drops').color)}"
+       aria-label="${escapeHtml(titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
+      <span aria-hidden="true">${categoryIconMarkup(route, 'app-dex-tab-icon')}</span>
+      <small>${escapeHtml(titel)}</small>
+    </a>`).join('');
+  const eigene = appDockEigene.map((item) => {
+    const route = `collection/${item.id}`;
+    return `
+      <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
+         data-collection-id="${item.id}" style="--app-dex-tab-color:${escapeHtml(item.color || '#FF69AE')}"
+         aria-label="${escapeHtml(item.name)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
+        <span aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
+        <small>${escapeHtml(item.name)}</small>
+      </a>`;
+  }).join('');
+  const coins = coinDexIsVisible() ? `
+    <a class="app-dex-tab${aktiveDockRoute === 'coins' ? ' aktiv' : ''}" href="#coins"
+       data-sammlung="coins" style="--app-dex-tab-color:${escapeHtml(pageLook('coins', categoryColor('coins'), 'wallpaper-game').color)}"
+       aria-label="Coin-Dex"${aktiveDockRoute === 'coins' ? ' aria-current="page"' : ''}>
+      <span aria-hidden="true">${categoryIconMarkup('coins', 'app-dex-tab-icon')}</span>
+      <small>Coins</small>
+    </a>` : '';
+  const suche = `
+    <a class="app-dex-tab app-dex-tool" href="#search" aria-label="MUSCLEDEX durchsuchen">
+      <span aria-hidden="true">${materialIconMarkup('search')}</span>
+      <small>Suche</small>
+    </a>`;
+  return standard + eigene + coins + suche;
+}
+
+function appDexShellZeichnen(route, view) {
+  if (!istAppHauptDex(route, view)) {
+    appDexShellEntfernen();
+    return;
+  }
+  const aktiveDockRoute = view.dataset.appDockRoute || route;
+  const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
+  appDexShellEntfernen();
+  app.classList.add('dex-app-shell');
+  app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
+
+  const header = document.createElement('header');
+  header.className = 'app-dex-header';
+  header.style.backgroundColor = document.documentElement.dataset.theme === 'dark'
+    ? '#101A2B'
+    : (getComputedStyle(document.documentElement).getPropertyValue('--dex-seitenfarbe').trim()
+      || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+  header.innerHTML = `
+    <div class="app-dex-header-inner">
+      <span class="app-dex-brand" aria-label="MUSCLEDEX">${headerBrandMarkup()}</span>
+      <div class="app-dex-header-actions">
+        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }) : ''}
+        <button class="tuck-quadrat app-dex-create" type="button" aria-label="Neuen Dex erstellen">
+          ${materialIconMarkup('create_new_folder')}
+        </button>
+        <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+      </div>
+    </div>`;
+
+  const dock = document.createElement('nav');
+  dock.className = 'app-dex-dock';
+  dock.setAttribute('aria-label', 'Dex wechseln und Eintrag hinzufügen');
+  dock.innerHTML = `
+    <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
+    <button class="app-dex-menu" type="button" aria-label="Eintrag in ${escapeHtml(appDockTitel(aktiveDockRoute))} hinzufügen">
+      ${materialIconMarkup('place_item')}
+      <small>Eintrag</small>
+    </button>`;
+  app.append(header, dock);
+
+  const tabLeiste = dock.querySelector('.app-dex-tabs');
+  tabLeiste.scrollLeft = alterScrollstand;
+  requestAnimationFrame(() => {
+    const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
+    if (!aktiv) return;
+    const links = aktiv.offsetLeft;
+    const rechts = links + aktiv.offsetWidth;
+    if (links < tabLeiste.scrollLeft || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth) {
+      aktiv.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  });
+
+  header.querySelector('.app-dex-create').onclick = () => openCollectionEditor({
+    userId: session.user.id,
+    rootKey: 'home',
+    onSaved: () => {
+      appDockGeladen = false;
+      appDexShellDatenLaden(route, view, routeAbortController?.signal);
+    },
+  });
+  dock.querySelector('.app-dex-menu').onclick = () => {
+    const ausloeser = view.querySelector(':scope > :is(.neo-dex-floating-actions,.food-dex-floating-actions) :is(.neo-dex-action-primary,.food-dex-action-primary)');
+    if (ausloeser) ausloeser.click();
+    else view.querySelector('.kategorie-plus')?.click();
+  };
+  bindLongPress(tabLeiste, '.app-dex-tab', dexEinstellungenOeffner({
+    userId: session.user.id,
+    refresh: () => {
+      appDockGeladen = false;
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    },
+    itemsById: new Map(appDockEigene.map((item) => [item.id, item])),
+  }));
+}
+
+async function appDexShellDatenLaden(route, view, signal) {
+  if (!istAppHauptDex(route, view) || signal?.aborted) return;
+  try {
+    const [eigene, coinStand] = await Promise.all([
+      appDockGeladen ? Promise.resolve(appDockEigene) : loadCollections(session.user.id, { rootKey: 'home', signal }),
+      coinDexIsVisible() ? loadCoinSummary(session.user.id, signal) : Promise.resolve(null),
+    ]);
+    if (signal?.aborted || view !== app.querySelector(':scope > #view')) return;
+    appDockEigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
+    appDockGeladen = true;
+    appDockCoinStand = coinStand;
+    appDexShellZeichnen(route, view);
+  } catch (error) {
+    if (!signal?.aborted) console.warn('Dex-Menüband konnte nicht aktualisiert werden:', error.message);
+  }
+}
+
+function appDexShellAktualisieren(route, view, signal) {
+  appDexShellZeichnen(route, view);
+  if (!istAppHauptDex(route, view)) return;
+  setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route);
+  appDexShellDatenLaden(route, view, signal);
+}
+
+window.addEventListener('muscledex:coins-changed', async () => {
+  const view = app.querySelector(':scope > #view');
+  if (!session || !view || !istAppHauptDex(aktiveRoute, view) || !coinDexIsVisible()) return;
+  try {
+    appDockCoinStand = await loadCoinSummary(session.user.id, routeAbortController?.signal);
+    if (view === app.querySelector(':scope > #view')) appDexShellZeichnen(aktiveRoute, view);
+  } catch (error) {
+    if (!isAbortError(error)) console.warn('COIN-Stand im Header konnte nicht aktualisiert werden:', error.message);
+  }
+});
 
 // Welche Tabelle den Zaehler einer Sammlung fuellt. Routinen haben noch keine
 // Tabelle – ihre Karte zeigt weiter "Bald".
@@ -641,7 +833,10 @@ function renderChrome(transition = 'hart') {
     view.className = `view-neu${transition === 'vor' ? ' seite-vor-warten' : transition === 'detail' ? ' seite-detail-warten' : ''}`;
     app.append(view);
   } else {
-    app.replaceChildren();
+    // Der feste Dex-Header und das untere Menüband gehören zur App-Schale,
+    // nicht zur wechselnden Route. Beim ersten Seiten-Mount werden deshalb nur
+    // alte Ansichten entfernt; die Schale selbst bleibt unangetastet.
+    app.querySelectorAll(':scope > main,:scope > .view-alt,:scope > .view-neu').forEach((node) => node.remove());
     view = document.createElement('main');
     view.id = 'view';
     app.append(view);
@@ -683,6 +878,7 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
   aktiveRoute = route;
   setSeite(gemerkt.seite || (route === 'home' ? 'home' : route.startsWith('entry/') || route.startsWith('collection/') ? 'collection' : route));
   dexLookAusAnsichtWiederherstellen(gemerkt.node);
+  appDexShellAktualisieren(route, gemerkt.node, routeAbortController?.signal);
 
   if (!aktuell) return true;
   aktuell.removeAttribute('id');
@@ -1068,7 +1264,8 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const body = kind === 'body';
   const shopping = kind === 'shopping';
   const habits = kind === 'habits';
-  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'Body-Log' : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : shopping ? 'Einkauf' : habits ? 'Routinen' : 'Fooddex');
+  const coins = kind === 'coins';
+  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'Body-Log' : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : shopping ? 'Einkauf' : habits ? 'Routinen' : coins ? 'Coin-Dex' : 'Fooddex');
   const copy = body
     ? `<p>Im <b>Body-Log</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -1085,6 +1282,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     ? `<p>Im <b>Einkaufs-Dex</b> sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
     : habits
     ? `<p>Im <b>Routinen-Dex</b> planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
+    : coins
+    ? `<p>Im <b>Coin-Dex</b> sammelst du MUSCLE-COINS für erledigte Routinen, Check-ins und Messungen.</p>
+      <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
+      <p>Dein Kontostand bleibt auch im festen App-Header sichtbar.</p>`
     : custom
     ? `<p>In <b>${escapeHtml(title)}</b> sammelst du eigene Notizen, Links, Bilder und Tonaufnahmen an einem Ort.</p>
       <p>Mit <b>Tags</b> und <b>Unter-Dex</b> strukturierst du die Inhalte so, wie es für dein Thema sinnvoll ist.</p>
@@ -1171,6 +1372,8 @@ async function mountCustomCollection(container, item, signal) {
     if (!parent || signal?.aborted) break;
     lookRoot = parent;
   }
+  container.dataset.appDockRoute = `collection/${lookRoot.id}`;
+  container.dataset.appDockSubdex = item.id === lookRoot.id ? 'false' : 'true';
   const inheritsSystemDexLook = item.root_key !== 'home';
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
   const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
@@ -1403,12 +1606,36 @@ async function renderRoute() {
     }
   }
   if (generation !== renderGeneration) return;
-  const angefragt = (location.hash || '#home').slice(1);
+  // Die Initialisierung lag früher im Mount der Startseite. Da es diese
+  // Ansicht nicht mehr gibt, wird sie einmalig vor dem ersten Dex erledigt;
+  // andernfalls fehlten neuen Konten Reihenfolge, Farben und Standard-Dex.
+  if (!getPreference('muscledex:home-defaults-v1', false)) {
+    try {
+      const bestehende = await loadCollections(session.user.id, { rootKey: 'home' });
+      await initialeStartseiteEinrichten(session.user.id, undefined, bestehende);
+      appDockGeladen = false;
+    } catch (error) {
+      if (!isAbortError(error)) console.warn('Dex-Grundeinstellung konnte nicht vorbereitet werden:', error.message);
+    }
+  }
+  let angefragt = (location.hash || '#home').slice(1);
+  // Die frühere Startseite ist durch die feste Dex-Navigation ersetzt. Ein
+  // Einstieg über #home landet deshalb beim zuletzt verwendeten Haupt-Dex;
+  // neue Konten beginnen im Meal-Log.
+  if (angefragt === 'home') {
+    angefragt = appLetzteDexRoute();
+    history.replaceState(history.state, '', `#${angefragt}`);
+  }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  const route = ['home', 'search', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
+  let route = ['home', 'search', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
     : 'home';
+  if (route === 'home') {
+    route = appDexFallbackRoute();
+    angefragt = route;
+    history.replaceState(history.state, '', `#${route}`);
+  }
   let richtung = navRichtung(angefragt);
   if (erzwungenesRueckwaertsZiel === angefragt) {
     erzwungenesRueckwaertsZiel = '';
@@ -1475,6 +1702,10 @@ async function renderRoute() {
     await mountSearch(view, signal);
   } else if (route === 'profile') {
     setSeite('profile');
+    // Sichtbarkeit und Reihenfolge des Menübandes werden hier bearbeitet.
+    // Beim Zurückkehren muss deshalb auch die Liste eigener Dex frisch aus
+    // der Datenbank kommen und darf nicht aus dem Dock-Cache stammen.
+    appDockGeladen = false;
     const { mountProfile } = await profileModule();
     mountProfile(view, {
       session,
@@ -1667,7 +1898,12 @@ async function renderRoute() {
     });
   } else if (route.startsWith('collection/')) {
     const item = await getCollection(session.user.id, route.slice('collection/'.length), signal);
-    if (!item) { location.hash = 'home'; return; }
+    if (!item) {
+      const fallbackDex = appDexFallbackRoute();
+      setPreference(LETZTER_DEX_KEY, fallbackDex);
+      location.hash = fallbackDex;
+      return;
+    }
     await mountCustomCollection(view, item, signal);
   } else if (route.startsWith('entry/')) {
     // Keep the originating Dex surface during the transition. This prevents
@@ -1739,6 +1975,7 @@ async function renderRoute() {
     view.remove();
     return;
   }
+  appDexShellAktualisieren(route, view, signal);
   // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.
   // Supabase-Roundtrip). War alles praktisch sofort da – etwa nach der
   // iOS-Zurueck-Wischgeste, die den Inhalt oft schon zeigt, bevor unser
@@ -1820,11 +2057,12 @@ async function renderRoute() {
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();
   }
-  const dexAddButton = view.querySelector('.kategorie-plus');
+  const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
+    || view.querySelector('.kategorie-plus');
   if (dexAddButton) showGestureHintOnce({
     key: 'dex-hinzufuegen',
     title: 'Hier kommt Neues hinein',
-    text: 'Der Hinzufügen-Button oben passt sich jedem Dex an und zeigt die passenden Einträge.',
+    text: 'Der Eintrag-Button im Menüband passt sich jedem Dex an und zeigt die passenden Einträge.',
     gesture: 'add',
     target: dexAddButton,
     replace: true,
@@ -1835,6 +2073,7 @@ function renderLadefehler(error) {
   const info = userFacingLoadError(error, { online: navigator.onLine });
   routeAbortController?.abort();
   ansichtsCache.clear();
+  appDexShellEntfernen();
   app.querySelectorAll(':scope > main').forEach((node) => node.remove());
   const view = document.createElement('main');
   view.id = 'view';
@@ -1845,7 +2084,7 @@ function renderLadefehler(error) {
     <p>${info.message}</p>
     <div class="route-fehler-aktionen">
       <button class="btn btn-primary" type="button" data-route-retry>Erneut versuchen</button>
-      <a class="btn" href="#home">Zur Startseite</a>
+      <a class="btn" href="#home">Zum letzten Dex</a>
     </div>
   </section>`;
   app.append(view);
@@ -1895,6 +2134,9 @@ if (!supabaseKonfiguriert) {
       navigationZuruecksetzen('home');
       profile = null;
       profileLadePromise = null;
+      appDockEigene = [];
+      appDockGeladen = false;
+      appDockCoinStand = null;
       setPreferenceUser('');
     }
     if (event === 'SIGNED_IN' && !bisherigeUserId) {
@@ -1905,6 +2147,9 @@ if (!supabaseKonfiguriert) {
       navigationZuruecksetzen((location.hash || '#home').slice(1) || 'home');
       profile = null;
       profileLadePromise = null;
+      appDockEigene = [];
+      appDockGeladen = false;
+      appDockCoinStand = null;
     }
     if (session?.user?.id) {
       const aktiveUserId = session.user.id;
