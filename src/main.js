@@ -631,7 +631,7 @@ function renderChrome(transition = 'hart') {
     // fuer einen Frame auf das pinke Standarddesign zurueck.
     bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
     bisher.classList.add('view-alt');
-    bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping', 'habits'].includes(bisherigeSeite));
+    bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping', 'habits', 'coins'].includes(bisherigeSeite));
     bisher.classList.toggle('view-alt-hart', transition === 'hart');
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
@@ -1490,8 +1490,15 @@ async function renderRoute() {
     });
   } else if (route === 'coins') {
     setSeite('coins');
+    applyPageLook('coins', categoryColor('coins'), 'wallpaper-game');
+    view.classList.add('neo-dex-page', 'food-dex-page', 'coin-dex-page');
     prepareSpecialDexPage(view, 'coin-dex');
-    await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
+    const coinActions = await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
+    installNeoDexChrome(view, {
+      title: 'Coin-Dex',
+      meta: coinActions?.meta || 'Belohnungen',
+      closeHref: '#home',
+    });
   } else if (route === 'body') {
     setSeite('body');
     applyPageLook('body', categoryColor('body'), 'wallpaper-measure');
@@ -1815,7 +1822,7 @@ async function renderRoute() {
     view.classList.remove('view-neu');
     entferneUebergangshintergrund();
   }
-  const dexAddButton = route !== 'coins' ? view.querySelector('.kategorie-plus') : null;
+  const dexAddButton = view.querySelector('.kategorie-plus');
   if (dexAddButton) showGestureHintOnce({
     key: 'dex-hinzufuegen',
     title: 'Hier kommt Neues hinein',

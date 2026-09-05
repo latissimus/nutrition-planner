@@ -50,7 +50,7 @@ export function coinHeaderMarkup(summary) {
 
 function coinEarningOverview() {
   const group = (title, icon, values) => `<div class="coin-verdienst-gruppe"><span class="coin-verdienst-titel"><i>${icon}</i><b>${title}</b></span><div>${values.map(([label, coins]) => `<span><small>${label}</small><strong>${coins}${muscleCoinMarkup('coin-wert-symbol')}</strong></span>`).join('')}</div></div>`;
-  return `<details class="coin-verdienst">
+  return `<details class="coin-verdienst special-dex-wide-card" data-coin-earning-overview>
     <summary><span><b>So verdienst du Coins</b><small>Vergütung anzeigen</small></span>${materialIconMarkup('chevron_right')}</summary>
     <div class="coin-verdienst-inhalt">
       <small class="coin-verdienst-hinweis">Je Routine und geplantem Tag einmal</small>
@@ -70,8 +70,8 @@ function closeOverlay(backdrop) {
 
 function rewardEditor({ userId, existing = null, onSaved }) {
   const backdrop = document.createElement('div');
-  backdrop.className = 'kategorie-sheet-backdrop coin-editor-backdrop';
-  backdrop.innerHTML = `<section class="kategorie-sheet coin-editor" role="dialog" aria-modal="true" aria-label="Belohnung ${existing ? 'bearbeiten' : 'anlegen'}">
+  backdrop.className = 'kategorie-sheet-backdrop special-dex-overlay coin-editor-backdrop';
+  backdrop.innerHTML = `<section class="kategorie-sheet special-dex-sheet coin-editor" role="dialog" aria-modal="true" aria-label="Belohnung ${existing ? 'bearbeiten' : 'anlegen'}">
     <header><h2>${existing ? 'Belohnung bearbeiten' : 'Neue Belohnung'}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-coin-reward-form>
       <label class="dex-entry-field"><span>Belohnung</span><input class="input" data-reward-name maxlength="80" value="${escapeHtml(existing?.name || '')}" placeholder="z. B. Lieblingssnack" required></label>
@@ -134,27 +134,31 @@ function historyText(item) {
 
 export async function mountCoinDex(container, { userId, signal, mountChrome }) {
   const color = categoryColor('coins');
-  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="seitenkopf"><h1>COIN-DEX</h1></div><div class="coin-dex-inhalt"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-  mountChrome(container, 'coins', 'COIN-DEX', { color, meta: 'Belohnungen', hideAppearanceIcon: true, onPlus: () => rewardEditor({ userId, onSaved: refresh }) });
+  const openRewardEditor = () => rewardEditor({ userId, onSaved: refresh });
+  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="seitenkopf"><h1>Coin-Dex</h1></div><div class="coin-dex-inhalt special-dex-content special-dex-stack"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
+  mountChrome(container, 'coins', 'Coin-Dex', {
+    color, meta: 'Belohnungen', pageLookPattern: 'wallpaper-game', hideAppearanceIcon: true, onPlus: openRewardEditor,
+  });
   let ledgerQuery = supabase.from('muscle_coin_ledger').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30);
   let rewardsQuery = supabase.from('muscle_rewards').select('*').eq('user_id', userId).eq('active', true).order('cost');
   if (signal) { ledgerQuery = ledgerQuery.abortSignal(signal); rewardsQuery = rewardsQuery.abortSignal(signal); }
   const [{ data: ledger, error }, { data: rewards, error: rewardsError }] = await Promise.all([ledgerQuery, rewardsQuery]);
   if (error || rewardsError) {
-    container.querySelector('.coin-dex-inhalt').innerHTML = '<div class="tuck-leer"><b>COIN-DEX noch nicht bereit</b><span>Bitte zuerst das neue Datenbank-Update einspielen.</span></div>';
-    return;
+    container.querySelector('.coin-dex-inhalt').innerHTML = '<div class="tuck-leer"><b>Coin-Dex noch nicht bereit</b><span>Bitte zuerst das neue Datenbank-Update einspielen.</span></div>';
+    return { meta: 'Belohnungen', openAddMenu: openRewardEditor };
   }
   const balance = (ledger || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
   const next = nextReward(rewards || [], balance);
   const progress = next ? Math.min(100, Math.round((balance / next.cost) * 100)) : 0;
   container.querySelector('.coin-dex-inhalt').innerHTML = `
-    <section class="coin-balance-card">
+    <section class="coin-balance-card special-dex-hero">
       ${muscleCoinMarkup('coin-balance-symbol')}
       <span><small>DEIN KONTOSTAND</small><strong>${balance}</strong><b>MUSCLE-COINS</b></span>
+      <button type="button" class="coin-balance-info" data-coin-info aria-label="Verdienstregeln anzeigen">${materialIconMarkup('info')}</button>
     </section>
     ${coinEarningOverview()}
-    ${next ? `<section class="coin-next"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} Coins</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
+    ${next ? `<section class="coin-next special-dex-wide-card"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} Coins</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
     <header class="coin-section-title"><h2>Deine Belohnungen</h2></header>
     <section class="coin-reward-list">${(rewards || []).length ? rewards.map((item) => rewardMarkup(item, balance)).join('') : '<div class="coin-empty"><b>Noch keine Belohnung</b><span>Lege etwas fest, auf das du dich wirklich freust.</span></div>'}</section>
     ${(ledger || []).length ? `<h2 class="coin-history-title">Zuletzt</h2><section class="coin-history">${ledger.slice(0, 8).map((item) => `<div><span>${escapeHtml(historyText(item))}<small>${new Date(item.created_at).toLocaleDateString('de-DE')}</small></span><b class="${item.amount > 0 ? 'plus' : 'minus'}">${item.amount > 0 ? '+' : ''}${item.amount}</b></div>`).join('')}</section>` : ''}`;
@@ -170,5 +174,15 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     if (redeemError) return toast(redeemError.message || 'Einlösen fehlgeschlagen.');
     notifyCoinBalanceChanged();
     toast('Belohnung eingelöst'); refresh();
+  };
+  container.querySelector('[data-coin-info]')?.addEventListener('click', () => {
+    const overview = container.querySelector('[data-coin-earning-overview]');
+    if (!overview) return;
+    overview.open = !overview.open;
+    if (overview.open) overview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  return {
+    meta: `${(rewards || []).length} ${(rewards || []).length === 1 ? 'Belohnung' : 'Belohnungen'}`,
+    openAddMenu: openRewardEditor,
   };
 }
