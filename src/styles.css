@@ -9489,6 +9489,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:100%!important;
   height:100lvh!important;
 }
+/* Die weitgehend einfarbige Einkaufsflaeche wirkt mit dem allgemeinen
+   400-ms-Profil deutlich abrupter als die staerker gegliederten Special-Dex.
+   Ein minimal laengerer Ausstieg und eine klarere linke Tiefenkante machen
+   dieselbe Rueckwaertsbewegung auf iOS als zusammenhaengenden Slide sichtbar. */
+.app-shell>.view-alt-zurueck.shopping-dex-page.seite-raus-rechts{
+  animation-duration:.48s!important;
+  animation-timing-function:cubic-bezier(.22,.72,0,1)!important;
+  box-shadow:-14px 0 28px rgba(0,0,0,.22)!important;
+}
 .shopping-dex-page>*:not(:is(.neo-dex-floating-actions,.food-dex-floating-actions)){
   position:relative!important;
   z-index:1!important;
