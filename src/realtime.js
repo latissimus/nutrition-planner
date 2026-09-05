@@ -1,8 +1,22 @@
-import { supabase } from './supabase.js';
+/**
+ * Refresh-Koordinator ohne Postgres-Realtime.
+ *
+ * Ursprünglich hielt jede Ansicht eine oder mehrere Supabase-Realtime-
+ * Verbindungen offen. Auf dem iPhone summierten sich diese Kanäle (bis zu
+ * 22 Subscriptions über die App verteilt) zu spürbaren Aussetzern und
+ * langsamen Wechseln. Für eine Solo-Nutzer-App auf einem Gerät sind Live-
+ * Updates aus der Datenbank unnötig: alle Änderungen entstehen lokal und
+ * werden schon per notifyHomeCountsChanged/notifyCoinBalanceChanged nach
+ * jedem Save propagiert.
+ *
+ * subscribeToTableChanges/subscribeToTablesChanges behalten deshalb ihre
+ * Signatur, hören aber nur noch auf lokale App-Events plus die Rückkehr
+ * in den Vordergrund (visibilitychange). Für Sharing-Szenarien sieht die
+ * andere Person Änderungen beim nächsten Aufwachen der App – nicht live,
+ * aber ohne den Perf-Preis.
+ */
 
-// Lokaler Fallback für Zähler auf der Startseite. Er wird nach einem
-// erfolgreichen Schreibvorgang ausgelöst, falls der Postgres-Realtime-Kanal
-// auf dem Gerät verzögert oder gar nicht verbunden ist.
+// Lokale Ereignisse: jeder Save streut sie, jeder Refresh hört mit.
 export function notifyHomeCountsChanged() {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:counts-changed'));
 }
@@ -11,12 +25,9 @@ export function notifyCoinBalanceChanged() {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:coins-changed'));
 }
 
-const zufallsId = () => globalThis.crypto?.randomUUID?.()
-  || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-/* Mehrere schnelle Datenbankereignisse (etwa ein Rezeptimport) werden zu
-   genau einem Nachladen zusammengefasst. Läuft bereits ein Abruf, folgt
-   anschließend höchstens ein weiterer mit dem dann neuesten Stand. */
+/* Mehrere schnelle Anfragen (z. B. ein Rezeptimport) werden zu genau
+   einem Nachladen zusammengefasst. Läuft bereits ein Abruf, folgt danach
+   höchstens ein weiterer mit dem dann neuesten Stand. */
 export function createRealtimeRefresh(onRefresh, { delay = 90, onError } = {}) {
   let timer = null;
   let running = false;
@@ -54,40 +65,44 @@ export function createRealtimeRefresh(onRefresh, { delay = 90, onError } = {}) {
   };
 }
 
-export function subscribeToTableChanges({ table, signal, onChange, onError }) {
-  if (!supabase || !table || typeof onChange !== 'function' || signal?.aborted) return () => {};
-  const refresh = createRealtimeRefresh(onChange, { onError });
-  const channel = supabase.channel(`muscledex:${table}:${zufallsId()}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table }, () => refresh.request())
-    .subscribe();
-  let closed = false;
-  const close = () => {
-    if (closed) return;
-    closed = true;
-    refresh.stop();
-    supabase.removeChannel(channel);
+const REFRESH_EVENTS = ['muscledex:counts-changed', 'muscledex:coins-changed'];
+
+function attachRefresh(request, signal) {
+  if (typeof window === 'undefined') return () => {};
+  const listener = () => request();
+  const visibility = () => { if (document.visibilityState === 'visible') request(); };
+  REFRESH_EVENTS.forEach((event) => window.addEventListener(event, listener));
+  document.addEventListener('visibilitychange', visibility);
+  const detach = () => {
+    REFRESH_EVENTS.forEach((event) => window.removeEventListener(event, listener));
+    document.removeEventListener('visibilitychange', visibility);
   };
-  signal?.addEventListener('abort', close, { once: true });
-  return close;
+  signal?.addEventListener('abort', detach, { once: true });
+  return detach;
 }
 
-// Verwandte Tabellen teilen genau einen Refresh-Koordinator. So löst ein
-// Schreibvorgang, der mehrere Realtime-Ereignisse erzeugt, nur einen Reload
-// der Ansicht aus und niemals parallele Vollabfragen pro Tabelle.
-export function subscribeToTablesChanges({ tables = [], signal, onChange, onError, delay = 90 }) {
-  const uniqueTables = [...new Set(tables.filter(Boolean))];
-  if (!supabase || !uniqueTables.length || typeof onChange !== 'function' || signal?.aborted) return () => {};
-  const refresh = createRealtimeRefresh(onChange, { delay, onError });
-  const channels = uniqueTables.map((table) => supabase.channel(`muscledex:${table}:${zufallsId()}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table }, () => refresh.request())
-    .subscribe());
+export function subscribeToTableChanges({ table, signal, onChange, onError }) {
+  if (!table || typeof onChange !== 'function' || signal?.aborted) return () => {};
+  const refresh = createRealtimeRefresh(onChange, { onError });
+  const detach = attachRefresh(refresh.request, signal);
   let closed = false;
-  const close = () => {
+  return () => {
     if (closed) return;
     closed = true;
     refresh.stop();
-    channels.forEach((channel) => supabase.removeChannel(channel));
+    detach();
   };
-  signal?.addEventListener('abort', close, { once: true });
-  return close;
+}
+
+export function subscribeToTablesChanges({ tables = [], signal, onChange, onError, delay = 90 }) {
+  if (!tables.length || typeof onChange !== 'function' || signal?.aborted) return () => {};
+  const refresh = createRealtimeRefresh(onChange, { delay, onError });
+  const detach = attachRefresh(refresh.request, signal);
+  let closed = false;
+  return () => {
+    if (closed) return;
+    closed = true;
+    refresh.stop();
+    detach();
+  };
 }
