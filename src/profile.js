@@ -88,15 +88,15 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   wrap.className = 'wrap pad-bottom profil-fixkopf';
   wrap.innerHTML = `
     <nav class="kategorie-kopf profil-kopf" aria-label="Mein Konto bedienen">
-      <div class="kategorie-kopftitel"><strong>MEIN KONTO</strong></div>
+      <div class="kategorie-kopftitel"><strong>PROFIL</strong></div>
       <a class="kategorie-kopfknopf kategorie-schliessen" href="#home" aria-label="Mein Konto schließen">${materialIconMarkup('close')}</a>
     </nav>
-    <section class="seiten-einstieg">
-      <b>Alles zu deinem Konto</b>
-      <span>Profil, Darstellung und Daten übersichtlich verwalten.</span>
-    </section>`;
+    <header class="profile-page-heading">
+      <h1>Profil</h1>
+      <p>Konto &amp; Einstellungen</p>
+    </header>`;
 
-  const konto = abschnitt(wrap, 'Konto', true);
+  const konto = abschnitt(wrap, 'Konto', true, 'profile-konto');
   const top = document.createElement('div');
   top.className = 'profile-top';
   const avatarSlot = document.createElement('div');
