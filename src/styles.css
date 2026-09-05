@@ -10088,6 +10088,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 #app.dex-app-shell :is(.home-scrollinhalt,.dex-detail-scrollinhalt,.kategorie-scrollinhalt){
   padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
 }
+/* Der feste LOGMAN-Kopf braucht eine klar erkennbare Trennung zur ersten
+   Hero-Karte. Die übrigen Abstände innerhalb der Dex bleiben unverändert. */
+#app.dex-app-shell #view.special-dex-page .kategorie-scrollinhalt{
+  padding-top:24px!important;
+}
 .app-dex-header{
   position:absolute;
   z-index:85;

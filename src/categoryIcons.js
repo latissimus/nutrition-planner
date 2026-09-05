@@ -533,6 +533,7 @@ function eintragTypWaehlen(container, route, options = {}) {
         <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>
         ${options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : ''}`
         : standardEntries}
+      ${options.onCreateSub ? `<button data-entry-type="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
     </div>`);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
     const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
@@ -542,6 +543,7 @@ function eintragTypWaehlen(container, route, options = {}) {
     if (type === 'own-recipe') return options.onAddOwnRecipe?.();
     if (type === 'audio') return options.onAddAudio?.();
     if (type === 'routine') return options.onAddRoutine?.();
+    if (type === 'sub') return options.onCreateSub?.();
     if (type === 'note') {
       if (options.onAddNote) return options.onAddNote();
       return toast('Notizen sind für diesen Dex vorbereitet.');

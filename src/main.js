@@ -165,7 +165,6 @@ let authMode = 'login';
 let renderGeneration = 0;
 let routeAbortController = null;
 let vorgemerkteSuche = '';
-let browserRueckwaerts = false;
 let appRueckwaerts = false;
 let popstateNavigation = false;
 let erzwungenesRueckwaertsZiel = '';
@@ -240,7 +239,6 @@ function navigationZuruecksetzen(route = 'home') {
 // noch einmal darueberlegen.
 window.addEventListener('popstate', () => {
   popstateNavigation = true;
-  browserRueckwaerts = !appRueckwaerts;
   appRueckwaerts = false;
 });
 
@@ -619,13 +617,6 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
         <small>${escapeHtml(item.name)}</small>
       </a>`;
   }).join('');
-  const coins = coinDexIsVisible() ? `
-    <a class="app-dex-tab${aktiveDockRoute === 'coins' ? ' aktiv' : ''}" href="#coins"
-       data-sammlung="coins" style="--app-dex-tab-color:${escapeHtml(pageLook('coins', categoryColor('coins'), 'wallpaper-game').color)}"
-       aria-label="Coin-Dex"${aktiveDockRoute === 'coins' ? ' aria-current="page"' : ''}>
-      <span aria-hidden="true">${categoryIconMarkup('coins', 'app-dex-tab-icon')}</span>
-      <small>Coins</small>
-    </a>` : '';
   const suche = `
     <a class="app-dex-tab app-dex-tool" href="#search" aria-label="MUSCLEDEX durchsuchen">
       <span aria-hidden="true">${materialIconMarkup('search')}</span>
@@ -636,7 +627,7 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
       <span aria-hidden="true">${materialIconMarkup('create_new_folder')}</span>
       <small>Dex +</small>
     </button>`;
-  return standard + eigene + coins + suche + neu;
+  return standard + eigene + suche + neu;
 }
 
 function appSyncStatusAktualisieren() {
@@ -1700,14 +1691,11 @@ async function renderRoute() {
     erzwungenesRueckwaertsZiel = '';
     richtung = 'zurueck';
   }
-  const warBrowserRueckwaerts = browserRueckwaerts;
-  browserRueckwaerts = false;
-
   // Eine schon besuchte Zielseite ist sofort da. Beim nativen iOS-Swipe hat
   // WebKit die Bewegung bereits interaktiv gezeichnet; wir tauschen dann nur
   // noch lautlos auf dieselbe, erhaltene DOM-Ansicht. Beim X-/Zurueck-Tap
   // zeichnet die App selbst den Rueckwaerts-Slide.
-  if (richtung === 'zurueck' && gemerkteAnsichtZeigen(route, richtung, warBrowserRueckwaerts)) return;
+  if (richtung === 'zurueck' && gemerkteAnsichtZeigen(route, richtung, true)) return;
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
@@ -1715,13 +1703,10 @@ async function renderRoute() {
   if (richtung === 'gleich') vorherigerController?.abort();
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
-  const transition = richtung === 'vor' && route.startsWith('entry/')
-    ? 'detail'
-    : richtung === 'vor' && route !== 'home'
-      ? 'vor'
-      : richtung === 'zurueck'
-        ? 'zurueck'
-        : 'hart';
+  // Wie beim LOGMAN werden Seiten ohne Slide, Fade oder Gegenbewegung
+  // gewechselt. Der alte Dex bleibt nur während des Datenladens stehen und
+  // wird anschließend in einem Schritt durch die fertige Ansicht ersetzt.
+  const transition = 'hart';
   const view = renderChrome(transition);
   if (route.startsWith('entry/')) {
     // Carry the rendered surface (including a selected wallpaper) over to
@@ -2078,7 +2063,9 @@ async function renderRoute() {
   // Zwei Frames: erst die komplett gemountete neue Seite samt Tapete
   // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
   // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (transition !== 'hart') {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
   aktiveRoute = route;
   if (transition === 'vor' || transition === 'detail') {
     view.classList.remove('seite-vor-warten', 'seite-detail-warten');
