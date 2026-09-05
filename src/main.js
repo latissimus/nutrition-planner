@@ -218,11 +218,9 @@ function nachEigenerSeitenanimation(element, animationName, callback, timeout = 
 
 function seitenausstiegVorbereiten(element) {
   if (!element) return;
-  // Ein `position:fixed` gezeichnetes Muster kann WebKit beim Transformieren
-  // eines Scrollcontainers als eigene Viewport-Ebene festhalten. Der aktuelle
-  // Scrollversatz erlaubt CSS, die Tapete fuer den Ausstieg deckungsgleich als
-  // absolute Ebene in die animierte Seite zu legen.
-  element.style.setProperty('--seiten-ausstieg-scroll-top', `${Math.max(0, element.scrollTop || 0)}px`);
+  // Alle Dex verlassen die Ansicht als eine einzige, unveraenderte Ebene.
+  // Dauer, Easing, Schatten und Gegenbewegung kommen ausschliesslich aus den
+  // gemeinsamen `seite-*`-Regeln.
   element.classList.add('view-alt-zurueck', 'seite-raus-rechts');
 }
 
