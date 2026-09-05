@@ -2166,9 +2166,35 @@ function renderLadefehler(error) {
   retry.focus({ preventScroll: true });
 }
 
+let dexModuleVorgeladen = false;
+function dexModuleVorladen() {
+  if (dexModuleVorgeladen) return;
+  dexModuleVorgeladen = true;
+  /* Ohne diesen Vorlauf lädt der Browser jedes Dex-Modul erst dann vom
+     Netz/aus dem Service-Worker-Cache, wenn du zum ersten Mal auf die
+     Kachel tippst. Das erklärt den „gestückelten“ Ersterst-Aufbau: erst
+     kommt die JS-Datei, dann parst sie, dann laufen mount-Await-Ketten.
+     Wir laden alle Dex-Module still im Leerlauf, sobald der erste Paint
+     durch ist. Ab dann ist jeder Tap sofort. */
+  const start = () => {
+    remindersModule().catch(() => {});
+    bodyMetricsModule().catch(() => {});
+    sleepModule().catch(() => {});
+    shoppingModule().catch(() => {});
+    routinesModule().catch(() => {});
+    entryDetailModule().catch(() => {});
+  };
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(start, { timeout: 3000 });
+  } else {
+    setTimeout(start, 800);
+  }
+}
+
 async function render() {
   try {
     await renderRoute();
+    if (session) dexModuleVorladen();
   } catch (error) {
     if (isAbortError(error)) return;
     console.error('Seite konnte nicht geladen werden:', error);
