@@ -39,23 +39,6 @@ const ICONS = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
 };
 
-// Wert und Beschriftung: Die Auswahlliste fuer eigene Sammlungen braucht beides.
-export const ICON_OPTIONS = [
-  ['body', 'Körperwerte'],
-  ['reminders', 'Erinnerung'],
-  ['food', 'Essen'],
-  ['recipes', 'Rezept'],
-  ['habits', 'Gewohnheit'],
-  ['supplement', 'Supplement'],
-  ['drink', 'Trinken'],
-  ['sleep', 'Schlaf'],
-  ['folder', 'Ordner'],
-  ['heart', 'Herz'],
-  ['star', 'Stern'],
-  ['bolt', 'Energie'],
-  ['sun', 'Tag'],
-];
-
 export function iconMarkup(name, className = 'app-icon') {
   const path = ICONS[name] || ICONS.folder;
   return `<svg class="${className}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"

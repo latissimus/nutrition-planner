@@ -238,40 +238,6 @@ async function upsertCompletion(userId, reminderId, patch) {
   return data;
 }
 
-export async function loadReminderDashboard(userId, now = new Date()) {
-  const reminders = await loadReminders(userId);
-  const weekday = now.getDay();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const today = reminders.filter((reminder) =>
-    reminder.active && (reminder.weekdays || WEEKDAYS).includes(weekday));
-
-  const meals = today
-    .filter((reminder) => reminder.type === 'meal')
-    .sort((a, b) => minutesFromTime(a.time) - minutesFromTime(b.time));
-  const nextMeal = meals.find((reminder) => minutesFromTime(reminder.time) >= currentMinutes);
-
-  const supplements = today.filter((reminder) => reminder.type === 'supplement');
-  const drink = today.find((reminder) => reminder.type === 'drink');
-  const drinkInterval = Math.max(15, Number(drink?.metadata?.intervall_minuten || 120));
-
-  return {
-    meal: nextMeal
-      ? { value: String(nextMeal.time).slice(0, 5), detail: nextMeal.label }
-      : meals.length
-        ? { value: 'Fertig', detail: `${meals.length} heute geplant` }
-        : { value: 'Kein Plan', detail: 'Heute keine aktive Mahlzeit' },
-    supplement: supplements.length
-      ? { value: String(supplements.length), detail: supplements.length === 1 ? 'Einnahme geplant' : 'Einnahmen geplant' }
-      : { value: 'Keine', detail: 'Heute nichts aktiv' },
-    drink: drink
-      ? {
-          value: drinkInterval % 60 === 0 ? `${drinkInterval / 60} h` : `${drinkInterval} min`,
-          detail: `von ${String(drink.time).slice(0, 5)} bis ${drink.metadata?.bis || '21:00'}`,
-        }
-      : { value: 'Aus', detail: 'Keine aktive Erinnerung' },
-  };
-}
-
 function reminderPayload(userId, reminder) {
   return {
     user_id: userId,

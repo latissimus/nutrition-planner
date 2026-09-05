@@ -173,7 +173,12 @@ let appDockEigene = [];
 let appDockGeladen = false;
 let appDockCoinStand = null;
 
-const ansichtsCache = createLruCache({ limit: 10, onEvict: disposeViewEntry });
+/* Cache-Limit bewusst niedrig: jede gecachte Route behält ihre Realtime-
+   Abos und Timer am Leben, bis sie verdrängt wird. Bei 10 gehaltenen Views
+   summieren sich das zu 20–40 offenen Postgres-Channels auf dem iPhone und
+   die App fängt an zu hängen. 3 reicht für den typischen Rückweg (home ↔
+   Dex ↔ Detail), alles andere lädt beim Zurückspringen neu. */
+const ansichtsCache = createLruCache({ limit: 3, onEvict: disposeViewEntry });
 
 // Die Startseite wird fuer den schnellen Rueckweg als abgetrennte DOM-Ansicht
 // zwischengespeichert. Aendert sich die Darstellung eines Dex auf einer
@@ -647,12 +652,15 @@ function appDexShellZeichnen(route, view) {
   }
   const aktiveDockRoute = view.dataset.appDockRoute || route;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
-  appDexShellEntfernen();
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
 
-  const header = document.createElement('header');
-  header.className = 'app-dex-header';
+  let header = app.querySelector(':scope > .app-dex-header');
+  if (!header) {
+    header = document.createElement('header');
+    header.className = 'app-dex-header';
+    app.append(header);
+  }
   header.style.backgroundColor = document.documentElement.dataset.theme === 'dark'
     ? '#101A2B'
     : (getComputedStyle(document.documentElement).getPropertyValue('--dex-seitenfarbe').trim()
@@ -667,8 +675,12 @@ function appDexShellZeichnen(route, view) {
       </div>
     </div>`;
 
-  const dock = document.createElement('nav');
-  dock.className = 'app-dex-dock';
+  let dock = app.querySelector(':scope > .app-dex-dock');
+  if (!dock) {
+    dock = document.createElement('nav');
+    dock.className = 'app-dex-dock';
+    app.append(dock);
+  }
   dock.setAttribute('aria-label', 'Dex wechseln und Eintrag hinzufügen');
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
@@ -677,7 +689,6 @@ function appDexShellZeichnen(route, view) {
         ${appMenueComputerMarkup()}
       </button>
     </div>`;
-  app.append(header, dock);
   appSyncStatusAktualisieren();
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
@@ -734,6 +745,10 @@ function appDexShellZeichnen(route, view) {
 
 async function appDexShellDatenLaden(route, view, signal) {
   if (!istAppHauptDex(route, view) || signal?.aborted) return;
+  /* Navigation und Kontostand sind App-Schalen-Daten. Sobald sie geladen
+     sind, werden sie nicht bei jedem Dex-Wechsel erneut vom Server geholt und
+     die bereits sichtbare Schale dadurch auch nicht ein zweites Mal gebaut. */
+  if (appDockGeladen && (appDockCoinStand || !coinDexIsVisible())) return;
   try {
     const [eigene, coinStand] = await Promise.all([
       appDockGeladen ? Promise.resolve(appDockEigene) : loadCollections(session.user.id, { rootKey: 'home', signal }),
@@ -1695,7 +1710,11 @@ async function renderRoute() {
   // WebKit die Bewegung bereits interaktiv gezeichnet; wir tauschen dann nur
   // noch lautlos auf dieselbe, erhaltene DOM-Ansicht. Beim X-/Zurueck-Tap
   // zeichnet die App selbst den Rueckwaerts-Slide.
-  if (richtung === 'zurueck' && gemerkteAnsichtZeigen(route, richtung, true)) return;
+  /* Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
+     sofort verfügbar. Die alte Logik verwendete ihn nur beim Zurückgehen und
+     lud denselben Dex beim Antippen im Menü häufig vollständig neu. */
+  if (richtung !== 'gleich' && ansichtsCache.peek(route)
+    && gemerkteAnsichtZeigen(route, richtung, true)) return;
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;

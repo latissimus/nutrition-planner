@@ -51,8 +51,6 @@ const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
 const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
-let deferredPageLook = null;
-let deferPageLook = false;
 const defaultColors = {
   body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#FBE7A3',
   recipes: '#007DCC', training: '#215E61', habits: '#9564DD',
@@ -265,33 +263,8 @@ function writeRootPageLook(look) {
 
 export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   const look = pageLook(scope, fallbackColor, fallbackPattern);
-  if (deferPageLook) {
-    deferredPageLook = look;
-    return look;
-  }
   writeRootPageLook(look);
   return look;
-}
-
-// Bereitet eine noch unsichtbare Zielansicht vor, ohne den Look der aktuell
-// sichtbaren Seite umzuschalten. Das ist insbesondere bei dynamisch geladenen
-// Dex wichtig: Die Tapete kann bereits rasterisiert werden, während Daten und
-// Code-Chunk laden, und erscheint danach gemeinsam mit dem Inhalt.
-export function deferNextPageLook(value = true) {
-  deferPageLook = value;
-  if (value) deferredPageLook = null;
-}
-
-export function pendingPageLook() {
-  return deferredPageLook;
-}
-
-export function commitPendingPageLook() {
-  const look = deferredPageLook;
-  deferPageLook = false;
-  deferredPageLook = null;
-  if (!look) return;
-  writeRootPageLook(look);
 }
 
 function pageLookPicker(scope, fallbackColor, fallbackPattern, onChange) {
