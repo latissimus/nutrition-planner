@@ -1464,17 +1464,19 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'body');
     const { mountBodyMetrics } = await bodyMetricsModule();
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-    // Nach jedem bodyMetrics-Re-Render (jede DB-Änderung wischt das gesamte
-    // view.innerHTML weg) den dex-eintraege-Slot wieder anhängen und neu
-    // laden, sonst verschwindet der Bereich mit den eigenen Body-Log-Notizen
-    // nach der ersten Wiegung dauerhaft.
+    // Den Dex-Eintragsbereich beim ersten Body-Mount ergänzen. Spätere
+    // Messwert-Updates erhalten seinen DOM-Knoten samt Realtime-Abo.
+    let bodyDexEntriesInitialisiert = false;
     const rehydrateDexEntries = async () => {
       const wrap = view.querySelector(':scope > .wrap');
       if (!wrap) return;
-      if (!wrap.querySelector(':scope > [data-dex-entries]')) {
-        wrap.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
+      const content = wrap.querySelector(':scope > .kategorie-scrollinhalt') || wrap;
+      if (!content.querySelector(':scope > [data-dex-entries]')) {
+        content.insertAdjacentHTML('beforeend', dexEntriesSlotMarkup());
       }
+      if (bodyDexEntriesInitialisiert) return;
       await renderDexEntries(view, { userId: session.user.id, rootKey: 'body', color: categoryColor('body'), signal, hideEmpty: true });
+      bodyDexEntriesInitialisiert = true;
     };
     const bodyActions = await mountBodyMetrics(view, {
       session,

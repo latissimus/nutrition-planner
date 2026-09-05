@@ -208,14 +208,28 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   const renderOnce = async () => {
     state = await queryState(userId, signal);
     if (signal?.aborted) return;
-    container.innerHTML = `<div class="wrap pad-bottom body-metrics-wrap">
+    const markup = `
       ${bodyHeroMarkup(state)}
       ${bodyCompMarkup(state)}
       ${weightMarkup(state)}
       ${skinfoldMarkup(state)}
       ${waistMarkup(state)}
-      ${logmanMarkup(state)}
-    </div>`;
+      ${logmanMarkup(state)}`;
+    const content = container.querySelector(':scope > .body-metrics-wrap > .kategorie-scrollinhalt');
+    if (content) {
+      // Nach dem ersten Mount liegen Titel und Aktionsknöpfe außerhalb dieses
+      // Inhaltscontainers. Nur die Messkarten austauschen, damit ein neuer
+      // Gewichtswert niemals den gesamten Dex-Chrome samt Bedienung löscht.
+      // Der eigene Body-Dex-Eintragsbereich behält dabei seine Listener und
+      // sein Realtime-Abo, statt bei jeder Wiegung erneut angelegt zu werden.
+      const entries = content.querySelector(':scope > [data-dex-entries]');
+      content.innerHTML = markup;
+      if (entries) content.append(entries);
+    } else {
+      container.innerHTML = `<div class="wrap pad-bottom body-metrics-wrap">${markup}</div>`;
+    }
+    const pageMeta = container.querySelector('[data-food-scroll-meta]');
+    if (pageMeta) pageMeta.textContent = `${state.weights.length} ${state.weights.length === 1 ? 'Wiegung' : 'Wiegungen'}`;
     bind();
     // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
     // (Update-Hinweis mit eigenen Body-Log-Notizen) wieder anzuhängen und

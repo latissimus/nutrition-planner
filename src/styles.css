@@ -7543,7 +7543,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 :root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-sheet{
   overflow-x:clip!important;
-  overflow-y:visible!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
   padding-bottom:calc(18px + env(safe-area-inset-bottom))!important;
 }
 :root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-form{
