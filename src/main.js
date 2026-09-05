@@ -168,6 +168,7 @@ let vorgemerkteSuche = '';
 let browserRueckwaerts = false;
 let appRueckwaerts = false;
 let popstateNavigation = false;
+let erzwungenesRueckwaertsZiel = '';
 let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
 
 const ansichtsCache = createLruCache({ limit: 10, onEvict: disposeViewEntry });
@@ -218,7 +219,25 @@ document.addEventListener('click', (event) => {
     document.documentElement.style.setProperty('--detail-origin-x', `${event.clientX}px`);
     document.documentElement.style.setProperty('--detail-origin-y', `${event.clientY}px`);
   }
-  if (!routeStack.isPrevious(ziel)) return;
+  if (!routeStack.isPrevious(ziel)) {
+    // Nach einem Reload bzw. einem eingespielten App-Update kann die PWA
+    // direkt in einem Dex weiterlaufen. Der nur im Speicher liegende
+    // Navigationsstapel kennt Home dann nicht mehr als vorherige Ansicht.
+    // Ein Dex-X ist trotzdem semantisch immer ein Rueckweg: Home wird frisch
+    // aufgebaut, waehrend der aktuelle Dex wie gewohnt nach rechts ausfaehrt.
+    const istDexSchliessen = ziel === 'home' && link.matches([
+      '.neo-dex-action-close',
+      '.food-dex-action-close',
+      '.kategorie-schliessen',
+    ].join(','));
+    if (!istDexSchliessen) return;
+    event.preventDefault();
+    erzwungenesRueckwaertsZiel = ziel;
+    routeStack.reset(ziel);
+    if ((location.hash || '#home').slice(1) === ziel) render();
+    else location.hash = ziel;
+    return;
+  }
   event.preventDefault();
   appRueckwaerts = true;
   history.back();
@@ -1357,7 +1376,11 @@ async function renderRoute() {
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
     : 'home';
-  const richtung = navRichtung(angefragt);
+  let richtung = navRichtung(angefragt);
+  if (erzwungenesRueckwaertsZiel === angefragt) {
+    erzwungenesRueckwaertsZiel = '';
+    richtung = 'zurueck';
+  }
   const warBrowserRueckwaerts = browserRueckwaerts;
   browserRueckwaerts = false;
 
