@@ -10198,9 +10198,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inset:0;
   border:2px solid #0A1330;
   border-radius:16px;
-  background:rgba(255,255,255,.27);
-  -webkit-backdrop-filter:blur(6.65px) saturate(1.25);
-  backdrop-filter:blur(6.65px) saturate(1.25);
+  /* Die MUSCLEDEX-Tapeten bestehen aus feineren, transparenteren Linien als
+     die LOGMAN-Tapete. Mit dessen unveränderten Glaswerten verschwanden sie
+     vollständig. Die Schale bleibt Milchglas, lässt das jeweilige Muster
+     aber sichtbar durchscheinen. */
+  background:rgba(255,255,255,.18);
+  -webkit-backdrop-filter:blur(3.5px) saturate(1.2);
+  backdrop-filter:blur(3.5px) saturate(1.2);
 }
 .app-dex-tabs{
   min-width:0;
@@ -10329,7 +10333,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .app-dex-dock::before{background:linear-gradient(180deg,#101A2B 0,rgba(16,26,43,.7) 45%,transparent 100%)}
 :root[data-theme="dark"] .app-dex-dock::after{background:#101A2B}
-:root[data-theme="dark"] .app-dex-dock-inner::before{border-color:#697486;background:rgba(30,33,42,.27)}
+:root[data-theme="dark"] .app-dex-dock-inner::before{border-color:#697486;background:rgba(30,33,42,.18)}
 :root[data-theme="dark"] .app-dex-tab{color:#EDF0F6}
 :root[data-theme="dark"] .app-dex-tab.aktiv{
   color:#101A2B;
