@@ -9540,8 +9540,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:0;
   inset:0;
   pointer-events:none;
-  background:var(--dex-ink,#111);
-  opacity:.08;
+  background:#fff;
+  opacity:.12;
   -webkit-mask-image:var(--dex-tapete);
   mask-image:var(--dex-tapete);
   -webkit-mask-size:360px auto;
@@ -9571,7 +9571,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-inline:0!important;
 }
 .coin-dex-page :is(.neo-dex-scroll-title,.food-dex-scroll-title){
-  color:var(--dex-ink,#111)!important;
+  color:#fff!important;
 }
 .coin-dex-page .coin-dex-inhalt{
   display:grid!important;
@@ -9582,17 +9582,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coin-dex-page .coin-balance-card{
   box-sizing:border-box;
   display:grid;
-  grid-template-columns:82px minmax(0,1fr) 46px;
+  grid-template-columns:82px minmax(0,1fr) 34px;
   align-items:center;
   gap:18px;
-  min-height:152px;
-  padding:20px 22px;
+  min-height:118px;
+  padding:18px;
 }
 .coin-dex-page .coin-balance-card .coin-balance-symbol{
   display:block;
-  width:82px;
-  height:82px;
-  flex-basis:82px;
+  width:76px;
+  height:76px;
+  flex-basis:76px;
 }
 .coin-dex-page .coin-balance-card>span{
   display:grid;
@@ -9609,10 +9609,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coin-dex-page .coin-balance-card strong{
   margin:5px 0 2px;
   font-family:var(--tech,"JetBrains Mono",monospace);
-  font-size:clamp(48px,14vw,62px);
-  font-weight:700;
-  line-height:.9;
-  letter-spacing:-.045em;
+  font-size:clamp(36px,11vw,48px);
+  font-weight:800;
+  line-height:.98;
+  letter-spacing:-.035em;
   font-variant-numeric:tabular-nums slashed-zero;
   font-feature-settings:"zero" 1,"tnum" 1;
 }
@@ -9627,20 +9627,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:grid;
   place-items:center;
   box-sizing:border-box;
-  width:46px;
-  height:46px;
+  width:34px;
+  height:34px;
+  min-height:34px;
   padding:0;
   border:1.75px solid #111;
   border-radius:50%;
   background:var(--ordner,var(--dex-seitenfarbe,#05BDE8));
-  color:#111;
-}
-.coin-dex-page .coin-balance-info :is(.material-svg,svg){
-  display:block;
-  width:23px;
-  height:23px;
-  color:#111;
-  fill:#111;
+  color:var(--ordner-ink,#fff);
+  font:800 13px/1 var(--tech,"JetBrains Mono",monospace);
+  font-style:normal;
+  box-shadow:none;
 }
 .coin-dex-page .coin-verdienst{
   overflow:hidden;
@@ -9667,9 +9664,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .coin-dex-page .coin-next{
   padding:15px 17px;
-  border-width:1.5px;
-  border-radius:15px;
-  background:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#05BDE8)) 15%,#fff);
+  border:0;
+  border-radius:18px;
+  background:#fff;
 }
 .coin-dex-page :is(.coin-section-title h2,.coin-history-title){
   font-family:"Work Sans",var(--ui),sans-serif;
@@ -9680,7 +9677,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .coin-dex-page .coin-reward{
   border-radius:18px;
+  border:0;
   background:#fff;
+}
+.coin-dex-page .coin-reward::before{
+  display:none;
 }
 .coin-dex-page .coin-reward-actions .coin-redeem{
   border-color:#111;
@@ -9693,11 +9694,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 @media(max-width:390px){
   .coin-dex-page .coin-balance-card{
-    grid-template-columns:66px minmax(0,1fr) 42px;
+    grid-template-columns:68px minmax(0,1fr) 34px;
     gap:13px;
-    padding-inline:17px;
+    min-height:112px;
+    padding:18px;
   }
-  .coin-dex-page .coin-balance-card .coin-balance-symbol{width:66px;height:66px}
-  .coin-dex-page .coin-balance-card strong{font-size:clamp(42px,13vw,54px)}
-  .coin-dex-page .coin-balance-info{width:42px;height:42px}
+  .coin-dex-page .coin-balance-card .coin-balance-symbol{width:68px;height:68px}
+  .coin-dex-page .coin-balance-card strong{font-size:clamp(36px,11vw,48px)}
 }
