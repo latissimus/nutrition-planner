@@ -576,6 +576,31 @@ function appDockTitel(route) {
     || (route === 'coins' ? 'Coin-Dex' : 'Dex');
 }
 
+function appMenueComputerMarkup() {
+  return `<span class="app-menue-computer" aria-hidden="true">
+    <svg viewBox="0 0 62 55" preserveAspectRatio="none">
+      <defs>
+        <mask id="app-menue-fenster-ausschnitt" maskUnits="userSpaceOnUse">
+          <rect width="62" height="55" fill="#FFFFFF"/>
+          <rect x="7" y="21" width="43" height="23" rx="5" fill="#000000"/>
+        </mask>
+      </defs>
+      <rect class="app-menue-computer-schatten" x="6" y="5" width="53" height="47" rx="7" fill="#7560E6" mask="url(#app-menue-fenster-ausschnitt)"/>
+      <g class="app-menue-computer-front">
+        <rect x="2" y="2" width="54" height="47" rx="7" fill="#F2A5DA" stroke="#8968FF" stroke-width="2.3" mask="url(#app-menue-fenster-ausschnitt)"/>
+        <path d="M9 2h40a7 7 0 0 1 7 7v8H2V9a7 7 0 0 1 7-7Z" fill="#AEEBFA"/>
+        <path d="M2 17h54" fill="none" stroke="#8968FF" stroke-width="2.3"/>
+        <path d="M31 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="38" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
+        <path d="m46 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
+        <rect class="app-menue-computer-innen" x="7" y="21" width="43" height="23" rx="5"/>
+        <rect x="7" y="21" width="43" height="23" rx="5" fill="none" stroke="#8968FF" stroke-width="1.8"/>
+        <text class="app-menue-computer-text" x="28.5" y="32.5" fill="#111111" font-family="'Work Sans'" font-size="9.6" font-style="italic" font-weight="700" text-anchor="middle" dominant-baseline="middle">MENÜ</text>
+      </g>
+    </svg>
+  </span>`;
+}
+
 function appDockEintraegeMarkup(aktiveDockRoute) {
   const standard = sichtbareSammlungen().map(([route, titel]) => `
     <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
@@ -606,7 +631,22 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
       <span aria-hidden="true">${materialIconMarkup('search')}</span>
       <small>Suche</small>
     </a>`;
-  return standard + eigene + coins + suche;
+  const neu = `
+    <button class="app-dex-tab app-dex-tool app-dex-create" type="button" aria-label="Neuen Dex erstellen">
+      <span aria-hidden="true">${materialIconMarkup('create_new_folder')}</span>
+      <small>Dex +</small>
+    </button>`;
+  return standard + eigene + coins + suche + neu;
+}
+
+function appSyncStatusAktualisieren() {
+  const status = app.querySelector(':scope > .app-dex-header .app-dex-sync');
+  if (!status) return;
+  const online = navigator.onLine;
+  status.textContent = online ? '✓' : '↑';
+  status.className = `app-dex-sync save-dot ${online ? 'ok' : 'wait'}`;
+  status.title = online ? 'synchronisiert' : 'auf diesem Gerät gesichert · wartet auf Verbindung';
+  status.setAttribute('aria-label', status.title);
 }
 
 function appDexShellZeichnen(route, view) {
@@ -631,9 +671,7 @@ function appDexShellZeichnen(route, view) {
       <span class="app-dex-brand" aria-label="MUSCLEDEX">${headerBrandMarkup()}</span>
       <div class="app-dex-header-actions">
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }) : ''}
-        <button class="tuck-quadrat app-dex-create" type="button" aria-label="Neuen Dex erstellen">
-          ${materialIconMarkup('create_new_folder')}
-        </button>
+        <span class="app-dex-sync save-dot" role="status"></span>
         <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
       </div>
     </div>`;
@@ -642,12 +680,14 @@ function appDexShellZeichnen(route, view) {
   dock.className = 'app-dex-dock';
   dock.setAttribute('aria-label', 'Dex wechseln und Eintrag hinzufügen');
   dock.innerHTML = `
-    <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
-    <button class="app-dex-menu" type="button" aria-label="Eintrag in ${escapeHtml(appDockTitel(aktiveDockRoute))} hinzufügen">
-      ${materialIconMarkup('place_item')}
-      <small>Eintrag</small>
-    </button>`;
+    <div class="app-dex-dock-inner">
+      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
+      <button class="app-dex-menu" type="button" aria-label="Menü für ${escapeHtml(appDockTitel(aktiveDockRoute))} öffnen">
+        ${appMenueComputerMarkup()}
+      </button>
+    </div>`;
   app.append(header, dock);
+  appSyncStatusAktualisieren();
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
   tabLeiste.scrollLeft = alterScrollstand;
@@ -661,7 +701,7 @@ function appDexShellZeichnen(route, view) {
     }
   });
 
-  header.querySelector('.app-dex-create').onclick = () => openCollectionEditor({
+  dock.querySelector('.app-dex-create').onclick = () => openCollectionEditor({
     userId: session.user.id,
     rootKey: 'home',
     onSaved: () => {
@@ -674,6 +714,23 @@ function appDexShellZeichnen(route, view) {
     if (ausloeser) ausloeser.click();
     else view.querySelector('.kategorie-plus')?.click();
   };
+  const menueKnopf = dock.querySelector('.app-dex-menu');
+  let menueDruckStart = 0;
+  let menueDruckTimer = 0;
+  const menueDruecken = () => {
+    clearTimeout(menueDruckTimer);
+    menueDruckStart = performance.now();
+    menueKnopf.classList.add('ist-gedrueckt');
+    menueDruckTimer = window.setTimeout(() => menueKnopf.classList.remove('ist-gedrueckt'), 900);
+  };
+  const menueLoslassen = () => {
+    clearTimeout(menueDruckTimer);
+    const rest = Math.max(0, 150 - (performance.now() - menueDruckStart));
+    menueDruckTimer = window.setTimeout(() => menueKnopf.classList.remove('ist-gedrueckt'), rest);
+  };
+  menueKnopf.addEventListener('pointerdown', menueDruecken, { passive: true });
+  menueKnopf.addEventListener('pointerup', menueLoslassen, { passive: true });
+  menueKnopf.addEventListener('pointercancel', menueLoslassen, { passive: true });
   bindLongPress(tabLeiste, '.app-dex-tab', dexEinstellungenOeffner({
     userId: session.user.id,
     refresh: () => {
@@ -718,6 +775,8 @@ window.addEventListener('muscledex:coins-changed', async () => {
     if (!isAbortError(error)) console.warn('COIN-Stand im Header konnte nicht aktualisiert werden:', error.message);
   }
 });
+window.addEventListener('online', appSyncStatusAktualisieren);
+window.addEventListener('offline', appSyncStatusAktualisieren);
 
 // Welche Tabelle den Zaehler einer Sammlung fuellt. Routinen haben noch keine
 // Tabelle – ihre Karte zeigt weiter "Bald".
@@ -2062,7 +2121,7 @@ async function renderRoute() {
   if (dexAddButton) showGestureHintOnce({
     key: 'dex-hinzufuegen',
     title: 'Hier kommt Neues hinein',
-    text: 'Der Eintrag-Button im Menüband passt sich jedem Dex an und zeigt die passenden Einträge.',
+    text: 'Der Menübutton passt sich jedem Dex an und zeigt die passenden Einträge.',
     gesture: 'add',
     target: dexAddButton,
     replace: true,
