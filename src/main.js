@@ -33,6 +33,7 @@ import { initInterfaceSounds, syncInterfaceSounds } from './uiSounds.js';
 import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
+import { startRoute as perfStart, mark as perfMark, finishRoute as perfFinish, abortRoute as perfAbort } from './perfOverlay.js';
 import {
   applyPageLook, categoryColor, categoryIconMarkup, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
@@ -1712,6 +1713,7 @@ async function renderRoute() {
     erzwungenesRueckwaertsZiel = '';
     richtung = 'zurueck';
   }
+  perfStart(route);
   // Eine schon besuchte Zielseite ist sofort da. Beim nativen iOS-Swipe hat
   // WebKit die Bewegung bereits interaktiv gezeichnet; wir tauschen dann nur
   // noch lautlos auf dieselbe, erhaltene DOM-Ansicht. Beim X-/Zurueck-Tap
@@ -1720,7 +1722,7 @@ async function renderRoute() {
      sofort verfügbar. Die alte Logik verwendete ihn nur beim Zurückgehen und
      lud denselben Dex beim Antippen im Menü häufig vollständig neu. */
   if (richtung !== 'gleich' && ansichtsCache.peek(route)
-    && gemerkteAnsichtZeigen(route, richtung, true)) return;
+    && gemerkteAnsichtZeigen(route, richtung, true)) { perfMark('cache-hit'); perfFinish(); return; }
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
@@ -1733,6 +1735,7 @@ async function renderRoute() {
   // wird anschließend in einem Schritt durch die fertige Ansicht ersetzt.
   const transition = 'hart';
   const view = renderChrome(transition);
+  perfMark('chrome');
   if (route.startsWith('entry/')) {
     // Carry the rendered surface (including a selected wallpaper) over to
     // the detail view instead of briefly falling back to the neutral cream
@@ -2042,9 +2045,12 @@ async function renderRoute() {
   // sofort wiederhergestellte Ansicht gelegt werden.
   if (generation !== renderGeneration || aktiveRoute !== vorherigeRoute && richtung === 'gleich') {
     view.remove();
+    perfAbort();
     return;
   }
+  perfMark('mount');
   appDexShellAktualisieren(route, view, signal);
+  perfMark('shell');
   // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.
   // Supabase-Roundtrip). War alles praktisch sofort da – etwa nach der
   // iOS-Zurueck-Wischgeste, die den Inhalt oft schon zeigt, bevor unser
@@ -2134,6 +2140,7 @@ async function renderRoute() {
     view.classList.remove('view-neu', 'warten-auf-daten');
     entferneUebergangshintergrund();
   }
+  perfFinish();
   const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
     || view.querySelector('.kategorie-plus');
   if (dexAddButton) showGestureHintOnce({
