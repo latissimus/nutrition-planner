@@ -190,6 +190,42 @@ window.addEventListener('muscledex:appearance-changed', () => {
 const routeStack = createRouteStack(aktiveRoute);
 const navRichtung = (ziel) => routeStack.navigate(ziel);
 
+// `animationend` steigt von animierten Kindknoten bis zur ganzen Seite auf.
+// Beim Aufraeumen eines Seitenwechsels darf deshalb ausschliesslich das Ende
+// der Animation auf der Seitenwurzel zaehlen. Andernfalls kann etwa eine
+// Listen- oder Ladeanimation den ausgehenden Dex mitten im Slide entfernen.
+function nachEigenerSeitenanimation(element, animationName, callback, timeout = 540) {
+  if (!element) {
+    callback();
+    return;
+  }
+  let abgeschlossen = false;
+  let fallback = 0;
+  const fertig = () => {
+    if (abgeschlossen) return;
+    abgeschlossen = true;
+    element.removeEventListener('animationend', beiAnimationsende);
+    window.clearTimeout(fallback);
+    callback();
+  };
+  const beiAnimationsende = (event) => {
+    if (event.target !== element || event.animationName !== animationName) return;
+    fertig();
+  };
+  element.addEventListener('animationend', beiAnimationsende);
+  fallback = window.setTimeout(fertig, timeout);
+}
+
+function seitenausstiegVorbereiten(element) {
+  if (!element) return;
+  // Ein `position:fixed` gezeichnetes Muster kann WebKit beim Transformieren
+  // eines Scrollcontainers als eigene Viewport-Ebene festhalten. Der aktuelle
+  // Scrollversatz erlaubt CSS, die Tapete fuer den Ausstieg deckungsgleich als
+  // absolute Ebene in die animierte Seite zu legen.
+  element.style.setProperty('--seiten-ausstieg-scroll-top', `${Math.max(0, element.scrollTop || 0)}px`);
+  element.classList.add('view-alt-zurueck', 'seite-raus-rechts');
+}
+
 function navigationZuruecksetzen(route = 'home') {
   routeAbortController?.abort();
   routeAbortController = null;
@@ -664,9 +700,8 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
     fertig();
   } else {
     gemerkt.node.classList.add('seite-zurueck');
-    aktuell.classList.add('seite-raus-rechts');
-    aktuell.addEventListener('animationend', fertig, { once: true });
-    setTimeout(fertig, 540);
+    seitenausstiegVorbereiten(aktuell);
+    nachEigenerSeitenanimation(aktuell, 'seiteRausRechts', fertig);
   }
   // Die gespeicherte Ansicht bleibt bewusst stabil. Ein nachgelagerter
   // Voll-Render hat auf iOS den inneren Home-Scroller kurz ersetzt und konnte
@@ -1764,7 +1799,7 @@ async function renderRoute() {
   } else if (transition === 'zurueck') {
     const alteSeite = app.querySelector(':scope > .view-alt');
     view.classList.add('seite-zurueck');
-    alteSeite?.classList.add('view-alt-zurueck', 'seite-raus-rechts');
+    seitenausstiegVorbereiten(alteSeite);
     const aufraeumen = () => {
       alteSeite?.remove();
       vorherigerController?.abort();
@@ -1772,8 +1807,7 @@ async function renderRoute() {
       if (homeStilBeimTauschSetzen) setSeite('home');
       entferneUebergangshintergrund();
     };
-    alteSeite?.addEventListener('animationend', aufraeumen, { once: true });
-    setTimeout(aufraeumen, 540);
+    nachEigenerSeitenanimation(alteSeite, 'seiteRausRechts', aufraeumen);
   } else {
     app.querySelector(':scope > .view-alt')?.remove();
     if (richtung === 'gleich') vorherigerController?.abort();
