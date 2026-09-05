@@ -87,10 +87,6 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   const wrap = document.createElement('div');
   wrap.className = 'wrap pad-bottom profil-fixkopf';
   wrap.innerHTML = `
-    <nav class="kategorie-kopf profil-kopf" aria-label="Mein Konto bedienen">
-      <div class="kategorie-kopftitel"><strong>PROFIL</strong></div>
-      <a class="kategorie-kopfknopf kategorie-schliessen" href="#home" aria-label="Mein Konto schließen">${materialIconMarkup('close')}</a>
-    </nav>
     <header class="profile-page-heading">
       <h1>Profil</h1>
       <p>Konto &amp; Einstellungen</p>
@@ -451,10 +447,17 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   version.textContent = `Version ${__BUILD_COMMIT__} · ${__BUILD_TIME__}`;
   wrap.appendChild(version);
 
-  const kopf = wrap.querySelector(':scope > .profil-kopf');
   const inhalt = document.createElement('div');
   inhalt.className = 'profil-scrollinhalt';
-  while (kopf?.nextSibling) inhalt.appendChild(kopf.nextSibling);
+  while (wrap.firstChild) inhalt.appendChild(wrap.firstChild);
   wrap.appendChild(inhalt);
+
+  const aktionen = document.createElement('nav');
+  aktionen.className = 'profile-floating-actions neo-dex-floating-actions food-dex-floating-actions';
+  aktionen.setAttribute('aria-label', 'Profil schließen');
+  aktionen.innerHTML = `
+    <a class="profile-floating-close neo-dex-action-button neo-dex-action-close food-dex-action-button food-dex-action-close"
+       href="#home" aria-label="Profil schließen">${materialIconMarkup('close')}</a>`;
+  wrap.appendChild(aktionen);
   container.appendChild(wrap);
 }
