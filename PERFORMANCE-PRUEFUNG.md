@@ -107,3 +107,13 @@ eines System-Dex bereits zwischen `pointerdown` und `click` vorbereitet, ohne
 dabei Daten vorab zu laden. Damit bleibt nur die tatsächlich erste Datenabfrage
 eines bislang nie geöffneten Dex unvermeidbar; erneute Wechsel innerhalb der
 Hauptnavigation sollten unmittelbar aus dem Cache erfolgen.
+
+Eine anschließende statische Altlastprüfung bestätigte keine unerreichbaren
+JavaScript-Module, fand aber 1.043 tote CSS-Regeln beziehungsweise Selektorzweige
+und 13 nicht mehr referenzierte Animationen. Betroffen waren unter anderem die
+entfernte Start-/Suchseite, frühere Slide-Übergänge, alte Tutorial-, Food-,
+Einkaufs-Hero- und Body-Regeln. Die bereinigte Produktions-CSS sank von rund
+443,2 auf 333,9 kB, gzip von rund 73,3 auf 54,3 kB. Alle 122 Tests und der
+Produktions-Build blieben erfolgreich. Anschließend wurden alle acht Haupt-Dex
+im angemeldeten Browser vollständig durchgeschaltet: pro Route waren genau eine
+Ansicht, ein Header und ein Menüband aktiv; die Browserkonsole blieb fehlerfrei.
