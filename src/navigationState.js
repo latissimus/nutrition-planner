@@ -1,6 +1,6 @@
 /**
- * Kleine, DOM-unabhaengige Navigationsbausteine. Die Animationen bleiben in
- * main.js; Richtung und Cache-Lebenszyklus lassen sich hier separat testen.
+ * Kleine, DOM-unabhängige Navigationsbausteine. Richtung und
+ * Cache-Lebenszyklus lassen sich hier separat testen.
  */
 export function createRouteStack(initialRoute = 'home') {
   let routes = [initialRoute || 'home'];

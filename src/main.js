@@ -164,7 +164,6 @@ let recovery = false;
 let authMode = 'login';
 let renderGeneration = 0;
 let routeAbortController = null;
-let popstateNavigation = false;
 let erzwungenesRueckwaertsZiel = '';
 let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
 let appDockEigene = [];
@@ -203,13 +202,6 @@ function navigationZuruecksetzen(route = 'home') {
   routeStack.reset(route);
   aktiveRoute = route;
 }
-
-// Bei der interaktiven iOS-Zurueck-Geste malt Safari die vorige History-Seite
-// bereits selbst. Der folgende App-Render darf die weggewischte Ansicht nicht
-// noch einmal darueberlegen.
-window.addEventListener('popstate', () => {
-  popstateNavigation = true;
-});
 
 // Schliessen- und Zurueck-Knoepfe duerfen keinen neuen History-Eintrag
 // erzeugen. Liegt ihr Ziel direkt hinter der aktuellen Route, verwenden wir
@@ -1943,9 +1935,6 @@ async function render() {
 }
 
 window.addEventListener('hashchange', () => {
-  if (popstateNavigation) {
-    popstateNavigation = false;
-  }
   render();
 });
 
