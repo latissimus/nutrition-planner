@@ -65,10 +65,10 @@ function bodyHeroMarkup(state) {
   return `<div class="body-v2-stack ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}"><section class="body-v2-hero ${SPECIAL_DEX_CLASSES.hero}" style="--body-progress:${progress}%">
     <div class="body-v2-ring"><span><b>${latest ? display(trend.average7Kg) : '–'}</b><small>7-TAGE Ø</small></span></div>
     <div class="body-v2-hero-value"><small>AKTUELLES GEWICHT</small><div><strong>${latest ? display(latest.kg) : '–'}</strong>${latest ? '<b>kg</b>' : ''}</div><span>${latest ? weeklyLabel : 'Noch keine Messung'}</span></div>
-    <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="Body-Log-Auswertung erklären">i</button>
+    <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="BODYLOG-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
-    <p>Der <b>Body-Log</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
+    <p>Der <b>BODYLOG</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
     <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>12-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
   </div></div>`;
 }
@@ -171,7 +171,7 @@ function bodyCompMarkup(state) {
         <span>Schlaf & Erholung <b>${recovery == null ? 'noch unklar' : recovery > 0 ? 'verbessert' : recovery < 0 ? 'verschlechtert' : 'stabil'}</b></span>
       </div>
       <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
-      <details class="body-inner-details"><summary><span>Orientierungsbereiche anpassen</span>${materialIconMarkup('chevron_right')}</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>Der Body-Log vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
+      <details class="body-inner-details"><summary><span>Orientierungsbereiche anpassen</span>${materialIconMarkup('chevron_right')}</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>Der BODYLOG vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
     </div>
   </details>`;
 }
@@ -196,7 +196,7 @@ function logmanMarkup(state) {
     days.set(date, current);
     return days;
   }, new Map())].map(([datum, value]) => ({ datum, wert: value.sum / value.count }));
-  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-logman-card><header><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span></header><div class="body-v2-card-body"><p class="body-explain">Importierte LOGMAN-Daten zeigen, ob deine vergleichbare Trainingsleistung eher steigt, fällt oder stabil bleibt. Der Body-Log nutzt das nur als Zusatzsignal, nicht als alleinigen Beweis.</p>${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}<button class="body-reset-mini" type="button" data-reset-body="logman">LOGMAN-Importe zurücksetzen</button></div></section>`;
+  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-logman-card><header><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span></header><div class="body-v2-card-body"><p class="body-explain">Importierte LOGMAN-Daten zeigen, ob deine vergleichbare Trainingsleistung eher steigt, fällt oder stabil bleibt. Der BODYLOG nutzt das nur als Zusatzsignal, nicht als alleinigen Beweis.</p>${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}<button class="body-reset-mini" type="button" data-reset-body="logman">LOGMAN-Importe zurücksetzen</button></div></section>`;
 }
 
 export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal, onRendered }) {
@@ -232,7 +232,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     if (pageMeta) pageMeta.textContent = `${state.weights.length} ${state.weights.length === 1 ? 'Wiegung' : 'Wiegungen'}`;
     bind();
     // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
-    // (Update-Hinweis mit eigenen Body-Log-Notizen) wieder anzuhängen und
+    // (Update-Hinweis mit eigenen BODYLOG-Notizen) wieder anzuhängen und
     // renderDexEntries darauf loszulassen. Sonst überlebt der Slot nur den
     // ersten Mount, weil container.innerHTML alles wegwirft.
     try { await onRendered?.(container); } catch { /* ignoriert */ }
@@ -268,7 +268,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const closeAndRender = async () => {
       overlay.remove();
       try { await render(); }
-      catch (error) { toast(error.message || 'Body-Log konnte nicht aktualisiert werden'); }
+      catch (error) { toast(error.message || 'BODYLOG konnte nicht aktualisiert werden'); }
     };
     const withBusySubmit = async (form, action) => {
       const submit = form.querySelector('button[type="submit"]');
@@ -451,11 +451,11 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       };
     });
   };
-  container.innerHTML = '<div class="wrap"><section class="card"><p>Body-Log wird geladen …</p></section></div>';
+  container.innerHTML = '<div class="wrap"><section class="card"><p>BODYLOG wird geladen …</p></section></div>';
   try {
     await render();
   } catch (error) {
-    if (!signal?.aborted) container.innerHTML = `<div class="wrap"><section class="card"><p class="msg err">Body-Log konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section></div>`;
+    if (!signal?.aborted) container.innerHTML = `<div class="wrap"><section class="card"><p class="msg err">BODYLOG konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section></div>`;
   }
   subscribeToTablesChanges({
     tables: ['weights', 'skinfolds', 'waist_measurements', 'bodycomp_checkins', 'logman_performance', 'nutrition_settings'],
