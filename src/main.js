@@ -644,12 +644,17 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
         <small>${escapeHtml(item.name)}</small>
       </a>`;
   }).join('');
+  const suche = `
+    <a class="app-dex-tab app-dex-tool" href="#search" aria-label="MUSCLEDEX durchsuchen">
+      <span aria-hidden="true">${materialIconMarkup('search')}</span>
+      <small>Suche</small>
+    </a>`;
   const neu = `
     <button class="app-dex-tab app-dex-tool app-dex-create" type="button" aria-label="Neuen Dex erstellen">
       <span aria-hidden="true">${materialIconMarkup('create_new_folder')}</span>
       <small>Dex +</small>
     </button>`;
-  return standard + eigene + neu;
+  return standard + eigene + suche + neu;
 }
 
 function appSyncStatusAktualisieren() {
@@ -802,20 +807,110 @@ window.addEventListener('muscledex:coins-changed', async () => {
 window.addEventListener('online', appSyncStatusAktualisieren);
 window.addEventListener('offline', appSyncStatusAktualisieren);
 
-function renderChrome() {
+// Welche Tabelle den Zaehler einer Sammlung fuellt. Routinen haben noch keine
+// Tabelle – ihre Karte zeigt weiter "Bald".
+// Row Level Security ist auf allen Tabellen aktiv, die Zaehlung liefert also
+// von sich aus nur die eigenen Zeilen; ein Filter auf die user_id waere
+// doppelt gemoppelt.
+// Zuletzt geladene Zahlen. Beim Zurueckspringen auf die Startseite stehen sie
+// dadurch sofort da, statt erneut durch den Platzhalter zu laufen.
+let zaehlerStand = {};
+
+const ZAEHLQUELLEN = {
+  body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
+  reminders: { tabelle: 'reminders', filters: [['active', true]], filterIn: ['type', ['meal', 'supplement', 'drink']], eins: 'Erinnerung', viele: 'Erinnerungen' },
+  'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
+  training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
+  // Gezaehlt wird, was fuer den naechsten Einkauf ausgewaehlt (angehakt) ist –
+  // die Karte beantwortet damit direkt "Wie viele Lebensmittel muss ich noch
+  // besorgen?" statt "Wie viele koennte ich theoretisch besorgen?".
+  shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel', viele: 'Lebensmittel' },
+  habits: { tabelle: 'routines', eins: 'Routine', viele: 'Routinen' },
+  sleep: { tabelle: 'sleep_logs', eins: 'Nacht', viele: 'Nächte' },
+};
+
+// head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
+// leere Antworten statt der kompletten Tabellen.
+async function zaehlerLaden(signal) {
+  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter, filters = [], filterIn }]) => {
+    try {
+      if (route === 'reminders') {
+        // Der MEAL-LOG zeigt die belegten Tageszeit-Kategorien, nicht jede
+        // einzelne Mahlzeit oder jedes Supplement. Ein Frühstück plus ein
+        // Supplement bleibt dadurch genau eine Kategorie.
+        let reminderQuery = supabase.from(tabelle)
+          .select('type,label,time,metadata')
+          .eq('active', true)
+          .in('type', ['meal', 'supplement', 'drink']);
+        reminderQuery = reminderQuery.abortSignal(signal);
+        const { data, error } = await reminderQuery;
+        if (error) return [route, null];
+        const kategorien = new Set();
+        (data || []).forEach((reminder) => {
+          if (reminder.type === 'drink') { kategorien.add('drink'); return; }
+          const label = String(reminder.label || '').toLocaleLowerCase('de');
+          const slot = reminder.metadata?.meal_slot
+            || (label.includes('frühstück') ? 'breakfast'
+              : label.includes('vormittag') ? 'snack_morning'
+                : label.includes('mittagessen') ? 'lunch'
+                  : label.includes('nachmittag') ? 'snack_afternoon'
+                    : label.includes('abend') ? 'dinner' : null);
+          if (slot) { kategorien.add(slot); return; }
+          const [hours, minutes] = String(reminder.time || '00:00').split(':').map(Number);
+          const total = (Number(hours) || 0) * 60 + (Number(minutes) || 0);
+          kategorien.add(total < 585 ? 'breakfast' : total < 720 ? 'snack_morning'
+            : total < 900 ? 'lunch' : total < 1080 ? 'snack_afternoon' : 'dinner');
+        });
+        return [route, kategorien.size];
+      }
+      let countQuery = supabase.from(tabelle).select('*', { count: 'exact', head: true });
+      if (filter) countQuery = countQuery.eq(filter[0], filter[1]);
+      filters.forEach(([field, value]) => { countQuery = countQuery.eq(field, value); });
+      if (filterIn) countQuery = countQuery.in(filterIn[0], filterIn[1]);
+      countQuery = countQuery.abortSignal(signal);
+      const { count, error } = await countQuery;
+      return [route, error ? null : (count ?? 0)];
+    } catch (e) {
+      return [route, null];   // offline: die Karte behaelt ihren Platzhalter
+    }
+  }));
+  return Object.fromEntries(paare);
+}
+
+function zaehlerText(route, anzahl) {
+  const quelle = ZAEHLQUELLEN[route];
+  if (!quelle || anzahl === null || anzahl === undefined) return null;
+  return `<b>${anzahl}</b><span>${anzahl === 1 ? quelle.eins : quelle.viele}</span>`;
+}
+
+// Traegt geladene Zahlen in bereits gezeichnete Karten nach. Die Karten
+// erscheinen dadurch sofort und fuellen sich, sobald die Antwort da ist.
+function zaehlerEintragen(container, zaehler) {
+  container.querySelectorAll('[data-sammlung]').forEach((karte) => {
+    const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
+    const meta = karte.querySelector('.dex-datensatz-meta');
+    if (text && meta) meta.innerHTML = text;
+  });
+}
+
+function renderChrome(transition = 'hart') {
   app.classList.add('app-shell');
+  // Kein globaler Kopf mehr: jede Seite ist Vollbild, Home traegt Logo und
+  // Avatar als normalen Seiteninhalt (siehe mountHome).
   const bisher = app.querySelector(':scope > #view');
   let view;
   if (bisher?.hasChildNodes()) {
     const hintergrund = getComputedStyle(document.body);
     const bisherigeSeite = document.documentElement.dataset.seite || '';
     bisher.removeAttribute('id');
-    /* Seitenbezogene Klassen (vor allem `hat-kategoriefarbe`) müssen auf
-       der ausgehenden Ansicht erhalten bleiben — sonst fällt ihr Plus-Knopf
-       während eines Rücksprungs für einen Frame auf das Standarddesign zurück. */
-    bisher.classList.remove('view-neu');
-    bisher.classList.add('view-alt', 'view-alt-hart');
+    // Seitenbezogene Klassen (vor allem `hat-kategoriefarbe`) muessen auf
+    // der ausgehenden Ansicht erhalten bleiben. Wird die Klassenliste hier
+    // komplett ersetzt, faellt ihr Plus-Knopf waehrend eines Ruecksprungs
+    // fuer einen Frame auf das pinke Standarddesign zurueck.
+    bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
+    bisher.classList.add('view-alt');
     bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping', 'habits', 'coins'].includes(bisherigeSeite));
+    bisher.classList.toggle('view-alt-hart', transition === 'hart');
     bisher.style.backgroundColor = hintergrund.backgroundColor;
     bisher.style.backgroundImage = hintergrund.backgroundImage;
     bisher.style.backgroundSize = hintergrund.backgroundSize;
@@ -823,11 +918,11 @@ function renderChrome() {
     bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
     view = document.createElement('main');
     view.id = 'view';
-    /* `warten-auf-daten` hält die neue Ansicht unsichtbar, bis der Mount
-       vollständig fertig ist. Die alte Ansicht bleibt derweil komplett
-       stehen (siehe .view-alt-hart in styles.css); getauscht wird nur
-       der fertige Endzustand — kein „…wird geladen"-Zwischenstand. */
-    view.className = 'view-neu warten-auf-daten';
+    /* `warten-auf-daten` hält die frische Ansicht unsichtbar, bis der Mount
+       vollständig fertig ist. Zusammen mit der jetzt sichtbaren alten Ansicht
+       (siehe styles.css) sieht der Nutzer keine „…wird geladen“-Zwischen­
+       zustände mehr; getauscht wird erst der fertige Endzustand. */
+    view.className = `view-neu warten-auf-daten${transition === 'vor' ? ' seite-vor-warten' : transition === 'detail' ? ' seite-detail-warten' : ''}`;
     app.append(view);
   } else {
     // Der feste Dex-Header und das untere Menüband gehören zur App-Schale,
@@ -966,6 +1061,65 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
 }
 
 // Alle DEX-Eintraege teilen dieselbe dreilagige Ordnerform.
+function sammlungsKarten(daten = sammlungen, zaehler = {}) {
+  return daten.map(([route, titel, , icon, farbe, status]) => {
+    // Solange die Zahl laedt, steht der Stand da. So springt die Karte beim
+    // Nachtragen nur um eine Zeile und nicht um ihre halbe Hoehe.
+    const meta = zaehlerText(route, zaehler[route])
+      || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
+    const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
+    const dexFarbe = pageLook(route, categoryColor(route), 'drops').color || categoryColor(route);
+    return dexOrdnerKarte({
+      href: `#${route}`, route, titel, meta, iconInhalt,
+      farbe: dexFarbe,
+    });
+  }).join('');
+}
+
+function eigeneSammlungsKarten(items, stats = new Map()) {
+  return items.map((item) => {
+    const count = stats.get(item.id)?.entries || 0;
+    return dexOrdnerKarte({
+      href: `#collection/${item.id}`,
+      titel: escapeHtml(item.name),
+      meta: `<b>${count}</b><span>${count === 1 ? 'Eintrag' : 'Einträge'}</span>`,
+      iconInhalt: collectionIconMarkup(item.icon_key),
+      farbe: item.color,
+      eigene: true,
+      collectionId: item.id,
+    });
+  }).join('');
+}
+
+async function eigeneDexStatistik(userId, roots, signal) {
+  if (!roots.length) return new Map();
+  let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', 'home');
+  let entriesQuery = supabase.from('dex_entries').select('collection_id').eq('user_id', userId).eq('root_key', 'home');
+  if (signal) { collectionsQuery = collectionsQuery.abortSignal(signal); entriesQuery = entriesQuery.abortSignal(signal); }
+  const [{ data: collections, error: collectionError }, { data: entries, error: entryError }] = await Promise.all([collectionsQuery, entriesQuery]);
+  if (collectionError) throw collectionError;
+  if (entryError) throw entryError;
+  const childrenByParent = new Map();
+  (collections || []).forEach((item) => {
+    if (!item.parent_id) return;
+    const list = childrenByParent.get(item.parent_id) || [];
+    list.push(item.id); childrenByParent.set(item.parent_id, list);
+  });
+  const entryCount = new Map();
+  (entries || []).forEach(({ collection_id: id }) => { if (id) entryCount.set(id, (entryCount.get(id) || 0) + 1); });
+  const result = new Map();
+  roots.forEach((root) => {
+    const descendants = [];
+    const queue = [...(childrenByParent.get(root.id) || [])];
+    while (queue.length) {
+      const id = queue.shift(); descendants.push(id); queue.push(...(childrenByParent.get(id) || []));
+    }
+    const ids = [root.id, ...descendants];
+    result.set(root.id, { children: descendants.length, entries: ids.reduce((sum, id) => sum + (entryCount.get(id) || 0), 0) });
+  });
+  return result;
+}
+
 async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   if (!roots.length) return new Map();
   let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
@@ -1048,6 +1202,151 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   return true;
 }
 
+async function mountHome(container, signal, { setzeSeite = true } = {}) {
+  if (setzeSeite) setSeite('home');
+  let sichtbar = sichtbareSammlungen();
+  let eigene = [];
+  let eigeneStats = new Map();
+  try {
+    eigene = await loadCollections(session.user.id, { rootKey: 'home', signal });
+    const seeded = await initialeStartseiteEinrichten(session.user.id, signal, eigene);
+    if (seeded) eigene = await loadCollections(session.user.id, { rootKey: 'home', signal });
+    sichtbar = sichtbareSammlungen();
+  }
+  catch (error) { if (!signal?.aborted) toast('Eigene Dex-Einträge konnten nicht geladen werden.'); }
+  if (signal?.aborted) return;
+  eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
+  try { eigeneStats = await eigeneDexStatistik(session.user.id, eigene, signal); }
+  catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
+  const coinSichtbar = coinDexIsVisible();
+  const coinSummary = coinSichtbar ? await loadCoinSummary(session.user.id, signal) : null;
+  if (signal?.aborted) return;
+  container.innerHTML = `
+    <div class="wrap pad-bottom tuck-home home-fixkopf">
+      <div class="tuck-kopfzeile">
+        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
+        <div class="tuck-kopf-aktionen">
+          ${coinSichtbar ? coinHeaderMarkup(coinSummary) : ''}
+          <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
+            ${materialIconMarkup('create_new_folder')}
+          </button>
+          <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+        </div>
+      </div>
+      <div class="home-scrollinhalt">
+      <div class="tuck-ablage">
+        <label class="tuck-ablage-feld" for="schnell-suche">
+          ${materialIconMarkup('search')}
+          <input id="schnell-suche" type="search" autocomplete="off"
+                 placeholder="MUSCLE-DEX durchsuchen" aria-label="MUSCLE-DEX durchsuchen">
+        </label>
+        <button class="tuck-ablage-knopf" type="button" aria-label="Suche öffnen">
+          ${materialIconMarkup('search')}
+        </button>
+      </div>
+      <header class="tuck-titelzeile">
+        <h1>Meine Dex-Einträge</h1>
+      </header>
+      <section class="tuck-grid" aria-label="Meine Dex-Einträge">
+        ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
+      </section>
+      </div>
+    </div>`;
+
+  // Einstellungen und neue Dex werden auf der Startseite bewusst hart neu
+  // gerendert. Die Startansicht kann im Navigationscache liegen; ein reines
+  // Hashchange würde dann gelegentlich nur die alte DOM-Kopie stehen lassen.
+  const homeNeuLaden = () => {
+    navigationZuruecksetzen('home');
+    render();
+  };
+
+  container.querySelector('.neu-sammlung').onclick = () => openCollectionEditor({
+    userId: session.user.id,
+    rootKey: 'home',
+    onSaved: homeNeuLaden,
+  });
+
+  bindLongPress(container.querySelector('.tuck-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
+    userId: session.user.id,
+    refresh: homeNeuLaden,
+    itemsById: new Map(eigene.map((item) => [item.id, item])),
+  }));
+  if (container.querySelector('.dex-ordner-test')) showGestureHintOnce({
+    key: 'dex-langer-tipp',
+    title: 'Dex-Info und Bearbeiten',
+    text: 'Halte einen Dex länger gedrückt, um die Info oder Bearbeitung zu öffnen.',
+    gesture: 'hold',
+  });
+
+  const sucheOeffnen = () => {
+    vorgemerkteSuche = container.querySelector('#schnell-suche').value.trim();
+    location.hash = 'search';
+  };
+  container.querySelector('.tuck-ablage-knopf').onclick = sucheOeffnen;
+  container.querySelector('#schnell-suche').onkeydown = (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); sucheOeffnen(); }
+  };
+
+  zaehlerLaden(signal).then((zaehler) => {
+    if (signal?.aborted) return;
+    zaehlerStand = zaehler;
+    // Zwischenzeitlich kann eine andere Seite gemountet sein.
+    if (container.isConnected) zaehlerEintragen(container, zaehler);
+  });
+
+  const aktualisiereHomeZaehler = async () => {
+    // `container` darf hier bewusst vom Dokument getrennt sein: Genau so wird
+    // die Startseite im Navigationscache gehalten. Das Aktualisieren einer
+    // abgetrennten DOM-Struktur ist gueltig und sorgt dafuer, dass beim
+    // Zurueckkehren sofort der aktuelle Stand sichtbar ist.
+    if (signal?.aborted) return;
+    const [zaehler, stats] = await Promise.all([
+      zaehlerLaden(signal),
+      eigeneDexStatistik(session.user.id, eigene, signal).catch(() => new Map()),
+    ]);
+    if (signal?.aborted) return;
+    zaehlerStand = zaehler;
+    eigeneStats = stats;
+    zaehlerEintragen(container, zaehler);
+    container.querySelectorAll('[data-collection-id]').forEach((karte) => {
+      const meta = karte.querySelector('.dex-datensatz-meta');
+      const stat = stats.get(karte.dataset.collectionId);
+      if (meta && stat) meta.innerHTML = `<b>${stat.entries}</b><span>${stat.entries === 1 ? 'Eintrag' : 'Einträge'}</span>`;
+    });
+  };
+  const lokaleZaehlungsAenderung = () => { aktualisiereHomeZaehler().catch(() => {}); };
+  window.addEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung);
+  signal?.addEventListener('abort', () => window.removeEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung), { once: true });
+  ['weights', 'reminders', 'dex_entries', 'shopping_items', 'routines', 'sleep_logs']
+    .forEach((table) => subscribeToTableChanges({ table, signal, onChange: aktualisiereHomeZaehler, onError: () => {} }));
+  const aktualisiereCoinStand = async () => {
+    // Wie die Kartenzaehler muss auch der Kopfstand aktualisiert werden,
+    // waehrend Home als abgetrennte Ansicht im Navigationscache liegt.
+    if (signal?.aborted || !coinSichtbar) return;
+    const summary = await loadCoinSummary(session.user.id, signal);
+    if (signal?.aborted) return;
+    const kopf = container.querySelector('.coin-kopfstand');
+    if (!kopf) return;
+    const stand = kopf.querySelector('strong');
+    if (stand) stand.textContent = String(summary.balance);
+    kopf.setAttribute('aria-label', `MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}`);
+  };
+  const lokaleCoinAenderung = () => { aktualisiereCoinStand().catch(() => {}); };
+  window.addEventListener('muscledex:coins-changed', lokaleCoinAenderung);
+  signal?.addEventListener('abort', () => window.removeEventListener('muscledex:coins-changed', lokaleCoinAenderung), { once: true });
+  subscribeToTableChanges({
+    table: 'muscle_coin_ledger', signal, onChange: aktualisiereCoinStand, onError: () => {},
+  });
+  subscribeToTableChanges({
+    table: 'collections', signal,
+    onChange: () => {
+      if (aktiveRoute !== 'home') ansichtsCache.delete('home');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    },
+    onError: () => {},
+  });
+}
 
 const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">DEX-Einträge werden geladen …</div></div>';
 
@@ -1239,6 +1538,107 @@ async function mountCustomCollection(container, item, signal) {
   subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
 }
 
+async function mountSearch(container, signal) {
+  setSeite('search');
+  container.classList.add('dex-fixkopf', 'such-fixkopf-view');
+  container.innerHTML = `
+    <div class="wrap pad-bottom tuck-suche-seite such-fixkopf">
+      <div class="tuck-suchzeile">
+        <label class="tuck-suchfeld" for="global-search">
+          ${iconMarkup('search')}
+          <input id="global-search" type="search" autocomplete="off" placeholder="Dex-Einträge durchsuchen …">
+        </label>
+        <a class="seiten-x" href="#home" aria-label="Suche schließen">${materialIconMarkup('close')}</a>
+      </div>
+      <div class="such-scrollinhalt">
+      <section class="such-tags" data-search-tags hidden></section>
+      <h2 class="tuck-abschnittstitel">Dex-Treffer</h2>
+      <section class="dex-inhaltsgrid such-eintraege" data-search-results><div class="daten-laden">DEX-Einträge werden geladen …</div></section>
+      <div class="tuck-leer" data-search-empty hidden>
+        ${iconMarkup('search')}
+        <b>Nichts gefunden</b>
+        <span>Kein Titel, keine Beschreibung und kein Tag passen zu deiner Suche.</span>
+      </div>
+      </div>
+    </div>`;
+
+  const input = container.querySelector('#global-search');
+  const results = container.querySelector('[data-search-results]');
+  const empty = container.querySelector('[data-search-empty]');
+  const tagsSlot = container.querySelector('[data-search-tags]');
+  let entries = [];
+  let activeTag = '';
+  const renderResults = () => {
+    const query = input.value.trim().toLocaleLowerCase('de');
+    const treffer = entries.filter((entry) => {
+      const tags = entry.tags || [];
+      const haystack = `${entry.title || ''} ${entry.note || ''} ${tags.join(' ')}`.toLocaleLowerCase('de');
+      const tagMatch = !activeTag || tags.some((tag) => tag.toLocaleLowerCase('de') === activeTag.toLocaleLowerCase('de'));
+      return tagMatch && (!query || haystack.includes(query));
+    });
+    results.innerHTML = treffer.map((entry) => dexEntryOverviewMarkup(entry, categoryColor(entry.root_key))).join('');
+    vorschaubilderEinblenden(results);
+    empty.hidden = treffer.length > 0;
+  };
+  input.oninput = renderResults;
+  try {
+    entries = await loadAllDexEntries(session.user.id, signal);
+    if (signal?.aborted) return;
+    const tags = [...new Set(entries.flatMap((entry) => entry.tags || []).map((tag) => tag.trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'de'));
+    if (tags.length) {
+      const limit = 8;
+      tagsSlot.hidden = false;
+      tagsSlot.innerHTML = `<div class="such-tag-liste" data-tag-list>${tags.map((tag, index) => `<button type="button" data-search-tag="${escapeHtml(tag)}"${index >= limit ? ' hidden' : ''}>#${escapeHtml(tag)}</button>`).join('')}</div>
+        ${tags.length > limit ? `<button class="such-tags-mehr" type="button" data-tags-toggle aria-expanded="false" aria-label="Weitere Tags anzeigen">⌄</button>` : ''}`;
+      tagsSlot.onclick = (event) => {
+        const tagButton = event.target.closest('[data-search-tag]');
+        if (tagButton) {
+          activeTag = activeTag === tagButton.dataset.searchTag ? '' : tagButton.dataset.searchTag;
+          tagsSlot.querySelectorAll('[data-search-tag]').forEach((button) => button.classList.toggle('aktiv', button === tagButton && Boolean(activeTag)));
+          renderResults();
+          return;
+        }
+        const toggle = event.target.closest('[data-tags-toggle]');
+        if (!toggle) return;
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        toggle.textContent = expanded ? '⌄' : '⌃';
+        tagsSlot.querySelectorAll('[data-search-tag]').forEach((button, index) => { button.hidden = expanded && index >= limit; });
+      };
+    }
+    renderResults();
+  } catch (error) {
+    if (!signal?.aborted) results.innerHTML = `<div class="msg err">Suche konnte nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
+  }
+  if (vorgemerkteSuche) {
+    input.value = vorgemerkteSuche;
+    vorgemerkteSuche = '';
+    renderResults();
+  }
+}
+
+function mountComingSoon(container, route) {
+  setSeite(route);
+  container.innerHTML = `
+    <div class="wrap pad-bottom bereich-vorschau">
+      <div class="seitenkopf">
+        <div class="seitenkopf-text">
+          <span class="seitenkopf-kicker">Routine</span>
+          <h1 class="section-title">ROUTINEN</h1>
+        </div>
+      </div>
+      <section class="seiten-einstieg">
+        <b>Kleine Schritte, die bleiben</b>
+        <span>Tägliche Routinen, Serien und Fortschritt werden hier aufgebaut.</span>
+      </section>
+      <section class="card vorschau-karte">
+        <span aria-hidden="true">${iconMarkup('habits')}</span>
+        <strong>Dieser Bereich kommt als Nächstes.</strong>
+        <p>Die Navigation ist bereits aktiv, die Funktionen ergänzen wir im nächsten Schritt.</p>
+      </section>
+    </div>`;
+}
 
 async function profilLaden() {
   profile = await loadProfile(session.user.id);
@@ -1300,14 +1700,12 @@ async function renderRoute() {
     history.replaceState(history.state, '', `#${angefragt}`);
   }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  /* Zulässige Routen: Profil, Coin-Dex, ein Standard-Dex aus dem Menüband,
-     eine eigene Sammlung, ein Eintragsdetail. Alles andere (Altlink #home,
-     #search, ...) landet im Fallback-Dex ganz links im Menüband. */
-  let route = ['profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
+  let route = ['home', 'search', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
-    : appDexFallbackRoute();
-  if (angefragt !== route) {
+    : 'home';
+  if (route === 'home') {
+    route = appDexFallbackRoute();
     angefragt = route;
     history.replaceState(history.state, '', `#${route}`);
   }
@@ -1333,9 +1731,11 @@ async function renderRoute() {
   if (richtung === 'gleich') vorherigerController?.abort();
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
-  // Wie beim LOGMAN werden Seiten ohne Slide/Fade gewechselt: alte Ansicht
-  // bleibt sichtbar bis die neue komplett gemountet ist, dann atomar tauschen.
-  const view = renderChrome();
+  // Wie beim LOGMAN werden Seiten ohne Slide, Fade oder Gegenbewegung
+  // gewechselt. Der alte Dex bleibt nur während des Datenladens stehen und
+  // wird anschließend in einem Schritt durch die fertige Ansicht ersetzt.
+  const transition = 'hart';
+  const view = renderChrome(transition);
   perfMark('chrome');
   /* Ab hier werden setSeite/applyPageLook nur noch gepuffert. Erst wenn
      die neue Ansicht wirklich fertig ist, wenden wir beide atomar an —
@@ -1364,7 +1764,22 @@ async function renderRoute() {
       seite: vorherigeSeite,
     });
   }
-  if (route === 'profile') {
+  // Beim Schliessen eines Vollbild-DEX bleibt dessen alte Ansicht bis zum
+  // fertigen Home-Mount sichtbar. `data-seite="home"` darf deshalb erst im
+  // selben Takt wie das Entfernen dieser Ansicht gesetzt werden; andernfalls
+  // verliert sie vorher kurz ihre seitenspezifische Typografie.
+  const homeStilBeimTauschSetzen = route === 'home' && Boolean(app.querySelector(':scope > .view-alt'));
+  if (homeStilBeimTauschSetzen) view.classList.add('home-transition-view');
+  // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
+  // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
+  // die Animation ihn zurueck an den Start reisst.
+  if (transition === 'vor') view.classList.add('seite-vor-warten');
+  if (transition === 'detail') view.classList.add('seite-detail-warten');
+  if (route === 'home') {
+    await mountHome(view, signal, { setzeSeite: !homeStilBeimTauschSetzen });
+  } else if (route === 'search') {
+    await mountSearch(view, signal);
+  } else if (route === 'profile') {
     setSeite('profile');
     // Sichtbarkeit und Reihenfolge des Menübandes werden hier bearbeitet.
     // Beim Zurückkehren muss deshalb auch die Liste eigener Dex frisch aus
@@ -1629,6 +2044,8 @@ async function renderRoute() {
       editLabel: 'Sleep-Log bearbeiten',
       infoKind: 'sleep',
     });
+  } else {
+    mountHome(view, signal);
   }
   // Wurde waehrend eines langsamen Mounts bereits zurueck navigiert, darf
   // die inzwischen veraltete Zielseite nicht spaeter doch noch ueber die
@@ -1641,30 +2058,102 @@ async function renderRoute() {
     return;
   }
   perfMark('mount');
-  /* Zwei Frames Wartezeit: die neu gemountete Ansicht wird noch unsichtbar
-     im Speicher rasterisiert, danach passiert der Wechsel atomar. Ohne den
-     Puffer würde die neue Ansicht ohne Inhalt eingeblendet und einen Frame
-     später erst gefüllt. */
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if (aktiveRoute !== route && vorherigeRoute !== route) {
-    commitSeiteDefer();
-    commitPageLookDefer();
-    perfAbort();
-    return;
-  }
-  aktiveRoute = route;
-  /* Atomarer Wechsel: alle sichtbaren Änderungen in derselben synchronen
-     Sequenz. Chrome-Commit + Shell-Neubau + View-Sichtbarkeit + Entfernen
-     der alten View passieren im selben Tick, damit der Nutzer weder ein
-     kurzes „Header schon gefärbt, Inhalt noch alt“ noch das umgekehrte
-     Aufblitzen sieht. */
-  app.querySelectorAll(':scope > .view-alt').forEach((node) => node.remove());
-  if (richtung === 'gleich') vorherigerController?.abort();
+  /* Chrome (html-Attribute + Custom Properties) und Shell zusammen anwenden,
+     kurz bevor die neue Ansicht sichtbar wird. So sieht der Nutzer einen
+     einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
   commitSeiteDefer();
   commitPageLookDefer();
   appDexShellAktualisieren(route, view, signal);
-  view.classList.remove('view-neu', 'warten-auf-daten');
   perfMark('shell');
+  // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.
+  // Supabase-Roundtrip). War alles praktisch sofort da – etwa nach der
+  // iOS-Zurueck-Wischgeste, die den Inhalt oft schon zeigt, bevor unser
+  // eigener Reload durch ist –, wirkt eine erzwungene Animation haerter als
+  // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
+  // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
+  const neuerHintergrund = getComputedStyle(document.body);
+  const neueAnsicht = getComputedStyle(view);
+  const lookFarbe = homeStilBeimTauschSetzen
+    ? (document.documentElement.dataset.theme === 'dark' ? '#101A2B' : '#F2EBE0')
+    // Bei einer SVG-Tapete sind body, #app und #view absichtlich transparent,
+    // damit das Muster im fertigen Dex bis in die iOS-Safe-Area reicht. Für
+    // den Einschub darf deshalb nicht `body.backgroundColor` verwendet werden:
+    // das wäre transparent und ließe den bereits umgeschalteten Root-Hintergrund
+    // stehen, während nur der Inhalt hereinfährt. Die Dex-Farbe liegt schon vor
+    // dem ersten Animationsframe als Custom Property auf der Zielansicht.
+    : neueAnsicht.getPropertyValue('--dex-seitenfarbe').trim()
+      || neueAnsicht.getPropertyValue('--bg').trim()
+      || getComputedStyle(document.documentElement).backgroundColor
+      || neuerHintergrund.backgroundColor;
+  // Die Tapete liegt im scrollbaren Dex-Inhalt und ist damit Teil derselben
+  // animierten Ebene wie Karten und Texte. Auf #view selbst bleibt nur die
+  // unveraenderte App-Hintergrundfarbe; sonst wuerde das Muster beim Slide
+  // einen Frame vor oder hinter dem Inhalt erscheinen.
+  const musterBild = 'none';
+  // Die normale Seite ist absichtlich transparent, damit die Tapete auf
+  // html/body bis unter die iOS-Statusleiste reicht. Während des Slides muss
+  // die neue Seite aber eine EIGENE, deckende Kopie dieser Tapete tragen.
+  // `important` ist hier nötig, weil die Transparenzregel für #view selbst
+  // ebenfalls important ist.
+  view.style.setProperty('background-color', lookFarbe, 'important');
+  view.style.setProperty('background-image', musterBild, 'important');
+  view.style.setProperty('background-size', 'auto', 'important');
+  view.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
+  view.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
+  view.style.setProperty('background-attachment', 'scroll', 'important');
+  const entferneUebergangshintergrund = () => {
+    ['background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'background-attachment']
+      .forEach((property) => view.style.removeProperty(property));
+  };
+  // Zwei Frames: erst die komplett gemountete neue Seite samt Tapete
+  // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
+  // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
+  if (transition !== 'hart') {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
+  aktiveRoute = route;
+  if (transition === 'vor' || transition === 'detail') {
+    view.classList.remove('seite-vor-warten', 'seite-detail-warten');
+    view.classList.add(transition === 'detail' ? 'seite-detail' : 'seite-vor');
+    const alteSeite = app.querySelector(':scope > .view-alt');
+    let abgeschlossen = false;
+    const aufraeumen = () => {
+      if (abgeschlossen) return;
+      abgeschlossen = true;
+      if (aktiveRoute !== route) return;
+      if (richtung === 'vor' && alteSeite) ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
+      else alteSeite?.remove();
+      view.classList.remove('view-neu', 'seite-vor', 'seite-detail');
+      if (homeStilBeimTauschSetzen) setSeite('home');
+      entferneUebergangshintergrund();
+    };
+    view.addEventListener('animationend', aufraeumen, { once: true });
+    setTimeout(aufraeumen, 520);
+  } else if (transition === 'zurueck') {
+    const alteSeite = app.querySelector(':scope > .view-alt');
+    view.classList.add('seite-zurueck');
+    seitenausstiegVorbereiten(alteSeite);
+    const aufraeumen = () => {
+      alteSeite?.remove();
+      vorherigerController?.abort();
+      view.classList.remove('view-neu', 'seite-zurueck');
+      if (homeStilBeimTauschSetzen) setSeite('home');
+      entferneUebergangshintergrund();
+    };
+    nachEigenerSeitenanimation(alteSeite, 'seiteRausRechts', aufraeumen);
+  } else {
+    /* Zwei Frames Wartezeit, damit der Browser die fertig gemountete Ansicht
+       samt Hintergrund im Speicher rasterisiert, bevor sie sichtbar wird.
+       Ohne das würde die neue Ansicht mit weißer Fläche eingeblendet und
+       einen Frame später erst mit Inhalt gefüllt. */
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (aktiveRoute !== route && vorherigeRoute !== route) return;
+    app.querySelectorAll(':scope > .view-alt').forEach((node) => node.remove());
+    if (richtung === 'gleich') vorherigerController?.abort();
+    if (homeStilBeimTauschSetzen) setSeite('home');
+    view.classList.remove('view-neu', 'warten-auf-daten');
+    entferneUebergangshintergrund();
+  }
   perfFinish();
   const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
     || view.querySelector('.kategorie-plus');
