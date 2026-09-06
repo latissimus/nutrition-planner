@@ -28,33 +28,30 @@ export function capboySvg() {
   // bleibt transparent — sonst wird das Blatt optisch zum vollen Rechteck
   // "ergaenzt" und der Faltcharakter verschwindet.
   const disk = `<g class="capboy-blatt">
-    <polygon class="capboy-knick" points="209,4 237,32 211,33" fill="#FFFFFF"/>
-    <image href="${paperUrl}" x="160" y="-2" width="86" height="108"/>
+    <polygon class="capboy-knick" points="195,10 220,35 196,35" fill="#FFFFFF"/>
+    <image href="${paperUrl}" x="156" y="8" width="68" height="86"/>
   </g>`;
-  // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
-  // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
-  // LOGMAN-Standard-letter-spacing -1.62 haelt sie sauber lesbar.
+  // Schrift-Metriken angeglichen an das LOGMAN-Logo: Die leicht groessere
+  // Wortmarke bleibt vor dem nun kompakteren Blatt klarer Hauptdarsteller.
   // Y und der rechte Stern werden gezielt nach links gezogen: das kursive Y
   // hinterlaesst rechts eine grosse optische Luecke, deren Ausgleich einen
   // negativen dx vor dem Y und ein deutlich reduziertes dx vor dem Stern
   // braucht. So sitzt der Stern rechts wieder symmetrisch zum linken.
   const txt =
-    `<tspan font-size="27" stroke-width="3.1" dy="-3">★</tspan>` +
-    `<tspan dx="8" dy="3">CAPBO</tspan>` +
+    `<tspan font-size="24" stroke-width="2.8" dy="-3">★</tspan>` +
+    `<tspan dx="5" dy="3">CAPBO</tspan>` +
     `<tspan dx="-4">Y</tspan>` +
-    `<tspan font-size="27" stroke-width="3.1" dx="-2" dy="-3">★</tspan>`;
+    `<tspan font-size="24" stroke-width="2.8" dx="-4" dy="-3">★</tspan>`;
   const path = `<textPath href="#${id}" startOffset="50%">${txt}</textPath>`;
-  // viewBox eng am Inhalt: LOGMAN nutzt 318x85, wir liegen bei 332x106 (die
-  // Diskette ist im SVG statt via CSS-::before, deshalb etwas hoeher). Vorher
-  // stand hier 380x130 — die Luft skalierte die Buchstaben bei fester CSS-
-  // Breite (5.3em) sichtbar kleiner als beim LOGMAN.
-  return `<svg class="brand-svg capboy-svg" viewBox="28 9 332 106" role="img" aria-label="CAPBOY">
+  // Der ViewBox ist optisch auf die Wortmitte zentriert und vertikal enger als
+  // zuvor. So verschenkt das kleinere Blatt im Header keine Leerflaeche.
+  return `<svg class="brand-svg capboy-svg" viewBox="24 9 332 98" role="img" aria-label="CAPBOY">
   <defs><path id="${id}" d="${d}" fill="none"/></defs>
   ${disk}
   <g font-family="'Work Sans'" font-style="italic" font-weight="700"
-     font-size="64" letter-spacing="-1.62" text-anchor="middle"
-     stroke="var(--brand-outline,#0A1330)" stroke-width="5.2" stroke-linejoin="round">
-    <text transform="translate(4.2,4.2)" fill="var(--brand-outline,#0A1330)">${path}</text>
+     font-size="66" letter-spacing="-1.72" text-anchor="middle"
+     stroke="var(--brand-outline,#0A1330)" stroke-width="5" stroke-linejoin="round">
+    <text transform="translate(3.8,3.8)" fill="var(--brand-outline,#0A1330)">${path}</text>
     <text fill="var(--brand-pink,#FF69AE)" paint-order="stroke fill">${path}</text>
   </g>
 </svg>`;

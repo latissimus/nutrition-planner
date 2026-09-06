@@ -131,7 +131,7 @@
   --down:#B3242B;
 
   --mq-h:34px;
-  --brand-outline:#000000;
+  --brand-outline:#0A1330;
   --brand-pink:#FF69AE;      /* Logo-Pink wie im LOGMAN-Logo (weicher als --pink) */
   /* CAPBOY-Blatt: SVG hat fixe Navy-Farbe, im Dark-Mode via CSS-Filter
      invertiert (siehe .capboy-blatt image weiter unten). */
