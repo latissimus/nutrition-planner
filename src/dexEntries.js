@@ -34,7 +34,7 @@ export function normalizeDexUrl(value) {
 }
 
 export function sourceFromUrl(value) {
-  if (!value) return 'MUSCLE-DEX';
+  if (!value) return 'CAPBOY';
   try {
     return new URL(value).hostname.replace(/^www\./, '').toUpperCase();
   } catch { return 'LINK'; }
@@ -168,7 +168,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
       </label>
       ${audio ? '' : `<div class="dex-entry-field"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note && !ownRecipe ? '' : 'optional'}</small></span>
-        ${noteEditorMarkup('dex-entry-note', '', { placeholder: note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild im Dex behalten?' : 'Kurze Beschreibung des Inhalts …', required: note && !ownRecipe })}
+        ${noteEditorMarkup('dex-entry-note', '', { placeholder: note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild auf dieser Seite behalten?' : 'Kurze Beschreibung des Inhalts …', required: note && !ownRecipe })}
       </div>`}
       <button class="btn btn-primary btn-block dex-entry-save" type="submit" data-no-interface-sound>${label} speichern</button>
     </form>
@@ -482,7 +482,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
       if (error) throw error;
       notifyHomeCountsChanged();
       close();
-      toast(type === 'image' ? 'Bild im Dex gespeichert' : type === 'audio' ? 'Tonaufnahme im Dex gespeichert' : type === 'routine' ? 'Routine im Dex gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} im Dex gespeichert` : 'Link im Dex gespeichert');
+      toast(type === 'image' ? 'Bild auf der Seite gespeichert' : type === 'audio' ? 'Tonaufnahme auf der Seite gespeichert' : type === 'routine' ? 'Routine auf der Seite gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} auf der Seite gespeichert` : 'Link auf der Seite gespeichert');
       await onSaved?.(data);
       // Erst nach Upload, Datenbank-Insert UND aktualisierter Dex-Ansicht:
       // Der Ton bestätigt das fertige Ergebnis, nicht nur den Buttondruck.
@@ -639,7 +639,7 @@ const foodFilterDefinitions = [
 ];
 
 function foodFiltersMarkup(active = 'all') {
-  return `<nav class="neo-dex-filter food-dex-filter" aria-label="Food-Dex filtern">${foodFilterDefinitions.map(([key, label]) =>
+  return `<nav class="neo-dex-filter food-dex-filter" aria-label="Rezepte filtern">${foodFilterDefinitions.map(([key, label]) =>
     `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
 }
 
@@ -693,7 +693,7 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
   if (hasChildren) return '';
   if (hideEmpty) return '';
   return `<section class="sammlung-alle"><h2>Alle Einträge (0)</h2><div class="sammlung-leer">
-      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leerer Dex</strong>
+      <div class="dex-leer-symbol" aria-hidden="true"><i></i><b></b></div><strong>Leere Seite</strong>
       <span>${emptyText}</span></div></section>`;
 }
 
@@ -808,7 +808,7 @@ export async function renderDexEntries(container, {
     return entries;
   } catch (error) {
     if (signal?.aborted) return [];
-    slot.innerHTML = `<div class="msg err">DEX-Einträge konnten nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
+    slot.innerHTML = `<div class="msg err">Einträge konnten nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
     return [];
   }
 }

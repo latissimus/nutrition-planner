@@ -42,7 +42,7 @@ export async function loadCoinSummary(userId, signal) {
 }
 
 export function coinHeaderMarkup(summary) {
-  return `<a class="coin-kopfstand" href="#coins" aria-label="MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}">
+  return `<a class="coin-kopfstand" href="#coins" aria-label="CAPBOY-COINS öffnen, aktueller Kontostand ${summary.balance}">
     <strong>${summary.balance}</strong>
     ${muscleCoinMarkup('coin-kopf-symbol')}
   </a>`;
@@ -75,7 +75,7 @@ function rewardEditor({ userId, existing = null, onSaved }) {
     <header><h2>${existing ? 'Belohnung bearbeiten' : 'Neue Belohnung'}</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-coin-reward-form>
       <label class="dex-entry-field"><span>Belohnung</span><input class="input" data-reward-name maxlength="80" value="${escapeHtml(existing?.name || '')}" placeholder="z. B. Lieblingssnack" required></label>
-      <label class="dex-entry-field"><span>Preis in MUSCLE-COINS</span><input class="input coin-zahlenfeld" data-reward-cost type="number" inputmode="numeric" min="1" max="100000" value="${existing?.cost || 100}" required></label>
+      <label class="dex-entry-field"><span>Preis in CAPBOY-COINS</span><input class="input coin-zahlenfeld" data-reward-cost type="number" inputmode="numeric" min="1" max="100000" value="${existing?.cost || 100}" required></label>
       <label class="dex-entry-field"><span>Notiz <small>optional</small></span><textarea class="input" data-reward-note maxlength="500" rows="3" placeholder="Womit möchtest du dich belohnen?">${escapeHtml(existing?.note || '')}</textarea></label>
       <label class="dex-entry-field"><span>Link <small>optional</small></span><input class="input" data-reward-link type="url" inputmode="url" value="${escapeHtml(existing?.link_url || '')}" placeholder="https://…"></label>
       <button class="btn btn-primary btn-block" type="submit">Belohnung speichern</button>
@@ -136,8 +136,8 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
   const color = categoryColor('coins');
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
   const openRewardEditor = () => rewardEditor({ userId, onSaved: refresh });
-  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="coin-dex-inhalt special-dex-content special-dex-stack"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
-  mountChrome(container, 'coins', 'Coin-Dex', {
+  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="coin-dex-inhalt special-dex-content special-dex-stack"><div class="daten-laden">CAPBOY-COINS werden geladen …</div></div></div>`;
+  mountChrome(container, 'coins', 'COINS', {
     color, meta: 'Belohnungen', pageLookPattern: 'wallpaper-game', hideAppearanceIcon: true, onPlus: openRewardEditor,
   });
   let ledgerQuery = supabase.from('muscle_coin_ledger').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30);
@@ -145,7 +145,7 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
   if (signal) { ledgerQuery = ledgerQuery.abortSignal(signal); rewardsQuery = rewardsQuery.abortSignal(signal); }
   const [{ data: ledger, error }, { data: rewards, error: rewardsError }] = await Promise.all([ledgerQuery, rewardsQuery]);
   if (error || rewardsError) {
-    container.querySelector('.coin-dex-inhalt').innerHTML = '<div class="tuck-leer"><b>Coin-Dex noch nicht bereit</b><span>Bitte zuerst das neue Datenbank-Update einspielen.</span></div>';
+    container.querySelector('.coin-dex-inhalt').innerHTML = '<div class="tuck-leer"><b>COINS noch nicht bereit</b><span>Bitte zuerst das neue Datenbank-Update einspielen.</span></div>';
     return { meta: 'Belohnungen', openAddMenu: openRewardEditor };
   }
   const balance = (ledger || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
@@ -154,7 +154,7 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
   container.querySelector('.coin-dex-inhalt').innerHTML = `
     <section class="coin-balance-card special-dex-hero">
       ${muscleCoinMarkup('coin-balance-symbol')}
-      <span><small>DEIN KONTOSTAND</small><strong>${balance}</strong><b>MUSCLE-COINS</b></span>
+      <span><small>DEIN KONTOSTAND</small><strong>${balance}</strong><b>CAPBOY-COINS</b></span>
     </section>
     ${coinEarningOverview()}
     ${next ? `<section class="coin-next special-dex-wide-card"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} Coins</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
@@ -168,7 +168,7 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     if (!reward) return;
     if (event.target.closest('[data-reward-edit]')) return rewardEditor({ userId, existing: reward, onSaved: refresh });
     if (!event.target.closest('[data-reward-redeem]')) return;
-    if (!confirm(`„${reward.name}“ für ${reward.cost} MUSCLE-COINS einlösen?`)) return;
+    if (!confirm(`„${reward.name}“ für ${reward.cost} CAPBOY-COINS einlösen?`)) return;
     const { error: redeemError } = await supabase.rpc('redeem_muscle_reward', { target_reward: reward.id });
     if (redeemError) return toast(redeemError.message || 'Einlösen fehlgeschlagen.');
     notifyCoinBalanceChanged();

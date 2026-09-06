@@ -193,7 +193,7 @@ function summaryMarkup(state, date) {
   </section>
   <div class="som-kurzhilfe nutrition-calibration-help" id="nutrition-calibration-help" data-nutrition-calibration-help hidden>
     <p>Die <b>Kalorien-Kalibrierung</b> verknüpft deine vollständig protokollierten Ernährungstage mit deinem geglätteten Gewichtstrend. Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden dabei nicht überbewertet.</p>
-    <p>Aussagekräftig wird die Entwicklung erst über mehrere vergleichbare Wochen. Nach mindestens <b>21 Tagen</b> kann MUSCLEDEX einschätzen, ob dein bisheriges Kalorienziel zu deinem tatsächlichen Verlauf passt.</p>
+    <p>Aussagekräftig wird die Entwicklung erst über mehrere vergleichbare Wochen. Nach mindestens <b>21 Tagen</b> kann CAPBOY einschätzen, ob dein bisheriges Kalorienziel zu deinem tatsächlichen Verlauf passt.</p>
     <p>Ein Vorschlag verändert dein Ziel <b>niemals automatisch</b>. Du entscheidest selbst, ob du ihn übernimmst.</p>
     <p><b>Aktueller Stand:</b> ${escapeHtml(adaptiveStatusText(adaptive.result))}</p>
     ${adaptive.result.eligible ? '<button class="nutrition-calibration-more" type="button" data-open-nutrition-adaptive>Vorschlag im Detail ansehen</button>' : ''}
@@ -248,7 +248,7 @@ function adaptiveOverlayMarkup(model) {
     ? `<div class="nutrition-adaptive-actions"><button class="btn btn-primary" type="button" data-accept-adaptive="${result.suggestedTarget}">Vorschlag von ${decimal(result.suggestedTarget)} kcal übernehmen</button><button class="btn" type="button" data-reject-adaptive="${result.suggestedTarget}">Ablehnen</button><button class="btn" type="button" data-later-adaptive>Später entscheiden</button></div>` : '';
   return `<header><div><small>KALORIENZIEL VERSTEHEN</small><h2>Kalorien-Kalibrierung</h2></div><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="nutrition-knowledge-card">
-      <h3>WAS MACHT MUSCLEDEX?</h3>
+      <h3>WAS MACHT CAPBOY?</h3>
       <ol>
         <li><i>1</i><p><b>Du protokollierst vollständig.</b><span>Mindestens 21 Tage zeigen, was du im Alltag wirklich isst.</span></p></li>
         <li><i>2</i><p><b>Der Gewichtstrend wird geglättet.</b><span>Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden nicht überbewertet.</span></p></li>
@@ -259,11 +259,11 @@ function adaptiveOverlayMarkup(model) {
     <section class="nutrition-adaptive-status">
       <h3>DEIN AKTUELLER STAND</h3>
       <p>${escapeHtml(result.reason)}</p>
-      ${rejectedRecently ? '<p>Du hast diesen Vorschlag abgelehnt. MUSCLEDEX bewertet ihn nach weiteren Daten erneut.</p>' : ''}
+      ${rejectedRecently ? '<p>Du hast diesen Vorschlag abgelehnt. CAPBOY bewertet ihn nach weiteren Daten erneut.</p>' : ''}
       ${evidence.status ? `<p>Gemeinsame BodyComp-Auswertung: <b>${escapeHtml(evidence.status.message || 'noch nicht eindeutig')}</b></p>` : ''}
       ${details}${action}
     </section>
-    <details class="nutrition-technical"><summary>Technische Einordnung ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary><p>Für längere Gewichtstrends nutzt MUSCLEDEX ungefähr 7.700 kcal als grobe rechnerische Entsprechung pro Kilogramm. Das ist keine Tagesregel und keine exakte Messung. Deshalb werden nur geglättete Verläufe bewertet, Vorschläge auf etwa 100 kcal begrenzt und immer von dir bestätigt.</p></details>`;
+    <details class="nutrition-technical"><summary>Technische Einordnung ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary><p>Für längere Gewichtstrends nutzt CAPBOY ungefähr 7.700 kcal als grobe rechnerische Entsprechung pro Kilogramm. Das ist keine Tagesregel und keine exakte Messung. Deshalb werden nur geglättete Verläufe bewertet, Vorschläge auf etwa 100 kcal begrenzt und immer von dir bestätigt.</p></details>`;
 }
 
 function calculatorMarkup(state, result) {
@@ -658,7 +658,7 @@ async function recipeEditor({ userId, date, onSave }) {
     recipes = data || [];
   } catch { list.innerHTML = '<p>Rezepte konnten nicht geladen werden.</p>'; return; }
   if (!recipes.length) {
-    list.innerHTML = '<p>Noch kein Rezept vorhanden. Lege im Food-Dex ein eigenes Rezept mit Zutaten aus der Datenbank an.</p>';
+    list.innerHTML = '<p>Noch kein Rezept vorhanden. Lege auf der Seite REZEPTE ein eigenes Rezept mit Zutaten aus der Datenbank an.</p>';
     return;
   }
   await signRecipeImages(recipes);
@@ -671,7 +671,7 @@ async function recipeEditor({ userId, date, onSave }) {
       : `<span class="nutrition-food-platzhalter">${materialIconMarkup('menu_book', 'nutrition-food-icon')}</span>`;
     return `<button type="button" data-recipe-index="${index}"${usable ? '' : ' disabled'}>
       ${vorschau}
-      <div><b>${escapeHtml(recipe.title || 'Rezept')}</b><small>${usable ? `${items.length} Zutaten · ${Math.round(total.grams)} g` : 'Zutaten im Food-Dex aus der Datenbank wählen'}</small></div>
+      <div><b>${escapeHtml(recipe.title || 'Rezept')}</b><small>${usable ? `${items.length} Zutaten · ${Math.round(total.grams)} g` : 'Zutaten auf der Seite REZEPTE aus der Datenbank wählen'}</small></div>
       <strong>${usable ? `${decimal(total.kcal)} kcal` : ''}</strong>
     </button>`;
   }).join('');

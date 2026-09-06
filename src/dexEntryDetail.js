@@ -58,8 +58,8 @@ async function loadEntry(userId, id, signal) {
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'REZEPTE', training: 'TRAINING', reminders: 'MAHLZEITEN', body: 'KÖRPER', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'STRESS' };
-  data.dex_name = rootNames[data.root_key] || 'MUSCLE-DEX';
+  const rootNames = { home: 'Meine Einträge', 'food-log': 'REZEPTE', training: 'TRAINING', reminders: 'MAHLZEITEN', body: 'KÖRPER', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'STRESS' };
+  data.dex_name = rootNames[data.root_key] || 'CAPBOY';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
     if (collection?.color) data.color = collection.color;
@@ -201,7 +201,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
     if (error) { toast(error.message || 'Löschen fehlgeschlagen'); return; }
     notifyHomeCountsChanged();
     if (entry.image_path || entry.audio_path) await supabase.storage.from(BUCKET).remove([entry.image_path || entry.audio_path]);
-    close(); toast('Dex-Eintrag gelöscht');
+    close(); toast('Eintrag gelöscht');
     if (onDeleted) onDeleted();
     else location.hash = backHref(entry).slice(1);
   };

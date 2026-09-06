@@ -62,7 +62,7 @@ function structuredMetadata(html: string, fallbackProvider = '') {
 }
 
 async function oembed(endpoint: string) {
-  const response = await fetch(endpoint, { headers: { 'User-Agent': 'MUSCLE-DEX/1.0' }, signal: AbortSignal.timeout(6500) });
+  const response = await fetch(endpoint, { headers: { 'User-Agent': 'CAPBOY/1.0' }, signal: AbortSignal.timeout(6500) });
   if (!response.ok) throw new Error('oEmbed nicht verfügbar');
   return await response.json();
 }
@@ -99,7 +99,7 @@ async function pageMetadata(url: URL, existingResponse?: Response) {
       proxyUrl.searchParams.set('_x_tr_tl', 'en');
       proxyUrl.searchParams.set('_x_tr_hl', 'en');
       const proxyResponse = await fetch(proxyUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CAPBOY/1.0)' },
         redirect: 'follow', signal: AbortSignal.timeout(8000),
       });
       if (proxyResponse.ok) html = (await proxyResponse.text()).slice(0, 1_000_000);
@@ -165,7 +165,7 @@ async function tiktokEmbedMetadata(url: URL) {
   const postId = url.pathname.match(/\/(?:video|photo)\/(\d+)/i)?.[1];
   if (!postId) throw new Error('TikTok-Beitrag nicht erkannt');
   const response = await fetch(`https://www.tiktok.com/embed/v2/${postId}`, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CAPBOY/1.0)' },
     signal: AbortSignal.timeout(6500),
   });
   if (!response.ok) throw new Error('TikTok-Embed nicht verfügbar');
@@ -211,7 +211,7 @@ async function stablePreviewUrl(value: string) {
   try {
     const response = await fetch(safeUrl(value), {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; CAPBOY/1.0)',
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
         Referer: value.includes('cdninstagram.com') || value.includes('fbcdn.net') ? 'https://www.instagram.com/' : '',
       },
@@ -250,7 +250,7 @@ Deno.serve(async (request) => {
     let resolvedResponse: Response | undefined;
     if (url.hostname === 'vm.tiktok.com' || url.hostname === 'vt.tiktok.com') {
       resolvedResponse = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MUSCLE-DEX/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CAPBOY/1.0)' },
         redirect: 'follow', signal: AbortSignal.timeout(6500),
       });
       url = safeUrl(resolvedResponse.url);

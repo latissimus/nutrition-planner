@@ -30,7 +30,7 @@
 }
 
 /* ============================================================
-   MUSCLE-DEX — Design-Tokens
+   CAPBOY — Design-Tokens
 
    Zwei Themes teilen sich einen Satz Variablen:
      retro  Feastables-Palette auf Tuckii-Struktur (Vorgabe, dieser :root)
@@ -60,7 +60,7 @@
    Wörter und Überschriften auf eine Schreibmaschinenschrift wechseln. Die
    lokalen Alternativen decken iOS, Android, macOS und Windows ab. */
 @font-face{
-  font-family:"MUSCLEDEX Ziffern";
+  font-family:"CAPBOY Ziffern";
   src:url('../JetBrainsMono/fonts/variable/JetBrainsMono[wght].ttf') format('truetype');
   font-style:normal;
   font-weight:100 900;
@@ -190,9 +190,9 @@
   --feast-royal:var(--fe-blurple);
   --feast-violet:var(--fe-blurple);
 
-  --mono:"MUSCLEDEX Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --ui:"MUSCLEDEX Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --display:"MUSCLEDEX Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"CAPBOY Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --ui:"CAPBOY Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --display:"CAPBOY Ziffern","Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   /* LOGMAN nutzt für Messwerte und technische Angaben die native
      Monospace-Schrift des Geräts. In MUSCLE-DEX bleibt sie bewusst ein
      eigener Akzent, damit Navigation und Fließtext weiterhin ruhig in
@@ -8132,11 +8132,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Der aktive Tab wird nicht mehr farblich hinterlegt und bekommt auch keine
    Rahmen. Das Icon selbst erhaelt einen harten LOGMAN-Schlagschatten und wirkt
    dadurch aus dem Menue heraus gehoben. filter:drop-shadow folgt der Alpha-
-   Kante des SVGs — Konturen bleiben scharf, statt einen Kasten zu werfen.
-   4-px-Versatz statt LOGMANs 3-px-klein, weil der Schatten auf 28-px-Icons
-   sonst kaum vom eigenen Icon-Rand unterscheidbar ist. */
+   Kante des SVGs — Konturen bleiben scharf, statt einen Kasten zu werfen. */
 .app-dex-tab.aktiv>span{
-  filter:drop-shadow(4px 4px 0 #0A1330);
+  filter:drop-shadow(2.5px 2.5px 0 #0A1330);
 }
 .app-dex-menu{
   position:relative;
@@ -8203,7 +8201,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .app-dex-tab{color:#EDF0F6}
 :root[data-theme="dark"] .app-dex-tab.aktiv{color:#EDF0F6}
 :root[data-theme="dark"] .app-dex-tab.aktiv>span{
-  filter:drop-shadow(4px 4px 0 #EDF0F6);
+  filter:drop-shadow(2.5px 2.5px 0 #EDF0F6);
 }
 @media(max-width:390px){
   .app-dex-header-inner{width:calc(100% - 24px)}

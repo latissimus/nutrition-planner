@@ -263,7 +263,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   const startseite = abschnitt(wrap, 'Menüband anpassen');
   const startHinweis = document.createElement('p');
   startHinweis.className = 'profile-hinweis';
-  startHinweis.textContent = 'Lege fest, welche Dex im unteren Menüband erscheinen und in welcher Reihenfolge sie angeordnet sind.';
+  startHinweis.textContent = 'Lege fest, welche Seiten im unteren Menüband erscheinen und in welcher Reihenfolge sie angeordnet sind.';
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
     ['body', 'KÖRPER'], ['reminders', 'MAHLZEITEN'], ['food-log', 'REZEPTE'],
@@ -283,10 +283,10 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
     coinCheckbox.checked = coinDexIsVisible();
     coinCheckbox.onchange = () => {
       setCoinDexVisible(coinCheckbox.checked);
-      toast(`COIN-DEX ${coinCheckbox.checked ? 'eingeblendet' : 'ausgeblendet'}.`);
+      toast(`COINS ${coinCheckbox.checked ? 'eingeblendet' : 'ausgeblendet'}.`);
     };
     const coinText = document.createElement('span');
-    coinText.textContent = 'COIN-DEX';
+    coinText.textContent = 'COINS';
     const coinTrack = document.createElement('i');
     coinTrack.className = 'switchline-track';
     coinLabel.append(coinCheckbox, coinTrack, coinText);
@@ -331,18 +331,18 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
 
   const eigeneTitel = document.createElement('h3');
   eigeneTitel.className = 'profile-untertitel';
-  eigeneTitel.textContent = 'Eigene Dex';
+  eigeneTitel.textContent = 'Eigene Seiten';
   startseite.appendChild(eigeneTitel);
   const eigeneListe = document.createElement('div');
   eigeneListe.className = 'sammlungs-sortierung';
-  eigeneListe.innerHTML = '<p class="profile-hinweis">Eigene Dex werden geladen …</p>';
+  eigeneListe.innerHTML = '<p class="profile-hinweis">Eigene Seiten werden geladen …</p>';
   startseite.appendChild(eigeneListe);
   loadCollections(session.user.id, { rootKey: 'home', signal }).then((items) => {
     if (signal?.aborted) return;
     const renderEigene = () => {
       const ordered = orderCustomCollections(items);
       if (!ordered.length) {
-        eigeneListe.innerHTML = '<p class="profile-hinweis">Noch keine eigenen Dex angelegt.</p>';
+        eigeneListe.innerHTML = '<p class="profile-hinweis">Noch keine eigenen Seiten angelegt.</p>';
         return;
       }
       eigeneListe.replaceChildren(...ordered.map((item, index) => {
@@ -379,12 +379,12 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
     };
     renderEigene();
   }).catch(() => {
-    if (!signal?.aborted) eigeneListe.innerHTML = '<p class="profile-hinweis">Eigene Dex konnten nicht geladen werden.</p>';
+    if (!signal?.aborted) eigeneListe.innerHTML = '<p class="profile-hinweis">Eigene Seiten konnten nicht geladen werden.</p>';
   });
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
-    <p class="profile-hinweis">Exportiert Profil, Messwerte, Erinnerungen, Routinen, Dex, Einträge, Einkaufsliste, Einstellungen, Freigaben und MUSCLE-COINS als JSON-Datei. Private Medien werden als Speicherpfade aufgeführt.</p>
+    <p class="profile-hinweis">Exportiert Profil, Messwerte, Erinnerungen, Routinen, Seiten, Einträge, Einkaufsliste, Einstellungen, Freigaben und CAPBOY-COINS als JSON-Datei. Private Medien werden als Speicherpfade aufgeführt.</p>
     <button class="btn btn-block" type="button" data-export>Daten exportieren</button>
     <div class="profile-daten-status" aria-live="polite"></div>`;
   daten.querySelector('[data-export]').onclick = async (event) => {

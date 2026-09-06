@@ -30,7 +30,7 @@ self.addEventListener('push', (event) => {
   let daten = {};
   try { daten = event.data ? event.data.json() : {}; }
   catch (e) { daten = { body: event.data ? event.data.text() : '' }; }
-  const title = daten.title || 'MUSCLEDEX';
+  const title = daten.title || 'CAPBOY';
   const basis = {
     body: daten.body || '',
     tag: daten.tag || 'muscledex',

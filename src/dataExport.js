@@ -64,7 +64,7 @@ function storageReferences(daten) {
 }
 
 export function exportFileName(date = new Date()) {
-  return `muscledex-export-${date.toISOString().slice(0, 10)}.json`;
+  return `capboy-export-${date.toISOString().slice(0, 10)}.json`;
 }
 
 export async function createFullDataExport({ session, profile, theme, signal, onProgress } = {}) {
@@ -80,7 +80,7 @@ export async function createFullDataExport({ session, profile, theme, signal, on
   daten.freigaben = await loadShares(userId, signal);
 
   return {
-    format: 'MUSCLEDEX-Datenexport',
+    format: 'CAPBOY-Datenexport',
     format_version: 1,
     exportiert_am: new Date().toISOString(),
     konto: {

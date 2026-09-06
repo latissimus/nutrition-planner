@@ -565,10 +565,10 @@ function appDexShellEntfernen() {
 
 function appDockTitel(route) {
   if (route.startsWith('collection/')) {
-    return appDockEigene.find((item) => `collection/${item.id}` === route)?.name || 'Dex';
+    return appDockEigene.find((item) => `collection/${item.id}` === route)?.name || 'Seite';
   }
   return sammlungen.find(([key]) => key === route)?.[1]
-    || (route === 'coins' ? 'Coin-Dex' : 'Dex');
+    || (route === 'coins' ? 'COINS' : 'Seite');
 }
 
 function appDockEintraegeMarkup(aktiveDockRoute) {
@@ -638,7 +638,7 @@ function appDexShellZeichnen(route, view) {
     dock.className = 'app-dex-dock';
     app.append(dock);
   }
-  dock.setAttribute('aria-label', 'Dex wechseln und Eintrag hinzufügen');
+  dock.setAttribute('aria-label', 'Seite wechseln und Eintrag hinzufügen');
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
       <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
@@ -815,7 +815,7 @@ function istDunkleOrdnerfarbe(farbe) {
 // eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
 function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
   const infoKindFor = (route) => ({ reminders: 'meal', sleep: 'sleep', body: 'body', training: 'training', 'food-log': 'food', stress: 'stress', home: 'custom' }[route] || route);
-  const titleFor = (route) => sammlungen.find(([key]) => key === route)?.[1] || 'Dex';
+  const titleFor = (route) => sammlungen.find(([key]) => key === route)?.[1] || 'Seite';
   return (el) => {
     const collectionId = el.dataset.collectionId;
     if (collectionId) {
@@ -826,6 +826,8 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
       // Dex selbst (ueber dessen eigenen "+"-Knopf), nicht per Long-Press von
       // aussen auf die Kachel des uebergeordneten Dex.
       return () => settingsSheet(`collection-${item.id}`, refresh, {
+        title: isSubDex ? 'Ordner bearbeiten' : 'Seite bearbeiten',
+        deleteLabel: isSubDex ? 'Ordner löschen' : 'Seite löschen',
         disableAppearance: isSubDex,
         appearanceLabel: isSubDex ? undefined : 'Icon ändern/umbenennen',
         infoLabel: `${item.name}-Info`,
@@ -833,8 +835,8 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
         onRename: isSubDex ? () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }) : null,
         onEditAppearance: isSubDex ? null : () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
         onDelete: async () => {
-          if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
-          try { await deleteCollection(userId, item); toast('Dex gelöscht'); refresh(); }
+          if (!confirm(`„${item.name}“ samt Unterordnern wirklich löschen?`)) return;
+          try { await deleteCollection(userId, item); toast(isSubDex ? 'Ordner gelöscht' : 'Seite gelöscht'); refresh(); }
           catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
         },
       });
@@ -934,7 +936,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   return true;
 }
 
-const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">DEX-Einträge werden geladen …</div></div>';
+const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">Einträge werden geladen …</div></div>';
 
 function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const training = kind === 'training';
@@ -946,7 +948,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'KÖRPER' : sleep ? 'SCHLAF' : meal ? 'MAHLZEITEN' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'Coin-Dex' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'KÖRPER' : sleep ? 'SCHLAF' : meal ? 'MAHLZEITEN' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
   const copy = body
     ? `<p>Im <b>KÖRPER</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -956,30 +958,30 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
       <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden erst aus mehreren vergleichbaren Check-ins abgeleitet.</p>
       <p>Die Auswertung zeigt beobachtete Zusammenhänge und ersetzt keine medizinische Diagnose.</p>`
     : meal
-    ? `<p>Im <b>MAHLZEITEN</b>-Dex planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
+    ? `<p>Auf der Seite <b>MAHLZEITEN</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
       <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>
       <p>Über den Hinzufügen-Button erfasst du Lebensmittel oder ergänzt deine Planung.</p>`
     : shopping
-    ? `<p>Im <b>EINKAUF</b>-Dex sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
+    ? `<p>Auf der Seite <b>EINKAUF</b> sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
     : habits
-    ? `<p>Im <b>ROUTINEN</b>-Dex planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
+    ? `<p>Auf der Seite <b>ROUTINEN</b> planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
     : stress
-    ? `<p>In <b>STRESS</b> hältst du <b>Belastungen</b>, <b>Auslöser</b> und <b>Entspannung</b> fest.</p><p>Mit <b>Tags</b> und <b>Unter-Dex</b> ordnest du, was dich stresst oder herunterfährt, und findest Muster über Wochen hinweg.</p>`
+    ? `<p>Auf der Seite <b>STRESS</b> hältst du <b>Belastungen</b>, <b>Auslöser</b> und <b>Entspannung</b> fest.</p><p>Mit <b>Tags</b> und <b>Unterordnern</b> ordnest du, was dich stresst oder herunterfährt, und findest Muster über Wochen hinweg.</p>`
     : coins
-    ? `<p>Im <b>Coin-Dex</b> sammelst du MUSCLE-COINS für erledigte Routinen, Check-ins und Messungen.</p>
+    ? `<p>Auf der Seite <b>COINS</b> sammelst du CAPBOY-COINS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
       <p>Dein Kontostand bleibt auch im festen App-Header sichtbar.</p>`
     : custom
     ? `<p>In <b>${escapeHtml(title)}</b> sammelst du eigene Notizen, Links, Bilder und Tonaufnahmen an einem Ort.</p>
-      <p>Mit <b>Tags</b> und <b>Unter-Dex</b> strukturierst du die Inhalte so, wie es für dein Thema sinnvoll ist.</p>
-      <p>Die Farbe kannst du am Haupt-Dex ändern. Unter-Dex übernehmen den Look automatisch.</p>`
+      <p>Mit <b>Tags</b> und <b>Unterordnern</b> strukturierst du die Inhalte so, wie es für dein Thema sinnvoll ist.</p>
+      <p>Die Farbe kannst du an der Hauptseite ändern. Unterordner übernehmen den Look automatisch.</p>`
     : training
     ? `<p>In <b>TRAINING</b> sammelst du <b>Übungen</b>, <b>Trainingswissen</b>, Links, Bilder, Videos und Tonaufnahmen an einem Ort.</p>
       <p>Mit Klassen wie <b>Übungen</b>, <b>Regeneration</b>, <b>Tipps</b> oder <b>Verletzung</b> findest du relevante Inhalte schnell wieder.</p>
-      <p>Unter-Dex helfen dir, Trainingsbereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
+      <p>Unterordner helfen dir, Trainingsbereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
     : `<p>In <b>REZEPTE</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
       <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
-      <p>Unter-Dex helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
+      <p>Unterordner helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
   const existing = document.querySelector('[data-food-info-dialog]');
   if (existing) existing.remove();
   const overlay = document.createElement('div');
@@ -1069,7 +1071,7 @@ async function mountCustomCollection(container, item, signal) {
     inheritedPageLookScope: inheritedLookScope,
     pageLookColor: inheritedColor,
     pageLookPattern: inheritedPattern,
-    meta: `${children.length} Unter-Dex`,
+    meta: `${children.length} Unterordner`,
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
@@ -1091,18 +1093,20 @@ async function mountCustomCollection(container, item, signal) {
       userId: ownerId, rootKey: item.root_key, currentCollectionId: item.id, onChanged: refresh,
     }),
     onDelete: async () => {
-      if (!confirm(`„${item.name}“ samt Unter-Dex wirklich löschen?`)) return;
+      if (!confirm(`„${item.name}“ samt Unterordnern wirklich löschen?`)) return;
       try {
         await deleteCollection(ownerId, item);
-        toast('Dex gelöscht');
+        toast(isSubDex ? 'Ordner gelöscht' : 'Seite gelöscht');
         location.hash = backHref.slice(1);
       } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
     },
+    title: isSubDex ? 'Ordner bearbeiten' : 'Seite bearbeiten',
+    deleteLabel: isSubDex ? 'Ordner löschen' : 'Seite löschen',
   });
   if (neoDexSkin) {
     installNeoDexChrome(container, {
       title: item.name,
-      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: backHref,
       editLabel: `${item.name} bearbeiten`,
       infoKind: customDexSkin ? 'custom' : trainingDexSkin ? 'training' : 'food',
@@ -1119,9 +1123,9 @@ async function mountCustomCollection(container, item, signal) {
     onChanged: (entries, total) => {
       if (!Array.isArray(entries)) return;
       const meta = container.querySelector('.kategorie-kopftitel small');
-      if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+      if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
       const scrollMeta = container.querySelector('[data-food-scroll-meta]');
-      if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+      if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
     },
   });
   subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
@@ -1264,7 +1268,7 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'coin-dex');
     const coinActions = await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
     installNeoDexChrome(view, {
-      title: 'Coin-Dex',
+      title: 'COINS',
       meta: coinActions?.meta || 'Belohnungen',
       closeHref: '#home',
     });
@@ -1363,7 +1367,7 @@ async function renderRoute() {
     });
     mountCategoryChrome(view, route, 'REZEPTE', {
       pageLookScope: route, pageLookPattern: 'triangles',
-      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      meta: `0 Einträge · ${children.length} Unterordner`,
       onAddNote: () => openEntry('note'),
       onAddLink: () => openEntry('link'),
       onAddImage: () => openEntry('image'),
@@ -1378,7 +1382,7 @@ async function renderRoute() {
     // zweispaltige Eintragsraster mehr Platz hat.
     installNeoDexChrome(view, {
       title: 'REZEPTE',
-      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: '#home',
       editLabel: 'REZEPTE bearbeiten',
     });
@@ -1390,9 +1394,9 @@ async function renderRoute() {
       onChanged: (entries, total) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
-        if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
         const scrollMeta = view.querySelector('[data-food-scroll-meta]');
-        if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
@@ -1412,7 +1416,7 @@ async function renderRoute() {
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
     mountCategoryChrome(view, route, 'TRAINING', {
       pageLookScope: route, pageLookPattern: 'wallpaper-dumbbell',
-      meta: `${children.length} Unter-Dex`,
+      meta: `${children.length} Unterordner`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
@@ -1420,7 +1424,7 @@ async function renderRoute() {
     });
     installNeoDexChrome(view, {
       title: 'TRAINING',
-      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: '#home',
       editLabel: 'TRAINING bearbeiten',
       infoKind: 'training',
@@ -1432,9 +1436,9 @@ async function renderRoute() {
       userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
-        if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
         const scrollMeta = view.querySelector('[data-food-scroll-meta]');
-        if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
       },
     });
   } else if (route.startsWith('collection/')) {
@@ -1520,7 +1524,7 @@ async function renderRoute() {
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'stress', onSaved: refresh });
     mountCategoryChrome(view, route, 'STRESS', {
       pageLookScope: route, pageLookPattern: 'wallpaper-blitz',
-      meta: `${children.length} Unter-Dex`,
+      meta: `${children.length} Unterordner`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
       onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'stress', onSaved: refresh }),
@@ -1528,7 +1532,7 @@ async function renderRoute() {
     });
     installNeoDexChrome(view, {
       title: 'STRESS',
-      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: '#home',
       editLabel: 'STRESS bearbeiten',
       infoKind: 'stress',
@@ -1540,9 +1544,9 @@ async function renderRoute() {
       userId: session.user.id, rootKey: 'stress', color: categoryColor('stress'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
-        if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
         const scrollMeta = view.querySelector('[data-food-scroll-meta]');
-        if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
       },
     });
   }
@@ -1577,7 +1581,7 @@ async function renderRoute() {
   if (dexAddButton) showGestureHintOnce({
     key: 'dex-hinzufuegen',
     title: 'Hier kommt Neues hinein',
-    text: 'Der Menübutton passt sich jedem Dex an und zeigt die passenden Einträge.',
+    text: 'Der Menübutton passt sich jeder Seite an und zeigt die passenden Einträge.',
     gesture: 'add',
     target: dexAddButton,
     replace: true,
@@ -1599,7 +1603,7 @@ function renderLadefehler(error) {
     <p>${info.message}</p>
     <div class="route-fehler-aktionen">
       <button class="btn btn-primary" type="button" data-route-retry>Erneut versuchen</button>
-      <a class="btn" href="#home">Zum letzten Dex</a>
+      <a class="btn" href="#home">Zur letzten Seite</a>
     </div>
   </section>`;
   app.append(view);

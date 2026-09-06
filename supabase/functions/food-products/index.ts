@@ -42,7 +42,7 @@ function normalize(product: Record<string, any>) {
 async function openFoodFacts(url: URL) {
   const response = await fetch(url, {
     headers: {
-      'User-Agent': 'MUSCLE-DEX/1.0 (nutrition lookup; contact via project repository)',
+      'User-Agent': 'CAPBOY/1.0 (nutrition lookup; contact via project repository)',
       Accept: 'application/json',
       'Accept-Language': 'de-DE,de;q=0.9,en;q=0.7',
     },

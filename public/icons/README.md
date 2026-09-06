@@ -1,9 +1,9 @@
-# MUSCLEDEX Slab Icons
+# CAPBOY Slab Icons
 
-Eigenständiges SVG-Iconset für MUSCLEDEX. Die Formen wurden für dieses Projekt
+Eigenständiges SVG-Iconset für CAPBOY. Die Formen wurden für dieses Projekt
 auf einem 24×24-Raster gezeichnet und orientieren sich an kräftigen,
 abgerundeten Slab-Konturen. Jedes Symbol besitzt zusätzlich einen harten,
-nach rechts unten versetzten Schlagschatten in MUSCLEDEX-Braun `#492426`.
+nach rechts unten versetzten Schlagschatten in CAPBOY-Braun `#492426`.
 
 ## Verwendung
 

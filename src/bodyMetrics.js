@@ -125,7 +125,7 @@ function weightMarkup(state) {
     <p class="body-goal-status" data-tone="${interpretation.tone}"><b>${interpretation.label}</b><span>${interpretation.text}</span></p>
     ${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh', points: true }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}
     <p class="body-chart-legend"><b>Punkte:</b> einzelne Wiegungen · <b>kräftige Linie:</b> geglätteter 7-Tage-Schnitt</p></div>
-    ${infoDetails('Warum bewertet MUSCLEDEX den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
+    ${infoDetails('Warum bewertet CAPBOY den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
     ${infoDetails('Wie oft wiegen?', BODY_EXPLANATIONS.weighingFrequency)}
     <button class="body-reset-mini" type="button" data-reset-body="weights">Gewichtsverlauf zurücksetzen</button>
   </div></section>`;
@@ -140,7 +140,7 @@ function skinfoldMarkup(state) {
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 12 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
-    <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob MUSCLEDEX dich alle zwei bis vier Wochen an eine neue 12-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
+    <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle zwei bis vier Wochen an eine neue 12-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
     <button class="body-reset-mini" type="button" data-reset-body="skinfolds">12-Falten-Werte zurücksetzen</button>
   </div></section>`;
 }
@@ -288,7 +288,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         if (error) return toast('Gewicht konnte nicht gespeichert werden');
         notifyHomeCountsChanged();
         if (isNew) notifyCoinBalanceChanged();
-        toast(isNew ? 'Gewicht gespeichert · +1 MUSCLE-COIN' : 'Gewicht aktualisiert');
+        toast(isNew ? 'Gewicht gespeichert · +1 CAPBOY-COIN' : 'Gewicht aktualisiert');
         await closeAndRender();
       });
     };
@@ -304,7 +304,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' });
         if (error) return toast('Taillenumfang konnte nicht gespeichert werden');
         if (isNew) notifyCoinBalanceChanged();
-        toast(isNew ? 'Taillenumfang gespeichert · +1 MUSCLE-COIN' : 'Taillenumfang aktualisiert');
+        toast(isNew ? 'Taillenumfang gespeichert · +1 CAPBOY-COIN' : 'Taillenumfang aktualisiert');
         await closeAndRender();
       });
     };
@@ -338,7 +338,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           if (error) return toast('Messung konnte nicht gespeichert werden');
           notifyHomeCountsChanged();
           if (isNew) notifyCoinBalanceChanged();
-          toast(isNew ? '12-Falten-Summe gespeichert · +1 MUSCLE-COIN' : '12-Falten-Summe aktualisiert');
+          toast(isNew ? '12-Falten-Summe gespeichert · +1 CAPBOY-COIN' : '12-Falten-Summe aktualisiert');
           await closeAndRender();
         });
       };

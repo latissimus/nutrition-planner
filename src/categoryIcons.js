@@ -78,7 +78,7 @@ const fixedSystemPatterns = {
   stress: 'wallpaper-blitz',
 };
 const colorGroups = [
-  ['DEX-Farben', [
+  ['Seitenfarben', [
     ['Kaffeebraun', '#492426'],
     ['Creme', '#F2EBE0'],
     ['Retro Muscle Hellblau', '#B1E7FF'],
@@ -423,9 +423,9 @@ function appearancePicker(route, onChange, { hideIcon = false } = {}) {
   let selectedIcon = getPreference(storageKey(route), defaults[route]);
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
+    <header><h2>${escapeHtml(actions.title || 'Seite bearbeiten')}</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="dex-appearance-form">
-      ${hideIcon ? '<p class="sheet-hinweis">Für diesen Dex gibt es keine Icon-Einstellung.</p>' : `<h3>Icon</h3>
+      ${hideIcon ? '<p class="sheet-hinweis">Für diese Seite gibt es keine Icon-Einstellung.</p>' : `<h3>Icon</h3>
       <div class="sammlung-editor-icons">${icons.map((icon) => `<button type="button" data-icon-id="${icon.id}" class="${icon.id === selectedIcon ? 'aktiv ' : ''}${icon.originalColors ? 'icon-originalfarben' : ''}" aria-label="Icon ${icon.title}">${icon.svg}</button>`).join('')}</div>`}
       ${hideIcon ? '' : `<label class="sammlung-emoji-eigen" for="eigenes-emoji-appearance"><span>Eigenes Emoji</span>
         <input id="eigenes-emoji-appearance" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
@@ -481,15 +481,15 @@ export function settingsSheet(route, onChange, actions = {}) {
   const showAppearance = !actions.disableAppearance && !actions.hideAppearanceIcon;
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Dex bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
+    <header><h2>Seite bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
-      ${actions.onInfo ? `<button data-action="info">${materialIcon('info', 'sheet-list-icon')}<span>${escapeHtml(actions.infoLabel || 'Dex-Info')}</span></button>` : ''}
+      ${actions.onInfo ? `<button data-action="info">${materialIcon('info', 'sheet-list-icon')}<span>${escapeHtml(actions.infoLabel || 'Seiteninfo')}</span></button>` : ''}
       ${showAppearance ? `<button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${escapeHtml(actions.appearanceLabel || 'Icon ändern')}</span></button>` : ''}
       ${actions.onSelect ? `<button data-action="select">${materialIcon('select_check_box', 'sheet-list-icon')}<span>Auswahl</span></button>` : ''}
       ${actions.onRename ? `<button data-action="rename">${materialIcon('edit', 'sheet-list-icon')}<span>Umbenennen</span></button>` : ''}
-      ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
+      ${actions.onCreateSub ? `<button data-action="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unterordner erstellen</span></button>` : ''}
       ${actions.onShare ? `<button data-action="share">${materialIcon('upload_file', 'sheet-list-icon')}<span>Mit Partner teilen</span></button>` : ''}
-      ${actions.onDelete ? `<button class="sheet-gefahr" data-action="delete">${materialIcon('delete_forever', 'sheet-list-icon')}<span>Dex löschen</span></button>` : ''}
+      ${actions.onDelete ? `<button class="sheet-gefahr" data-action="delete">${materialIcon('delete_forever', 'sheet-list-icon')}<span>${escapeHtml(actions.deleteLabel || 'Seite löschen')}</span></button>` : ''}
     </div>`);
   backdrop.querySelector('.sheet-menue').onclick = (event) => {
     const action = event.target.closest('[data-action]')?.dataset.action;
@@ -516,7 +516,7 @@ function plusAction(container, route) {
   if (target) {
     target.click();
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } else toast('Hinzufügen wird mit den Inhalten dieses Dex aktiviert.');
+  } else toast('Hinzufügen wird mit den Inhalten dieser Seite aktiviert.');
 }
 
 function eintragTypWaehlen(container, route, options = {}) {
@@ -535,7 +535,7 @@ function eintragTypWaehlen(container, route, options = {}) {
         <button data-entry-type="own-recipe">${materialIcon('note_add', 'sheet-list-icon')}<span>Eigenes Rezept</span></button>
         ${options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : ''}`
         : standardEntries}
-      ${options.onCreateSub ? `<button data-entry-type="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unter-Dex erstellen</span></button>` : ''}
+      ${options.onCreateSub ? `<button data-entry-type="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unterordner erstellen</span></button>` : ''}
     </div>`);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
     const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
@@ -548,16 +548,16 @@ function eintragTypWaehlen(container, route, options = {}) {
     if (type === 'sub') return options.onCreateSub?.();
     if (type === 'note') {
       if (options.onAddNote) return options.onAddNote();
-      return toast('Notizen sind für diesen Dex vorbereitet.');
+      return toast('Notizen sind für diese Seite vorbereitet.');
     }
     if (type === 'link') {
       if (options.onAddLink) return options.onAddLink();
-      return toast('Links sind für diesen Dex vorbereitet.');
+      return toast('Links sind für diese Seite vorbereitet.');
     }
     if (type === 'image') {
       if (options.onAddImage) return options.onAddImage();
       if (route === 'food-log') return plusAction(container, route);
-      return toast('Bilder sind für diesen Dex vorbereitet.');
+      return toast('Bilder sind für diese Seite vorbereitet.');
     }
   };
 }

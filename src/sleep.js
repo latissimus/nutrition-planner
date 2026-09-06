@@ -64,7 +64,7 @@ export function calculateSleepSummary(logs = []) {
 }
 
 export function analyzeSleepTrends(logs = []) {
-  if (logs.length < 6) return ['Nach sechs Morgen-Check-ins kann MUSCLE-DEX erste persönliche Zusammenhänge zeigen.'];
+  if (logs.length < 6) return ['Nach sechs Morgen-Check-ins kann CAPBOY erste persönliche Zusammenhänge zeigen.'];
   const hints = [];
   TAGS.forEach((tag) => {
     const tagged = logs.filter((log) => (log.tags || []).includes(tag));
@@ -203,7 +203,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
     closeSelector: '[data-sheet-close]',
     ariaLabel: 'Morgen-Check-in',
     markup: `
-    <header><div><small>+3 MUSCLE-COINS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <header><div><small>+3 CAPBOY-COINS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-sleep-checkin-form>
       <label class="dex-entry-field"><span>Datum</span><input class="input" type="date" data-sleep-date value="${date}" required></label>
       <div class="sleep-time-pair"><label class="dex-entry-field"><span>Eingeschlafen</span><input class="input" type="time" data-sleep-bedtime value="${String(existing?.bedtime || schedule?.bedtime || '22:30').slice(0, 5)}" required></label><label class="dex-entry-field"><span>Aufgewacht</span><input class="input" type="time" data-sleep-wake value="${String(existing?.wake_time || schedule?.wake_time || '06:30').slice(0, 5)}" required></label></div>
@@ -239,7 +239,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
       if (submit) submit.disabled = false;
       return;
     }
-    closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 MUSCLE-COINS'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 CAPBOY-COINS'); await onSaved?.();
     playInterfaceSound('bonus', { retrigger: 'restart' });
   };
   backdrop.querySelector('[data-sleep-delete]')?.addEventListener('click', async () => {
@@ -314,7 +314,7 @@ function render(container, userId, state, refresh) {
     </section>
     <div class="som-kurzhilfe nutrition-calibration-help sleep-analysis-help" id="sleep-analysis-help" data-sleep-analysis-help hidden>
       <p>Der <b>7-Tage-Verlauf</b> verwendet deine bis zu sieben neuesten vollständigen Morgen-Check-ins. Schlafdauer und Qualität sind Mittelwerte; die Abweichung zeigt, wie weit deine Schlafenszeiten durchschnittlich von deinem eigenen Rhythmus entfernt lagen.</p>
-      <p>Für <b>persönliche Zusammenhänge</b> betrachtet MUSCLEDEX bis zu 30 Check-ins. Ein Tag oder eine Gewohnheit wird erst verglichen, wenn jeweils mindestens drei Nächte mit und ohne diesen Einfluss vorliegen und der Unterschied deutlich genug ist.</p>
+      <p>Für <b>persönliche Zusammenhänge</b> betrachtet CAPBOY bis zu 30 Check-ins. Ein Tag oder eine Gewohnheit wird erst verglichen, wenn jeweils mindestens drei Nächte mit und ohne diesen Einfluss vorliegen und der Unterschied deutlich genug ist.</p>
       <p>Die Ergebnisse beschreiben beobachtete Muster und <b>keine medizinischen Ursachen</b>. Einzelne Nächte werden deshalb nicht überbewertet.</p>
       <p><b>Aktueller Stand:</b> ${state.logs.length ? `${state.logs.length} Check-in${state.logs.length === 1 ? '' : 's'} gespeichert${state.logs.length < 6 ? ` · noch ${6 - state.logs.length} bis zur ersten Zusammenhangsanalyse` : ''}` : 'Noch keine Check-ins gespeichert'}</p>
     </div>

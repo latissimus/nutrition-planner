@@ -195,7 +195,7 @@ function notificationText(reminder) {
   if (reminder.type === 'sleep') {
     const phase = reminder.metadata?.phase;
     const body = phase === 'wind-down' ? 'Zeit, Bildschirm und Tempo langsam herunterzufahren.'
-      : phase === 'check-in' ? 'Wie war deine Nacht? Dein Check-in bringt 3 MUSCLE-COINS.'
+      : phase === 'check-in' ? 'Wie war deine Nacht? Dein Check-in bringt 3 CAPBOY-COINS.'
         : 'Dein geplanter Schlaf beginnt jetzt.';
     return { title: `${notificationSymbol(reminder)} ${reminder.label.split(' · ')[0]}`, body };
   }
@@ -1304,7 +1304,7 @@ export async function mountReminders(container, { session, signal }) {
           <div class="sheet-menue mahl-add-unterpunkte">
             <button type="button" data-add-type="nutrition:scan">${materialIconMarkup('photo_camera')}<span><b>Barcode</b><small>Produkt scannen</small></span></button>
             <button type="button" data-add-type="nutrition:search">${materialIconMarkup('search')}<span><b>Suche</b><small>Lebensmittel finden</small></span></button>
-            <button type="button" data-add-type="nutrition:recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Aus dem Food-Dex übernehmen</small></span></button>
+            <button type="button" data-add-type="nutrition:recipe">${materialIconMarkup('menu_book')}<span><b>Rezept</b><small>Aus REZEPTE übernehmen</small></span></button>
             <button type="button" data-add-type="nutrition:manual">${materialIconMarkup('edit')}<span><b>Eigenes Lebensmittel</b><small>Werte selbst eintragen</small></span></button>
           </div>
         </section>` : ''}

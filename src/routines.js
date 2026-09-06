@@ -92,10 +92,10 @@ function routineHeroMarkup(state) {
         <strong>${stats.offen}</strong>
         <b>ROUTINEN</b>
       </span>
-      <button class="som-info-knopf routine-info-button" type="button" data-toggle-routine-info aria-expanded="false" aria-controls="routine-info-help" aria-label="ROUTINEN-Dex erklären">i</button>
+      <button class="som-info-knopf routine-info-button" type="button" data-toggle-routine-info aria-expanded="false" aria-controls="routine-info-help" aria-label="Seite ROUTINEN erklären">i</button>
     </section>
     <div class="som-kurzhilfe nutrition-calibration-help routine-info-help" id="routine-info-help" data-routine-info-help hidden>
-      <p>Der <b>ROUTINEN</b>-Dex sammelt wiederkehrende Abläufe, die du im Alltag abhaken möchtest.</p>
+      <p>Die Seite <b>ROUTINEN</b> sammelt wiederkehrende Abläufe, die du im Alltag abhaken möchtest.</p>
       <p>Der Hero zeigt, wie viele für heute geplante Routinen noch offen sind. Der Ring zeigt den heutigen Fortschritt.</p>
       <p>Eine Routine kannst du durch Tippen auf den Kreis abhaken. Langes Drücken öffnet die Bearbeitung; bei Timer-Routinen startet der Play-Button den Timer.</p>
     </div>
@@ -161,7 +161,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
       <fieldset class="routine-days"><legend>Wiederholen</legend><div>${days.map(([value, label]) => `<button type="button" data-routine-day="${value}" class="${selectedDays.has(value) ? 'aktiv' : ''}" aria-pressed="${selectedDays.has(value)}">${label}</button>`).join('')}</div></fieldset>
       ${selectedTemplate === 'custom'
         ? `<label class="dex-entry-field"><span>Coins pro Abschluss</span><input class="input coin-zahlenfeld" data-routine-coins type="number" inputmode="numeric" min="0" max="50" value="${existing?.coin_reward ?? 5}" required><small class="routine-coin-info">Für diese freie Routine selbst festlegen: 0–50 Coins.</small></label>`
-        : `<div class="routine-coin-fest" data-routine-coin-hint>${routineCoinValue(selectedTemplate, selectedDuration)} MUSCLE-COINS pro Abschluss</div>`}
+        : `<div class="routine-coin-fest" data-routine-coin-hint>${routineCoinValue(selectedTemplate, selectedDuration)} CAPBOY-COINS pro Abschluss</div>`}
       <label class="dex-entry-field"><span>${selectedTemplate === 'custom' ? 'Ablauf' : 'Notiz'} <small>optional</small></span><textarea class="input" data-routine-note maxlength="500" rows="3" placeholder="${selectedTemplate === 'custom' ? 'Jeden Schritt in eine neue Zeile schreiben …' : 'Kurzer Hinweis zur Durchführung …'}">${escapeHtml(existing?.note || '')}</textarea></label>
       <button class="btn btn-primary btn-block" type="submit"${existing ? '' : ' data-no-interface-sound'}>Routine speichern</button>
       ${existing ? '<button class="btn btn-block routine-delete" type="button" data-routine-delete>Routine löschen</button>' : ''}
@@ -200,7 +200,7 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
     const customInput = backdrop.querySelector('[data-routine-custom-duration]');
     if (customInput) customInput.value = '';
     const hint = backdrop.querySelector('[data-routine-coin-hint]');
-    if (hint) hint.textContent = `${routineCoinValue(selectedTemplate, Number(button.dataset.routineDuration))} MUSCLE-COINS pro Abschluss`;
+    if (hint) hint.textContent = `${routineCoinValue(selectedTemplate, Number(button.dataset.routineDuration))} CAPBOY-COINS pro Abschluss`;
   });
   backdrop.querySelector('[data-routine-custom-duration]')?.addEventListener('input', (event) => {
     if (!event.currentTarget.value) return;

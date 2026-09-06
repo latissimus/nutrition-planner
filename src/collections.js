@@ -108,7 +108,7 @@ export function collectionGridMarkup(items, options = {}) {
   if (!items.length) return '';
   const counts = options.counts || new Map();
   return `<section class="unter-sammlungen-block">
-    <h2>Unter-Dex (${items.length})</h2>
+    <h2>Unterordner (${items.length})</h2>
     <div class="unter-sammlungen-grid">${items.map((item) => collectionCardMarkup(item, counts.get(item.id)?.entries || 0, options)).join('')}</div>
   </section>`;
 }
@@ -148,7 +148,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
   const isSubDex = Boolean(parentId || existing?.parent_id) || rootKey !== 'home';
   const showIconPicker = !isSubDex;
   const showColorPicker = !isSubDex;
-  const editorTitle = existing ? 'Dex bearbeiten' : (isSubDex ? 'Neuer Unter-Dex' : 'Neuer Dex');
+  const editorTitle = existing ? (isSubDex ? 'Ordner bearbeiten' : 'Seite bearbeiten') : (isSubDex ? 'Neuer Unterordner' : 'Neue Seite');
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop sammlung-editor-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet sammlung-editor" role="dialog" aria-modal="true" aria-label="${editorTitle}">
@@ -164,7 +164,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
         <label class="sammlung-emoji-eigen" for="collection-emoji"><span>Eigenes Emoji</span>
           <input id="collection-emoji" inputmode="text" maxlength="12" placeholder="z. B. 🦾" value="${selectedIcon.startsWith('emoji:') ? escapeHtml(selectedIcon.slice(6)) : ''}">
         </label>` : ''}
-      <button class="btn btn-primary btn-block sammlung-editor-speichern" type="submit">${existing ? 'Änderungen speichern' : (isSubDex ? 'Unter-Dex erstellen' : 'Dex erstellen')}</button>
+      <button class="btn btn-primary btn-block sammlung-editor-speichern" type="submit">${existing ? 'Änderungen speichern' : (isSubDex ? 'Unterordner erstellen' : 'Seite erstellen')}</button>
     </form>
   </section>`;
   let color = selectedColor;
@@ -201,7 +201,7 @@ export function openCollectionEditor({ userId, rootKey, parentId = null, existin
     try {
       const saved = await saveCollection(userId, { rootKey, parentId, name: input.value, color, iconKey }, existing);
       close();
-      toast(existing ? 'Dex aktualisiert' : (isSubDex ? 'Unter-Dex erstellt' : 'Dex erstellt'));
+      toast(existing ? (isSubDex ? 'Ordner aktualisiert' : 'Seite aktualisiert') : (isSubDex ? 'Unterordner erstellt' : 'Seite erstellt'));
       await onSaved?.(saved);
     } catch (error) {
       toast(error.message || 'Speichern fehlgeschlagen');

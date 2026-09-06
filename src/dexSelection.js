@@ -11,8 +11,8 @@ function targetSheet(collections, currentCollectionId, onPick) {
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-ziel-backdrop';
   const options = collections.filter((item) => item.id !== currentCollectionId);
-  backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Ziel-Dex wählen">
-    <header><h2>Ziel-Dex wählen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  backdrop.innerHTML = `<section class="kategorie-sheet" role="dialog" aria-modal="true" aria-label="Zielordner wählen">
+    <header><h2>Zielordner wählen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="sheet-menue dex-ziel-liste">
       <button type="button" data-target-id="">${materialIconMarkup('create_new_folder', 'sheet-list-icon')}<span>Oberste Ebene</span></button>
       ${options.map((item) => `<button type="button" data-target-id="${item.id}">${materialIconMarkup(item.icon_key || 'create_new_folder', 'sheet-list-icon')}<span>${escapeHtml(item.name)}</span></button>`).join('')}
@@ -36,7 +36,7 @@ export async function startDexSelection(container, {
 } = {}) {
   if (container.classList.contains('dex-auswahlmodus')) return;
   const cards = [...container.querySelectorAll('.dex-ordner-test[data-collection-id],.dex-inhaltskarte[data-dex-entry-id]')];
-  if (!cards.length) return toast('In diesem Dex gibt es noch nichts auszuwählen.');
+  if (!cards.length) return toast('Auf dieser Seite gibt es noch nichts auszuwählen.');
 
   const selectedCollections = new Set();
   const selectedEntries = new Set();
@@ -111,7 +111,7 @@ export async function startDexSelection(container, {
     const { data: collections, error } = await supabase.from('collections')
       .select('id,parent_id,root_key,name,icon_key,user_id')
       .eq('user_id', userId).eq('root_key', rootKey).order('name');
-    if (error) return toast('Ziel-Dex konnten nicht geladen werden.');
+    if (error) return toast('Zielordner konnten nicht geladen werden.');
     const blocked = new Set(selectedCollections);
     // Auch alle Nachfahren sperren: Sonst koennte ein ausgewaehlter Dex in
     // seinen eigenen Unterbaum verschoben und damit ein Zyklus erzeugt werden.
@@ -125,7 +125,7 @@ export async function startDexSelection(container, {
       });
     }
     targetSheet((collections || []).filter((item) => !blocked.has(item.id)), currentCollectionId, async (targetId) => {
-      if (targetId && blocked.has(targetId)) return toast('Ein Dex kann nicht in sich selbst verschoben werden.');
+      if (targetId && blocked.has(targetId)) return toast('Ein Ordner kann nicht in sich selbst verschoben werden.');
       try {
         if (selectedEntries.size) {
           const { error: entryError } = await supabase.from('dex_entries')

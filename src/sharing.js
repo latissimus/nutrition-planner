@@ -28,12 +28,12 @@ export async function resolveSharedSpace(userId, scope, signal) {
 }
 
 export async function openShareSheet(scope) {
-  const label = scope === 'shopping' ? 'Einkauf' : 'Food-Dex';
+  const label = scope === 'shopping' ? 'Einkauf' : 'Rezepte';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop teilen-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet teilen-sheet" role="dialog" aria-modal="true" aria-label="${label} teilen">
     <header><h2>${label} teilen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <p class="profile-hinweis">Die Person benötigt ein eigenes MUSCLE-DEX-Konto. Beide Profile können diesen Bereich anschließend gemeinsam bearbeiten.</p>
+    <p class="profile-hinweis">Die Person benötigt ein eigenes CAPBOY-Konto. Beide Profile können diesen Bereich anschließend gemeinsam bearbeiten.</p>
     <form data-share-form><label class="dex-entry-field"><span>E-Mail des Partners</span><input class="input" type="email" autocomplete="email" required placeholder="name@beispiel.de"></label><button class="btn btn-primary btn-block" type="submit">Freigeben</button></form>
     <h3>Freigegeben für</h3><div class="teilen-liste" data-share-list><span>Wird geladen …</span></div>
   </section>`;

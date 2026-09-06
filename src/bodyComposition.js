@@ -19,15 +19,15 @@ export const BODYCOMP_THRESHOLDS = Object.freeze({
 });
 
 export const BODY_EXPLANATIONS = Object.freeze({
-  dailyWeight: 'Das Tagesgewicht schwankt unter anderem durch Wasser, Salz, Kohlenhydrate, Verdauungsinhalt und Training. MUSCLEDEX bewertet deshalb nicht einzelne Messungen, sondern den geglätteten Verlauf.',
+  dailyWeight: 'Das Tagesgewicht schwankt unter anderem durch Wasser, Salz, Kohlenhydrate, Verdauungsinhalt und Training. CAPBOY bewertet deshalb nicht einzelne Messungen, sondern den geglätteten Verlauf.',
   average7: 'Der 7-Tage-Schnitt reduziert tägliche Schwankungen und zeigt die kurzfristige Gewichtsentwicklung.',
   trend28: 'Der 28-Tage-Trend hilft zu beurteilen, ob dein Gewicht langfristig stabil bleibt, langsam fällt oder steigt.',
   weighingFrequency: 'Drei Wiegungen pro Woche reichen für eine grundlegende Verlaufskontrolle. Fünf bis sieben Wiegungen verbessern die Kalorienkalibrierung. Wiege dich möglichst morgens nach dem Toilettengang und vor dem Essen.',
   skinfolds: 'Die 12-Falten-Summe ist ein Verlaufswert für das Unterhautfett. Sie ist keine direkte Messung des Körperfettanteils. Vergleiche sind nur sinnvoll, wenn die Messungen unter ähnlichen Bedingungen durchgeführt werden.',
   waist: 'Der Taillenumfang ergänzt die Hautfaltenmessung. Er kann Veränderungen im Bauchbereich zeigen, wird aber ebenfalls durch Messposition, Verdauung und Atmung beeinflusst.',
-  performance: 'Steigende Kraft kann durch Muskelaufbau, bessere Technik oder neuronale Anpassungen entstehen. MUSCLEDEX verwendet die LOGMAN-Leistung deshalb nur gemeinsam mit Körper- und Erholungswerten.',
+  performance: 'Steigende Kraft kann durch Muskelaufbau, bessere Technik oder neuronale Anpassungen entstehen. CAPBOY verwendet die LOGMAN-Leistung deshalb nur gemeinsam mit Körper- und Erholungswerten.',
   recovery: 'Schlaf und Erholung beweisen keinen Muskelaufbau. Sie zeigen, ob die Voraussetzungen für Training, Regeneration und eine kontrollierte Diät wahrscheinlich ausreichend sind.',
-  initialCalories: 'Dieser Wert ist zunächst eine Schätzung aus Alter, Größe, Gewicht und Aktivität. Er ist kein gemessener Stoffwechselwert. Mit ausreichend protokollierten Ernährungs- und Gewichtsdaten kann MUSCLEDEX die Schätzung später vorsichtig an deinen tatsächlichen Verlauf anpassen.',
+  initialCalories: 'Dieser Wert ist zunächst eine Schätzung aus Alter, Größe, Gewicht und Aktivität. Er ist kein gemessener Stoffwechselwert. Mit ausreichend protokollierten Ernährungs- und Gewichtsdaten kann CAPBOY die Schätzung später vorsichtig an deinen tatsächlichen Verlauf anpassen.',
 });
 
 export function ageOnDate(birthDate, reference = new Date()) {

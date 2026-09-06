@@ -54,7 +54,7 @@ describe('vollstaendiger Datenexport', () => {
       .rejects.toThrow('weights: offline');
   });
 
-  it('verwendet MUSCLEDEX als Dateinamen', () => {
-    expect(exportFileName(new Date('2026-08-12T12:00:00Z'))).toBe('muscledex-export-2026-08-12.json');
+  it('verwendet CAPBOY als Dateinamen', () => {
+    expect(exportFileName(new Date('2026-08-12T12:00:00Z'))).toBe('capboy-export-2026-08-12.json');
   });
 });
