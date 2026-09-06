@@ -19,8 +19,16 @@ export function capboySvg() {
   // die geknickte Ecke exakt wie in der Datei entworfen (Falt-Ecke als
   // sichtbares Fenster durch nonzero + gegenlaeufige Windungen). Ein eigener
   // Stroke wuerde die Falt-Ecke ueberdecken; deshalb ohne Kontur.
+  // Der weisse Rechteck-Backing haelt genau die Papiergroesse — sichtbar wird
+  // er nur da, wo die Falt-Ecke des Blatts durchsichtig ist. Ergebnis: der
+  // Knick erscheint weiss statt "Seitenhintergrund". Im Darkmode dreht ein
+  // eigener CSS-Filter das Backing auf Navy (siehe styles.css).
+  // Weisses Backing sitzt in den ECHTEN Papiergrenzen (Paper.svg hat ringsum
+  // ~5-Einheiten-Rand innerhalb seiner viewBox 459x563). Sonst leuchtete das
+  // Rechteck rechts und oben ueber die Papierkante hinweg als heller Streifen.
   const disk = `<g class="capboy-blatt">
-    <image href="${paperUrl}" x="160" y="7" width="86" height="108"/>
+    <rect class="capboy-knick" x="165" y="4" width="76" height="104" fill="#FFFFFF"/>
+    <image href="${paperUrl}" x="160" y="2" width="86" height="108"/>
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
   // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das

@@ -291,8 +291,12 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 .brand{position:relative;z-index:0;display:inline-block;font-size:22px;line-height:0}
 .brand-svg{display:block;width:5.3em;height:auto;overflow:visible}
 /* Paper.svg im CAPBOY-Logo hat fixe Navy-Fuellung; im Darkmode via
-   Filter zu Weiss invertieren, statt eine zweite Datei zu pflegen. */
+   Filter zu Weiss invertieren, statt eine zweite Datei zu pflegen. Das
+   Backing-Rechteck fuer den Knick wird gleich mitgedreht: hell im Light-
+   Mode (Knick weiss auf navy Blatt), dunkel im Dark-Mode (Knick navy auf
+   weissem Blatt). */
 :root[data-theme="dark"] .capboy-blatt image{filter:brightness(0) invert(1)}
+:root[data-theme="dark"] .capboy-blatt .capboy-knick{fill:#0A1330}
 /* Athleten-Silhouette (Navy) hinter dem Schriftzug.
    Das Bild ist navy und geht auf dunklem Grund unter – im Dark-Theme hellt ein
    Filter es auf, statt eine zweite Bilddatei zu pflegen. */
@@ -7925,7 +7929,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-dex-header-inner{
   box-sizing:border-box;
-  width:min(calc(100% - 28px),580px);
+  /* Dieselbe 36-px-Inhaltsachse und dieselbe Maximalbreite wie Hero und
+     Karten der Spezialseiten. Der Header bleibt Teil der festen Schale,
+     wirkt dadurch aber nicht mehr seitlich gegen den Inhalt verschoben. */
+  width:min(calc(100% - 72px),604px);
   height:var(--app-dex-header-h);
   margin-inline:auto;
   display:flex;
@@ -8163,7 +8170,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#EDF0F6;
 }
 @media(max-width:390px){
-  .app-dex-header-inner{width:calc(100% - 24px)}
   .app-dex-header-actions{gap:5px}
   .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:32px;height:32px;flex-basis:32px}
 }
