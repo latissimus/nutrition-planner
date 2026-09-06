@@ -133,12 +133,8 @@
   --mq-h:34px;
   --brand-outline:#000000;
   --brand-pink:#FF69AE;      /* Logo-Pink wie im LOGMAN-Logo (weicher als --pink) */
-  /* CAPBOY-Diskette: Koerper + Schlitz sind navy, Shutter + Etikett weiss.
-     Darkmode tauscht die Rollen: navy wird weiss und umgekehrt. */
+  /* CAPBOY-Blatt: navy im Light-Mode, invertiert weiss im Dark-Mode. */
   --capboy-body:#001454;
-  --capboy-shutter:#FFFFFF;
-  --capboy-slot:#001454;
-  --capboy-label:#FFFFFF;
   --sil-filter:none;
 
   /* Tuckii misst auf dem iPhone 14 (390 pt Breite) rund 3 pt Rand, 4 pt harten
@@ -244,11 +240,8 @@
   /* Logo: Das gedeckte Navy verschwindet auf dunklem Grund, die Kontur waere
      weg. Dunkles Blau bleibt als Kontur, ist aber vom Hintergrund abgesetzt. */
   --brand-outline:#0A1330;
-  /* CAPBOY-Diskette umgekehrt: Koerper + Schlitz weiss, Shutter + Etikett navy. */
+  /* CAPBOY-Blatt umgekehrt: im Dark-Mode weiss statt navy. */
   --capboy-body:#FFFFFF;
-  --capboy-shutter:#0A1330;
-  --capboy-slot:#FFFFFF;
-  --capboy-label:#0A1330;
   /* Silhouette weiss: die saubere Umkehrung von "dunkle Form auf hellem Grund".
      brightness(0) faerbt das PNG schwarz und laesst die Transparenz stehen,
      invert(1) macht daraus Weiss – so bleibt es bei einer Bilddatei. */
