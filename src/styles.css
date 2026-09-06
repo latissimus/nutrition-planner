@@ -3243,7 +3243,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-zutaten-detail li .dex-zutat-name{grid-area:name;min-width:0;font-weight:600;overflow-wrap:anywhere}
 .dex-zutaten-detail li .dex-zutat-gramm{grid-area:menge;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .dex-zutaten-detail li strong{grid-area:kcal;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
-.dex-zutaten-summe{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--app-divider);font-size:12.5px;font-weight:750;color:var(--muted)}
+.dex-zutaten-summe{margin:12px 0 0;padding-top:0;border-top:1px solid var(--app-divider);font-size:12.5px;font-weight:750;color:var(--muted)}
 /* Zutaten-Editor (Rezept anlegen/bearbeiten): je Zeile Name · Grammfeld · kcal · Entfernen. */
 .dex-zutaten-liste{display:grid;gap:8px}
 .dex-zutaten-leer{margin:0;padding:12px;border:1px dashed var(--app-outline);border-radius:10px;color:var(--muted);font-size:13px;line-height:1.4}
@@ -3613,9 +3613,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   padding-bottom:calc(42px + env(safe-area-inset-bottom));
   overscroll-behavior:contain;-webkit-overflow-scrolling:touch
 }
-.dex-detail-fixkopf .dex-detail-steuerung{position:relative;z-index:20;margin-top:0;margin-bottom:10px;background:var(--bg)}
+.dex-detail-fixkopf .dex-detail-steuerung{position:relative;z-index:20;margin-top:0;padding-top:0;padding-bottom:calc(42px + env(safe-area-inset-bottom));margin-bottom:10px;background:var(--bg)}
 .kategorie-scrollinhalt{
-  position:relative;z-index:0;min-height:0;overflow-x:hidden;overflow-y:auto;padding-top:10px;padding-bottom:calc(42px + env(safe-area-inset-bottom));
+  position:relative;z-index:0;min-height:0;overflow-x:hidden;overflow-y:auto;padding-top:0;padding-bottom:calc(42px + env(safe-area-inset-bottom));
   overscroll-behavior-x:none;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;isolation:isolate;contain:paint;
 }
 .kategorie-scrollinhalt>:first-child{margin-top:0}
@@ -4623,6 +4623,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
 .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt>*{position:relative;z-index:1}
+
+
 
 /* Im Darkmode liegt die feste Tapete exakt in der zweiten Zeile der App-Shell:
    unterhalb des Kopfbereichs, aber hinter dem scrollenden Inhalt. Damit bleibt
