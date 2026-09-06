@@ -9992,19 +9992,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-dex-header-h:64px;
   --app-dex-dock-bottom:max(6px,calc(env(safe-area-inset-bottom) - 6px));
 }
-/* EINE einzige globale Regel für den Abstand zwischen Dex-Inhalt und
-   festem App-Header: Safe-Area + Header-Höhe + 24 px Atemluft für den
-   Hero. Der Selektor deckt alle drei View-Zustände ab (aktive #view,
-   ausgehende .view-alt, eintreffende .view-neu), damit während einer
-   Route-Transition kein Ruck nach oben passiert. */
+/* Kein Padding auf der aeusseren View: Sonst haette der innere Scrollcontainer
+   (.kategorie-scrollinhalt) einen festen Top-Versatz und der Seiteninhalt
+   koennte beim Scrollen niemals bis unter den Header rutschen — sichtbarer
+   Abstand zwischen Header und Scrollbereich. Der Header-Freiraum wird
+   stattdessen als padding-top INNERHALB des Scrollcontainers gesetzt, damit
+   er beim Scrollen mitwandert. */
 #app.dex-app-shell>:is(#view,.view-alt,.view-neu){
   box-sizing:border-box!important;
-  padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 24px)!important;
+  padding-top:0!important;
   padding-bottom:0!important;
 }
-/* Der Inhalt läuft – wie beim LOGMAN – hinter der schwebenden Milchglas-
-   leiste unten weiter, bekommt dort aber genügend Scrollreserve. */
+/* Header-Freiraum liegt jetzt IM Scrollcontainer: Safe-Area + Header-Hoehe +
+   24 px Atemluft. So kann der Inhalt beim Scrollen unter den Header wandern
+   und der Scrollbereich reicht optisch bis an die Header-Kante heran. */
 #app.dex-app-shell :is(.home-scrollinhalt,.dex-detail-scrollinhalt,.kategorie-scrollinhalt){
+  padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 24px)!important;
   padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
 }
 .app-dex-header{
