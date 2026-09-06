@@ -164,7 +164,6 @@ let recovery = false;
 let authMode = 'login';
 let renderGeneration = 0;
 let routeAbortController = null;
-let appRueckwaerts = false;
 let popstateNavigation = false;
 let erzwungenesRueckwaertsZiel = '';
 let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
@@ -196,40 +195,6 @@ window.addEventListener('muscledex:appearance-changed', () => {
 const routeStack = createRouteStack(aktiveRoute);
 const navRichtung = (ziel) => routeStack.navigate(ziel);
 
-// `animationend` steigt von animierten Kindknoten bis zur ganzen Seite auf.
-// Beim Aufraeumen eines Seitenwechsels darf deshalb ausschliesslich das Ende
-// der Animation auf der Seitenwurzel zaehlen. Andernfalls kann etwa eine
-// Listen- oder Ladeanimation den ausgehenden Dex mitten im Slide entfernen.
-function nachEigenerSeitenanimation(element, animationName, callback, timeout = 540) {
-  if (!element) {
-    callback();
-    return;
-  }
-  let abgeschlossen = false;
-  let fallback = 0;
-  const fertig = () => {
-    if (abgeschlossen) return;
-    abgeschlossen = true;
-    element.removeEventListener('animationend', beiAnimationsende);
-    window.clearTimeout(fallback);
-    callback();
-  };
-  const beiAnimationsende = (event) => {
-    if (event.target !== element || event.animationName !== animationName) return;
-    fertig();
-  };
-  element.addEventListener('animationend', beiAnimationsende);
-  fallback = window.setTimeout(fertig, timeout);
-}
-
-function seitenausstiegVorbereiten(element) {
-  if (!element) return;
-  // Alle Dex verlassen die Ansicht als eine einzige, unveraenderte Ebene.
-  // Dauer, Easing, Schatten und Gegenbewegung kommen ausschliesslich aus den
-  // gemeinsamen `seite-*`-Regeln.
-  element.classList.add('view-alt-zurueck', 'seite-raus-rechts');
-}
-
 function navigationZuruecksetzen(route = 'home') {
   routeAbortController?.abort();
   routeAbortController = null;
@@ -243,7 +208,6 @@ function navigationZuruecksetzen(route = 'home') {
 // noch einmal darueberlegen.
 window.addEventListener('popstate', () => {
   popstateNavigation = true;
-  appRueckwaerts = false;
 });
 
 // Schliessen- und Zurueck-Knoepfe duerfen keinen neuen History-Eintrag
@@ -281,7 +245,6 @@ document.addEventListener('click', (event) => {
     return;
   }
   event.preventDefault();
-  appRueckwaerts = true;
   history.back();
 });
 
@@ -900,7 +863,6 @@ function renderChrome() {
 function ansichtMerken(route, node, controller, seite) {
   if (!route || !node) return;
   node.removeAttribute('id');
-  node.classList.remove('view-alt', 'view-alt-hart', 'view-neu', 'seite-vor', 'seite-detail', 'seite-raus-rechts');
   node.classList.add('view-cache');
   // Ton darf nach einem Seitenwechsel nie unsichtbar weiterlaufen. Iframes
   // werden hier noch nicht getrennt, weil die Ansicht fuer den sofortigen
@@ -912,7 +874,7 @@ function ansichtMerken(route, node, controller, seite) {
   ansichtsCache.set(route, { node, controller, seite });
 }
 
-function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
+function gemerkteAnsichtZeigen(route) {
   const gemerkt = ansichtsCache.take(route);
   if (!gemerkt) return false;
   const aktuell = app.querySelector(':scope > #view');
@@ -920,7 +882,7 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
   const bisherigerController = routeAbortController;
   const bisherigeSeite = document.documentElement.dataset.seite || '';
 
-  gemerkt.node.classList.remove('view-cache', 'view-alt', 'view-alt-hart', 'view-alt-zurueck', 'seite-raus-rechts');
+  gemerkt.node.classList.remove('view-cache');
   gemerkt.node.id = 'view';
   app.insertBefore(gemerkt.node, aktuell || null);
   routeAbortController = gemerkt.controller;
@@ -929,23 +891,7 @@ function gemerkteAnsichtZeigen(route, richtung, ohneAnimation = false) {
   dexLookAusAnsichtWiederherstellen(gemerkt.node);
   appDexShellAktualisieren(route, gemerkt.node, routeAbortController?.signal);
 
-  if (!aktuell) return true;
-  aktuell.removeAttribute('id');
-  aktuell.classList.add('view-alt', 'view-alt-zurueck');
-  let abgeschlossen = false;
-  const fertig = () => {
-    if (abgeschlossen) return;
-    abgeschlossen = true;
-    ansichtMerken(bisherigeRoute, aktuell, bisherigerController, bisherigeSeite);
-    gemerkt.node.classList.remove('seite-zurueck');
-  };
-  if (ohneAnimation) {
-    fertig();
-  } else {
-    gemerkt.node.classList.add('seite-zurueck');
-    seitenausstiegVorbereiten(aktuell);
-    nachEigenerSeitenanimation(aktuell, 'seiteRausRechts', fertig);
-  }
+  if (aktuell) ansichtMerken(bisherigeRoute, aktuell, bisherigerController, bisherigeSeite);
   // Die gespeicherte Ansicht bleibt bewusst stabil. Ein nachgelagerter
   // Voll-Render hat auf iOS den inneren Home-Scroller kurz ersetzt und konnte
   // dadurch direkt nach dem Zurückkehren eine Berührung verschlucken.
@@ -1474,28 +1420,6 @@ async function mountCustomCollection(container, item, signal) {
   subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
 }
 
-function mountComingSoon(container, route) {
-  setSeite(route);
-  container.innerHTML = `
-    <div class="wrap pad-bottom bereich-vorschau">
-      <div class="seitenkopf">
-        <div class="seitenkopf-text">
-          <span class="seitenkopf-kicker">Routine</span>
-          <h1 class="section-title">ROUTINEN</h1>
-        </div>
-      </div>
-      <section class="seiten-einstieg">
-        <b>Kleine Schritte, die bleiben</b>
-        <span>Tägliche Routinen, Serien und Fortschritt werden hier aufgebaut.</span>
-      </section>
-      <section class="card vorschau-karte">
-        <span aria-hidden="true">${iconMarkup('habits')}</span>
-        <strong>Dieser Bereich kommt als Nächstes.</strong>
-        <p>Die Navigation ist bereits aktiv, die Funktionen ergänzen wir im nächsten Schritt.</p>
-      </section>
-    </div>`;
-}
-
 async function profilLaden() {
   profile = await loadProfile(session.user.id);
   if (!profile) throw new Error('Profil konnte nicht angelegt werden.');
@@ -1579,7 +1503,7 @@ async function renderRoute() {
      sofort verfügbar. Die alte Logik verwendete ihn nur beim Zurückgehen und
      lud denselben Dex beim Antippen im Menü häufig vollständig neu. */
   if (richtung !== 'gleich' && ansichtsCache.peek(route)
-    && gemerkteAnsichtZeigen(route, richtung, true)) { perfMark('cache-hit'); perfFinish(); return; }
+    && gemerkteAnsichtZeigen(route)) { perfMark('cache-hit'); perfFinish(); return; }
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;

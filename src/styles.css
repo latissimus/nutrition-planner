@@ -3982,60 +3982,9 @@ body{overscroll-behavior:none}
   padding-top:env(safe-area-inset-top);
 }
 .app-shell{position:relative}
-.app-shell>.view-alt,.app-shell>.view-neu{position:absolute;inset:0;width:100%;height:100%;min-height:0}
-.app-shell>.view-alt{
-  z-index:1;overflow-x:hidden;overflow-y:auto;pointer-events:none;
-  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-  padding-top:env(safe-area-inset-top);
-}
-/* Beim harten LOGMAN-Wechsel darf die alte Seite nicht noch einen Frame lang
-   sichtbar bleiben: Nach dem Entfernen ihrer #view-ID greifen sonst kurz die
-   allgemeineren Breitenregeln und der Inhalt zieht sich auseinander. Der
-   Knoten bleibt für Cache und Datenzustand erhalten, wird aber sofort
-   unsichtbar, bis ihn die fertige Zielansicht ersetzt. */
-/* Die alte Ansicht bleibt beim harten Wechsel SICHTBAR, bis die neue
-   komplett gemountet ist. So sieht der Nutzer nicht mehr die einzelnen
-   „…wird geladen“-Platzhalter, sondern nur die fertigen Endzustände. */
-.app-shell>.view-alt-hart{z-index:1;pointer-events:none}
-.app-shell>.view-neu.warten-auf-daten{visibility:hidden}
-.app-shell>.view-cache{display:none!important}
-.app-shell>.view-alt-zurueck{z-index:3;will-change:transform}
-.app-shell>.view-neu{z-index:2;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);background-color:var(--dex-seitenfarbe,var(--bg))}
-.app-shell>.view-neu.home-transition-view{
-  background-color:#F2EBE0!important;
-  background-image:none!important;
-}
-:root[data-theme="dark"] .app-shell>.view-neu.home-transition-view{
-  background-color:#101A2B!important;
-  background-image:none!important;
-}
+.app-shell>.warten-auf-daten{display:none!important}
 html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
-/* Seitliche Einschub-Animation: neue Seite kommt beim Oeffnen eines Dex von
-   rechts hereingeschoben. #view hat bereits overflow-x:hidden, dadurch
-   erzeugt der Startzustand ausserhalb des Viewports keinen Scrollbalken.
-   dex-einschub-warten haelt die Seite VOR dem Mounten schon an der
-   Start-Position fest (unsichtbar) – ohne das wuerde der fertig geladene
-   Inhalt kurz an seiner Endposition aufblitzen, bevor die Animation ihn
-   zurueck an den Start reisst und neu reinschiebt. */
-.dex-einschub-warten{transform:translateX(100%);opacity:0}
-@keyframes dexEinschub{
-  from{transform:translateX(100%);opacity:0}
-  to{transform:translateX(0);opacity:1}
-}
-.dex-einschub{animation:dexEinschub .32s cubic-bezier(.16,.84,.32,1) both}
-
-/* Rueckwaerts (Schliessen/Zurueck-Wischgeste), Home und Eintraege: kein
-   seitlicher Schub, nur ein reines, bewusst langsameres Einblenden. */
-.seite-warten{opacity:0}
-@keyframes seiteEinblenden{from{opacity:0}to{opacity:1}}
-.seite-einblenden{animation:seiteEinblenden .55s cubic-bezier(.16,.84,.32,1) both}
-
-@media(prefers-reduced-motion:reduce){
-  .dex-einschub-warten,.seite-warten{transform:none;opacity:1}
-  .dex-einschub,.seite-einblenden,.seite-vor,.seite-zurueck,.seite-raus-rechts,.seite-detail{animation:none}
-  .seite-vor-warten,.seite-zurueck-warten,.seite-detail-warten{transform:none;opacity:1}
-}
 
 /* ---------- Sammlungen und Unter-Sammlungen ---------- */
 .kategorie-kopftitel small{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:600}
