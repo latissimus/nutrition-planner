@@ -51,5 +51,11 @@ Rückkehr in den Vordergrund verwerfen alte Cache-Ansichten stattdessen gezielt.
 Die Historie trennt Aufbau und Cache bei der Medianberechnung. Alle genannten
 Ansichten wurden im angemeldeten Endzustand geprüft; dabei waren genau eine
 Ansicht, ein Header und ein Menüband aktiv und die Konsole blieb fehlerfrei.
+Der nicht mehr erreichbare Renderer der früheren Startseite samt Zählerabfragen
+und Aktualisierungs-Listenern wurde entfernt. Das erzeugte Hauptpaket sank dabei
+von rund 576,4 kB auf 568,9 kB (unkomprimiert). Außerdem entfällt die frühere
+Verzögerung um zwei Browser-Frames vor jedem Hash-Wechsel. Ein erneuter Kaltstart
+über `#home` landete direkt im zuletzt verwendeten Sleep-Log; weder eine alte
+Startseite noch die Suchseite befand sich anschließend im DOM.
 Vollständige Wiederholungsserien, Frame-Aufnahmen, Speicherprüfung und
 iPhone-Messungen stehen noch aus.

@@ -38,7 +38,7 @@ import {
   applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
-  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, mainDexFolderSvg, openCollectionEditor, saveCollection,
+  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
 
@@ -757,92 +757,6 @@ window.addEventListener('muscledex:coins-changed', async () => {
 window.addEventListener('online', appSyncStatusAktualisieren);
 window.addEventListener('offline', appSyncStatusAktualisieren);
 
-// Welche Tabelle den Zaehler einer Sammlung fuellt. Routinen haben noch keine
-// Tabelle – ihre Karte zeigt weiter "Bald".
-// Row Level Security ist auf allen Tabellen aktiv, die Zaehlung liefert also
-// von sich aus nur die eigenen Zeilen; ein Filter auf die user_id waere
-// doppelt gemoppelt.
-// Zuletzt geladene Zahlen. Beim Zurueckspringen auf die Startseite stehen sie
-// dadurch sofort da, statt erneut durch den Platzhalter zu laufen.
-let zaehlerStand = {};
-
-const ZAEHLQUELLEN = {
-  body: { tabelle: 'weights', eins: 'Messung', viele: 'Messungen' },
-  reminders: { tabelle: 'reminders', filters: [['active', true]], filterIn: ['type', ['meal', 'supplement', 'drink']], eins: 'Erinnerung', viele: 'Erinnerungen' },
-  'food-log': { tabelle: 'dex_entries', filter: ['root_key', 'food-log'], eins: 'Eintrag', viele: 'Einträge' },
-  training: { tabelle: 'dex_entries', filter: ['root_key', 'training'], eins: 'Eintrag', viele: 'Einträge' },
-  // Gezaehlt wird, was fuer den naechsten Einkauf ausgewaehlt (angehakt) ist –
-  // die Karte beantwortet damit direkt "Wie viele Lebensmittel muss ich noch
-  // besorgen?" statt "Wie viele koennte ich theoretisch besorgen?".
-  shopping: { tabelle: 'shopping_items', filter: ['checked', true], eins: 'Lebensmittel', viele: 'Lebensmittel' },
-  habits: { tabelle: 'routines', eins: 'Routine', viele: 'Routinen' },
-  sleep: { tabelle: 'sleep_logs', eins: 'Nacht', viele: 'Nächte' },
-};
-
-// head:true holt nur den Zaehler, keine Zeilen – fuenf Karten kosten so fuenf
-// leere Antworten statt der kompletten Tabellen.
-async function zaehlerLaden(signal) {
-  const paare = await Promise.all(Object.entries(ZAEHLQUELLEN).map(async ([route, { tabelle, filter, filters = [], filterIn }]) => {
-    try {
-      if (route === 'reminders') {
-        // Der MEAL-LOG zeigt die belegten Tageszeit-Kategorien, nicht jede
-        // einzelne Mahlzeit oder jedes Supplement. Ein Frühstück plus ein
-        // Supplement bleibt dadurch genau eine Kategorie.
-        let reminderQuery = supabase.from(tabelle)
-          .select('type,label,time,metadata')
-          .eq('active', true)
-          .in('type', ['meal', 'supplement', 'drink']);
-        reminderQuery = reminderQuery.abortSignal(signal);
-        const { data, error } = await reminderQuery;
-        if (error) return [route, null];
-        const kategorien = new Set();
-        (data || []).forEach((reminder) => {
-          if (reminder.type === 'drink') { kategorien.add('drink'); return; }
-          const label = String(reminder.label || '').toLocaleLowerCase('de');
-          const slot = reminder.metadata?.meal_slot
-            || (label.includes('frühstück') ? 'breakfast'
-              : label.includes('vormittag') ? 'snack_morning'
-                : label.includes('mittagessen') ? 'lunch'
-                  : label.includes('nachmittag') ? 'snack_afternoon'
-                    : label.includes('abend') ? 'dinner' : null);
-          if (slot) { kategorien.add(slot); return; }
-          const [hours, minutes] = String(reminder.time || '00:00').split(':').map(Number);
-          const total = (Number(hours) || 0) * 60 + (Number(minutes) || 0);
-          kategorien.add(total < 585 ? 'breakfast' : total < 720 ? 'snack_morning'
-            : total < 900 ? 'lunch' : total < 1080 ? 'snack_afternoon' : 'dinner');
-        });
-        return [route, kategorien.size];
-      }
-      let countQuery = supabase.from(tabelle).select('*', { count: 'exact', head: true });
-      if (filter) countQuery = countQuery.eq(filter[0], filter[1]);
-      filters.forEach(([field, value]) => { countQuery = countQuery.eq(field, value); });
-      if (filterIn) countQuery = countQuery.in(filterIn[0], filterIn[1]);
-      countQuery = countQuery.abortSignal(signal);
-      const { count, error } = await countQuery;
-      return [route, error ? null : (count ?? 0)];
-    } catch (e) {
-      return [route, null];   // offline: die Karte behaelt ihren Platzhalter
-    }
-  }));
-  return Object.fromEntries(paare);
-}
-
-function zaehlerText(route, anzahl) {
-  const quelle = ZAEHLQUELLEN[route];
-  if (!quelle || anzahl === null || anzahl === undefined) return null;
-  return `<b>${anzahl}</b><span>${anzahl === 1 ? quelle.eins : quelle.viele}</span>`;
-}
-
-// Traegt geladene Zahlen in bereits gezeichnete Karten nach. Die Karten
-// erscheinen dadurch sofort und fuellen sich, sobald die Antwort da ist.
-function zaehlerEintragen(container, zaehler) {
-  container.querySelectorAll('[data-sammlung]').forEach((karte) => {
-    const text = zaehlerText(karte.dataset.sammlung, zaehler[karte.dataset.sammlung]);
-    const meta = karte.querySelector('.dex-datensatz-meta');
-    if (text && meta) meta.innerHTML = text;
-  });
-}
-
 function renderChrome() {
   app.classList.add('app-shell');
   // Die sichtbare Seite behält ihre ID und sämtliche Layoutregeln bis zum Tausch.
@@ -910,20 +824,6 @@ function istDunkleOrdnerfarbe(farbe) {
   return (r * 299 + g * 587 + b * 114) / 1000 < 135;
 }
 
-function dexOrdnerKarte({ href, titel, meta, iconInhalt, farbe, route = '', eigene = false, collectionId = '' }) {
-  return `
-  <div class="tuck-fach dex-ordner-testfach${istDunkleOrdnerfarbe(farbe) ? ' dex-ordner-dunkel' : ''}${route ? ` dex-ordner-${route}` : ''}${eigene ? ' eigene-sammlung' : ''}" style="--ordner:${farbe}">
-    <a class="tuck-karte dex-datensatz-karte dex-ordner-test" href="${href}"${route ? ` data-sammlung="${route}"` : ''}${collectionId ? ` data-collection-id="${collectionId}"` : ''}>
-      ${mainDexFolderSvg}
-      <span class="dex-ordner-inhalt">
-        <span class="dex-datensatz-meta">${meta}</span>
-        <h2>${titel}</h2>
-      </span>
-      <span class="dex-ordner-kartenicon" aria-hidden="true">${iconInhalt}</span>
-    </a>
-  </div>`;
-}
-
 // Baut fuer eine Kachel (eingebaute Kategorie ueber data-sammlung oder
 // eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
 function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
@@ -965,66 +865,6 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
   };
 }
 
-// Alle DEX-Eintraege teilen dieselbe dreilagige Ordnerform.
-function sammlungsKarten(daten = sammlungen, zaehler = {}) {
-  return daten.map(([route, titel, , icon, farbe, status]) => {
-    // Solange die Zahl laedt, steht der Stand da. So springt die Karte beim
-    // Nachtragen nur um eine Zeile und nicht um ihre halbe Hoehe.
-    const meta = zaehlerText(route, zaehler[route])
-      || (ZAEHLQUELLEN[route] ? '<b>…</b>' : `<b>${status}</b>`);
-    const iconInhalt = categoryIconMarkup(route, 'muscledex-sammlungsicon');
-    const dexFarbe = pageLook(route, categoryColor(route), 'drops').color || categoryColor(route);
-    return dexOrdnerKarte({
-      href: `#${route}`, route, titel, meta, iconInhalt,
-      farbe: dexFarbe,
-    });
-  }).join('');
-}
-
-function eigeneSammlungsKarten(items, stats = new Map()) {
-  return items.map((item) => {
-    const count = stats.get(item.id)?.entries || 0;
-    return dexOrdnerKarte({
-      href: `#collection/${item.id}`,
-      titel: escapeHtml(item.name),
-      meta: `<b>${count}</b><span>${count === 1 ? 'Eintrag' : 'Einträge'}</span>`,
-      iconInhalt: collectionIconMarkup(item.icon_key),
-      farbe: item.color,
-      eigene: true,
-      collectionId: item.id,
-    });
-  }).join('');
-}
-
-async function eigeneDexStatistik(userId, roots, signal) {
-  if (!roots.length) return new Map();
-  let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', 'home');
-  let entriesQuery = supabase.from('dex_entries').select('collection_id').eq('user_id', userId).eq('root_key', 'home');
-  if (signal) { collectionsQuery = collectionsQuery.abortSignal(signal); entriesQuery = entriesQuery.abortSignal(signal); }
-  const [{ data: collections, error: collectionError }, { data: entries, error: entryError }] = await Promise.all([collectionsQuery, entriesQuery]);
-  if (collectionError) throw collectionError;
-  if (entryError) throw entryError;
-  const childrenByParent = new Map();
-  (collections || []).forEach((item) => {
-    if (!item.parent_id) return;
-    const list = childrenByParent.get(item.parent_id) || [];
-    list.push(item.id); childrenByParent.set(item.parent_id, list);
-  });
-  const entryCount = new Map();
-  (entries || []).forEach(({ collection_id: id }) => { if (id) entryCount.set(id, (entryCount.get(id) || 0) + 1); });
-  const result = new Map();
-  roots.forEach((root) => {
-    const descendants = [];
-    const queue = [...(childrenByParent.get(root.id) || [])];
-    while (queue.length) {
-      const id = queue.shift(); descendants.push(id); queue.push(...(childrenByParent.get(id) || []));
-    }
-    const ids = [root.id, ...descendants];
-    result.set(root.id, { children: descendants.length, entries: ids.reduce((sum, id) => sum + (entryCount.get(id) || 0), 0) });
-  });
-  return result;
-}
-
 async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   if (!roots.length) return new Map();
   let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
@@ -1062,10 +902,10 @@ async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   return result;
 }
 
-// Neue Konten starten mit derselben klaren Reihenfolge und Farb-/Emoji-Sprache
-// wie die aktuelle MUSCLE-DEX-Startseite. Die Initialisierung ist bewusst
-// einmalig und überschreibt keine bestehenden persönlichen Einstellungen.
-async function initialeStartseiteEinrichten(userId, signal, existing = []) {
+// Neue Konten starten mit einer vollständigen Dex-Navigation sowie passenden
+// Farben und Icons. Die Initialisierung ist einmalig und überschreibt keine
+// bestehenden persönlichen Einstellungen.
+async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   const key = 'muscledex:home-defaults-v1';
   if (getPreference(key, false) || existing.length) {
     if (!getPreference(key, false)) setPreference(key, true);
@@ -1105,133 +945,6 @@ async function initialeStartseiteEinrichten(userId, signal, existing = []) {
   }
   setPreference(key, true);
   return true;
-}
-
-async function mountHome(container, signal, { setzeSeite = true } = {}) {
-  if (setzeSeite) setSeite('home');
-  let sichtbar = sichtbareSammlungen();
-  let eigene = [];
-  let eigeneStats = new Map();
-  try {
-    eigene = await loadCollections(session.user.id, { rootKey: 'home', signal });
-    const seeded = await initialeStartseiteEinrichten(session.user.id, signal, eigene);
-    if (seeded) eigene = await loadCollections(session.user.id, { rootKey: 'home', signal });
-    sichtbar = sichtbareSammlungen();
-  }
-  catch (error) { if (!signal?.aborted) toast('Eigene Dex-Einträge konnten nicht geladen werden.'); }
-  if (signal?.aborted) return;
-  eigene = orderCustomCollections(eigene).filter((item) => customCollectionIsVisible(item.id));
-  try { eigeneStats = await eigeneDexStatistik(session.user.id, eigene, signal); }
-  catch (error) { if (!signal?.aborted) toast('Dex-Zähler konnten nicht geladen werden.'); }
-  const coinSichtbar = coinDexIsVisible();
-  const coinSummary = coinSichtbar ? await loadCoinSummary(session.user.id, signal) : null;
-  if (signal?.aborted) return;
-  container.innerHTML = `
-    <div class="wrap pad-bottom tuck-home home-fixkopf">
-      <div class="tuck-kopfzeile">
-        <a class="kopf-marke" href="#home" aria-label="MUSCLE-DEX – Meine Dex-Einträge">${headerBrandMarkup()}</a>
-        <div class="tuck-kopf-aktionen">
-          ${coinSichtbar ? coinHeaderMarkup(coinSummary) : ''}
-          <button class="tuck-quadrat betont neu-sammlung" type="button" aria-label="Neuen Dex erstellen">
-            ${materialIconMarkup('create_new_folder')}
-          </button>
-          <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
-        </div>
-      </div>
-      <div class="home-scrollinhalt">
-      <header class="tuck-titelzeile">
-        <h1>Meine Dex-Einträge</h1>
-      </header>
-      <section class="tuck-grid" aria-label="Meine Dex-Einträge">
-        ${sammlungsKarten(sichtbar, zaehlerStand)}${eigeneSammlungsKarten(eigene, eigeneStats)}
-      </section>
-      </div>
-    </div>`;
-
-  // Einstellungen und neue Dex werden auf der Startseite bewusst hart neu
-  // gerendert. Die Startansicht kann im Navigationscache liegen; ein reines
-  // Hashchange würde dann gelegentlich nur die alte DOM-Kopie stehen lassen.
-  const homeNeuLaden = () => {
-    navigationZuruecksetzen('home');
-    render();
-  };
-
-  container.querySelector('.neu-sammlung').onclick = () => openCollectionEditor({
-    userId: session.user.id,
-    rootKey: 'home',
-    onSaved: homeNeuLaden,
-  });
-
-  bindLongPress(container.querySelector('.tuck-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-    userId: session.user.id,
-    refresh: homeNeuLaden,
-    itemsById: new Map(eigene.map((item) => [item.id, item])),
-  }));
-  if (container.querySelector('.dex-ordner-test')) showGestureHintOnce({
-    key: 'dex-langer-tipp',
-    title: 'Dex-Info und Bearbeiten',
-    text: 'Halte einen Dex länger gedrückt, um die Info oder Bearbeitung zu öffnen.',
-    gesture: 'hold',
-  });
-
-  zaehlerLaden(signal).then((zaehler) => {
-    if (signal?.aborted) return;
-    zaehlerStand = zaehler;
-    // Zwischenzeitlich kann eine andere Seite gemountet sein.
-    if (container.isConnected) zaehlerEintragen(container, zaehler);
-  });
-
-  const aktualisiereHomeZaehler = async () => {
-    // `container` darf hier bewusst vom Dokument getrennt sein: Genau so wird
-    // die Startseite im Navigationscache gehalten. Das Aktualisieren einer
-    // abgetrennten DOM-Struktur ist gueltig und sorgt dafuer, dass beim
-    // Zurueckkehren sofort der aktuelle Stand sichtbar ist.
-    if (signal?.aborted) return;
-    const [zaehler, stats] = await Promise.all([
-      zaehlerLaden(signal),
-      eigeneDexStatistik(session.user.id, eigene, signal).catch(() => new Map()),
-    ]);
-    if (signal?.aborted) return;
-    zaehlerStand = zaehler;
-    eigeneStats = stats;
-    zaehlerEintragen(container, zaehler);
-    container.querySelectorAll('[data-collection-id]').forEach((karte) => {
-      const meta = karte.querySelector('.dex-datensatz-meta');
-      const stat = stats.get(karte.dataset.collectionId);
-      if (meta && stat) meta.innerHTML = `<b>${stat.entries}</b><span>${stat.entries === 1 ? 'Eintrag' : 'Einträge'}</span>`;
-    });
-  };
-  const lokaleZaehlungsAenderung = () => { aktualisiereHomeZaehler().catch(() => {}); };
-  window.addEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung);
-  signal?.addEventListener('abort', () => window.removeEventListener('muscledex:counts-changed', lokaleZaehlungsAenderung), { once: true });
-  ['weights', 'reminders', 'dex_entries', 'shopping_items', 'routines', 'sleep_logs']
-    .forEach((table) => subscribeToTableChanges({ table, signal, onChange: aktualisiereHomeZaehler, onError: () => {} }));
-  const aktualisiereCoinStand = async () => {
-    // Wie die Kartenzaehler muss auch der Kopfstand aktualisiert werden,
-    // waehrend Home als abgetrennte Ansicht im Navigationscache liegt.
-    if (signal?.aborted || !coinSichtbar) return;
-    const summary = await loadCoinSummary(session.user.id, signal);
-    if (signal?.aborted) return;
-    const kopf = container.querySelector('.coin-kopfstand');
-    if (!kopf) return;
-    const stand = kopf.querySelector('strong');
-    if (stand) stand.textContent = String(summary.balance);
-    kopf.setAttribute('aria-label', `MUSCLE-COINS öffnen, aktueller Kontostand ${summary.balance}`);
-  };
-  const lokaleCoinAenderung = () => { aktualisiereCoinStand().catch(() => {}); };
-  window.addEventListener('muscledex:coins-changed', lokaleCoinAenderung);
-  signal?.addEventListener('abort', () => window.removeEventListener('muscledex:coins-changed', lokaleCoinAenderung), { once: true });
-  subscribeToTableChanges({
-    table: 'muscle_coin_ledger', signal, onChange: aktualisiereCoinStand, onError: () => {},
-  });
-  subscribeToTableChanges({
-    table: 'collections', signal,
-    onChange: () => {
-      if (aktiveRoute !== 'home') ansichtsCache.delete('home');
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
-    },
-    onError: () => {},
-  });
 }
 
 const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">DEX-Einträge werden geladen …</div></div>';
@@ -1474,7 +1187,7 @@ async function renderRoute() {
   if (!getPreference('muscledex:home-defaults-v1', false)) {
     try {
       const bestehende = await loadCollections(session.user.id, { rootKey: 'home' });
-      await initialeStartseiteEinrichten(session.user.id, undefined, bestehende);
+      await initialeDexNavigationEinrichten(session.user.id, undefined, bestehende);
       appDockGeladen = false;
     } catch (error) {
       if (!isAbortError(error)) console.warn('Dex-Grundeinstellung konnte nicht vorbereitet werden:', error.message);
@@ -1489,12 +1202,11 @@ async function renderRoute() {
     history.replaceState(history.state, '', `#${angefragt}`);
   }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  let route = ['home', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
-    || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
-    ? angefragt
-    : 'home';
-  if (route === 'home') {
-    route = appDexFallbackRoute();
+  const istBekannteRoute = ['profile', 'coins'].includes(angefragt)
+    || bereiche.some(([ziel]) => ziel === angefragt)
+    || angefragt.startsWith('collection/') || angefragt.startsWith('entry/');
+  let route = istBekannteRoute ? angefragt : appDexFallbackRoute();
+  if (!istBekannteRoute) {
     angefragt = route;
     history.replaceState(history.state, '', `#${route}`);
   }
@@ -1541,9 +1253,7 @@ async function renderRoute() {
       }
     }
   }
-  if (route === 'home') {
-    await mountHome(view, signal);
-  } else if (route === 'profile') {
+  if (route === 'profile') {
     setSeite('profile');
     // Sichtbarkeit und Reihenfolge des Menübandes werden hier bearbeitet.
     // Beim Zurückkehren muss deshalb auch die Liste eigener Dex frisch aus
@@ -1808,8 +1518,6 @@ async function renderRoute() {
       editLabel: 'Sleep-Log bearbeiten',
       infoKind: 'sleep',
     });
-  } else {
-    mountHome(view, signal);
   }
   // Wurde waehrend eines langsamen Mounts bereits zurueck navigiert, darf
   // die inzwischen veraltete Zielseite nicht spaeter doch noch ueber die
