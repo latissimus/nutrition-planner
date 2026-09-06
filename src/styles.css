@@ -8172,21 +8172,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:32px;height:32px;flex-basis:32px}
 }
 
-/* MAHLZEITEN-Testlauf: Nicht den festen Header nach innen schieben, sondern
-   den Seiteninhalt auf dessen Achse verbreitern. Damit beginnen Logo, Hero,
-   Infokarte und Mahlzeitenkarten auf derselben senkrechten Linie. */
+/* MAHLZEITEN-Testlauf: Der optische Rand folgt dem appweit bereits
+   verwendeten 21-px-Inhaltsraster. Das verbreitert die Karten gegenueber
+   dem alten 36-px-Rand, ohne sie an den Displayrand zu druecken. */
 :root[data-seite="reminders"] .meal-log-dex-page{
-  --special-dex-inline:14px!important;
+  --special-dex-inline:var(--dex-content-gutter,21px)!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .special-dex-content{
-  width:min(calc(100% - 28px),580px)!important;
-}
-@media(max-width:390px){
-  :root[data-seite="reminders"] .meal-log-dex-page{
-    --special-dex-inline:12px!important;
-  }
-  :root[data-seite="reminders"] .meal-log-dex-page .special-dex-content{
-    width:calc(100% - 24px)!important;
-    max-width:580px!important;
-  }
+  width:min(calc(100% - 42px),var(--special-dex-content-max,604px))!important;
 }
