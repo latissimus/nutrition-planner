@@ -968,7 +968,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     : stress
     ? `<p>Auf der Seite <b>STRESS</b> hältst du <b>Belastungen</b>, <b>Auslöser</b> und <b>Entspannung</b> fest.</p><p>Mit <b>Tags</b> und <b>Unterordnern</b> ordnest du, was dich stresst oder herunterfährt, und findest Muster über Wochen hinweg.</p>`
     : coins
-    ? `<p>Auf der Seite <b>COINS</b> sammelst du CAPBOY-COINS für erledigte Routinen, Check-ins und Messungen.</p>
+    ? `<p>Auf der Seite <b>COINS</b> sammelst du CAPCOINS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
       <p>Dein Kontostand bleibt auch im festen App-Header sichtbar.</p>`
     : custom

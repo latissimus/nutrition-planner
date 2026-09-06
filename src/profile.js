@@ -384,7 +384,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
-    <p class="profile-hinweis">Exportiert Profil, Messwerte, Erinnerungen, Routinen, Seiten, Einträge, Einkaufsliste, Einstellungen, Freigaben und CAPBOY-COINS als JSON-Datei. Private Medien werden als Speicherpfade aufgeführt.</p>
+    <p class="profile-hinweis">Exportiert Profil, Messwerte, Erinnerungen, Routinen, Seiten, Einträge, Einkaufsliste, Einstellungen, Freigaben und CAPCOINS als JSON-Datei. Private Medien werden als Speicherpfade aufgeführt.</p>
     <button class="btn btn-block" type="button" data-export>Daten exportieren</button>
     <div class="profile-daten-status" aria-live="polite"></div>`;
   daten.querySelector('[data-export]').onclick = async (event) => {

@@ -7963,9 +7963,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Abstand zwischen Header und Scrollbereich. Der Header-Freiraum wird
    stattdessen als padding-top INNERHALB des Scrollcontainers gesetzt, damit
    er beim Scrollen mitwandert. */
-/* Header-Freiraum liegt jetzt IM Scrollcontainer: Safe-Area + Header-Hoehe +
-   24 px Atemluft. So kann der Inhalt beim Scrollen unter den Header wandern
-   und der Scrollbereich reicht optisch bis an die Header-Kante heran. */
+#app.dex-app-shell>:is(#view,.view-alt,.view-neu){
+  box-sizing:border-box!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
+}
+/* Header-Freiraum liegt IM Scrollcontainer: Safe-Area + Header-Hoehe +
+   24 px Atemluft, damit unter dem Header ein sichtbarer Abstand steht und
+   der Inhalt beim Scrollen sanft dahinter verschwindet. Padding-bottom
+   haelt das untere Menueband frei, damit nichts unter dem Dock endet. */
+#app.dex-app-shell :is(.home-scrollinhalt,.dex-detail-scrollinhalt,.kategorie-scrollinhalt){
+  padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 24px)!important;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
+}
 .app-dex-header{
   position:absolute;
   z-index:85;
