@@ -2,6 +2,8 @@ import { supabase } from './supabase.js';
 
 let activeUserId = '';
 let values = new Map();
+const pendingByUser = new Map();
+const syncTimers = new Map();
 
 const cacheKey = (userId) => `muscledex:user-preferences:${userId}`;
 const dirtyKey = (userId) => `muscledex:user-preferences-dirty:${userId}`;
@@ -87,22 +89,57 @@ export function getPreference(key, fallback = null) {
   return values.has(key) ? values.get(key) : fallback;
 }
 
-export function setPreference(key, value) {
+async function flushPreferences(userId) {
+  syncTimers.delete(userId);
+  const pending = pendingByUser.get(userId);
+  if (!pending?.size) return;
+  pendingByUser.delete(userId);
+  const rows = [...pending].map(([key, value]) => ({
+    user_id: userId, key, value, updated_at: new Date().toISOString(),
+  }));
+  let error = null;
+  try {
+    ({ error } = await supabase.from('user_preferences')
+      .upsert(rows, { onConflict: 'user_id,key' }));
+  } catch (requestError) {
+    error = requestError;
+  }
+  if (error) {
+    console.warn('Einstellungen konnten nicht synchronisiert werden:', error.message);
+    const erneut = pendingByUser.get(userId) || new Map();
+    pending.forEach((value, key) => {
+      if (!erneut.has(key)) erneut.set(key, value);
+    });
+    pendingByUser.set(userId, erneut);
+    return;
+  }
+  const remaining = readDirty(userId);
+  const neuer = pendingByUser.get(userId);
+  pending.forEach((_, key) => {
+    // Wurde derselbe Schlüssel während der Anfrage erneut geändert, bleibt er
+    // absichtlich als noch nicht synchronisiert markiert.
+    if (!neuer?.has(key)) remaining.delete(key);
+  });
+  writeDirty(userId, remaining);
+}
+
+function schedulePreferenceSync(userId, key, value, delay) {
+  const pending = pendingByUser.get(userId) || new Map();
+  pending.set(key, value);
+  pendingByUser.set(userId, pending);
+  const timer = syncTimers.get(userId);
+  if (timer) clearTimeout(timer);
+  syncTimers.set(userId, setTimeout(() => { flushPreferences(userId); }, delay));
+}
+
+export function setPreference(key, value, { syncDelay = 500 } = {}) {
   if (!activeUserId) return;
+  if (values.has(key) && JSON.stringify(values.get(key)) === JSON.stringify(value)) return;
   values.set(key, value);
   writeCache();
   const userId = activeUserId;
   const dirty = readDirty(userId);
   dirty.add(key);
   writeDirty(userId, dirty);
-  supabase.from('user_preferences').upsert({
-    user_id: userId, key, value, updated_at: new Date().toISOString(),
-  }, { onConflict: 'user_id,key' }).then(({ error }) => {
-    if (error) console.warn('Einstellung konnte nicht synchronisiert werden:', error.message);
-    else {
-      const remaining = readDirty(userId);
-      remaining.delete(key);
-      writeDirty(userId, remaining);
-    }
-  });
+  schedulePreferenceSync(userId, key, value, Math.max(0, Number(syncDelay) || 0));
 }

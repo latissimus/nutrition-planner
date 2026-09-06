@@ -40,6 +40,7 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
+import { hasMenuIcon, menuIconMarkup } from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -501,13 +502,13 @@ function avatarMarkup() {
 // Stand. Die Beschreibung steht bewusst nicht auf der Karte: Tuckii zeigt dort
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
-  ['body', 'Body-Log', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
-  ['reminders', 'MEAL-LOG', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
-  ['food-log', 'Fooddex', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
-  ['training', 'Trainingdex', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
-  ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
-  ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
-  ['sleep', 'SLEEP-LOG', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
+  ['body', 'BODYLOG', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
+  ['reminders', 'MEALS', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
+  ['food-log', 'COOKNOTES', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
+  ['training', 'TRAINNOTES', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
+  ['shopping', 'FOODS', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
+  ['habits', 'ROUTINES', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
+  ['sleep', 'SLEEPLOG', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 const sichtbareSammlungen = () => {
@@ -585,7 +586,7 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
     <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
        data-sammlung="${route}" style="--app-dex-tab-color:${escapeHtml(pageLook(route, categoryColor(route), 'drops').color)}"
        aria-label="${escapeHtml(titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
-      <span aria-hidden="true">${categoryIconMarkup(route, 'app-dex-tab-icon')}</span>
+      <span aria-hidden="true">${hasMenuIcon(route) ? menuIconMarkup(route, 'app-dex-tab-icon') : categoryIconMarkup(route, 'app-dex-tab-icon')}</span>
       <small>${escapeHtml(titel)}</small>
     </a>`).join('');
   const eigene = appDockEigene.map((item) => {
@@ -739,7 +740,10 @@ async function appDexShellDatenLaden(route, view, signal) {
 function appDexShellAktualisieren(route, view, signal) {
   appDexShellZeichnen(route, view);
   if (!istAppHauptDex(route, view)) return;
-  setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route);
+  // Während eines schnellen Durchblätterns zählt nur der zuletzt erreichte
+  // Dex. Lokal ist er sofort gespeichert; die Serverkopie folgt gesammelt,
+  // sobald die Navigation kurz ruht.
+  setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 1500 });
   appDexShellDatenLaden(route, view, signal);
 }
 
@@ -957,23 +961,23 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const shopping = kind === 'shopping';
   const habits = kind === 'habits';
   const coins = kind === 'coins';
-  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'Body-Log' : sleep ? 'Sleep-Log' : meal ? 'Meal-Log' : training ? 'Trainingdex' : shopping ? 'Einkauf' : habits ? 'Routinen' : coins ? 'Coin-Dex' : 'Fooddex');
+  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'BODYLOG' : sleep ? 'SLEEPLOG' : meal ? 'MEALS' : training ? 'TRAINNOTES' : shopping ? 'FOODS' : habits ? 'ROUTINES' : coins ? 'Coin-Dex' : 'COOKNOTES');
   const copy = body
-    ? `<p>Im <b>Body-Log</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
+    ? `<p>Im <b>BODYLOG</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
       <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und keine medizinische Diagnose.</p>`
     : sleep
-    ? `<p>Im <b>Sleep-Log</b> planst du deinen Schlafrhythmus und hältst morgens <b>Schlafdauer</b>, <b>Qualität</b> und <b>Energie</b> fest.</p>
+    ? `<p>Im <b>SLEEPLOG</b> planst du deinen Schlafrhythmus und hältst morgens <b>Schlafdauer</b>, <b>Qualität</b> und <b>Energie</b> fest.</p>
       <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden erst aus mehreren vergleichbaren Check-ins abgeleitet.</p>
       <p>Die Auswertung zeigt beobachtete Zusammenhänge und ersetzt keine medizinische Diagnose.</p>`
     : meal
-    ? `<p>Im <b>Meal-Log</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
+    ? `<p>Im <b>MEALS</b>-Dex planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
       <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>
       <p>Über den Hinzufügen-Button erfasst du Lebensmittel oder ergänzt deine Planung.</p>`
     : shopping
-    ? `<p>Im <b>Einkaufs-Dex</b> sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
+    ? `<p>Im <b>FOODS</b>-Dex sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
     : habits
-    ? `<p>Im <b>Routinen-Dex</b> planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
+    ? `<p>Im <b>ROUTINES</b>-Dex planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
     : coins
     ? `<p>Im <b>Coin-Dex</b> sammelst du MUSCLE-COINS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
@@ -983,10 +987,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
       <p>Mit <b>Tags</b> und <b>Unter-Dex</b> strukturierst du die Inhalte so, wie es für dein Thema sinnvoll ist.</p>
       <p>Die Farbe kannst du am Haupt-Dex ändern. Unter-Dex übernehmen den Look automatisch.</p>`
     : training
-    ? `<p>Im <b>Trainingdex</b> sammelst du <b>Übungen</b>, <b>Trainingswissen</b>, Links, Bilder, Videos und Tonaufnahmen an einem Ort.</p>
+    ? `<p>In <b>TRAINNOTES</b> sammelst du <b>Übungen</b>, <b>Trainingswissen</b>, Links, Bilder, Videos und Tonaufnahmen an einem Ort.</p>
       <p>Mit Klassen wie <b>Übungen</b>, <b>Regeneration</b>, <b>Tipps</b> oder <b>Verletzung</b> findest du relevante Inhalte schnell wieder.</p>
       <p>Unter-Dex helfen dir, Trainingsbereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
-    : `<p>Im <b>Fooddex</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
+    : `<p>In <b>COOKNOTES</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
       <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
       <p>Unter-Dex helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
   const existing = document.querySelector('[data-food-info-dialog]');
@@ -1195,7 +1199,7 @@ async function renderRoute() {
   let angefragt = (location.hash || '#home').slice(1);
   // Die frühere Startseite ist durch die feste Dex-Navigation ersetzt. Ein
   // Einstieg über #home landet deshalb beim zuletzt verwendeten Haupt-Dex;
-  // neue Konten beginnen im Meal-Log.
+  // neue Konten beginnen im MEALS-Dex.
   if ((angefragt === 'home' || angefragt === 'search')) {
     angefragt = appLetzteDexRoute();
     history.replaceState(history.state, '', `#${angefragt}`);
@@ -1306,16 +1310,16 @@ async function renderRoute() {
       onRendered: rehydrateDexEntries,
     });
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
-    mountCategoryChrome(view, route, 'Body-Log', {
+    mountCategoryChrome(view, route, 'BODYLOG', {
       pageLookScope: route, pageLookPattern: 'wallpaper-measure',
       onPlus: () => bodyActions?.openAddMenu?.(),
       onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
     });
     installNeoDexChrome(view, {
-      title: 'Body-Log',
+      title: 'BODYLOG',
       meta: bodyActions?.meta || '0 Wiegungen',
       closeHref: '#home',
-      editLabel: 'Body-Log bearbeiten',
+      editLabel: 'BODYLOG bearbeiten',
       infoKind: 'body',
     });
   } else if (route === 'reminders') {
@@ -1324,15 +1328,15 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'meal-log');
     const { mountReminders } = await remindersModule();
     const reminderActions = await mountReminders(view, { session, profile, signal });
-    mountCategoryChrome(view, route, 'Meal-Log', {
+    mountCategoryChrome(view, route, 'MEALS', {
       pageLookScope: route, pageLookPattern: 'wallpaper-burger',
       onPlus: () => reminderActions?.openAddMenu?.(),
     });
     installNeoDexChrome(view, {
-      title: 'Meal-Log',
+      title: 'MEALS',
       meta: reminderActions?.meta || '5 Mahlzeiten',
       closeHref: '#home',
-      editLabel: 'Meal-Log bearbeiten',
+      editLabel: 'MEALS bearbeiten',
       infoKind: 'meal',
     });
   } else if (route === 'shopping') {
@@ -1343,7 +1347,7 @@ async function renderRoute() {
     view.classList.add('shopping-dex-page');
     const { mountShoppingList } = await shoppingModule();
     const shoppingActions = await mountShoppingList(view, { session, signal });
-    mountCategoryChrome(view, route, 'EINKAUF', {
+    mountCategoryChrome(view, route, 'FOODS', {
       pageLookScope: route, pageLookPattern: 'drops',
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
@@ -1351,7 +1355,7 @@ async function renderRoute() {
       onShare: shoppingActions?.isShared ? null : () => openShareSheet('shopping'),
     });
     installNeoDexChrome(view, {
-      title: 'Einkauf',
+      title: 'FOODS',
       meta: 'Einkaufsliste',
       closeHref: '#home',
     });
@@ -1370,7 +1374,7 @@ async function renderRoute() {
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
     });
-    mountCategoryChrome(view, route, 'Fooddex', {
+    mountCategoryChrome(view, route, 'COOKNOTES', {
       pageLookScope: route, pageLookPattern: 'triangles',
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'),
@@ -1382,13 +1386,14 @@ async function renderRoute() {
       onSelect: () => startDexSelection(view, { userId: foodOwnerId, rootKey: 'food-log', onChanged: refresh }),
       onShare: foodSpace.isShared ? null : () => openShareSheet('food-log'),
     });
-    // Food-Dex gets a compact Vozzy-inspired header: the primary actions live
-    // in one small floating menu so the two-column entry grid has more room.
+    // COOKNOTES bekommt einen kompakten Vozzy-inspirierten Header: die
+    // wichtigsten Aktionen liegen in einem kleinen Floating-Menü, damit das
+    // zweispaltige Eintragsraster mehr Platz hat.
     installNeoDexChrome(view, {
-      title: 'Fooddex',
+      title: 'COOKNOTES',
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       closeHref: '#home',
-      editLabel: 'Fooddex bearbeiten',
+      editLabel: 'COOKNOTES bearbeiten',
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
       userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
@@ -1407,7 +1412,7 @@ async function renderRoute() {
   } else if (route === 'training') {
     setSeite('training');
     // A collection mutation remounts this route while the Supabase request is
-    // still pending. Paint the fixed Trainingdex surface immediately so the
+    // still pending. Paint the fixed TRAINNOTES surface immediately so the
     // shared template fallback (#FBE7A3) can never flash in that gap.
     applyPageLook('training', categoryColor('training'), 'wallpaper-dumbbell');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
@@ -1418,7 +1423,7 @@ async function renderRoute() {
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: categoryColor('training'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
-    mountCategoryChrome(view, route, 'Trainingdex', {
+    mountCategoryChrome(view, route, 'TRAINNOTES', {
       pageLookScope: route, pageLookPattern: 'wallpaper-dumbbell',
       meta: `${children.length} Unter-Dex`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
@@ -1427,10 +1432,10 @@ async function renderRoute() {
       onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: 'training', onChanged: refresh }),
     });
     installNeoDexChrome(view, {
-      title: 'Trainingdex',
+      title: 'TRAINNOTES',
       meta: `0 Einträge · ${children.length} Unter-Dex`,
       closeHref: '#home',
-      editLabel: 'Trainingdex bearbeiten',
+      editLabel: 'TRAINNOTES bearbeiten',
       infoKind: 'training',
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
@@ -1473,15 +1478,15 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'routines');
     const { mountRoutines } = await routinesModule();
     const routineActions = await mountRoutines(view, { session, signal });
-    mountCategoryChrome(view, route, 'Routinen', {
+    mountCategoryChrome(view, route, 'ROUTINES', {
       pageLookScope: route, pageLookPattern: 'triangles',
       onPlus: () => routineActions?.openRoutineEditor?.(),
     });
     installNeoDexChrome(view, {
-      title: 'Routinen',
+      title: 'ROUTINES',
       meta: routineActions?.meta || '0 Routinen',
       closeHref: '#home',
-      editLabel: 'Routinen bearbeiten',
+      editLabel: 'ROUTINES bearbeiten',
       infoKind: 'habits',
     });
     await renderDexEntries(view, { userId: session.user.id, rootKey: 'habits', routineId: null, color: categoryColor('habits'), signal, hideEmpty: true });
@@ -1503,15 +1508,15 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'sleep');
     const { mountSleepDex } = await sleepModule();
     const sleepActions = await mountSleepDex(view, { userId: session.user.id, signal });
-    mountCategoryChrome(view, route, 'Sleep-Log', {
+    mountCategoryChrome(view, route, 'SLEEPLOG', {
       pageLookScope: route,
       pageLookPattern: 'wallpaper-moon',
       onPlus: () => sleepActions?.openAddMenu?.(),
     });
     installNeoDexChrome(view, {
-      title: 'Sleep-Log',
+      title: 'SLEEPLOG',
       meta: sleepActions?.meta || 'Schlaf planen',
-      editLabel: 'Sleep-Log bearbeiten',
+      editLabel: 'SLEEPLOG bearbeiten',
       infoKind: 'sleep',
     });
   }
