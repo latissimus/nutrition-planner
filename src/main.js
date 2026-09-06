@@ -553,6 +553,7 @@ function appLetzteDexRoute() {
 }
 
 function istAppHauptDex(route, view) {
+  if (route === 'profile') return true;
   if (APP_DEX_ROUTES.has(route)) return true;
   return route.startsWith('collection/') && Boolean(view?.dataset.appDockRoute);
 }
@@ -608,6 +609,7 @@ function appDexShellZeichnen(route, view) {
     return;
   }
   const aktiveDockRoute = view.dataset.appDockRoute || route;
+  const istProfil = route === 'profile';
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
@@ -628,7 +630,8 @@ function appDexShellZeichnen(route, view) {
       <div class="app-dex-header-actions">
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }) : ''}
         <span class="app-dex-sync save-dot" role="status"></span>
-        <a class="nav-av nav-av-fb" href="#profile" aria-label="Profil und Einstellungen">${avatarMarkup()}</a>
+        <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
+           aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>
       </div>
     </div>`;
 
@@ -642,7 +645,9 @@ function appDexShellZeichnen(route, view) {
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
       <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
-      <button class="app-dex-menu" type="button" aria-label="Menü für ${escapeHtml(appDockTitel(aktiveDockRoute))} öffnen">
+      <button class="app-dex-menu" type="button" aria-label="${istProfil
+        ? `Zurück zu ${escapeHtml(appDockTitel(aktiveDockRoute))}`
+        : `Menü für ${escapeHtml(appDockTitel(aktiveDockRoute))} öffnen`}">
         ${entryButtonMarkup()}
       </button>
     </div>`;
@@ -668,6 +673,10 @@ function appDexShellZeichnen(route, view) {
   });
 
   dock.querySelector('.app-dex-menu').onclick = () => {
+    if (istProfil) {
+      location.hash = aktiveDockRoute;
+      return;
+    }
     /* Frühere Zwischenstation über die floating Add-Buttons ist weg –
        der Menü-Knopf löst die Add-Aktion direkt am (unsichtbaren)
        Kategoriekopf des jeweiligen Dex aus. */
@@ -727,7 +736,9 @@ function appDexShellAktualisieren(route, view, signal) {
   // Während eines schnellen Durchblätterns zählt nur der zuletzt erreichte
   // Dex. Lokal ist er sofort gespeichert; die Serverkopie folgt gesammelt,
   // sobald die Navigation fünf Sekunden ruht.
-  setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
+  if (route !== 'profile') {
+    setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
+  }
   appDexShellDatenLaden(route, view, signal);
 }
 
@@ -1246,6 +1257,9 @@ async function renderRoute() {
   }
   if (route === 'profile') {
     setSeite('profile');
+    // Das Profil bleibt Teil derselben festen App-Schale. Im Menüband bleibt
+    // deshalb die zuletzt geöffnete Inhaltsseite markiert.
+    view.dataset.appDockRoute = appLetzteDexRoute();
     // Sichtbarkeit und Reihenfolge des Menübandes werden hier bearbeitet.
     // Beim Zurückkehren muss deshalb auch die Liste eigener Dex frisch aus
     // der Datenbank kommen und darf nicht aus dem Dock-Cache stammen.

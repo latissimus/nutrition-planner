@@ -8,7 +8,6 @@ import {
   setCustomCollectionVisible,
 } from './collectionPreferences.js';
 import { loadCollections } from './collections.js';
-import { materialIconMarkup } from './categoryIcons.js';
 import { createFullDataExport, exportFileName } from './dataExport.js';
 import {
   interfaceSoundsEnabled, playInterfaceSound, setInterfaceSoundsEnabled,
@@ -86,11 +85,6 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   container.classList.add('profil-fixkopf-view');
   const wrap = document.createElement('div');
   wrap.className = 'wrap pad-bottom profil-fixkopf';
-  wrap.innerHTML = `
-    <header class="profile-page-heading">
-      <h1>Profil</h1>
-      <p>Konto &amp; Einstellungen</p>
-    </header>`;
 
   const konto = abschnitt(wrap, 'Konto', true, 'profile-konto');
   const top = document.createElement('div');
@@ -452,12 +446,5 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   while (wrap.firstChild) inhalt.appendChild(wrap.firstChild);
   wrap.appendChild(inhalt);
 
-  const aktionen = document.createElement('nav');
-  aktionen.className = 'profile-floating-actions neo-dex-floating-actions food-dex-floating-actions';
-  aktionen.setAttribute('aria-label', 'Profil schließen');
-  aktionen.innerHTML = `
-    <a class="profile-floating-close neo-dex-action-button neo-dex-action-close food-dex-action-button food-dex-action-close"
-       href="#home" aria-label="Profil schließen">${materialIconMarkup('close')}</a>`;
-  wrap.appendChild(aktionen);
   container.appendChild(wrap);
 }
