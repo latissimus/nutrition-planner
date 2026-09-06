@@ -8186,7 +8186,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    feine Kontur statt des bisherigen harten Hero-Schattens. */
 :root[data-seite="reminders"] .meal-log-dex-page :is(
   .nutrition-coin-hero,
-  .nutrition-coin-overview
+  .nutrition-coin-overview,
+  .mahl-zeitblock
 ){
   border:1.5px solid #111!important;
   box-shadow:none!important;
