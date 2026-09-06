@@ -23,11 +23,12 @@ export function capboySvg() {
   // er nur da, wo die Falt-Ecke des Blatts durchsichtig ist. Ergebnis: der
   // Knick erscheint weiss statt "Seitenhintergrund". Im Darkmode dreht ein
   // eigener CSS-Filter das Backing auf Navy (siehe styles.css).
-  // Weisses Backing sitzt nur unter der Falt-Ecke oben rechts (die einzige
-  // Stelle, an der das Paper.svg transparent ist). Vollflaechig-Backing hatte
-  // sub-pixel ueber die abgerundeten Papierkanten geleuchtet.
+  // Weisser Knick sitzt exakt im inneren Falt-Dreieck des Blatts (die
+  // Rueckseite des umgeknickten Zipfels). Der diagonale Eck-Schnitt daneben
+  // bleibt transparent — sonst wird das Blatt optisch zum vollen Rechteck
+  // "ergaenzt" und der Faltcharakter verschwindet.
   const disk = `<g class="capboy-blatt">
-    <rect class="capboy-knick" x="209" y="4" width="30" height="34" fill="#FFFFFF"/>
+    <polygon class="capboy-knick" points="209,8 237,36 211,37" fill="#FFFFFF"/>
     <image href="${paperUrl}" x="160" y="2" width="86" height="108"/>
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst

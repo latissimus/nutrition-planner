@@ -8176,8 +8176,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    verwendeten 21-px-Inhaltsraster. Das verbreitert die Karten gegenueber
    dem alten 36-px-Rand, ohne sie an den Displayrand zu druecken. */
 :root[data-seite="reminders"] .meal-log-dex-page{
-  --special-dex-inline:24px!important;
+  --special-dex-inline:28px!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .special-dex-content{
-  width:min(calc(100% - 48px),var(--special-dex-content-max,604px))!important;
+  width:min(calc(100% - 56px),var(--special-dex-content-max,604px))!important;
 }
