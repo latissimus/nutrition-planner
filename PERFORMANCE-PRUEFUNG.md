@@ -50,5 +50,25 @@ von rund 576,4 kB auf 568,9 kB (unkomprimiert). Außerdem entfällt die frühere
 Verzögerung um zwei Browser-Frames vor jedem Hash-Wechsel. Ein erneuter Kaltstart
 über `#home` landete direkt im zuletzt verwendeten Sleep-Log; weder eine alte
 Startseite noch die Suchseite befand sich anschließend im DOM.
-Vollständige Wiederholungsserien, Frame-Aufnahmen, Speicherprüfung und
-iPhone-Messungen stehen noch aus.
+Eine erste Safari-Timeline wurde anschließend direkt in der Home-Screen-PWA auf
+einem iPhone 14 mit iOS 26.5.2 aufgenommen (31,73 Sekunden, gegen 11:15 Uhr).
+Sie enthält 18 Dex-Wechsel. Die CPU-Auslastung lag im Mittel bei rund 8 % und
+maximal bei rund 22 %. Es gab keine JavaScript-Aufgabe ab 50 ms; die längste
+JavaScript-Aufgabe dauerte rund 48 ms, der längste Layout-Eintrag rund 40 ms.
+Die Aufnahme zeigt damit keine dauerhafte CPU-Sättigung.
+
+Auffällig waren dagegen 88 Netzwerkanfragen, darunter genau 18 Schreibzugriffe
+auf `user_preferences` – zuvor wurde bei jedem Dex-Wechsel der zuletzt geöffnete
+Dex sofort einzeln zum Server geschrieben. Diese Einstellung wird nun lokal
+sofort aktualisiert und serverseitig für 1,5 Sekunden gebündelt. Mehrere schnelle
+Wechsel erzeugen dadurch nur noch einen Schreibzugriff mit dem endgültigen Dex.
+Nicht übertragene Änderungen bleiben lokal als ausstehend markiert und werden
+beim nächsten Laden erneut synchronisiert. Drei gezielte Synchronisationstests
+sowie die vollständige Prüfung mit 122 Tests und Produktions-Build sind
+erfolgreich.
+
+Für einen belastbaren Vorher-/Nachherwert fehlt noch eine zweite Safari-Timeline
+mit demselben Wechselablauf. Danach sind die wiederholten Daten-Lesezugriffe
+(langsamster gemessener Abruf rund 648 ms) und eine Speicheraufnahme die nächsten
+Kandidaten. Erst diese Messungen entscheiden, ob ein größerer Daten-Cache oder
+weitere Paketaufteilung die iPhone-Laufzeit tatsächlich verbessert.
