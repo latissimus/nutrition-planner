@@ -15,17 +15,18 @@ export function capboySvg() {
   const id = 'capbrand' + (++seq);
   // Bogen: identisch zum LOGMAN-Original (viewBox 0 0 380 130, Spanne 298).
   const d = `M 41,96 Q 190,74 339,96`;
-  // Papier-Silhouette (noun_Paper_8203947): 459x563 Ausgangsgroesse. Mit
-  // scale(0.19) ~72x102 im Ziel, per translate mittig bei x=190. Ecke oben
-  // rechts ist umgeknickt — das einzige Detail, sonst ruhige Flaeche.
-  // vector-effect:non-scaling-stroke haelt die Kontur bei allen App-Groessen
-  // gleich stark, statt sie mit dem scale(0.19) mitzuschrumpfen.
-  const disk = `<g class="capboy-blatt" transform="translate(150.29 8.72) scale(0.19)">
-    <path fill-rule="evenodd"
+  // Papier hinter dem Wort: einfache Rechteck-Silhouette mit klar sichtbarer
+  // Ecke oben rechts, hand-gezeichnet statt gescaltes Noun-SVG (dort war das
+  // Falt-Dreieck bei kleiner Skalierung kaum lesbar). Koerper 80x100 mittig
+  // bei viewBox-Center x=194, Falt-Ecke 22 Einheiten gross — deutlich
+  // erkennbar als abgeknickter Papierrand.
+  const disk = `<g class="capboy-blatt">
+    <path d="M 154,111 L 232,111 L 232,33 L 210,11 L 154,11 Z"
       fill="var(--capboy-body,#001454)"
-      stroke="var(--brand-outline,#0A1330)" stroke-width="4" stroke-linejoin="round"
-      vector-effect="non-scaling-stroke"
-      d="M430.208,169.784c-0.099,-0.697 -0.298,-1.294 -0.597,-1.891c-0.398,-1.195 -1.194,-2.289 -2.189,-3.285l-149.188,-149.187c-1.891,-1.891 -4.479,-2.886 -7.067,-2.886l-233.284,-0c-5.474,-0 -9.953,4.478 -9.953,9.952l0,517.526c0,5.474 4.479,9.952 9.953,9.952l382.568,0c5.474,0 9.952,-4.478 9.952,-9.952l0,-368.338c0,-0.697 0,-1.294 -0.199,-1.891l0.004,-0Zm-158.939,11.843c-5.474,0 -9.953,-4.478 -9.953,-9.952l0,-139.232l5.773,-0l143.417,143.417l-0,5.772l-139.237,-0.005Z"/>
+      stroke="var(--brand-outline,#0A1330)" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M 210,11 L 210,33 L 232,33"
+      fill="none"
+      stroke="var(--brand-outline,#0A1330)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
   // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
