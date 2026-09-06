@@ -84,3 +84,26 @@ zu prüfen. In der zweiten Aufnahme wurden 57 GET-Anfragen erfasst; der langsams
 Abruf dauerte rund 395 ms. Erst diese Messungen entscheiden, ob ein größerer
 Daten-Cache oder weitere Paketaufteilung die iPhone-Laufzeit tatsächlich
 verbessert.
+
+Die dritte iPhone-Aufnahme nach Erhöhung der Synchronisationsruhe dauerte 25,15
+Sekunden und enthielt 23 Dex-Wechsel. Während der gesamten Wechselserie gab es
+keinen POST und damit auch keinen Schreibzugriff auf `user_preferences`. Die
+Änderung hat das Ziel erreicht: Die Navigation löst keine Server-Synchronisation
+mehr aus, solange weitergeblättert wird. Erfasst wurden 85 GET-Anfragen; der
+langsamste dauerte rund 201 ms. Die CPU lag im Mittel bei rund 10,9 % und maximal
+bei 28,7 %. Ein einzelnes Ereignis überschritt 50 ms: eine vollständige
+JavaScript-Speicherbereinigung von 53,8 ms unmittelbar an einem Dex-Wechsel. Die
+längste Layout-Phase lag bei rund 41,2 ms. Der nächste Prüfpunkt ist deshalb der
+Speicher- und Cache-Lebenszyklus; weitere Netzwerkoptimierung allein erklärt
+diesen einzelnen Hänger nicht.
+
+Die Analyse des Ansichtscaches zeigte anschließend, dass trotz acht eingebauter
+Haupt-Dex nur drei fertige Ansichten gehalten wurden. Beim Durchblättern wurde
+eine bereits besuchte Seite deshalb rasch verworfen und bei der Rückkehr erneut
+aus DOM und Serverdaten aufgebaut. Der begrenzte Cache fasst nun die sieben
+nicht sichtbaren Haupt-Dex sowie einen zusätzlichen Rückweg. Abgelegte Ansichten
+behalten weiterhin keine Listener oder Timer. Außerdem wird der Lazy-Load-Chunk
+eines System-Dex bereits zwischen `pointerdown` und `click` vorbereitet, ohne
+dabei Daten vorab zu laden. Damit bleibt nur die tatsächlich erste Datenabfrage
+eines bislang nie geöffneten Dex unvermeidbar; erneute Wechsel innerhalb der
+Hauptnavigation sollten unmittelbar aus dem Cache erfolgen.

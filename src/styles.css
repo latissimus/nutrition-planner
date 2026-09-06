@@ -10180,9 +10180,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-overflow:ellipsis;
   white-space:nowrap;
 }
+/* Der aktive Tab wird nicht mehr farblich hinterlegt, sondern durch einen
+   harten LOGMAN-Schlagschatten hervorgehoben — Inset-Border laesst die Form
+   klar erkennbar, die 3-px-Versatzflaeche wirkt wie herausgehoben. */
 .app-dex-tab.aktiv{
-  background:color-mix(in srgb,var(--app-dex-tab-color,var(--akzent)) 48%,rgba(255,255,255,.2));
-  box-shadow:inset 0 0 0 1.5px #0A1330;
+  background:none;
+  box-shadow:inset 0 0 0 1.5px #0A1330,3px 3px 0 #0A1330;
 }
 .app-dex-menu{
   position:relative;
@@ -10254,8 +10257,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .app-dex-dock-inner::before{border-color:#697486;background:#101A2B}
 :root[data-theme="dark"] .app-dex-tab{color:#EDF0F6}
 :root[data-theme="dark"] .app-dex-tab.aktiv{
-  color:#101A2B;
-  box-shadow:inset 0 0 0 1.5px #EDF0F6;
+  color:#EDF0F6;
+  box-shadow:inset 0 0 0 1.5px #EDF0F6,3px 3px 0 #EDF0F6;
 }
 @media(max-width:390px){
   .app-dex-header-inner{width:calc(100% - 24px)}

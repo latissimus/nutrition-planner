@@ -51,6 +51,18 @@ const shoppingModule = () => import('./shoppingList.js');
 const routinesModule = () => import('./routines.js');
 const sleepModule = () => import('./sleep.js');
 
+function dexModulVorbereiten(route = '') {
+  const loader = ({
+    body: bodyMetricsModule,
+    reminders: remindersModule,
+    shopping: shoppingModule,
+    habits: routinesModule,
+    sleep: sleepModule,
+    profile: profileModule,
+  })[route];
+  if (loader) void loader().catch(() => {});
+}
+
 /* Android und andere installierte PWAs können die Displayausrichtung direkt
    sperren. iOS wertet dafür primär den orientation-Eintrag im Manifest aus;
    der erneute Versuch nach dem ersten Tipp deckt Browser ab, die zuvor eine
@@ -172,10 +184,12 @@ let appDockCoinStand = null;
 let preferencesLadePromise = Promise.resolve();
 let preferencesLadeUserId = '';
 
-/* Cache-Limit bewusst niedrig: drei fertige DOM-Ansichten reichen für kurze
-   Rückwege. Beim Ablegen werden ihre Listener und Timer beendet; dadurch
-   bleiben weder versteckte Aktualisierungen noch Hintergrundarbeit übrig. */
-const ansichtsCache = createLruCache({ limit: 3, onEvict: disposeViewEntry });
+/* Der Cache fasst die sieben gerade nicht sichtbaren Ansichten der acht
+   eingebauten Haupt-Dex. So wird eine bereits besuchte Hauptseite beim
+   Durchblättern nicht sofort wieder verworfen und samt Daten neu aufgebaut.
+   Listener und Timer abgelegter Ansichten sind weiterhin beendet; eigene Dex
+   und Detailseiten bleiben durch das feste Limit begrenzt. */
+const ansichtsCache = createLruCache({ limit: 8, onEvict: disposeViewEntry });
 
 // Datenänderungen machen abgelegte Ansichten ungültig. Die aktive Ansicht ist
 // nicht im Cache und aktualisiert sich über ihren eigenen Listener. Nach einer
@@ -636,6 +650,13 @@ function appDexShellZeichnen(route, view) {
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
   tabLeiste.scrollLeft = alterScrollstand;
+  // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
+  // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
+  // keine Daten geladen und keine sichtbare Ansicht verändert.
+  tabLeiste.addEventListener('pointerdown', (event) => {
+    const ziel = event.target.closest?.('.app-dex-tab')?.getAttribute('href')?.replace(/^#/, '');
+    if (ziel) dexModulVorbereiten(ziel);
+  }, { passive: true });
   requestAnimationFrame(() => {
     const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
     if (!aktiv) return;
