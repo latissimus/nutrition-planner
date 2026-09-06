@@ -275,11 +275,11 @@ export function beginPageLookDefer() {
   pageLookPuffer = null;
 }
 
-export function commitPageLookDefer() {
+export function commitPageLookDefer(verwerfen = false) {
   const gepuffert = pageLookPuffer;
   pageLookDeferAktiv = false;
   pageLookPuffer = null;
-  if (gepuffert) writeRootPageLook(gepuffert);
+  if (gepuffert && !verwerfen) writeRootPageLook(gepuffert);
 }
 
 export function applyPageLook(scope, fallbackColor, fallbackPattern = 'drops') {

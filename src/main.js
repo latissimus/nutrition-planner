@@ -21,7 +21,7 @@ import {
   coinDexIsVisible, customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes,
 } from './collectionPreferences.js';
 import { coinHeaderMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
-import { dexEntryOverviewMarkup, loadAllDexEntries, openDexEntryEditor, renderDexEntries, vorschaubilderEinblenden } from './dexEntries.js';
+import { openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
@@ -164,7 +164,6 @@ let recovery = false;
 let authMode = 'login';
 let renderGeneration = 0;
 let routeAbortController = null;
-let vorgemerkteSuche = '';
 let appRueckwaerts = false;
 let popstateNavigation = false;
 let erzwungenesRueckwaertsZiel = '';
@@ -306,11 +305,11 @@ let seiteDeferAktiv = false;
 let seitePuffer = null;
 
 function beginSeiteDefer() { seiteDeferAktiv = true; seitePuffer = null; }
-function commitSeiteDefer() {
+function commitSeiteDefer(verwerfen = false) {
   const gepuffert = seitePuffer;
   seiteDeferAktiv = false;
   seitePuffer = null;
-  if (gepuffert !== null) writeSeite(gepuffert);
+  if (gepuffert !== null && !verwerfen) writeSeite(gepuffert);
 }
 
 function writeSeite(name) {
@@ -644,17 +643,12 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
         <small>${escapeHtml(item.name)}</small>
       </a>`;
   }).join('');
-  const suche = `
-    <a class="app-dex-tab app-dex-tool" href="#search" aria-label="MUSCLEDEX durchsuchen">
-      <span aria-hidden="true">${materialIconMarkup('search')}</span>
-      <small>Suche</small>
-    </a>`;
   const neu = `
     <button class="app-dex-tab app-dex-tool app-dex-create" type="button" aria-label="Neuen Dex erstellen">
       <span aria-hidden="true">${materialIconMarkup('create_new_folder')}</span>
       <small>Dex +</small>
     </button>`;
-  return standard + eigene + suche + neu;
+  return standard + eigene + neu;
 }
 
 function appSyncStatusAktualisieren() {
@@ -893,52 +887,13 @@ function zaehlerEintragen(container, zaehler) {
   });
 }
 
-function renderChrome(transition = 'hart') {
+function renderChrome() {
   app.classList.add('app-shell');
-  // Kein globaler Kopf mehr: jede Seite ist Vollbild, Home traegt Logo und
-  // Avatar als normalen Seiteninhalt (siehe mountHome).
-  const bisher = app.querySelector(':scope > #view');
-  let view;
-  if (bisher?.hasChildNodes()) {
-    const hintergrund = getComputedStyle(document.body);
-    const bisherigeSeite = document.documentElement.dataset.seite || '';
-    bisher.removeAttribute('id');
-    // Seitenbezogene Klassen (vor allem `hat-kategoriefarbe`) muessen auf
-    // der ausgehenden Ansicht erhalten bleiben. Wird die Klassenliste hier
-    // komplett ersetzt, faellt ihr Plus-Knopf waehrend eines Ruecksprungs
-    // fuer einen Frame auf das pinke Standarddesign zurueck.
-    bisher.classList.remove('view-neu', 'seite-vor-warten', 'seite-vor');
-    bisher.classList.add('view-alt');
-    bisher.classList.toggle('system-dex-view', ['body', 'reminders', 'shopping', 'habits', 'coins'].includes(bisherigeSeite));
-    bisher.classList.toggle('view-alt-hart', transition === 'hart');
-    bisher.style.backgroundColor = hintergrund.backgroundColor;
-    bisher.style.backgroundImage = hintergrund.backgroundImage;
-    bisher.style.backgroundSize = hintergrund.backgroundSize;
-    bisher.style.backgroundPosition = hintergrund.backgroundPosition;
-    bisher.style.backgroundRepeat = hintergrund.backgroundRepeat;
-    view = document.createElement('main');
-    view.id = 'view';
-    /* `warten-auf-daten` hält die frische Ansicht unsichtbar, bis der Mount
-       vollständig fertig ist. Zusammen mit der jetzt sichtbaren alten Ansicht
-       (siehe styles.css) sieht der Nutzer keine „…wird geladen“-Zwischen­
-       zustände mehr; getauscht wird erst der fertige Endzustand. */
-    view.className = `view-neu warten-auf-daten${transition === 'vor' ? ' seite-vor-warten' : transition === 'detail' ? ' seite-detail-warten' : ''}`;
-    app.append(view);
-  } else {
-    // Der feste Dex-Header und das untere Menüband gehören zur App-Schale,
-    // nicht zur wechselnden Route. Beim ersten Seiten-Mount werden deshalb nur
-    // alte Ansichten entfernt; die Schale selbst bleibt unangetastet.
-    app.querySelectorAll(':scope > main,:scope > .view-alt,:scope > .view-neu').forEach((node) => node.remove());
-    view = document.createElement('main');
-    view.id = 'view';
-    // Beim allerersten Mount (kein alter View im DOM) darf die Ansicht sofort
-    // sichtbar sein; sonst bliebe die App bis zum ersten Datenabruf schwarz.
-    app.append(view);
-  }
-  // Jede Route beginnt in ihrem eigenen, einzigen Scrollcontainer oben. Das
-  // Dokument selbst bewegt sich nie; dadurch muss iOS keinen Sticky-Header
-  // gegen eine alte Dokument-Scrollposition neu zusammensetzen.
-  view.scrollTop = 0;
+  // Die sichtbare Seite behält ihre ID und sämtliche Layoutregeln bis zum Tausch.
+  const view = document.createElement('main');
+  view.className = 'warten-auf-daten';
+  view.hidden = true;
+  app.append(view);
   return view;
 }
 
@@ -1234,16 +1189,6 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
         </div>
       </div>
       <div class="home-scrollinhalt">
-      <div class="tuck-ablage">
-        <label class="tuck-ablage-feld" for="schnell-suche">
-          ${materialIconMarkup('search')}
-          <input id="schnell-suche" type="search" autocomplete="off"
-                 placeholder="MUSCLE-DEX durchsuchen" aria-label="MUSCLE-DEX durchsuchen">
-        </label>
-        <button class="tuck-ablage-knopf" type="button" aria-label="Suche öffnen">
-          ${materialIconMarkup('search')}
-        </button>
-      </div>
       <header class="tuck-titelzeile">
         <h1>Meine Dex-Einträge</h1>
       </header>
@@ -1278,15 +1223,6 @@ async function mountHome(container, signal, { setzeSeite = true } = {}) {
     text: 'Halte einen Dex länger gedrückt, um die Info oder Bearbeitung zu öffnen.',
     gesture: 'hold',
   });
-
-  const sucheOeffnen = () => {
-    vorgemerkteSuche = container.querySelector('#schnell-suche').value.trim();
-    location.hash = 'search';
-  };
-  container.querySelector('.tuck-ablage-knopf').onclick = sucheOeffnen;
-  container.querySelector('#schnell-suche').onkeydown = (event) => {
-    if (event.key === 'Enter') { event.preventDefault(); sucheOeffnen(); }
-  };
 
   zaehlerLaden(signal).then((zaehler) => {
     if (signal?.aborted) return;
@@ -1538,86 +1474,6 @@ async function mountCustomCollection(container, item, signal) {
   subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
 }
 
-async function mountSearch(container, signal) {
-  setSeite('search');
-  container.classList.add('dex-fixkopf', 'such-fixkopf-view');
-  container.innerHTML = `
-    <div class="wrap pad-bottom tuck-suche-seite such-fixkopf">
-      <div class="tuck-suchzeile">
-        <label class="tuck-suchfeld" for="global-search">
-          ${iconMarkup('search')}
-          <input id="global-search" type="search" autocomplete="off" placeholder="Dex-Einträge durchsuchen …">
-        </label>
-        <a class="seiten-x" href="#home" aria-label="Suche schließen">${materialIconMarkup('close')}</a>
-      </div>
-      <div class="such-scrollinhalt">
-      <section class="such-tags" data-search-tags hidden></section>
-      <h2 class="tuck-abschnittstitel">Dex-Treffer</h2>
-      <section class="dex-inhaltsgrid such-eintraege" data-search-results><div class="daten-laden">DEX-Einträge werden geladen …</div></section>
-      <div class="tuck-leer" data-search-empty hidden>
-        ${iconMarkup('search')}
-        <b>Nichts gefunden</b>
-        <span>Kein Titel, keine Beschreibung und kein Tag passen zu deiner Suche.</span>
-      </div>
-      </div>
-    </div>`;
-
-  const input = container.querySelector('#global-search');
-  const results = container.querySelector('[data-search-results]');
-  const empty = container.querySelector('[data-search-empty]');
-  const tagsSlot = container.querySelector('[data-search-tags]');
-  let entries = [];
-  let activeTag = '';
-  const renderResults = () => {
-    const query = input.value.trim().toLocaleLowerCase('de');
-    const treffer = entries.filter((entry) => {
-      const tags = entry.tags || [];
-      const haystack = `${entry.title || ''} ${entry.note || ''} ${tags.join(' ')}`.toLocaleLowerCase('de');
-      const tagMatch = !activeTag || tags.some((tag) => tag.toLocaleLowerCase('de') === activeTag.toLocaleLowerCase('de'));
-      return tagMatch && (!query || haystack.includes(query));
-    });
-    results.innerHTML = treffer.map((entry) => dexEntryOverviewMarkup(entry, categoryColor(entry.root_key))).join('');
-    vorschaubilderEinblenden(results);
-    empty.hidden = treffer.length > 0;
-  };
-  input.oninput = renderResults;
-  try {
-    entries = await loadAllDexEntries(session.user.id, signal);
-    if (signal?.aborted) return;
-    const tags = [...new Set(entries.flatMap((entry) => entry.tags || []).map((tag) => tag.trim()).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, 'de'));
-    if (tags.length) {
-      const limit = 8;
-      tagsSlot.hidden = false;
-      tagsSlot.innerHTML = `<div class="such-tag-liste" data-tag-list>${tags.map((tag, index) => `<button type="button" data-search-tag="${escapeHtml(tag)}"${index >= limit ? ' hidden' : ''}>#${escapeHtml(tag)}</button>`).join('')}</div>
-        ${tags.length > limit ? `<button class="such-tags-mehr" type="button" data-tags-toggle aria-expanded="false" aria-label="Weitere Tags anzeigen">⌄</button>` : ''}`;
-      tagsSlot.onclick = (event) => {
-        const tagButton = event.target.closest('[data-search-tag]');
-        if (tagButton) {
-          activeTag = activeTag === tagButton.dataset.searchTag ? '' : tagButton.dataset.searchTag;
-          tagsSlot.querySelectorAll('[data-search-tag]').forEach((button) => button.classList.toggle('aktiv', button === tagButton && Boolean(activeTag)));
-          renderResults();
-          return;
-        }
-        const toggle = event.target.closest('[data-tags-toggle]');
-        if (!toggle) return;
-        const expanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!expanded));
-        toggle.textContent = expanded ? '⌄' : '⌃';
-        tagsSlot.querySelectorAll('[data-search-tag]').forEach((button, index) => { button.hidden = expanded && index >= limit; });
-      };
-    }
-    renderResults();
-  } catch (error) {
-    if (!signal?.aborted) results.innerHTML = `<div class="msg err">Suche konnte nicht geladen werden: ${escapeHtml(error.message || 'Unbekannter Fehler')}</div>`;
-  }
-  if (vorgemerkteSuche) {
-    input.value = vorgemerkteSuche;
-    vorgemerkteSuche = '';
-    renderResults();
-  }
-}
-
 function mountComingSoon(container, route) {
   setSeite(route);
   container.innerHTML = `
@@ -1695,12 +1551,12 @@ async function renderRoute() {
   // Die frühere Startseite ist durch die feste Dex-Navigation ersetzt. Ein
   // Einstieg über #home landet deshalb beim zuletzt verwendeten Haupt-Dex;
   // neue Konten beginnen im Meal-Log.
-  if (angefragt === 'home') {
+  if ((angefragt === 'home' || angefragt === 'search')) {
     angefragt = appLetzteDexRoute();
     history.replaceState(history.state, '', `#${angefragt}`);
   }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  let route = ['home', 'search', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
+  let route = ['home', 'profile', 'coins'].includes(angefragt) || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/')
     ? angefragt
     : 'home';
@@ -1734,8 +1590,7 @@ async function renderRoute() {
   // Wie beim LOGMAN werden Seiten ohne Slide, Fade oder Gegenbewegung
   // gewechselt. Der alte Dex bleibt nur während des Datenladens stehen und
   // wird anschließend in einem Schritt durch die fertige Ansicht ersetzt.
-  const transition = 'hart';
-  const view = renderChrome(transition);
+  const view = renderChrome();
   perfMark('chrome');
   /* Ab hier werden setSeite/applyPageLook nur noch gepuffert. Erst wenn
      die neue Ansicht wirklich fertig ist, wenden wir beide atomar an —
@@ -1747,7 +1602,7 @@ async function renderRoute() {
     // Carry the rendered surface (including a selected wallpaper) over to
     // the detail view instead of briefly falling back to the neutral cream
     // collection background while the entry query is loading.
-    const sourceView = app.querySelector(':scope > .view-alt');
+    const sourceView = app.querySelector(':scope > #view');
     dexLookAusAnsichtWiederherstellen(sourceView);
     dexLookAufAnsichtUebertragen(sourceView, view);
     if (sourceView) {
@@ -1756,29 +1611,8 @@ async function renderRoute() {
       }
     }
   }
-  if (richtung === 'vor') {
-    const ausgehend = app.querySelector(':scope > .view-alt');
-    if (ausgehend) ansichtsCache.set(vorherigeRoute, {
-      node: ausgehend,
-      controller: vorherigerController,
-      seite: vorherigeSeite,
-    });
-  }
-  // Beim Schliessen eines Vollbild-DEX bleibt dessen alte Ansicht bis zum
-  // fertigen Home-Mount sichtbar. `data-seite="home"` darf deshalb erst im
-  // selben Takt wie das Entfernen dieser Ansicht gesetzt werden; andernfalls
-  // verliert sie vorher kurz ihre seitenspezifische Typografie.
-  const homeStilBeimTauschSetzen = route === 'home' && Boolean(app.querySelector(':scope > .view-alt'));
-  if (homeStilBeimTauschSetzen) view.classList.add('home-transition-view');
-  // Die neue Seite bleibt unsichtbar, bis wirklich ALLES gemountet ist –
-  // sonst blitzt der fertige Inhalt kurz an seiner Endposition auf, bevor
-  // die Animation ihn zurueck an den Start reisst.
-  if (transition === 'vor') view.classList.add('seite-vor-warten');
-  if (transition === 'detail') view.classList.add('seite-detail-warten');
   if (route === 'home') {
-    await mountHome(view, signal, { setzeSeite: !homeStilBeimTauschSetzen });
-  } else if (route === 'search') {
-    await mountSearch(view, signal);
+    await mountHome(view, signal);
   } else if (route === 'profile') {
     setSeite('profile');
     // Sichtbarkeit und Reihenfolge des Menübandes werden hier bearbeitet.
@@ -1993,7 +1827,7 @@ async function renderRoute() {
     ));
     if (activeTemplateDex) {
       document.documentElement.dataset.seite = activeTemplateDex;
-      dexLookAusAnsichtWiederherstellen(app.querySelector(':scope > .view-alt'));
+      dexLookAusAnsichtWiederherstellen(app.querySelector(':scope > #view'));
     }
     const { mountDexEntryDetail } = await entryDetailModule();
     await mountDexEntryDetail(view, { userId: session.user.id, id: route.slice('entry/'.length), signal });
@@ -2052,8 +1886,10 @@ async function renderRoute() {
   // sofort wiederhergestellte Ansicht gelegt werden.
   if (generation !== renderGeneration || aktiveRoute !== vorherigeRoute && richtung === 'gleich') {
     view.remove();
-    commitSeiteDefer();
-    commitPageLookDefer();
+    routeAbortController?.abort();
+    routeAbortController = vorherigerController;
+    commitSeiteDefer(true);
+    commitPageLookDefer(true);
     perfAbort();
     return;
   }
@@ -2063,97 +1899,17 @@ async function renderRoute() {
      einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
   commitSeiteDefer();
   commitPageLookDefer();
-  appDexShellAktualisieren(route, view, signal);
   perfMark('shell');
-  // Nur animieren, wenn wirklich eine spuerbare Ladeluecke da war (z. B.
-  // Supabase-Roundtrip). War alles praktisch sofort da – etwa nach der
-  // iOS-Zurueck-Wischgeste, die den Inhalt oft schon zeigt, bevor unser
-  // eigener Reload durch ist –, wirkt eine erzwungene Animation haerter als
-  // gar keine: Der Inhalt war ja "schon da" und wuerde nochmal auf- und
-  // abblenden. Direkt sichtbar machen faengt dieses doppelte Aufblitzen ab.
-  const neuerHintergrund = getComputedStyle(document.body);
-  const neueAnsicht = getComputedStyle(view);
-  const lookFarbe = homeStilBeimTauschSetzen
-    ? (document.documentElement.dataset.theme === 'dark' ? '#101A2B' : '#F2EBE0')
-    // Bei einer SVG-Tapete sind body, #app und #view absichtlich transparent,
-    // damit das Muster im fertigen Dex bis in die iOS-Safe-Area reicht. Für
-    // den Einschub darf deshalb nicht `body.backgroundColor` verwendet werden:
-    // das wäre transparent und ließe den bereits umgeschalteten Root-Hintergrund
-    // stehen, während nur der Inhalt hereinfährt. Die Dex-Farbe liegt schon vor
-    // dem ersten Animationsframe als Custom Property auf der Zielansicht.
-    : neueAnsicht.getPropertyValue('--dex-seitenfarbe').trim()
-      || neueAnsicht.getPropertyValue('--bg').trim()
-      || getComputedStyle(document.documentElement).backgroundColor
-      || neuerHintergrund.backgroundColor;
-  // Die Tapete liegt im scrollbaren Dex-Inhalt und ist damit Teil derselben
-  // animierten Ebene wie Karten und Texte. Auf #view selbst bleibt nur die
-  // unveraenderte App-Hintergrundfarbe; sonst wuerde das Muster beim Slide
-  // einen Frame vor oder hinter dem Inhalt erscheinen.
-  const musterBild = 'none';
-  // Die normale Seite ist absichtlich transparent, damit die Tapete auf
-  // html/body bis unter die iOS-Statusleiste reicht. Während des Slides muss
-  // die neue Seite aber eine EIGENE, deckende Kopie dieser Tapete tragen.
-  // `important` ist hier nötig, weil die Transparenzregel für #view selbst
-  // ebenfalls important ist.
-  view.style.setProperty('background-color', lookFarbe, 'important');
-  view.style.setProperty('background-image', musterBild, 'important');
-  view.style.setProperty('background-size', 'auto', 'important');
-  view.style.setProperty('background-position', neuerHintergrund.backgroundPosition, 'important');
-  view.style.setProperty('background-repeat', neuerHintergrund.backgroundRepeat, 'important');
-  view.style.setProperty('background-attachment', 'scroll', 'important');
-  const entferneUebergangshintergrund = () => {
-    ['background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'background-attachment']
-      .forEach((property) => view.style.removeProperty(property));
-  };
-  // Zwei Frames: erst die komplett gemountete neue Seite samt Tapete
-  // rasterisieren, dann die Bewegung starten. So kann WebKit nicht erst den
-  // Inhalt und einen Frame spaeter den Hintergrund in die Ebene aufnehmen.
-  if (transition !== 'hart') {
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const alteSeite = app.querySelector(':scope > #view');
+  if (alteSeite) {
+    if (richtung !== 'gleich') ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
+    else alteSeite.remove();
   }
   aktiveRoute = route;
-  if (transition === 'vor' || transition === 'detail') {
-    view.classList.remove('seite-vor-warten', 'seite-detail-warten');
-    view.classList.add(transition === 'detail' ? 'seite-detail' : 'seite-vor');
-    const alteSeite = app.querySelector(':scope > .view-alt');
-    let abgeschlossen = false;
-    const aufraeumen = () => {
-      if (abgeschlossen) return;
-      abgeschlossen = true;
-      if (aktiveRoute !== route) return;
-      if (richtung === 'vor' && alteSeite) ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
-      else alteSeite?.remove();
-      view.classList.remove('view-neu', 'seite-vor', 'seite-detail');
-      if (homeStilBeimTauschSetzen) setSeite('home');
-      entferneUebergangshintergrund();
-    };
-    view.addEventListener('animationend', aufraeumen, { once: true });
-    setTimeout(aufraeumen, 520);
-  } else if (transition === 'zurueck') {
-    const alteSeite = app.querySelector(':scope > .view-alt');
-    view.classList.add('seite-zurueck');
-    seitenausstiegVorbereiten(alteSeite);
-    const aufraeumen = () => {
-      alteSeite?.remove();
-      vorherigerController?.abort();
-      view.classList.remove('view-neu', 'seite-zurueck');
-      if (homeStilBeimTauschSetzen) setSeite('home');
-      entferneUebergangshintergrund();
-    };
-    nachEigenerSeitenanimation(alteSeite, 'seiteRausRechts', aufraeumen);
-  } else {
-    /* Zwei Frames Wartezeit, damit der Browser die fertig gemountete Ansicht
-       samt Hintergrund im Speicher rasterisiert, bevor sie sichtbar wird.
-       Ohne das würde die neue Ansicht mit weißer Fläche eingeblendet und
-       einen Frame später erst mit Inhalt gefüllt. */
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    if (aktiveRoute !== route && vorherigeRoute !== route) return;
-    app.querySelectorAll(':scope > .view-alt').forEach((node) => node.remove());
-    if (richtung === 'gleich') vorherigerController?.abort();
-    if (homeStilBeimTauschSetzen) setSeite('home');
-    view.classList.remove('view-neu', 'warten-auf-daten');
-    entferneUebergangshintergrund();
-  }
+  view.id = 'view';
+  view.hidden = false;
+  view.classList.remove('warten-auf-daten');
+  appDexShellAktualisieren(route, view, signal);
   perfFinish();
   const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
     || view.querySelector('.kategorie-plus');
@@ -2224,14 +1980,27 @@ function dexModuleVorladen() {
   }
 }
 
+let renderLaeuft = false;
+let renderAngefordert = false;
 async function render() {
+  renderAngefordert = true;
+  if (renderLaeuft) {
+    ++renderGeneration;
+    return;
+  }
+  renderLaeuft = true;
   try {
-    await renderRoute();
+    while (renderAngefordert) {
+      renderAngefordert = false;
+      await renderRoute();
+    }
     if (session) dexModuleVorladen();
   } catch (error) {
     if (isAbortError(error)) return;
     console.error('Seite konnte nicht geladen werden:', error);
     renderLadefehler(error);
+  } finally {
+    renderLaeuft = false;
   }
 }
 
