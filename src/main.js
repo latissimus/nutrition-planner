@@ -705,8 +705,8 @@ function appDexShellAktualisieren(route, view, signal) {
   if (!istAppHauptDex(route, view)) return;
   // Während eines schnellen Durchblätterns zählt nur der zuletzt erreichte
   // Dex. Lokal ist er sofort gespeichert; die Serverkopie folgt gesammelt,
-  // sobald die Navigation kurz ruht.
-  setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 1500 });
+  // sobald die Navigation fünf Sekunden ruht.
+  setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
   appDexShellDatenLaden(route, view, signal);
 }
 

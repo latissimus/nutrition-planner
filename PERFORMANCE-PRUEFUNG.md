@@ -60,15 +60,27 @@ Die Aufnahme zeigt damit keine dauerhafte CPU-Sättigung.
 Auffällig waren dagegen 88 Netzwerkanfragen, darunter genau 18 Schreibzugriffe
 auf `user_preferences` – zuvor wurde bei jedem Dex-Wechsel der zuletzt geöffnete
 Dex sofort einzeln zum Server geschrieben. Diese Einstellung wird nun lokal
-sofort aktualisiert und serverseitig für 1,5 Sekunden gebündelt. Mehrere schnelle
+sofort aktualisiert und serverseitig gebündelt. Mehrere schnelle
 Wechsel erzeugen dadurch nur noch einen Schreibzugriff mit dem endgültigen Dex.
 Nicht übertragene Änderungen bleiben lokal als ausstehend markiert und werden
 beim nächsten Laden erneut synchronisiert. Drei gezielte Synchronisationstests
 sowie die vollständige Prüfung mit 122 Tests und Produktions-Build sind
 erfolgreich.
 
-Für einen belastbaren Vorher-/Nachherwert fehlt noch eine zweite Safari-Timeline
-mit demselben Wechselablauf. Danach sind die wiederholten Daten-Lesezugriffe
-(langsamster gemessener Abruf rund 648 ms) und eine Speicheraufnahme die nächsten
-Kandidaten. Erst diese Messungen entscheiden, ob ein größerer Daten-Cache oder
-weitere Paketaufteilung die iPhone-Laufzeit tatsächlich verbessert.
+Die zweite iPhone-Aufnahme dauerte 22,17 Sekunden und enthielt 16 Dex-Wechsel.
+Die Zahl der Preference-Schreibzugriffe sank von einem Zugriff pro Wechsel auf
+7 Zugriffe, also um rund 56 % bezogen auf die Wechsel. Insgesamt wurden 64
+Netzwerkanfragen erfasst. Die längste JavaScript-Aufgabe sank von rund 48 auf
+41,8 ms; erneut gab es keine Aufgabe ab 50 ms. Der längste Layout-Eintrag lag bei
+rund 38 ms. Die CPU lag im Mittel bei rund 10,6 % und maximal bei 36 %; die
+Aufnahmen sind wegen unterschiedlicher Länge und Bediengeschwindigkeit nur
+eingeschränkt als CPU-Vorher-/Nachhervergleich geeignet. Weil die Wechselpausen
+mehrfach länger als die zunächst gewählten 1,5 Sekunden waren, wurde die
+Synchronisationsruhe anschließend auf 5 Sekunden erhöht. Die Navigation und
+lokale Speicherung bleiben dabei unmittelbar.
+
+Als Nächstes sind die wiederholten Daten-Lesezugriffe und eine Speicheraufnahme
+zu prüfen. In der zweiten Aufnahme wurden 57 GET-Anfragen erfasst; der langsamste
+Abruf dauerte rund 395 ms. Erst diese Messungen entscheiden, ob ein größerer
+Daten-Cache oder weitere Paketaufteilung die iPhone-Laufzeit tatsächlich
+verbessert.

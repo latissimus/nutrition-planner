@@ -25,13 +25,16 @@ export function capboySvg() {
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
   // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
-  // LOGMAN-Standard-letter-spacing -1.62 haelt sie sauber lesbar (nicht wie
-  // beim ersten Editor-Wert -4 aneinandergeklebt), symmetrische Sternluecken
-  // 8/7 wie im Original.
+  // LOGMAN-Standard-letter-spacing -1.62 haelt sie sauber lesbar.
+  // Y und der rechte Stern werden gezielt nach links gezogen: das kursive Y
+  // hinterlaesst rechts eine grosse optische Luecke, deren Ausgleich einen
+  // negativen dx vor dem Y und ein deutlich reduziertes dx vor dem Stern
+  // braucht. So sitzt der Stern rechts wieder symmetrisch zum linken.
   const txt =
     `<tspan font-size="27" stroke-width="3.1" dy="-3">★</tspan>` +
-    `<tspan dx="8" dy="3">CAPBOY</tspan>` +
-    `<tspan font-size="27" stroke-width="3.1" dx="7" dy="-3">★</tspan>`;
+    `<tspan dx="8" dy="3">CAPBO</tspan>` +
+    `<tspan dx="-4">Y</tspan>` +
+    `<tspan font-size="27" stroke-width="3.1" dx="-2" dy="-3">★</tspan>`;
   const path = `<textPath href="#${id}" startOffset="50%">${txt}</textPath>`;
   // viewBox eng am Inhalt: LOGMAN nutzt 318x85, wir liegen bei 332x106 (die
   // Diskette ist im SVG statt via CSS-::before, deshalb etwas hoeher). Vorher
