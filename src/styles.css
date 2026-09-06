@@ -8181,3 +8181,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .special-dex-content{
   width:min(calc(100% - 56px),var(--special-dex-content-max,604px))!important;
 }
+
+/* LOGMAN-Rahmen fuer die beiden hervorgehobenen MAHLZEITEN-Karten:
+   feine Kontur statt des bisherigen harten Hero-Schattens. */
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-hero,
+  .nutrition-coin-overview
+){
+  border:1.5px solid #111!important;
+  box-shadow:none!important;
+}
