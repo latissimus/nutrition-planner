@@ -16,7 +16,7 @@ import '@fontsource/figtree/latin-800.css';
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme } from './theme.js';
-import { brandMarkup, headerBrandMarkup } from './brand.js';
+import { capboyMarkup } from './brand.js';
 import {
   coinDexIsVisible, customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes,
 } from './collectionPreferences.js';
@@ -332,7 +332,7 @@ function renderSetup() {
   setSeite('setup');
   app.innerHTML = `
     <main class="setup-shell wrap">
-      ${brandMarkup()}
+      ${capboyMarkup()}
       <section class="card setup-card">
         <span class="seitenkopf-kicker">Einrichtung</span>
         <h1 class="section-title">Supabase verbinden</h1>
@@ -369,7 +369,7 @@ function renderAuth() {
       <span>ERNÄHRUNG ◆ SUPPLEMENTS ◆ SCHLAF ◆ GEWOHNHEITEN ◆ </span>
     </div>
     <main class="auth-shell">
-      <div class="auth-marke">${headerBrandMarkup()}</div>
+      <div class="auth-marke">${capboyMarkup()}</div>
       ${login ? '' : '<h1 class="auth-title">Registrieren</h1>'}
       <p class="auth-sub">${login ? 'Melde dich mit E-Mail und Passwort an.' : 'Erstelle deinen persönlichen Account.'}</p>
       <div data-auth-msg></div>
@@ -456,7 +456,7 @@ function renderRecovery() {
   setSeite('auth');
   app.innerHTML = `
     <main class="auth-shell">
-      <div class="auth-marke">${brandMarkup()}</div>
+      <div class="auth-marke">${capboyMarkup()}</div>
       <h1 class="auth-title">Neues Passwort</h1>
       <p class="auth-sub">Wähle ein neues Passwort für deinen Account.</p>
       <div data-recovery-msg></div>
@@ -614,7 +614,7 @@ function appDexShellZeichnen(route, view) {
       || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
   header.innerHTML = `
     <div class="app-dex-header-inner">
-      <span class="app-dex-brand" aria-label="MUSCLEDEX">${headerBrandMarkup()}</span>
+      <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }) : ''}
         <span class="app-dex-sync save-dot" role="status"></span>

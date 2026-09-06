@@ -133,8 +133,6 @@
   --mq-h:34px;
   --brand-outline:#000000;
   --brand-pink:#FF69AE;      /* Logo-Pink wie im LOGMAN-Logo (weicher als --pink) */
-  --brand-card-bg:#17224C;   /* Navy-Karte hinter dem MUSCLEDEX-Schriftzug */
-  --brand-card-mark:#F1ECDE; /* helles Abwaerts-Dreieck auf der Karte */
   /* CAPBOY-Diskette: Koerper + Schlitz sind navy, Shutter + Etikett weiss.
      Darkmode tauscht die Rollen: navy wird weiss und umgekehrt. */
   --capboy-body:#001454;
@@ -246,8 +244,6 @@
   /* Logo: Das gedeckte Navy verschwindet auf dunklem Grund, die Kontur waere
      weg. Dunkles Blau bleibt als Kontur, ist aber vom Hintergrund abgesetzt. */
   --brand-outline:#0A1330;
-  --brand-card-bg:#22346E;   /* im Dunkelmodus etwas aufgehellt, damit die Karte
-                                nicht mit dem Hintergrund verschmilzt */
   /* CAPBOY-Diskette umgekehrt: Koerper + Schlitz weiss, Shutter + Etikett navy. */
   --capboy-body:#FFFFFF;
   --capboy-shutter:#0A1330;
@@ -10022,8 +10018,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom:2px solid #0A1330;
   color:#0A1330;
   --brand-outline:#0A1330;
-  --brand-card-bg:#0A1330;
-  --brand-card-mark:#F1ECDE;
 }
 .app-dex-header-inner{
   box-sizing:border-box;
@@ -10236,8 +10230,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#697486;
   color:#EDF0F6;
   --brand-outline:#EDF0F6;
-  --brand-card-bg:#EDF0F6;
-  --brand-card-mark:#101A2B;
 }
 :root[data-theme="dark"]{
   /* Im Darkmode ist die App-Fläche bewusst einheitlich tiefblau. Die
