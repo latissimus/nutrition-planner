@@ -10086,21 +10086,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-dex-header-h:64px;
   --app-dex-dock-bottom:max(6px,calc(env(safe-area-inset-bottom) - 6px));
 }
+/* EINE einzige globale Regel für den Abstand zwischen Dex-Inhalt und
+   festem App-Header: Safe-Area + Header-Höhe + 24 px Atemluft für den
+   Hero. Der Selektor deckt alle drei View-Zustände ab (aktive #view,
+   ausgehende .view-alt, eintreffende .view-neu), damit während einer
+   Route-Transition kein Ruck nach oben passiert. */
 #app.dex-app-shell>:is(#view,.view-alt,.view-neu){
   box-sizing:border-box!important;
-  padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h))!important;
+  padding-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 24px)!important;
   padding-bottom:0!important;
 }
-/* Die Seite läuft – wie beim LOGMAN – hinter der schwebenden Milchglasleiste
-   weiter. Nur der Inhalt bekommt unten genügend Scrollreserve, nicht die
-   komplette View eine zusätzliche deckende Fläche. */
+/* Der Inhalt läuft – wie beim LOGMAN – hinter der schwebenden Milchglas-
+   leiste unten weiter, bekommt dort aber genügend Scrollreserve. */
 #app.dex-app-shell :is(.home-scrollinhalt,.dex-detail-scrollinhalt,.kategorie-scrollinhalt){
   padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
-}
-/* Der feste LOGMAN-Kopf braucht eine klar erkennbare Trennung zur ersten
-   Hero-Karte. Die übrigen Abstände innerhalb der Dex bleiben unverändert. */
-#app.dex-app-shell #view.special-dex-page .kategorie-scrollinhalt{
-  padding-top:24px!important;
 }
 .app-dex-header{
   position:absolute;
