@@ -517,7 +517,7 @@ function avatarMarkup() {
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
   ['body', 'KÖRPER', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
-  ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
+  ['reminders', 'TRACKER', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'REZEPTE', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
@@ -942,7 +942,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'KÖRPER' : sleep ? 'SCHLAF' : meal ? 'MAHLZEITEN' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'KÖRPER' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
   const copy = body
     ? `<p>Im <b>KÖRPER</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -952,7 +952,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
       <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden erst aus mehreren vergleichbaren Check-ins abgeleitet.</p>
       <p>Die Auswertung zeigt beobachtete Zusammenhänge und ersetzt keine medizinische Diagnose.</p>`
     : meal
-    ? `<p>Auf der Seite <b>MAHLZEITEN</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
+    ? `<p>Auf der Seite <b>TRACKER</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
       <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>
       <p>Über den Hinzufügen-Button erfasst du Lebensmittel oder ergänzt deine Planung.</p>`
     : shopping
@@ -1184,7 +1184,7 @@ async function renderRoute() {
   let angefragt = (location.hash || '#home').slice(1);
   // Die frühere Startseite ist durch die feste Dex-Navigation ersetzt. Ein
   // Einstieg über #home landet deshalb beim zuletzt verwendeten Haupt-Dex;
-  // neue Konten beginnen im MAHLZEITEN-Dex.
+  // neue Konten beginnen im TRACKER-Dex.
   if ((angefragt === 'home' || angefragt === 'search')) {
     angefragt = appLetzteDexRoute();
     history.replaceState(history.state, '', `#${angefragt}`);
@@ -1316,15 +1316,15 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'meal-log');
     const { mountReminders } = await remindersModule();
     const reminderActions = await mountReminders(view, { session, profile, signal });
-    mountCategoryChrome(view, route, 'MAHLZEITEN', {
+    mountCategoryChrome(view, route, 'TRACKER', {
       pageLookScope: route, pageLookPattern: 'wallpaper-burger',
       onPlus: () => reminderActions?.openAddMenu?.(),
     });
     installNeoDexChrome(view, {
-      title: 'MAHLZEITEN',
+      title: 'TRACKER',
       meta: reminderActions?.meta || '5 Mahlzeiten',
       closeHref: '#home',
-      editLabel: 'MAHLZEITEN bearbeiten',
+      editLabel: 'TRACKER bearbeiten',
       infoKind: 'meal',
     });
   } else if (route === 'shopping') {

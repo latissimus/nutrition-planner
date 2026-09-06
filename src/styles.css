@@ -4484,11 +4484,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page::before{
   content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
-  background:var(--dex-ink,#fff);opacity:.10;
-  -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
-  -webkit-mask-size:360px auto;mask-size:360px auto;
-  -webkit-mask-position:center top;mask-position:center top;
-  -webkit-mask-repeat:repeat;mask-repeat:repeat;
+  background-color:transparent;
+  background-image:var(--muster-dreieck);
+  background-repeat:repeat;
+  background-size:auto;
+  opacity:1;
+  -webkit-mask-image:none;mask-image:none;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page::before{
+  background-image:var(--muster-dreieck-dunkel);
 }
 :root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt{
   background-image:none!important;
@@ -7948,6 +7952,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-header-actions{display:flex;align-items:center;gap:7px;min-width:0}
 .app-dex-header .coin-kopfstand{color:currentColor;top:-2px}
 .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:36px;height:36px;flex-basis:36px}
+/* Die Zahl steht optisch etwas zu hoch, weil das Sternchen seine Bild-Mitte
+   nicht auf der Textbaseline hat. Ein kleiner translateY zieht die Ziffer auf
+   die visuelle Mitte des Sterns. */
+.app-dex-header .coin-kopfstand strong{transform:translateY(3px) scaleY(.9)}
 .app-dex-header .nav-av{
   width:44px;
   min-width:44px;
@@ -8098,7 +8106,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:0;
   border-left:2px solid #0A1330;
   border-radius:0 10px 10px 0;
-  background:color-mix(in srgb,#fff 24%,transparent);
+  background:transparent;
   color:#0A1330;
   box-shadow:none;
   overflow:hidden;
@@ -8163,7 +8171,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .app-dex-menu{
   border-left-color:#697486;
-  background:rgba(237,240,246,.08);
+  background:transparent;
   color:#EDF0F6;
 }
 @media(max-width:390px){

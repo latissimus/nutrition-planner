@@ -192,7 +192,7 @@ function summaryMarkup(state, date) {
     <button class="som-info-knopf nutrition-calibration-info" type="button" data-toggle-nutrition-calibration aria-expanded="false" aria-controls="nutrition-calibration-help" aria-label="Kalorien-Kalibrierung erklären">i</button>
   </section>
   <div class="som-kurzhilfe nutrition-calibration-help" id="nutrition-calibration-help" data-nutrition-calibration-help hidden>
-    <p>Auf der Seite <b>MAHLZEITEN</b> planst und protokollierst du Mahlzeiten, Supplements und deine Flüssigkeitszufuhr. Die Zeitfenster strukturieren deinen Tag; Hinweise und Erinnerungen stellst du gezielt pro Mahlzeit ein.</p>
+    <p>Auf der Seite <b>TRACKER</b> planst und protokollierst du Mahlzeiten, Supplements und deine Flüssigkeitszufuhr. Die Zeitfenster strukturieren deinen Tag; Hinweise und Erinnerungen stellst du gezielt pro Mahlzeit ein.</p>
     <p>Über den zentralen Hinzufügen-Button erfasst du Lebensmittel, Supplements und weitere Einträge oder passt deine Planung an.</p>
     <p>Die <b>Kalorien-Kalibrierung</b> verknüpft deine vollständig protokollierten Ernährungstage mit deinem geglätteten Gewichtstrend. Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden dabei nicht überbewertet.</p>
     <p>Aussagekräftig wird die Entwicklung erst über mehrere vergleichbare Wochen. Nach mindestens <b>21 Tagen</b> kann CAPBOY einschätzen, ob dein bisheriges Kalorienziel zu deinem tatsächlichen Verlauf passt.</p>
