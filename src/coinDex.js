@@ -136,7 +136,7 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
   const color = categoryColor('coins');
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
   const openRewardEditor = () => rewardEditor({ userId, onSaved: refresh });
-  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="seitenkopf"><h1>Coin-Dex</h1></div><div class="coin-dex-inhalt special-dex-content special-dex-stack"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
+  container.innerHTML = `<div class="wrap pad-bottom coin-dex-seite"><div class="coin-dex-inhalt special-dex-content special-dex-stack"><div class="daten-laden">MUSCLE-COINS werden geladen …</div></div></div>`;
   mountChrome(container, 'coins', 'Coin-Dex', {
     color, meta: 'Belohnungen', pageLookPattern: 'wallpaper-game', hideAppearanceIcon: true, onPlus: openRewardEditor,
   });

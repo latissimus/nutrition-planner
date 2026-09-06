@@ -10307,16 +10307,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Haupt-Dex brauchen weder ihre wiederholte Seitenüberschrift noch die alte
    seitliche Buttonspalte. Bei Unter-Dex bleibt der Zurückknopf erhalten. */
-#app.dex-app-shell:not(.dex-app-shell-unterdex) #view>:is(.neo-dex-floating-actions,.food-dex-floating-actions){display:none!important}
-#app.dex-app-shell.dex-app-shell-unterdex #view>:is(.neo-dex-floating-actions,.food-dex-floating-actions){
+/* Floating-Action-Leisten werden vom App-Shell-Menüband ersetzt und deshalb
+   ausgeblendet. Selektoren auf ALLE View-Zustände erweitern, sonst blitzen
+   die Buttons während der Route-Transition an der alten View auf. */
+#app.dex-app-shell:not(.dex-app-shell-unterdex) > :is(#view, .view-alt, .view-neu)>:is(.neo-dex-floating-actions,.food-dex-floating-actions){display:none!important}
+#app.dex-app-shell.dex-app-shell-unterdex > :is(#view, .view-alt, .view-neu)>:is(.neo-dex-floating-actions,.food-dex-floating-actions){
   bottom:calc(94px + env(safe-area-inset-bottom))!important;
 }
-#app.dex-app-shell.dex-app-shell-unterdex #view>:is(.neo-dex-floating-actions,.food-dex-floating-actions) :is(.neo-dex-action-primary,.food-dex-action-primary){display:none!important}
-#app.dex-app-shell:not(.dex-app-shell-unterdex) #view :is(.neo-dex-scroll-title,.food-dex-scroll-title),
-#app.dex-app-shell:not(.dex-app-shell-unterdex) #view .shopping-page-heading,
-#app.dex-app-shell:not(.dex-app-shell-unterdex) #view .coin-dex-seite>.seitenkopf{
-  display:none!important;
-}
+#app.dex-app-shell.dex-app-shell-unterdex > :is(#view, .view-alt, .view-neu)>:is(.neo-dex-floating-actions,.food-dex-floating-actions) :is(.neo-dex-action-primary,.food-dex-action-primary){display:none!important}
+/* Frühere neo-dex-scroll-title, food-dex-scroll-title, shopping-page-heading
+   und coin-dex-seite>.seitenkopf wurden komplett aus dem DOM entfernt
+   (Overkill mit dem festen App-Header oben). Kein Verstecken mehr nötig. */
 
 :root[data-theme="dark"] .app-dex-header{
   background:#101A2B;

@@ -40,7 +40,6 @@ import {
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, mainDexFolderSvg, openCollectionEditor, saveCollection,
 } from './collections.js';
-import { foodDexActionsMarkup } from './foodDexActions.js';
 import { prepareSpecialDexPage } from './specialDex.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
@@ -735,9 +734,10 @@ function appDexShellZeichnen(route, view) {
     },
   });
   dock.querySelector('.app-dex-menu').onclick = () => {
-    const ausloeser = view.querySelector(':scope > :is(.neo-dex-floating-actions,.food-dex-floating-actions) :is(.neo-dex-action-primary,.food-dex-action-primary)');
-    if (ausloeser) ausloeser.click();
-    else view.querySelector('.kategorie-plus')?.click();
+    /* Frühere Zwischenstation über die floating Add-Buttons ist weg –
+       der Menü-Knopf löst die Add-Aktion direkt am (unsichtbaren)
+       Kategoriekopf des jeweiligen Dex aus. */
+    view.querySelector('.kategorie-plus')?.click();
   };
   const menueKnopf = dock.querySelector('.app-dex-menu');
   let menueDruckStart = 0;
@@ -1411,47 +1411,19 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   document.body.append(overlay);
 }
 
-function installNeoDexChrome(view, {
-  title = 'Fooddex',
-  meta = '0 Einträge · 0 Unter-Dex',
-  closeHref = '#home',
-} = {}) {
+function installNeoDexChrome(view) {
+  /* Die schwebende Add/Close-Leiste unten rechts wurde entfernt: der
+     Menü-Button im festen Dex-Dock löst das Hinzufügen aus, ein
+     Schließen-Button ist überflüssig (man ist immer in EINEM Dex).
+     Aria-hidden auf die alten Header-Steuerungen, damit Screen-Reader
+     sie nicht mehr ankündigen. Und noch eventuelle Reste aus dem
+     Ansichtscache wegräumen, damit auf keiner Seite mehr eine solche
+     Leiste aufblitzen kann. */
   const foodBar = view.querySelector('.kategorie-kopf');
-  const foodAdd = foodBar?.querySelector('.kategorie-plus');
-  const foodSettings = foodBar?.querySelector('[data-category-settings]');
-  const foodActions = document.createElement('div');
-  foodActions.innerHTML = foodDexActionsMarkup({
-    primaryContent: materialIconMarkup('place_item'),
-    primaryAttributes: 'data-food-action="add"',
-    primaryLabel: `Eintrag in ${escapeHtml(title)} hinzufügen`,
-    closeHref: escapeHtml(closeHref),
-    closeLabel: 'Zurück',
-  });
-  const foodActionBar = foodActions.firstElementChild;
-  foodActionBar.querySelector('[data-food-action="add"]').onclick = () => {
-    foodAdd?.click();
-  };
   foodBar?.querySelector('.kategorie-plus')?.setAttribute('aria-hidden', 'true');
   foodBar?.querySelector('[data-category-settings]')?.setAttribute('aria-hidden', 'true');
   foodBar?.querySelector('.kategorie-schliessen')?.setAttribute('aria-hidden', 'true');
   view.querySelector('.neo-dex-floating-actions,.food-dex-floating-actions')?.remove();
-  view.appendChild(foodActionBar);
-
-  const foodContent = view.querySelector('.kategorie-scrollinhalt');
-  const existingTitle = foodContent?.querySelector(':scope > .neo-dex-scroll-title, :scope > .food-dex-scroll-title');
-  if (existingTitle) {
-    const titleNode = existingTitle.querySelector('strong');
-    const metaNode = existingTitle.querySelector('[data-food-scroll-meta]');
-    if (titleNode) titleNode.textContent = title;
-    if (metaNode) metaNode.textContent = meta;
-  } else if (foodContent) {
-    const titleBlock = document.createElement('section');
-    titleBlock.className = 'neo-dex-scroll-title food-dex-scroll-title';
-    titleBlock.innerHTML = `
-      <strong>${escapeHtml(title)}</strong>
-      <small data-food-scroll-meta>${escapeHtml(meta)}</small>`;
-    foodContent.prepend(titleBlock);
-  }
 }
 
 async function mountCustomCollection(container, item, signal) {
