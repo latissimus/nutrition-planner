@@ -23,16 +23,19 @@ export function capboySvg() {
     <rect x="210" y="24" width="7" height="14" rx="1" fill="var(--capboy-slot,#001454)"/>
     <rect x="160" y="56" width="72" height="46" rx="3" fill="var(--capboy-label,#FFFFFF)"/>
   </g>`;
+  // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 54,
+  // letter-spacing -1.62 (echte Work-Sans-Messung), symmetrische Sternluecken
+  // 8/7. Das haelt CAPBOY optisch in einer Reihe mit dem LOGMAN.
   const txt =
     `<tspan font-size="27" stroke-width="3.1" dy="-3">★</tspan>` +
-    `<tspan dx="9" dy="3">CAPBOY</tspan>` +
-    `<tspan font-size="27" stroke-width="3.1" dx="1.5" dy="-3">★</tspan>`;
+    `<tspan dx="8" dy="3">CAPBOY</tspan>` +
+    `<tspan font-size="27" stroke-width="3.1" dx="7" dy="-3">★</tspan>`;
   const path = `<textPath href="#${id}" startOffset="50%">${txt}</textPath>`;
   return `<svg class="brand-svg capboy-svg" viewBox="0 0 380 130" role="img" aria-label="CAPBOY">
   <defs><path id="${id}" d="${d}" fill="none"/></defs>
   ${disk}
   <g font-family="'Work Sans'" font-style="italic" font-weight="700"
-     font-size="64" letter-spacing="-4" text-anchor="middle"
+     font-size="54" letter-spacing="-1.62" text-anchor="middle"
      stroke="var(--brand-outline,#0A1330)" stroke-width="5.2" stroke-linejoin="round">
     <text transform="translate(4.2,4.2)" fill="var(--brand-outline,#0A1330)">${path}</text>
     <text fill="var(--brand-pink,#FF69AE)" paint-order="stroke fill">${path}</text>
