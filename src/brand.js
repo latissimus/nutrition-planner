@@ -38,10 +38,10 @@ export function capboySvg() {
   // negativen dx vor dem Y und ein deutlich reduziertes dx vor dem Stern
   // braucht. So sitzt der Stern rechts wieder symmetrisch zum linken.
   const txt =
-    `<tspan font-size="24" stroke-width="2.8" dy="-3">★</tspan>` +
-    `<tspan dx="5" dy="3">CAPBO</tspan>` +
+    `<tspan font-size="28" stroke-width="3.1" dy="-7">★</tspan>` +
+    `<tspan dx="5" dy="7">CAPBO</tspan>` +
     `<tspan dx="-4">Y</tspan>` +
-    `<tspan font-size="24" stroke-width="2.8" dx="-4" dy="-3">★</tspan>`;
+    `<tspan font-size="28" stroke-width="3.1" dx="-4" dy="-7">★</tspan>`;
   const path = `<textPath href="#${id}" startOffset="50%">${txt}</textPath>`;
   // Der ViewBox ist optisch auf die Wortmitte zentriert und vertikal enger als
   // zuvor. So verschenkt das kleinere Blatt im Header keine Leerflaeche.
