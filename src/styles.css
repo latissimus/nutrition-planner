@@ -7948,7 +7948,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-dex-brand .brand{font-size:clamp(19px,5.5vw,23px)}
 .app-dex-header-actions{display:flex;align-items:center;gap:7px;min-width:0}
-.app-dex-header .coin-kopfstand{color:currentColor}
+.app-dex-header .coin-kopfstand{color:currentColor;top:-2px}
+.app-dex-header .coin-kopfstand .coin-kopf-symbol{width:36px;height:36px;flex-basis:36px}
 .app-dex-header .nav-av{
   width:44px;
   min-width:44px;
@@ -8157,5 +8158,5 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:390px){
   .app-dex-header-inner{width:calc(100% - 24px)}
   .app-dex-header-actions{gap:5px}
-  .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:36px;height:36px;flex-basis:36px}
+  .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:32px;height:32px;flex-basis:32px}
 }
