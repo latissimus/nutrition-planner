@@ -4484,17 +4484,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page::before{
   content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
-  background:#0B1B44;
-  opacity:.055;
-  -webkit-mask-image:url("../SeitenIcons/MEALS.svg");
-  mask-image:url("../SeitenIcons/MEALS.svg");
-  -webkit-mask-size:112px 112px;mask-size:112px 112px;
+  background:var(--dex-ink,#fff);opacity:.10;
+  -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
+  -webkit-mask-size:360px auto;mask-size:360px auto;
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
-}
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page::before{
-  background:#EDF0F6;
-  opacity:.04;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .kategorie-scrollinhalt{
   background-image:none!important;
@@ -8123,7 +8117,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transition:transform 70ms ease-out;
 }
 .app-dex-menu-icon svg{display:block;width:44px;height:44px;max-width:100%;max-height:100%}
-.app-dex-menu:active .app-dex-menu-icon,.app-dex-menu.ist-gedrueckt .app-dex-menu-icon{transform:translate(2px,2px)}
+/* Der globale button:active-Effekt darf den Knopf samt Trennlinie nicht
+   verschieben. Nur die Diskette reagiert mit einem sehr kleinen Druckweg. */
+.app-dex-menu:active,.app-dex-menu.ist-gedrueckt{
+  transform:none!important;
+  box-shadow:none!important;
+}
+.app-dex-menu:active .app-dex-menu-icon,.app-dex-menu.ist-gedrueckt .app-dex-menu-icon{
+  transform:translate(1px,1px);
+}
 
 /* Haupt-Dex brauchen weder ihre wiederholte Seitenüberschrift noch die alte
    seitliche Buttonspalte. Bei Unter-Dex bleibt der Zurückknopf erhalten. */
