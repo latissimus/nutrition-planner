@@ -8009,8 +8009,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-inline:auto;
   padding:5px;
   display:grid;
-  grid-template-columns:minmax(0,1fr) 62px;
-  gap:4px;
+  grid-template-columns:minmax(0,1fr) 68px;
+  gap:6px;
   border-radius:16px;
 }
 .app-dex-dock-inner::before{
@@ -8028,7 +8028,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   min-width:0;
   display:flex;
   align-items:stretch;
-  gap:2px;
+  gap:3px;
   overflow-x:auto;
   overflow-y:hidden;
   overscroll-behavior-x:contain;
@@ -8037,8 +8037,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-dex-tab{
   box-sizing:border-box;
-  width:54px;
-  min-width:54px;
+  width:56px;
+  min-width:56px;
   height:55px;
   padding:5px 2px 4px;
   display:grid;
@@ -8070,27 +8070,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   max-width:100%;
   overflow:hidden;
   color:currentColor;
-  font:750 8px/1 var(--ui);
+  font:780 8.5px/1 var(--ui);
   letter-spacing:-.02em;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
-/* Der aktive Tab wird nicht mehr farblich hinterlegt und bekommt auch keine
-   Rahmen. Das Icon selbst erhaelt einen harten LOGMAN-Schlagschatten und wirkt
-   dadurch aus dem Menue heraus gehoben. filter:drop-shadow folgt der Alpha-
-   Kante des SVGs — Konturen bleiben scharf, statt einen Kasten zu werfen. */
+/* Die Auswahlflaeche macht die aktive Seite auch ohne wiederholte Ueberschrift
+   eindeutig. Der harte LOGMAN-Schlagschatten am Icon bleibt zusaetzlich
+   erhalten; drop-shadow folgt dabei der Alpha-Kante des jeweiligen SVGs. */
+.app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 58%,var(--dex-seitenfarbe,var(--bg)));
+  box-shadow:inset 0 0 0 1.5px #0A1330;
+}
 .app-dex-tab.aktiv>span{
   filter:drop-shadow(2.5px 2.5px 0 #0A1330);
 }
 .app-dex-menu{
   position:relative;
   box-sizing:border-box;
-  width:62px;
+  width:68px;
   height:55px;
   padding:0;
   border:0;
-  border-radius:0;
-  background:none;
+  border-left:2px solid #0A1330;
+  border-radius:0 10px 10px 0;
+  background:color-mix(in srgb,#fff 24%,transparent);
   color:#0A1330;
   box-shadow:none;
   overflow:hidden;
@@ -8145,9 +8149,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .app-dex-dock::after{background:#101A2B}
 :root[data-theme="dark"] .app-dex-dock-inner::before{border-color:#697486;background:#101A2B}
 :root[data-theme="dark"] .app-dex-tab{color:#EDF0F6}
-:root[data-theme="dark"] .app-dex-tab.aktiv{color:#EDF0F6}
+:root[data-theme="dark"] .app-dex-tab.aktiv{
+  color:#EDF0F6;
+  background:#252E3D;
+  box-shadow:inset 0 0 0 1.5px #697486;
+}
 :root[data-theme="dark"] .app-dex-tab.aktiv>span{
   filter:drop-shadow(2.5px 2.5px 0 #EDF0F6);
+}
+:root[data-theme="dark"] .app-dex-menu{
+  border-left-color:#697486;
+  background:rgba(237,240,246,.08);
+  color:#EDF0F6;
 }
 @media(max-width:390px){
   .app-dex-header-inner{width:calc(100% - 24px)}
