@@ -33,7 +33,11 @@ export function capboySvg() {
     `<tspan dx="8" dy="3">CAPBOY</tspan>` +
     `<tspan font-size="27" stroke-width="3.1" dx="7" dy="-3">★</tspan>`;
   const path = `<textPath href="#${id}" startOffset="50%">${txt}</textPath>`;
-  return `<svg class="brand-svg capboy-svg" viewBox="0 0 380 130" role="img" aria-label="CAPBOY">
+  // viewBox eng am Inhalt: LOGMAN nutzt 318x85, wir liegen bei 332x106 (die
+  // Diskette ist im SVG statt via CSS-::before, deshalb etwas hoeher). Vorher
+  // stand hier 380x130 — die Luft skalierte die Buchstaben bei fester CSS-
+  // Breite (5.3em) sichtbar kleiner als beim LOGMAN.
+  return `<svg class="brand-svg capboy-svg" viewBox="28 9 332 106" role="img" aria-label="CAPBOY">
   <defs><path id="${id}" d="${d}" fill="none"/></defs>
   ${disk}
   <g font-family="'Work Sans'" font-style="italic" font-weight="700"
