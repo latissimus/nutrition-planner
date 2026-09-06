@@ -68,8 +68,10 @@ function bodyHeroMarkup(state) {
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="KÖRPER-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
+    <p>Im <b>KÖRPER</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
     <p>Der <b>KÖRPER</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
     <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>12-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
+    <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und <b>keine medizinische Diagnose</b>.</p>
   </div></div>`;
 }
 

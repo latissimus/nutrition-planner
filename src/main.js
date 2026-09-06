@@ -610,6 +610,7 @@ function appDexShellZeichnen(route, view) {
   }
   const aktiveDockRoute = view.dataset.appDockRoute || route;
   const istProfil = route === 'profile';
+  const istCoins = route === 'coins';
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
@@ -628,7 +629,7 @@ function appDexShellZeichnen(route, view) {
     <div class="app-dex-header-inner">
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
-        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }) : ''}
+        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         <span class="app-dex-sync save-dot" role="status"></span>
         <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
            aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>
@@ -699,14 +700,6 @@ function appDexShellZeichnen(route, view) {
   menueKnopf.addEventListener('pointerdown', menueDruecken, { passive: true });
   menueKnopf.addEventListener('pointerup', menueLoslassen, { passive: true });
   menueKnopf.addEventListener('pointercancel', menueLoslassen, { passive: true });
-  bindLongPress(tabLeiste, '.app-dex-tab', dexEinstellungenOeffner({
-    userId: session.user.id,
-    refresh: () => {
-      appDockGeladen = false;
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
-    },
-    itemsById: new Map(appDockEigene.map((item) => [item.id, item])),
-  }));
 }
 
 async function appDexShellDatenLaden(route, view, signal) {
@@ -826,7 +819,6 @@ function istDunkleOrdnerfarbe(farbe) {
 // eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
 function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
   const infoKindFor = (route) => ({ reminders: 'meal', sleep: 'sleep', body: 'body', training: 'training', 'food-log': 'food', stress: 'stress', home: 'custom' }[route] || route);
-  const titleFor = (route) => sammlungen.find(([key]) => key === route)?.[1] || 'Seite';
   return (el) => {
     const collectionId = el.dataset.collectionId;
     if (collectionId) {
@@ -850,15 +842,6 @@ function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
           try { await deleteCollection(userId, item); toast(isSubDex ? 'Ordner gelöscht' : 'Seite gelöscht'); refresh(); }
           catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
         },
-      });
-    }
-    const route = el.dataset.sammlung;
-    if (route) {
-      const title = titleFor(route);
-      return () => settingsSheet(route, refresh, {
-        infoLabel: `${title}-Info`,
-        onInfo: () => openNeoDexInfoDialog(infoKindFor(route), title),
-        appearanceLabel: `${title} bearbeiten`,
       });
     }
     return null;

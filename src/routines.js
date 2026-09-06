@@ -97,6 +97,7 @@ function routineHeroMarkup(state) {
     <div class="som-kurzhilfe nutrition-calibration-help routine-info-help" id="routine-info-help" data-routine-info-help hidden>
       <p>Die Seite <b>ROUTINEN</b> sammelt wiederkehrende Abläufe, die du im Alltag abhaken möchtest.</p>
       <p>Der Hero zeigt, wie viele für heute geplante Routinen noch offen sind. Der Ring zeigt den heutigen Fortschritt.</p>
+      <p>Neue Routinen legst du über den zentralen Hinzufügen-Button an. Dort bestimmst du unter anderem Tage, Dauer und Erinnerungen.</p>
       <p>Eine Routine kannst du durch Tippen auf den Kreis abhaken. Langes Drücken öffnet die Bearbeitung; bei Timer-Routinen startet der Play-Button den Timer.</p>
     </div>
   </div>`;

@@ -2,7 +2,7 @@ import { supabase } from './supabase.js';
 import { categoryColor, materialIconMarkup } from './categoryIcons.js';
 import { toast } from './toast.js';
 import { notifyCoinBalanceChanged } from './realtime.js';
-import muscleCoinUrl from '../MUSCLE-COIN Neu.svg';
+import muscleCoinUrl from '../SeitenIcons/CAPCOIN.svg';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -41,8 +41,10 @@ export async function loadCoinSummary(userId, signal) {
   }
 }
 
-export function coinHeaderMarkup(summary) {
-  return `<a class="coin-kopfstand" href="#coins" aria-label="CAPCOINS öffnen, aktueller Kontostand ${summary.balance}">
+export function coinHeaderMarkup(summary, { aktiv = false } = {}) {
+  const cls = `coin-kopfstand${aktiv ? ' aktiv' : ''}`;
+  const aria = aktiv ? ' aria-current="page"' : '';
+  return `<a class="${cls}" href="#coins" aria-label="CAPCOINS öffnen, aktueller Kontostand ${summary.balance}"${aria}>
     <strong>${summary.balance}</strong>
     ${muscleCoinMarkup('coin-kopf-symbol')}
   </a>`;

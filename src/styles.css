@@ -1782,6 +1782,10 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .coin-kopfstand .coin-kopf-symbol{width:44px;height:44px;flex-basis:44px}
 .coin-kopfstand strong{min-width:13px;font-size:12px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
 .coin-kopfstand:active{transform:translateY(1px)}
+/* Selektiert (Route #coins): derselbe harte Schlagschatten wie die aktiven
+   Menü-Icons — filter:drop-shadow folgt der Alpha-Kante des CAPCOIN-SVGs. */
+.coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
+:root[data-theme="dark"] .coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #EDF0F6)}
 
 /* Dex-Karten: Die Farbe sitzt als schmaler Streifen innerhalb der Oberkante. */
 .tuck-fach{

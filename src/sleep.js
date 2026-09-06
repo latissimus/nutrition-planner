@@ -313,6 +313,7 @@ function render(container, userId, state, refresh) {
       <button class="som-info-knopf nutrition-calibration-info sleep-analysis-info" type="button" data-toggle-sleep-analysis aria-expanded="false" aria-controls="sleep-analysis-help" aria-label="Schlafauswertung erklären">i</button>
     </section>
     <div class="som-kurzhilfe nutrition-calibration-help sleep-analysis-help" id="sleep-analysis-help" data-sleep-analysis-help hidden>
+      <p>Auf der Seite <b>SCHLAF</b> legst du deinen Schlafrhythmus fest und hältst morgens Schlafdauer, Qualität und Energie fest. Schlafplan und Morgen-Check-in erreichst du über den zentralen Hinzufügen-Button.</p>
       <p>Der <b>7-Tage-Verlauf</b> verwendet deine bis zu sieben neuesten vollständigen Morgen-Check-ins. Schlafdauer und Qualität sind Mittelwerte; die Abweichung zeigt, wie weit deine Schlafenszeiten durchschnittlich von deinem eigenen Rhythmus entfernt lagen.</p>
       <p>Für <b>persönliche Zusammenhänge</b> betrachtet CAPBOY bis zu 30 Check-ins. Ein Tag oder eine Gewohnheit wird erst verglichen, wenn jeweils mindestens drei Nächte mit und ohne diesen Einfluss vorliegen und der Unterschied deutlich genug ist.</p>
       <p>Die Ergebnisse beschreiben beobachtete Muster und <b>keine medizinischen Ursachen</b>. Einzelne Nächte werden deshalb nicht überbewertet.</p>
