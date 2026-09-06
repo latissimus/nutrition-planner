@@ -45,6 +45,7 @@ const defaults = {
   recipes: 'menu_book', training: 'fitness_center', habits: 'bucket_check',
   shopping: 'emoji:🛒',
   sleep: 'emoji:😴',
+  stress: 'emoji:⚡',
   coins: 'star',
 };
 const storageKey = (route) => `muscledex:kategorie-icon:${route}`;
@@ -56,6 +57,7 @@ const defaultColors = {
   recipes: '#007DCC', training: '#215E61', habits: '#9564DD',
   shopping: '#FFCF00',
   sleep: '#333D6D',
+  stress: '#B5BAFF',
   coins: '#05BDE8',
 };
 const fixedSystemColors = {
@@ -65,6 +67,7 @@ const fixedSystemColors = {
   reminders: '#525CEB',
   habits: '#9564DD',
   sleep: '#333D6D',
+  stress: '#B5BAFF',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-measure',
@@ -72,6 +75,7 @@ const fixedSystemPatterns = {
   training: 'wallpaper-dumbbell',
   reminders: 'wallpaper-burger',
   sleep: 'wallpaper-moon',
+  stress: 'wallpaper-blitz',
 };
 const colorGroups = [
   ['DEX-Farben', [

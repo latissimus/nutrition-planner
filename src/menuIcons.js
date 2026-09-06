@@ -18,6 +18,7 @@ const routeToFile = {
   // Der Dateiname enthält versehentlich die Endung im Namen; wird hier
   // eindeutig zugeordnet, ohne die Datei im Projektordner umzubenennen.
   sleep: 'SLEEPLOGsvg.svg',
+  stress: 'STRESSNOTES.svg',
 };
 
 /* Wie bei den MUSCLEDEX-ICONS werden interne IDs in eingebetteten Bitmaps

@@ -509,6 +509,7 @@ const sammlungen = [
   ['shopping', 'FOODS', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINES', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
   ['sleep', 'SLEEPLOG', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
+  ['stress', 'STRESSNOTES', 'Stress und Entspannung festhalten.', 'stress', 'periwinkle', 'Aktiv'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 const sichtbareSammlungen = () => {
@@ -574,12 +575,7 @@ function appDockEintraegeMarkup(aktiveDockRoute) {
         <small>${escapeHtml(item.name)}</small>
       </a>`;
   }).join('');
-  const neu = `
-    <button class="app-dex-tab app-dex-tool app-dex-create" type="button" aria-label="Neuen Dex erstellen">
-      <span aria-hidden="true">${materialIconMarkup('create_new_folder')}</span>
-      <small>Dex +</small>
-    </button>`;
-  return standard + eigene + neu;
+  return standard + eigene;
 }
 
 function appSyncStatusAktualisieren() {
@@ -650,14 +646,6 @@ function appDexShellZeichnen(route, view) {
     }
   });
 
-  dock.querySelector('.app-dex-create').onclick = () => openCollectionEditor({
-    userId: session.user.id,
-    rootKey: 'home',
-    onSaved: () => {
-      appDockGeladen = false;
-      appDexShellDatenLaden(route, view, routeAbortController?.signal);
-    },
-  });
   dock.querySelector('.app-dex-menu').onclick = () => {
     /* Frühere Zwischenstation über die floating Add-Buttons ist weg –
        der Menü-Knopf löst die Add-Aktion direkt am (unsichtbaren)
@@ -805,7 +793,7 @@ function istDunkleOrdnerfarbe(farbe) {
 // Baut fuer eine Kachel (eingebaute Kategorie ueber data-sammlung oder
 // eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
 function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
-  const infoKindFor = (route) => ({ reminders: 'meal', sleep: 'sleep', body: 'body', training: 'training', 'food-log': 'food', home: 'custom' }[route] || route);
+  const infoKindFor = (route) => ({ reminders: 'meal', sleep: 'sleep', body: 'body', training: 'training', 'food-log': 'food', stress: 'stress', home: 'custom' }[route] || route);
   const titleFor = (route) => sammlungen.find(([key]) => key === route)?.[1] || 'Dex';
   return (el) => {
     const collectionId = el.dataset.collectionId;
@@ -936,7 +924,8 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const shopping = kind === 'shopping';
   const habits = kind === 'habits';
   const coins = kind === 'coins';
-  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'BODYLOG' : sleep ? 'SLEEPLOG' : meal ? 'MEALS' : training ? 'TRAINNOTES' : shopping ? 'FOODS' : habits ? 'ROUTINES' : coins ? 'Coin-Dex' : 'COOKNOTES');
+  const stress = kind === 'stress';
+  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'BODYLOG' : sleep ? 'SLEEPLOG' : meal ? 'MEALS' : training ? 'TRAINNOTES' : shopping ? 'FOODS' : habits ? 'ROUTINES' : stress ? 'STRESSNOTES' : coins ? 'Coin-Dex' : 'COOKNOTES');
   const copy = body
     ? `<p>Im <b>BODYLOG</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -953,6 +942,8 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     ? `<p>Im <b>FOODS</b>-Dex sammelst und planst du Lebensmittel für deinen nächsten Einkauf.</p><p>Gruppen und Status helfen dir, offene und bereits erledigte Besorgungen schnell zu unterscheiden.</p>`
     : habits
     ? `<p>Im <b>ROUTINES</b>-Dex planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
+    : stress
+    ? `<p>In <b>STRESSNOTES</b> hältst du <b>Belastungen</b>, <b>Auslöser</b> und <b>Entspannung</b> fest.</p><p>Mit <b>Tags</b> und <b>Unter-Dex</b> ordnest du, was dich stresst oder herunterfährt, und findest Muster über Wochen hinweg.</p>`
     : coins
     ? `<p>Im <b>Coin-Dex</b> sammelst du MUSCLE-COINS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
@@ -1493,6 +1484,45 @@ async function renderRoute() {
       meta: sleepActions?.meta || 'Schlaf planen',
       editLabel: 'SLEEPLOG bearbeiten',
       infoKind: 'sleep',
+    });
+  } else if (route === 'stress') {
+    setSeite('stress');
+    // Fixierte Farbe und Tapete zuerst setzen, damit waehrend des Ladens
+    // (siehe TRAINNOTES-Muster) niemals der neutrale Sammlungs-Look aufblitzt.
+    applyPageLook('stress', categoryColor('stress'), 'wallpaper-blitz');
+    const children = await loadCollections(session.user.id, { rootKey: 'stress', signal });
+    const childStats = await dexSammlungsStatistik(session.user.id, 'stress', children, signal);
+    if (signal?.aborted) return;
+    view.classList.add('neo-dex-page', 'food-dex-page');
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: categoryColor('stress'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'stress', onSaved: refresh });
+    mountCategoryChrome(view, route, 'STRESSNOTES', {
+      pageLookScope: route, pageLookPattern: 'wallpaper-blitz',
+      meta: `${children.length} Unter-Dex`,
+      onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
+      onAddAudio: () => openEntry('audio'),
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'stress', onSaved: refresh }),
+      onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: 'stress', onChanged: refresh }),
+    });
+    installNeoDexChrome(view, {
+      title: 'STRESSNOTES',
+      meta: `0 Einträge · ${children.length} Unter-Dex`,
+      closeHref: '#home',
+      editLabel: 'STRESSNOTES bearbeiten',
+      infoKind: 'stress',
+    });
+    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
+      userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
+    }));
+    await renderDexEntries(view, {
+      userId: session.user.id, rootKey: 'stress', color: categoryColor('stress'), signal, hasChildren: children.length > 0,
+      onChanged: (entries, total) => {
+        const meta = view.querySelector('.kategorie-kopftitel small');
+        if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+        const scrollMeta = view.querySelector('[data-food-scroll-meta]');
+        if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unter-Dex`;
+      },
     });
   }
   // Wurde waehrend eines langsamen Mounts bereits zurueck navigiert, darf
