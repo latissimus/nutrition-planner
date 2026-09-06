@@ -7929,10 +7929,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-dex-header-inner{
   box-sizing:border-box;
-  /* Dieselbe 36-px-Inhaltsachse und dieselbe Maximalbreite wie Hero und
-     Karten der Spezialseiten. Der Header bleibt Teil der festen Schale,
-     wirkt dadurch aber nicht mehr seitlich gegen den Inhalt verschoben. */
-  width:min(calc(100% - 72px),604px);
+  width:min(calc(100% - 28px),580px);
   height:var(--app-dex-header-h);
   margin-inline:auto;
   display:flex;
@@ -8170,6 +8167,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#EDF0F6;
 }
 @media(max-width:390px){
+  .app-dex-header-inner{width:calc(100% - 24px)}
   .app-dex-header-actions{gap:5px}
   .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:32px;height:32px;flex-basis:32px}
 }
