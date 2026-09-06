@@ -308,9 +308,6 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
   background:none}
 :root[data-theme="dark"] .brand::before{opacity:1}
 .nav{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.nav-btn{background:var(--surface);border:var(--bw) solid var(--ink);color:var(--text);
-  padding:7px 11px;border-radius:var(--r);font-size:13px;font-weight:700;
-  font-family:var(--display);font-style:italic;text-transform:uppercase}
 .nav-btn.active{background:var(--navy);color:#fff}
 .nav-btn.pink{background:var(--pink);color:var(--accent-ink)}
 /* FAQ-Knopf, solange das Sheet offen ist. Gelb passt auf den hellblauen Grund
@@ -389,8 +386,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 .btn-navy{background:var(--navy);color:#fff}
 .btn-block{width:100%}
 .btn:disabled{opacity:.5}
-.btn:active,.nb-chip:active,.log-tutorial-weiter:active,.som-prio-toggle:active,
-.som-modusseg button:active,.som-spender-wahl:active,.faq-tutorial-start:active{
+.btn:active,.nb-chip:active,.log-tutorial-weiter:active,.som-prio-toggle:active,.faq-tutorial-start:active{
   transform:translateY(1px)}
 
 /* ---------- Inputs ---------- */
@@ -599,10 +595,8 @@ label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercas
 .prev b{color:var(--text);font-weight:700}
 .delta{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;font-family:var(--mono);padding:2px 8px;border-radius:999px;margin-left:6px;border:var(--bw) solid var(--ink)}
 .d-up{background:#D8F5E6;color:var(--up)}
-.d-hold{background:#FBEFD2;color:var(--hold)}
 .d-down{background:#FFE0D8;color:var(--down)}
 :root[data-theme="dark"] .d-up{background:#163527;color:#7DE0A7}
-:root[data-theme="dark"] .d-hold{background:#3A3018;color:#F0C96A}
 :root[data-theme="dark"] .d-down{background:#3B211D;color:#FF9A83}
 
 .setrow{display:flex;align-items:center;gap:7px;margin-top:8px}
@@ -645,9 +639,7 @@ label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercas
    passte beides nicht in 60px. */
 /* Seitliches Polster bestimmt auf dem Telefon die Breite der Leiste – nicht
    max-width, die greift dort nie.
-   UNTERGRENZE sind 7px: Der Schlagschatten steht 4px nach rechts, darunter
-   beruehrt die rechte untere Ecke den Bildschirmrand. */
-.ctrlbar{--ctrlbar-bottom:max(6px, calc(env(safe-area-inset-bottom) - 6px));
+   UNTERGRENZE sind 7px: Der Schlagschatten steht 4px nach rechts{--ctrlbar-bottom:max(6px, calc(env(safe-area-inset-bottom) - 6px));
   position:fixed;left:0;right:0;bottom:0;z-index:30;
   padding:0 7px var(--ctrlbar-bottom);overflow:hidden;
   background:linear-gradient(180deg,transparent 0,var(--bg) 8px,transparent 8px)}
@@ -681,9 +673,6 @@ html.statusleiste-overlay .ctrlbar{z-index:50;background:var(--bg)}
   border-radius:16px;box-shadow:0 0 0 100vmax var(--bg);
   clip-path:inset(8px -100vmax -100vmax -100vmax)}
 html.statusleiste-overlay .ctrlbar .inner::after{box-shadow:0 0 0 100vmax var(--bg)}
-.ci{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;padding:8px 2px;
-  border:0;border-radius:11px;background:none;color:var(--text);cursor:pointer}
 .ci .wert{font-family:var(--display);font-style:italic;font-weight:700;font-size:15px;
   height:22px;line-height:22px;text-transform:uppercase;letter-spacing:.01em;
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -699,12 +688,9 @@ html.statusleiste-overlay .ctrlbar .inner::after{box-shadow:0 0 0 100vmax var(--
   text-transform:uppercase;letter-spacing:.04em;
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Das native Element liegt unsichtbar ueber dem Feld: <select> und
-   type="date" oeffnen so die Systemauswahl von iOS, ohne dass wir sie
-   nachbauen – nachgebaut waere sie in jedem Punkt schlechter. */
-.ci select,.ci input{position:absolute;inset:0;width:100%;height:100%;
+   type="date" oeffnen so die Systemauswahl von iOS{position:absolute;inset:0;width:100%;height:100%;
   opacity:0;border:0;border-radius:11px;background:none;
   -webkit-appearance:none;appearance:none}
-.ci select:disabled{cursor:default}
 .ci:has(select:disabled) .wert{opacity:.55}
 /* Das Menue rechts. Das kleine Computerfenster greift die Cyan-, Pink- und
    Violetttoene alter Desktop-Oberflaechen auf und hebt sich damit von den
@@ -725,7 +711,6 @@ html.statusleiste-overlay .ctrlbar .inner::after{box-shadow:0 0 0 100vmax var(--
 /* Im Dark-Mode hellblau und deckend, Ziffer schwarz. Weiss stand darauf bei
    1.35:1 und war unlesbar – schwarz bringt 14.6:1. */
 :root[data-theme="dark"] .ctrlbar.timer-an .inner::before{background:#AEDCF6}
-:root[data-theme="dark"] .ctrlbar.timer-an .timerfeld,
 :root[data-theme="dark"] .ctrlbar.timer-an .timerfeld .x{color:#0A0A0A}
 /* Der abgelaufene Zustand traegt sonst ein helles Gruen, das auf Hellblau
    ebenfalls verschwindet. Dunkelgruen haelt den Unterschied zum Lauf. */
@@ -733,34 +718,21 @@ html.statusleiste-overlay .ctrlbar .inner::after{box-shadow:0 0 0 100vmax var(--
 .ctrlbar.timer-an .slots,.ctrlbar.timer-an .menue{display:none}
 .ctrlbar.ohne-menue .menue{display:none}
 .ctrlbar.nur-menue .slots{display:none}
-.ctrlbar.nur-menue{background:none;overflow:visible;pointer-events:none}
 .ctrlbar.nur-menue .inner{max-width:104px;padding:0;pointer-events:auto}
 .ctrlbar.nur-menue .inner::before,.ctrlbar.nur-menue .inner::after{display:none}
 /* Auf Unterseiten entfaellt die Leiste ganz. Zurueck ins Log fuehrt der
-   "← Log"-Chip unter dem Kopf, und das Log ist die Seite, zu der man ohnehin
-   staendig zurueckkehrt – das Menue unten war der zweite Weg zum selben Ziel.
-   Der Admin behaelt seine volle Leiste (er bekommt nie .nur-menue), weil die
-   vier Felder dort die einzige Moeglichkeit sind, durch fremde Wochen zu
-   blaettern. Eine laufende Pause holt die Leiste sofort zurueck – siehe unten. */
-.ctrlbar.nur-menue:not(.timer-an){display:none}
+   "← Log"-Chip unter dem Kopf, und das Log ist die Seite, weil die
+   vier Felder dort die einzige Moeglichkeit sind{display:none}
 /* Ohne Leiste braucht der Seitenfuss keinen Platz mehr freizuhalten. Laeuft
    gerade eine Pause, steht die Leiste wieder da und der Abstand ebenso. */
 body:has(.ctrlbar.nur-menue:not(.timer-an)) .pad-bottom{padding-bottom:24px}
 
 /* Eine laufende Pause gehört der ganzen App. Auf Unterseiten nimmt der Timer
-   deshalb wieder die volle Leistenbreite ein, statt in der schmalen
-   Nur-Menü-Hülle zu stecken. */
-.ctrlbar.nur-menue.timer-an{pointer-events:auto}
+   deshalb wieder die volle Leistenbreite ein{pointer-events:auto}
 .ctrlbar.nur-menue.timer-an .inner{max-width:580px;padding:5px}
 .ctrlbar.nur-menue.timer-an .inner::before{display:block}
-/* Das × liegt absolut rechts und zaehlt nicht zur Breite – sonst waere die
-   Zahl um dessen halbe Breite nach links verschoben statt wirklich mittig. */
-.timerfeld{position:relative;flex:1;display:flex;align-items:center;justify-content:center;
-  color:#fff;font-family:var(--mono);font-size:26px;font-weight:800;letter-spacing:-.02em;
-  padding:6px 0}
 .timerfeld .mitte{display:inline-flex;align-items:center;gap:9px}
 .timerfeld .pausensymbol{display:block;fill:currentColor;opacity:.85}
-.timerfeld[hidden]{display:none}
 .timerfeld .x{position:absolute;right:8px;top:50%;transform:translateY(-50%);
   background:none;border:0;color:#fff;font-size:20px;opacity:.7;padding:0 6px;line-height:1}
 .ctrlbar.timer-an .timerfeld.done{color:#8FE9B4}
@@ -980,12 +952,6 @@ html.overlay-vollflaechig body::before{display:none}
   background:var(--surface);color:var(--muted);font-family:var(--mono);font-size:10px;
   font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 .seitenkopf .section-title{margin:0;min-width:0;font-size:27px}
-.seiten-einstieg{display:flex;flex-direction:column;align-items:flex-start;gap:2px;
-  margin:0 0 10px;padding:8px 11px;border:var(--bw) solid var(--ink);
-  border-radius:var(--r);background:var(--surface)}
-.seiten-einstieg b{font-family:var(--display);font-style:italic;font-size:13px;
-  text-transform:uppercase;white-space:nowrap}
-.seiten-einstieg span{color:var(--muted);font-size:12px;line-height:1.35;text-align:left}
 
 
 .zurueck .pf{font-family:var(--mono);font-style:normal;font-size:16px;margin-right:3px;line-height:1}
@@ -1083,26 +1049,12 @@ html.overlay-vollflaechig body::before{display:none}
 .som-inline-plan{margin-top:11px}
 .som-ed-label{display:block;margin-bottom:6px;font-size:11px;color:var(--muted);font-weight:800;
   text-transform:uppercase;letter-spacing:.06em}
-.som-modusseg{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border:var(--bw) solid var(--ink);border-radius:var(--r)}
-.som-modusseg button{min-width:0;padding:8px 6px;border:0;border-right:var(--bw) solid var(--ink);
-  background:var(--surface);color:var(--text)}
-.som-modusseg button:last-child{border-right:0}
 .som-modusseg button.on{background:var(--prio);color:#fff}
-.som-modusseg b,.som-modusseg small{display:block}
-.som-modusseg b{font-family:var(--display);font-style:italic;text-transform:uppercase;font-size:12px}
-.som-modusseg small{margin-top:2px;font-size:10.5px;opacity:.8}
 .som-spender{margin-top:12px}
-.som-spender-wahl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;width:100%;margin-top:6px;padding:8px 9px;
-  text-align:left;background:var(--surface);color:var(--text);border:1.5px solid var(--ink);border-radius:var(--r)}
 .som-spender-wahl.on{border-color:var(--prio-text);background:var(--prio);color:#fff}
 .som-spender-wahl.on small,.som-spender-wahl.on .som-spender-zahlen{color:rgba(255,255,255,.78)}
 .som-spender-wahl.on em{color:#fff}
-.som-spender-wahl span:first-child{min-width:0}
-.som-spender-wahl b,.som-spender-wahl small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.som-spender-wahl b{font-family:var(--display);font-style:italic;text-transform:uppercase;font-size:12px}
-.som-spender-wahl small{margin-top:1px;font-size:11px;color:var(--muted)}
 .som-spender-zahlen{align-self:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
-.som-spender-wahl em{grid-column:1/-1;font-style:normal;font-size:10px;font-weight:800;color:var(--prio-text);text-transform:uppercase}
 .som-spender-frei{display:block;margin-top:10px}
 .som-spender-frei select{width:100%;min-height:40px;padding:8px 34px 8px 10px;background:var(--surface);
   border:var(--bw) solid var(--ink);border-radius:var(--r);color:var(--text);font-family:var(--mono);
@@ -1295,7 +1247,6 @@ html.overlay-vollflaechig body::before{display:none}
 .faq-suche button{position:absolute;right:6px;width:32px;height:32px;padding:0;border:0;
   border-radius:50%;background:var(--prio);color:#fff;font-size:18px;line-height:1}
 .faq-suche p{margin:8px 0 0;color:var(--muted);font-size:12px}
-.faq[hidden]{display:none}
 .faq-startkarte{position:relative;overflow:hidden;margin:0 0 16px;padding:16px 15px 14px;
   border:var(--bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface)}
 .faq-startkarte::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:var(--pink)}
@@ -1320,24 +1271,13 @@ html.overlay-vollflaechig body::before{display:none}
 /* Aufklapper nach dem Vorbild ihrer FAQ-Seite. Dort gemessen: Karte weiss,
    2px Rand, Radius 18px, Polster 18px – und die FRAGE in Monospace 18px mit
    Gewicht 400, nicht in der kursiven Display-Schrift. Die Versalien stehen
-   dort im Text, nicht im CSS; wir behalten text-transform, weil unsere Fragen
-   gemischt geschrieben sind. */
-.faq{scroll-margin-top:calc(var(--topbar-h) + 10px);border:var(--bw) solid var(--ink);
+   dort im Text, nicht im CSS; wir behalten text-transform{scroll-margin-top:calc(var(--topbar-h) + 10px);border:var(--bw) solid var(--ink);
   border-radius:var(--r-karte);background:var(--surface);margin-bottom:10px;overflow:hidden}
-.faq>summary{list-style:none;cursor:pointer;padding:18px 46px 18px 18px;position:relative;
-  font-family:var(--mono);font-weight:400;text-transform:uppercase;font-size:16px;
-  line-height:1.35;color:var(--text)}
-.faq>summary::-webkit-details-marker{display:none}
 /* Gezeichnetes Chevron statt "+"/"–" – dasselbe Zeichen wie in den
-   Auswahlfeldern, damit Aufklappen ueberall gleich aussieht. */
-.faq>summary::after{content:"";position:absolute;right:16px;top:50%;
+   Auswahlfeldern{content:"";position:absolute;right:16px;top:50%;
   width:22px;height:22px;margin-top:-11px;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E") center/22px no-repeat;
   transition:transform .18s}
-.faq[open]>summary::after{transform:rotate(180deg)}
-:root[data-theme="dark"] .faq>summary::after{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23EDF0F6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")}
-.faq[open]>summary{border-bottom:var(--bw) solid var(--ink);background:var(--surface2)}
 .faq-a{padding:18px}
 /* Antworten bleiben linksbuendig: Zentrierter Fliesstext liest sich schlecht,
    und dort steht ganze Absaetze, keine Kurzhinweise. */
@@ -1453,23 +1393,8 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
    im Log entsprechen (Phasenende, "Neue Phase starten"). Die Versionszeile ist
    Diagnose, kein eigener Abschnitt – sie braucht keinen Absatz davor. */
 .buildinfo{text-align:center;font-size:12px;color:var(--faint);margin:10px 0 0;font-family:var(--mono)}
-
-/* ============================================================
-   NUTRITION PLANNER — neue App-Shell
-
-   Die Variablen und Grundkomponenten oben sind bewusst 1:1 aus LOGMAN
-   uebernommen. Dieser Abschnitt enthaelt nur die neue Navigation und das
-   vorlaeufige Dashboard; ein Produktname ist noch nicht fest eingebrannt.
-   ============================================================ */
-
-.produktmarke{
-  display:inline-flex;align-items:center;gap:9px;color:var(--navy);font-family:var(--display);
-  font-style:italic;font-weight:700;font-size:20px;line-height:.85;text-transform:uppercase}
-.produktmarke small{display:block;margin-bottom:4px;color:var(--muted);font-family:var(--mono);
-  font-size:8px;font-style:normal;letter-spacing:.18em}
 .produktmarke-pixel{display:grid;place-items:center;width:34px;height:34px;background:var(--pink);
   color:var(--accent-ink);border:var(--bw) solid var(--ink);border-radius:8px;font-size:15px}
-:root[data-theme="dark"] .produktmarke{color:var(--text)}
 
 .app-kopf .wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .kopf-marke{text-decoration:none}
@@ -1545,10 +1470,6 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 :root[data-seite="body"] .seitenkopf-kicker{background:#BFE7D2;color:#141414;border-color:#141414}
 :root[data-seite="reminders"] .seitenkopf-kicker{background:#FFDE59;color:#141414;border-color:#141414}
 :root[data-seite="food-log"] .seitenkopf-kicker{background:#FF69AE;color:#141414;border-color:#141414}
-
-.food-form-card{position:relative;margin-bottom:28px;overflow:hidden}
-.food-form-card::before{content:"";position:absolute;inset:0 0 auto;height:7px;background:var(--pink)}
-.food-form-card form{display:grid;gap:0;padding-top:4px}
 .food-note{min-height:92px;resize:vertical}
 .food-form-grid{display:grid;grid-template-columns:minmax(0,12rem) minmax(0,1fr);gap:12px 16px;align-items:end}
 .food-form-grid>label{display:block;min-width:0}
@@ -1561,14 +1482,11 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .food-toolbar h2{font-size:24px;color:var(--navy)}
 .food-toolbar span,.food-date{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted)}
 .food-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.food-card{padding:0;overflow:hidden;margin:0!important}
 .food-image{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--surface2);
   border-bottom:var(--bw) solid var(--ink)}
 .food-placeholder{display:flex;align-items:center;justify-content:center;color:var(--pink);
   font-family:var(--display);font-size:54px}
 .food-card-body{padding:14px}
-.food-card h2{font-size:20px;margin:5px 0 8px;overflow-wrap:anywhere}
-.food-card p{margin:0;color:var(--muted);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 .food-actions .btn{padding:7px 9px;font-size:11px}
 .food-empty{grid-column:1/-1;display:flex;flex-direction:column;gap:5px;text-align:center}
 .food-empty span{color:var(--muted);font-size:12px}
@@ -1586,7 +1504,6 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
   font-weight:900;vertical-align:middle;color:var(--text)}
 .d-up{background:#D8F5E6;color:#0B5C33}
 .d-down{background:#FFE0D8;color:#8A2A12}
-.d-hold{background:var(--surface2);color:var(--muted)}
 
 .falten-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin:12px 0 6px}
 .falte{min-width:0}
@@ -1610,16 +1527,9 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .gew-eingabe .btn{grid-column:1/-1;width:100%}
 
 .reminder-list{display:grid;gap:12px;margin:14px 0}
-.reminder-row{position:relative;min-width:0;border:var(--bw) solid var(--ink);border-radius:var(--r);
-  padding:14px;background:var(--surface2);overflow:hidden}
-.reminder-row::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--pink)}
 .switchline{display:flex;align-items:center;gap:9px;margin:0 0 10px;font-family:var(--display);
   font-style:italic;font-weight:700;text-transform:uppercase}
 .switchline input{width:20px;height:20px;accent-color:var(--pink)}
-.reminder-grid{display:grid;grid-template-columns:repeat(3,minmax(108px,1fr));gap:10px;align-items:end}
-.reminder-grid label{min-width:0}
-.reminder-grid label span{display:block;margin:0 0 4px;font-size:10px;font-weight:800;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .reminder-grid .input{width:100%;min-width:0}
 .reminder-grid .input[type="time"]{width:min(100%,8.5rem)}
 
@@ -1685,14 +1595,12 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 
 
 .seitenkopf-text{gap:6px}
-.seiten-einstieg{margin-bottom:14px;padding:10px 12px;border-radius:12px}
 
 /* Erinnerungen werden nach Zweck gruppiert. Innerhalb der Gruppe ersetzen
    feine Trenner die vielen ineinander geschachtelten Karten. */
 [data-reminders-card]{padding:0;border:0;background:transparent;overflow:visible}
 [data-reminders-card]::before{display:none}
 [data-permission]:empty{display:none}
-.pushbar{margin:0 0 14px;padding:5px 6px 5px 12px}
 .reminder-list{gap:16px;margin:0 0 16px}
 .reminder-group{overflow:hidden;background:var(--surface);border:var(--bw) solid var(--ink);
   border-radius:var(--r-karte)}
@@ -1712,10 +1620,6 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .reminder-group:not([open]) .reminder-group-chevron{transform:rotate(-90deg)}
 .reminder-group:not([open]) .reminder-group-head{border-bottom:0}
 .reminder-group-list{padding-left:14px}
-.reminder-row{padding:13px 14px 13px 0;border:0;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 22%,transparent);
-  border-radius:0;background:transparent;overflow:visible}
-.reminder-row:last-child{border-bottom:0}
-.reminder-row::before{display:none}
 .switchline{margin-bottom:8px}
 .switchline input{flex:0 0 auto;width:21px;height:21px}
 .sammlung-sichtbarkeit{display:flex;align-items:center;gap:10px;min-height:52px;margin:0;border-bottom:1px solid rgba(0,0,0,.14)}
@@ -1726,8 +1630,6 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .sortier-tasten button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--ink);border-radius:9px;background:var(--surface);color:var(--text);font:800 18px/1 var(--ui)}
 .sortier-tasten button:disabled{opacity:.25}
 .reminder-row>.fld-l{margin-left:30px}
-.reminder-row>[data-label]{width:calc(100% - 30px);margin:0 0 10px 30px;padding:8px 10px;background:var(--surface2)}
-.reminder-grid{margin-left:30px;grid-template-columns:repeat(3,minmax(0,8.5rem));justify-content:start}
 .reminder-grid .input{margin:0;padding:8px 9px}
 .reminder-add{display:flex;align-items:center;gap:8px;width:calc(100% - 28px);min-height:42px;
   margin:4px 14px 12px;padding:7px 0;background:none;color:var(--link);border:0;
@@ -1746,29 +1648,16 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 
 
 /* Food-Log: Eingabe als aufklappbare Aktion, gespeicherte Ideen als kompakte
-   Medienliste. Damit ist die Sammlung der Hauptinhalt, nicht ein Dauerformular. */
-.food-form-card{padding:0;background:var(--surface)}
-.food-form-card::before{display:none}
-.food-form-card>summary{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;
-  gap:10px;padding:12px 14px;list-style:none;cursor:pointer}
-.food-form-card>summary::-webkit-details-marker{display:none}
-.food-form-card>summary::after{content:"+";grid-column:3;grid-row:1/3;color:var(--link);
-  font-family:var(--display);font-size:25px;font-style:italic;font-weight:800}
-.food-form-card[open]>summary::after{content:"−"}
+   Medienliste. Damit ist die Sammlung der Hauptinhalt{padding:0;background:var(--surface)}
 .food-form-card>summary>span:not(.food-add-icon){font-family:var(--display);font-style:italic;
   font-weight:700;text-transform:uppercase}
-.food-form-card>summary small{grid-column:2;color:var(--muted);font-size:9.5px}
 .food-add-icon{grid-row:1/3;display:grid;place-items:center;width:36px;height:36px;
   border:1.5px solid var(--ink);border-radius:50%;background:var(--pink);color:var(--accent-ink);
   font-size:24px;font-weight:800}
-.food-form-card form{padding:16px;border-top:var(--bw) solid var(--ink)}
 .food-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
-.food-card{display:grid;grid-template-columns:96px minmax(0,1fr);min-height:96px}
 .food-image{width:96px;height:100%;min-height:96px;aspect-ratio:auto;border:0;border-right:var(--bw) solid var(--ink)}
 .food-placeholder{font-size:34px}
 .food-card-body{min-width:0;padding:12px}
-.food-card h2{margin:3px 0 5px;font-size:17px}
-.food-card p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .food-actions{margin-top:9px}
 
 /* Messwerte bleiben datenreich, bekommen aber dieselbe Listenruhe. */
@@ -1779,13 +1668,8 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .mess-neu[open] summary::after{content:"⌃"}
 
 /* Etwas dichter als das Trainings-UI: In einer Planungs-App sollen mehr
-   Eintraege gleichzeitig sichtbar sein, ohne die Tippziele zu verkleinern. */
-:root[data-seite="body"] .seiten-einstieg,
-:root[data-seite="reminders"] .seiten-einstieg,
-:root[data-seite="food-log"] .seiten-einstieg{margin-bottom:12px}
-.food-form-card{margin-bottom:20px}
+   Eintraege gleichzeitig sichtbar sein{margin-bottom:12px}
 .reminder-list{gap:12px}
-.reminder-row{padding-top:11px;padding-bottom:11px}
 
 @media(max-width:520px){
   .app-kopf .wrap{min-height:64px}
@@ -1871,12 +1755,7 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 body{font-family:var(--ui)}
 .wrap{max-width:560px;padding-inline:12px}
 .pad-bottom{padding-bottom:88px}
-.app-kopf{border-bottom:0;background:color-mix(in srgb,var(--app-bg) 88%,transparent);
-  -webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
-.app-kopf::after,.app-kopf::before{background:transparent}
 .app-kopf .wrap{min-height:62px}
-.produktmarke{color:var(--app-purple);font-style:normal;font-size:18px;letter-spacing:-.02em}
-.produktmarke small{color:var(--app-secondary)}
 .produktmarke-pixel{width:32px;height:32px;border:0;border-radius:10px;background:var(--pink)}
 .app-kopf .nav-av{width:38px;height:38px;border:0;background:var(--app-card);box-shadow:0 5px 18px rgba(20,18,32,.09)}
 
@@ -1886,17 +1765,12 @@ h1,h2,h3,.display,.section-title{font-style:normal;letter-spacing:-.025em}
 .seitenkopf-kicker{padding:0;border:0!important;border-radius:0!important;background:none!important;
   color:var(--app-secondary)!important;font-family:var(--mono);font-size:var(--app-fs-label);letter-spacing:.08em}
 
-
-.seiten-einstieg{gap:3px;margin-bottom:16px;padding:0 2px;border:0;background:transparent}
-.seiten-einstieg b{font-family:var(--ui);font-style:normal;font-size:var(--app-fs-body)}
-.seiten-einstieg span{font-family:var(--mono);font-size:var(--app-fs-small);color:var(--app-secondary)}
-
 .card{border:0;border-radius:20px;background:var(--app-card);box-shadow:0 1px 0 rgba(20,18,32,.02)}
 .card + .card{margin-top:14px}
 .input{border:1px solid var(--app-divider);border-radius:11px;background:var(--app-field);
   font-family:var(--mono);font-size:15px}
 .input:focus{border-color:var(--app-purple);box-shadow:0 0 0 3px color-mix(in srgb,var(--app-purple) 18%,transparent)}
-label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:var(--app-secondary)}
+label.fld-l,.falte span{font-family:var(--ui);color:var(--app-secondary)}
 .btn{min-height:var(--app-control-h);border:0;border-radius:12px;background:var(--app-field);
   font-family:var(--display);font-style:italic;font-size:var(--app-fs-button)}
 .btn-primary{background:var(--pink);color:var(--accent-ink)}
@@ -1922,7 +1796,6 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 /* Reminder-Gruppen und Profil-Dropdowns nutzen exakt dieselbe Formsprache. */
 [data-reminders-card]{background:transparent}
-.pushbar{border:0!important;border-radius:14px;box-shadow:none}
 .reminder-group,.profile-abschnitt{
   margin-bottom:12px;border:0;border-radius:18px;background:var(--app-card);box-shadow:none}
 .reminder-group-head,.profile-abschnitt>summary{
@@ -1932,28 +1805,19 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .reminder-group[open] .reminder-group-head,.profile-abschnitt[open]>summary{background:transparent}
 .reminder-group-icon{border:0;background:var(--pink)}
 .reminder-group-list{padding-left:14px}
-.reminder-row{border-bottom:1px solid var(--app-divider);padding-right:14px}
 .switchline{font-family:var(--ui);font-style:normal}
-.reminder-row>[data-label]{background:var(--app-field)}
 .reminder-add{min-height:var(--app-control-h);border-top:1px solid var(--app-divider);
   font-family:var(--display);font-style:italic;font-size:12px;color:var(--app-purple)}
 .reminder-add span{border:0;background:var(--pink);color:var(--accent-ink)}
 .reminder-group-chevron{color:var(--app-secondary)}
 [data-save-reminders]{background:rgba(255,105,174,.82);color:var(--accent-ink);border:0;border-radius:14px;
   -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}
-
-/* Food-Log und Messwerte werden zu ruhigen weissen Gruppen. */
-.food-form-card{border-radius:18px}
-.food-form-card>summary{font-family:var(--ui)}
-.food-form-card>summary::after{color:var(--app-purple)}
 .food-form-card>summary>span:not(.food-add-icon){font-family:var(--ui);font-style:normal}
 .food-add-icon{border:0;background:var(--pink);color:var(--accent-ink)}
-.food-form-card form{border-top:1px solid var(--app-divider)}
-.food-card{border-radius:18px}
 .food-image{border-right:1px solid var(--app-divider)}
 .food-toolbar h2{color:var(--app-purple);font-style:normal}
 .mess-kopf{border:0;border-radius:14px;background:var(--navy);color:#fff}
-.mess-label,.mess-datum,.mess-wert,.mess-wert span{color:var(--text)}
+.mess-label,.mess-datum{color:var(--text)}
 .mess-kopf .mess-label,.mess-kopf .mess-datum,.mess-kopf .mess-wert,.mess-kopf .mess-wert span{color:#fff}
 .mess-neu{border-top:1px solid var(--app-divider)}
 .mess-neu summary{font-family:var(--ui);font-style:normal!important}
@@ -1979,12 +1843,6 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   
   
 }
-
-/* Einmaliger Hinweis fuer Benachrichtigungen. Kein Dauergast: Nach dem Tippen
-   oder Wegwischen ist er fuer immer weg. */
-.pushbar{display:flex;align-items:center;gap:8px;margin-top:12px;
-  background:var(--mr);border:var(--bw) solid var(--ink);border-radius:var(--r);
-  color:var(--accent-ink);padding:4px 4px 4px 12px}
 .pb-go{flex:1;background:none;border:0;text-align:left;color:inherit;
   font-family:var(--display);font-style:italic;font-weight:700;font-size:14.5px;
   text-transform:uppercase;padding:8px 0}
@@ -2029,8 +1887,6 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   background:var(--navy-panel);color:#fff}
 .mess-label{display:block;margin-bottom:6px;font-family:var(--mono);font-size:10px;font-weight:800;
   letter-spacing:.07em;text-transform:uppercase;color:#B9C6E8}
-.mess-wert{font-family:var(--display);font-style:italic;font-weight:700;font-size:30px;line-height:1;color:#fff}
-.mess-wert span{font-size:16px;opacity:.72}
 /* Bildunterschrift zur Kennzahl – gleiche Groesse wie die uebrigen
    Erklaertexte, aber linksbuendig: Sie gehoert zur Zahl darueber. */
 .mess-datum{font-size:13px;color:#D8E0F5;margin-top:7px}
@@ -2155,8 +2011,8 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .ci .lbl,.log-tutorial-kopf span,.tutorial-rollen small,.tutorial-zielkopf>span,
 .tutorial-eingabe small,.tutorial-startfx small,.willkommen-fx span,.log-weiter span,
 .seitenkopf-kicker,.som-stat small,.som-ablauf span,.som-ablauf i,.som-legende,
-.som-prio-marke,.som-wert small,.som-indirekt-quellen>span,.som-modusseg small,
-.som-spender-zahlen,.som-spender-wahl em,.volrolle,.feedback-zaehler,
+.som-prio-marke,.som-wert small,.som-indirekt-quellen>span,
+.som-spender-zahlen,.volrolle,.feedback-zaehler,
 .feedback-eintrag-kopf time,.feedback-eintrag small,.faq-start-kicker,
 .mess-label,.prog-kurvenkopf span,.k-achse{
   font-size:11px!important}
@@ -2184,17 +2040,12 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 .btn,.pb-go,[data-save-reminders]{
   font-family:var(--display);font-style:italic;font-weight:700;text-transform:uppercase}
 .pb-go{padding:8px 2px;text-align:left}
-.pushbar{min-height:52px;margin:0 0 12px;padding:4px 8px 4px 12px;
-  border:0!important;border-radius:14px;background:var(--mr);box-shadow:none}
 .food-actions .btn{min-height:36px;padding:7px 10px;font-size:12px}
-.seiten-einstieg{margin-bottom:14px}
 .card + .card{margin-top:14px}
 .reminder-list{gap:12px;margin-block:0 14px}
 .reminder-group,.profile-abschnitt{margin-bottom:12px}
 .reminder-group-head,.profile-abschnitt>summary{min-height:58px}
-.reminder-row{padding-block:11px}
-.switchline{font-size:14px}
-.reminder-grid label span,.falte span,label.fld-l{font-size:var(--app-fs-label)}
+.switchline{font-size:14px}.falte span,label.fld-l{font-size:var(--app-fs-label)}
 .reminder-grid .input{min-height:40px}
 .mess-kopf{margin-bottom:12px;padding:13px;border:0;border-radius:14px;
   background:var(--navy);color:#fff}
@@ -2205,9 +2056,6 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   font-size:14px;font-style:italic!important}
 .falten-grid{gap:8px 10px;margin-top:10px}
 .gew-eingabe{gap:8px;margin-top:14px}
-.food-form-card{margin-bottom:18px}
-.food-form-card>summary{min-height:60px}
-.food-form-card form{padding:14px}
 .food-form-actions{margin-top:12px}
 .profile-abschnitt-inhalt{padding:15px}
 .profile-top{margin-bottom:16px}
@@ -2217,22 +2065,13 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   
   .card{padding:15px}
 }
-
-/* ---------- Letzter visueller Abgleich ---------- */
-
-
-
-/* Header: etwas mehr Praesenz und dieselbe feine Kontur wie die Inhalte. */
-.app-kopf{border-bottom:1px solid var(--app-outline)}
 .app-kopf .wrap{min-height:68px}
-.produktmarke{font-size:19px}
 .produktmarke-pixel{width:35px;height:35px;border:1px solid var(--app-outline)}
 .app-kopf .nav-av{width:40px;height:40px;border:1px solid var(--app-outline)}
 
 /* Leichte Rahmen verbinden die Retro-Farben, ohne die neue ruhige Struktur
    wieder in schwere Brutalismus-Karten zu verwandeln. */
-.card,.modulraster,.reminder-group,.profile-abschnitt,.food-card,.food-form-card,
-.pushbar,.themeseg,.zurueck{
+.card,.modulraster,.reminder-group,.profile-abschnitt,.themeseg,.zurueck{
   border:1px solid var(--app-outline)!important}
 .input{border-color:var(--app-outline)}
 .btn,.profile-datei-knopf,.reminder-add span,.food-add-icon{
@@ -2290,18 +2129,15 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
   background-image:var(--muster-dreieck);background-attachment:fixed}
 :root[data-theme="dark"] #view{
   background-image:var(--muster-dreieck-dunkel);background-attachment:fixed}
-
-.app-kopf{border-bottom-width:2px}
-.produktmarke{font-family:var(--display);font-style:italic;font-weight:700}
 .produktmarke-pixel{border-width:2px}
 .seitenkopf .section-title,.listen-titel,.food-toolbar h2,.mini-title{
   font-family:var(--display);font-style:italic;font-weight:700}
 
-.card,.modulraster,.reminder-group,.profile-abschnitt,.food-card,.food-form-card{
+.card,.modulraster,.reminder-group,.profile-abschnitt{
   border-width:2px!important;box-shadow:3px 3px 0 var(--app-hard-shadow)}
 
-.modulkarte:not(:last-child),.reminder-row{border-bottom-color:var(--app-outline)}
-.zurueck,.pushbar,.themeseg{border-width:2px!important}
+.modulkarte:not(:last-child){border-bottom-color:var(--app-outline)}
+.zurueck,.themeseg{border-width:2px!important}
 .btn,.profile-datei-knopf,.reminder-add span,.food-add-icon{
   border-width:2px;border-color:var(--app-outline)}
 .btn-primary,[data-save-reminders],.phase-reset{
@@ -2311,7 +2147,7 @@ label.fld-l,.falte span,.reminder-grid label span{font-family:var(--ui);color:va
 
 
 .reminder-group-head em{font-family:var(--mono)}
-.seitenkopf-kicker,label.fld-l,.falte span,.reminder-grid label span{
+.seitenkopf-kicker,label.fld-l,.falte span{
   font-family:var(--mono)}
 
 /* ============================================================
@@ -2345,10 +2181,8 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 #app{min-height:100dvh}
 #view{min-height:calc(100dvh - 68px)}
 
-/* Deckender, musterfreier Kopf in exakt derselben Unterseitenfarbe. */
-.app-kopf{
+/* Deckender{
   background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
-.app-kopf::before,.app-kopf::after{background:var(--bg)}
 
 /* Keine weichen oder harten Schlagschatten. Kontur und Farbe reichen. */
 
@@ -2383,8 +2217,6 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
 .push-status .msg span{font-size:12px;font-weight:600;opacity:.8}
 .push-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .push-actions .btn{min-width:0;padding-inline:10px;font-size:12px}
-.pushbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
-.pushbar>span{font-size:12px;font-weight:700;line-height:1.3}
 .pushbar .pb-go{text-align:center}
 @media(max-width:420px){
   .push-actions,.pushbar{grid-template-columns:1fr}
@@ -2438,9 +2270,6 @@ html,body,#app{min-height:100%;background-color:var(--bg)}
   --feast-line:#000000;
   --muster-home-feast:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='180' viewBox='0 0 260 180'%3E%3Cg fill='none' stroke='%23492425' stroke-width='5' stroke-linecap='round' stroke-linejoin='round' stroke-opacity='.075'%3E%3Cpath d='M20 41h38l-19 33z' transform='rotate(-11 39 57)'/%3E%3Cpath d='M177 13h48l-24 42z' transform='rotate(16 201 34)'/%3E%3Cpath d='M80 123h42l-21 36z' transform='rotate(8 101 141)'/%3E%3Cpath d='M214 124h28l-14 24z' transform='rotate(-19 228 136)'/%3E%3C/g%3E%3Cg fill='%23FF2F9F' fill-opacity='.075'%3E%3Ccircle cx='105' cy='32' r='13'/%3E%3Ccircle cx='33' cy='137' r='9'/%3E%3Ccircle cx='170' cy='104' r='11'/%3E%3C/g%3E%3C/svg%3E");
 }
-
-/* LOGMAN: 44-px Bedienelement plus je 10 px vertikaler Innenabstand. */
-.app-kopf{border-bottom:2px solid var(--feast-line)}
 .app-kopf .wrap{min-height:44px;gap:10px}
 .kopf-logo{
   width:clamp(104px,30vw,120px);
@@ -2662,16 +2491,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
   
   .home-inhalt{padding-top:15px}
 }
-
-
-
-/* ---------- Gemeinsamer Feastables-Untergrund ohne Uebersichtsseite ---------- */
-
-
-
-
-
-.app-kopf,.app-kopf::before,.app-kopf::after{background:var(--app-chrome-bg)}
 /* #view selbst bleibt durchsichtig: Das Tapeten-Muster faerbt jetzt html
    (siehe weiter unten), damit es unter der Statusleiste/Notch und dem
    Home-Indicator hindurchreicht statt an #view's Scrollbereich zu enden. */
@@ -2703,20 +2522,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
    Kontur ohne Schatten (--hart:none), in Dark mit heller Kontur.
 
    Masse stammen vom iPhone 14 (390 pt Breite): 3 pt Rand, 4 pt Versatz,
-   14 pt Kartenradius, 44 pt Tippziele.
-   ============================================================ */
-
-/* ---------- Kopfzeile ---------- */
-/* Der Kopf bleibt wie bisher stehen; nur seine Bedienelemente werden zu den
-   quadratischen Tuckii-Knoepfen. Suchfeld und Profil sitzen nebeneinander. */
-/* Die Flaeche muss hier explizit stehen: Aus frueheren Umbauten liegen noch
-   Kopfzeilen-Regeln mit Milchglas und eigener Farbe darueber. */
-.app-kopf,.app-kopf::before,.app-kopf::after{background:var(--bg)}
-.app-kopf{
-  padding:calc(env(safe-area-inset-top) + 8px) 0 10px;
-  border-bottom:var(--bw) solid var(--ink);
-  -webkit-backdrop-filter:none;backdrop-filter:none;
-}
+   14 pt Kartenradius{background:var(--bg)}
 .app-kopf .wrap{min-height:48px;gap:10px}
 .kopf-logo{width:clamp(100px,29vw,118px);max-height:46px}
 .kopf-aktionen{gap:8px}
@@ -2726,8 +2532,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 
 /* Ein Quadrat fuer alle Kopf- und Seitenknoepfe: Suche, Profil, Zurueck,
-   Plus, Neuer Ordner. Tuckii setzt genau eine Form fuer alle davon. */
-.tuck-quadrat{
+   Plus{
   display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
   background:var(--surface);color:var(--text);
@@ -2736,9 +2541,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .tuck-quadrat .app-icon{width:22px;height:22px}
 .tuck-quadrat.aktiv{background:var(--akzent);color:var(--akzent-ink)}
 .tuck-quadrat.betont{background:var(--akzent);color:var(--akzent-ink)}
-/* Der Druckpunkt: Die Flaeche faehrt in ihren eigenen Schatten hinein. Ohne
-   Schatten (Retro) bleibt nur der Versatz – das genuegt als Rueckmeldung. */
-.tuck-quadrat:active{transform:translate(2px,2px);box-shadow:none}
 /* Das Profilbild ist derselbe Knopf, nur mit Bild statt Symbol. */
 .app-kopf .nav-av{
   width:44px;height:44px;border-radius:var(--r);overflow:hidden;
@@ -2749,24 +2551,10 @@ button,a,[role="button"],summary{touch-action:manipulation;
 
 /* ---------- Start: Schnellablage ---------- */
 /* Tuckii setzt ueber die Bibliothek ein Eingabefeld plus einen Knopf im
-   Akzent (IMG_5109). Feld und Knopf teilen sich eine Zeile, der Knopf ist
-   quadratisch und so hoch wie das Feld. */
-.tuck-ablage{
+   Akzent (IMG_5109). Feld und Knopf teilen sich eine Zeile{
   display:grid;grid-template-columns:minmax(0,1fr) 62px;gap:10px;align-items:stretch;
   margin:0 2px 40px;
 }
-.tuck-ablage-feld{
-  display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;
-  min-height:66px;padding:0 16px;
-  border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
-  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
-}
-.tuck-ablage-feld>b{font-size:19px;font-weight:800;line-height:1}
-.tuck-ablage-feld input{
-  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
-  font-family:var(--ui);font-size:15px;font-weight:600;
-}
-.tuck-ablage-feld input::placeholder{color:var(--faint);opacity:1}
 .tuck-ablage-feld .app-icon{width:20px;height:20px;color:var(--muted)}
 .tuck-ablage-feld .material-svg,.tuck-ablage-feld .material-svg svg{width:21px;height:21px;fill:var(--text)}
 /* Das Plus ist ein SVG, kein Textzeichen: Als Schrift sitzt "+" auf der
@@ -2793,27 +2581,19 @@ button,a,[role="button"],summary{touch-action:manipulation;
 /* Gleicher Abstand nach oben wie beim Oeffnen eines Dex (.kategorie-kopf
    margin-top:18px). */
 .tuck-home{padding-top:18px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
-/* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt,
-   der ganz normal mitscrollt. */
-.tuck-kopfzeile{
+/* Logo und Avatar sind kein globaler Kopf mehr, sondern normaler Home-Inhalt{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
   margin:0 2px 56px;
 }
-.tuck-kopf-aktionen{display:flex;align-items:center;gap:10px}
 .tuck-kopf-aktionen .neu-sammlung{background:var(--surface);color:var(--text)}
-/* Das Ordner-Plus sitzt neben der Ueberschrift, nicht im Kopf. */
-.tuck-titelzeile{
+/* Das Ordner-Plus sitzt neben der Ueberschrift{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
   margin:0 2px 4px;
-}
-.tuck-titelzeile h1{
-  min-width:0;color:var(--text);font-size:clamp(19px,5.4vw,23px);line-height:1.1;
 }
 /* Masse aus Inspirationen/IMG_5109, per Pixelmessung bei 390 pt Breite:
    Spaltenabstand 18,7 pt, und zwischen Kartenunterkante und dem Reiter der
    naechsten Reihe liegen 30,7 pt. Der Zeilenabstand im Raster muss diese
-   30,7 pt plus die 18 pt sichtbaren Reiter tragen, also rund 49 pt. */
-.tuck-grid{
+   30,7 pt plus die 18 pt sichtbaren Reiter tragen{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
   gap:10px 19px;padding:30px 3px 6px;
 }
@@ -2998,18 +2778,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
   padding-inline:14px;
 }
 
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="habits"]) :is(.mahl-intro,.seiten-einstieg){
-  display:flex;flex-direction:column;gap:4px;margin:3px 2px 16px;padding:0;
-  border:0;background:transparent;color:var(--text);
-}
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="habits"]) :is(.mahl-intro,.seiten-einstieg)>b{
-  font-family:var(--display);font-size:18px;font-style:normal;font-weight:800;line-height:1;
-  letter-spacing:0;text-transform:uppercase;
-}
-:root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="habits"]) :is(.mahl-intro,.seiten-einstieg)>span{
-  color:var(--muted);font-size:12.5px;line-height:1.4;
-}
-
 /* Alle grossen Module besitzen dieselbe ruhige, kompakte Kartenhuelle. */
 :root[data-seite="reminders"] .mahl-zeitblock,
 :root[data-seite="shopping"] :is(.einkauf-formular,.einkauf-gruppe),
@@ -3148,9 +2916,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .custom-duration-input i{grid-area:1/1;z-index:1;align-self:center;justify-self:end;margin-right:12px;color:var(--muted);font-size:11px;font-style:normal;font-weight:800;line-height:1;pointer-events:none}
 .mobility-editor-settings>header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.mobility-editor-settings>header>span{display:grid;gap:3px}.mobility-editor-settings>header b{font-size:14px}.mobility-editor-settings>header small{color:var(--muted);font-size:11px;line-height:1.25}
 .mobility-editor-settings>header button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:6px 10px;border:1px solid var(--app-outline);border-radius:9px;background:var(--surface);font:800 11px/1 var(--ui);white-space:nowrap}.mobility-editor-settings>header button>b{font-size:18px;line-height:1}
-.mobility-exercise-list{display:grid;gap:8px}.mobility-exercise-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.7fr) 34px;gap:7px;align-items:center}.mobility-exercise-row .input{min-width:0;height:44px;min-height:44px;padding:8px 10px;font-size:12px}.mobility-exercise-row>button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent}.mobility-exercise-row>button .material-svg,.mobility-exercise-row>button svg{width:18px;height:18px;fill:#000}
-.mobility-overview>header>span{display:grid;gap:3px}.mobility-overview>header h2{margin:0}.mobility-overview>header small{color:var(--muted);font-size:11px;font-weight:700}.mobility-overview ol{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--app-divider)}
-.mobility-overview li{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--app-divider)}.mobility-overview li>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#000);font-size:12px;font-weight:800}.mobility-overview li p{display:grid;gap:3px;margin:0}.mobility-overview li b{font-size:15px}.mobility-overview li small{color:var(--muted);font-size:12px;font-weight:600}.mobility-overview-note{display:grid;gap:5px;margin-top:15px;padding:12px;border-radius:10px;background:var(--surface2)}.mobility-overview-note b{font-size:11px;text-transform:uppercase}.mobility-overview-note p{margin:0;font-size:13px;line-height:1.4}.mobility-timer-start{margin-top:15px}
+.mobility-exercise-list{display:grid;gap:8px}.mobility-exercise-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.7fr) 34px;gap:7px;align-items:center}.mobility-exercise-row .input{min-width:0;height:44px;min-height:44px;padding:8px 10px;font-size:12px}.mobility-exercise-row>button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent}.mobility-exercise-row>button .material-svg,.mobility-exercise-row>button svg{width:18px;height:18px;fill:#000}.mobility-overview-note{display:grid;gap:5px;margin-top:15px;padding:12px;border-radius:10px;background:var(--surface2)}.mobility-overview-note b{font-size:11px;text-transform:uppercase}.mobility-overview-note p{margin:0;font-size:13px;line-height:1.4}.mobility-timer-start{margin-top:15px}
 .routine-duration{min-width:0;margin:0;padding:0;border:0}
 .routine-duration legend{margin-bottom:8px;font:800 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase}
 .routine-duration>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(54px,1fr));gap:5px}
@@ -3399,8 +3165,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-detail-knopf .material-svg,.dex-detail-knopf svg{width:23px;height:23px;fill:#000}
 .dex-detail-knopf:active{transform:translate(2px,2px);box-shadow:none}
-.dex-detail-favorit{background:var(--surface);color:#000}
-.dex-detail-favorit .material-svg,.dex-detail-favorit svg,.dex-detail-favorit svg *{color:#000!important;fill:#000!important}
+.dex-detail-favorit .material-svg{color:#000!important;fill:#000!important}
 .dex-detail-favorit.aktiv{background:var(--fe-pink);color:#fff}
 .dex-detail-favorit.aktiv .material-svg,.dex-detail-favorit.aktiv svg,.dex-detail-favorit.aktiv svg *{color:#fff!important;fill:#fff!important}
 .dex-detail-karte{width:calc(100% - 8px);max-width:calc(100% - 8px);min-width:0;margin-inline:auto;overflow:hidden;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart)}
@@ -3543,19 +3308,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .tuck-fach.blue{--ordner:var(--fe-blue)}
 .tuck-fach.gelb{--ordner:var(--fe-yellow)}
 .tuck-fach.gruen{--ordner:var(--fe-green)}
-
-.tuck-icon{
-  display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;
-  border:var(--icon-bw) solid var(--ink);border-radius:9px;
-  background:var(--ordner);color:var(--accent-ink);
-}
 .tuck-icon .app-icon{width:23px;height:23px}
 .tuck-icon.muscledex-iconfeld{
   width:46px;height:46px;flex-basis:46px;border:0;border-radius:0;background:transparent;
-}
-.tuck-icon .muscledex-sammlungsicon,
-.tuck-icon .muscledex-sammlungsicon svg{
-  display:block;width:29px;height:29px;
 }
 .tuck-icon .kategorie-emoji{
   width:auto;height:auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
@@ -3705,15 +3460,8 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-editor form{display:grid;gap:14px}.coin-zahlenfeld{text-align:center;font-variant-numeric:tabular-nums}.coin-reward-delete{color:#b51f55}
 .routine-coin-fest{padding:11px 13px;border-radius:10px;background:color-mix(in srgb,#05bde8 16%,var(--surface));font-size:13px;font-weight:800;text-align:center}
 .routine-coin-info{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:600}
-.seiten-x{
-  display:grid!important;place-items:center;width:44px;min-width:44px;height:44px;padding:0!important;
-  border:var(--karten-bw) solid var(--ink)!important;border-radius:var(--r)!important;
-  background:var(--surface)!important;color:#000!important;box-shadow:var(--hart-klein);
-  font:0/1 var(--ui)!important;line-height:0!important;text-decoration:none!important;
-}
 .seiten-x .material-svg{display:grid;place-items:center;width:100%;height:100%}
 .seiten-x .material-svg svg{display:block;width:22px;height:22px;margin:auto;fill:#000}
-.seiten-x:active{transform:translate(2px,2px);box-shadow:none}
 
 .kategorie-sheet-backdrop{
   /* viewport-fit=cover + black-translucent: Diese EINE gerenderte Flaeche
@@ -3824,84 +3572,13 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
    "Erinnerungen" auf schmalen Karten ist genau das gewollt. */
 /* Tuckii setzt Zahl und Einheit in eine Zeile ("0 links"). Auf Deutsch geht
    das nicht auf: In der Metaspalte sind 83,5 px Platz, "Erinnerungen" misst
-   bei 13 px schon 82,3 px – 1,2 px Reserve, und jedes laengere Wort bricht
-   mitten durch. Deshalb hier gestapelt: Die Einheit bekommt die volle Breite
-   und liegt bei 12 px mit 76 px komfortabel darunter. */
-/* ---------- Suche ---------- */
-.tuck-suche-seite{padding-top:16px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
+   bei 13 px schon 82,3 px – 1,2 px Reserve{padding-top:16px;padding-bottom:calc(42px + env(safe-area-inset-bottom))}
 .app-shell>#view.such-fixkopf-view,
 .app-shell>.such-fixkopf-view{
   width:100%;height:100%;min-height:0!important;overflow:hidden!important
 }
-.tuck-suche-seite.such-fixkopf{
-  display:flex;flex-direction:column;
-  width:100%;height:100%;max-height:100%;min-height:0;padding-top:8px;padding-bottom:0;overflow:hidden;isolation:isolate
-}
-.such-fixkopf .tuck-suchzeile{position:relative;z-index:20;min-height:52px;padding-bottom:8px}
-.such-fixkopf .tuck-suchfeld,
-.such-fixkopf .seiten-x{height:52px;min-height:52px}
-.such-scrollinhalt{
-  position:relative;z-index:0;flex:1 1 0;width:100%;height:0;min-height:0;align-self:stretch;overflow-x:hidden;overflow-y:scroll;padding-top:10px;
-  padding-bottom:calc(42px + env(safe-area-inset-bottom));
-  overscroll-behavior-x:none;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y
-}
-.such-tags{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:7px;align-items:start;margin:10px 1px 18px}
-.such-tags[hidden]{display:none}
-.such-tag-liste{display:flex;flex-wrap:wrap;gap:6px}
-.such-tag-liste button{
-  min-height:27px;padding:4px 8px;border:1px solid var(--ink);border-radius:999px;
-  background:var(--surface);color:var(--text);font:700 10px/1 var(--ui);
-}
 .such-tag-liste button.aktiv{background:#492426;color:#fff}
-.such-tags-mehr{
-  display:grid;place-items:center;width:28px;height:28px;padding:0;border:1px solid var(--ink);
-  border-radius:50%;background:var(--surface);color:var(--text);font:900 18px/1 var(--ui);
-}
-.such-eintraege{margin-top:2px}
-.tuck-suchzeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
-.tuck-suchzeile>a{
-  display:grid;place-items:center;min-height:52px;padding:0 16px;
-  border:var(--bw) solid var(--ink);border-radius:var(--r);
-  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
-  font-size:15px;font-weight:700;text-decoration:none;
-}
-.tuck-suchfeld{
-  display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;
-  min-height:52px;padding:0 14px;
-  border:var(--bw) solid var(--ink);border-radius:var(--r);
-  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
-}
 .tuck-suchfeld .app-icon{width:22px;height:22px}
-.tuck-suchfeld input{
-  width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
-  font-family:var(--ui);font-size:16px;font-weight:600;
-}
-.tuck-suchfeld input::placeholder{color:var(--faint);opacity:1}
-
-/* Die Bibliotheks-Kachel ist bei Tuckii die einzige vollflaechig eingefaerbte
-   Flaeche der Suche – sie traegt deshalb den Markenakzent. */
-.tuck-bibliothek{
-  margin:20px 0 24px;padding:15px 16px;
-  border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
-  background:var(--akzent);color:var(--akzent-ink);box-shadow:var(--hart);
-}
-.tuck-bibliothek>span{
-  display:block;margin-bottom:12px;font-size:12px;font-weight:800;
-  letter-spacing:.09em;text-transform:uppercase;
-}
-.tuck-bibliothek-werte{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-.tuck-bibliothek-werte>div{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  border-left:1px solid rgba(0,0,0,.25);
-}
-.tuck-bibliothek-werte>div:first-child{border-left:0}
-.tuck-bibliothek-werte b{font-size:22px;font-weight:800;line-height:1}
-.tuck-bibliothek-werte small{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-
-.tuck-abschnittstitel{
-  margin:0 2px 12px;color:var(--text);font-size:15px;font-weight:800;
-  letter-spacing:.06em;text-transform:uppercase;
-}
 .tuck-leer{
   display:grid;place-items:center;gap:10px;padding:48px 20px;text-align:center;color:var(--muted);
 }
@@ -3937,27 +3614,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 }
 :root[data-seite] .seitenkopf .zurueck .pf{font:800 22px/1 var(--ui);font-style:normal}
 :root[data-seite] .seitenkopf .zurueck:active{transform:translate(2px,2px);box-shadow:none}
-
-/* ---------- Einstellungen (Profil) ---------- */
-/* Tuckii gruppiert Einstellungen unter grauen Versalien-Labels und legt jede
-   Zeile als eigene Karte an. Genau das bekommt das Profil hier. */
-.tuck-gruppe{
-  margin:22px 2px 10px;color:var(--muted);font-size:12px;font-weight:800;
-  letter-spacing:.09em;text-transform:uppercase;
-}
-.tuck-zeile{
-  display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:14px;align-items:center;
-  width:100%;margin-bottom:12px;padding:15px 16px;text-align:left;
-  border:var(--bw) solid var(--ink);border-radius:var(--r-karte);
-  background:var(--surface);color:var(--text);box-shadow:var(--hart-klein);
-  font-family:var(--ui);text-decoration:none;
-}
-.tuck-zeile:active{transform:translate(2px,2px);box-shadow:none}
 .tuck-zeile .app-icon{width:26px;height:26px}
-.tuck-zeile-text{display:flex;flex-direction:column;gap:3px;min-width:0}
-.tuck-zeile-text b{font-size:16px;font-weight:700}
-.tuck-zeile-text span{color:var(--muted);font-size:13px;font-weight:500;line-height:1.3}
-.tuck-zeile-pfeil{color:var(--muted);font:700 20px/1 var(--ui)}
 
 /* Die Themewahl bleibt ein Segment, bekommt aber die neue Geometrie. */
 .themeseg{border:var(--bw) solid var(--ink);border-radius:var(--r);box-shadow:var(--hart-klein)}
@@ -3969,16 +3626,14 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 /* Koerperwerte, Erinnerungen, Food-Log und Profil lesen ihre Farben ohnehin
    aus den Tokens. Hier kommt nur der harte Schatten dazu, damit sie dieselbe
    Formsprache tragen wie die Bibliothek. */
-.card,.block,.msg,.reminder-group,.reminder-row,.profile-abschnitt,
-.food-card,.food-form-card,.mess-kopf,.nb-k,.nb-leer,.som-muskel,.volbar,
-.faq,.tuck-bibliothek,.tuck-zeile{
+.card,.block,.msg,.reminder-group,.profile-abschnitt,.mess-kopf,.nb-k,.nb-leer,.som-muskel,.volbar{
   border-width:var(--karten-bw);
 }
-.block .bhead,.faq[open]>summary,.profile-abschnitt[open]>summary,
+.block .bhead,.profile-abschnitt[open]>summary,
 .reminder-group[open]>.reminder-group-head,.food-image{
   border-bottom-width:var(--karten-bw);
 }
-.card,.reminder-group,.profile-abschnitt,.food-form-card,.food-card{box-shadow:var(--hart-klein)}
+.card,.reminder-group,.profile-abschnitt{box-shadow:var(--hart-klein)}
 .btn{box-shadow:var(--hart-klein)}
 .btn:active{transform:translate(2px,2px);box-shadow:none}
 /* Einheitlicher Drückeffekt (wie .kategorie-kopfknopf) als Fallback fuer
@@ -4141,16 +3796,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   gap:8px;max-width:100%;padding:2px 5px 7px 1px;overflow-x:auto;
   overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
 }
-.sammlung-editor-icons,.sammlung-editor-tapeten{
+.sammlung-editor-icons{
   display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,44px);grid-auto-columns:44px;
   gap:8px;max-width:100%;padding:2px 4px 7px 1px;overflow-x:auto;
   overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
 }
-.sammlung-editor-farben button,.sammlung-editor-icons button,.sammlung-editor-tapeten button{position:relative;aspect-ratio:1;padding:0;
+.sammlung-editor-farben button,.sammlung-editor-icons button{position:relative;aspect-ratio:1;padding:0;
   border:1.5px solid var(--ink);border-radius:8px;background:var(--farbe,#fff);box-shadow:none}
-.sammlung-editor-icons button,.sammlung-editor-tapeten button{display:grid;place-items:center;background:var(--surface);}
+.sammlung-editor-icons button{display:grid;place-items:center;background:var(--surface);}
 .sammlung-editor-icons button svg{width:28px;height:28px;fill:#000}
-.sammlung-editor-tapeten button i{display:block;width:100%;height:100%;border-radius:6px;background-color:var(--dex-seitenfarbe,var(--surface));background-size:34px;opacity:1;filter:none}
 .sammlung-editor-tapeten button.aktiv{background:var(--surface);box-shadow:3px 3px 0 #000}
 .sammlung-editor-tapeten button i.tapete-datei,
 .seitenmuster-auswahl i.tapete-datei{background-image:var(--tapeten-vorschau);background-size:cover;background-position:center;opacity:1;filter:none}
@@ -4290,9 +3944,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .seitenmuster-auswahl button{display:flex;align-items:center;gap:9px;min-height:54px;padding:8px;border:2px solid var(--ink);border-radius:12px;background:var(--surface);font:800 13px/1 var(--ui)}
 .seitenmuster-auswahl button.aktiv{background:color-mix(in srgb,var(--ordner) 28%,var(--surface))}
 .seitenmuster-auswahl i{width:36px;height:36px;border-radius:8px;background-color:var(--dex-seitenfarbe);background-size:34px;opacity:1;filter:none}
-
-/* ---------- Deterministische Navigation ---------- */
-.seite-vor-warten{transform:translateX(100%);opacity:1}
 .seite-zurueck-warten{transform:translateX(-18%);opacity:1}
 .seite-detail-warten{transform:scale(.86);opacity:0;transform-origin:var(--detail-origin-x,50%) var(--detail-origin-y,50%)}
 .seite-fade-warten{opacity:0}
@@ -4420,17 +4071,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-feature-settings:"zero" 1!important;
   opacity:1!important;
 }
-:is(.neo-dex-scroll-title,.food-dex-scroll-title){display:grid;gap:10px;margin:0 2px 25px;color:var(--dex-ink,#000)}
-:is(.neo-dex-scroll-title,.food-dex-scroll-title) strong{
-  display:block;font-family:"Work Sans",sans-serif;font-size:clamp(26px,7.35vw,32px);
-  font-weight:900;line-height:.96;letter-spacing:-.045em;text-transform:none;
-  -webkit-text-stroke:0;text-rendering:geometricPrecision;
-}
-:is(.neo-dex-scroll-title,.food-dex-scroll-title) small{
-  display:block;font-family:var(--tech);font-size:12px;font-weight:700;line-height:1.35;
-  letter-spacing:.015em;font-variant-numeric:slashed-zero;font-feature-settings:"zero" 1;
-  color:currentColor;opacity:.92;
-}
 :is(.neo-dex-page,.food-dex-page) .sammlung-leer strong{
   font-family:"Work Sans",sans-serif;
   font-size:21px;
@@ -4450,7 +4090,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer span{
   color:#fff!important;
 }
-:root[data-seite="training"] :is(.neo-dex-scroll-title,.food-dex-scroll-title),
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2){
   color:#fff!important;
 }
@@ -4586,20 +4225,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-scanner{position:relative;overflow:hidden;aspect-ratio:4/3;border:2px solid var(--ink);border-radius:13px;background:#111}.nutrition-scanner video{display:block;width:100%;height:100%;object-fit:cover}.nutrition-scanner>span{position:absolute;top:50%;left:50%;width:76%;height:38%;border:3px solid #fff;border-radius:12px;transform:translate(-50%,-50%);box-shadow:0 0 0 999px rgba(0,0,0,.22)}
 .nutrition-scanner-tools{display:flex;justify-content:center;margin-top:12px}.nutrition-scanner-tools>[data-scanner-torch]{display:flex;align-items:center;justify-content:center;gap:8px;min-width:138px;height:48px;padding:0 15px;border:var(--karten-bw) solid var(--ink);border-radius:13px;background:var(--surface);box-shadow:var(--hart-klein);color:var(--ink);font:800 13px/1 var(--ui)}.nutrition-scanner-tools>[data-scanner-torch][hidden]{display:none}.nutrition-scanner-tools>[data-scanner-torch][aria-pressed="true"]{background:var(--ink);color:var(--surface)}.nutrition-scanner-tools>[data-scanner-torch] svg{display:block;width:23px;height:23px;fill:currentColor}.nutrition-scanner-tools>[data-scanner-torch] span{white-space:nowrap}
 .nutrition-scanner-status{margin:12px 0 0;color:var(--ink);font-size:12px;font-weight:800;text-align:center}.nutrition-scanner-help{margin:14px 0 18px;text-align:center}.nutrition-barcode-manual{margin-top:0}
-.nutrition-own-products{margin:0 0 18px;padding:0 0 15px;border-bottom:1px solid var(--app-divider)}.nutrition-own-products h3{margin:0 0 7px;font-size:12px;letter-spacing:.05em}.nutrition-own-products>div{display:grid;gap:0}.nutrition-own-products button{display:grid;grid-template-columns:minmax(0,1fr) 24px;align-items:center;gap:8px;min-height:60px;padding:8px 2px;border:0;border-bottom:1px solid var(--app-divider);background:transparent;color:var(--ink);text-align:left}.nutrition-own-products button:last-child{border-bottom:0}.nutrition-own-products button b,.nutrition-own-products button small{display:block}.nutrition-own-products button b{font-size:15px}.nutrition-own-products button small{margin-top:3px;color:var(--muted);font-size:12px;font-weight:650}.nutrition-own-products button svg{width:20px;height:20px;fill:currentColor}
 .nutrition-period-inline{border-top:1px solid var(--app-divider);background:color-mix(in srgb,var(--ordner) 5%,var(--surface))}.nutrition-period-inline>header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px 5px}.nutrition-period-inline>header span{font:800 9px/1 var(--ui);letter-spacing:.08em}.nutrition-period-inline>header b{font-size:11px}.nutrition-period-inline .nutrition-entry{padding-left:16px}
 .nutrition-add-menu button>span{display:grid;gap:2px;text-align:left}.nutrition-add-menu button small{color:var(--muted);font-size:10px;font-weight:600}.nutrition-add-menu .material-svg,.nutrition-add-menu svg{width:22px;height:22px;fill:#000}
 .nutrition-gram-picker{height:52px;text-align:center;text-align-last:center;font-size:17px;font-weight:750}
 @media(min-width:520px){.nutrition-calc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nutrition-calc-grid .nutrition-wide{grid-column:1/-1}}
 @media(max-width:370px){.nutrition-balance{grid-template-columns:minmax(0,1fr) 86px}.nutrition-ring{width:82px;height:82px}.nutrition-balance strong{font-size:26px}.nutrition-macros>div{grid-template-columns:105px minmax(0,1fr)}.nutrition-four-grid{grid-template-columns:1fr}}
-.mahl-intro{margin:2px 2px 14px;display:flex;flex-direction:column;gap:2px}
-.mahl-intro b{font:800 17px/1 var(--ui);letter-spacing:.04em}
-.mahl-intro span{font-size:13px;color:var(--muted)}
-.mahl-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:hidden;margin-bottom:18px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
-.mahl-status>div{min-width:0;padding:11px 9px;border-right:1px solid color-mix(in srgb,var(--ink) 20%,transparent)}
-.mahl-status>div:last-child{border-right:0}
-.mahl-status small{display:block;margin-bottom:5px;font:800 8.5px/1 var(--ui);letter-spacing:.05em;color:var(--muted)}
-.mahl-status b{display:block;font:800 12px/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis}
 .mahl-hinzufuegen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 16px}
 .mahl-hinzufuegen button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:9px 12px;border:var(--karten-bw) solid var(--ink);border-radius:12px;background:var(--surface);box-shadow:var(--hart-klein);color:var(--ink);font:800 13px/1 var(--ui)}
 .mahl-hinzufuegen button b{font-size:22px;line-height:1}
@@ -4646,13 +4276,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-mahlzeit-notiz{min-height:88px;padding:12px 13px;line-height:1.4;resize:vertical}
 .mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{height:48px;min-height:48px;padding-top:0;padding-bottom:0;line-height:48px;text-align:center;text-align-last:center}
 .mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{height:48px;line-height:48px;text-align:center}
-.mahl-wasserkarte{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;margin-top:18px;padding:13px;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
 .mahl-wasser-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:#83CFE0}
 .mahl-wasser-icon svg{width:23px;height:23px;fill:#000}
-.mahl-wasserkarte>div{display:flex;min-width:0;flex-direction:column;gap:2px}
-.mahl-wasserkarte small{font:800 9px/1 var(--ui);letter-spacing:.08em;color:var(--muted)}
-.mahl-wasserkarte b{font:800 15px/1.15 var(--ui)}
-.mahl-wasserkarte span{font-size:11px;color:var(--muted)}
 .mahl-wasser-editor{border:0}
 .mahl-wasser-editor>summary{padding:8px;border:1px solid var(--ink);border-radius:9px;font:700 11px/1 var(--ui);list-style:none;cursor:pointer}
 .mahl-wasser-editor[open]{grid-column:1/-1;border-top:1px solid var(--app-divider)}
@@ -4777,11 +4402,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart-klein)}
 .einkauf-formular .input{margin-bottom:8px}
 .einkauf-formular-zeile{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
-.einkauf-formular-zeile .input{margin-bottom:0}
-
-/* Tag-Chips zum Filtern: eine durchgehend scrollende Zeile statt der
-   umbrechenden Chip-Liste der globalen Suche (.such-tag-liste) – bei vielen
-   Tags waechst eine umbrechende Liste unkontrolliert in die Hoehe, eine
+.einkauf-formular-zeile .input{margin-bottom:0} eine
    scrollende Zeile bleibt immer genau eine Zeile hoch. */
 .einkauf-tags{margin:0 0 14px}
 .einkauf-suche{display:grid;grid-template-columns:24px minmax(0,1fr) 34px;align-items:center;gap:8px;width:100%;min-height:50px;margin:0 0 14px;padding:5px 7px 5px 13px;border:1.5px solid var(--ink);border-radius:13px;background:var(--surface)}
@@ -4921,10 +4542,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-row-head{display:grid;grid-template-columns:16px minmax(0,1fr) auto 14px;
   align-items:center;gap:12px;padding:12px 2px;cursor:pointer;list-style:none}
 .rem-row-head::-webkit-details-marker{display:none}
-.rem-row-dot{width:14px;height:14px;border-radius:4px;background:#492425}
-.rem-row-dot[data-type="supplement"]{background:#492425;opacity:.7}
-.rem-row-dot[data-type="drink"]{background:#492425;opacity:.4}
-.rem-row-dot[data-type="body"]{background:#492425;opacity:.55}
 .rem-row.ist-inaktiv .rem-row-dot{background:color-mix(in srgb,var(--ink) 30%,transparent);opacity:.6}
 .rem-row-titel{min-width:0;display:flex;flex-direction:column;gap:2px}
 .rem-row-titel b{font-family:var(--ui);font-style:normal;font-weight:700;font-size:14.5px;
@@ -5100,7 +4717,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.routine-days,.routine-duration) legend{
   font-size:11px;line-height:1.2;letter-spacing:.06em;
 }
-:is(.seiten-einstieg,.mahl-intro)>span,
 :is(.mess-hinweis,.mess-leer,.kurve-leer,.routine-copy small,.einkauf-row-note){
   font-size:12px;line-height:1.4;
 }
@@ -5574,14 +5190,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-adaptive{margin-top:10px;border-top:1px solid var(--app-divider)}.nutrition-adaptive>summary{display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:13px;font-weight:850;cursor:pointer;list-style:none}.nutrition-adaptive>summary::-webkit-details-marker{display:none}.nutrition-adaptive h4{margin:10px 0 4px;font-size:13px}.nutrition-adaptive>p,.nutrition-adaptive>small{display:block;color:var(--muted);font-size:11px;line-height:1.5}.nutrition-adaptive-values{margin:10px 0}.nutrition-adaptive .btn{width:100%;margin:10px 0}.nutrition-adaptive-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.nutrition-adaptive-actions .btn{margin:0}.nutrition-adaptive-actions .btn-primary{grid-column:1/-1}
 .nutrition-calculation span i{display:block;margin-top:2px;color:var(--muted);font-size:10px;font-style:normal;line-height:1.3}
 
-/* Die Tageskarte ist eine Übersicht, keine Dokumentationsseite. Rechner,
-   Datenqualität und Herleitung öffnen sich deshalb in eigenen Overlays. */
-.nutrition-quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 16px 12px}
-.nutrition-quick-actions>button{display:grid;grid-template-columns:minmax(0,1fr) 24px;align-items:center;gap:8px;min-width:0;min-height:56px;padding:8px 10px;border:1px solid var(--app-outline);border-radius:11px;background:var(--app-field);color:var(--ink);text-align:left;box-shadow:none}
-.nutrition-quick-actions>button>span{display:grid;min-width:0;gap:3px}.nutrition-quick-actions small{overflow:hidden;color:var(--muted);font:850 9px/1 var(--ui);letter-spacing:.06em;text-overflow:ellipsis;white-space:nowrap}.nutrition-quick-actions b{overflow:hidden;font:800 13px/1.15 var(--ui);text-overflow:ellipsis;white-space:nowrap}.nutrition-quick-actions .material-svg,.nutrition-quick-actions svg{display:block;width:22px;height:22px;margin:auto;fill:currentColor}
-.nutrition-adaptive-teaser{display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center;gap:12px;width:100%;min-height:62px;padding:9px 16px 11px;border:0;border-top:1px solid var(--app-divider);background:var(--surface);color:var(--ink);text-align:left;box-shadow:none}
-.nutrition-adaptive-teaser>span{display:grid;min-width:0;gap:3px}.nutrition-adaptive-teaser b{font:850 14px/1.15 var(--ui)}.nutrition-adaptive-teaser small{overflow:hidden;color:var(--muted);font:650 11px/1.25 var(--ui);text-overflow:ellipsis;white-space:nowrap}.nutrition-adaptive-teaser>i{display:grid;place-items:center;width:38px;height:38px;border:1.5px solid var(--ink);border-radius:50%;background:var(--ordner);color:var(--ordner-ink,#fff);font:900 20px/1 var(--tech);font-style:normal}
-.nutrition-quick-actions>button:active,.nutrition-adaptive-teaser:active{transform:translate(1px,1px);background:color-mix(in srgb,var(--ordner) 10%,var(--surface))}
+/* Die Tageskarte ist eine Übersicht, keine Dokumentationsseite. Rechner{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 16px 12px}.nutrition-quick-actions .material-svg{display:block;width:22px;height:22px;margin:auto;fill:currentColor}
 
 .nutrition-sheet>header>div{display:grid;gap:2px;min-width:0}.nutrition-sheet>header>div>small{color:var(--ordner);font:900 10px/1 var(--ui);letter-spacing:.08em}.nutrition-sheet>header>div>h2{line-height:1.1}
 .nutrition-day-status-overlay .nutrition-day-quality{margin:0;padding:13px}.nutrition-day-status-overlay .nutrition-day-quality label{min-height:42px;font-size:13px}.nutrition-day-status-overlay .nutrition-day-quality small{font-size:11px}
@@ -6289,9 +5898,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .nutrition-product-slot-icon,.mahl-wasser-icon
 ){
   background:var(--ordner)!important;color:var(--dex-ink,#fff)!important;
-}
-:root[data-seite="reminders"] :is(.rem-row-dot,.rem-row-dot[data-type="supplement"],.rem-row-dot[data-type="drink"],.rem-row-dot[data-type="body"]){
-  background:var(--ordner)!important;
 }
 :root[data-seite="reminders"] :is(.rem-switch input:checked~.rem-switch-thumb,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.nutrition-tracking-toggle input:checked+.nutrition-switch-track){
   background:var(--ordner)!important;
