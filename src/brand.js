@@ -12,15 +12,15 @@ let seq = 0;
 
 export function capboySvg() {
   const id = 'capbrand' + (++seq);
-  // Bogen: identisch zum LOGMAN-Original (viewBox 0 0 380 130, Spanne 298).
-  const d = `M 41,96 Q 190,74 339,96`;
+  // Bogen: LOGMAN-Spanne, Anstieg 28 (statt LOGMAN-Original 22) — spuerbar
+  // staerker gekruemmt, damit der Text mehr Charakter hat.
+  const d = `M 41,96 Q 190,68 339,96`;
   // Paper.svg aus SeitenIcons direkt als <image> eingebettet — dann rendert
   // die geknickte Ecke exakt wie in der Datei entworfen (Falt-Ecke als
   // sichtbares Fenster durch nonzero + gegenlaeufige Windungen). Ein eigener
-  // Stroke wuerde die Falt-Ecke ueberdecken; deshalb ohne Kontur. Position
-  // 154-232 x 11-111 = 78x100 mittig bei viewBox-Center x=193.
+  // Stroke wuerde die Falt-Ecke ueberdecken; deshalb ohne Kontur.
   const disk = `<g class="capboy-blatt">
-    <image href="${paperUrl}" x="154" y="11" width="78" height="100"/>
+    <image href="${paperUrl}" x="160" y="7" width="86" height="108"/>
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
   // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
