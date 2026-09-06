@@ -4,10 +4,9 @@
 // Work Sans italic 700, pinke Fuellung mit Navy-Kontur und hartem 4.2px-
 // Schatten, dazu zwei halbgrosse Sterne. Statt der Athleten-Silhouette sitzt
 // hier ein Blatt Papier mit umgeknickter Ecke hinter dem Wort — passt zum
-// CAP von "Capture / notieren". Die Papierfarbe laeuft ueber --capboy-body,
-// damit sich das Blatt im Darkmode invertieren laesst.
-//
-// Warum SVG und nicht CSS: Gekruemmter Text laesst sich in CSS nicht setzen.
+// CAP von "Capture / notieren".
+
+import paperUrl from '../SeitenIcons/Paper.svg';
 
 let seq = 0;
 
@@ -15,18 +14,13 @@ export function capboySvg() {
   const id = 'capbrand' + (++seq);
   // Bogen: identisch zum LOGMAN-Original (viewBox 0 0 380 130, Spanne 298).
   const d = `M 41,96 Q 190,74 339,96`;
-  // Papier hinter dem Wort: einfache Rechteck-Silhouette mit klar sichtbarer
-  // Ecke oben rechts, hand-gezeichnet statt gescaltes Noun-SVG (dort war das
-  // Falt-Dreieck bei kleiner Skalierung kaum lesbar). Koerper 80x100 mittig
-  // bei viewBox-Center x=194, Falt-Ecke 22 Einheiten gross — deutlich
-  // erkennbar als abgeknickter Papierrand.
+  // Paper.svg aus SeitenIcons direkt als <image> eingebettet — dann rendert
+  // die geknickte Ecke exakt wie in der Datei entworfen (Falt-Ecke als
+  // sichtbares Fenster durch nonzero + gegenlaeufige Windungen). Ein eigener
+  // Stroke wuerde die Falt-Ecke ueberdecken; deshalb ohne Kontur. Position
+  // 154-232 x 11-111 = 78x100 mittig bei viewBox-Center x=193.
   const disk = `<g class="capboy-blatt">
-    <path d="M 154,111 L 232,111 L 232,33 L 210,11 L 154,11 Z"
-      fill="var(--capboy-body,#001454)"
-      stroke="var(--brand-outline,#0A1330)" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M 210,11 L 210,33 L 232,33"
-      fill="none"
-      stroke="var(--brand-outline,#0A1330)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <image href="${paperUrl}" x="154" y="11" width="78" height="100"/>
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
   // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
