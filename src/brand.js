@@ -28,8 +28,8 @@ export function capboySvg() {
   // bleibt transparent — sonst wird das Blatt optisch zum vollen Rechteck
   // "ergaenzt" und der Faltcharakter verschwindet.
   const disk = `<g class="capboy-blatt">
-    <polygon class="capboy-knick" points="209,8 237,36 211,37" fill="#FFFFFF"/>
-    <image href="${paperUrl}" x="160" y="2" width="86" height="108"/>
+    <polygon class="capboy-knick" points="209,4 237,32 211,33" fill="#FFFFFF"/>
+    <image href="${paperUrl}" x="160" y="-2" width="86" height="108"/>
   </g>`;
   // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
   // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
