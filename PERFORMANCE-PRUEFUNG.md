@@ -22,14 +22,8 @@ Produktions-PWA-Zeiten vergleichen. Keine echten Messdaten ändern oder löschen
 
 ## Messgrenzen
 
-Das vorhandene Perf-Overlay misst Router-Laufzeit ab startRoute bis finishRoute.
-Die ergänzte Historie enthält höchstens 100 Wechsel und zeigt pro Route Anzahl
-und Median. Sie lebt nur im Speicher. Diese Zeit ist weder die gesamte Startzeit
-noch die Zeit bis zum tatsächlich sichtbaren Bildschirmbild. Cache-Treffer und
-Erstaufrufe sind anhand der angezeigten Schritte getrennt zu vergleichen.
-
-Für tatsächliche Darstellung, blockierte Frames und JavaScript-Aufgaben zusätzlich
-Safaris Timeline auf dem angeschlossenen iPhone aufnehmen. Vorher-/Nachherwerte
+Für tatsächliche Darstellung, blockierte Frames und JavaScript-Aufgaben Safaris
+Timeline auf dem angeschlossenen iPhone aufnehmen. Vorher-/Nachherwerte
 erst nach identischen Abläufen vergleichen. Bestehende Funktionstests ersetzen
 diese Geräteprüfung nicht.
 
@@ -48,8 +42,7 @@ Konto) lagen beim vollständigen Aufbau je nach Dex ungefähr zwischen 70 und
 kein belastbarer Vorher-/Nachhervergleich. Die Cache-Logik baut eine bereits
 sichtbare Cache-Ansicht nicht mehr ein zweites Mal auf. Datenänderungen und die
 Rückkehr in den Vordergrund verwerfen alte Cache-Ansichten stattdessen gezielt.
-Die Historie trennt Aufbau und Cache bei der Medianberechnung. Alle genannten
-Ansichten wurden im angemeldeten Endzustand geprüft; dabei waren genau eine
+Alle genannten Ansichten wurden im angemeldeten Endzustand geprüft; dabei waren genau eine
 Ansicht, ein Header und ein Menüband aktiv und die Konsole blieb fehlerfrei.
 Der nicht mehr erreichbare Renderer der früheren Startseite samt Zählerabfragen
 und Aktualisierungs-Listenern wurde entfernt. Das erzeugte Hauptpaket sank dabei

@@ -33,7 +33,6 @@ import { initInterfaceSounds, syncInterfaceSounds } from './uiSounds.js';
 import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
-import { startRoute as perfStart, mark as perfMark, finishRoute as perfFinish, abortRoute as perfAbort } from './perfOverlay.js';
 import {
   applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
@@ -1215,13 +1214,11 @@ async function renderRoute() {
     erzwungenesRueckwaertsZiel = '';
     richtung = 'zurueck';
   }
-  perfStart(route);
   // Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
   // sofort verfügbar. Die sichtbare Seite wird ohne Übergangsanimation
   // atomar getauscht.
   if (richtung !== 'gleich' && ansichtsCache.peek(route)
-    && gemerkteAnsichtZeigen(route)) { perfMark('cache-hit'); perfFinish(); return; }
-  perfMark(`cache-miss ${ansichtsCache.keys().join(',') || 'leer'}`);
+    && gemerkteAnsichtZeigen(route)) return;
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
@@ -1233,7 +1230,6 @@ async function renderRoute() {
   // gewechselt. Der alte Dex bleibt nur während des Datenladens stehen und
   // wird anschließend in einem Schritt durch die fertige Ansicht ersetzt.
   const view = renderChrome();
-  perfMark('chrome');
   /* Ab hier werden setSeite/applyPageLook nur noch gepuffert. Erst wenn
      die neue Ansicht wirklich fertig ist, wenden wir beide atomar an —
      zusammen mit dem Sichtbarwerden. Sonst sieht der Nutzer erst neue
@@ -1528,16 +1524,13 @@ async function renderRoute() {
     routeAbortController = vorherigerController;
     commitSeiteDefer(true);
     commitPageLookDefer(true);
-    perfAbort();
     return;
   }
-  perfMark('mount');
   /* Chrome (html-Attribute + Custom Properties) und Shell zusammen anwenden,
      kurz bevor die neue Ansicht sichtbar wird. So sieht der Nutzer einen
      einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
   commitSeiteDefer();
   commitPageLookDefer();
-  perfMark('shell');
   const alteSeite = app.querySelector(':scope > #view');
   if (alteSeite) {
     if (richtung !== 'gleich') ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
@@ -1548,7 +1541,6 @@ async function renderRoute() {
   view.hidden = false;
   view.classList.remove('warten-auf-daten');
   appDexShellAktualisieren(route, view, signal);
-  perfFinish();
   const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
     || view.querySelector('.kategorie-plus');
   if (dexAddButton) showGestureHintOnce({
