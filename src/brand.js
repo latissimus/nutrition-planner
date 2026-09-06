@@ -20,8 +20,8 @@ export function capboySvg() {
   // rechts ist umgeknickt — das einzige Detail, sonst ruhige Flaeche.
   // vector-effect:non-scaling-stroke haelt die Kontur bei allen App-Groessen
   // gleich stark, statt sie mit dem scale(0.19) mitzuschrumpfen.
-  const disk = `<g class="capboy-blatt" transform="translate(146.29 8.72) scale(0.19)">
-    <path fill-rule="nonzero"
+  const disk = `<g class="capboy-blatt" transform="translate(150.29 8.72) scale(0.19)">
+    <path fill-rule="evenodd"
       fill="var(--capboy-body,#001454)"
       stroke="var(--brand-outline,#0A1330)" stroke-width="4" stroke-linejoin="round"
       vector-effect="non-scaling-stroke"
