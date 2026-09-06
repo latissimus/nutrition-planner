@@ -4112,7 +4112,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-image:none!important;
 }
 :root[data-seite="body"],:root[data-seite="food-log"],
-:root[data-seite="habits"],:root[data-seite="search"]{
+:root[data-seite="habits"]{
   background-image:var(--muster-dreieck)!important;background-size:auto!important;
 }
 :root[data-seite="recipes"],
@@ -4127,7 +4127,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-size:auto,112px!important;
 }
 :root[data-theme="dark"][data-seite="body"],:root[data-theme="dark"][data-seite="food-log"],
-:root[data-theme="dark"][data-seite="habits"],:root[data-theme="dark"][data-seite="search"]{
+:root[data-theme="dark"][data-seite="habits"]{
   background-image:var(--muster-dreieck-dunkel)!important;
 }
 :root[data-theme="dark"][data-seite="recipes"],

@@ -170,20 +170,21 @@ let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
 let appDockEigene = [];
 let appDockGeladen = false;
 let appDockCoinStand = null;
+let preferencesLadePromise = Promise.resolve();
+let preferencesLadeUserId = '';
 
-/* Cache-Limit bewusst niedrig: jede gecachte Route behält ihre Realtime-
-   Abos und Timer am Leben, bis sie verdrängt wird. Bei 10 gehaltenen Views
-   summieren sich das zu 20–40 offenen Postgres-Channels auf dem iPhone und
-   die App fängt an zu hängen. 3 reicht für den typischen Rückweg (home ↔
-   Dex ↔ Detail), alles andere lädt beim Zurückspringen neu. */
+/* Cache-Limit bewusst niedrig: drei fertige DOM-Ansichten reichen für kurze
+   Rückwege. Beim Ablegen werden ihre Listener und Timer beendet; dadurch
+   bleiben weder versteckte Aktualisierungen noch Hintergrundarbeit übrig. */
 const ansichtsCache = createLruCache({ limit: 3, onEvict: disposeViewEntry });
 
-// Die Startseite wird fuer den schnellen Rueckweg als abgetrennte DOM-Ansicht
-// zwischengespeichert. Aendert sich die Darstellung eines Dex auf einer
-// Unterseite, darf diese Kopie nicht mit alter Farbe bzw. altem Icon wieder
-// eingeblendet werden. Beim Zurueckkehren wird sie dann frisch aufgebaut.
-window.addEventListener('muscledex:appearance-changed', () => {
-  if (aktiveRoute !== 'home') ansichtsCache.delete('home');
+// Datenänderungen machen abgelegte Ansichten ungültig. Die aktive Ansicht ist
+// nicht im Cache und aktualisiert sich über ihren eigenen Listener. Nach einer
+// Rückkehr aus dem Hintergrund werden ebenfalls keine alten Daten gezeigt.
+['muscledex:counts-changed', 'muscledex:coins-changed', 'muscledex:appearance-changed']
+  .forEach((event) => window.addEventListener(event, () => ansichtsCache.clear()));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') ansichtsCache.clear();
 });
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
@@ -862,6 +863,12 @@ function renderChrome() {
 
 function ansichtMerken(route, node, controller, seite) {
   if (!route || !node) return;
+  // Eine abgelegte Ansicht darf keine globalen Aktualisierungs-Listener
+  // behalten. Sonst löst ein Speichern nach mehreren Dex-Wechseln denselben
+  // Refresh mehrfach aus. Die DOM-Ansicht bleibt als sofortige Vorschau im
+  // Cache. Bei einer Datenänderung wird sie verworfen, nicht nachträglich und
+  // für den Nutzer sichtbar noch einmal aufgebaut.
+  controller?.abort();
   node.removeAttribute('id');
   node.classList.add('view-cache');
   // Ton darf nach einem Seitenwechsel nie unsichtbar weiterlaufen. Iframes
@@ -871,7 +878,7 @@ function ansichtMerken(route, node, controller, seite) {
     try { media.pause(); } catch {}
   });
   node.remove();
-  ansichtsCache.set(route, { node, controller, seite });
+  ansichtsCache.set(route, { node, controller: null, seite });
 }
 
 function gemerkteAnsichtZeigen(route) {
@@ -885,17 +892,22 @@ function gemerkteAnsichtZeigen(route) {
   gemerkt.node.classList.remove('view-cache');
   gemerkt.node.id = 'view';
   app.insertBefore(gemerkt.node, aktuell || null);
-  routeAbortController = gemerkt.controller;
+  routeAbortController = new AbortController();
   aktiveRoute = route;
   setSeite(gemerkt.seite || (route === 'home' ? 'home' : route.startsWith('entry/') || route.startsWith('collection/') ? 'collection' : route));
   dexLookAusAnsichtWiederherstellen(gemerkt.node);
   appDexShellAktualisieren(route, gemerkt.node, routeAbortController?.signal);
+  // Die ursprünglichen Listener wurden beim Ablegen beendet. Für die wieder
+  // aktive Cache-Ansicht genügt ein einziger zentraler Refresh: Änderungen
+  // führen atomar zu einem normalen Neuaufbau derselben Route.
+  subscribeToTableChanges({
+    table: 'aktive-cache-ansicht',
+    signal: routeAbortController.signal,
+    onChange: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+    onError: () => {},
+  });
 
   if (aktuell) ansichtMerken(bisherigeRoute, aktuell, bisherigerController, bisherigeSeite);
-  // Die gespeicherte Ansicht bleibt bewusst stabil. Ein nachgelagerter
-  // Voll-Render hat auf iOS den inneren Home-Scroller kurz ersetzt und konnte
-  // dadurch direkt nach dem Zurückkehren eine Berührung verschlucken.
-  // Aktualisierungen kommen über Realtime bzw. beim nächsten echten Öffnen.
   return true;
 }
 
@@ -1451,6 +1463,11 @@ async function renderRoute() {
   if (!supabaseKonfiguriert) return renderSetup();
   if (recovery) return renderRecovery();
   if (!session) return renderAuth();
+  // Farben, Tapeten, Dex-Reihenfolge und letzter Dex sind kontogebunden.
+  // Der erste Bildschirm darf deshalb erst nach diesen Einstellungen gebaut
+  // werden. Zuvor erschien beim Accountwechsel kurz das Standarddesign.
+  await preferencesLadePromise;
+  if (generation !== renderGeneration) return;
   if (!profile) {
     try { await profilSicherLaden(); }
     catch (error) {
@@ -1495,15 +1512,12 @@ async function renderRoute() {
     richtung = 'zurueck';
   }
   perfStart(route);
-  // Eine schon besuchte Zielseite ist sofort da. Beim nativen iOS-Swipe hat
-  // WebKit die Bewegung bereits interaktiv gezeichnet; wir tauschen dann nur
-  // noch lautlos auf dieselbe, erhaltene DOM-Ansicht. Beim X-/Zurueck-Tap
-  // zeichnet die App selbst den Rueckwaerts-Slide.
-  /* Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
-     sofort verfügbar. Die alte Logik verwendete ihn nur beim Zurückgehen und
-     lud denselben Dex beim Antippen im Menü häufig vollständig neu. */
+  // Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
+  // sofort verfügbar. Die sichtbare Seite wird ohne Übergangsanimation
+  // atomar getauscht.
   if (richtung !== 'gleich' && ansichtsCache.peek(route)
     && gemerkteAnsichtZeigen(route)) { perfMark('cache-hit'); perfFinish(); return; }
+  perfMark(`cache-miss ${ansichtsCache.keys().join(',') || 'leer'}`);
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
@@ -1928,16 +1942,11 @@ async function render() {
   }
 }
 
-// Zwei rAF, damit der Browser den :active-Druckeffekt eines getippten Links
-// noch zeichnet, bevor render() den kompletten Seiteninhalt ersetzt – ohne
-// Verzoegerung verschwindet das gedrueckte Element vor dem ersten Paint.
 window.addEventListener('hashchange', () => {
   if (popstateNavigation) {
     popstateNavigation = false;
-    render();
-    return;
   }
-  requestAnimationFrame(() => requestAnimationFrame(() => render()));
+  render();
 });
 
 if (!supabaseKonfiguriert) {
@@ -1955,6 +1964,8 @@ if (!supabaseKonfiguriert) {
       appDockGeladen = false;
       appDockCoinStand = null;
       setPreferenceUser('');
+      preferencesLadeUserId = '';
+      preferencesLadePromise = Promise.resolve();
     }
     if (event === 'SIGNED_IN' && !bisherigeUserId) {
       navigationZuruecksetzen('home');
@@ -1971,6 +1982,12 @@ if (!supabaseKonfiguriert) {
     if (session?.user?.id) {
       const aktiveUserId = session.user.id;
       setPreferenceUser(aktiveUserId);
+      if (preferencesLadeUserId !== aktiveUserId) {
+        preferencesLadeUserId = aktiveUserId;
+        preferencesLadePromise = loadUserPreferences(aktiveUserId)
+          .then(() => { syncInterfaceSounds(); })
+          .catch((error) => console.warn('Einstellungen konnten nicht geladen werden:', error.message));
+      }
       const reminderLoopStarten = (opts) => remindersModule()
         .then(({ startReminderLoop }) => startReminderLoop(aktiveUserId, opts)).catch(() => {});
       reminderLoopStarten();
@@ -1984,13 +2001,7 @@ if (!supabaseKonfiguriert) {
     // Nutzers (z. B. nach Rueckkehr in die PWA) aktualisieren nur die Session.
     if (event === 'TOKEN_REFRESHED') return;
     if (event === 'SIGNED_IN' && bisherigeUserId === session?.user?.id && profile) return;
-    const preferenceUserId = session?.user?.id || '';
     syncInterfaceSounds();
     render();
-    if (preferenceUserId) {
-      loadUserPreferences(preferenceUserId)
-        .then(() => { syncInterfaceSounds(); })
-        .catch(() => {});
-    }
   });
 }

@@ -1,7 +1,7 @@
 /**
  * Sichtbarer Perf-Overlay für Dex-Wechsel.
  *
- * Aktivieren:  URL mit #perf öffnen, oder in der Konsole:
+ * Aktivieren:  URL mit ?perf=1 öffnen, oder in der Konsole:
  *              localStorage.setItem('muscledex:perf','1'); location.reload();
  * Deaktivieren:localStorage.removeItem('muscledex:perf'); location.reload();
  *
@@ -10,20 +10,22 @@
  * Werkzeug — hat keinen Einfluss auf die App, wenn nicht aktiviert.
  */
 
-const KEY = 'muscledex:perf-aus';
+const KEY = 'muscledex:perf';
 let versteckt = false;
 let overlay = null;
 let start = 0;
 let route = '';
 let marks = [];
+// Nur Laufzeiten und Routennamen; keine Kontodaten oder Eintragsinhalte.
+const messungen = [];
 
 function istAktiv() {
   if (versteckt) return false;
   try {
     if (typeof window === 'undefined') return false;
-    // Nur ausgeschaltet, wenn Nutzer den × im Overlay geklickt hat.
-    return localStorage.getItem(KEY) !== '1';
-  } catch { return true; }
+    return new URLSearchParams(location.search).get('perf') === '1'
+      || localStorage.getItem(KEY) === '1';
+  } catch { return false; }
 }
 
 function ensureOverlay() {
@@ -52,7 +54,6 @@ function ensureOverlay() {
     'padding:0',
   ].join(';');
   zu.onclick = () => {
-    try { localStorage.setItem(KEY, '1'); } catch {}
     versteckt = true;
     overlay?.remove();
     overlay = null;
@@ -91,6 +92,13 @@ export function finishRoute() {
   const box = ensureOverlay();
   if (!box) return;
   const gesamt = marks[marks.length - 1].t;
+  const modus = marks.some((m) => m.label === 'cache-hit') ? 'Cache' : 'Aufbau';
+  messungen.push({ route, modus, ms: gesamt });
+  if (messungen.length > 100) messungen.shift();
+  const vergleich = messungen.filter((m) => m.route === route && m.modus === modus).map((m) => m.ms).sort((a, b) => a - b);
+  const median = vergleich.length % 2
+    ? vergleich[Math.floor(vergleich.length / 2)]
+    : (vergleich[vergleich.length / 2 - 1] + vergleich[vergleich.length / 2]) / 2;
   const zeilen = marks.map((m) => {
     const anteil = Math.min(100, Math.max(1, Math.round(m.delta / Math.max(gesamt, 1) * 100)));
     const balken = '█'.repeat(Math.max(1, Math.round(anteil / 4)));
@@ -110,7 +118,7 @@ export function finishRoute() {
     box.append(inner);
   }
   inner.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
-    <b>${route}</b><span style="color:#FF69AE">Σ ${Math.round(gesamt)} ms</span>
+    <b>${route} · ${modus}</b><span style="color:#FF69AE">Σ ${Math.round(gesamt)} ms · n=${vergleich.length} · Median ${Math.round(median)} ms</span>
   </div>${zeilen}`;
   start = 0;
 }
