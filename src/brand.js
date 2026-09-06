@@ -23,9 +23,11 @@ export function capboySvg() {
     <rect x="210" y="24" width="7" height="14" rx="1" fill="var(--capboy-slot,#001454)"/>
     <rect x="160" y="56" width="72" height="46" rx="3" fill="var(--capboy-label,#FFFFFF)"/>
   </g>`;
-  // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 54,
-  // letter-spacing -1.62 (echte Work-Sans-Messung), symmetrische Sternluecken
-  // 8/7. Das haelt CAPBOY optisch in einer Reihe mit dem LOGMAN.
+  // Schrift-Metriken angeglichen an das LOGMAN-Logo: Font-Groesse 64 laesst
+  // die Buchstaben so gross erscheinen wie beim LOGMAN in seiner App, das
+  // LOGMAN-Standard-letter-spacing -1.62 haelt sie sauber lesbar (nicht wie
+  // beim ersten Editor-Wert -4 aneinandergeklebt), symmetrische Sternluecken
+  // 8/7 wie im Original.
   const txt =
     `<tspan font-size="27" stroke-width="3.1" dy="-3">★</tspan>` +
     `<tspan dx="8" dy="3">CAPBOY</tspan>` +
@@ -35,7 +37,7 @@ export function capboySvg() {
   <defs><path id="${id}" d="${d}" fill="none"/></defs>
   ${disk}
   <g font-family="'Work Sans'" font-style="italic" font-weight="700"
-     font-size="54" letter-spacing="-1.62" text-anchor="middle"
+     font-size="64" letter-spacing="-1.62" text-anchor="middle"
      stroke="var(--brand-outline,#0A1330)" stroke-width="5.2" stroke-linejoin="round">
     <text transform="translate(4.2,4.2)" fill="var(--brand-outline,#0A1330)">${path}</text>
     <text fill="var(--brand-pink,#FF69AE)" paint-order="stroke fill">${path}</text>
