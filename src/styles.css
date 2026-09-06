@@ -10194,14 +10194,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:hidden;
   isolation:isolate;
 }
-.app-menue-computer{position:absolute;inset:2px 1px 1px;z-index:1;display:block;pointer-events:none}
-.app-menue-computer svg{display:block;width:100%;height:100%;overflow:visible}
-.app-menue-computer-front{transition:transform 70ms ease-out}
-.app-dex-menu:active .app-menue-computer-front,
-.app-dex-menu.ist-gedrueckt .app-menue-computer-front{transform:translate(4px,3px)}
-.app-dex-menu:active .app-menue-computer-schatten,
-.app-dex-menu.ist-gedrueckt .app-menue-computer-schatten{opacity:0}
-.app-menue-computer-innen{fill:transparent}
+.app-dex-menu-icon{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+  transition:transform 70ms ease-out;
+}
+.app-dex-menu-icon svg{display:block;width:44px;height:44px;max-width:100%;max-height:100%}
+.app-dex-menu:active .app-dex-menu-icon,
+.app-dex-menu.ist-gedrueckt .app-dex-menu-icon{transform:translate(2px,2px)}
 
 /* Haupt-Dex brauchen weder ihre wiederholte Seitenüberschrift noch die alte
    seitliche Buttonspalte. Bei Unter-Dex bleibt der Zurückknopf erhalten. */
@@ -10252,8 +10255,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#101A2B;
   box-shadow:inset 0 0 0 1.5px #EDF0F6;
 }
-:root[data-theme="dark"] .app-menue-computer-text{fill:#FFFFFF}
-
 @media(max-width:390px){
   .app-dex-header-inner{width:calc(100% - 24px)}
   .app-dex-header-actions{gap:5px}

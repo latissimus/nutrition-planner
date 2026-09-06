@@ -40,7 +40,7 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
-import { hasMenuIcon, menuIconMarkup } from './menuIcons.js';
+import { entryButtonMarkup, hasMenuIcon, menuIconMarkup } from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -556,31 +556,6 @@ function appDockTitel(route) {
     || (route === 'coins' ? 'Coin-Dex' : 'Dex');
 }
 
-function appMenueComputerMarkup() {
-  return `<span class="app-menue-computer" aria-hidden="true">
-    <svg viewBox="0 0 62 55" preserveAspectRatio="none">
-      <defs>
-        <mask id="app-menue-fenster-ausschnitt" maskUnits="userSpaceOnUse">
-          <rect width="62" height="55" fill="#FFFFFF"/>
-          <rect x="7" y="21" width="43" height="23" rx="5" fill="#000000"/>
-        </mask>
-      </defs>
-      <rect class="app-menue-computer-schatten" x="6" y="5" width="53" height="47" rx="7" fill="#7560E6" mask="url(#app-menue-fenster-ausschnitt)"/>
-      <g class="app-menue-computer-front">
-        <rect x="2" y="2" width="54" height="47" rx="7" fill="#F2A5DA" stroke="#8968FF" stroke-width="2.3" mask="url(#app-menue-fenster-ausschnitt)"/>
-        <path d="M9 2h40a7 7 0 0 1 7 7v8H2V9a7 7 0 0 1 7-7Z" fill="#AEEBFA"/>
-        <path d="M2 17h54" fill="none" stroke="#8968FF" stroke-width="2.3"/>
-        <path d="M31 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
-        <rect x="38" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
-        <path d="m46 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
-        <rect class="app-menue-computer-innen" x="7" y="21" width="43" height="23" rx="5"/>
-        <rect x="7" y="21" width="43" height="23" rx="5" fill="none" stroke="#8968FF" stroke-width="1.8"/>
-        <text class="app-menue-computer-text" x="28.5" y="32.5" fill="#111111" font-family="'Work Sans'" font-size="9.6" font-style="italic" font-weight="700" text-anchor="middle" dominant-baseline="middle">MENÜ</text>
-      </g>
-    </svg>
-  </span>`;
-}
-
 function appDockEintraegeMarkup(aktiveDockRoute) {
   const standard = sichtbareSammlungen().map(([route, titel]) => `
     <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
@@ -658,7 +633,7 @@ function appDexShellZeichnen(route, view) {
     <div class="app-dex-dock-inner">
       <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
       <button class="app-dex-menu" type="button" aria-label="Menü für ${escapeHtml(appDockTitel(aktiveDockRoute))} öffnen">
-        ${appMenueComputerMarkup()}
+        ${entryButtonMarkup()}
       </button>
     </div>`;
   appSyncStatusAktualisieren();

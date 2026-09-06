@@ -49,3 +49,13 @@ export function menuIconMarkup(route, className = 'app-dex-tab-icon') {
 export function hasMenuIcon(route) {
   return svgByRoute.has(route);
 }
+
+/* EINTRAG.svg dient als Kontextmenü-Knopf rechts im Menüband. Wird über eine
+   eigene Funktion ausgeliefert, weil der Knopf keiner Route zugeordnet ist. */
+const entryEntry = Object.entries(modules).find(([path]) => path.endsWith('/EINTRAG.svg'));
+const entryIconSvg = entryEntry ? prefixInterneIds(entryEntry[1], 'mdxm-entry-') : '';
+
+export function entryButtonMarkup(className = 'app-dex-menu-icon') {
+  if (!entryIconSvg) return '';
+  return `<span class="${className} icon-originalfarben" aria-hidden="true">${entryIconSvg}</span>`;
+}
