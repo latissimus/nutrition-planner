@@ -502,7 +502,7 @@ function avatarMarkup() {
 // Stand. Die Beschreibung steht bewusst nicht auf der Karte: Tuckii zeigt dort
 // nur Symbol, Zaehler und Namen – Fliesstext wuerde das Raster zerreissen.
 const sammlungen = [
-  ['body', 'BODY', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
+  ['body', 'KÖRPER', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'MAHLZEITEN', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'REZEPTE', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
@@ -925,9 +925,9 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'BODY' : sleep ? 'SCHLAF' : meal ? 'MAHLZEITEN' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'Coin-Dex' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigener Dex' : body ? 'KÖRPER' : sleep ? 'SCHLAF' : meal ? 'MAHLZEITEN' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'Coin-Dex' : 'REZEPTE');
   const copy = body
-    ? `<p>Im <b>BODY</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
+    ? `<p>Im <b>KÖRPER</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
       <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und keine medizinische Diagnose.</p>`
     : sleep
@@ -1276,16 +1276,16 @@ async function renderRoute() {
       onRendered: rehydrateDexEntries,
     });
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
-    mountCategoryChrome(view, route, 'BODY', {
+    mountCategoryChrome(view, route, 'KÖRPER', {
       pageLookScope: route, pageLookPattern: 'wallpaper-measure',
       onPlus: () => bodyActions?.openAddMenu?.(),
       onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
     });
     installNeoDexChrome(view, {
-      title: 'BODY',
+      title: 'KÖRPER',
       meta: bodyActions?.meta || '0 Wiegungen',
       closeHref: '#home',
-      editLabel: 'BODY bearbeiten',
+      editLabel: 'KÖRPER bearbeiten',
       infoKind: 'body',
     });
   } else if (route === 'reminders') {
