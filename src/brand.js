@@ -12,9 +12,9 @@ let seq = 0;
 
 export function capboySvg() {
   const id = 'capbrand' + (++seq);
-  // Bogen: LOGMAN-Spanne, Anstieg 28 (statt LOGMAN-Original 22) — spuerbar
-  // staerker gekruemmt, damit der Text mehr Charakter hat.
-  const d = `M 41,96 Q 190,68 339,96`;
+  // Bogen: LOGMAN-Spanne, Anstieg 34 (LOGMAN-Original war 22) — deutlich
+  // staerker gekruemmt, damit der Text richtig schwingt.
+  const d = `M 41,96 Q 190,62 339,96`;
   // Paper.svg aus SeitenIcons direkt als <image> eingebettet — dann rendert
   // die geknickte Ecke exakt wie in der Datei entworfen (Falt-Ecke als
   // sichtbares Fenster durch nonzero + gegenlaeufige Windungen). Ein eigener

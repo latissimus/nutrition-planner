@@ -4483,10 +4483,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   isolation:isolate;
 }
 :root[data-seite="reminders"] .meal-log-dex-page::before{
-  content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
+  content:"";position:fixed;z-index:0;inset:-72px;pointer-events:none;
   background:var(--dex-ink,#fff);opacity:.10;
   -webkit-mask-image:var(--food-vozzy-pattern);mask-image:var(--food-vozzy-pattern);
-  -webkit-mask-size:360px auto;mask-size:360px auto;
+  -webkit-mask-size:440px auto;mask-size:440px auto;
   -webkit-mask-position:center top;mask-position:center top;
   -webkit-mask-repeat:repeat;mask-repeat:repeat;
 }
