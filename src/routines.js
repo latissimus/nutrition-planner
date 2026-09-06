@@ -90,12 +90,12 @@ function routineHeroMarkup(state) {
       <span class="routine-hero-value">
         <small>${stats.offen ? 'HEUTE OFFEN' : stats.heute.length ? 'HEUTE ERLEDIGT' : 'HEUTE GEPLANT'}</small>
         <strong>${stats.offen}</strong>
-        <b>ROUTINES</b>
+        <b>ROUTINEN</b>
       </span>
-      <button class="som-info-knopf routine-info-button" type="button" data-toggle-routine-info aria-expanded="false" aria-controls="routine-info-help" aria-label="ROUTINES-Dex erklären">i</button>
+      <button class="som-info-knopf routine-info-button" type="button" data-toggle-routine-info aria-expanded="false" aria-controls="routine-info-help" aria-label="ROUTINEN-Dex erklären">i</button>
     </section>
     <div class="som-kurzhilfe nutrition-calibration-help routine-info-help" id="routine-info-help" data-routine-info-help hidden>
-      <p>Der <b>ROUTINES</b>-Dex sammelt wiederkehrende Abläufe, die du im Alltag abhaken möchtest.</p>
+      <p>Der <b>ROUTINEN</b>-Dex sammelt wiederkehrende Abläufe, die du im Alltag abhaken möchtest.</p>
       <p>Der Hero zeigt, wie viele für heute geplante Routinen noch offen sind. Der Ring zeigt den heutigen Fortschritt.</p>
       <p>Eine Routine kannst du durch Tippen auf den Kreis abhaken. Langes Drücken öffnet die Bearbeitung; bei Timer-Routinen startet der Play-Button den Timer.</p>
     </div>

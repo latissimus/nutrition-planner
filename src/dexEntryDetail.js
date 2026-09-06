@@ -58,7 +58,7 @@ async function loadEntry(userId, id, signal) {
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'COOKNOTES', training: 'TRAINNOTES', reminders: 'MEALS', body: 'BODYLOG', habits: 'ROUTINES', sleep: 'SLEEPLOG', stress: 'STRESSNOTES' };
+  const rootNames = { home: 'Meine Dex-Einträge', 'food-log': 'REZEPTE', training: 'TRAINING', reminders: 'MAHLZEITEN', body: 'BODY', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'STRESS' };
   data.dex_name = rootNames[data.root_key] || 'MUSCLE-DEX';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();

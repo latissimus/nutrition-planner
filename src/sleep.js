@@ -255,8 +255,8 @@ function actionsMenu({ userId, state, onSaved }) {
     colorScope: 'sleep',
     sheetClassName: 'sleep-action-card',
     closeSelector: '[data-sheet-close]',
-    ariaLabel: 'SLEEPLOG ergänzen',
-    markup: `<header><h2>SLEEPLOG</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button></div>`,
+    ariaLabel: 'SCHLAF ergänzen',
+    markup: `<header><h2>SCHLAF</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header><div class="sheet-menue"><button type="button" data-sleep-action="checkin">${materialIconMarkup('bedtime')}<span><b>Morgen-Check-in</b><small>Schlaf und Energie festhalten</small></span></button><button type="button" data-sleep-action="plan">${materialIconMarkup('alarm')}<span><b>Schlafplan</b><small>Zeiten und Erinnerungen einstellen</small></span></button><button type="button" data-sleep-action="sound">${materialIconMarkup('dark_mode')}<span><b>Schlafsound</b><small>Mit Abschalttimer und Ausblenden</small></span></button></div>`,
   });
   const close = () => closeOverlay(backdrop);
   backdrop.addEventListener('click', (event) => {

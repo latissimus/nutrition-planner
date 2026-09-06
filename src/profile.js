@@ -266,9 +266,9 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   startHinweis.textContent = 'Lege fest, welche Dex im unteren Menüband erscheinen und in welcher Reihenfolge sie angeordnet sind.';
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
-    ['body', 'BODYLOG'], ['reminders', 'MEALS'], ['food-log', 'COOKNOTES'],
-    ['training', 'TRAINNOTES'], ['shopping', 'FOODS'], ['habits', 'ROUTINES'],
-    ['sleep', 'SLEEPLOG'], ['stress', 'STRESSNOTES'],
+    ['body', 'BODY'], ['reminders', 'MAHLZEITEN'], ['food-log', 'REZEPTE'],
+    ['training', 'TRAINING'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
+    ['sleep', 'SCHLAF'], ['stress', 'STRESS'],
   ]);
   const sammlungsListe = document.createElement('div');
   sammlungsListe.className = 'sammlungs-sortierung';
