@@ -8129,14 +8129,36 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-dex-menu-icon svg{display:block;width:44px;height:44px;max-width:100%;max-height:100%}
 /* Der globale button:active-Effekt darf den Knopf samt Trennlinie nicht
-   verschieben. Nur die Diskette reagiert mit einem sehr kleinen Druckweg. */
+   verschieben. Der darin liegende LOGMAN-Computer reagiert separat. */
 .app-dex-menu:active,.app-dex-menu.ist-gedrueckt{
   transform:none!important;
   box-shadow:none!important;
 }
-.app-dex-menu:active .app-dex-menu-icon,.app-dex-menu.ist-gedrueckt .app-dex-menu-icon{
-  transform:translate(1px,1px);
+.app-dex-menu .menue-computer{
+  inset:2px 1px 1px;
+  display:block;
+  place-items:initial;
+  transition:none;
 }
+.app-dex-menu .menue-computer svg{
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  max-height:none;
+  overflow:visible;
+}
+.app-dex-menu .menue-computer-front{transition:transform 70ms ease-out}
+.app-dex-menu:active .menue-computer-front,
+.app-dex-menu.ist-gedrueckt .menue-computer-front{
+  transform:translate(4px,3px);
+}
+.app-dex-menu:active .menue-computer-schatten,
+.app-dex-menu.ist-gedrueckt .menue-computer-schatten{
+  opacity:0;
+}
+.app-dex-menu .menue-computer-innen{fill:transparent}
+:root[data-theme="dark"] .app-dex-menu .menue-computer-text{fill:#fff}
 
 /* Haupt-Dex brauchen weder ihre wiederholte Seitenüberschrift noch die alte
    seitliche Buttonspalte. Bei Unter-Dex bleibt der Zurückknopf erhalten. */
@@ -8384,8 +8406,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-left-width:1.5px;
 }
 :root[data-seite="reminders"] .app-dex-menu-icon svg{
-  width:40px;
-  height:40px;
+  width:100%;
+  height:100%;
 }
 :root[data-theme="dark"][data-seite="reminders"] .app-dex-tab.aktiv{
   background:#252E3D;

@@ -51,12 +51,29 @@ export function hasMenuIcon(route) {
   return svgByRoute.has(route);
 }
 
-/* EINTRAG.svg dient als Kontextmenü-Knopf rechts im Menüband. Wird über eine
-   eigene Funktion ausgeliefert, weil der Knopf keiner Route zugeordnet ist. */
-const entryEntry = Object.entries(modules).find(([path]) => path.endsWith('/EINTRAG.svg'));
-const entryIconSvg = entryEntry ? prefixInterneIds(entryEntry[1], 'mdxm-entry-') : '';
-
 export function entryButtonMarkup(className = 'app-dex-menu-icon') {
-  if (!entryIconSvg) return '';
-  return `<span class="${className} icon-originalfarben" aria-hidden="true">${entryIconSvg}</span>`;
+  /* Derselbe kleine Desktop-Computer wie im LOGMAN. Die CAPBOY-Aktion bleibt
+     unverändert: Der Knopf öffnet weiterhin das Kontextmenü der aktiven Seite. */
+  return `<span class="${className} menue-computer" aria-hidden="true">
+    <svg viewBox="0 0 62 55" preserveAspectRatio="none">
+      <defs>
+        <mask id="capboy-menue-fenster-ausschnitt" maskUnits="userSpaceOnUse">
+          <rect width="62" height="55" fill="#FFFFFF"/>
+          <rect x="7" y="21" width="43" height="23" rx="5" fill="#000000"/>
+        </mask>
+      </defs>
+      <rect class="menue-computer-schatten" x="6" y="5" width="53" height="47" rx="7" fill="#7560E6" mask="url(#capboy-menue-fenster-ausschnitt)"/>
+      <g class="menue-computer-front">
+        <rect x="2" y="2" width="54" height="47" rx="7" fill="#F2A5DA" stroke="#8968FF" stroke-width="2.3" mask="url(#capboy-menue-fenster-ausschnitt)"/>
+        <path d="M9 2h40a7 7 0 0 1 7 7v8H2V9a7 7 0 0 1 7-7Z" fill="#AEEBFA"/>
+        <path d="M2 17h54" fill="none" stroke="#8968FF" stroke-width="2.3"/>
+        <path d="M31 11h4" fill="none" stroke="#8968FF" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="38" y="7.5" width="5" height="5" fill="none" stroke="#8968FF" stroke-width="1.5"/>
+        <path d="m46 7.5 5 5m0-5-5 5" fill="none" stroke="#8968FF" stroke-width="1.5" stroke-linecap="round"/>
+        <rect class="menue-computer-innen" x="7" y="21" width="43" height="23" rx="5"/>
+        <rect x="7" y="21" width="43" height="23" rx="5" fill="none" stroke="#8968FF" stroke-width="1.8"/>
+        <text class="menue-computer-text" x="28.5" y="32.5" fill="#111111" font-family="'Work Sans'" font-size="9.6" font-style="italic" font-weight="700" text-anchor="middle" dominant-baseline="middle">MENÜ</text>
+      </g>
+    </svg>
+  </span>`;
 }
