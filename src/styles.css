@@ -334,6 +334,21 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
   to{transform:scale(1.25);opacity:1}
 }
 
+/* Kaltstart wie bei LOGMAN: Der TRACKER-Ton liegt bereits im HTML an; diese
+   Ebene bringt nach dem Laden des JS die aktuelle CAPBOY-Wortmarke hinein.
+   Sie bleibt stehen, waehrend Profil, Einstellungen und erster Dex parallel
+   aufgebaut werden, und verschwindet erst beim atomaren Seitenwechsel. */
+.app-start-splash{
+  position:fixed;z-index:2000;inset:0;display:flex;align-items:center;
+  justify-content:center;background:#525CEB;
+  padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+}
+.app-start-splash .brand{
+  font-size:46px;
+  animation:splash-in 2s cubic-bezier(.16,.84,.32,1) both;
+}
+@media (prefers-reduced-motion:reduce){.app-start-splash .brand{animation:none}}
+
 /* Ladebildschirm beim Kaltstart – dieselbe Geste wie der Splash, nur mit dem
    Laufband darueber und einer Zeile darunter. Er zieht auf und atmet dann
    weiter: Ohne WLAN steht er laenger, und ein eingefrorenes Logo laesst die

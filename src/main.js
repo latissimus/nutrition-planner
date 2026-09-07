@@ -166,6 +166,24 @@ if (routineActionFromUrl) {
 }
 
 const app = document.querySelector('#app');
+const APP_START_SPLASH_MS = 2000;
+const appStartSplashBeginn = performance.now();
+
+/* Der Splash wird sofort nach dem Parsen des Einstiegschunks gezeichnet. Der
+   blaue First Paint davor kommt bereits aus index.html, sodass auch auf einem
+   kalten iPhone-Start kein cremefarbener Zwischenframe mehr sichtbar ist. */
+app.innerHTML = `<div class="app-start-splash" role="status" aria-label="CAPBOY wird geladen">${capboyMarkup()}</div>`;
+
+function appStartSplashVerwerfen() {
+  document.documentElement.classList.remove('app-booting');
+  app.querySelector(':scope > .app-start-splash')?.remove();
+}
+
+async function appStartSplashAbwarten() {
+  const rest = Math.max(0, APP_START_SPLASH_MS - (performance.now() - appStartSplashBeginn));
+  if (rest) await new Promise((resolve) => setTimeout(resolve, rest));
+}
+
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -341,6 +359,7 @@ function meldung(slot, text, art) {
 }
 
 function renderSetup() {
+  appStartSplashVerwerfen();
   app.classList.remove('app-shell');
   appDexShellEntfernen();
   setSeite('setup');
@@ -373,6 +392,7 @@ function renderSetup() {
 }
 
 function renderAuth() {
+  appStartSplashVerwerfen();
   app.classList.remove('app-shell');
   appDexShellEntfernen();
   setSeite('auth');
@@ -465,6 +485,7 @@ function renderAuth() {
 }
 
 function renderRecovery() {
+  appStartSplashVerwerfen();
   app.classList.remove('app-shell');
   appDexShellEntfernen();
   setSeite('auth');
@@ -1561,8 +1582,16 @@ async function renderRoute() {
   /* Chrome (html-Attribute + Custom Properties) und Shell zusammen anwenden,
      kurz bevor die neue Ansicht sichtbar wird. So sieht der Nutzer einen
      einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
+  if (app.querySelector(':scope > .app-start-splash')) await appStartSplashAbwarten();
+  if (generation !== renderGeneration) {
+    view.remove();
+    commitSeiteDefer(true);
+    commitPageLookDefer(true);
+    return;
+  }
   commitSeiteDefer();
   commitPageLookDefer();
+  appStartSplashVerwerfen();
   const alteSeite = app.querySelector(':scope > #view');
   if (alteSeite) {
     if (richtung !== 'gleich') ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
@@ -1586,6 +1615,7 @@ async function renderRoute() {
 }
 
 function renderLadefehler(error) {
+  appStartSplashVerwerfen();
   const info = userFacingLoadError(error, { online: navigator.onLine });
   routeAbortController?.abort();
   ansichtsCache.clear();
