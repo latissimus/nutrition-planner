@@ -133,8 +133,8 @@
   --mq-h:34px;
   --brand-outline:#0A1330;
   --brand-pink:#FF69AE;      /* Logo-Pink wie im LOGMAN-Logo (weicher als --pink) */
-  /* CAPBOY-Blatt: SVG hat fixe Navy-Farbe, im Dark-Mode via CSS-Filter
-     invertiert (siehe .capboy-blatt image weiter unten). */
+  /* Dieselbe Kraftsport-Silhouette wie bei LOGMAN; im Dark-Mode wird die
+     eine Bilddatei per Filter aufgehellt. */
   --sil-filter:none;
 
   /* Tuckii misst auf dem iPhone 14 (390 pt Breite) rund 3 pt Rand, 4 pt harten
@@ -290,20 +290,13 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
    damit die Aufrufstellen unveraendert bleiben. */
 .brand{position:relative;z-index:0;display:inline-block;font-size:22px;line-height:0}
 .brand-svg{display:block;width:5.3em;height:auto;overflow:visible}
-/* Paper.svg im CAPBOY-Logo hat fixe Navy-Fuellung; im Darkmode via
-   Filter zu Weiss invertieren, statt eine zweite Datei zu pflegen. Das
-   Backing-Rechteck fuer den Knick wird gleich mitgedreht: hell im Light-
-   Mode (Knick weiss auf navy Blatt), dunkel im Dark-Mode (Knick navy auf
-   weissem Blatt). */
-:root[data-theme="dark"] .capboy-blatt image{filter:brightness(0) invert(1)}
-:root[data-theme="dark"] .capboy-blatt .capboy-knick{fill:#0A1330}
 /* Athleten-Silhouette (Navy) hinter dem Schriftzug.
    Das Bild ist navy und geht auf dunklem Grund unter – im Dark-Theme hellt ein
    Filter es auf, statt eine zweite Bilddatei zu pflegen. */
 .brand::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:1.9em;height:1.9em;z-index:-1;pointer-events:none;
   filter:var(--sil-filter);
-  background:none}
+  background:url(./assets/silhouette-navy.png) center/contain no-repeat}
 :root[data-theme="dark"] .brand::before{opacity:1}
 .nav{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 /* FAQ-Knopf, solange das Sheet offen ist. Gelb passt auf den hellblauen Grund
