@@ -8460,3 +8460,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet>header{
   margin-bottom:7px!important;
 }
+
+/* Alte System-Dex-Regeln setzten `border:0 !important`; ein spaeteres
+   border-width allein konnte deshalb keine sichtbare Kontur erzeugen. Hier
+   wird der komplette Border-Shorthand gesetzt. Der gewollte Buttonschatten
+   bleibt unangetastet. */
+:root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet :is(
+  .btn,
+  .btn-primary,
+  .rem-speichern
+){
+  border:1.5px solid #111!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .special-dex-overlay>.special-dex-sheet :is(
+  .btn,
+  .btn-primary,
+  .rem-speichern
+){
+  border-color:#697486!important;
+}
+
+/* Der Trinkplan lebt teilweise direkt in seiner TRACKER-Karte und lag damit
+   ausserhalb der Overlay-Farbregel. Auch seine Hauptaktion folgt der aktiven
+   Seitenfarbe statt dem alten braunen System-Dex-Akzent. */
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken :is(
+  .btn-primary,
+  .rem-speichern
+){
+  border:1.5px solid #111!important;
+  background:var(--ordner,#525CEB)!important;
+  color:var(--ordner-ink,#fff)!important;
+}
