@@ -8440,3 +8440,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="reminders"] .app-dex-tab.aktiv>span{
   filter:drop-shadow(2px 2px 0 #EDF0F6);
 }
+
+/* TRACKER-Overlay als Vorlage: dieselbe 28-px-Achse und dieselbe 15-px-
+   Rundung wie die Karten. Die Dialogflaeche schwebt bereits durch den
+   abgedunkelten Hintergrund und braucht deshalb keinen Kartenschatten. */
+:root[data-seite="reminders"] .special-dex-overlay{
+  padding-inline:28px!important;
+}
+:root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet{
+  width:min(100%,604px)!important;
+  max-width:604px!important;
+  border:1.5px solid #111!important;
+  border-radius:15px!important;
+  box-shadow:none!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .special-dex-overlay>.special-dex-sheet{
+  border-color:#697486!important;
+}
+:root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet>header{
+  margin-bottom:7px!important;
+}
