@@ -8225,10 +8225,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root[data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#fff;
+  --tracker-tint:color-mix(in srgb,var(--ordner) 7%,#fff);
   --muted:#586274;
 }
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#191C24;
+  --tracker-tint:color-mix(in srgb,var(--ordner) 11%,#191C24);
   --muted:#AEB7C6;
 }
 
@@ -8290,23 +8292,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:relative;
   overflow:hidden;
   padding-top:20px;
+  background:var(--tracker-tint)!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero::before{
-  content:"";
-  position:absolute;
-  inset:0 0 auto;
-  height:4px;
-  background:var(--brand-pink,#FF69AE);
-  pointer-events:none;
+  content:none;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
-  .nutrition-coin-overview>summary,
   .nutrition-coin-overview-body,
-  .mahl-zeitblock>header,
   .mahl-zeitblock .mahl-timeline,
   .nutrition-ring::after
 ){
   background:var(--tracker-card)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-overview>summary,
+  .mahl-zeitblock>header
+){
+  background:var(--tracker-tint)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after{
+  background:var(--tracker-tint)!important;
 }
 
 /* LOGMAN-Typohierarchie: kursive Work-Sans-Titel, Mono nur fuer Uhrzeiten,
