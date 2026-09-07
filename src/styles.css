@@ -8272,19 +8272,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    voll funktionsfaehig, lesen sich aber als Status statt als zweite Marke. */
 :root[data-seite="reminders"] .app-dex-header-actions{gap:4px}
 :root[data-seite="reminders"] .app-dex-header .coin-kopfstand{
-  gap:2px;
-  height:40px;
+  gap:0;
+  height:34px;
 }
 :root[data-seite="reminders"] .app-dex-header .coin-kopfstand .coin-kopf-symbol{
-  width:29px;
-  height:29px;
-  flex-basis:29px;
+  width:25px;
+  height:25px;
+  flex-basis:25px;
 }
 :root[data-seite="reminders"] .app-dex-header .coin-kopfstand strong{
-  min-width:11px;
+  min-width:10px;
   color:#24304A;
-  font:700 10.5px/1 var(--tech);
-  transform:translateY(2px);
+  font:700 10px/1 var(--tech);
+  transform:translateY(1px);
 }
 :root[data-seite="reminders"] .app-dex-sync{
   height:21px;
@@ -8323,6 +8323,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
   position:relative;
   overflow:hidden;
+  grid-template-columns:76px minmax(0,1fr) 34px;
+  gap:12px;
   padding-top:20px;
   background:var(--tracker-tint)!important;
 }
@@ -8358,6 +8360,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value small{
   letter-spacing:.055em!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-overview>summary b,
+  .mahl-zeitblock>header h2
+){
+  font-size:15px!important;
+  line-height:1.1!important;
+  text-transform:uppercase;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
   .nutrition-coin-overview>summary small,
@@ -8400,8 +8410,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-size:23px;
 }
 :root[data-seite="reminders"] .app-dex-tab small{
-  font-size:8px;
-  font-weight:750;
+  opacity:.72;
+  font-family:var(--tech);
+  font-size:7.5px;
+  font-weight:800;
+  letter-spacing:.015em;
 }
 :root[data-seite="reminders"] .app-dex-tab.aktiv{
   background:color-mix(in srgb,#fff 54%,var(--dex-seitenfarbe,var(--bg)));
