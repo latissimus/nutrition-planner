@@ -9,7 +9,10 @@ export function capboySvg() {
   const d = `M 26,96 Q 175,52 324,96`;
   const txt =
     `<tspan font-size="27" stroke-width="3.1" dy="-3">★</tspan>` +
-    `<tspan dx="8" dy="3">CAPBOY</tspan>` +
+    // LOGMAN enthaelt mit dem M einen deutlich breiteren Buchstaben. Eine
+    // leicht offenere Laufweite gibt CAPBOY dieselbe optische Praesenz, ohne
+    // Schrift oder Silhouette horizontal zu verzerren.
+    `<tspan dx="8" dy="3" letter-spacing="0.2">CAPBOY</tspan>` +
     `<tspan font-size="27" stroke-width="3.1" dx="7" dy="-3">★</tspan>`;
   const path = `<textPath href="#${id}" startOffset="50%">${txt}</textPath>`;
   return `<svg class="brand-svg capboy-svg" viewBox="18 19 318 85" role="img" aria-label="CAPBOY">

@@ -7952,7 +7952,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   min-width:0;
   line-height:0;
 }
-.app-dex-brand .brand{font-size:clamp(19px,5.5vw,23px)}
+/* Exakt dieselbe aeussere Skalierung wie das LOGMAN-Logo. Die fruehere
+   5.5-vw-Regel ergab auf dem iPhone 14 nur 21.45 statt 22 px und verkleinerte
+   damit zugleich Schriftzug und Athleten-Silhouette. */
+.app-dex-brand .brand{font-size:22px}
 .app-dex-header-actions{display:flex;align-items:center;gap:7px;min-width:0}
 .app-dex-header .coin-kopfstand{color:currentColor;top:-2px}
 .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:36px;height:36px;flex-basis:36px}
