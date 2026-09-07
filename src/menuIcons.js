@@ -55,7 +55,7 @@ export function entryButtonMarkup(className = 'app-dex-menu-icon') {
   /* Derselbe kleine Desktop-Computer wie im LOGMAN. Die CAPBOY-Aktion bleibt
      unverändert: Der Knopf öffnet weiterhin das Kontextmenü der aktiven Seite. */
   return `<span class="${className} menue-computer" aria-hidden="true">
-    <svg viewBox="0 0 62 55" preserveAspectRatio="none">
+    <svg viewBox="0 0 62 55" preserveAspectRatio="xMidYMid meet">
       <defs>
         <mask id="capboy-menue-fenster-ausschnitt" maskUnits="userSpaceOnUse">
           <rect width="62" height="55" fill="#FFFFFF"/>

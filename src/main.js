@@ -618,9 +618,19 @@ function appSyncStatusAktualisieren() {
   const status = app.querySelector(':scope > .app-dex-header .app-dex-sync');
   if (!status) return;
   const online = navigator.onLine;
-  status.textContent = online ? '✓' : '↑';
-  status.className = `app-dex-sync save-dot ${online ? 'ok' : 'wait'}`;
-  status.title = online ? 'synchronisiert' : 'auf diesem Gerät gesichert · wartet auf Verbindung';
+  /* Der erfolgreiche Normalzustand bleibt still. Ein permanenter Haken war
+     mehrdeutig (online, gespeichert oder erledigt?) und konkurrierte mit den
+     CAPCOINS. Sichtbar wird der Platz nur, wenn wirklich Aufmerksamkeit nötig
+     ist. Die Offline-Fähigkeit und der Service Worker bleiben davon unberührt. */
+  status.hidden = online;
+  status.textContent = online ? '' : 'OFFLINE';
+  status.className = `app-dex-sync save-dot${online ? '' : ' wait'}`;
+  if (online) {
+    status.removeAttribute('title');
+    status.removeAttribute('aria-label');
+    return;
+  }
+  status.title = 'Offline · Verbindung zum Synchronisieren erforderlich';
   status.setAttribute('aria-label', status.title);
 }
 

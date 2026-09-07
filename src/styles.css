@@ -7985,8 +7985,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#60706A;
   font:700 18px/1 var(--tech);
 }
+.app-dex-sync[hidden]{display:none!important}
 .app-dex-sync.ok{color:#17804A}
-.app-dex-sync.wait{color:#1E63A7;font-size:22px;font-weight:900}
+.app-dex-sync.wait{
+  width:auto;
+  height:24px;
+  padding:0 7px;
+  border:1.5px solid currentColor;
+  border-radius:999px;
+  color:#1E63A7;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.045em;
+}
+:root[data-theme="dark"] .app-dex-sync.wait{color:#AEDCF6}
 
 .app-dex-dock{
   position:absolute;
@@ -8275,9 +8287,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:translateY(2px);
 }
 :root[data-seite="reminders"] .app-dex-sync{
-  width:21px;
   height:21px;
-  font-size:15px;
 }
 :root[data-theme="dark"][data-seite="reminders"] .app-dex-header .coin-kopfstand strong{
   color:#C7CFDC;
