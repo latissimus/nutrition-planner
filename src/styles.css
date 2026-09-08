@@ -8650,6 +8650,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* REZEPTE, TRAINING und STRESS: gleiche Aussenachse, aber keine kuenstlich
    breiten Einzelkarten. Ihre Raster bleiben responsiv und eigenstaendig. */
+:root[data-seite="food-log"] .neo-dex-page.dex-fixkopf>.wrap,
+:root[data-seite="training"] .neo-dex-page.dex-fixkopf>.wrap,
+:root[data-seite="stress"] .neo-dex-page.dex-fixkopf>.wrap{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:none!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+:root[data-seite="food-log"] .neo-dex-page .kategorie-scrollinhalt,
+:root[data-seite="training"] .neo-dex-page .kategorie-scrollinhalt,
+:root[data-seite="stress"] .neo-dex-page .kategorie-scrollinhalt{
+  box-sizing:border-box!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
 .neo-dex-page .sammlung-seite{
   box-sizing:border-box!important;
   width:min(calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline)),var(--cap-content-max))!important;
