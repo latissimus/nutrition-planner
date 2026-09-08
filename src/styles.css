@@ -8519,9 +8519,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-tab small{
   opacity:.9;
   font-family:var(--tech);
-  font-size:8.5px;
-  font-weight:850;
-  letter-spacing:0;
+  font-size:9px;
+  font-weight:900;
+  line-height:1;
+  letter-spacing:-.01em;
 }
 .app-dex-tab.aktiv{
   background:color-mix(in srgb,#fff 54%,var(--dex-seitenfarbe,var(--bg)));
