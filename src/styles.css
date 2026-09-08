@@ -6647,7 +6647,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:16px;
 }
 :root[data-seite="reminders"] .rem-period-overlay .kategorie-sheet>header{
-  margin-bottom:8px!important;
+  margin-bottom:4px!important;
 }
 :root[data-seite="reminders"] .rem-period-overlay .rem-overlay-hinweis{
   margin:0 0 5px;
@@ -8408,7 +8408,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#697486!important;
 }
 :root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet>header{
-  margin-bottom:7px!important;
+  margin-bottom:4px!important;
 }
 
 /* Alte System-Dex-Regeln setzten `border:0 !important`; ein spaeteres
@@ -8687,6 +8687,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-top:0!important;
   padding-bottom:22px!important;
 }
+.neo-dex-page :is(.neo-dex-filter,.food-dex-filter)>button:first-child{
+  margin-left:-8px!important;
+}
+.neo-dex-page :is(.neo-dex-filter,.food-dex-filter)>button:last-child{
+  margin-right:-8px!important;
+}
 
 /* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.
    Der Buttonschatten bleibt als einzige plastische Ebene erhalten. */
@@ -8702,7 +8708,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
   font-family:"Work Sans",var(--ui),sans-serif!important;
 }
-.kategorie-sheet>header{margin-bottom:7px!important}
+.kategorie-sheet>header,
+.special-dex-overlay>.special-dex-sheet>header{margin-bottom:4px!important}
 .kategorie-sheet :is(h1,h2,h3,label,legend,button,b,strong){font-family:"Work Sans",var(--ui),sans-serif}
 .kategorie-sheet :is(input[type="date"],input[type="time"],input[type="number"],output,.coin-zahlenfeld){
   font-family:var(--tech)!important;

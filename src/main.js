@@ -168,6 +168,17 @@ if (routineActionFromUrl) {
 const app = document.querySelector('#app');
 const APP_START_SPLASH_MS = 2000;
 const appStartSplashBeginn = performance.now();
+const appSchriftenBereit = document.fonts
+  ? Promise.race([
+      Promise.all([
+        document.fonts.load('800 16px Figtree'),
+        document.fonts.load('900 16px "Work Sans"'),
+        document.fonts.load('italic 700 16px "Work Sans"'),
+        document.fonts.load('800 16px "JetBrains Mono"'),
+      ]),
+      new Promise((resolve) => setTimeout(resolve, 2500)),
+    ]).catch(() => [])
+  : Promise.resolve([]);
 
 /* Der Splash wird sofort nach dem Parsen des Einstiegschunks gezeichnet. Der
    blaue First Paint davor kommt bereits aus index.html, sodass auch auf einem
@@ -175,13 +186,20 @@ const appStartSplashBeginn = performance.now();
 app.innerHTML = `<div class="app-start-splash" role="status" aria-label="CAPBOY wird geladen">${capboyMarkup()}</div>`;
 
 function appStartSplashVerwerfen() {
-  document.documentElement.classList.remove('app-booting');
-  app.querySelector(':scope > .app-start-splash')?.remove();
+  const ausblenden = () => {
+    document.documentElement.classList.remove('app-booting');
+    app.querySelector(':scope > .app-start-splash')?.remove();
+  };
+  if (!document.fonts || document.fonts.status === 'loaded') ausblenden();
+  else void appSchriftenBereit.finally(ausblenden);
 }
 
 async function appStartSplashAbwarten() {
   const rest = Math.max(0, APP_START_SPLASH_MS - (performance.now() - appStartSplashBeginn));
-  if (rest) await new Promise((resolve) => setTimeout(resolve, rest));
+  await Promise.all([
+    rest ? new Promise((resolve) => setTimeout(resolve, rest)) : Promise.resolve(),
+    appSchriftenBereit,
+  ]);
 }
 
 const escapeHtml = (value = '') => String(value)
