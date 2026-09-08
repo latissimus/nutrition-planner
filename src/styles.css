@@ -8680,24 +8680,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:700!important;
   letter-spacing:-.02em!important;
 }
-.neo-dex-page :is(.neo-dex-filter,.food-dex-filter,.unter-sammlungen-grid){
+.neo-dex-page .unter-sammlungen-grid{
   padding-left:0!important;
   padding-right:0!important;
   scroll-padding-inline:0!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter){
-  /* Der erste Chip beginnt auf der Hero-Oberkante. Die entfernte obere
-     Luft wandert nach unten, damit der Abstand zum Inhalt gleich bleibt. */
+  /* Exakt dieselbe Viewport-Ausbruchstechnik wie die funktionierende
+     Einkauf-Tagleiste: Die Leiste selbst reicht bis zu beiden Displaykanten,
+     nur ihre normale Startposition liegt auf der gemeinsamen Inhaltsachse. */
+  box-sizing:border-box!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  margin-left:calc(50% - 50vw)!important;
+  margin-right:calc(50% - 50vw)!important;
   padding-top:0!important;
+  padding-left:var(--cap-reference-inline)!important;
+  padding-right:var(--cap-reference-inline)!important;
   padding-bottom:22px!important;
-}
-.neo-dex-page :is(.neo-dex-filter,.food-dex-filter)>button:first-child{
-  /* Die runde Pillenform braucht mehr als nur die rechnerische Kante:
-     Mit -8px blieb der gekruemmte Rand optisch mehrere Pixel eingerueckt. */
-  margin-left:-16px!important;
-}
-.neo-dex-page :is(.neo-dex-filter,.food-dex-filter)>button:last-child{
-  margin-right:-16px!important;
+  scroll-padding-left:var(--cap-reference-inline)!important;
+  scroll-padding-right:var(--cap-reference-inline)!important;
 }
 
 /* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.

@@ -19,6 +19,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="habits"] .routine-dex-page :is(.routine-hero-stack,.routine-plan,.routine-notizen)');
     expect(designSystem).toContain(':root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche');
     expect(designSystem).toContain('.neo-dex-page .sammlung-seite');
+    expect(designSystem).toContain('width:100vw!important');
+    expect(designSystem).toContain('margin-left:calc(50% - 50vw)!important');
     expect(designSystem).toContain(':root[data-seite="profile"] .profil-scrollinhalt');
     expect(designSystem).toContain('100vw - var(--cap-reference-inline) - var(--cap-reference-inline)');
   });
