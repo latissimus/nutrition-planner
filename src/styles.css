@@ -7625,6 +7625,43 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:2px solid #111!important;
   box-shadow:0 3.5px 0 #000!important;
 }
+
+/* ROUTINEN hatte fuer seine Listenkarte noch einen spezifischeren
+   border:0-Hotfix. Er darf den gemeinsamen Kartenstandard nicht aushebeln. */
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  box-shadow:none!important;
+}
+
+/* PROFIL ist zwar keine Inhaltsseite, lebt aber im selben App-Shell. Seine
+   Akkordeons folgen deshalb derselben Achse und Kartenfamilie. */
+:root[data-seite="profile"] .profil-scrollinhalt{
+  box-sizing:border-box!important;
+  width:min(calc(100% - 56px),var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  margin-inline:auto!important;
+}
+:root[data-seite="profile"] .profile-abschnitt,
+:root[data-seite="profile"] .profile-abschnitt.profile-konto{
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  background:var(--cap-card)!important;
+  box-shadow:none!important;
+}
+:root[data-seite="profile"] .profile-abschnitt>summary{
+  background:var(--cap-tint)!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:15px!important;
+  font-style:italic!important;
+  font-weight:700!important;
+  letter-spacing:-.025em!important;
+}
+:root[data-seite="profile"] .profile-ausloggen .btn{
+  border:1.5px solid #111!important;
+  border-radius:11px!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
 :root[data-seite="profile"] .profile-abschnitt>summary{
   box-sizing:border-box;
   display:flex;
@@ -8268,32 +8305,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --muted:#AEB7C6;
 }
 
-/* Das Logo bleibt der einzige dominante Blickfang. CAPCOIN und Sync bleiben
-   voll funktionsfaehig, lesen sich aber als Status statt als zweite Marke. */
-:root[data-seite="reminders"] .app-dex-header-actions{gap:4px}
-:root[data-seite="reminders"] .app-dex-header .coin-kopfstand{
-  gap:0;
-  height:34px;
-}
-:root[data-seite="reminders"] .app-dex-header .coin-kopfstand .coin-kopf-symbol{
-  width:25px;
-  height:25px;
-  flex-basis:25px;
-}
-:root[data-seite="reminders"] .app-dex-header .coin-kopfstand strong{
-  min-width:10px;
-  margin-right:4px;
-  color:#24304A;
-  font:700 10px/1 var(--tech);
-  transform:translateY(1px);
-}
-:root[data-seite="reminders"] .app-dex-sync{
-  height:21px;
-}
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-header .coin-kopfstand strong{
-  color:#C7CFDC;
-}
-
 /* Weniger und groessere Wiederholungen lassen das Burger-Motiv als Tapete
    statt als zweite Inhaltsebene erscheinen. */
 :root[data-seite="reminders"] .meal-log-dex-page::before{
@@ -8380,67 +8391,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-family:var(--tech)!important;
 }
 
-/* Leichteres Milchglas-Menue nur im TRACKER-Testlauf. Auswahl-Schatten und
-   die feste Trennlinie vor dem zentralen Eintragsknopf bleiben erhalten. */
-:root[data-seite="reminders"] .app-dex-dock-inner{
-  grid-template-columns:minmax(0,1fr) 62px;
-  gap:5px;
-  padding:4px;
-}
-:root[data-seite="reminders"] .app-dex-dock-inner::before{
-  border-width:1.5px;
-  background:color-mix(in srgb,var(--dex-seitenfarbe,var(--bg)) 72%,transparent);
-  -webkit-backdrop-filter:blur(13px) saturate(1.08);
-  backdrop-filter:blur(13px) saturate(1.08);
-}
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-dock-inner::before{
-  background:rgba(16,26,43,.78);
-}
-:root[data-seite="reminders"] .app-dex-tabs{gap:2px}
-:root[data-seite="reminders"] .app-dex-tab{
-  width:54px;
-  min-width:54px;
-  height:53px;
-  grid-template-rows:30px 11px;
-  padding:5px 2px 3px;
-  border-radius:10px;
-}
-:root[data-seite="reminders"] .app-dex-tab>span{
-  width:29px;
-  height:29px;
-  font-size:23px;
-}
-:root[data-seite="reminders"] .app-dex-tab small{
-  opacity:.9;
-  font-family:var(--tech);
-  font-size:8.5px;
-  font-weight:850;
-  letter-spacing:0;
-}
-:root[data-seite="reminders"] .app-dex-tab.aktiv{
-  background:color-mix(in srgb,#fff 54%,var(--dex-seitenfarbe,var(--bg)));
-  box-shadow:inset 0 0 0 1.25px #0A1330;
-}
-:root[data-seite="reminders"] .app-dex-tab.aktiv>span{
-  filter:drop-shadow(2px 2px 0 #0A1330);
-}
-:root[data-seite="reminders"] .app-dex-menu{
-  width:62px;
-  height:53px;
-  border-left-width:1.5px;
-}
-:root[data-seite="reminders"] .app-dex-menu-icon svg{
-  width:100%;
-  height:100%;
-}
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-tab.aktiv{
-  background:#252E3D;
-  box-shadow:inset 0 0 0 1.25px #697486;
-}
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-tab.aktiv>span{
-  filter:drop-shadow(2px 2px 0 #EDF0F6);
-}
-
 /* TRACKER-Overlay als Vorlage: dieselbe 28-px-Achse und dieselbe 15-px-
    Rundung wie die Karten. Die Dialogflaeche schwebt bereits durch den
    abgedunkelten Hintergrund und braucht deshalb keinen Kartenschatten. */
@@ -8490,4 +8440,273 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:1.5px solid #111!important;
   background:var(--ordner,#525CEB)!important;
   color:var(--ordner-ink,#fff)!important;
+}
+
+/* ============================================================
+   CAPBOY DESIGN-SYSTEM
+
+   TRACKER ist die verbindliche Referenz. Diese Regeln ersetzen die zuvor
+   je Seite wiederholten 21-/28-/36-px-Geometrien durch genau eine Achse.
+   Rasterseiten verwenden dieselbe Aussenkante, behalten innen aber ihr
+   zweispaltiges Layout. Overlays bleiben mit 520px bewusst kompakter.
+   ============================================================ */
+:root{
+  --cap-page-inline:28px;
+  --cap-content-max:604px;
+  --cap-stack-gap:18px;
+  --cap-card-radius:15px;
+  --cap-card-border:1.5px solid #111;
+  --cap-card:#fff;
+  --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#525CEB)) 7%,#fff);
+  --cap-muted:#586274;
+  --cap-sheet-inline:21px;
+  --cap-sheet-max:520px;
+  --dex-content-gutter:var(--cap-page-inline);
+  --dex-content-max:var(--cap-content-max);
+}
+:root[data-theme="dark"]{
+  --cap-card:#191C24;
+  --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#525CEB)) 11%,#191C24);
+  --cap-muted:#AEB7C6;
+  --cap-card-border:1.5px solid #697486;
+}
+
+/* Header: dieselbe ruhige Statushierarchie wie im fertigen TRACKER. */
+.app-dex-header-actions{gap:4px}
+.app-dex-header .coin-kopfstand{gap:0;height:34px}
+.app-dex-header .coin-kopfstand .coin-kopf-symbol{
+  width:25px;
+  height:25px;
+  flex-basis:25px;
+}
+.app-dex-header .coin-kopfstand strong{
+  min-width:10px;
+  margin-right:4px;
+  color:#24304A;
+  font:700 10px/1 var(--tech);
+  transform:translateY(1px);
+}
+.app-dex-sync{height:21px}
+:root[data-theme="dark"] .app-dex-header .coin-kopfstand strong{color:#C7CFDC}
+
+/* Globales Milchglas-Menue: feste Menue-Spalte, unverrueckbare Trennlinie
+   und identische Tab-Typografie auf jeder Seite. */
+.app-dex-dock-inner{
+  grid-template-columns:minmax(0,1fr) 62px;
+  gap:5px;
+  padding:4px;
+}
+.app-dex-dock-inner::before{
+  border-width:1.5px;
+  background:color-mix(in srgb,var(--dex-seitenfarbe,var(--bg)) 72%,transparent);
+  -webkit-backdrop-filter:blur(13px) saturate(1.08);
+  backdrop-filter:blur(13px) saturate(1.08);
+}
+.app-dex-tabs{gap:2px}
+.app-dex-tab{
+  width:54px;
+  min-width:54px;
+  height:53px;
+  grid-template-rows:30px 11px;
+  padding:5px 2px 3px;
+  border-radius:10px;
+}
+.app-dex-tab>span{width:29px;height:29px;font-size:23px}
+.app-dex-tab small{
+  opacity:.9;
+  font-family:var(--tech);
+  font-size:8.5px;
+  font-weight:850;
+  letter-spacing:0;
+}
+.app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 54%,var(--dex-seitenfarbe,var(--bg)));
+  box-shadow:inset 0 0 0 1.25px #0A1330;
+}
+.app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #0A1330)}
+.app-dex-menu{width:62px;height:53px;border-left-width:1.5px}
+.app-dex-menu-icon svg{width:100%;height:100%}
+:root[data-theme="dark"] .app-dex-dock-inner::before{background:rgba(16,26,43,.78)}
+:root[data-theme="dark"] .app-dex-tab.aktiv{
+  background:#252E3D;
+  box-shadow:inset 0 0 0 1.25px #697486;
+}
+:root[data-theme="dark"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #EDF0F6)}
+
+/* Breite Karten: TRACKER, SCHLAF, ROUTINEN, KOERPER und CAPCOINS. */
+.special-dex-page{
+  --special-dex-inline:var(--cap-page-inline)!important;
+  --special-dex-gap:var(--cap-stack-gap)!important;
+  --special-dex-content-max:var(--cap-content-max)!important;
+  --special-dex-radius:var(--cap-card-radius)!important;
+  --special-dex-border:var(--cap-card-border)!important;
+  --special-dex-hero-bg:var(--cap-tint)!important;
+  --special-dex-card-bg:var(--cap-card)!important;
+  --special-dex-hero-shadow:none!important;
+}
+.special-dex-page .special-dex-content,
+:root[data-seite="sleep"] .sleep-dex-page [data-sleep-content],
+:root[data-seite="body"] .body-log-dex-page .body-metrics-wrap>.special-dex-content,
+:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-stack,.routine-plan,.routine-notizen),
+.coin-dex-page .coin-dex-inhalt{
+  box-sizing:border-box!important;
+  width:min(calc(100% - 56px),var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  margin-inline:auto!important;
+  padding-inline:0!important;
+}
+.special-dex-page :is(.special-dex-hero,.special-dex-wide-card),
+:root[data-seite="body"] :is(.body-v2-hero,.body-v2-overview,.body-v2-card),
+:root[data-seite="sleep"] :is(.sleep-tonight,.sleep-checkin-overview,.sleep-section),
+:root[data-seite="habits"] :is(.routine-hero,.routine-zeitblock),
+.coin-dex-page :is(.coin-balance-card,.coin-verdienst,.coin-next,.coin-reward,.coin-empty){
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  box-shadow:none!important;
+}
+.special-dex-page .special-dex-hero,
+:root[data-seite="body"] .body-v2-hero,
+:root[data-seite="sleep"] .sleep-tonight,
+:root[data-seite="habits"] .routine-hero,
+.coin-dex-page .coin-balance-card{background:var(--cap-tint)!important}
+.special-dex-page .special-dex-wide-card,
+:root[data-seite="body"] :is(.body-v2-overview,.body-v2-card),
+:root[data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section),
+:root[data-seite="habits"] .routine-zeitblock,
+.coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty){background:var(--cap-card)!important}
+
+/* Gemeinsame Karten-Typografie. Mono bleibt allein Daten, Uhrzeiten und
+   Messwerten vorbehalten. */
+.special-dex-page :is(
+  .nutrition-coin-hero-value>small,
+  .nutrition-coin-overview>summary b,
+  .mahl-zeitblock>header h2,
+  .sleep-tonight-value>small,
+  .sleep-section-title h2,
+  .routine-hero-value>small,
+  .routine-zeitblock>header h2,
+  .body-v2-hero-value>small,
+  .body-v2-overview>summary b,
+  .body-v2-card>header b,
+  .coin-section-title h2
+){
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-style:italic!important;
+  font-weight:700!important;
+  letter-spacing:-.025em!important;
+}
+.special-dex-page :is(
+  .nutrition-coin-overview>summary b,
+  .mahl-zeitblock>header h2,
+  .sleep-section-title h2,
+  .routine-zeitblock>header h2,
+  .body-v2-overview>summary b,
+  .body-v2-card>header b,
+  .coin-section-title h2
+){font-size:15px!important;line-height:1.1!important}
+.special-dex-page :is(small,.body-explain,.routine-copy small,.sleep-chart-empty){color:var(--cap-muted)}
+
+/* EINKAUF nutzt ebenfalls die 28-px-Achse. Suchfeld und Gruppen sind damit
+   immer exakt gleich breit; die Tagleiste bleibt separat voll scrollbar. */
+:root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche,
+:root[data-seite="shopping"] .shopping-dex-wrap .einkauf-kopfzeile,
+:root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-liste]{
+  box-sizing:border-box!important;
+  width:min(calc(100vw - 56px),var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+:root[data-seite="shopping"] .einkauf-suche,
+:root[data-seite="shopping"] .einkauf-gruppe{
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  box-shadow:none!important;
+}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head{
+  background:var(--cap-tint)!important;
+}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head b{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:15px!important;
+  font-style:italic!important;
+  font-weight:700!important;
+  letter-spacing:-.025em!important;
+}
+:root[data-seite="shopping"] .einkauf-tag-scroll{
+  width:100vw!important;
+  margin-inline:calc(50% - 50vw)!important;
+  padding-left:var(--cap-page-inline)!important;
+  padding-right:var(--cap-page-inline)!important;
+  scroll-padding-inline:var(--cap-page-inline)!important;
+}
+
+/* REZEPTE, TRAINING und STRESS: gleiche Aussenachse, aber keine kuenstlich
+   breiten Einzelkarten. Ihre Raster bleiben responsiv und eigenstaendig. */
+.neo-dex-page .sammlung-seite{
+  box-sizing:border-box!important;
+  width:min(calc(100% - 56px),var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  margin-inline:auto!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.neo-dex-page .dex-inhaltsgrid{
+  gap:14px!important;
+  padding-inline:0!important;
+}
+.neo-dex-page .dex-inhaltskarte{
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  box-shadow:none!important;
+}
+.neo-dex-page .dex-inhaltskarte strong{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-style:italic!important;
+  font-weight:700!important;
+  letter-spacing:-.02em!important;
+}
+.neo-dex-page :is(.neo-dex-filter,.food-dex-filter,.unter-sammlungen-grid){
+  padding-left:var(--cap-page-inline)!important;
+  padding-right:var(--cap-page-inline)!important;
+  scroll-padding-inline:var(--cap-page-inline)!important;
+}
+
+/* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.
+   Der Buttonschatten bleibt als einzige plastische Ebene erhalten. */
+.kategorie-sheet-backdrop{
+  box-sizing:border-box;
+  padding-inline:var(--cap-sheet-inline)!important;
+}
+.kategorie-sheet{
+  width:min(100%,var(--cap-sheet-max))!important;
+  max-width:var(--cap-sheet-max)!important;
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  box-shadow:none!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+}
+.kategorie-sheet>header{margin-bottom:7px!important}
+.kategorie-sheet :is(h1,h2,h3,label,legend,button,b,strong){font-family:"Work Sans",var(--ui),sans-serif}
+.kategorie-sheet :is(input[type="date"],input[type="time"],input[type="number"],output,.coin-zahlenfeld){
+  font-family:var(--tech)!important;
+  font-variant-numeric:slashed-zero tabular-nums;
+}
+.kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border:1.5px solid #111!important;
+}
+:root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#697486!important;
+}
+:root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop) .btn-primary{
+  border:1.5px solid #111!important;
+  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  color:var(--ordner-ink,#111)!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+
+@media(max-width:390px){
+  .app-dex-header-actions{gap:4px}
+  .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:25px;height:25px;flex-basis:25px}
+  :root[data-seite="profile"] .profil-scrollinhalt{width:calc(100% - 56px)!important}
 }
