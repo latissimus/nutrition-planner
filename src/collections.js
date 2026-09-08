@@ -143,6 +143,9 @@ function closeEditor(backdrop) {
 }
 
 export function openCollectionEditor({ userId, rootKey, parentId = null, existing = null, onSaved }) {
+  // Eigene Hauptseiten werden nicht mehr angeboten. Vorhandene Seiten und
+  // Unterordner bleiben unangetastet und können weiterhin geöffnet werden.
+  if (rootKey === 'home' && !parentId && !existing) return null;
   const selectedColor = existing?.color || categoryColor(rootKey) || COLLECTION_COLORS[0];
   const selectedIcon = existing?.icon_key || COLLECTION_ICONS.find((icon) => icon === 'create_new_folder') || COLLECTION_ICONS[0];
   const isSubDex = Boolean(parentId || existing?.parent_id) || rootKey !== 'home';

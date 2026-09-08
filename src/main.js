@@ -37,7 +37,7 @@ import {
   applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
-  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor, saveCollection,
+  collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
 import { entryButtonMarkup, hasMenuIcon, menuIconMarkup } from './menuIcons.js';
@@ -946,17 +946,6 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     setPageLookColor(route, color);
     setPageLookPattern(route, pattern);
   });
-  try {
-    const neu = await saveCollection(userId, {
-      rootKey: 'home', parentId: null, name: 'Neu', color: '#FF06B7', iconKey: 'emoji:🆕',
-    });
-    if (neu?.id) {
-      setPageLookColor(`collection-${neu.id}`, '#FF06B7');
-      setPageLookPattern(`collection-${neu.id}`, 'wallpaper-blitz');
-    }
-  } catch (error) {
-    if (!signal?.aborted) console.warn('Standard-Dex konnte nicht angelegt werden:', error.message);
-  }
   setPreference(key, true);
   return true;
 }

@@ -7,6 +7,7 @@ const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
 describe('CAPBOY Design-System', () => {
   it('legt die gemeinsame Kartenachse zentral fest', () => {
     expect(designSystem).toContain('--cap-page-inline:28px');
+    expect(designSystem).toContain('--cap-wide-page-inline:21px');
     expect(designSystem).toContain('--cap-content-max:604px');
     expect(designSystem).toContain('width:min(calc(100% - 56px),var(--cap-content-max))');
   });
@@ -17,6 +18,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche');
     expect(designSystem).toContain('.neo-dex-page .sammlung-seite');
     expect(designSystem).toContain(':root[data-seite="profile"] .profil-scrollinhalt');
+    expect(designSystem).toContain('var(--cap-wide-page-inline) - var(--cap-wide-page-inline)');
   });
 
   it('haelt Header, Dock und Sheets global statt seitenspezifisch', () => {
@@ -24,5 +26,11 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.app-dex-dock-inner{');
     expect(designSystem).toContain('.kategorie-sheet{');
     expect(designSystem).toContain('--cap-sheet-max:520px');
+  });
+
+  it('vereinheitlicht Tapeten und Beitragsdetails', () => {
+    expect(designSystem).toContain('mask-size:500px auto!important');
+    expect(designSystem).toContain('.dex-detail-card-close');
+    expect(designSystem).toContain('border-radius:var(--cap-card-radius)!important');
   });
 });

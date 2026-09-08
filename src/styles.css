@@ -7638,7 +7638,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Akkordeons folgen deshalb derselben Achse und Kartenfamilie. */
 :root[data-seite="profile"] .profil-scrollinhalt{
   box-sizing:border-box!important;
-  width:min(calc(100% - 56px),var(--cap-content-max))!important;
+  width:min(calc(100% - var(--cap-wide-page-inline) - var(--cap-wide-page-inline)),var(--cap-content-max))!important;
   max-width:var(--cap-content-max)!important;
   margin-inline:auto!important;
 }
@@ -8452,6 +8452,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root{
   --cap-page-inline:28px;
+  --cap-wide-page-inline:21px;
   --cap-content-max:604px;
   --cap-stack-gap:18px;
   --cap-card-radius:15px;
@@ -8612,7 +8613,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .shopping-dex-wrap .einkauf-kopfzeile,
 :root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-liste]{
   box-sizing:border-box!important;
-  width:min(calc(100vw - 56px),var(--cap-content-max))!important;
+  width:min(calc(100vw - var(--cap-wide-page-inline) - var(--cap-wide-page-inline)),var(--cap-content-max))!important;
   max-width:var(--cap-content-max)!important;
   margin-left:auto!important;
   margin-right:auto!important;
@@ -8636,16 +8637,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .einkauf-tag-scroll{
   width:100vw!important;
   margin-inline:calc(50% - 50vw)!important;
-  padding-left:var(--cap-page-inline)!important;
-  padding-right:var(--cap-page-inline)!important;
-  scroll-padding-inline:var(--cap-page-inline)!important;
+  padding-left:var(--cap-wide-page-inline)!important;
+  padding-right:var(--cap-wide-page-inline)!important;
+  scroll-padding-inline:var(--cap-wide-page-inline)!important;
 }
 
 /* REZEPTE, TRAINING und STRESS: gleiche Aussenachse, aber keine kuenstlich
    breiten Einzelkarten. Ihre Raster bleiben responsiv und eigenstaendig. */
 .neo-dex-page .sammlung-seite{
   box-sizing:border-box!important;
-  width:min(calc(100% - 56px),var(--cap-content-max))!important;
+  width:min(calc(100% - var(--cap-wide-page-inline) - var(--cap-wide-page-inline)),var(--cap-content-max))!important;
   max-width:var(--cap-content-max)!important;
   margin-inline:auto!important;
   padding-left:0!important;
@@ -8667,9 +8668,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:-.02em!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter,.unter-sammlungen-grid){
-  padding-left:var(--cap-page-inline)!important;
-  padding-right:var(--cap-page-inline)!important;
-  scroll-padding-inline:var(--cap-page-inline)!important;
+  padding-left:var(--cap-wide-page-inline)!important;
+  padding-right:var(--cap-wide-page-inline)!important;
+  scroll-padding-inline:var(--cap-wide-page-inline)!important;
 }
 
 /* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.
@@ -8708,5 +8709,81 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:390px){
   .app-dex-header-actions{gap:4px}
   .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:25px;height:25px;flex-basis:25px}
-  :root[data-seite="profile"] .profil-scrollinhalt{width:calc(100% - 56px)!important}
+  :root[data-seite="profile"] .profil-scrollinhalt{width:calc(100% - 42px)!important}
+}
+
+/* Die Motive behalten ihre jeweilige Seitenidentitaet, verwenden aber auf
+   allen Seiten dieselbe ruhige Skalierung und Deckkraft wie TRACKER. */
+:root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page)::before,
+:root[data-seite="training"] :is(.neo-dex-page,.training-dex-page)::before,
+:root[data-seite="stress"] .neo-dex-page::before,
+:root[data-seite="sleep"] .sleep-log-dex-page::before,
+:root[data-seite="habits"] .routine-dex-page::before,
+:root[data-seite="shopping"] .shopping-dex-page::before{
+  opacity:.065!important;
+  -webkit-mask-size:500px auto!important;
+  mask-size:500px auto!important;
+}
+:root[data-seite="body"] .body-log-dex-page::before{
+  opacity:.065!important;
+  background-size:500px auto!important;
+}
+
+/* Beitragsdetails folgen derselben Kartenfamilie. Das Schliessen sitzt in
+   der Karte; nur das Aktionsmenue bleibt als eigener Schnellzugriff. */
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt{
+  padding:12px var(--cap-wide-page-inline) calc(42px + env(safe-area-inset-bottom))!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
+  position:relative!important;
+  width:min(100%,var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  overflow:hidden!important;
+  border:var(--cap-card-border)!important;
+  border-radius:var(--cap-card-radius)!important;
+  background:var(--cap-card)!important;
+  box-shadow:none!important;
+}
+.dex-detail-card-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:8;
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  box-sizing:border-box;
+  border:var(--cap-card-border);
+  border-radius:10px;
+  background:var(--cap-card);
+  color:var(--text,#111);
+  box-shadow:none;
+}
+.dex-detail-card-close .material-svg,
+.dex-detail-card-close svg{width:21px;height:21px}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-bild,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-video,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-linkvorschau,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-provider,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-audio{
+  width:calc(100% - 28px)!important;
+  margin:14px 14px 0!important;
+  border:var(--cap-card-border)!important;
+  border-radius:11px!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-bild img,
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-linkvorschau img{
+  border-radius:9px!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt{
+  gap:16px!important;
+  padding:20px 18px 24px!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt h1{
+  padding-right:38px;
+  font-size:clamp(27px,7vw,48px)!important;
+  font-style:italic!important;
+  font-weight:700!important;
+  letter-spacing:-.03em!important;
 }
