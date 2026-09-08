@@ -965,7 +965,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     shopping: ['#00E0BA', 'wallpaper-brokkoli', '🛒'],
     habits: ['#8C00FF', 'wallpaper-wolke', '🧠'],
     training: ['#215E61', 'wallpaper-dumbbell', '💪🏻'],
-    body: ['#B1E7FF', 'wallpaper-measure', '📐'],
+    body: ['#B1E7FF', 'wallpaper-comp', '📐'],
     coins: ['#00A8FF', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
@@ -1319,7 +1319,7 @@ async function renderRoute() {
     });
   } else if (route === 'body') {
     setSeite('body');
-    applyPageLook('body', categoryColor('body'), 'wallpaper-measure');
+    applyPageLook('body', categoryColor('body'), 'wallpaper-comp');
     view.classList.add('neo-dex-page', 'food-dex-page', 'body-log-dex-page');
     prepareSpecialDexPage(view, 'body');
     const { mountBodyMetrics } = await bodyMetricsModule();
@@ -1347,7 +1347,7 @@ async function renderRoute() {
     });
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'body', onSaved: refresh });
     mountCategoryChrome(view, route, 'COMP', {
-      pageLookScope: route, pageLookPattern: 'wallpaper-measure',
+      pageLookScope: route, pageLookPattern: 'wallpaper-comp',
       onPlus: () => bodyActions?.openAddMenu?.(),
       onAddNote: () => openEntry('note'), onAddImage: () => openEntry('image'),
     });
@@ -1559,7 +1559,7 @@ async function renderRoute() {
     setSeite('stress');
     // Fixierte Farbe und Tapete zuerst setzen, damit waehrend des Ladens
     // (siehe TRAINING-Muster) niemals der neutrale Sammlungs-Look aufblitzt.
-    applyPageLook('stress', categoryColor('stress'), 'wallpaper-blitz');
+    applyPageLook('stress', categoryColor('stress'), 'wallpaper-stress');
     const children = await loadCollections(session.user.id, { rootKey: 'stress', signal });
     const childStats = await dexSammlungsStatistik(session.user.id, 'stress', children, signal);
     if (signal?.aborted) return;
@@ -1568,7 +1568,7 @@ async function renderRoute() {
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'stress', onSaved: refresh });
     mountCategoryChrome(view, route, 'STRESS', {
-      pageLookScope: route, pageLookPattern: 'wallpaper-blitz',
+      pageLookScope: route, pageLookPattern: 'wallpaper-stress',
       meta: `${children.length} Unterordner`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),

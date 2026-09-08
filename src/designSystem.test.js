@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
 const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
+const categoryIcons = readFileSync(new URL('./categoryIcons.js', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.js', import.meta.url), 'utf8');
 
 describe('CAPBOY Design-System', () => {
   it('legt die gemeinsame Kartenachse zentral fest', () => {
@@ -39,5 +41,14 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('mask-size:500px auto!important');
     expect(designSystem).toContain('.dex-detail-card-actions');
     expect(designSystem).toContain('border-radius:var(--cap-card-radius)!important');
+  });
+
+  it('bindet die festen COMP- und STRESS-Tapeten statt der Alt-Motive ein', () => {
+    expect(categoryIcons).toContain("body: 'wallpaper-comp'");
+    expect(categoryIcons).toContain("stress: 'wallpaper-stress'");
+    expect(main).toContain("applyPageLook('body', categoryColor('body'), 'wallpaper-comp')");
+    expect(main).toContain("applyPageLook('stress', categoryColor('stress'), 'wallpaper-stress')");
+    expect(css).toContain('--body-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Comp.svg"))');
+    expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before');
   });
 });

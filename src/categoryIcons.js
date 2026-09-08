@@ -70,12 +70,12 @@ const fixedSystemColors = {
   stress: '#B5BAFF',
 };
 const fixedSystemPatterns = {
-  body: 'wallpaper-measure',
+  body: 'wallpaper-comp',
   'food-log': 'wallpaper-pizza',
   training: 'wallpaper-dumbbell',
   reminders: 'wallpaper-burger',
   sleep: 'wallpaper-moon',
-  stress: 'wallpaper-blitz',
+  stress: 'wallpaper-stress',
 };
 const colorGroups = [
   ['Seitenfarben', [
