@@ -8,6 +8,8 @@ describe('CAPBOY Design-System', () => {
   it('legt die gemeinsame Kartenachse zentral fest', () => {
     expect(designSystem).toContain('--cap-page-inline:28px');
     expect(designSystem).toContain('--cap-reference-inline:18.5px');
+    expect(designSystem).toContain('@media(max-width:430px)');
+    expect(designSystem).toContain('--cap-reference-inline:16px');
     expect(designSystem).toContain('--cap-content-max:604px');
     expect(designSystem).toContain('width:min(calc(100% - 56px),var(--cap-content-max))');
   });
@@ -26,6 +28,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.app-dex-dock-inner{');
     expect(designSystem).toContain('.kategorie-sheet{');
     expect(designSystem).toContain('--cap-sheet-max:520px');
+    expect(designSystem).toContain('.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu)');
   });
 
   it('vereinheitlicht Tapeten und Beitragsdetails', () => {

@@ -168,6 +168,9 @@ if (routineActionFromUrl) {
 const app = document.querySelector('#app');
 const APP_START_SPLASH_MS = 2000;
 const appStartSplashBeginn = performance.now();
+const appLogoSchriftBereit = document.fonts
+  ? document.fonts.load('italic 700 54px "Work Sans"', 'CAPBOY').catch(() => [])
+  : Promise.resolve([]);
 const appSchriftenBereit = document.fonts
   ? Promise.race([
       Promise.all([
@@ -179,6 +182,13 @@ const appSchriftenBereit = document.fonts
       new Promise((resolve) => setTimeout(resolve, 2500)),
     ]).catch(() => [])
   : Promise.resolve([]);
+
+/* Die Wortmarke verwendet Text innerhalb eines SVG. Ohne diese Schranke
+   zeichnet Safari beim Kaltstart fuer einen Frame seine Serif-Ersatzschrift.
+   Erst die nachweislich geladene Work-Sans-Italic darf sichtbar werden. */
+void appLogoSchriftBereit.finally(() => {
+  document.documentElement.classList.add('app-logo-font-ready');
+});
 
 /* Der Splash wird sofort nach dem Parsen des Einstiegschunks gezeichnet. Der
    blaue First Paint davor kommt bereits aus index.html, sodass auch auf einem

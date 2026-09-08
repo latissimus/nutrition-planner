@@ -338,9 +338,14 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 }
 .app-start-splash .brand{
   font-size:46px;
+  opacity:0;
+}
+.app-logo-font-ready .app-start-splash .brand{
   animation:splash-in 2s cubic-bezier(.16,.84,.32,1) both;
 }
-@media (prefers-reduced-motion:reduce){.app-start-splash .brand{animation:none}}
+@media (prefers-reduced-motion:reduce){
+  .app-logo-font-ready .app-start-splash .brand{animation:none;opacity:1}
+}
 
 /* Ladebildschirm beim Kaltstart – dieselbe Geste wie der Splash, nur mit dem
    Laufband darueber und einer Zeile darunter. Er zieht auf und atmet dann
@@ -8710,6 +8715,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .kategorie-sheet>header,
 .special-dex-overlay>.special-dex-sheet>header{margin-bottom:4px!important}
+/* Aktionsmenues beginnen optisch direkt unter dem Titel. Die Zeilenhoehe
+   selbst bleibt gross genug zum Tippen; nur die zuvor doppelte Kopfluft wird
+   fuer Schlaf, Routinen, Tracker und alle weiteren Seiten zentral entfernt. */
+.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu){
+  margin-top:-8px!important;
+}
 .kategorie-sheet :is(h1,h2,h3,label,legend,button,b,strong){font-family:"Work Sans",var(--ui),sans-serif}
 .kategorie-sheet :is(input[type="date"],input[type="time"],input[type="number"],output,.coin-zahlenfeld){
   font-family:var(--tech)!important;
@@ -8728,10 +8739,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:0 3.5px 0 #000!important;
 }
 
-@media(max-width:390px){
+@media(max-width:430px){
+  :root{--cap-reference-inline:16px}
   .app-dex-header-actions{gap:4px}
   .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:25px;height:25px;flex-basis:25px}
-  :root[data-seite="profile"] .profil-scrollinhalt{width:calc(100vw - 37px)!important}
+  :root[data-seite="profile"] .profil-scrollinhalt{
+    width:calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline))!important;
+  }
 }
 
 /* Die Motive behalten ihre jeweilige Seitenidentitaet, verwenden aber auf
