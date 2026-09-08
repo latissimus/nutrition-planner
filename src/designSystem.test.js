@@ -23,6 +23,9 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="food-log"] .neo-dex-page.dex-fixkopf>.wrap');
     expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page .kategorie-scrollinhalt');
     expect(designSystem).toContain('.neo-dex-page .sammlung-seite');
+    expect(designSystem).toContain('.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden)');
+    expect(designSystem).toContain('.neo-dex-page .unter-sammlungen-block>h2');
+    expect(designSystem).toContain('padding-left:var(--cap-reference-inline)!important');
     expect(designSystem).toContain('width:100vw!important');
     expect(designSystem).toContain('margin-left:calc(50% - 50vw)!important');
     expect(designSystem).toContain(':root[data-seite="profile"] .profil-scrollinhalt');

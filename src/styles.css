@@ -8677,6 +8677,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-left:0!important;
   padding-right:0!important;
 }
+.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden),
+.neo-dex-page .unter-sammlungen-block>h2{
+  /* Beitragsraster, Abschnittstitel und Nachladen-Aktion liegen dagegen auf
+     der verbindlichen TRACKER-Achse. Full-Bleed gilt ausschliesslich fuer
+     horizontal scrollbare Leisten. */
+  box-sizing:border-box!important;
+  width:min(calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline)),var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
 .neo-dex-page .dex-inhaltsgrid{
   gap:14px!important;
   padding-inline:0!important;
@@ -8698,9 +8709,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:-.02em!important;
 }
 .neo-dex-page .unter-sammlungen-grid{
-  padding-left:0!important;
-  padding-right:0!important;
-  scroll-padding-inline:0!important;
+  /* Der Ordner-Karussell-Scrollport bleibt vollbreit, sein erster und letzter
+     Eintrag beginnen aber auf derselben Achse wie die Beitragskarten. */
+  padding-left:var(--cap-reference-inline)!important;
+  padding-right:var(--cap-reference-inline)!important;
+  scroll-padding-inline:var(--cap-reference-inline)!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter){
   /* Exakt dieselbe Viewport-Ausbruchstechnik wie die funktionierende
