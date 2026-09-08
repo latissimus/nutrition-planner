@@ -27,8 +27,10 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.app-dex-header-actions{gap:4px}');
     expect(designSystem).toContain('.app-dex-dock-inner{');
     expect(designSystem).toContain('.kategorie-sheet{');
+    expect(designSystem).toContain('--cap-sheet-inline:28px');
     expect(designSystem).toContain('--cap-sheet-max:520px');
-    expect(designSystem).toContain('.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu)');
+    expect(designSystem).toContain('.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu,.mahl-add-gruppe)');
+    expect(designSystem).toContain('.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button');
   });
 
   it('vereinheitlicht Tapeten und Beitragsdetails', () => {

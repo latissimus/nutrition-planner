@@ -2542,9 +2542,6 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 
 /* Quadratische Bedienelemente teilen dieselbe optische Mitte. So verrutschen
    weder SVGs noch ihre Klickflaechen durch Schrift-Grundlinien. */
-:root[data-seite="profile"]{--akzent:#492426;--akzent-ink:#fff}
-:root[data-seite="profile"] :is(.themebtn.on,.profile-datei-knopf,.role-tag,.btn-primary){background:#492426!important;color:#fff!important}
-:root[data-seite="profile"] .profile-abschnitt input[type="checkbox"]{accent-color:#492426}
 .sheet-menue{display:grid}
 .sheet-menue>button{
   display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:13px;
@@ -8403,8 +8400,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-inline:28px!important;
 }
 :root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet{
-  width:min(100%,604px)!important;
-  max-width:604px!important;
+  width:min(100%,var(--cap-sheet-max,520px))!important;
+  max-width:var(--cap-sheet-max,520px)!important;
   border:1.5px solid #111!important;
   border-radius:15px!important;
   box-shadow:none!important;
@@ -8468,7 +8465,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-card:#fff;
   --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#525CEB)) 7%,#fff);
   --cap-muted:#586274;
-  --cap-sheet-inline:21px;
+  /* TRACKER ist auch fuer Dialoge die Referenz: auf dem iPhone liegen alle
+     Sheets 28px innerhalb des Viewports, unabhaengig von ihrer Seite. */
+  --cap-sheet-inline:28px;
   --cap-sheet-max:520px;
   --dex-content-gutter:var(--cap-page-inline);
   --dex-content-max:var(--cap-content-max);
@@ -8720,7 +8719,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Aktionsmenues beginnen optisch direkt unter dem Titel. Die Zeilenhoehe
    selbst bleibt gross genug zum Tippen; nur die zuvor doppelte Kopfluft wird
    fuer Schlaf, Routinen, Tracker und alle weiteren Seiten zentral entfernt. */
-.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu){
+.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu,.mahl-add-gruppe){
   margin-top:-8px!important;
 }
 .kategorie-sheet :is(h1,h2,h3,label,legend,button,b,strong){font-family:"Work Sans",var(--ui),sans-serif}
@@ -8739,6 +8738,115 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
   color:var(--ordner-ink,#111)!important;
   box-shadow:0 3.5px 0 #000!important;
+}
+
+/* Einheitliche Aktionsmenues
+   --------------------------
+   Rezepte/Training/Stress, Schlaf, Routinen, TRACKER und COMP hatten noch
+   eigene Zeilenraster. Diese letzte Schicht ist absichtlich allgemeiner als
+   die Seitenmodule: Inhalt und Icons bleiben individuell, Geometrie und
+   Schriftbild kommen nur noch aus dieser gemeinsamen Vorlage. */
+.kategorie-sheet>header{
+  min-height:44px!important;
+  margin-bottom:4px!important;
+}
+.kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu,.mahl-add-gruppe){
+  margin-top:-8px!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:0!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:12px!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:62px!important;
+  padding:8px 2px!important;
+  border:0!important;
+  border-bottom:1.5px solid #111!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#111!important;
+  box-shadow:none!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:15px!important;
+  font-style:normal!important;
+  font-weight:760!important;
+  line-height:1.1!important;
+  letter-spacing:-.035em!important;
+  text-align:left!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button:last-child{
+  border-bottom:0!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button>span:last-child{
+  min-width:0;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button>span:last-child:has(>b){
+  display:grid!important;
+  gap:3px!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button b{
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:15px!important;
+  font-style:normal!important;
+  font-weight:760!important;
+  line-height:1.1!important;
+  letter-spacing:-.035em!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button small{
+  display:block!important;
+  margin:0!important;
+  color:var(--cap-muted,#586274)!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:11px!important;
+  font-style:normal!important;
+  font-weight:560!important;
+  line-height:1.25!important;
+  letter-spacing:-.02em!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button> :is(.material-svg,.sheet-list-icon,.routine-template-icon){
+  display:grid!important;
+  place-items:center!important;
+  align-self:center!important;
+  justify-self:center!important;
+  box-sizing:border-box!important;
+  width:34px!important;
+  height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:24px!important;
+  line-height:1!important;
+}
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button> :is(.material-svg,.sheet-list-icon)>svg,
+.kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button>svg{
+  display:block!important;
+  width:24px!important;
+  height:24px!important;
+  margin:auto!important;
+}
+:root[data-theme="dark"] .kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  border-bottom-color:#697486!important;
+  color:#EDF0F6!important;
+}
+
+/* Auf der Profilseite ersetzt der Seitenakzent die letzte alte braune
+   Systemfarbe auch bei generischen Buttons und nativen Checkboxen. */
+:root[data-seite="profile"]{
+  --akzent:var(--profile-accent,#9564DD)!important;
+  --akzent-ink:#111!important;
+}
+:root[data-seite="profile"] :is(.themebtn.on,.profile-datei-knopf,.role-tag,.btn-primary){
+  background:var(--profile-accent,#9564DD)!important;
+  color:#111!important;
+}
+:root[data-seite="profile"] .profile-abschnitt input[type="checkbox"]{
+  accent-color:var(--profile-accent,#9564DD)!important;
 }
 
 @media(max-width:430px){

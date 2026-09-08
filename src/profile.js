@@ -3,11 +3,9 @@ import { signOut } from './auth.js';
 import { getTheme, setTheme } from './theme.js';
 import { toast } from './toast.js';
 import {
-  coinDexIsVisible, collectionIsVisible, collectionOrder, customCollectionIsVisible, moveCollection,
-  moveCustomCollection, orderCustomCollections, setCoinDexVisible, setCollectionVisible,
-  setCustomCollectionVisible,
+  coinDexIsVisible, collectionIsVisible, collectionOrder, moveCollection,
+  setCoinDexVisible, setCollectionVisible,
 } from './collectionPreferences.js';
-import { loadCollections } from './collections.js';
 import { createFullDataExport, exportFileName } from './dataExport.js';
 import {
   interfaceSoundsEnabled, playInterfaceSound, setInterfaceSoundsEnabled,
@@ -322,59 +320,6 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   };
   renderSammlungen();
   startseite.appendChild(sammlungsListe);
-
-  const eigeneTitel = document.createElement('h3');
-  eigeneTitel.className = 'profile-untertitel';
-  eigeneTitel.textContent = 'Eigene Seiten';
-  startseite.appendChild(eigeneTitel);
-  const eigeneListe = document.createElement('div');
-  eigeneListe.className = 'sammlungs-sortierung';
-  eigeneListe.innerHTML = '<p class="profile-hinweis">Eigene Seiten werden geladen …</p>';
-  startseite.appendChild(eigeneListe);
-  loadCollections(session.user.id, { rootKey: 'home', signal }).then((items) => {
-    if (signal?.aborted) return;
-    const renderEigene = () => {
-      const ordered = orderCustomCollections(items);
-      if (!ordered.length) {
-        eigeneListe.innerHTML = '<p class="profile-hinweis">Noch keine eigenen Seiten angelegt.</p>';
-        return;
-      }
-      eigeneListe.replaceChildren(...ordered.map((item, index) => {
-        const zeile = document.createElement('div');
-        zeile.className = 'sammlung-sichtbarkeit';
-        const label = document.createElement('label');
-        label.className = 'switchline';
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = customCollectionIsVisible(item.id);
-        checkbox.onchange = () => {
-          setCustomCollectionVisible(item.id, checkbox.checked);
-          toast(`${item.name} ${checkbox.checked ? 'eingeblendet' : 'ausgeblendet'}.`);
-        };
-        const text = document.createElement('span');
-        text.textContent = item.name;
-        const track = document.createElement('i');
-        track.className = 'switchline-track';
-        label.append(checkbox, track, text);
-        const tasten = document.createElement('span');
-        tasten.className = 'sortier-tasten';
-        [['↑', -1, 'nach oben'], ['↓', 1, 'nach unten']].forEach(([zeichen, richtung, beschreibung]) => {
-          const taste = document.createElement('button');
-          taste.type = 'button';
-          taste.textContent = zeichen;
-          taste.disabled = richtung < 0 ? index === 0 : index === ordered.length - 1;
-          taste.setAttribute('aria-label', `${item.name} ${beschreibung}`);
-          taste.onclick = () => { if (moveCustomCollection(items, item.id, richtung)) renderEigene(); };
-          tasten.appendChild(taste);
-        });
-        zeile.append(label, tasten);
-        return zeile;
-      }));
-    };
-    renderEigene();
-  }).catch(() => {
-    if (!signal?.aborted) eigeneListe.innerHTML = '<p class="profile-hinweis">Eigene Seiten konnten nicht geladen werden.</p>';
-  });
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
