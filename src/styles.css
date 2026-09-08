@@ -7638,7 +7638,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Akkordeons folgen deshalb derselben Achse und Kartenfamilie. */
 :root[data-seite="profile"] .profil-scrollinhalt{
   box-sizing:border-box!important;
-  width:min(calc(100% - var(--cap-wide-page-inline) - var(--cap-wide-page-inline)),var(--cap-content-max))!important;
+  width:min(calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline)),var(--cap-content-max))!important;
   max-width:var(--cap-content-max)!important;
   margin-inline:auto!important;
 }
@@ -8452,7 +8452,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root{
   --cap-page-inline:28px;
-  --cap-wide-page-inline:21px;
+  /* Sichtbare Kartenkante des TRACKERS. Dessen historischer Scroll-Wrapper
+     ist breiter als der Viewport; viewportbezogene Seiten verwenden deshalb
+     diesen gemessenen Wert statt dessen interner 28-px-Einrueckung. */
+  --cap-reference-inline:18.5px;
   --cap-content-max:604px;
   --cap-stack-gap:18px;
   --cap-card-radius:15px;
@@ -8613,7 +8616,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .shopping-dex-wrap .einkauf-kopfzeile,
 :root[data-seite="shopping"] .shopping-dex-wrap [data-einkauf-liste]{
   box-sizing:border-box!important;
-  width:min(calc(100vw - var(--cap-wide-page-inline) - var(--cap-wide-page-inline)),var(--cap-content-max))!important;
+  width:min(calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline)),var(--cap-content-max))!important;
   max-width:var(--cap-content-max)!important;
   margin-left:auto!important;
   margin-right:auto!important;
@@ -8637,16 +8640,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .einkauf-tag-scroll{
   width:100vw!important;
   margin-inline:calc(50% - 50vw)!important;
-  padding-left:var(--cap-wide-page-inline)!important;
-  padding-right:var(--cap-wide-page-inline)!important;
-  scroll-padding-inline:var(--cap-wide-page-inline)!important;
+  padding-left:var(--cap-reference-inline)!important;
+  padding-right:var(--cap-reference-inline)!important;
+  scroll-padding-inline:var(--cap-reference-inline)!important;
 }
 
 /* REZEPTE, TRAINING und STRESS: gleiche Aussenachse, aber keine kuenstlich
    breiten Einzelkarten. Ihre Raster bleiben responsiv und eigenstaendig. */
 .neo-dex-page .sammlung-seite{
   box-sizing:border-box!important;
-  width:min(calc(100% - var(--cap-wide-page-inline) - var(--cap-wide-page-inline)),var(--cap-content-max))!important;
+  width:min(calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline)),var(--cap-content-max))!important;
   max-width:var(--cap-content-max)!important;
   margin-inline:auto!important;
   padding-left:0!important;
@@ -8655,6 +8658,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .neo-dex-page .dex-inhaltsgrid{
   gap:14px!important;
   padding-inline:0!important;
+}
+.neo-dex-page .dex-eintraege{
+  margin-left:0!important;
+  margin-right:0!important;
 }
 .neo-dex-page .dex-inhaltskarte{
   border:var(--cap-card-border)!important;
@@ -8668,9 +8675,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:-.02em!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter,.unter-sammlungen-grid){
-  padding-left:var(--cap-wide-page-inline)!important;
-  padding-right:var(--cap-wide-page-inline)!important;
-  scroll-padding-inline:var(--cap-wide-page-inline)!important;
+  padding-left:var(--cap-reference-inline)!important;
+  padding-right:var(--cap-reference-inline)!important;
+  scroll-padding-inline:var(--cap-reference-inline)!important;
 }
 
 /* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.
@@ -8709,7 +8716,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:390px){
   .app-dex-header-actions{gap:4px}
   .app-dex-header .coin-kopfstand .coin-kopf-symbol{width:25px;height:25px;flex-basis:25px}
-  :root[data-seite="profile"] .profil-scrollinhalt{width:calc(100% - 42px)!important}
+  :root[data-seite="profile"] .profil-scrollinhalt{width:calc(100vw - 37px)!important}
 }
 
 /* Die Motive behalten ihre jeweilige Seitenidentitaet, verwenden aber auf
@@ -8732,7 +8739,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Beitragsdetails folgen derselben Kartenfamilie. Das Schliessen sitzt in
    der Karte; nur das Aktionsmenue bleibt als eigener Schnellzugriff. */
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt{
-  padding:12px var(--cap-wide-page-inline) calc(42px + env(safe-area-inset-bottom))!important;
+  padding:12px var(--cap-reference-inline) calc(42px + env(safe-area-inset-bottom))!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
   position:relative!important;

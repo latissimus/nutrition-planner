@@ -7,7 +7,7 @@ const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
 describe('CAPBOY Design-System', () => {
   it('legt die gemeinsame Kartenachse zentral fest', () => {
     expect(designSystem).toContain('--cap-page-inline:28px');
-    expect(designSystem).toContain('--cap-wide-page-inline:21px');
+    expect(designSystem).toContain('--cap-reference-inline:18.5px');
     expect(designSystem).toContain('--cap-content-max:604px');
     expect(designSystem).toContain('width:min(calc(100% - 56px),var(--cap-content-max))');
   });
@@ -18,7 +18,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche');
     expect(designSystem).toContain('.neo-dex-page .sammlung-seite');
     expect(designSystem).toContain(':root[data-seite="profile"] .profil-scrollinhalt');
-    expect(designSystem).toContain('var(--cap-wide-page-inline) - var(--cap-wide-page-inline)');
+    expect(designSystem).toContain('100vw - var(--cap-reference-inline) - var(--cap-reference-inline)');
   });
 
   it('haelt Header, Dock und Sheets global statt seitenspezifisch', () => {
