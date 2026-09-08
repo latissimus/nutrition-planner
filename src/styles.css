@@ -8693,10 +8693,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-bottom:22px!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter)>button:first-child{
-  margin-left:-8px!important;
+  /* Die runde Pillenform braucht mehr als nur die rechnerische Kante:
+     Mit -8px blieb der gekruemmte Rand optisch mehrere Pixel eingerueckt. */
+  margin-left:-16px!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter)>button:last-child{
-  margin-right:-8px!important;
+  margin-right:-16px!important;
 }
 
 /* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.
