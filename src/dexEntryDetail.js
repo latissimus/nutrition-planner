@@ -323,12 +323,12 @@ function detailMarkup(entry, look) {
     closeHref: backHref(entry),
     menuLabel: 'Eintragsmenü',
     closeLabel: 'Eintrag schließen',
-    showClose: false,
+    showClose: true,
   });
   return `<div class="dex-detail-overlay dex-detail-fixkopf${contrastClass}" role="main" aria-label="Eintrag anzeigen">
     <div class="dex-detail-scrollinhalt">
       <article class="dex-detail-karte dex-detail-popup" style="--eintrag-farbe:${escapeHtml(popupColor)}">
-        <a class="dex-detail-card-close" href="${escapeHtml(backHref(entry))}" data-entry-close aria-label="Eintrag schließen">${materialIconMarkup('close')}</a>
+        <div class="dex-detail-card-actions">${actions}</div>
         ${media}
         <div class="dex-detail-inhalt">
         ${entry.title ? `<h1>${escapeHtml(entry.title)}</h1>` : ''}
@@ -342,8 +342,7 @@ function detailMarkup(entry, look) {
         </div>
       </article>
     </div>
-  </div>
-  ${actions}`;
+  </div>`;
 }
 
 export async function mountDexEntryDetail(container, { userId, id, signal }) {

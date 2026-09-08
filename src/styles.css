@@ -8661,6 +8661,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-inline:0!important;
 }
 .neo-dex-page .dex-eintraege{
+  margin-top:0!important;
   margin-left:0!important;
   margin-right:0!important;
 }
@@ -8676,9 +8677,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:-.02em!important;
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter,.unter-sammlungen-grid){
-  padding-left:var(--cap-reference-inline)!important;
-  padding-right:var(--cap-reference-inline)!important;
-  scroll-padding-inline:var(--cap-reference-inline)!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  scroll-padding-inline:0!important;
+}
+.neo-dex-page :is(.neo-dex-filter,.food-dex-filter){
+  /* Der erste Chip beginnt auf der Hero-Oberkante. Die entfernte obere
+     Luft wandert nach unten, damit der Abstand zum Inhalt gleich bleibt. */
+  padding-top:0!important;
+  padding-bottom:22px!important;
 }
 
 /* Alle Sheets teilen Kontur, Rundung, Typografie und Buttonbehandlung.
@@ -8752,31 +8759,49 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--cap-card)!important;
   box-shadow:none!important;
 }
-.dex-detail-card-close{
+.dex-detail-card-actions{
   position:absolute;
   top:12px;
   right:12px;
   z-index:8;
-  display:grid;
-  place-items:center;
-  width:36px;
-  height:36px;
-  box-sizing:border-box;
-  border:var(--cap-card-border);
-  border-radius:10px;
-  background:var(--cap-card);
-  color:var(--text,#111);
-  box-shadow:none;
 }
-.dex-detail-card-close .material-svg,
-.dex-detail-card-close svg{width:21px;height:21px}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-floating-actions,.food-dex-floating-actions){
+  position:relative!important;
+  inset:auto!important;
+  display:flex!important;
+  grid-template-columns:none!important;
+  align-items:center!important;
+  gap:6px!important;
+  width:auto!important;
+  inline-size:auto!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
+  width:36px!important;
+  min-width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  border:var(--cap-card-border)!important;
+  border-radius:10px!important;
+  background:var(--cap-card)!important;
+  color:var(--text,#111)!important;
+  box-shadow:none!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-close,.food-dex-action-close) :is(.material-svg,svg){
+  width:21px!important;
+  height:21px!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-popover,.food-dex-action-popover){
+  top:calc(100% + 8px)!important;
+  right:0!important;
+  bottom:auto!important;
+}
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-bild,
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-video,
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-linkvorschau,
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-provider,
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>.dex-detail-audio{
   width:calc(100% - 28px)!important;
-  margin:14px 14px 0!important;
+  margin:60px 14px 0!important;
   border:var(--cap-card-border)!important;
   border-radius:11px!important;
 }
@@ -8787,6 +8812,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt{
   gap:16px!important;
   padding:20px 18px 24px!important;
+}
+.dex-detail-popup>.dex-detail-card-actions+.dex-detail-inhalt{
+  padding-top:68px!important;
 }
 .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-inhalt h1{
   padding-right:38px;

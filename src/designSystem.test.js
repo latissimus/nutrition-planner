@@ -30,7 +30,7 @@ describe('CAPBOY Design-System', () => {
 
   it('vereinheitlicht Tapeten und Beitragsdetails', () => {
     expect(designSystem).toContain('mask-size:500px auto!important');
-    expect(designSystem).toContain('.dex-detail-card-close');
+    expect(designSystem).toContain('.dex-detail-card-actions');
     expect(designSystem).toContain('border-radius:var(--cap-card-radius)!important');
   });
 });
