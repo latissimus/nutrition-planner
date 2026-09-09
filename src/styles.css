@@ -8939,8 +8939,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .dex-detail-card-actions{
   position:absolute;
-  top:12px;
-  right:12px;
+  top:10px;
+  right:10px;
   z-index:8;
 }
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-floating-actions,.food-dex-floating-actions){
@@ -8949,20 +8949,30 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:flex!important;
   grid-template-columns:none!important;
   align-items:center!important;
-  gap:6px!important;
+  gap:2px!important;
   width:auto!important;
   inline-size:auto!important;
 }
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
-  width:36px!important;
-  min-width:36px!important;
-  height:36px!important;
-  min-height:36px!important;
-  border:var(--cap-card-border)!important;
-  border-radius:10px!important;
-  background:var(--cap-card)!important;
+  width:40px!important;
+  min-width:40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  border:0!important;
+  border-radius:8px!important;
+  background:transparent!important;
   color:var(--text,#111)!important;
   box-shadow:none!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button):active{
+  background:var(--cap-tint)!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-more-dots,.food-dex-more-dots){gap:3px!important}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-more-dots,.food-dex-more-dots) i{
+  width:4px!important;
+  height:4px!important;
 }
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-close,.food-dex-action-close) :is(.material-svg,svg){
   width:21px!important;

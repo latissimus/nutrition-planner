@@ -45,7 +45,13 @@ describe('CAPBOY Design-System', () => {
   it('vereinheitlicht Tapeten und Beitragsdetails', () => {
     expect(designSystem).toContain('mask-size:500px auto!important');
     expect(designSystem).toContain('.dex-detail-card-actions');
+    expect(designSystem).toContain('background:transparent!important');
     expect(designSystem).toContain('border-radius:var(--cap-card-radius)!important');
+  });
+
+  it('oeffnet Unterordner ohne verstecktes Longpress-Menue', () => {
+    expect(main).not.toContain("bindLongPress(view.querySelector('.unter-sammlungen-grid')");
+    expect(main).not.toContain("bindLongPress(container.querySelector('.unter-sammlungen-grid')");
   });
 
   it('bindet die festen COMP- und STRESS-Tapeten statt der Alt-Motive ein', () => {

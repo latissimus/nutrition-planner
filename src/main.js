@@ -1,5 +1,4 @@
 import './styles.css';
-import { bindLongPress } from './longPress.js';
 // Figtree (SIL Open Font License). Ausgewaehlt im direkten Vergleich mit einem
 // vergroesserten Ausschnitt aus Inspirationen/IMG_5112: Tuckiis Schrift hat ein
 // doppelstoeckiges "a" mit Schwaenzchen, einen GERADEN "y"-Abstrich, runde
@@ -34,7 +33,7 @@ import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
+  applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
@@ -874,39 +873,6 @@ function istDunkleOrdnerfarbe(farbe) {
   return (r * 299 + g * 587 + b * 114) / 1000 < 135;
 }
 
-// Baut fuer eine Kachel (eingebaute Kategorie ueber data-sammlung oder
-// eigener Dex ueber data-collection-id) die passende "Dex bearbeiten"-Aktion.
-function dexEinstellungenOeffner({ userId, refresh, itemsById }) {
-  const infoKindFor = (route) => ({ reminders: 'meal', sleep: 'sleep', body: 'body', training: 'training', 'food-log': 'food', stress: 'stress', home: 'custom' }[route] || route);
-  return (el) => {
-    const collectionId = el.dataset.collectionId;
-    if (collectionId) {
-      const item = itemsById?.get(collectionId);
-      if (!item) return null;
-      const isSubDex = Boolean(item.parent_id) || item.root_key !== 'home';
-      // Kein onCreateSub hier: "Unter-Dex erstellen" gibt es bewusst nur im
-      // Dex selbst (ueber dessen eigenen "+"-Knopf), nicht per Long-Press von
-      // aussen auf die Kachel des uebergeordneten Dex.
-      return () => settingsSheet(`collection-${item.id}`, refresh, {
-        title: isSubDex ? 'Ordner bearbeiten' : 'Seite bearbeiten',
-        deleteLabel: isSubDex ? 'Ordner löschen' : 'Seite löschen',
-        disableAppearance: isSubDex,
-        appearanceLabel: isSubDex ? undefined : 'Icon ändern/umbenennen',
-        infoLabel: `${item.name}-Info`,
-        onInfo: () => openNeoDexInfoDialog(infoKindFor(item.root_key), item.name),
-        onRename: isSubDex ? () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }) : null,
-        onEditAppearance: isSubDex ? null : () => openCollectionEditor({ userId, rootKey: item.root_key, parentId: item.parent_id, existing: item, onSaved: refresh }),
-        onDelete: async () => {
-          if (!confirm(`„${item.name}“ samt Unterordnern wirklich löschen?`)) return;
-          try { await deleteCollection(userId, item); toast(isSubDex ? 'Ordner gelöscht' : 'Seite gelöscht'); refresh(); }
-          catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
-        },
-      });
-    }
-    return null;
-  };
-}
-
 async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   if (!roots.length) return new Map();
   let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
@@ -1154,11 +1120,6 @@ async function mountCustomCollection(container, item, signal) {
       infoKind: customDexSkin ? 'custom' : trainingDexSkin ? 'training' : 'food',
     });
   }
-  bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-    userId: ownerId,
-    refresh,
-    itemsById: new Map(children.map((kind) => [kind.id, kind])),
-  }));
   await renderDexEntries(container, {
     userId: ownerId, rootKey: item.root_key, collectionId: item.id,
     color: inheritedColor, signal, hasChildren: children.length > 0,
@@ -1431,9 +1392,6 @@ async function renderRoute() {
       closeHref: '#home',
       editLabel: 'REZEPTE bearbeiten',
     });
-    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-      userId: foodOwnerId, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
-    }));
     await renderDexEntries(view, {
       userId: foodOwnerId, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
@@ -1474,9 +1432,6 @@ async function renderRoute() {
       editLabel: 'TRAINING bearbeiten',
       infoKind: 'training',
     });
-    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-      userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
-    }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
@@ -1582,9 +1537,6 @@ async function renderRoute() {
       editLabel: 'STRESS bearbeiten',
       infoKind: 'stress',
     });
-    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', dexEinstellungenOeffner({
-      userId: session.user.id, refresh, itemsById: new Map(children.map((kind) => [kind.id, kind])),
-    }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'stress', color: categoryColor('stress'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
