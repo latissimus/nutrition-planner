@@ -13,6 +13,7 @@ const routeToFile = {
   reminders: 'MEALS.svg',
   'food-log': 'COOKNOTES.svg',
   training: 'TRAINNOTES.svg',
+  supps: 'SUPPS.svg',
   shopping: 'FOODS.svg',
   habits: 'ROUTINES.svg',
   // Der Dateiname enthält versehentlich die Endung im Namen; wird hier

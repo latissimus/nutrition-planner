@@ -568,6 +568,7 @@ const sammlungen = [
   ['body', 'COMP', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'TRACKER', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'REZEPTE', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
+  ['supps', 'SUPPS', 'Supplement-Wissen, Wirkung und Dosierung.', 'supps', 'coral', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
@@ -951,13 +952,14 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     return false;
   }
   if (signal?.aborted) return false;
-  const order = ['food-log', 'reminders', 'sleep', 'shopping', 'habits', 'training', 'body'];
+  const order = ['food-log', 'reminders', 'supps', 'sleep', 'shopping', 'habits', 'training', 'body', 'stress'];
   setPreference('muscledex:sammlungs-reihenfolge', order);
   setPreference('muscledex:sichtbare-sammlungen', order);
   setPreference('muscledex:coin-dex-sichtbar', true);
   const looks = {
     'food-log': ['#E3B505', 'wallpaper-pizza', '🍕'],
     reminders: ['#4E342E', 'wallpaper-burger', '🍔'],
+    supps: ['#FF6B6B', 'wallpaper-supps', '💊'],
     sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],
     shopping: ['#00C2CB', 'wallpaper-brokkoli', '🛒'],
     habits: ['#4B0082', 'wallpaper-wolke', '🧠'],
@@ -979,6 +981,7 @@ const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries>
 
 function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const training = kind === 'training';
+  const supps = kind === 'supps';
   const custom = kind === 'custom';
   const meal = kind === 'meal';
   const sleep = kind === 'sleep';
@@ -987,7 +990,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
   const copy = body
     ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -1018,6 +1021,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     ? `<p>In <b>TRAINING</b> sammelst du <b>Übungen</b>, <b>Trainingswissen</b>, Links, Bilder, Videos und Tonaufnahmen an einem Ort.</p>
       <p>Mit Klassen wie <b>Übungen</b>, <b>Regeneration</b>, <b>Tipps</b> oder <b>Verletzung</b> findest du relevante Inhalte schnell wieder.</p>
       <p>Unterordner helfen dir, Trainingsbereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
+    : supps
+    ? `<p>In <b>SUPPS</b> sammelst du Wissen zu <b>Supplements</b>, Wirkung, Dosierung, Produkten und Studien an einem Ort.</p>
+      <p>Mit Themen wie <b>Grundlagen</b>, <b>Wirkung</b>, <b>Dosierung</b> oder <b>Studien</b> findest du relevante Inhalte schnell wieder.</p>
+      <p>Unterordner helfen dir, Supplement-Gruppen sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
     : `<p>In <b>REZEPTE</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
       <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
       <p>Unterordner helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
@@ -1058,10 +1065,11 @@ function installNeoDexChrome(view) {
 
 async function mountCustomCollection(container, item, signal) {
   const customDexSkin = item.root_key === 'home';
-  const neoDexSkin = ['food-log', 'training', 'home'].includes(item.root_key);
+  const neoDexSkin = ['food-log', 'training', 'supps', 'home'].includes(item.root_key);
   const isSubDex = Boolean(item.parent_id) || item.root_key !== 'home';
   const foodDexSkin = item.root_key === 'food-log';
   const trainingDexSkin = item.root_key === 'training';
+  const suppsDexSkin = item.root_key === 'supps';
   let lookRoot = item;
   while (lookRoot.parent_id) {
     const parent = await getCollection(session.user.id, lookRoot.parent_id, signal);
@@ -1074,7 +1082,7 @@ async function mountCustomCollection(container, item, signal) {
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
   const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
   let inheritedPattern = inheritsSystemDexLook
-    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : trainingDexSkin ? 'wallpaper-dumbbell' : 'drops').pattern
+    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : 'drops').pattern
     : 'setometer-triangles';
   if (customDexSkin) {
     // Eigene Haupt-Dex bestimmen ihre Farbe in der Datenbank. Die Tapete ist
@@ -1114,7 +1122,7 @@ async function mountCustomCollection(container, item, signal) {
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
-    onAddAudio: ['home', 'training'].includes(item.root_key) ? () => openEntry('audio') : null,
+    onAddAudio: ['home', 'training', 'supps'].includes(item.root_key) ? () => openEntry('audio') : null,
     onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
     onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
     onCreateSub: () => openCollectionEditor({
@@ -1148,7 +1156,7 @@ async function mountCustomCollection(container, item, signal) {
       meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: backHref,
       editLabel: `${item.name} bearbeiten`,
-      infoKind: customDexSkin ? 'custom' : trainingDexSkin ? 'training' : 'food',
+      infoKind: customDexSkin ? 'custom' : trainingDexSkin ? 'training' : suppsDexSkin ? 'supps' : 'food',
     });
   }
   bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
@@ -1445,34 +1453,38 @@ async function renderRoute() {
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
-  } else if (route === 'training') {
-    setSeite('training');
+  } else if (route === 'training' || route === 'supps') {
+    const isSupps = route === 'supps';
+    const title = isSupps ? 'SUPPS' : 'TRAINING';
+    const pattern = isSupps ? 'wallpaper-supps' : 'wallpaper-dumbbell';
+    const routeColor = categoryColor(route);
+    setSeite(route);
     // A collection mutation remounts this route while the Supabase request is
-    // still pending. Paint the fixed TRAINING surface immediately so the
+    // still pending. Paint the fixed Wissensseite immediately so the
     // shared template fallback (#E3B505) can never flash in that gap.
-    applyPageLook('training', categoryColor('training'), 'wallpaper-dumbbell');
-    const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
-    const childStats = await dexSammlungsStatistik(session.user.id, 'training', children, signal);
+    applyPageLook(route, routeColor, pattern);
+    const children = await loadCollections(session.user.id, { rootKey: route, signal });
+    const childStats = await dexSammlungsStatistik(session.user.id, route, children, signal);
     if (signal?.aborted) return;
     view.classList.add('neo-dex-page', 'food-dex-page');
-    view.classList.toggle('food-dex-dunkler-hintergrund', true);
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: categoryColor('training'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(routeColor));
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: routeColor, counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
-    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'training', onSaved: refresh });
-    mountCategoryChrome(view, route, 'TRAINING', {
-      pageLookScope: route, pageLookPattern: 'wallpaper-dumbbell',
+    const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: route, onSaved: refresh });
+    mountCategoryChrome(view, route, title, {
+      pageLookScope: route, pageLookPattern: pattern,
       meta: `${children.length} Unterordner`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),
-      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: 'training', onSaved: refresh }),
-      onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: 'training', onChanged: refresh }),
+      onCreateSub: () => openCollectionEditor({ userId: session.user.id, rootKey: route, onSaved: refresh }),
+      onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: route, onChanged: refresh }),
     });
     installNeoDexChrome(view, {
-      title: 'TRAINING',
+      title,
       meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: '#home',
-      editLabel: 'TRAINING bearbeiten',
-      infoKind: 'training',
+      editLabel: `${title} bearbeiten`,
+      infoKind: route,
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
       userId: session.user.id,
@@ -1480,7 +1492,7 @@ async function renderRoute() {
       itemsById: new Map(children.map((kind) => [kind.id, kind])),
     }));
     await renderDexEntries(view, {
-      userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal, hasChildren: children.length > 0,
+      userId: session.user.id, rootKey: route, color: routeColor, signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
@@ -1501,7 +1513,7 @@ async function renderRoute() {
     // Keep the originating Dex surface during the transition. This prevents
     // both template Dex from flashing the neutral collection background or a
     // fallback wallpaper while the entry is loaded asynchronously.
-    const activeTemplateDex = ['food-log', 'training', 'custom-dex'].find((dex) => (
+    const activeTemplateDex = ['food-log', 'training', 'supps', 'stress', 'custom-dex'].find((dex) => (
       vorherigeRoute === dex || document.documentElement.dataset.seite === dex
     ));
     if (activeTemplateDex) {

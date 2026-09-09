@@ -23,6 +23,34 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
+const entryClassDefinitions = {
+  training: [
+    ['all', 'Alle'], ['exercise', 'Übungen'], ['recovery', 'Regeneration'],
+    ['tips', 'Tipps'], ['injury', 'Verletzung'],
+  ],
+  supps: [
+    ['all', 'Alle'], ['basics', 'Grundlagen'], ['effects', 'Wirkung'],
+    ['dosage', 'Dosierung'], ['products', 'Produkte'], ['studies', 'Studien'],
+  ],
+};
+
+function entryClassConfig(rootKey) {
+  const definitions = entryClassDefinitions[rootKey];
+  if (!definitions) return null;
+  return {
+    definitions,
+    fieldLabel: rootKey === 'training' ? 'Training-Klasse' : 'Thema',
+    customOptionLabel: rootKey === 'training' ? 'Eigene Klasse …' : 'Eigenes Thema …',
+    customFieldLabel: rootKey === 'training' ? 'Eigene Klasse' : 'Eigenes Thema',
+    customError: rootKey === 'training' ? 'Bitte eine eigene Klasse benennen.' : 'Bitte ein eigenes Thema benennen.',
+    filterLabel: rootKey === 'training' ? 'Training filtern' : 'SUPPS filtern',
+    emptyText: rootKey === 'training'
+      ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.'
+      : 'Für dieses Thema gibt es noch keinen SUPPS-Eintrag.',
+    customPlaceholder: rootKey === 'training' ? 'z. B. Technik' : 'z. B. Evidenz',
+  };
+}
+
 export function normalizeDexUrl(value) {
   const raw = String(value || '').trim();
   if (!raw) throw new Error('Bitte einen Link eintragen.');
@@ -105,7 +133,13 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
   const note = type === 'note' || routine;
   const cheatMeal = foodMode && foodKind === 'cheat_meal';
   const ownRecipe = foodMode && note && !cheatMeal;
-  const trainingMode = rootKey === 'training';
+  const classConfig = entryClassConfig(rootKey);
+  const titlePlaceholder = rootKey === 'supps'
+    ? 'z. B. Kreatin: Einnahme und Wirkung'
+    : 'z. B. Schnelles Protein-Frühstück';
+  const tagsPlaceholder = rootKey === 'supps'
+    ? 'z. B. Kreatin, Dosierung, Studie'
+    : 'z. B. Protein, Low Carb, Schnell';
   const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -137,7 +171,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
           <img data-image-preview alt="Ausgewähltes Rezeptbild" hidden>
         </label>` : ''}
       <label class="dex-entry-field" for="dex-entry-title"><span>Titel <small>${ownRecipe ? '' : 'optional'}</small></span>
-        <input id="dex-entry-title" class="input" maxlength="100" placeholder="z. B. Schnelles Protein-Frühstück"${ownRecipe ? ' required' : ''}>
+        <input id="dex-entry-title" class="input" maxlength="100" placeholder="${titlePlaceholder}"${ownRecipe ? ' required' : ''}>
       </label>
       ${foodMode ? `<div class="food-entry-meta">
         <label class="dex-entry-field" for="dex-entry-carb"><span>Carb-Klasse</span>
@@ -154,18 +188,18 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
         <div class="dex-zutaten-liste" data-zutaten-liste></div>
         <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('add')}<span>Zutat hinzufügen</span></button>
       </div>` : ''}
-      ${trainingMode ? `<label class="dex-entry-field" for="dex-entry-training-class"><span>Training-Klasse</span>
+      ${classConfig ? `<label class="dex-entry-field" for="dex-entry-training-class"><span>${classConfig.fieldLabel}</span>
         <select id="dex-entry-training-class" class="input">
-          <option value="unset">Nicht festgelegt</option><option value="exercise">Übungen</option>
-          <option value="recovery">Regeneration</option><option value="tips">Tipps</option>
-          <option value="injury">Verletzung</option><option value="custom">Eigene Klasse …</option>
+          <option value="unset">Nicht festgelegt</option>
+          ${classConfig.definitions.slice(1).map(([key, optionLabel]) => `<option value="${key}">${optionLabel}</option>`).join('')}
+          <option value="custom">${classConfig.customOptionLabel}</option>
         </select>
       </label>
-      <label class="dex-entry-field" for="dex-entry-training-class-custom" data-training-class-custom hidden><span>Eigene Klasse</span>
-        <input id="dex-entry-training-class-custom" class="input" maxlength="32" placeholder="z. B. Technik">
+      <label class="dex-entry-field" for="dex-entry-training-class-custom" data-training-class-custom hidden><span>${classConfig.customFieldLabel}</span>
+        <input id="dex-entry-training-class-custom" class="input" maxlength="32" placeholder="${classConfig.customPlaceholder}">
       </label>` : ''}
       <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
-        <input id="dex-entry-tags" class="input" maxlength="200" placeholder="z. B. Protein, Low Carb, Schnell">
+        <input id="dex-entry-tags" class="input" maxlength="200" placeholder="${tagsPlaceholder}">
       </label>
       ${audio ? '' : `<div class="dex-entry-field"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note && !ownRecipe ? '' : 'optional'}</small></span>
         ${noteEditorMarkup('dex-entry-note', '', { placeholder: note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild auf dieser Seite behalten?' : 'Kurze Beschreibung des Inhalts …', required: note && !ownRecipe })}
@@ -300,6 +334,7 @@ export function ingredientLine(it) {
 export function openDexEntryEditor({ type, userId, rootKey, collectionId = null, routineId = null, foodKind = null, entryLabel = '', onSaved }) {
   if (!['link', 'image', 'note', 'audio', 'routine'].includes(type)) throw new Error('Unbekannter Eintragstyp.');
   const foodMode = rootKey === 'food-log';
+  const classConfig = entryClassConfig(rootKey);
   const ownRecipe = foodMode && type === 'note' && foodKind !== 'cheat_meal';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop dex-entry-editor-backdrop';
@@ -457,12 +492,12 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
           imagePath = uploadedPath;
         }
       }
-      const selectedTrainingClass = rootKey === 'training'
+      const selectedEntryClass = classConfig
         ? (form.querySelector('#dex-entry-training-class').value === 'custom'
           ? form.querySelector('#dex-entry-training-class-custom').value.trim()
           : form.querySelector('#dex-entry-training-class').value)
         : null;
-      if (rootKey === 'training' && !selectedTrainingClass) throw new Error('Bitte eine eigene Klasse benennen.');
+      if (classConfig && !selectedEntryClass) throw new Error(classConfig.customError);
       const { data, error } = await supabase.from('dex_entries').insert({
         user_id: userId, collection_id: collectionId, routine_id: routineId, root_key: rootKey,
         entry_type: type, title, note: readNote(form.querySelector('#dex-entry-note')) || linkPreview.description || '',
@@ -472,7 +507,10 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
         food_kind: foodMode ? (foodKind || 'recipe') : null,
         carb_class: foodMode ? form.querySelector('#dex-entry-carb').value : null,
-        training_class: selectedTrainingClass,
+        // Das bestehende Datenbankfeld speichert die Klassifikation beider
+        // Wissensseiten. So bleibt die Remote-Struktur kompatibel, während
+        // TRAINING und SUPPS jeweils ihre eigenen sichtbaren Themen haben.
+        training_class: selectedEntryClass,
         prep_minutes: foodMode && form.querySelector('#dex-entry-prep').value
           ? Number(form.querySelector('#dex-entry-prep').value) : null,
         ingredient_items: foodMode ? recipeIngredients.getItems() : [],
@@ -643,25 +681,22 @@ function foodFiltersMarkup(active = 'all') {
     `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
 }
 
-const trainingFilterDefinitions = [
-  ['all', 'Alle'], ['exercise', 'Übungen'], ['recovery', 'Regeneration'],
-  ['tips', 'Tipps'], ['injury', 'Verletzung'],
-];
-
-function trainingFiltersMarkup(entries, active = 'all') {
-  const fixed = new Set(trainingFilterDefinitions.map(([key]) => key));
+function entryClassFiltersMarkup(entries, rootKey, active = 'all') {
+  const config = entryClassConfig(rootKey);
+  if (!config) return '';
+  const fixed = new Set(config.definitions.map(([key]) => key));
   const custom = [];
   entries.forEach((entry) => {
     const value = String(entry.training_class || '').trim();
     if (!value || value === 'unset' || fixed.has(value)) return;
     if (!custom.some((item) => item.toLocaleLowerCase('de') === value.toLocaleLowerCase('de'))) custom.push(value);
   });
-  const definitions = [...trainingFilterDefinitions, ...custom.sort((a, b) => a.localeCompare(b, 'de')).map((label) => [label, label])];
-  return `<nav class="neo-dex-filter food-dex-filter training-dex-filter" aria-label="Training filtern">${definitions.map(([key, label]) =>
-    `<button type="button" data-training-filter="${escapeHtml(key)}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${escapeHtml(label)}</button>`).join('')}</nav>`;
+  const definitions = [...config.definitions, ...custom.sort((a, b) => a.localeCompare(b, 'de')).map((label) => [label, label])];
+  return `<nav class="neo-dex-filter food-dex-filter entry-class-filter ${rootKey}-dex-filter" aria-label="${config.filterLabel}">${definitions.map(([key, label]) =>
+    `<button type="button" data-entry-class-filter="${escapeHtml(key)}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${escapeHtml(label)}</button>`).join('')}</nav>`;
 }
 
-function filterTrainingEntries(entries, filter) {
+function filterEntriesByClass(entries, filter) {
   if (filter === 'all') return entries;
   return entries.filter((entry) => String(entry.training_class || '').toLocaleLowerCase('de') === filter.toLocaleLowerCase('de'));
 }
@@ -699,7 +734,7 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
 
 export async function renderDexEntries(container, {
   userId, rootKey, collectionId = null, routineId, color, signal, onChanged,
-  foodFilters = rootKey === 'food-log', trainingFilters = rootKey === 'training', hasChildren = false, hideEmpty = false,
+  foodFilters = rootKey === 'food-log', classFilters = Boolean(entryClassConfig(rootKey)), hasChildren = false, hideEmpty = false,
 } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
@@ -709,16 +744,17 @@ export async function renderDexEntries(container, {
     let total = firstPage.total;
     if (signal?.aborted) return [];
     let activeFilter = 'all';
-    let activeTrainingFilter = 'all';
+    let activeClassFilter = 'all';
     let loadingMore = false;
     const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
     const stand = () => `${total}|${entries.map((entry) => `${entry.id}:${entry.updated_at || ''}`).join('|')}`;
     const paint = ({ filterScrollLeft = null } = {}) => {
       const foodEntries = foodFilters ? filterFoodEntries(entries, activeFilter) : entries;
-      const visibleEntries = trainingFilters ? filterTrainingEntries(foodEntries, activeTrainingFilter) : foodEntries;
+      const visibleEntries = classFilters ? filterEntriesByClass(foodEntries, activeClassFilter) : foodEntries;
       const hasMore = entries.length < total;
-      const filterIstLeer = (foodFilters && activeFilter !== 'all') || (trainingFilters && activeTrainingFilter !== 'all');
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${trainingFilters ? trainingFiltersMarkup(entries, activeTrainingFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : trainingFilters ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.' : undefined, filterIstLeer ? false : hasChildren, filterIstLeer ? false : hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
+      const filterIstLeer = (foodFilters && activeFilter !== 'all') || (classFilters && activeClassFilter !== 'all');
+      const classConfig = entryClassConfig(rootKey);
+      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${classFilters ? entryClassFiltersMarkup(entries, rootKey, activeClassFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : classConfig?.emptyText, filterIstLeer ? false : hasChildren, filterIstLeer ? false : hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
       const filterBar = slot.querySelector('.neo-dex-filter,.food-dex-filter');
       if (filterBar && filterScrollLeft != null) {
         filterBar.scrollLeft = filterScrollLeft;
@@ -735,10 +771,10 @@ export async function renderDexEntries(container, {
           paint({ filterScrollLeft });
         };
       });
-      slot.querySelectorAll('[data-training-filter]').forEach((button) => {
+      slot.querySelectorAll('[data-entry-class-filter]').forEach((button) => {
         button.onclick = () => {
           const filterScrollLeft = button.closest('.neo-dex-filter,.food-dex-filter')?.scrollLeft ?? 0;
-          activeTrainingFilter = button.dataset.trainingFilter;
+          activeClassFilter = button.dataset.entryClassFilter;
           paint({ filterScrollLeft });
         };
       });

@@ -24,6 +24,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="habits"] .routine-dex-page :is(.routine-hero-stack,.routine-plan,.routine-notizen)');
     expect(designSystem).toContain(':root[data-seite="shopping"] .shopping-dex-wrap .einkauf-suche');
     expect(designSystem).toContain(':root[data-seite="food-log"] .neo-dex-page.dex-fixkopf>.wrap');
+    expect(designSystem).toContain(':root[data-seite="supps"] .neo-dex-page.dex-fixkopf>.wrap');
     expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page .kategorie-scrollinhalt');
     expect(designSystem).toContain('.neo-dex-page .sammlung-seite');
     expect(designSystem).toContain('.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden)');
@@ -88,7 +89,17 @@ describe('CAPBOY Design-System', () => {
 
   it('verwendet fuer STRESS dasselbe Detail-Popover wie fuer TRAINING', () => {
     expect(entryDetail).toContain("container.classList.add('neo-dex-entry-view', 'food-dex-entry-view')");
-    expect(entryDetail).toContain("['food-log', 'training', 'stress', 'home'].includes(entry.root_key)");
+    expect(entryDetail).toContain("['food-log', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)");
+  });
+
+  it('registriert SUPPS als feste Coral-Wissensseite mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("supps: '#FF6B6B'");
+    expect(categoryIcons).toContain("supps: 'wallpaper-supps'");
+    expect(main).toContain("route === 'training' || route === 'supps'");
+    expect(main).toContain("const pattern = isSupps ? 'wallpaper-supps' : 'wallpaper-dumbbell'");
+    expect(entryDetail).toContain("supps: 'SUPPS'");
+    expect(entryDetail).toContain("rootKey === 'supps'");
+    expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
   });
 
   it('verwendet auf COMP den weissen Kontrast und die gemeinsame Hero-Schrift', () => {

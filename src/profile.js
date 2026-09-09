@@ -259,7 +259,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
     ['body', 'COMP'], ['reminders', 'TRACKER'], ['food-log', 'REZEPTE'],
-    ['training', 'TRAINING'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
+    ['training', 'TRAINING'], ['supps', 'SUPPS'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
     ['sleep', 'SCHLAF'], ['stress', 'STRESS'],
   ]);
   const sammlungsListe = document.createElement('div');
