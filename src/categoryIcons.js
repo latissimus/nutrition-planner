@@ -484,7 +484,7 @@ export function settingsSheet(route, onChange, actions = {}) {
   const showAppearance = !actions.disableAppearance && !actions.hideAppearanceIcon;
   const backdrop = sheet(`
     <div class="sheet-griff" aria-hidden="true"></div>
-    <header><h2>Seite bearbeiten</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
+    <header><h2>${escapeHtml(actions.title || 'Seite bearbeiten')}</h2><button data-sheet-close aria-label="Schließen">${materialIcon('close')}</button></header>
     <div class="sheet-menue">
       ${actions.onInfo ? `<button data-action="info">${materialIcon('info', 'sheet-list-icon')}<span>${escapeHtml(actions.infoLabel || 'Seiteninfo')}</span></button>` : ''}
       ${showAppearance ? `<button data-action="appearance">${materialIcon('edit', 'sheet-list-icon')}<span>${escapeHtml(actions.appearanceLabel || 'Icon ändern')}</span></button>` : ''}

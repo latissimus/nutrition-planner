@@ -5,6 +5,8 @@ const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
 const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
 const categoryIcons = readFileSync(new URL('./categoryIcons.js', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.js', import.meta.url), 'utf8');
+const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 
 describe('CAPBOY Design-System', () => {
   it('legt die gemeinsame Kartenachse zentral fest', () => {
@@ -50,9 +52,48 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('border-radius:var(--cap-card-radius)!important');
   });
 
-  it('oeffnet Unterordner ohne verstecktes Longpress-Menue', () => {
-    expect(main).not.toContain("bindLongPress(view.querySelector('.unter-sammlungen-grid')");
-    expect(main).not.toContain("bindLongPress(container.querySelector('.unter-sammlungen-grid')");
+  it('beschraenkt das Longpress-Menue von Unterordnern auf Verwaltung', () => {
+    const start = main.indexOf('function unterordnerEinstellungenOeffner');
+    const end = main.indexOf('async function dexSammlungsStatistik', start);
+    const folderMenu = main.slice(start, end);
+    expect(folderMenu).toContain('onRename:');
+    expect(folderMenu).toContain('onDelete:');
+    expect(folderMenu).not.toContain('onInfo:');
+    expect(main).toContain("bindLongPress(view.querySelector('.unter-sammlungen-grid')");
+    expect(main).toContain("bindLongPress(container.querySelector('.unter-sammlungen-grid')");
+    expect(categoryIcons).toContain("actions.title || 'Seite bearbeiten'");
+  });
+
+  it('verwendet ROUTINEN-Lila und eine weisse Silhouette im Splash', () => {
+    const splashStart = css.indexOf('.app-start-splash{');
+    const splashEnd = css.indexOf('.app-logo-font-ready', splashStart);
+    const splashCss = css.slice(splashStart, splashEnd);
+    expect(indexHtml).toContain('name="theme-color" content="#4B0082"');
+    expect(indexHtml).toContain('background:#4B0082!important');
+    expect(manifest).toContain('"background_color": "#4B0082"');
+    expect(splashCss).toContain('background:#4B0082');
+    expect(splashCss).toContain('.app-start-splash .brand{');
+    expect(splashCss).toContain('--sil-filter:brightness(0) invert(1)');
+  });
+
+  it('zentriert Detailaktionen auch ohne seitenspezifische Hilfsklasse', () => {
+    const actionStart = designSystem.indexOf('.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button');
+    const actionEnd = designSystem.indexOf('.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-popover', actionStart);
+    const actionCss = designSystem.slice(actionStart, actionEnd);
+    expect(actionCss).toContain('display:grid!important;');
+    expect(actionCss).toContain('place-items:center!important;');
+    expect(actionCss).toContain('background:currentColor!important;');
+  });
+
+  it('verwendet auf COMP den weissen Kontrast und die gemeinsame Hero-Schrift', () => {
+    expect(css).toContain('.app-dex-menu .menue-computer-text{fill:var(--dex-ink,#111)!important}');
+    expect(css).toContain('color:var(--dex-ink,#fff)!important;');
+    const heroStart = css.indexOf(':root[data-seite="body"] .body-v2-hero-value>small{');
+    const heroEnd = css.indexOf('}', heroStart);
+    const heroCss = css.slice(heroStart, heroEnd);
+    expect(heroCss).toContain('font-family:"Work Sans"');
+    expect(heroCss).toContain('font-style:italic!important;');
+    expect(heroCss).toContain('font-weight:700!important;');
   });
 
   it('bindet die festen COMP- und STRESS-Tapeten statt der Alt-Motive ein', () => {

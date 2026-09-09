@@ -1,4 +1,5 @@
 import './styles.css';
+import { bindLongPress } from './longPress.js';
 // Figtree (SIL Open Font License). Ausgewaehlt im direkten Vergleich mit einem
 // vergroesserten Ausschnitt aus Inspirationen/IMG_5112: Tuckiis Schrift hat ein
 // doppelstoeckiges "a" mit Schwaenzchen, einen GERADEN "y"-Abstrich, runde
@@ -33,7 +34,7 @@ import { maybeShowPushOnboarding } from './pushOnboarding.js';
 import { isAbortError, userFacingLoadError } from './errorHandling.js';
 import { subscribeToTableChanges } from './realtime.js';
 import {
-  applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern,
+  applyPageLook, beginPageLookDefer, categoryColor, categoryIconMarkup, commitPageLookDefer, materialIconMarkup, mountCategoryChrome, pageLook, setPageLookColor, setPageLookPattern, settingsSheet,
 } from './categoryIcons.js';
 import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
@@ -190,7 +191,7 @@ void appLogoSchriftBereit.finally(() => {
 });
 
 /* Der Splash wird sofort nach dem Parsen des Einstiegschunks gezeichnet. Der
-   blaue First Paint davor kommt bereits aus index.html, sodass auch auf einem
+   violette First Paint davor kommt bereits aus index.html, sodass auch auf einem
    kalten iPhone-Start kein cremefarbener Zwischenframe mehr sichtbar ist. */
 app.innerHTML = `<div class="app-start-splash" role="status" aria-label="CAPBOY wird geladen">${capboyMarkup()}</div>`;
 
@@ -873,6 +874,36 @@ function istDunkleOrdnerfarbe(farbe) {
   return (r * 299 + g * 587 + b * 114) / 1000 < 135;
 }
 
+// Unterordner behalten ihre Verwaltungsaktionen per Longpress. Die allgemeine
+// Seiteninfo gehoert dagegen nur zur Hauptseite und wird hier bewusst nicht
+// angeboten: Das kompakte Menue enthaelt ausschliesslich Umbenennen/Loeschen.
+function unterordnerEinstellungenOeffner({ userId, refresh, itemsById }) {
+  return (element) => {
+    const item = itemsById?.get(element.dataset.collectionId);
+    if (!item) return null;
+    return () => settingsSheet(`collection-${item.id}`, refresh, {
+      title: 'Ordner bearbeiten',
+      disableAppearance: true,
+      onRename: () => openCollectionEditor({
+        userId,
+        rootKey: item.root_key,
+        parentId: item.parent_id,
+        existing: item,
+        onSaved: refresh,
+      }),
+      onDelete: async () => {
+        if (!confirm(`„${item.name}“ samt Unterordnern wirklich löschen?`)) return;
+        try {
+          await deleteCollection(userId, item);
+          toast('Ordner gelöscht');
+          refresh();
+        } catch (error) { toast(error.message || 'Löschen fehlgeschlagen'); }
+      },
+      deleteLabel: 'Ordner löschen',
+    });
+  };
+}
+
 async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   if (!roots.length) return new Map();
   let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
@@ -1120,6 +1151,11 @@ async function mountCustomCollection(container, item, signal) {
       infoKind: customDexSkin ? 'custom' : trainingDexSkin ? 'training' : 'food',
     });
   }
+  bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
+    userId: ownerId,
+    refresh,
+    itemsById: new Map(children.map((kind) => [kind.id, kind])),
+  }));
   await renderDexEntries(container, {
     userId: ownerId, rootKey: item.root_key, collectionId: item.id,
     color: inheritedColor, signal, hasChildren: children.length > 0,
@@ -1393,6 +1429,11 @@ async function renderRoute() {
       closeHref: '#home',
       editLabel: 'REZEPTE bearbeiten',
     });
+    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
+      userId: foodOwnerId,
+      refresh,
+      itemsById: new Map(children.map((kind) => [kind.id, kind])),
+    }));
     await renderDexEntries(view, {
       userId: foodOwnerId, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
@@ -1433,6 +1474,11 @@ async function renderRoute() {
       editLabel: 'TRAINING bearbeiten',
       infoKind: 'training',
     });
+    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
+      userId: session.user.id,
+      refresh,
+      itemsById: new Map(children.map((kind) => [kind.id, kind])),
+    }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'training', color: categoryColor('training'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {
@@ -1538,6 +1584,11 @@ async function renderRoute() {
       editLabel: 'STRESS bearbeiten',
       infoKind: 'stress',
     });
+    bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
+      userId: session.user.id,
+      refresh,
+      itemsById: new Map(children.map((kind) => [kind.id, kind])),
+    }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'stress', color: categoryColor('stress'), signal, hasChildren: children.length > 0,
       onChanged: (entries, total) => {

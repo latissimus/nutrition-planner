@@ -327,18 +327,19 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
   to{transform:scale(1.25);opacity:1}
 }
 
-/* Kaltstart wie bei LOGMAN: Der TRACKER-Ton liegt bereits im HTML an; diese
+/* Kaltstart wie bei LOGMAN: Der ROUTINEN-Ton liegt bereits im HTML an; diese
    Ebene bringt nach dem Laden des JS die aktuelle CAPBOY-Wortmarke hinein.
    Sie bleibt stehen, waehrend Profil, Einstellungen und erster Dex parallel
    aufgebaut werden, und verschwindet erst beim atomaren Seitenwechsel. */
 .app-start-splash{
   position:fixed;z-index:2000;inset:0;display:flex;align-items:center;
-  justify-content:center;background:#4E342E;
+  justify-content:center;background:#4B0082;
   padding:20px 20px calc(20px + env(safe-area-inset-bottom));
 }
 .app-start-splash .brand{
   font-size:46px;
   opacity:0;
+  --sil-filter:brightness(0) invert(1);
 }
 .app-logo-font-ready .app-start-splash .brand{
   animation:splash-in 2s cubic-bezier(.16,.84,.32,1) both;
@@ -5669,8 +5670,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="body"] .body-v2-hero-value>small{
   color:#111!important;
-  font:800 11px/1.1 "Work Sans",var(--ui),sans-serif!important;
-  letter-spacing:.08em!important;
+  font-family:"Work Sans",var(--ui),sans-serif!important;
+  font-size:11px!important;
+  font-style:italic!important;
+  font-weight:700!important;
+  line-height:1.1!important;
+  letter-spacing:-.025em!important;
 }
 :root[data-seite="body"] .body-v2-hero-value>div{
   display:flex!important;
@@ -5710,7 +5715,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:1.5px solid #111!important;
   border-radius:50%!important;
   background:var(--ordner)!important;
-  color:#111!important;
+  color:var(--dex-ink,#fff)!important;
   font:800 13px/1 var(--tech)!important;
   box-shadow:none!important;
 }
@@ -5933,7 +5938,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-variant-numeric:slashed-zero tabular-nums!important;
   font-feature-settings:"zero" 1!important;
 }
-:root[data-seite="body"] :is(.btn-primary,.body-add-overlay .btn-primary){background:var(--ordner)!important;color:#111!important}
+:root[data-seite="body"] :is(.btn-primary,.body-add-overlay .btn-primary){background:var(--ordner)!important;color:var(--dex-ink,#fff)!important}
 :root[data-seite="body"] .body-reset-mini{
   display:block!important;
   width:100%!important;
@@ -6143,7 +6148,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:1.5px solid #111!important;
   border-radius:14px!important;
   background:var(--ordner)!important;
-  color:#111!important;
+  color:var(--dex-ink,#fff)!important;
   font:900 13px/1.15 "Work Sans",var(--ui),sans-serif!important;
   box-shadow:0 3px 0 #000!important;
 }
@@ -8205,7 +8210,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   opacity:0;
 }
 .app-dex-menu .menue-computer-innen{fill:transparent}
-:root[data-theme="dark"] .app-dex-menu .menue-computer-text{fill:#fff}
+.app-dex-menu .menue-computer-text{fill:var(--dex-ink,#111)!important}
 
 /* Haupt-Dex brauchen weder ihre wiederholte Seitenüberschrift noch die alte
    seitliche Buttonspalte. Bei Unter-Dex bleibt der Zurückknopf erhalten. */
@@ -8960,10 +8965,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   inline-size:auto!important;
 }
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
+  box-sizing:border-box!important;
+  display:grid!important;
+  place-items:center!important;
   width:40px!important;
   min-width:40px!important;
   height:40px!important;
   min-height:40px!important;
+  padding:0!important;
   border:0!important;
   border-radius:8px!important;
   background:transparent!important;
@@ -8975,14 +8984,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:none!important;
   box-shadow:none!important;
 }
-.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-more-dots,.food-dex-more-dots){gap:3px!important}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-more-dots,.food-dex-more-dots){margin:auto!important;gap:3px!important}
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-more-dots,.food-dex-more-dots) i{
   width:4px!important;
   height:4px!important;
+  background:currentColor!important;
 }
-.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-close,.food-dex-action-close) :is(.material-svg,svg){
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-close,.food-dex-action-close) .material-svg{
+  display:grid!important;
+  place-items:center!important;
   width:21px!important;
   height:21px!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-close,.food-dex-action-close) .material-svg svg{
+  width:21px!important;
+  height:21px!important;
+}
+.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-close,.food-dex-action-close) :is(.material-svg,svg,svg *){
+  color:currentColor!important;
+  fill:currentColor!important;
 }
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-popover,.food-dex-action-popover){
   top:calc(100% + 8px)!important;
