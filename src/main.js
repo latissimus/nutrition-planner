@@ -925,14 +925,14 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   setPreference('muscledex:sichtbare-sammlungen', order);
   setPreference('muscledex:coin-dex-sichtbar', true);
   const looks = {
-    'food-log': ['#FBE7A3', 'wallpaper-pizza', '🍕'],
-    reminders: ['#525CEB', 'wallpaper-burger', '🍔'],
-    sleep: ['#333D6D', 'wallpaper-moon', '😴'],
-    shopping: ['#00E0BA', 'wallpaper-brokkoli', '🛒'],
-    habits: ['#8C00FF', 'wallpaper-wolke', '🧠'],
-    training: ['#215E61', 'wallpaper-dumbbell', '💪🏻'],
-    body: ['#B1E7FF', 'wallpaper-comp', '📐'],
-    coins: ['#00A8FF', 'wallpaper-game', '🎮'],
+    'food-log': ['#E3B505', 'wallpaper-pizza', '🍕'],
+    reminders: ['#4E342E', 'wallpaper-burger', '🍔'],
+    sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],
+    shopping: ['#00C2CB', 'wallpaper-brokkoli', '🛒'],
+    habits: ['#4B0082', 'wallpaper-wolke', '🧠'],
+    training: ['#006D77', 'wallpaper-dumbbell', '💪🏻'],
+    body: ['#0B132B', 'wallpaper-comp', '📐'],
+    coins: ['#E6D6FF', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
     setPreference(`muscledex:kategorie-farbe:${route}`, color);
@@ -1249,6 +1249,7 @@ async function renderRoute() {
   }
   if (route === 'profile') {
     setSeite('profile');
+    applyPageLook('profile', categoryColor('profile'), 'drops');
     // Das Profil bleibt Teil derselben festen App-Schale. Im Menüband bleibt
     // deshalb die zuletzt geöffnete Inhaltsseite markiert.
     view.dataset.appDockRoute = appLetzteDexRoute();
@@ -1407,7 +1408,7 @@ async function renderRoute() {
     setSeite('training');
     // A collection mutation remounts this route while the Supabase request is
     // still pending. Paint the fixed TRAINING surface immediately so the
-    // shared template fallback (#FBE7A3) can never flash in that gap.
+    // shared template fallback (#E3B505) can never flash in that gap.
     applyPageLook('training', categoryColor('training'), 'wallpaper-dumbbell');
     const children = await loadCollections(session.user.id, { rootKey: 'training', signal });
     const childStats = await dexSammlungsStatistik(session.user.id, 'training', children, signal);

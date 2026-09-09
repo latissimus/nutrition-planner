@@ -53,21 +53,25 @@ const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
-  body: '#B1E7FF', reminders: '#FF3483', 'food-log': '#FBE7A3',
-  recipes: '#007DCC', training: '#215E61', habits: '#9564DD',
-  shopping: '#FFCF00',
-  sleep: '#333D6D',
-  stress: '#B5BAFF',
-  coins: '#05BDE8',
+  body: '#0B132B', reminders: '#4E342E', 'food-log': '#E3B505',
+  recipes: '#E3B505', training: '#006D77', habits: '#4B0082',
+  shopping: '#00C2CB',
+  sleep: '#1E3A8A',
+  stress: '#FF2E88',
+  coins: '#E6D6FF',
+  profile: '#A7C957',
 };
 const fixedSystemColors = {
-  body: '#B1E7FF',
-  'food-log': '#FBE7A3',
-  training: '#215E61',
-  reminders: '#525CEB',
-  habits: '#9564DD',
-  sleep: '#333D6D',
-  stress: '#B5BAFF',
+  body: '#0B132B',
+  'food-log': '#E3B505',
+  training: '#006D77',
+  reminders: '#4E342E',
+  habits: '#4B0082',
+  shopping: '#00C2CB',
+  sleep: '#1E3A8A',
+  stress: '#FF2E88',
+  coins: '#E6D6FF',
+  profile: '#A7C957',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',
@@ -129,14 +133,13 @@ export function colorIsDark(color) {
 }
 
 export function categoryColor(route) {
-  if (route === 'habits') return '#9564DD';
   if (fixedSystemColors[route]) return fixedSystemColors[route];
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && saved?.toUpperCase() === '#245953') return '#9564DD';
+  if (route === 'habits' && saved?.toUpperCase() === '#245953') return '#4B0082';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
-  return valid ? saved.toUpperCase() : (defaultColors[route] || '#B1E7FF');
+  return valid ? saved.toUpperCase() : (defaultColors[route] || '#E3B505');
 }
 
 const readableInkFor = (color) => (colorIsDark(color) ? '#FFFFFF' : '#111111');

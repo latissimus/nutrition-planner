@@ -6,8 +6,8 @@
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#F2EBE0",
-  "theme_color": "#F2EBE0",
+  "background_color": "#4E342E",
+  "theme_color": "#4E342E",
   "icons": [
     { "src": "muscledex-icon-192-v4.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "muscledex-icon-512-v4.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { dexEntryOverviewMarkup, isTikTokPhotoPost, normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
-import { colorIsDark } from './categoryIcons.js';
+import { categoryColor, colorIsDark } from './categoryIcons.js';
 
 describe('normalizeDexUrl', () => {
   it('ergänzt bei einer Domain das HTTPS-Protokoll', () => {
@@ -30,6 +30,24 @@ describe('Anbieter- und Farbkontrast', () => {
     expect(colorIsDark('#525CEB')).toBe(true);
     expect(colorIsDark('#FF3483')).toBe(false);
     expect(colorIsDark('#00E0BA')).toBe(false);
+  });
+
+  it('verankert die feste CAPBOY-Seitenpalette', () => {
+    expect(Object.fromEntries([
+      'food-log', 'reminders', 'sleep', 'habits', 'shopping',
+      'training', 'body', 'stress', 'coins', 'profile',
+    ].map((route) => [route, categoryColor(route)]))).toEqual({
+      'food-log': '#E3B505',
+      reminders: '#4E342E',
+      sleep: '#1E3A8A',
+      habits: '#4B0082',
+      shopping: '#00C2CB',
+      training: '#006D77',
+      body: '#0B132B',
+      stress: '#FF2E88',
+      coins: '#E6D6FF',
+      profile: '#A7C957',
+    });
   });
 });
 

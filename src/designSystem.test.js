@@ -62,4 +62,9 @@ describe('CAPBOY Design-System', () => {
     expect(css).toContain('--body-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Comp.svg"))');
     expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before');
   });
+
+  it('hellt nur auf den drei festgelegten Seiten die Logo-Silhouette auf', () => {
+    expect(designSystem).toContain(':root:is([data-seite="body"],[data-seite="sleep"],[data-seite="habits"]) .app-dex-brand .brand');
+    expect(designSystem).toContain('--sil-filter:brightness(0) invert(1)');
+  });
 });

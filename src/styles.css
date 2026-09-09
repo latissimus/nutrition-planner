@@ -333,7 +333,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
    aufgebaut werden, und verschwindet erst beim atomaren Seitenwechsel. */
 .app-start-splash{
   position:fixed;z-index:2000;inset:0;display:flex;align-items:center;
-  justify-content:center;background:#525CEB;
+  justify-content:center;background:#4E342E;
   padding:20px 20px calc(20px + env(safe-area-inset-bottom));
 }
 .app-start-splash .brand{
@@ -2849,7 +2849,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    finalen Blöcken weiter unten, damit keine alten Zwischenstände mehr die
    Kaskade verwässern. */
 :is(.neo-dex-page,.food-dex-page){
-  --food-page-purple:var(--dex-seitenfarbe,#FBE7A3);
+  --food-page-purple:var(--dex-seitenfarbe,#E3B505);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Pizza.svg"));
   font-family:"Work Sans",var(--ui),sans-serif;
 }
@@ -2877,7 +2877,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Food-Dex final overrides (kept after the generic wallpaper cascade). */
 :root[data-seite="food-log"]:not([data-theme="dark"]),:root[data-seite="training"]:not([data-theme="dark"]),:root[data-seite="custom-dex"]{
-  --food-page-purple:var(--dex-seitenfarbe,#FBE7A3);
+  --food-page-purple:var(--dex-seitenfarbe,#E3B505);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Pizza.svg"));
   background-color:var(--dex-seitenfarbe,var(--food-page-purple))!important;
   background-image:none!important;
@@ -4478,9 +4478,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Trainingdex. Seine breiten Zeitfenster bleiben als funktionsspezifische
    Module erhalten; Tapete, Titel und Bedienung folgen dem gemeinsamen Skin. */
 :root[data-seite="reminders"],:root[data-seite="reminders"] body{
-  --food-page-purple:var(--dex-seitenfarbe,#525CEB);
+  --food-page-purple:var(--dex-seitenfarbe,#4E342E);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Burger.svg"));
-  background-color:var(--dex-seitenfarbe,#525CEB)!important;
+  background-color:var(--dex-seitenfarbe,#4E342E)!important;
   background-image:none!important;
 }
 :root[data-seite="reminders"] :is(#app,#view){
@@ -5505,7 +5505,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#fff!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol :is(i,b){
-  background:var(--dex-seitenfarbe,var(--bg,#215E61))!important;
+  background:var(--dex-seitenfarbe,var(--bg,#006D77))!important;
   border-color:#fff!important;
   box-shadow:0 3.5px 0 #fff!important;
 }
@@ -5539,11 +5539,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    danach ruhige, flache Messkarten. Körperfett wird bewusst nicht geschätzt.
    ============================================================ */
 :root[data-seite="body"],:root[data-seite="body"] body{
-  --ordner:#B1E7FF;
-  --dex-seitenfarbe:#B1E7FF;
-  --ordner-ink:#111;
-  --dex-ink:#111;
-  background:#B1E7FF!important;
+  --ordner:var(--dex-seitenfarbe,#0B132B);
+  --ordner-ink:var(--dex-ink,#fff);
+  background:var(--dex-seitenfarbe,#0B132B)!important;
 }
 :root[data-seite="body"] :is(#app,#view){background:transparent!important}
 :root[data-seite="body"] .body-log-dex-page{
@@ -5551,9 +5549,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --body-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Comp.svg"));
   isolation:isolate;
   min-height:100dvh;
-  background:#B1E7FF!important;
+  background:var(--dex-seitenfarbe,#0B132B)!important;
   background-image:none!important;
-  color:#111;
+  color:var(--dex-ink,#fff);
   font-family:"Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="body"] .body-log-dex-page .kategorie-scrollinhalt::before{display:none!important}
@@ -6170,9 +6168,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Meal-Log. Schlafspezifische Diagramme und Routinen bleiben eigenständig.
    ============================================================ */
 :root[data-seite="sleep"],:root[data-seite="sleep"] body{
-  --food-page-purple:var(--dex-seitenfarbe,#333D6D);
+  --food-page-purple:var(--dex-seitenfarbe,#1E3A8A);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/moon.svg"));
-  background-color:var(--dex-seitenfarbe,#333D6D)!important;
+  background-color:var(--dex-seitenfarbe,#1E3A8A)!important;
   background-image:none!important;
 }
 :root[data-seite="sleep"] :is(#app,#view){
@@ -6782,7 +6780,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] :is(.reminder-overlay,.nutrition-overlay,.mahl-add-backdrop) .kategorie-sheet :is(
   .btn-primary,.rem-speichern
 ){
-  background:var(--dex-seitenfarbe,var(--ordner,#525CEB))!important;
+  background:var(--dex-seitenfarbe,var(--ordner,#4E342E))!important;
   border-color:#000!important;
   color:var(--dex-ink,#fff)!important;
 }
@@ -6813,9 +6811,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Routinen-Dex nach Meal-Log/Special-Dex-Vorlage. */
 :root[data-seite="habits"],:root[data-seite="habits"] body{
-  --food-page-purple:var(--dex-seitenfarbe,#9564DD);
+  --food-page-purple:var(--dex-seitenfarbe,#4B0082);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Wolke.svg"));
-  background-color:var(--dex-seitenfarbe,#9564DD)!important;
+  background-color:var(--dex-seitenfarbe,#4B0082)!important;
   background-image:none!important;
 }
 :root[data-seite="habits"] :is(#app,#view){
@@ -7202,7 +7200,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:0 2px 0 #000!important;
 }
 :root[data-seite="shopping"] .einkauf-tag-chip.aktiv{
-  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  background:var(--ordner,var(--dex-seitenfarbe,#00C2CB))!important;
   border-color:#111!important;
   color:#111!important;
 }
@@ -7235,7 +7233,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   white-space:nowrap!important;
 }
 :root[data-seite="shopping"] .einkauf-chip-btn.aktiv{
-  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  background:var(--ordner,var(--dex-seitenfarbe,#00C2CB))!important;
   border-color:#111!important;
   color:#111!important;
 }
@@ -7266,7 +7264,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:38px!important;
   height:38px!important;
   border-radius:8px!important;
-  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  background:var(--ordner,var(--dex-seitenfarbe,#00C2CB))!important;
 }
 :root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head b{
   font-family:"Work Sans",var(--ui),sans-serif!important;
@@ -7280,7 +7278,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-size:14px!important;
   font-style:normal!important;
   font-weight:800!important;
-  color:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#00E0BA)) 70%,#111)!important;
+  color:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#00C2CB)) 70%,#111)!important;
 }
 :root[data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-chevron{
   display:grid!important;
@@ -7338,7 +7336,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#fff!important;
 }
 :root[data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt{
-  background:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#00E0BA)) 14%,#fff)!important;
+  background:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#00C2CB)) 14%,#fff)!important;
 }
 :root[data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt::before{
   display:none!important;
@@ -7347,7 +7345,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:24px!important;
   height:24px!important;
   margin:0!important;
-  accent-color:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  accent-color:var(--ordner,var(--dex-seitenfarbe,#00C2CB))!important;
 }
 :root[data-seite="shopping"] .einkauf-row-name{
   font-family:"Work Sans",var(--ui),sans-serif!important;
@@ -7357,7 +7355,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-shell>#view.shopping-dex-page{
   isolation:isolate!important;
-  background-color:var(--dex-seitenfarbe,var(--bg,#00E0BA))!important;
+  background-color:var(--dex-seitenfarbe,var(--bg,#00C2CB))!important;
   background-image:none!important;
 }
 .shopping-dex-page.dex-tapete-datei::before{
@@ -7394,7 +7392,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop) .btn-primary{
   border:2px solid #000!important;
-  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  background:var(--ordner,var(--dex-seitenfarbe,#00C2CB))!important;
   color:#111!important;
   box-shadow:0 5px 0 #000!important;
 }
@@ -7405,7 +7403,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Tapete und Bedienung folgen Meal-, Sleep- und Body-Log.
    ============================================================ */
 :root[data-seite="coins"],:root[data-seite="coins"] body{
-  background-color:var(--dex-seitenfarbe,#05BDE8)!important;
+  background-color:var(--dex-seitenfarbe,#E6D6FF)!important;
   background-image:none!important;
 }
 :root[data-seite="coins"] :is(#app,#view){
@@ -7415,10 +7413,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coin-dex-page{
   --special-dex-inline:36px!important;
   --special-dex-gap:18px!important;
-  --special-dex-hero-bg:color-mix(in srgb,var(--ordner,#05BDE8) 9%,#fff);
+  --special-dex-hero-bg:color-mix(in srgb,var(--ordner,#E6D6FF) 9%,#fff);
   --special-dex-card-bg:#fff;
   isolation:isolate;
-  color:#fff;
+  color:var(--dex-ink,#111);
   font-family:"Work Sans",var(--ui),sans-serif;
 }
 :root[data-seite="coins"] .coin-dex-page::before{
@@ -7427,7 +7425,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:0;
   inset:0;
   pointer-events:none;
-  background:#fff;
+  background:var(--dex-ink,#111);
   opacity:.17;
   -webkit-mask-image:var(--dex-tapete);
   mask-image:var(--dex-tapete);
@@ -7456,7 +7454,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-inline:0!important;
 }
 .coin-dex-page .kategorie-kopftitel{
-  color:#fff!important;
+  color:var(--dex-ink,#111)!important;
 }
 .coin-dex-page .coin-dex-inhalt{
   display:grid!important;
@@ -7545,13 +7543,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:800;
   letter-spacing:-.035em;
   text-transform:none;
-  color:#fff;
+  color:var(--dex-ink,#111);
 }
 .coin-dex-page .coin-history-title{
   margin-top:16px!important;
 }
 .coin-dex-page .coin-history,.coin-dex-page .coin-history :is(span,small,b,.plus,.minus){
-  color:#fff;
+  color:var(--dex-ink,#111);
 }
 .coin-dex-page .coin-history small{
   opacity:.82;
@@ -7566,11 +7564,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .coin-dex-page .coin-reward-actions .coin-redeem{
   border-color:#111;
-  background:var(--ordner,var(--dex-seitenfarbe,#05BDE8));
+  background:var(--ordner,var(--dex-seitenfarbe,#E6D6FF));
   color:#111;
 }
 :root[data-seite="coins"] .coin-editor-backdrop{
-  --ordner:var(--dex-seitenfarbe,#05BDE8);
+  --ordner:var(--dex-seitenfarbe,#E6D6FF);
   --ordner-ink:var(--dex-ink,#111);
 }
 @media(max-width:390px){
@@ -7591,7 +7589,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    die ueber Jahre gewachsenen braunen und kursiven Darstellungsregeln.
    ============================================================ */
 :root[data-seite="profile"]{
-  --profile-accent:#9564DD;
+  --profile-accent:#A7C957;
   --akzent:var(--profile-accent);
   --akzent-ink:#111;
 }
@@ -7968,8 +7966,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   height:calc(env(safe-area-inset-top) + var(--app-dex-header-h));
   padding-top:env(safe-area-inset-top);
   background:var(--dex-seitenfarbe,var(--bg));
-  border-bottom:2px solid #0A1330;
-  color:#0A1330;
+  border-bottom:2px solid var(--dex-ink,#0A1330);
+  color:var(--dex-ink,#0A1330);
   --brand-outline:#0A1330;
 }
 .app-dex-header-inner{
@@ -8004,7 +8002,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:44px;
   min-width:44px;
   height:44px;
-  border:2px solid #0A1330;
+  border:2px solid var(--dex-ink,#0A1330);
   border-radius:50%;
   background:#fff;
   color:#0A1330;
@@ -8044,7 +8042,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-sizing:border-box;
   padding:8px 7px var(--app-dex-dock-bottom);
   background:transparent;
-  color:#0A1330;
+  color:var(--dex-ink,#0A1330);
   overflow:hidden;
 }
 .app-dex-dock::before{
@@ -8086,7 +8084,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:absolute;
   z-index:-1;
   inset:0;
-  border:2px solid #0A1330;
+  border:2px solid var(--dex-ink,#0A1330);
   border-radius:16px;
   /* Menüband uebernimmt die Seitenfarbe des aktiven Dex und deckt die
      Tapete darunter vollständig ab — kein Milchglas mehr. */
@@ -8116,7 +8114,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:0;
   border-radius:11px;
   background:none;
-  color:#0A1330;
+  color:var(--dex-ink,#0A1330);
   box-shadow:none;
   text-decoration:none;
   scroll-snap-align:center;
@@ -8148,10 +8146,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    erhalten; drop-shadow folgt dabei der Alpha-Kante des jeweiligen SVGs. */
 .app-dex-tab.aktiv{
   background:color-mix(in srgb,#fff 58%,var(--dex-seitenfarbe,var(--bg)));
-  box-shadow:inset 0 0 0 1.5px #0A1330;
+  box-shadow:inset 0 0 0 1.5px var(--dex-ink,#0A1330);
 }
 .app-dex-tab.aktiv>span{
-  filter:drop-shadow(2.5px 2.5px 0 #0A1330);
+  filter:drop-shadow(2.5px 2.5px 0 var(--dex-ink,#0A1330));
 }
 .app-dex-menu{
   position:relative;
@@ -8160,10 +8158,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   height:55px;
   padding:0;
   border:0;
-  border-left:2px solid #0A1330;
+  border-left:2px solid var(--dex-ink,#0A1330);
   border-radius:0 10px 10px 0;
   background:transparent;
-  color:#0A1330;
+  color:var(--dex-ink,#0A1330);
   box-shadow:none;
   overflow:hidden;
   isolation:isolate;
@@ -8438,7 +8436,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .rem-speichern
 ){
   border:1.5px solid #111!important;
-  background:var(--ordner,#525CEB)!important;
+  background:var(--ordner,#4E342E)!important;
   color:var(--ordner-ink,#fff)!important;
 }
 
@@ -8461,7 +8459,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-card-radius:15px;
   --cap-card-border:1.5px solid #111;
   --cap-card:#fff;
-  --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#525CEB)) 7%,#fff);
+  --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#4E342E)) 7%,#fff);
   --cap-muted:#586274;
   /* TRACKER ist auch fuer Dialoge die Referenz: auf dem iPhone liegen alle
      Sheets 28px innerhalb des Viewports, unabhaengig von ihrer Seite. */
@@ -8472,7 +8470,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"]{
   --cap-card:#191C24;
-  --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#525CEB)) 11%,#191C24);
+  --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#4E342E)) 11%,#191C24);
   --cap-muted:#AEB7C6;
   --cap-card-border:1.5px solid #697486;
 }
@@ -8488,7 +8486,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-header .coin-kopfstand strong{
   min-width:10px;
   margin-right:4px;
-  color:#24304A;
+  color:var(--dex-ink,#24304A);
   font:700 10px/1 var(--tech);
   transform:translateY(1px);
 }
@@ -8767,7 +8765,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop) .btn-primary{
   border:1.5px solid #111!important;
-  background:var(--ordner,var(--dex-seitenfarbe,#00E0BA))!important;
+  background:var(--ordner,var(--dex-seitenfarbe,#00C2CB))!important;
   color:var(--ordner-ink,#111)!important;
   box-shadow:0 3.5px 0 #000!important;
 }
@@ -8879,15 +8877,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Auf der Profilseite ersetzt der Seitenakzent die letzte alte braune
    Systemfarbe auch bei generischen Buttons und nativen Checkboxen. */
 :root[data-seite="profile"]{
-  --akzent:var(--profile-accent,#9564DD)!important;
+  --profile-accent:#A7C957!important;
+  --akzent:var(--profile-accent,#A7C957)!important;
   --akzent-ink:#111!important;
 }
 :root[data-seite="profile"] :is(.themebtn.on,.profile-datei-knopf,.role-tag,.btn-primary){
-  background:var(--profile-accent,#9564DD)!important;
+  background:var(--profile-accent,#A7C957)!important;
   color:#111!important;
 }
 :root[data-seite="profile"] .profile-abschnitt input[type="checkbox"]{
-  accent-color:var(--profile-accent,#9564DD)!important;
+  accent-color:var(--profile-accent,#A7C957)!important;
+}
+
+/* Auf den drei tiefblauen/violetten Seiten bleibt die pinke Wortmarke
+   unveraendert. Nur die dahinterliegende Athleten-Silhouette wird weiss,
+   damit ihre Form auf dem dunklen Seitenkopf klar lesbar bleibt. */
+:root:is([data-seite="body"],[data-seite="sleep"],[data-seite="habits"]) .app-dex-brand .brand{
+  --sil-filter:brightness(0) invert(1);
 }
 
 @media(max-width:430px){
