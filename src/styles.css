@@ -8889,10 +8889,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   accent-color:var(--profile-accent,#A7C957)!important;
 }
 
-/* Auf den drei tiefblauen/violetten Seiten bleibt die pinke Wortmarke
-   unveraendert. Nur die dahinterliegende Athleten-Silhouette wird weiss,
-   damit ihre Form auf dem dunklen Seitenkopf klar lesbar bleibt. */
-:root:is([data-seite="body"],[data-seite="sleep"],[data-seite="habits"]) .app-dex-brand .brand{
+/* Auf den dunklen Seiten bleibt die pinke Wortmarke unveraendert. Nur die
+   dahinterliegende Athleten-Silhouette wird fuer klaren Kontrast weiss. */
+:root:is([data-seite="body"],[data-seite="sleep"],[data-seite="habits"],[data-seite="reminders"],[data-seite="training"]) .app-dex-brand .brand{
   --sil-filter:brightness(0) invert(1);
 }
 

@@ -64,8 +64,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before');
   });
 
-  it('hellt nur auf den drei festgelegten Seiten die Logo-Silhouette auf', () => {
-    expect(designSystem).toContain(':root:is([data-seite="body"],[data-seite="sleep"],[data-seite="habits"]) .app-dex-brand .brand');
+  it('hellt auf den festgelegten dunklen Seiten die Logo-Silhouette auf', () => {
+    expect(designSystem).toContain(':root:is([data-seite="body"],[data-seite="sleep"],[data-seite="habits"],[data-seite="reminders"],[data-seite="training"]) .app-dex-brand .brand');
     expect(designSystem).toContain('--sil-filter:brightness(0) invert(1)');
   });
 });
