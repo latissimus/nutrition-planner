@@ -8785,6 +8785,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .kategorie-sheet>header + :is(.sheet-menue,.kategorie-sheet-menu,.mahl-add-gruppe){
   margin-top:-8px!important;
 }
+:root[data-seite="sleep"] .sleep-action-card>header{
+  /* Das Aktionsmenue braucht keinen sticky Editor-Kopf. Dessen historisches
+     16-px-Innenpolster erzeugte hier die zusaetzliche Leerzeile. */
+  position:static!important;
+  top:auto!important;
+  margin:0 0 4px!important;
+  padding:0!important;
+  background:transparent!important;
+}
 .kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu){
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
