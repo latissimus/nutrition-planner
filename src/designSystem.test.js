@@ -44,6 +44,7 @@ describe('CAPBOY Design-System', () => {
 
   it('vereinheitlicht Tapeten und Beitragsdetails', () => {
     expect(designSystem).toContain('mask-size:500px auto!important');
+    expect(designSystem).toContain(':root[data-seite="coins"] .coin-dex-page::before');
     expect(designSystem).toContain('.dex-detail-card-actions');
     expect(designSystem).toContain('background:transparent!important');
     expect(designSystem).toContain('border-radius:var(--cap-card-radius)!important');

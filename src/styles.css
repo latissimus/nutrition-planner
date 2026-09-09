@@ -8912,7 +8912,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="stress"] .neo-dex-page::before,
 :root[data-seite="sleep"] .sleep-log-dex-page::before,
 :root[data-seite="habits"] .routine-dex-page::before,
-:root[data-seite="shopping"] .shopping-dex-page::before{
+:root[data-seite="shopping"] .shopping-dex-page::before,
+:root[data-seite="coins"] .coin-dex-page::before{
   opacity:.065!important;
   -webkit-mask-size:500px auto!important;
   mask-size:500px auto!important;
