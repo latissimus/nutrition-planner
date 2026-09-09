@@ -5,6 +5,7 @@ const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
 const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
 const categoryIcons = readFileSync(new URL('./categoryIcons.js', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.js', import.meta.url), 'utf8');
+const entryDetail = readFileSync(new URL('./dexEntryDetail.js', import.meta.url), 'utf8');
 const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 
@@ -83,6 +84,11 @@ describe('CAPBOY Design-System', () => {
     expect(actionCss).toContain('display:grid!important;');
     expect(actionCss).toContain('place-items:center!important;');
     expect(actionCss).toContain('background:currentColor!important;');
+  });
+
+  it('verwendet fuer STRESS dasselbe Detail-Popover wie fuer TRAINING', () => {
+    expect(entryDetail).toContain("container.classList.add('neo-dex-entry-view', 'food-dex-entry-view')");
+    expect(entryDetail).toContain("['food-log', 'training', 'stress', 'home'].includes(entry.root_key)");
   });
 
   it('verwendet auf COMP den weissen Kontrast und die gemeinsame Hero-Schrift', () => {

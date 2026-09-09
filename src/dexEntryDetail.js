@@ -353,12 +353,18 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   // Keep the originating page token active so the full entry page (including
   // the iOS safe-area) uses the same Dex background instead of the neutral
   // collection/cream fallback.
-  if (['food-log', 'training', 'home'].includes(entry.root_key)) {
+  // Jede Beitragsdetailseite verwendet dieselbe Aktionskomponente. STRESS
+  // fehlte hier bislang; dadurch griffen beim Oeffnen des Drei-Punkte-Menues
+  // alte allgemeine Buttonregeln und verteilten die Aktionen einzeln ueber
+  // der Karte. Mit denselben View-Klassen sitzt das Menue exakt wie bei
+  // TRAINING und bleibt als geschlossenes Popover an den drei Punkten.
+  container.classList.add('neo-dex-entry-view', 'food-dex-entry-view');
+  if (['food-log', 'training', 'stress', 'home'].includes(entry.root_key)) {
     document.documentElement.dataset.seite = entry.root_key === 'home' ? 'custom-dex' : entry.root_key;
     // Die Aktionsleiste und Tapete werden damit aus exakt denselben Regeln
     // wie im FoodDex selbst gezeichnet. Nur die Menüaktionen unterscheiden
     // sich inhaltlich.
-    container.classList.add('neo-dex-page', 'food-dex-page', 'neo-dex-entry-view', 'food-dex-entry-view');
+    container.classList.add('neo-dex-page', 'food-dex-page');
   }
   const look = await entryPageLook(entry, userId, signal);
   if (signal?.aborted) return;
