@@ -568,6 +568,7 @@ const sammlungen = [
   ['body', 'COMP', 'Gewicht, Hautfalten, Taille und Trends.', 'body', 'cyan', 'Aktiv'],
   ['reminders', 'TRACKER', 'Mahlzeiten, Supplements und Wasser.', 'reminders', 'pink', 'Aktiv'],
   ['food-log', 'REZEPTE', 'Cheat-Meals und Rezeptideen wiederfinden.', 'food', 'violet', 'Aktiv'],
+  ['essen', 'ESSEN', 'Ernährungswissen, Lebensmittel und Essverhalten.', 'essen', 'burgundy', 'Aktiv'],
   ['supps', 'SUPPS', 'Supplement-Wissen, Wirkung und Dosierung.', 'supps', 'coral', 'Aktiv'],
   ['training', 'TRAINING', 'Trainingseinheiten, Übungen und Trainingswissen.', 'training', 'orange', 'Aktiv'],
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
@@ -952,12 +953,13 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     return false;
   }
   if (signal?.aborted) return false;
-  const order = ['food-log', 'reminders', 'supps', 'sleep', 'shopping', 'habits', 'training', 'body', 'stress'];
+  const order = ['food-log', 'essen', 'reminders', 'supps', 'sleep', 'shopping', 'habits', 'training', 'body', 'stress'];
   setPreference('muscledex:sammlungs-reihenfolge', order);
   setPreference('muscledex:sichtbare-sammlungen', order);
   setPreference('muscledex:coin-dex-sichtbar', true);
   const looks = {
     'food-log': ['#E3B505', 'wallpaper-pizza', '🍕'],
+    essen: ['#800020', 'wallpaper-essen', '🍽️'],
     reminders: ['#4E342E', 'wallpaper-burger', '🍔'],
     supps: ['#FF6B6B', 'wallpaper-supps', '💊'],
     sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],
@@ -982,6 +984,7 @@ const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries>
 function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const training = kind === 'training';
   const supps = kind === 'supps';
+  const essen = kind === 'essen';
   const custom = kind === 'custom';
   const meal = kind === 'meal';
   const sleep = kind === 'sleep';
@@ -990,7 +993,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : essen ? 'ESSEN' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
   const copy = body
     ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -1025,6 +1028,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     ? `<p>In <b>SUPPS</b> sammelst du Wissen zu <b>Supplements</b>, Wirkung, Dosierung, Produkten und Studien an einem Ort.</p>
       <p>Mit Themen wie <b>Grundlagen</b>, <b>Wirkung</b>, <b>Dosierung</b> oder <b>Studien</b> findest du relevante Inhalte schnell wieder.</p>
       <p>Unterordner helfen dir, Supplement-Gruppen sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
+    : essen
+    ? `<p>In <b>ESSEN</b> sammelst du Wissen zu <b>Ernährung</b>, Lebensmitteln, Mahlzeiten und Essverhalten an einem Ort.</p>
+      <p>Mit Themen wie <b>Ernährung</b>, <b>Lebensmittel</b>, <b>Mahlzeiten</b> oder <b>Studien</b> findest du Videos und Einträge schnell wieder.</p>
+      <p>Unterordner helfen dir, Ernährungsbereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`
     : `<p>In <b>REZEPTE</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
       <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
       <p>Unterordner helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
@@ -1065,11 +1072,12 @@ function installNeoDexChrome(view) {
 
 async function mountCustomCollection(container, item, signal) {
   const customDexSkin = item.root_key === 'home';
-  const neoDexSkin = ['food-log', 'training', 'supps', 'home'].includes(item.root_key);
+  const neoDexSkin = ['food-log', 'essen', 'training', 'supps', 'home'].includes(item.root_key);
   const isSubDex = Boolean(item.parent_id) || item.root_key !== 'home';
   const foodDexSkin = item.root_key === 'food-log';
   const trainingDexSkin = item.root_key === 'training';
   const suppsDexSkin = item.root_key === 'supps';
+  const essenDexSkin = item.root_key === 'essen';
   let lookRoot = item;
   while (lookRoot.parent_id) {
     const parent = await getCollection(session.user.id, lookRoot.parent_id, signal);
@@ -1082,7 +1090,7 @@ async function mountCustomCollection(container, item, signal) {
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
   const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
   let inheritedPattern = inheritsSystemDexLook
-    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : 'drops').pattern
+    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : essenDexSkin ? 'wallpaper-essen' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : 'drops').pattern
     : 'setometer-triangles';
   if (customDexSkin) {
     // Eigene Haupt-Dex bestimmen ihre Farbe in der Datenbank. Die Tapete ist
@@ -1122,7 +1130,7 @@ async function mountCustomCollection(container, item, signal) {
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
-    onAddAudio: ['home', 'training', 'supps'].includes(item.root_key) ? () => openEntry('audio') : null,
+    onAddAudio: ['home', 'essen', 'training', 'supps'].includes(item.root_key) ? () => openEntry('audio') : null,
     onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
     onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
     onCreateSub: () => openCollectionEditor({
@@ -1156,7 +1164,7 @@ async function mountCustomCollection(container, item, signal) {
       meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: backHref,
       editLabel: `${item.name} bearbeiten`,
-      infoKind: customDexSkin ? 'custom' : trainingDexSkin ? 'training' : suppsDexSkin ? 'supps' : 'food',
+      infoKind: customDexSkin ? 'custom' : essenDexSkin ? 'essen' : trainingDexSkin ? 'training' : suppsDexSkin ? 'supps' : 'food',
     });
   }
   bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
@@ -1453,10 +1461,13 @@ async function renderRoute() {
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
-  } else if (route === 'training' || route === 'supps') {
-    const isSupps = route === 'supps';
-    const title = isSupps ? 'SUPPS' : 'TRAINING';
-    const pattern = isSupps ? 'wallpaper-supps' : 'wallpaper-dumbbell';
+  } else if (['essen', 'training', 'supps'].includes(route)) {
+    const pageConfig = {
+      essen: { title: 'ESSEN', pattern: 'wallpaper-essen' },
+      training: { title: 'TRAINING', pattern: 'wallpaper-dumbbell' },
+      supps: { title: 'SUPPS', pattern: 'wallpaper-supps' },
+    }[route];
+    const { title, pattern } = pageConfig;
     const routeColor = categoryColor(route);
     setSeite(route);
     // A collection mutation remounts this route while the Supabase request is
@@ -1513,7 +1524,7 @@ async function renderRoute() {
     // Keep the originating Dex surface during the transition. This prevents
     // both template Dex from flashing the neutral collection background or a
     // fallback wallpaper while the entry is loaded asynchronously.
-    const activeTemplateDex = ['food-log', 'training', 'supps', 'stress', 'custom-dex'].find((dex) => (
+    const activeTemplateDex = ['food-log', 'essen', 'training', 'supps', 'stress', 'custom-dex'].find((dex) => (
       vorherigeRoute === dex || document.documentElement.dataset.seite === dex
     ));
     if (activeTemplateDex) {

@@ -32,22 +32,28 @@ const entryClassDefinitions = {
     ['all', 'Alle'], ['basics', 'Grundlagen'], ['effects', 'Wirkung'],
     ['dosage', 'Dosierung'], ['products', 'Produkte'], ['studies', 'Studien'],
   ],
+  essen: [
+    ['all', 'Alle'], ['nutrition', 'Ernährung'], ['foods', 'Lebensmittel'],
+    ['meals', 'Mahlzeiten'], ['behavior', 'Verhalten'], ['studies', 'Studien'],
+  ],
 };
 
 function entryClassConfig(rootKey) {
   const definitions = entryClassDefinitions[rootKey];
   if (!definitions) return null;
+  const training = rootKey === 'training';
+  const pageName = { training: 'Training', supps: 'SUPPS', essen: 'ESSEN' }[rootKey];
   return {
     definitions,
-    fieldLabel: rootKey === 'training' ? 'Training-Klasse' : 'Thema',
-    customOptionLabel: rootKey === 'training' ? 'Eigene Klasse …' : 'Eigenes Thema …',
-    customFieldLabel: rootKey === 'training' ? 'Eigene Klasse' : 'Eigenes Thema',
-    customError: rootKey === 'training' ? 'Bitte eine eigene Klasse benennen.' : 'Bitte ein eigenes Thema benennen.',
-    filterLabel: rootKey === 'training' ? 'Training filtern' : 'SUPPS filtern',
-    emptyText: rootKey === 'training'
+    fieldLabel: training ? 'Training-Klasse' : 'Thema',
+    customOptionLabel: training ? 'Eigene Klasse …' : 'Eigenes Thema …',
+    customFieldLabel: training ? 'Eigene Klasse' : 'Eigenes Thema',
+    customError: training ? 'Bitte eine eigene Klasse benennen.' : 'Bitte ein eigenes Thema benennen.',
+    filterLabel: `${pageName} filtern`,
+    emptyText: training
       ? 'Für diese Klasse gibt es noch keinen Trainingseintrag.'
-      : 'Für dieses Thema gibt es noch keinen SUPPS-Eintrag.',
-    customPlaceholder: rootKey === 'training' ? 'z. B. Technik' : 'z. B. Evidenz',
+      : `Für dieses Thema gibt es noch keinen ${pageName}-Eintrag.`,
+    customPlaceholder: training ? 'z. B. Technik' : 'z. B. Evidenz',
   };
 }
 
@@ -136,10 +142,10 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
   const classConfig = entryClassConfig(rootKey);
   const titlePlaceholder = rootKey === 'supps'
     ? 'z. B. Kreatin: Einnahme und Wirkung'
-    : 'z. B. Schnelles Protein-Frühstück';
+    : rootKey === 'essen' ? 'z. B. Warum Protein beim Frühstück hilft' : 'z. B. Schnelles Protein-Frühstück';
   const tagsPlaceholder = rootKey === 'supps'
     ? 'z. B. Kreatin, Dosierung, Studie'
-    : 'z. B. Protein, Low Carb, Schnell';
+    : rootKey === 'essen' ? 'z. B. Protein, Sättigung, Studie' : 'z. B. Protein, Low Carb, Schnell';
   const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>

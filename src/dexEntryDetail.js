@@ -19,6 +19,10 @@ const SUPPS_CLASSES = [
   ['unset', 'Nicht festgelegt'], ['basics', 'Grundlagen'], ['effects', 'Wirkung'],
   ['dosage', 'Dosierung'], ['products', 'Produkte'], ['studies', 'Studien'],
 ];
+const ESSEN_CLASSES = [
+  ['unset', 'Nicht festgelegt'], ['nutrition', 'Ernährung'], ['foods', 'Lebensmittel'],
+  ['meals', 'Mahlzeiten'], ['behavior', 'Verhalten'], ['studies', 'Studien'],
+];
 
 function entryClassConfig(rootKey) {
   if (rootKey === 'training') return {
@@ -31,6 +35,14 @@ function entryClassConfig(rootKey) {
   };
   if (rootKey === 'supps') return {
     definitions: SUPPS_CLASSES,
+    fieldLabel: 'Thema',
+    customOptionLabel: 'Eigenes Thema …',
+    customFieldLabel: 'Eigenes Thema',
+    customPlaceholder: 'z. B. Evidenz',
+    customError: 'Bitte ein eigenes Thema benennen.',
+  };
+  if (rootKey === 'essen') return {
+    definitions: ESSEN_CLASSES,
     fieldLabel: 'Thema',
     customOptionLabel: 'Eigenes Thema …',
     customFieldLabel: 'Eigenes Thema',
@@ -82,7 +94,7 @@ async function loadEntry(userId, id, signal) {
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Einträge', 'food-log': 'REZEPTE', training: 'TRAINING', supps: 'SUPPS', reminders: 'TRACKER', body: 'COMP', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'STRESS' };
+  const rootNames = { home: 'Meine Einträge', 'food-log': 'REZEPTE', essen: 'ESSEN', training: 'TRAINING', supps: 'SUPPS', reminders: 'TRACKER', body: 'COMP', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'STRESS' };
   data.dex_name = rootNames[data.root_key] || 'CAPBOY';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
@@ -273,8 +285,9 @@ async function rootCollectionScope(userId, collectionId, signal) {
   if (root.root_key && root.root_key !== 'home') {
     const fallbackPattern = root.root_key === 'food-log'
       ? 'wallpaper-pizza'
-      : root.root_key === 'training' ? 'wallpaper-dumbbell'
-        : root.root_key === 'supps' ? 'wallpaper-supps' : 'drops';
+      : root.root_key === 'essen' ? 'wallpaper-essen'
+        : root.root_key === 'training' ? 'wallpaper-dumbbell'
+          : root.root_key === 'supps' ? 'wallpaper-supps' : 'drops';
     return {
       scope: root.root_key,
       color: categoryColor(root.root_key),
@@ -306,8 +319,9 @@ async function entryPageLook(entry, userId, signal) {
   }
   const fallbackPattern = entry.root_key === 'food-log'
     ? 'wallpaper-pizza'
-    : entry.root_key === 'training' ? 'wallpaper-dumbbell'
-      : entry.root_key === 'supps' ? 'wallpaper-supps' : 'drops';
+    : entry.root_key === 'essen' ? 'wallpaper-essen'
+      : entry.root_key === 'training' ? 'wallpaper-dumbbell'
+        : entry.root_key === 'supps' ? 'wallpaper-supps' : 'drops';
   return { ...pageLook(entry.root_key, categoryColor(entry.root_key), fallbackPattern), scope: entry.root_key };
 }
 
@@ -386,7 +400,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   // der Karte. Mit denselben View-Klassen sitzt das Menue exakt wie bei
   // TRAINING und bleibt als geschlossenes Popover an den drei Punkten.
   container.classList.add('neo-dex-entry-view', 'food-dex-entry-view');
-  if (['food-log', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)) {
+  if (['food-log', 'essen', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)) {
     document.documentElement.dataset.seite = entry.root_key === 'home' ? 'custom-dex' : entry.root_key;
     // Die Aktionsleiste und Tapete werden damit aus exakt denselben Regeln
     // wie im FoodDex selbst gezeichnet. Nur die Menüaktionen unterscheiden

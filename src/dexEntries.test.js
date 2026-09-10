@@ -35,13 +35,14 @@ describe('Anbieter- und Farbkontrast', () => {
   it('verankert die feste CAPBOY-Seitenpalette', () => {
     expect(Object.fromEntries([
       'food-log', 'reminders', 'sleep', 'habits', 'shopping',
-      'training', 'supps', 'body', 'stress', 'coins', 'profile',
+      'essen', 'training', 'supps', 'body', 'stress', 'coins', 'profile',
     ].map((route) => [route, categoryColor(route)]))).toEqual({
       'food-log': '#E3B505',
       reminders: '#4E342E',
       sleep: '#1E3A8A',
       habits: '#4B0082',
       shopping: '#00C2CB',
+      essen: '#800020',
       training: '#006D77',
       supps: '#FF6B6B',
       body: '#0B132B',

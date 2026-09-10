@@ -9,14 +9,23 @@ const SLEEP_DEX_MIGRATED_KEY = 'muscledex:sleep-dex-sichtbarkeit-v1';
 const STRESS_DEX_MIGRATED_KEY = 'muscledex:stress-dex-sichtbarkeit-v1';
 const SUPPS_DEX_MIGRATED_KEY = 'muscledex:supps-dex-sichtbarkeit-v1';
 const SUPPS_DEX_ORDER_MIGRATED_KEY = 'muscledex:supps-dex-reihenfolge-v1';
+const ESSEN_DEX_MIGRATED_KEY = 'muscledex:essen-dex-sichtbarkeit-v1';
+const ESSEN_DEX_ORDER_MIGRATED_KEY = 'muscledex:essen-dex-reihenfolge-v1';
 
-export const collectionRoutes = ['food-log', 'reminders', 'supps', 'sleep', 'shopping', 'habits', 'training', 'body', 'stress'];
+export const collectionRoutes = ['food-log', 'essen', 'reminders', 'supps', 'sleep', 'shopping', 'habits', 'training', 'body', 'stress'];
 
 function suppsInBestehendeReihenfolgeEinfuegen(saved) {
   const withoutSupps = saved.filter((route) => route !== 'supps');
   const trackerIndex = withoutSupps.indexOf('reminders');
   withoutSupps.splice(trackerIndex >= 0 ? trackerIndex + 1 : withoutSupps.length, 0, 'supps');
   return withoutSupps;
+}
+
+function essenInBestehendeReihenfolgeEinfuegen(saved) {
+  const withoutEssen = saved.filter((route) => route !== 'essen');
+  const rezepteIndex = withoutEssen.indexOf('food-log');
+  withoutEssen.splice(rezepteIndex >= 0 ? rezepteIndex + 1 : 0, 0, 'essen');
+  return withoutEssen;
 }
 
 export function collectionOrder() {
@@ -27,6 +36,11 @@ export function collectionOrder() {
       saved = suppsInBestehendeReihenfolgeEinfuegen(saved);
       setPreference(ORDER_KEY, saved);
       setPreference(SUPPS_DEX_ORDER_MIGRATED_KEY, true);
+    }
+    if (!getPreference(ESSEN_DEX_ORDER_MIGRATED_KEY, false)) {
+      saved = essenInBestehendeReihenfolgeEinfuegen(saved);
+      setPreference(ORDER_KEY, saved);
+      setPreference(ESSEN_DEX_ORDER_MIGRATED_KEY, true);
     }
     const valid = saved.filter((route, index) => collectionRoutes.includes(route) && saved.indexOf(route) === index);
     return [...valid, ...collectionRoutes.filter((route) => !valid.includes(route))];
@@ -52,6 +66,11 @@ export function visibleCollectionRoutes() {
       saved = [...new Set([...saved, 'supps'])];
       setPreference(STORAGE_KEY, saved);
       setPreference(SUPPS_DEX_MIGRATED_KEY, true);
+    }
+    if (Array.isArray(saved) && !getPreference(ESSEN_DEX_MIGRATED_KEY, false)) {
+      saved = [...new Set([...saved, 'essen'])];
+      setPreference(STORAGE_KEY, saved);
+      setPreference(ESSEN_DEX_MIGRATED_KEY, true);
     }
     if (!Array.isArray(saved)) return collectionOrder();
     return collectionOrder().filter((route) => saved.includes(route));

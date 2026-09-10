@@ -42,7 +42,7 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const defaults = {
   body: 'body_fat', reminders: 'notifications', 'food-log': 'fork_spoon',
-  recipes: 'menu_book', training: 'fitness_center', supps: 'medication', habits: 'bucket_check',
+  recipes: 'menu_book', essen: 'emoji:🍽️', training: 'fitness_center', supps: 'medication', habits: 'bucket_check',
   shopping: 'emoji:🛒',
   sleep: 'emoji:😴',
   stress: 'emoji:⚡',
@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#0B132B', reminders: '#4E342E', 'food-log': '#E3B505',
-  recipes: '#E3B505', training: '#006D77', supps: '#FF6B6B', habits: '#4B0082',
+  recipes: '#E3B505', essen: '#800020', training: '#006D77', supps: '#FF6B6B', habits: '#4B0082',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -64,6 +64,7 @@ const defaultColors = {
 const fixedSystemColors = {
   body: '#0B132B',
   'food-log': '#E3B505',
+  essen: '#800020',
   training: '#006D77',
   supps: '#FF6B6B',
   reminders: '#4E342E',
@@ -77,6 +78,7 @@ const fixedSystemColors = {
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',
   'food-log': 'wallpaper-pizza',
+  essen: 'wallpaper-essen',
   training: 'wallpaper-dumbbell',
   supps: 'wallpaper-supps',
   reminders: 'wallpaper-burger',

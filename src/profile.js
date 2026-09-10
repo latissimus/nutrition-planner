@@ -258,7 +258,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   startHinweis.textContent = 'Lege fest, welche Seiten im unteren Menüband erscheinen und in welcher Reihenfolge sie angeordnet sind.';
   startseite.appendChild(startHinweis);
   const sammlungsNamen = new Map([
-    ['body', 'COMP'], ['reminders', 'TRACKER'], ['food-log', 'REZEPTE'],
+    ['body', 'COMP'], ['reminders', 'TRACKER'], ['food-log', 'REZEPTE'], ['essen', 'ESSEN'],
     ['training', 'TRAINING'], ['supps', 'SUPPS'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
     ['sleep', 'SCHLAF'], ['stress', 'STRESS'],
   ]);

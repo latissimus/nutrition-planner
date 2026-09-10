@@ -12,6 +12,7 @@ const routeToFile = {
   body: 'BODYLOG.svg',
   reminders: 'MEALS.svg',
   'food-log': 'COOKNOTES.svg',
+  essen: 'ESSEN.svg',
   training: 'TRAINNOTES.svg',
   supps: 'SUPPS.svg',
   shopping: 'FOODS.svg',
