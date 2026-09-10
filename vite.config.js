@@ -45,7 +45,9 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.js',
-      registerType: 'autoUpdate',
+      // Die App zeigt einen eigenen Update-Hinweis und aktiviert die neue
+      // Version erst nach Tipp, damit ungespeicherte Eingaben erhalten bleiben.
+      registerType: 'prompt',
       injectRegister: false,
       manifest: false,
       injectManifest: {

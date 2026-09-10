@@ -3664,7 +3664,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Ein wartender Service Worker wird erst nach ausdruecklichem Tipp aktiviert,
    damit offene Eingaben nicht durch einen ungefragten Reload verloren gehen. */
-.pwa-update-button{position:fixed;z-index:1200;right:14px;bottom:max(14px,env(safe-area-inset-bottom));display:grid;gap:2px;min-width:176px;padding:11px 15px;border:2px solid var(--ink);border-radius:13px;background:#492426;color:#fff;box-shadow:var(--hart-klein);font-family:var(--ui);text-align:left}
+.pwa-update-button{position:fixed;z-index:1200;right:50%;bottom:calc(88px + env(safe-area-inset-bottom));display:grid;gap:2px;box-sizing:border-box;width:min(calc(100vw - 28px),320px);padding:11px 15px;border:2px solid var(--ink);border-radius:13px;background:#492426;color:#fff;box-shadow:var(--hart-klein);font-family:var(--ui);text-align:left;transform:translateX(50%)}
 .pwa-update-button[hidden]{display:none}
 .pwa-update-button b{font-size:13px}.pwa-update-button small{font-size:10px;opacity:.82}
 :root[data-theme="dark"] .pwa-update-button{background:var(--dark-action);color:var(--dark-action-ink);border-color:var(--text);box-shadow:3px 3px 0 #43516E}
