@@ -996,7 +996,7 @@ function gridCollectionMastheadMarkup(title, folders = 0) {
       <h1>${escapeHtml(title)}</h1>
       <small data-grid-collection-meta>${gridCollectionMetaText(0, folders)}</small>
     </div>
-    <button type="button" data-grid-collection-info aria-label="Info zur Sammlung">${materialIconMarkup('info')}</button>
+    <button class="som-info-knopf" type="button" data-grid-collection-info aria-label="Info zur Sammlung">i</button>
   </section>`;
 }
 

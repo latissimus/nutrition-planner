@@ -43,8 +43,11 @@ describe('CAPBOY Design-System', () => {
     expect(main).toContain('Wissenssammlung');
     expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'food', title: 'REZEPTE' })");
     expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'STRESS' })");
+    expect(main).toContain('class="som-info-knopf" type="button" data-grid-collection-info');
     expect(designSystem).toContain('.neo-dex-page .dex-sammlungskopf{');
     expect(designSystem).toContain('.neo-dex-page .dex-sammlungskopf h1{');
+    expect(designSystem).toContain('background:var(--ordner,var(--dex-seitenfarbe));');
+    expect(designSystem).toContain('font:800 13px/1 var(--tech);');
   });
 
   it('haelt Header, Dock und Sheets global statt seitenspezifisch', () => {
