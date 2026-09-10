@@ -4,8 +4,10 @@ import { describe, expect, it } from 'vitest';
 const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
 const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
 const categoryIcons = readFileSync(new URL('./categoryIcons.js', import.meta.url), 'utf8');
+const menuIcons = readFileSync(new URL('./menuIcons.js', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.js', import.meta.url), 'utf8');
 const entryDetail = readFileSync(new URL('./dexEntryDetail.js', import.meta.url), 'utf8');
+const suppsMenuIcon = readFileSync(new URL('../SeitenIcons/SUPPS.svg', import.meta.url), 'utf8');
 const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 
@@ -35,6 +37,16 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('margin-left:calc(50% - 50vw)!important');
     expect(designSystem).toContain(':root[data-seite="profile"] .profil-scrollinhalt');
     expect(designSystem).toContain('100vw - var(--cap-reference-inline) - var(--cap-reference-inline)');
+  });
+
+  it('kennzeichnet alle festen Rasterseiten als Wissenssammlung', () => {
+    expect(main).toContain("const GRID_COLLECTION_ROOTS = new Set(['food-log', 'essen', 'supps', 'training', 'stress'])");
+    expect(main).toContain('gridCollectionMastheadMarkup');
+    expect(main).toContain('Wissenssammlung');
+    expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'food', title: 'REZEPTE' })");
+    expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'STRESS' })");
+    expect(designSystem).toContain('.neo-dex-page .dex-sammlungskopf{');
+    expect(designSystem).toContain('.neo-dex-page .dex-sammlungskopf h1{');
   });
 
   it('haelt Header, Dock und Sheets global statt seitenspezifisch', () => {
@@ -102,6 +114,9 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("rootKey === 'supps'");
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
+    expect(suppsMenuIcon).toContain('fill="#FF6B6B"');
+    expect(suppsMenuIcon).toContain('fill="#F5E6CA"');
+    expect(menuIcons).toContain('.replace(/url\\(#([^)]+)\\)/g');
   });
 
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {

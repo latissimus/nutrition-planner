@@ -981,6 +981,36 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
 
 const dexEntriesSlotMarkup = () => '<div class="dex-eintraege" data-dex-entries><div class="daten-laden">Einträge werden geladen …</div></div>';
 
+const GRID_COLLECTION_ROOTS = new Set(['food-log', 'essen', 'supps', 'training', 'stress']);
+
+function gridCollectionMetaText(entries = 0, folders = 0) {
+  const entryLabel = entries === 1 ? 'Eintrag' : 'Einträge';
+  const folderLabel = folders === 1 ? 'Unterordner' : 'Unterordner';
+  return `${entries} ${entryLabel} · ${folders} ${folderLabel}`;
+}
+
+function gridCollectionMastheadMarkup(title, folders = 0) {
+  return `<section class="dex-sammlungskopf" data-grid-collection-header>
+    <div class="dex-sammlungskopf-text">
+      <span>Wissenssammlung</span>
+      <h1>${escapeHtml(title)}</h1>
+      <small data-grid-collection-meta>${gridCollectionMetaText(0, folders)}</small>
+    </div>
+    <button type="button" data-grid-collection-info aria-label="Info zur Sammlung">${materialIconMarkup('info')}</button>
+  </section>`;
+}
+
+function mountGridCollectionMasthead(root, { infoKind, title }) {
+  root.querySelector('[data-grid-collection-info]')?.addEventListener('click', () => {
+    openNeoDexInfoDialog(infoKind, title);
+  });
+}
+
+function updateGridCollectionMasthead(root, entries, folders) {
+  const meta = root.querySelector('[data-grid-collection-meta]');
+  if (meta) meta.textContent = gridCollectionMetaText(entries, folders);
+}
+
 function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const training = kind === 'training';
   const supps = kind === 'supps';
@@ -1072,12 +1102,14 @@ function installNeoDexChrome(view) {
 
 async function mountCustomCollection(container, item, signal) {
   const customDexSkin = item.root_key === 'home';
-  const neoDexSkin = ['food-log', 'essen', 'training', 'supps', 'home'].includes(item.root_key);
+  const gridDexSkin = GRID_COLLECTION_ROOTS.has(item.root_key);
+  const neoDexSkin = gridDexSkin || customDexSkin;
   const isSubDex = Boolean(item.parent_id) || item.root_key !== 'home';
   const foodDexSkin = item.root_key === 'food-log';
   const trainingDexSkin = item.root_key === 'training';
   const suppsDexSkin = item.root_key === 'supps';
   const essenDexSkin = item.root_key === 'essen';
+  const stressDexSkin = item.root_key === 'stress';
   let lookRoot = item;
   while (lookRoot.parent_id) {
     const parent = await getCollection(session.user.id, lookRoot.parent_id, signal);
@@ -1090,7 +1122,7 @@ async function mountCustomCollection(container, item, signal) {
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
   const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
   let inheritedPattern = inheritsSystemDexLook
-    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : essenDexSkin ? 'wallpaper-essen' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : 'drops').pattern
+    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : essenDexSkin ? 'wallpaper-essen' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : stressDexSkin ? 'wallpaper-stress' : 'drops').pattern
     : 'setometer-triangles';
   if (customDexSkin) {
     // Eigene Haupt-Dex bestimmen ihre Farbe in der Datenbank. Die Tapete ist
@@ -1108,12 +1140,20 @@ async function mountCustomCollection(container, item, signal) {
     container.classList.add('neo-dex-page', 'food-dex-page');
     container.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(inheritedColor));
   }
-  const collectionTitleMarkup = neoDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
+  const collectionTitleMarkup = gridDexSkin
+    ? gridCollectionMastheadMarkup(item.name, children.length)
+    : neoDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     ${collectionTitleMarkup}
     ${collectionGridMarkup(children, { inheritedColor, counts: childStats })}
     ${dexEntriesSlotMarkup()}
   </div>`;
+  if (gridDexSkin) {
+    mountGridCollectionMasthead(container, {
+      infoKind: foodDexSkin ? 'food' : item.root_key,
+      title: item.name,
+    });
+  }
   const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
   const openEntry = (type, foodKind = null) => openDexEntryEditor({
@@ -1130,7 +1170,7 @@ async function mountCustomCollection(container, item, signal) {
     onAddNote: () => openEntry('note'),
     onAddLink: () => openEntry('link'),
     onAddImage: () => openEntry('image'),
-    onAddAudio: ['home', 'essen', 'training', 'supps'].includes(item.root_key) ? () => openEntry('audio') : null,
+    onAddAudio: ['home', 'essen', 'training', 'supps', 'stress'].includes(item.root_key) ? () => openEntry('audio') : null,
     onAddRecipeLink: item.root_key === 'food-log' ? () => openEntry('link', 'recipe') : null,
     onAddOwnRecipe: item.root_key === 'food-log' ? () => openEntry('note', 'recipe') : null,
     onCreateSub: () => openCollectionEditor({
@@ -1164,7 +1204,7 @@ async function mountCustomCollection(container, item, signal) {
       meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: backHref,
       editLabel: `${item.name} bearbeiten`,
-      infoKind: customDexSkin ? 'custom' : essenDexSkin ? 'essen' : trainingDexSkin ? 'training' : suppsDexSkin ? 'supps' : 'food',
+      infoKind: customDexSkin ? 'custom' : foodDexSkin ? 'food' : item.root_key,
     });
   }
   bindLongPress(container.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({
@@ -1181,6 +1221,7 @@ async function mountCustomCollection(container, item, signal) {
       if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
       const scrollMeta = container.querySelector('[data-food-scroll-meta]');
       if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
+      updateGridCollectionMasthead(container, total ?? entries.length, children.length);
     },
   });
   subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
@@ -1419,7 +1460,9 @@ async function renderRoute() {
     view.classList.add('neo-dex-page', 'food-dex-page');
     view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(pageLook('food-log', categoryColor('food-log'), 'triangles').color));
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
+      ${gridCollectionMastheadMarkup('REZEPTE', children.length)}
       ${collectionGridMarkup(children, { inheritedColor: categoryColor('food-log'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    mountGridCollectionMasthead(view, { infoKind: 'food', title: 'REZEPTE' });
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type, foodKind = null) => openDexEntryEditor({
       type, foodKind, userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh,
@@ -1458,6 +1501,7 @@ async function renderRoute() {
         if (meta) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
         const scrollMeta = view.querySelector('[data-food-scroll-meta]');
         if (scrollMeta) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
+        updateGridCollectionMasthead(view, total ?? entries.length, children.length);
       },
     });
     subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
@@ -1479,7 +1523,10 @@ async function renderRoute() {
     if (signal?.aborted) return;
     view.classList.add('neo-dex-page', 'food-dex-page');
     view.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(routeColor));
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: routeColor, counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
+      ${gridCollectionMastheadMarkup(title, children.length)}
+      ${collectionGridMarkup(children, { inheritedColor: routeColor, counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    mountGridCollectionMasthead(view, { infoKind: route, title });
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: route, onSaved: refresh });
     mountCategoryChrome(view, route, title, {
@@ -1509,6 +1556,7 @@ async function renderRoute() {
         if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
         const scrollMeta = view.querySelector('[data-food-scroll-meta]');
         if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
+        if (Array.isArray(entries)) updateGridCollectionMasthead(view, total ?? entries.length, children.length);
       },
     });
   } else if (route.startsWith('collection/')) {
@@ -1589,7 +1637,10 @@ async function renderRoute() {
     const childStats = await dexSammlungsStatistik(session.user.id, 'stress', children, signal);
     if (signal?.aborted) return;
     view.classList.add('neo-dex-page', 'food-dex-page');
-    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">${collectionGridMarkup(children, { inheritedColor: categoryColor('stress'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
+      ${gridCollectionMastheadMarkup('STRESS', children.length)}
+      ${collectionGridMarkup(children, { inheritedColor: categoryColor('stress'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
+    mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'STRESS' });
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'stress', onSaved: refresh });
     mountCategoryChrome(view, route, 'STRESS', {
@@ -1619,6 +1670,7 @@ async function renderRoute() {
         if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
         const scrollMeta = view.querySelector('[data-food-scroll-meta]');
         if (scrollMeta && Array.isArray(entries)) scrollMeta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
+        if (Array.isArray(entries)) updateGridCollectionMasthead(view, total ?? entries.length, children.length);
       },
     });
   }

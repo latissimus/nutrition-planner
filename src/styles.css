@@ -8692,6 +8692,75 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding-left:0!important;
   padding-right:0!important;
 }
+.neo-dex-page .dex-sammlungskopf{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  box-sizing:border-box;
+  width:100%;
+  min-height:70px;
+  margin:0 auto 14px;
+  padding:0;
+  color:var(--dex-ink,#111);
+}
+.neo-dex-page .dex-sammlungskopf-text{
+  display:grid;
+  min-width:0;
+  gap:2px;
+}
+.neo-dex-page .dex-sammlungskopf-text>span{
+  font:800 9px/1.1 var(--tech);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.neo-dex-page .dex-sammlungskopf h1{
+  overflow:hidden;
+  margin:0;
+  color:inherit;
+  font-family:"Work Sans",var(--ui),sans-serif;
+  font-size:24px;
+  font-style:italic;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-.045em;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.neo-dex-page .dex-sammlungskopf small{
+  color:inherit;
+  font:700 10px/1.25 var(--tech);
+  letter-spacing:.015em;
+  opacity:.72;
+}
+.neo-dex-page .dex-sammlungskopf button{
+  display:grid;
+  flex:0 0 38px;
+  place-items:center;
+  width:38px;
+  min-width:38px;
+  height:38px;
+  min-height:38px;
+  padding:0;
+  border:1.5px solid currentColor;
+  border-radius:50%;
+  background:transparent;
+  color:inherit;
+  box-shadow:none;
+}
+.neo-dex-page .dex-sammlungskopf button :is(svg,.material-svg){
+  width:19px;
+  height:19px;
+  fill:currentColor;
+}
+.neo-dex-page .dex-sammlungskopf button:active{
+  transform:scale(.96);
+}
+.neo-dex-page .dex-sammlungskopf + .unter-sammlungen-block{
+  margin-top:2px!important;
+}
 .neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden),
 .neo-dex-page .unter-sammlungen-block>h2{
   /* Beitragsraster, Abschnittstitel und Nachladen-Aktion liegen dagegen auf
