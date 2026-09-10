@@ -32,8 +32,7 @@ function prefixInterneIds(rawSvg, prefix) {
     .replace(/<!DOCTYPE[\s\S]*?>/gi, '')
     .trim()
     .replace(/\sid="([^"]+)"/g, (_m, id) => ` id="${prefix}${id}"`)
-    .replace(/\s(xlink:href|href)="#([^"]+)"/g, (_m, attr, id) => ` ${attr}="#${prefix}${id}"`)
-    .replace(/url\(#([^)]+)\)/g, (_m, id) => `url(#${prefix}${id})`);
+    .replace(/\s(xlink:href|href)="#([^"]+)"/g, (_m, attr, id) => ` ${attr}="#${prefix}${id}"`);
 }
 
 const svgByRoute = new Map();

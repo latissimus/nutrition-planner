@@ -8761,7 +8761,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .neo-dex-page .dex-sammlungskopf + .unter-sammlungen-block{
   margin-top:2px!important;
 }
-.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden),
+.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden,.dex-sammlungskopf),
 .neo-dex-page .unter-sammlungen-block>h2{
   /* Beitragsraster, Abschnittstitel und Nachladen-Aktion liegen dagegen auf
      der verbindlichen TRACKER-Achse. Full-Bleed gilt ausschliesslich fuer

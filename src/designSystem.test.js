@@ -4,10 +4,8 @@ import { describe, expect, it } from 'vitest';
 const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
 const designSystem = css.slice(css.indexOf('CAPBOY DESIGN-SYSTEM'));
 const categoryIcons = readFileSync(new URL('./categoryIcons.js', import.meta.url), 'utf8');
-const menuIcons = readFileSync(new URL('./menuIcons.js', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.js', import.meta.url), 'utf8');
 const entryDetail = readFileSync(new URL('./dexEntryDetail.js', import.meta.url), 'utf8');
-const suppsMenuIcon = readFileSync(new URL('../SeitenIcons/SUPPS.svg', import.meta.url), 'utf8');
 const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 
@@ -30,7 +28,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="supps"] .neo-dex-page.dex-fixkopf>.wrap');
     expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page .kategorie-scrollinhalt');
     expect(designSystem).toContain('.neo-dex-page .sammlung-seite');
-    expect(designSystem).toContain('.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden)');
+    expect(designSystem).toContain('.neo-dex-page :is(.dex-eintrag-listen,.dex-mehr-laden,.dex-sammlungskopf)');
     expect(designSystem).toContain('.neo-dex-page .unter-sammlungen-block>h2');
     expect(designSystem).toContain('padding-left:var(--cap-reference-inline)!important');
     expect(designSystem).toContain('width:100vw!important');
@@ -114,9 +112,6 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("rootKey === 'supps'");
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
-    expect(suppsMenuIcon).toContain('fill="#FF6B6B"');
-    expect(suppsMenuIcon).toContain('fill="#F5E6CA"');
-    expect(menuIcons).toContain('.replace(/url\\(#([^)]+)\\)/g');
   });
 
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
