@@ -776,7 +776,9 @@ export function chooseReminderIcon(current, onSelected, { hostBackdrop = null } 
 export async function mountReminders(container, { session, signal }) {
   const userId = session.user.id;
   // Gewählte Dex-Ordnerfarbe (wie die Kartenstreifen) für die Platzhalter-Felder der Einträge.
-  container.style.setProperty('--ordner', pageLook('reminders', categoryColor('reminders'), 'wallpaper-burger').color);
+  const trackerLook = pageLook('reminders', categoryColor('reminders'), 'wallpaper-burger');
+  container.style.setProperty('--ordner', trackerLook.accent || trackerLook.color);
+  container.style.setProperty('--ordner-ink', trackerLook.accentInk || trackerLook.ink);
   container.innerHTML = `
     <div class="wrap pad-bottom">
       <div class="${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}" data-nutrition-root></div>

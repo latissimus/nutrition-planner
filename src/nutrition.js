@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
-import { materialIconMarkup, categoryColor, colorIsDark } from './categoryIcons.js';
+import { materialIconMarkup, pageLook } from './categoryIcons.js';
 import { subscribeToTablesChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
@@ -180,7 +180,7 @@ function summaryMarkup(state, date) {
   const remaining = Math.max(0, target - kcal);
   const over = Math.max(0, kcal - target);
   const adaptive = adaptiveModel(state, calculated, target);
-  const ordnerInk = colorIsDark(categoryColor('reminders')) ? '#fff' : '#000';
+  const ordnerInk = pageLook('reminders', '#FEEFB8', 'wallpaper-burger').accentInk;
   return `${trackingToggleMarkup(true)}
   <section class="nutrition-coin-hero ${SPECIAL_DEX_CLASSES.hero}" data-nutrition-card style="--ordner-ink:${ordnerInk}">
     <div class="nutrition-ring" style="--nutrition-progress:${progress(kcal, target) * 3.6}deg"><span>${target ? `${decimal(kcal)}<small>von ${decimal(target)}</small>` : '—<small>Ziel fehlt</small>'}</span></div>

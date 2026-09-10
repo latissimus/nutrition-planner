@@ -1,4 +1,4 @@
-import { categoryColor, colorIsDark } from './categoryIcons.js';
+import { categoryColor, pageLook } from './categoryIcons.js';
 
 export const SPECIAL_DEX_CLASSES = Object.freeze({
   page: 'special-dex-page',
@@ -28,12 +28,14 @@ export function createSpecialDexOverlay({
 } = {}) {
   if (replaceSelector) document.querySelector(replaceSelector)?.remove();
   const backdrop = document.createElement('div');
-  const color = categoryColor(colorScope);
+  const look = pageLook(colorScope, categoryColor(colorScope), 'drops');
   backdrop.className = `kategorie-sheet-backdrop ${SPECIAL_DEX_CLASSES.overlay} ${className}`.trim();
-  backdrop.style.setProperty('--ordner', color);
-  backdrop.style.setProperty('--dex-seitenfarbe', color);
-  backdrop.style.setProperty('--ordner-ink', colorIsDark(color) ? '#fff' : '#111');
-  backdrop.style.setProperty('--dex-ink', colorIsDark(color) ? '#fff' : '#111');
+  backdrop.style.setProperty('--ordner', look.accent || look.color);
+  backdrop.style.setProperty('--ordner-ink', look.accentInk || look.ink);
+  backdrop.style.setProperty('--dex-seitenfarbe', look.color);
+  backdrop.style.setProperty('--dex-ink', look.ink);
+  backdrop.style.setProperty('--dex-accent', look.accent || look.color);
+  backdrop.style.setProperty('--dex-accent-ink', look.accentInk || look.ink);
   const labelAttribute = ariaLabel ? ` aria-label="${String(ariaLabel).replaceAll('&', '&amp;').replaceAll('"', '&quot;')}"` : '';
   backdrop.innerHTML = `<section class="kategorie-sheet ${SPECIAL_DEX_CLASSES.sheet} ${sheetClassName}" role="dialog" aria-modal="true"${labelAttribute}>${markup}</section>`;
   backdrop.addEventListener('click', (event) => {

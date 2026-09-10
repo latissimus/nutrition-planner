@@ -331,7 +331,7 @@ function commitSeiteDefer(verwerfen = false) {
 function writeSeite(name) {
   document.documentElement.dataset.seite = name;
   delete document.documentElement.dataset.dexMuster;
-  ['--dex-seitenfarbe', '--dex-ink', '--dex-tapete', '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg', '--food-page-purple']
+  ['--dex-seitenfarbe', '--dex-ink', '--dex-accent', '--dex-accent-ink', '--ordner', '--ordner-ink', '--dex-tapete', '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg', '--food-page-purple']
     .forEach((property) => document.documentElement.style.removeProperty(property));
 }
 
@@ -348,6 +348,10 @@ function dexLookAusAnsichtWiederherstellen(node) {
   const ink = node.style.getPropertyValue('--dex-ink').trim() || '#111111';
   root.style.setProperty('--dex-seitenfarbe', color);
   root.style.setProperty('--dex-ink', ink);
+  ['--dex-accent', '--dex-accent-ink', '--ordner', '--ordner-ink'].forEach((property) => {
+    const value = node.style.getPropertyValue(property).trim();
+    if (value) root.style.setProperty(property, value);
+  });
   root.style.setProperty('--bg', color);
   root.style.setProperty('--app-bg', color);
   root.style.setProperty('--app-content-bg', color);
@@ -364,6 +368,10 @@ function dexLookAufAnsichtUebertragen(node, ziel) {
   [
     '--dex-seitenfarbe',
     '--dex-ink',
+    '--dex-accent',
+    '--dex-accent-ink',
+    '--ordner',
+    '--ordner-ink',
     '--dex-tapete',
     '--bg',
     '--app-bg',
@@ -960,13 +968,13 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   const looks = {
     'food-log': ['#E3B505', 'wallpaper-pizza', '🍕'],
     essen: ['#800020', 'wallpaper-essen', '🍽️'],
-    reminders: ['#4E342E', 'wallpaper-burger', '🍔'],
+    reminders: ['#FEEFB8', 'wallpaper-burger', '🍔'],
     supps: ['#FF6B6B', 'wallpaper-supps', '💊'],
     sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],
     shopping: ['#00C2CB', 'wallpaper-brokkoli', '🛒'],
     habits: ['#4B0082', 'wallpaper-wolke', '🧠'],
     training: ['#006D77', 'wallpaper-dumbbell', '💪🏻'],
-    body: ['#0B132B', 'wallpaper-comp', '📐'],
+    body: ['#FFF7E6', 'wallpaper-comp', '📐'],
     coins: ['#E6D6FF', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {

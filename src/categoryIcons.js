@@ -53,7 +53,7 @@ const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
-  body: '#0B132B', reminders: '#4E342E', 'food-log': '#E3B505',
+  body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#E3B505',
   recipes: '#E3B505', essen: '#800020', training: '#006D77', supps: '#FF6B6B', habits: '#4B0082',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
@@ -62,18 +62,30 @@ const defaultColors = {
   profile: '#A7C957',
 };
 const fixedSystemColors = {
-  body: '#0B132B',
+  body: '#FFF7E6',
   'food-log': '#E3B505',
   essen: '#800020',
   training: '#006D77',
   supps: '#FF6B6B',
-  reminders: '#4E342E',
+  reminders: '#FEEFB8',
   habits: '#4B0082',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
   coins: '#E6D6FF',
   profile: '#A7C957',
+};
+// Einige feste Seiten funktionieren bewusst als zweifarbige Retro-Paare
+// statt nur als farbige Flaeche mit automatisch schwarzer/weisser Schrift.
+// `ink` traegt Text, Konturen, Icons und Tapete; `accentInk` steht auf den
+// mit ink gefuellten Buttons und Toggles.
+const fixedSystemInks = {
+  body: '#991B1B',
+  reminders: '#4E342E',
+};
+const fixedSystemAccentInks = {
+  body: '#FFF7E6',
+  reminders: '#FEEFB8',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',
@@ -245,8 +257,13 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   const fixedColor = fixedSystemColors[scope];
   const fixedPattern = fixedSystemPatterns[scope];
   const fallback = fixedColor || fallbackColor || '#F2EBE0';
+  const color = fixedColor || getPreference(pageColorKey(scope), fallback).toUpperCase();
+  const ink = fixedSystemInks[scope] || readableInkFor(color);
   return {
-    color: fixedColor || getPreference(pageColorKey(scope), fallback).toUpperCase(),
+    color,
+    ink,
+    accent: fixedSystemInks[scope] || color,
+    accentInk: fixedSystemAccentInks[scope] || readableInkFor(color),
     // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
     // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.
     pattern: fixedPattern || normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
@@ -254,8 +271,15 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
 }
 
 function writePageLook(target, look) {
+  const ink = look.ink || readableInkFor(look.color);
+  const accent = look.accent || look.color;
+  const accentInk = look.accentInk || readableInkFor(accent);
   target.style.setProperty('--dex-seitenfarbe', look.color);
-  target.style.setProperty('--dex-ink', readableInkFor(look.color));
+  target.style.setProperty('--dex-ink', ink);
+  target.style.setProperty('--dex-accent', accent);
+  target.style.setProperty('--dex-accent-ink', accentInk);
+  target.style.setProperty('--ordner', accent);
+  target.style.setProperty('--ordner-ink', accentInk);
   target.style.setProperty('--bg', look.color);
   target.style.setProperty('--app-bg', look.color);
   target.style.setProperty('--app-content-bg', look.color);
@@ -576,11 +600,15 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const lookScope = options.pageLookScope || options.inheritedPageLookScope || route;
   const fallbackColor = options.pageLookColor || options.color || categoryColor(route);
   const look = applyPageLook(lookScope, fallbackColor, options.pageLookPattern || 'drops');
-  const ink = readableInkFor(look.color);
+  const ink = look.ink || readableInkFor(look.color);
+  const accent = look.accent || look.color;
+  const accentInk = look.accentInk || readableInkFor(accent);
   container.style.setProperty('--dex-seitenfarbe', look.color);
   container.style.setProperty('--dex-ink', ink);
-  container.style.setProperty('--ordner', look.color);
-  container.style.setProperty('--ordner-ink', ink);
+  container.style.setProperty('--dex-accent', accent);
+  container.style.setProperty('--dex-accent-ink', accentInk);
+  container.style.setProperty('--ordner', accent);
+  container.style.setProperty('--ordner-ink', accentInk);
   container.style.setProperty('--food-page-purple', look.color);
   container.dataset.dexMuster = look.pattern;
   container.classList.toggle('dex-dunkler-hintergrund', colorIsDark(look.color));

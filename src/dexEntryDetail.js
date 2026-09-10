@@ -350,7 +350,7 @@ function detailMarkup(entry, look) {
   const ingredients = ingredientsSection(entry);
   // Food-Dex cards use the page accent rather than the legacy yellow entry
   // register colour. Other Dex retain their configured entry colour.
-  const popupColor = look?.color || categoryColor(entry.root_key);
+  const popupColor = look?.accent || look?.color || categoryColor(entry.root_key);
   const contrastClass = colorIsDark(popupColor) ? ' dex-detail-dunkel' : '';
   const actions = foodDexActionsMarkup({
     panelAttributes: 'data-entry-menu-panel role="menu" aria-label="Eintragsaktionen"',
@@ -410,8 +410,15 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   const look = await entryPageLook(entry, userId, signal);
   if (signal?.aborted) return;
   applyPageLook(look.scope, look.color, look.pattern);
+  const ink = look.ink || (colorIsDark(look.color) ? '#FFFFFF' : '#111111');
+  const accent = look.accent || look.color;
+  const accentInk = look.accentInk || (colorIsDark(accent) ? '#FFFFFF' : '#111111');
   container.style.setProperty('--dex-seitenfarbe', look.color);
-  container.style.setProperty('--dex-ink', colorIsDark(look.color) ? '#FFFFFF' : '#111111');
+  container.style.setProperty('--dex-ink', ink);
+  container.style.setProperty('--dex-accent', accent);
+  container.style.setProperty('--dex-accent-ink', accentInk);
+  container.style.setProperty('--ordner', accent);
+  container.style.setProperty('--ordner-ink', accentInk);
   container.style.setProperty('--food-page-purple', look.color);
   container.dataset.dexMuster = look.pattern;
   const wallpaper = look.pattern?.startsWith('wallpaper-') ? look.pattern : '';

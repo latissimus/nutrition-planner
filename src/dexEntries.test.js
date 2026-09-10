@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { dexEntryOverviewMarkup, isTikTokPhotoPost, normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
-import { categoryColor, colorIsDark } from './categoryIcons.js';
+import { categoryColor, colorIsDark, pageLook } from './categoryIcons.js';
 
 describe('normalizeDexUrl', () => {
   it('ergänzt bei einer Domain das HTTPS-Protokoll', () => {
@@ -38,18 +38,27 @@ describe('Anbieter- und Farbkontrast', () => {
       'essen', 'training', 'supps', 'body', 'stress', 'coins', 'profile',
     ].map((route) => [route, categoryColor(route)]))).toEqual({
       'food-log': '#E3B505',
-      reminders: '#4E342E',
+      reminders: '#FEEFB8',
       sleep: '#1E3A8A',
       habits: '#4B0082',
       shopping: '#00C2CB',
       essen: '#800020',
       training: '#006D77',
       supps: '#FF6B6B',
-      body: '#0B132B',
+      body: '#FFF7E6',
       stress: '#FF2E88',
       coins: '#E6D6FF',
       profile: '#A7C957',
     });
+  });
+
+  it('verwendet für TRACKER und COMP feste Retro-Farbpaare', () => {
+    expect(pageLook('reminders', '#000000', 'wallpaper-burger')).toEqual(expect.objectContaining({
+      color: '#FEEFB8', ink: '#4E342E', accent: '#4E342E', accentInk: '#FEEFB8',
+    }));
+    expect(pageLook('body', '#000000', 'wallpaper-comp')).toEqual(expect.objectContaining({
+      color: '#FFF7E6', ink: '#991B1B', accent: '#991B1B', accentInk: '#FFF7E6',
+    }));
   });
 });
 

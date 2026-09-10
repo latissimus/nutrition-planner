@@ -126,15 +126,27 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page)::before');
   });
 
-  it('verwendet auf COMP den weissen Kontrast und die gemeinsame Hero-Schrift', () => {
+  it('verwendet auf COMP das feste Milk-Rot-Paar und die gemeinsame Hero-Schrift', () => {
     expect(css).toContain('.app-dex-menu .menue-computer-text{fill:var(--dex-ink,#111)!important}');
-    expect(css).toContain('color:var(--dex-ink,#fff)!important;');
+    expect(categoryIcons).toContain("body: '#FFF7E6'");
+    expect(categoryIcons).toContain("body: '#991B1B'");
+    expect(designSystem).toContain(':root[data-seite="body"]{');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid var(--dex-ink,#991B1B)');
+    expect(designSystem).toContain('color:var(--dex-accent-ink,#FFF7E6)!important;');
     const heroStart = css.indexOf(':root[data-seite="body"] .body-v2-hero-value>small{');
     const heroEnd = css.indexOf('}', heroStart);
     const heroCss = css.slice(heroStart, heroEnd);
     expect(heroCss).toContain('font-family:"Work Sans"');
     expect(heroCss).toContain('font-style:italic!important;');
     expect(heroCss).toContain('font-weight:700!important;');
+  });
+
+  it('verwendet auf TRACKER das feste Butter-Chocolate-Paar', () => {
+    expect(categoryIcons).toContain("reminders: '#FEEFB8'");
+    expect(categoryIcons).toContain("reminders: '#4E342E'");
+    expect(designSystem).toContain(':root[data-seite="reminders"]{');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid var(--dex-ink,#4E342E)');
+    expect(designSystem).toContain('color:var(--dex-accent-ink,#FEEFB8)!important;');
   });
 
   it('bindet die festen COMP- und STRESS-Tapeten statt der Alt-Motive ein', () => {
@@ -147,7 +159,8 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('hellt auf den festgelegten dunklen Seiten die Logo-Silhouette auf', () => {
-    expect(designSystem).toContain(':root:is([data-seite="body"],[data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="reminders"],[data-seite="training"]) .app-dex-brand .brand');
+    expect(designSystem).toContain(':root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="training"]) .app-dex-brand .brand');
+    expect(designSystem).not.toContain(':root:is([data-seite="body"],[data-seite="essen"]');
     expect(designSystem).toContain('--sil-filter:brightness(0) invert(1)');
   });
 });

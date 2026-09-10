@@ -4483,9 +4483,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Trainingdex. Seine breiten Zeitfenster bleiben als funktionsspezifische
    Module erhalten; Tapete, Titel und Bedienung folgen dem gemeinsamen Skin. */
 :root[data-seite="reminders"],:root[data-seite="reminders"] body{
-  --food-page-purple:var(--dex-seitenfarbe,#4E342E);
+  --food-page-purple:var(--dex-seitenfarbe,#FEEFB8);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Burger.svg"));
-  background-color:var(--dex-seitenfarbe,#4E342E)!important;
+  background-color:var(--dex-seitenfarbe,#FEEFB8)!important;
   background-image:none!important;
 }
 :root[data-seite="reminders"] :is(#app,#view){
@@ -5548,9 +5548,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    danach ruhige, flache Messkarten. Körperfett wird bewusst nicht geschätzt.
    ============================================================ */
 :root[data-seite="body"],:root[data-seite="body"] body{
-  --ordner:var(--dex-seitenfarbe,#0B132B);
-  --ordner-ink:var(--dex-ink,#fff);
-  background:var(--dex-seitenfarbe,#0B132B)!important;
+  --ordner:var(--dex-accent,var(--dex-ink,#991B1B));
+  --ordner-ink:var(--dex-accent-ink,var(--dex-seitenfarbe,#FFF7E6));
+  background:var(--dex-seitenfarbe,#FFF7E6)!important;
 }
 :root[data-seite="body"] :is(#app,#view){background:transparent!important}
 :root[data-seite="body"] .body-log-dex-page{
@@ -5558,7 +5558,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --body-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Comp.svg"));
   isolation:isolate;
   min-height:100dvh;
-  background:var(--dex-seitenfarbe,#0B132B)!important;
+  background:var(--dex-seitenfarbe,#FFF7E6)!important;
   background-image:none!important;
   color:var(--dex-ink,#fff);
   font-family:"Work Sans",var(--ui),sans-serif;
@@ -8976,7 +8976,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Auf den dunklen Seiten bleibt die pinke Wortmarke unveraendert. Nur die
    dahinterliegende Athleten-Silhouette wird fuer klaren Kontrast weiss. */
-:root:is([data-seite="body"],[data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="reminders"],[data-seite="training"]) .app-dex-brand .brand{
+:root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="training"]) .app-dex-brand .brand{
   --sil-filter:brightness(0) invert(1);
 }
 
@@ -9126,4 +9126,204 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-style:italic!important;
   font-weight:700!important;
   letter-spacing:-.03em!important;
+}
+
+/* ============================================================
+   ZWEIFARBIGE KERNSEITEN
+
+   TRACKER und COMP funktionieren wie eigenstaendige Retro-Verpackungen:
+   eine helle Grundflaeche plus eine feste dunkle Druckfarbe. Die Druckfarbe
+   traegt Text, Konturen, Icons und Tapete; auf gefuellten Aktionen kehrt sich
+   das Paar um. So bleibt die Hierarchie trotz individueller Schriftfarben
+   genauso vorhersagbar wie auf den einfarbigen Dex-Seiten.
+   ============================================================ */
+:root[data-seite="reminders"]{
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,var(--dex-ink,#4E342E) 8%,#FFFCF5);
+  --cap-card-border:1.5px solid var(--dex-ink,#4E342E);
+  --cap-muted:#705B55;
+}
+:root[data-seite="body"]{
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,var(--dex-ink,#991B1B) 8%,#FFFCF5);
+  --cap-card-border:1.5px solid var(--dex-ink,#991B1B);
+  --cap-muted:#75565A;
+}
+
+/* Auch der feste App-Rahmen verwendet die jeweilige Druckfarbe. */
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-header{
+  background:var(--dex-seitenfarbe)!important;
+  border-color:var(--dex-ink)!important;
+  color:var(--dex-ink)!important;
+  --brand-outline:var(--dex-ink);
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-header .nav-av{
+  border-color:var(--dex-ink)!important;
+  background:#FFFCF5!important;
+  color:var(--dex-ink)!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-dock{
+  color:var(--dex-ink)!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-dock::after{
+  background:var(--dex-seitenfarbe)!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-dock-inner::before{
+  border-color:var(--dex-ink)!important;
+  background:color-mix(in srgb,var(--dex-seitenfarbe) 82%,transparent)!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-tab{
+  color:var(--dex-ink)!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-tab.aktiv{
+  background:color-mix(in srgb,var(--dex-ink) 9%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px var(--dex-ink)!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-tab.aktiv>span{
+  filter:drop-shadow(2px 2px 0 var(--dex-ink))!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-menu{
+  border-left-color:var(--dex-ink)!important;
+  color:var(--dex-ink)!important;
+}
+
+/* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */
+:root[data-seite="reminders"] .meal-log-dex-page{
+  --tracker-card:#FFFCF5;
+  --tracker-tint:color-mix(in srgb,var(--dex-ink,#4E342E) 8%,#FFFCF5);
+  --muted:#705B55;
+  color:var(--dex-ink,#4E342E)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-hero,
+  .nutrition-coin-overview,
+  .nutrition-card,
+  .mahl-zeitblock
+){
+  border-color:var(--dex-ink,#4E342E)!important;
+  color:var(--dex-ink,#4E342E)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-hero-value small,
+  .nutrition-coin-hero-value strong,
+  .nutrition-coin-hero-value b,
+  .nutrition-coin-overview>summary b,
+  .mahl-zeitblock>header h2,
+  .rem-row-titel b,
+  .nutrition-entry b,
+  .nutrition-entry strong
+){
+  color:var(--dex-ink,#4E342E)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-overview-body,
+  .mahl-zeitblock .mahl-timeline,
+  .nutrition-period-inline,
+  .nutrition-ring::after
+){
+  background:var(--tracker-card)!important;
+}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet){
+  border-color:var(--dex-ink,#4E342E)!important;
+  color:var(--dex-ink,#4E342E)!important;
+}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet)>header h2,
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  color:var(--dex-ink,#4E342E)!important;
+}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern),
+:root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
+:root[data-seite="reminders"] .nutrition-portionen button.aktiv,
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
+  border-color:var(--dex-ink,#4E342E)!important;
+  background:var(--dex-ink,#4E342E)!important;
+  color:var(--dex-accent-ink,#FEEFB8)!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+  background:var(--dex-accent-ink,#FEEFB8)!important;
+}
+
+/* COMP: Milkflaeche mit einem tiefen Rot fuer Daten, Konturen und Aktionen. */
+:root[data-seite="body"] .body-log-dex-page{
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] :is(.body-v2-hero,.body-v2-overview,.body-v2-card){
+  border-color:var(--dex-ink,#991B1B)!important;
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] :is(.body-v2-overview,.body-v2-card,.body-v2-card-body,.body-analysis-help){
+  background:var(--cap-card,#FFFCF5)!important;
+}
+:root[data-seite="body"] :is(.body-v2-overview>summary,.body-v2-card>header){
+  background:var(--cap-tint)!important;
+}
+:root[data-seite="body"] :is(
+  .body-v2-hero-value>small,
+  .body-v2-hero-value strong,
+  .body-v2-hero-value b,
+  .body-v2-overview>summary b,
+  .body-v2-card>header b,
+  .body-v2-overview>summary>.material-svg,
+  .body-v2-card-body>.mini-title,
+  .bodycomp-message,
+  .body-latest-value>strong,
+  .body-chart-block>header>b,
+  .body-analysis-help b,
+  .body-explain b,
+  .body-chart-legend b,
+  .body-goal-status b,
+  .body-inner-details>summary
+){
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] :is(
+  .body-v2-hero,
+  .body-v2-overview,
+  .body-v2-card,
+  .body-analysis-help,
+  .body-reset-mini,
+  .guided-fold-grid fieldset,
+  .body-entry-form input:not([type="checkbox"]):not([type="file"]),
+  .body-entry-form select,
+  .body-entry-form .input,
+  .body-entry-form .falten-summe,
+  .body-entry-form .btn-primary
+){
+  border-color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] :is(
+  .body-analysis-info,
+  .btn-primary,
+  .body-add-overlay .btn-primary,
+  .body-entry-form .btn-primary
+){
+  background:var(--dex-ink,#991B1B)!important;
+  color:var(--dex-accent-ink,#FFF7E6)!important;
+}
+:root[data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track{
+  background:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after{
+  background:var(--dex-accent-ink,#FFF7E6)!important;
+}
+:root[data-seite="body"] :is(.special-dex-sheet,.kategorie-sheet){
+  border-color:var(--dex-ink,#991B1B)!important;
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] :is(.special-dex-sheet,.kategorie-sheet)>header h2,
+:root[data-seite="body"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] .dex-detail-popup{
+  border-color:var(--dex-ink,#991B1B)!important;
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button),
+:root[data-seite="body"] .dex-detail-popup .dex-detail-inhalt h1{
+  color:var(--dex-ink,#991B1B)!important;
+}
+:root[data-seite="body"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
+  border-color:var(--dex-ink,#991B1B)!important;
+  background:var(--dex-accent,var(--dex-ink,#991B1B))!important;
+  color:var(--dex-accent-ink,#FFF7E6)!important;
 }
