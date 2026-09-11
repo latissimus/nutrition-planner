@@ -142,10 +142,12 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 
 - Seitenfarbe: Blueberry `#4B125C`
 - Druckfarbe: warmes Creme `#FCEFBB`
-- Hero und Kartenköpfe: leicht violett getönt mit violetter Schrift
+- Hero und Kartenköpfe: leicht aufgehelltes Blueberry mit cremefarbener Schrift
 - Längere Routinenkarten: Warmweiß mit violetter Schrift
+- Kartenkonturen: Creme
 - Infoelement und primäre Aktionen: Blueberry mit cremefarbener Schrift
-- App-Header und Dock: neutral Weiß; Iconschatten bleiben Schwarz
+- Ausgewählte Wochentage und Dauern: Blueberry mit cremefarbener Schrift
+- App-Header und Dock: Creme statt Reinweiß; Iconschatten bleiben Schwarz
 - Kontextmenüs: neutral Weiß/Schwarz; nur Primäraktionen verwenden das Farbpaar
 
 ## App-Header und unteres Menü

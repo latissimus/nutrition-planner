@@ -179,8 +179,10 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("habits: '#FCEFBB'");
     expect(designSystem).toContain(':root[data-seite="habits"]{');
     expect(designSystem).toContain('--cap-card:#FFFCF5;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #FCEFBB;');
     expect(designSystem).toContain('background:#4B125C!important;\n  color:#FCEFBB!important;');
     expect(designSystem).toContain('background:#FFFCF5!important;\n  color:#4B125C!important;');
+    expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
   });
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {

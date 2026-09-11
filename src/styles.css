@@ -9621,8 +9621,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    tragen das Farbpaar. App-Chrome und Kontextmenüs bleiben neutral. */
 :root[data-seite="habits"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#4B125C 10%,#FFFCF5);
-  --cap-card-border:1.5px solid #000;
+  --cap-tint:color-mix(in srgb,#FCEFBB 10%,#4B125C);
+  --cap-card-border:1.5px solid #FCEFBB;
   --cap-muted:#715D75;
 }
 :root[data-seite="habits"] .routine-dex-page{
@@ -9637,9 +9637,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#FCEFBB!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-hero{
-  border-color:#000!important;
-  background:color-mix(in srgb,#4B125C 10%,#FFFCF5)!important;
-  color:#4B125C!important;
+  border-color:#FCEFBB!important;
+  background:color-mix(in srgb,#FCEFBB 10%,#4B125C)!important;
+  color:#FCEFBB!important;
 }
 :root[data-seite="habits"] .routine-dex-page :is(
   .routine-hero-value small,
@@ -9647,13 +9647,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .routine-hero-value b,
   .routine-progress-ring>span
 ){
-  color:#4B125C!important;
+  color:#FCEFBB!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-progress-ring{
-  background:conic-gradient(#4B125C var(--routine-progress),#dedede 0)!important;
+  background:conic-gradient(#FCEFBB var(--routine-progress),color-mix(in srgb,#FCEFBB 22%,#4B125C) 0)!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{
-  background:#FFFCF5!important;
+  background:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-info-button{
   border-color:#000!important;
@@ -9669,17 +9669,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-zeitblock{
-  border-color:#000!important;
+  border-color:#FCEFBB!important;
   background:#FFFCF5!important;
   color:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{
-  border-bottom-color:color-mix(in srgb,#4B125C 22%,transparent)!important;
-  background:color-mix(in srgb,#4B125C 8%,#FFFCF5)!important;
+  border-bottom-color:#FCEFBB!important;
+  background:color-mix(in srgb,#FCEFBB 10%,#4B125C)!important;
 }
 :root[data-seite="habits"] .routine-dex-page :is(
   .routine-zeitblock>header h2,
-  .routine-zeitblock>header small,
+  .routine-zeitblock>header small
+){
+  color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(
   .routine-copy b,
   .routine-copy small,
   .routine-zeitblock-leer
@@ -9710,37 +9714,38 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* Dunkler Hintergrund: App-Header und Dock bleiben neutral weiß, der harte
+/* Auf ROUTINEN ersetzt das warme Creme das reine Weiß auch im App-Chrome;
+   der harte
    Schatten der Navigationsicons bleibt wie im System festgelegt schwarz. */
 :root[data-seite="habits"] .app-dex-header{
-  --dex-ink:#fff;
+  --dex-ink:#FCEFBB;
   background:var(--dex-seitenfarbe)!important;
-  border-color:#fff!important;
-  color:#fff!important;
+  border-color:#FCEFBB!important;
+  color:#FCEFBB!important;
 }
 :root[data-seite="habits"] .app-dex-header .nav-av{
-  border-color:#fff!important;
-  background:#fff!important;
+  border-color:#FCEFBB!important;
+  background:#FFFCF5!important;
   color:#111!important;
 }
 :root[data-seite="habits"] .app-dex-dock{
-  --dex-ink:#fff;
-  color:#fff!important;
+  --dex-ink:#FCEFBB;
+  color:#FCEFBB!important;
 }
 :root[data-seite="habits"] .app-dex-dock::after{background:var(--dex-seitenfarbe)!important}
 :root[data-seite="habits"] .app-dex-dock-inner::before{
-  border-color:#fff!important;
+  border-color:#FCEFBB!important;
   background:color-mix(in srgb,var(--dex-seitenfarbe) 84%,transparent)!important;
 }
-:root[data-seite="habits"] .app-dex-tab{color:#fff!important}
+:root[data-seite="habits"] .app-dex-tab{color:#FCEFBB!important}
 :root[data-seite="habits"] .app-dex-tab.aktiv{
-  background:color-mix(in srgb,#fff 12%,var(--dex-seitenfarbe))!important;
-  box-shadow:inset 0 0 0 1.25px #fff!important;
+  background:color-mix(in srgb,#FCEFBB 12%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px #FCEFBB!important;
 }
 :root[data-seite="habits"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
 :root[data-seite="habits"] .app-dex-menu{
-  border-left-color:#fff!important;
-  color:#fff!important;
+  border-left-color:#FCEFBB!important;
+  color:#FCEFBB!important;
 }
 
 /* Neutrale Sheets; ausschließlich echte Primäraktionen verwenden
@@ -9772,6 +9777,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#FCEFBB!important;
 }
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:currentColor!important;
+}
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv{
+  border-color:#000!important;
+  background:#4B125C!important;
+  color:#FCEFBB!important;
+}
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv :is(span,b,strong,.material-svg,svg,svg *){
   color:#FCEFBB!important;
   fill:currentColor!important;
 }
