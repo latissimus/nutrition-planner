@@ -21,6 +21,8 @@ trotzdem.
 - Supabase Auth, Postgres, privater Storage und Row-Level Security
 - eigener Service Worker für Offline-Start und echte Web-Push-Erinnerungen
 - Retro-/Dark-Designsystem aus LOGMAN
+- verbindlicher Farbstandard für Grid- und Hero-Seiten unter
+  [`docs/dex-design-presets.md`](docs/dex-design-presets.md)
 - Hash-Routing, damit GitHub Pages keinen SPA-Fallback benötigt
 - Körperwerte mit Gewicht, 7-Tage-Schnitt und Hautfalten-Summe
 - generisches Reminder-Modell fuer Mahlzeiten, Supplements und Trinken
