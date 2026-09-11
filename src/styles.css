@@ -9150,41 +9150,45 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-muted:#75565A;
 }
 
-/* Auch der feste App-Rahmen verwendet die jeweilige Druckfarbe. */
+/* Der App-Rahmen bleibt bewusst neutral. Die wechselnden Farbpaare leben
+   innerhalb der Seite; Logo, Header und Dock bilden dadurch auf jeder Route
+   dieselbe stabile CAPBOY-Bedienebene. */
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-header{
+  --dex-ink:#0A1330;
   background:var(--dex-seitenfarbe)!important;
-  border-color:var(--dex-ink)!important;
-  color:var(--dex-ink)!important;
-  --brand-outline:var(--dex-ink);
+  border-color:#0A1330!important;
+  color:#0A1330!important;
+  --brand-outline:#0A1330;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-header .nav-av{
-  border-color:var(--dex-ink)!important;
+  border-color:#0A1330!important;
   background:#FFFCF5!important;
-  color:var(--dex-ink)!important;
+  color:#0A1330!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-dock{
-  color:var(--dex-ink)!important;
+  --dex-ink:#0A1330;
+  color:#0A1330!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-dock::after{
   background:var(--dex-seitenfarbe)!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-dock-inner::before{
-  border-color:var(--dex-ink)!important;
+  border-color:#0A1330!important;
   background:color-mix(in srgb,var(--dex-seitenfarbe) 82%,transparent)!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-tab{
-  color:var(--dex-ink)!important;
+  color:#0A1330!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-tab.aktiv{
-  background:color-mix(in srgb,var(--dex-ink) 9%,var(--dex-seitenfarbe))!important;
-  box-shadow:inset 0 0 0 1.25px var(--dex-ink)!important;
+  background:color-mix(in srgb,#0A1330 8%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px #0A1330!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-tab.aktiv>span{
-  filter:drop-shadow(2px 2px 0 var(--dex-ink))!important;
+  filter:drop-shadow(2px 2px 0 #0A1330)!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-menu{
-  border-left-color:var(--dex-ink)!important;
-  color:var(--dex-ink)!important;
+  border-left-color:#0A1330!important;
+  color:#0A1330!important;
 }
 
 /* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */
@@ -9223,15 +9227,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ){
   background:var(--tracker-card)!important;
 }
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet){
-  border-color:var(--dex-ink,#4E342E)!important;
-  color:var(--dex-ink,#4E342E)!important;
-}
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet)>header h2,
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
-  color:var(--dex-ink,#4E342E)!important;
-}
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern),
 :root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
 :root[data-seite="reminders"] .nutrition-portionen button.aktiv,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
@@ -9306,14 +9301,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after{
   background:var(--dex-accent-ink,#FFF7E6)!important;
 }
-:root[data-seite="body"] :is(.special-dex-sheet,.kategorie-sheet){
-  border-color:var(--dex-ink,#991B1B)!important;
-  color:var(--dex-ink,#991B1B)!important;
-}
-:root[data-seite="body"] :is(.special-dex-sheet,.kategorie-sheet)>header h2,
-:root[data-seite="body"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
-  color:var(--dex-ink,#991B1B)!important;
-}
 :root[data-seite="body"] .dex-detail-popup{
   border-color:var(--dex-ink,#991B1B)!important;
   color:var(--dex-ink,#991B1B)!important;
@@ -9326,4 +9313,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:var(--dex-ink,#991B1B)!important;
   background:var(--dex-accent,var(--dex-ink,#991B1B))!important;
   color:var(--dex-accent-ink,#FFF7E6)!important;
+}
+
+/* Kontextmenüs sind eine neutrale Systemebene. Lediglich ihre klickbaren
+   Aktionen greifen das jeweilige Seitenpaar wieder auf: Zeilen über die
+   Druckfarbe, ausgefüllte Buttons über Hintergrund und Druckfarbe. */
+:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *){
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  border-bottom-color:#111!important;
+  background:transparent!important;
+  color:var(--dex-accent,var(--dex-ink))!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button :is(b,strong,.material-svg,svg,svg *){
+  color:inherit!important;
+  fill:currentColor!important;
+}
+:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:var(--dex-accent,var(--dex-ink))!important;
+  background:var(--dex-seitenfarbe)!important;
+  color:var(--dex-accent,var(--dex-ink))!important;
 }
