@@ -53,8 +53,8 @@ const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
-  body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#E3B505',
-  recipes: '#E3B505', essen: '#800020', training: '#013E37', supps: '#FF6B6B', habits: '#4B0082',
+  body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#F1DF71',
+  recipes: '#F1DF71', essen: '#800020', training: '#013E37', supps: '#FF6B6B', habits: '#4B0082',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -63,7 +63,7 @@ const defaultColors = {
 };
 const fixedSystemColors = {
   body: '#FFF7E6',
-  'food-log': '#E3B505',
+  'food-log': '#F1DF71',
   essen: '#800020',
   training: '#013E37',
   supps: '#FF6B6B',
@@ -81,16 +81,19 @@ const fixedSystemColors = {
 // mit ink gefuellten Buttons und Toggles.
 const fixedSystemInks = {
   body: '#991B1B',
+  'food-log': '#552626',
   reminders: '#4E342E',
   training: '#FCEFBB',
 };
 const fixedSystemAccents = {
   body: '#991B1B',
+  'food-log': '#F1DF71',
   reminders: '#4E342E',
   training: '#013E37',
 };
 const fixedSystemAccentInks = {
   body: '#FFF7E6',
+  'food-log': '#552626',
   reminders: '#FEEFB8',
   training: '#FCEFBB',
 };
@@ -162,7 +165,7 @@ export function categoryColor(route) {
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
   if (route === 'habits' && saved?.toUpperCase() === '#245953') return '#4B0082';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
-  return valid ? saved.toUpperCase() : (defaultColors[route] || '#E3B505');
+  return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }
 
 const readableInkFor = (color) => (colorIsDark(color) ? '#FFFFFF' : '#111111');

@@ -966,7 +966,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   setPreference('muscledex:sichtbare-sammlungen', order);
   setPreference('muscledex:coin-dex-sichtbar', true);
   const looks = {
-    'food-log': ['#E3B505', 'wallpaper-pizza', '🍕'],
+    'food-log': ['#F1DF71', 'wallpaper-pizza', '🍕'],
     essen: ['#800020', 'wallpaper-essen', '🍽️'],
     reminders: ['#FEEFB8', 'wallpaper-burger', '🍔'],
     supps: ['#FF6B6B', 'wallpaper-supps', '💊'],
@@ -1524,7 +1524,7 @@ async function renderRoute() {
     setSeite(route);
     // A collection mutation remounts this route while the Supabase request is
     // still pending. Paint the fixed Wissensseite immediately so the
-    // shared template fallback (#E3B505) can never flash in that gap.
+    // shared template fallback (#F1DF71) can never flash in that gap.
     applyPageLook(route, routeColor, pattern);
     const children = await loadCollections(session.user.id, { rootKey: route, signal });
     const childStats = await dexSammlungsStatistik(session.user.id, route, children, signal);

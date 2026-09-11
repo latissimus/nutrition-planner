@@ -164,6 +164,15 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('color:#FCEFBB!important;\n  fill:currentColor!important;');
   });
 
+  it('verwendet auf REZEPTE das feste Yellow-Brown-Paar nach den Grid-Regeln', () => {
+    expect(categoryIcons).toContain("'food-log': '#F1DF71'");
+    expect(categoryIcons).toContain("'food-log': '#552626'");
+    expect(designSystem).toContain(':root[data-seite="food-log"]{');
+    expect(designSystem).toContain('--cap-card:#552626;');
+    expect(designSystem).toContain('background:#552626!important;\n  color:#F1DF71!important;');
+    expect(designSystem).toContain('background:#F1DF71!important;\n  color:#552626!important;');
+  });
+
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
     expect(designSystem).toContain('--dex-ink:#0A1330;');
     expect(designSystem).toContain('border-color:#0A1330!important;');

@@ -37,7 +37,7 @@ describe('Anbieter- und Farbkontrast', () => {
       'food-log', 'reminders', 'sleep', 'habits', 'shopping',
       'essen', 'training', 'supps', 'body', 'stress', 'coins', 'profile',
     ].map((route) => [route, categoryColor(route)]))).toEqual({
-      'food-log': '#E3B505',
+      'food-log': '#F1DF71',
       reminders: '#FEEFB8',
       sleep: '#1E3A8A',
       habits: '#4B0082',
@@ -52,12 +52,15 @@ describe('Anbieter- und Farbkontrast', () => {
     });
   });
 
-  it('verwendet für TRACKER, COMP und TRAINING feste Retro-Farbpaare', () => {
+  it('verwendet für TRACKER, COMP, REZEPTE und TRAINING feste Retro-Farbpaare', () => {
     expect(pageLook('reminders', '#000000', 'wallpaper-burger')).toEqual(expect.objectContaining({
       color: '#FEEFB8', ink: '#4E342E', accent: '#4E342E', accentInk: '#FEEFB8',
     }));
     expect(pageLook('body', '#000000', 'wallpaper-comp')).toEqual(expect.objectContaining({
       color: '#FFF7E6', ink: '#991B1B', accent: '#991B1B', accentInk: '#FFF7E6',
+    }));
+    expect(pageLook('food-log', '#000000', 'wallpaper-pizza')).toEqual(expect.objectContaining({
+      color: '#F1DF71', ink: '#552626', accent: '#F1DF71', accentInk: '#552626',
     }));
     expect(pageLook('training', '#000000', 'wallpaper-dumbbell')).toEqual(expect.objectContaining({
       color: '#013E37', ink: '#FCEFBB', accent: '#013E37', accentInk: '#FCEFBB',

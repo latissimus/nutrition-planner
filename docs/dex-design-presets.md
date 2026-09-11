@@ -95,6 +95,14 @@ TRAINING, ESSEN, SUPPS und STRESS.
 - Chips, Infoelement und Detailfelder: invertieren dasselbe Farbpaar
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
+### Referenz REZEPTE
+
+- Seitenfarbe: `#F1DF71`
+- Druckfarbe: `#552626`
+- Karten und inaktive Chips: Braun mit gelber Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Gelb mit brauner Schrift
+- Sämtliche Konturen und Retro-Schatten: Schwarz
+
 ## Hero-Seiten
 
 Hero-Seiten stellen einen aktuellen Zustand oder eine Kennzahl in den
