@@ -126,6 +126,8 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("shopping: '#49251E'");
     expect(designSystem).toContain(':root[data-seite="shopping"]{\n  --cap-card:#FFFCF5;');
     expect(designSystem).toContain('background:#FFEDE3!important;\n  color:#49251E!important;');
+    expect(designSystem).toContain('.einkauf-row input[type="checkbox"]{');
+    expect(designSystem).toContain('border:2px solid #49251E!important;');
   });
 
   it('verwendet auf SCHLAF Midnight, einen Creme-Hero und neutrale weiße Karten', () => {
@@ -150,6 +152,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('--stress-card-ink:#7A2940;');
     expect(designSystem).toContain('background:#E36887!important;');
     expect(designSystem).toContain('color:#FFE08C!important;');
+    expect(designSystem).toContain('.dex-sammlungskopf-text :is(span,small)');
+    expect(designSystem).toContain('box-shadow:none!important;');
   });
 
   it('verwendet für CAPSTARS Twilight Berry mit hellem Gelb und neutralen Karten', () => {
@@ -238,6 +242,8 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("habits: '#4B125C'");
     expect(categoryIcons).toContain("habits: '#FCEFBB'");
     expect(designSystem).toContain(':root[data-seite="habits"]{');
+    expect(designSystem).toContain('--routine-panel:color-mix(in srgb,#FCEFBB 90%,#4B125C);');
+    expect(designSystem).toContain('background:var(--routine-panel)!important;\n  color:#4B125C!important;');
     expect(designSystem).toContain('--cap-card:#FFFCF5;');
     expect(designSystem).toContain('--cap-card-border:1.5px solid #FCEFBB;');
     expect(designSystem).toContain('background:#4B125C!important;\n  color:#FCEFBB!important;');
@@ -268,8 +274,15 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('hellt auf den festgelegten dunklen Seiten die Logo-Silhouette auf', () => {
-    expect(designSystem).toContain(':root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="training"]) .app-dex-brand .brand');
+    expect(designSystem).toContain(':root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="training"],[data-seite="supps"]) .app-dex-brand .brand');
     expect(designSystem).not.toContain(':root:is([data-seite="body"],[data-seite="essen"]');
     expect(designSystem).toContain('--sil-filter:brightness(0) invert(1)');
+  });
+
+  it('rastet das horizontale App-Menü auf vollständigen Tabs ein', () => {
+    expect(css).toContain('scroll-snap-type:x mandatory;');
+    expect(css).toContain('scroll-snap-align:start;');
+    expect(main).toContain("tabLeiste.scrollTo({ left: eingerastet");
+    expect(main).not.toContain("aktiv.scrollIntoView({ behavior: 'smooth'");
   });
 });

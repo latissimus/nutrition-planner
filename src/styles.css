@@ -8139,7 +8139,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow-x:auto;
   overflow-y:hidden;
   overscroll-behavior-x:contain;
-  scroll-snap-type:x proximity;
+  scroll-snap-type:x mandatory;
   touch-action:pan-x;
 }
 .app-dex-tab{
@@ -8158,7 +8158,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dex-ink,#0A1330);
   box-shadow:none;
   text-decoration:none;
-  scroll-snap-align:center;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
 }
 .app-dex-tab>span{
   width:32px;
@@ -9004,7 +9005,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Auf den dunklen Seiten bleibt die pinke Wortmarke unveraendert. Nur die
    dahinterliegende Athleten-Silhouette wird fuer klaren Kontrast weiss. */
-:root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="training"]) .app-dex-brand .brand{
+:root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="habits"],[data-seite="training"],[data-seite="supps"]) .app-dex-brand .brand{
   --sil-filter:brightness(0) invert(1);
 }
 
@@ -10002,8 +10003,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    bleibt die lange Listenebene hell und ruhig; Status, Tapete und Aktionen
    tragen das Farbpaar. App-Chrome und Kontextmenüs bleiben neutral. */
 :root[data-seite="habits"]{
+  --routine-panel:color-mix(in srgb,#FCEFBB 90%,#4B125C);
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#FCEFBB 10%,#4B125C);
+  --cap-tint:var(--routine-panel);
   --cap-card-border:1.5px solid #FCEFBB;
   --cap-muted:#715D75;
 }
@@ -10020,8 +10022,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="habits"] .routine-dex-page .routine-hero{
   border-color:#FCEFBB!important;
-  background:color-mix(in srgb,#FCEFBB 10%,#4B125C)!important;
-  color:#FCEFBB!important;
+  background:var(--routine-panel)!important;
+  color:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page :is(
   .routine-hero-value small,
@@ -10029,13 +10031,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .routine-hero-value b,
   .routine-progress-ring>span
 ){
-  color:#FCEFBB!important;
+  color:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-progress-ring{
-  background:conic-gradient(#FCEFBB var(--routine-progress),color-mix(in srgb,#FCEFBB 22%,#4B125C) 0)!important;
+  background:conic-gradient(#4B125C var(--routine-progress),color-mix(in srgb,#4B125C 20%,var(--routine-panel)) 0)!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{
-  background:#4B125C!important;
+  background:var(--routine-panel)!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-info-button{
   border-color:#000!important;
@@ -10056,14 +10058,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{
-  border-bottom-color:#FCEFBB!important;
-  background:color-mix(in srgb,#FCEFBB 10%,#4B125C)!important;
+  border-bottom-color:color-mix(in srgb,#4B125C 24%,#FCEFBB)!important;
+  background:var(--routine-panel)!important;
 }
 :root[data-seite="habits"] .routine-dex-page :is(
   .routine-zeitblock>header h2,
   .routine-zeitblock>header small
 ){
-  color:#FCEFBB!important;
+  color:#4B125C!important;
 }
 :root[data-seite="habits"] .routine-dex-page :is(
   .routine-copy b,
@@ -10231,6 +10233,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#000!important;
   background:#49251E!important;
   color:#FFEDE3!important;
+  -webkit-text-fill-color:#FFEDE3!important;
   box-shadow:0 2px 0 #000!important;
 }
 :root[data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn).aktiv{
@@ -10262,6 +10265,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt{
   background:color-mix(in srgb,#FFEDE3 70%,#FFFCF5)!important;
+}
+:root[data-seite="shopping"] .einkauf-row input[type="checkbox"]{
+  box-sizing:border-box!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  border:2px solid #49251E!important;
+  border-radius:6px!important;
+  background:#FFFCF5!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:15px 15px!important;
+}
+:root[data-seite="shopping"] .einkauf-row input[type="checkbox"]:checked{
+  background-color:#49251E!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4L19 6' fill='none' stroke='%23FFEDE3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
 }
 :root[data-seite="shopping"] .einkauf-row-name{color:#49251E!important}
 :root[data-seite="shopping"] .app-dex-header{
@@ -10514,6 +10532,38 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom-color:#000!important;
 }
 
+/* Kleine COMP-Beschriftungen brauchen auf Cotton Cloud einen dunkleren
+   Leseton. Pink bleibt den großen Messwerten und eindeutigen Aktionen
+   vorbehalten. Die Gewichtshistorie übernimmt exakt die Typografie der
+   benachbarten Info-Zeile „Wie oft wiegen?“. */
+:root[data-seite="body"] :is(
+  .body-v2-hero-value>small,
+  .body-v2-overview>summary b,
+  .body-v2-card>header b,
+  .body-v2-card-body>.mini-title,
+  .body-chart-block>header>b,
+  .body-analysis-help b,
+  .body-explain b,
+  .body-chart-legend b,
+  .body-goal-status b,
+  .body-inner-details>summary
+){
+  color:#5C2746!important;
+}
+:root[data-seite="body"] .body-weight-history>summary{
+  display:flex!important;
+  grid-template-columns:none!important;
+  justify-content:space-between!important;
+  min-height:46px!important;
+  padding:7px 1px!important;
+  font-family:inherit!important;
+  font-size:13px!important;
+  font-style:normal!important;
+  font-weight:800!important;
+  line-height:normal!important;
+  letter-spacing:0!important;
+}
+
 /* MIND: Deep Blush mit warmem Gelb. Das direkte Farbpaar trägt
    Kopf, Tapete, Chips und Aktionen. Für längere Kartentexte wird das Blush
    abgedunkelt, weil Gelb und helles Blush dort allein zu wenig Kontrast haben. */
@@ -10563,7 +10613,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#000!important;
   background:var(--stress-card)!important;
   color:var(--stress-card-ink)!important;
-  box-shadow:0 3.5px 0 #000!important;
+  box-shadow:none!important;
 }
 :root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:#000!important;
@@ -10614,6 +10664,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="stress"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
+  color:var(--stress-card-ink)!important;
+}
+
+/* Kleine Schrift auf Deep Blush wird im dunklen Kartenton gesetzt. Der
+   warme Gelbton bleibt Titelakzent, Infofläche und Interaktionen vorbehalten. */
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf-text :is(span,small),
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) :is(
+  .unter-sammlungen-block>h2,
+  .sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2
+){
   color:var(--stress-card-ink)!important;
 }
 

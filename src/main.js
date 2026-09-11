@@ -737,9 +737,18 @@ function appDexShellZeichnen(route, view) {
     if (!aktiv) return;
     const links = aktiv.offsetLeft;
     const rechts = links + aktiv.offsetWidth;
-    if (links < tabLeiste.scrollLeft || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth) {
-      aktiv.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    const istAusserhalb = links < tabLeiste.scrollLeft
+      || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth;
+    const maximal = Math.max(0, tabLeiste.scrollWidth - tabLeiste.clientWidth);
+    const gewuenscht = istAusserhalb
+      ? links - ((tabLeiste.clientWidth - aktiv.offsetWidth) / 2)
+      : tabLeiste.scrollLeft;
+    const rasterpunkte = [...tabLeiste.querySelectorAll('.app-dex-tab')]
+      .map((tab) => Math.min(tab.offsetLeft, maximal));
+    const eingerastet = rasterpunkte.reduce((naechster, punkt) => (
+      Math.abs(punkt - gewuenscht) < Math.abs(naechster - gewuenscht) ? punkt : naechster
+    ), 0);
+    tabLeiste.scrollTo({ left: eingerastet, behavior: istAusserhalb ? 'smooth' : 'auto' });
   });
 
   dock.querySelector('.app-dex-menu').onclick = () => {
