@@ -128,12 +128,13 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#FFEDE3!important;\n  color:#49251E!important;');
   });
 
-  it('verwendet auf SCHLAF das feste Midnight-Creme-Paar ohne Logo-Einfaerbung', () => {
+  it('verwendet auf SCHLAF Midnight, einen Creme-Hero und neutrale weiße Karten', () => {
     expect(categoryIcons).toContain("sleep: '#0E1D47'");
     expect(categoryIcons).toContain("sleep: '#FCEFBB'");
-    expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#FCEFBB;');
+    expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#fff;\n  --cap-card:#fff;');
     expect(designSystem).toContain('background:#0E1D47!important;\n  color:#FCEFBB!important;');
-    expect(designSystem).toContain(':root[data-seite="sleep"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:none;');
+    expect(designSystem).toContain(':root[data-seite="sleep"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:brightness(0) invert(1);');
+    expect(designSystem).toContain(':root[data-seite="sleep"] .sleep-chart polyline{\n  stroke:#0E1D47!important;');
   });
 
   it('haelt auf COMP alle Kontextmenue-Konturen neutral schwarz', () => {

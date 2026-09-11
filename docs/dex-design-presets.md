@@ -192,9 +192,11 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - Seitenfarbe: Midnight `#0E1D47`
 - Druck- und Akzentfarbe: warmes Creme `#FCEFBB`
 - Hero und Seitenüberschriften: Midnight mit Creme-Schrift
-- Längere Schlafkarten: Creme mit Midnight-Schrift
-- Kartenkonturen sowie App-Header und Dock: Creme; Iconschatten Schwarz
-- Das CAPBOY-Logo behält Wortmarke, Kontur und Silhouette in den Originalfarben
+- Längere Schlafkarten: Weiß mit Midnight-Schrift und schwarzer Kontur
+- App-Header und Dock: neutrales Weiß statt Creme; Iconschatten Schwarz
+- Die CAPBOY-Wortmarke bleibt original; nur die Silhouette wird auf dem
+  dunklen Header für Sichtbarkeit weiß dargestellt
+- Diagrammlinie und Datenpunkte im 7-Tage-Verlauf: Midnight auf Weiß
 - Kontextmenüs: neutral Weiß/Schwarz; Primäraktionen Midnight mit Creme
 
 ### Referenz ROUTINEN

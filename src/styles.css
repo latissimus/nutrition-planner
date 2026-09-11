@@ -10292,18 +10292,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Der Hero bleibt dunkel und plakativ; längere Daten- und Leseflächen
    invertieren das Paar, damit die Seite ruhig und klar bleibt. */
 :root[data-seite="sleep"]{
-  --sleep-paper:#FCEFBB;
-  --cap-card:#FCEFBB;
+  --sleep-paper:#fff;
+  --cap-card:#fff;
   --cap-tint:color-mix(in srgb,#FCEFBB 7%,#0E1D47);
-  --cap-card-border:1.5px solid #FCEFBB;
-  --cap-muted:#B8B8C2;
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#5E6880;
 }
 :root[data-seite="sleep"] .sleep-dex-page{
-  --surface:#FCEFBB;
-  --surface2:color-mix(in srgb,#0E1D47 7%,#FCEFBB);
+  --surface:#fff;
+  --surface2:color-mix(in srgb,#0E1D47 7%,#fff);
   --text:#0E1D47;
   --ink:#FCEFBB;
-  --muted:#B8B8C2;
+  --muted:#5E6880;
   color:#FCEFBB!important;
 }
 :root[data-seite="sleep"] .sleep-tonight{
@@ -10330,15 +10330,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section){
-  border-color:#FCEFBB!important;
-  background:#FCEFBB!important;
+  border-color:#000!important;
+  background:#fff!important;
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-overview>summary,.sleep-section>header){
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] .sleep-checkin-overview>summary{
-  background:color-mix(in srgb,#0E1D47 7%,#FCEFBB)!important;
+  background:color-mix(in srgb,#0E1D47 7%,#fff)!important;
 }
 :root[data-seite="sleep"] :is(
   .sleep-checkin-overview>summary b,
@@ -10365,50 +10365,66 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p){
-  background:color-mix(in srgb,#0E1D47 7%,#FCEFBB)!important;
+  background:color-mix(in srgb,#0E1D47 7%,#fff)!important;
 }
 :root[data-seite="sleep"] .sleep-analysis-help{
   border-color:#000!important;
-  background:#FCEFBB!important;
+  background:#fff!important;
   color:#0E1D47!important;
 }
 
-/* Dunkle Seite: App-Chrome verwendet die Creme-Bedienfarbe; der harte
+/* Der Verlauf liegt auf Weiß: Rasterlinie, Kurve und Punkte bekommen daher
+   feste Midnight-Werte statt die cremefarbene Seitenvariable zu erben. */
+:root[data-seite="sleep"] .sleep-chart line{
+  stroke:#A7B0C6!important;
+  stroke-width:2!important;
+}
+:root[data-seite="sleep"] .sleep-chart polyline{
+  stroke:#0E1D47!important;
+  stroke-width:5!important;
+}
+:root[data-seite="sleep"] .sleep-chart circle{
+  fill:#fff!important;
+  stroke:#0E1D47!important;
+  stroke-width:2.5!important;
+}
+
+/* Dunkle Seite: App-Chrome verwendet neutrales Weiß; der harte
    Schatten der Menü-Symbole bleibt wie bei TRAINING neutral schwarz. */
 :root[data-seite="sleep"] .app-dex-header{
-  --dex-ink:#FCEFBB;
+  --dex-ink:#fff;
   background:#0E1D47!important;
-  border-color:#FCEFBB!important;
-  color:#FCEFBB!important;
+  border-color:#fff!important;
+  color:#fff!important;
   --brand-outline:#0A1330;
 }
 :root[data-seite="sleep"] .app-dex-brand .brand{
   --brand-outline:#0A1330;
-  --sil-filter:none;
+  --sil-filter:brightness(0) invert(1);
 }
 :root[data-seite="sleep"] .app-dex-header .nav-av{
-  border-color:#FCEFBB!important;
-  background:#FCEFBB!important;
+  border-color:#fff!important;
+  background:#fff!important;
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] .app-dex-dock{
-  --dex-ink:#FCEFBB;
-  color:#FCEFBB!important;
+  --dex-ink:#fff;
+  color:#fff!important;
 }
 :root[data-seite="sleep"] .app-dex-dock::after{background:#0E1D47!important}
 :root[data-seite="sleep"] .app-dex-dock-inner::before{
-  border-color:#FCEFBB!important;
+  border-color:#fff!important;
   background:color-mix(in srgb,#0E1D47 84%,transparent)!important;
 }
-:root[data-seite="sleep"] .app-dex-tab{color:#FCEFBB!important}
+:root[data-seite="sleep"] .app-dex-tab{color:#fff!important}
 :root[data-seite="sleep"] .app-dex-tab.aktiv{
-  background:color-mix(in srgb,#FCEFBB 12%,#0E1D47)!important;
-  box-shadow:inset 0 0 0 1.25px #FCEFBB!important;
+  background:color-mix(in srgb,#fff 12%,#0E1D47)!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
 }
 :root[data-seite="sleep"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
 :root[data-seite="sleep"] .app-dex-menu{
-  border-left-color:#FCEFBB!important;
-  color:#FCEFBB!important;
+  border-left-color:#fff!important;
+  color:#fff!important;
 }
 
 /* SCHLAF-Sheets bleiben neutrale Systemflächen. Nur echte Primäraktionen
