@@ -161,6 +161,14 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:brightness(0) invert(1);');
   });
 
+  it('verwendet auf PROFIL Slate Gray mit warmer Pfirsich-Creme', () => {
+    expect(categoryIcons).toContain("profile: '#203C3D'");
+    expect(categoryIcons).toContain("profile: '#F9DBBA'");
+    expect(designSystem).toContain(':root[data-seite="profile"]{\n  --profile-accent:#203C3D!important;');
+    expect(designSystem).toContain('--akzent-ink:#F9DBBA!important;');
+    expect(designSystem).toContain(':root[data-seite="profile"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:brightness(0) invert(1);');
+  });
+
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
     expect(categoryIcons).toContain("essen: '#3C153B'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");

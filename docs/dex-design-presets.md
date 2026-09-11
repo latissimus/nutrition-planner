@@ -214,6 +214,17 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - App-Header und Dock: neutrales Weiß; Silhouette Weiß, Wortmarke original
 - Kontextmenüs: neutral Weiß/Schwarz; Primäraktionen Twilight Berry mit Gelb
 
+### Referenz PROFIL
+
+- Seitenfarbe: Slate Gray `#203C3D`
+- Druck- und Akzentfarbe: warme Pfirsich-Creme `#F9DBBA`
+- Karteninhalte: Weiß mit Slate-Gray-Schrift
+- Kartenköpfe: Pfirsich-Creme mit Slate-Gray-Schrift
+- Ausgewählte Optionen, Toggles und Primärbuttons: Slate Gray mit
+  Pfirsich-Creme-Schrift beziehungsweise -Indikator
+- Kartenrahmen: Pfirsich-Creme; Buttonkonturen und Retro-Schatten: Schwarz
+- App-Header und Dock: neutrales Weiß; Silhouette Weiß, Wortmarke original
+
 ### Referenz ROUTINEN
 
 - Seitenfarbe: Blueberry `#4B125C`

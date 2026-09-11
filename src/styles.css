@@ -7602,9 +7602,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    die ueber Jahre gewachsenen braunen und kursiven Darstellungsregeln.
    ============================================================ */
 :root[data-seite="profile"]{
-  --profile-accent:#A7C957;
+  --profile-accent:#203C3D;
   --akzent:var(--profile-accent);
-  --akzent-ink:#111;
+  --akzent-ink:#F9DBBA;
 }
 :root[data-seite="profile"] .profil-fixkopf-view{
   color:#111;
@@ -8962,16 +8962,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Auf der Profilseite ersetzt der Seitenakzent die letzte alte braune
    Systemfarbe auch bei generischen Buttons und nativen Checkboxen. */
 :root[data-seite="profile"]{
-  --profile-accent:#A7C957!important;
-  --akzent:var(--profile-accent,#A7C957)!important;
-  --akzent-ink:#111!important;
+  --profile-accent:#203C3D!important;
+  --akzent:var(--profile-accent,#203C3D)!important;
+  --akzent-ink:#F9DBBA!important;
 }
 :root[data-seite="profile"] :is(.themebtn.on,.profile-datei-knopf,.role-tag,.btn-primary){
-  background:var(--profile-accent,#A7C957)!important;
-  color:#111!important;
+  background:var(--profile-accent,#203C3D)!important;
+  color:#F9DBBA!important;
 }
 :root[data-seite="profile"] .profile-abschnitt input[type="checkbox"]{
-  accent-color:var(--profile-accent,#A7C957)!important;
+  accent-color:var(--profile-accent,#203C3D)!important;
 }
 
 /* Auf den dunklen Seiten bleibt die pinke Wortmarke unveraendert. Nur die
@@ -10795,3 +10795,118 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#EDEBA4!important;
   fill:currentColor!important;
 }
+
+/* PROFIL: Slate Gray #203C3D mit dem aus der Vorlage abgenommenen warmen
+   Pfirsich-Creme #F9DBBA. Die Einstellungsflächen bleiben weiß und ruhig;
+   Überschriften sowie aktive Bedienelemente invertieren das Farbpaar. */
+:root[data-seite="profile"]{
+  --profile-accent:#203C3D!important;
+  --akzent:#203C3D!important;
+  --akzent-ink:#F9DBBA!important;
+  --cap-card:#fff;
+  --cap-tint:#F9DBBA;
+  --cap-card-border:1.5px solid #F9DBBA;
+  --cap-muted:#667273;
+}
+:root[data-seite="profile"],
+:root[data-seite="profile"] body,
+:root[data-seite="profile"] :is(#app,#view){
+  background-color:#203C3D!important;
+}
+:root[data-seite="profile"] .profil-fixkopf-view{color:#F9DBBA!important}
+:root[data-seite="profile"] .profile-abschnitt,
+:root[data-seite="profile"] .profile-abschnitt.profile-konto{
+  border-color:#F9DBBA!important;
+  background:#fff!important;
+  color:#203C3D!important;
+}
+:root[data-seite="profile"] .profile-abschnitt>summary{
+  border-bottom-color:color-mix(in srgb,#203C3D 20%,transparent)!important;
+  background:#F9DBBA!important;
+  color:#203C3D!important;
+}
+:root[data-seite="profile"] .profile-abschnitt>summary::after{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23203C3D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")!important;
+}
+:root[data-seite="profile"] :is(
+  .profile-name,
+  .profile-abschnitt .fld-l,
+  .profile-untertitel,
+  .sammlung-sichtbarkeit>.switchline,
+  .interface-sound-setting,
+  .interface-sound-setting :is(b,small)
+){
+  color:#203C3D!important;
+}
+:root[data-seite="profile"] :is(.profile-email,.profile-hinweis,.profile-daten-status,.profile-dateiname){
+  color:#667273!important;
+}
+:root[data-seite="profile"] :is(
+  .profile-datei,
+  .themeseg,
+  .sammlungs-sortierung,
+  .themebtn,
+  .sortier-tasten button,
+  .profile-abschnitt .input,
+  .profile-abschnitt .btn,
+  .profile-ausloggen .btn
+){
+  border-color:#000!important;
+  background:#fff!important;
+  color:#203C3D!important;
+}
+:root[data-seite="profile"] .profile-abschnitt .input:disabled{
+  background:color-mix(in srgb,#203C3D 7%,#fff)!important;
+  color:#667273!important;
+}
+:root[data-seite="profile"] :is(.role-tag,.profile-datei-knopf,.themebtn.on,.profile-abschnitt .btn-primary){
+  border-color:#000!important;
+  background:#203C3D!important;
+  color:#F9DBBA!important;
+}
+:root[data-seite="profile"] :is(.role-tag,.profile-datei-knopf,.themebtn.on,.profile-abschnitt .btn-primary) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#F9DBBA!important;
+  fill:currentColor!important;
+}
+:root[data-seite="profile"] .switchline input:checked~.switchline-track{
+  background:#203C3D!important;
+}
+:root[data-seite="profile"] .switchline-track::after,
+:root[data-seite="profile"] .switchline input:checked~.switchline-track::after{
+  background:#F9DBBA!important;
+}
+:root[data-seite="profile"] .sammlung-sichtbarkeit{
+  border-bottom-color:color-mix(in srgb,#203C3D 28%,transparent)!important;
+}
+:root[data-seite="profile"] .buildinfo{color:#F9DBBA!important}
+
+/* Auf der dunklen Profilseite bleibt die App-Schale neutral weiß. */
+:root[data-seite="profile"] .app-dex-header{
+  --dex-ink:#fff;
+  background:#203C3D!important;
+  border-color:#fff!important;
+  color:#fff!important;
+  --brand-outline:#0A1330;
+}
+:root[data-seite="profile"] .app-dex-brand .brand{
+  --brand-outline:#0A1330;
+  --sil-filter:brightness(0) invert(1);
+}
+:root[data-seite="profile"] .app-dex-header .nav-av{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#203C3D!important;
+}
+:root[data-seite="profile"] .app-dex-dock{--dex-ink:#fff;color:#fff!important}
+:root[data-seite="profile"] .app-dex-dock::after{background:#203C3D!important}
+:root[data-seite="profile"] .app-dex-dock-inner::before{
+  border-color:#fff!important;
+  background:color-mix(in srgb,#203C3D 84%,transparent)!important;
+}
+:root[data-seite="profile"] .app-dex-tab{color:#fff!important}
+:root[data-seite="profile"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 12%,#203C3D)!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
+}
+:root[data-seite="profile"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
+:root[data-seite="profile"] .app-dex-menu{border-left-color:#fff!important;color:#fff!important}
