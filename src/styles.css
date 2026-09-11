@@ -9149,6 +9149,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-card-border:1.5px solid var(--dex-ink,#991B1B);
   --cap-muted:#75565A;
 }
+:root[data-seite="training"]{
+  --cap-card:#FCEFBB;
+  --cap-tint:color-mix(in srgb,#013E37 5%,#FCEFBB);
+  --cap-card-border:1.5px solid #013E37;
+  --cap-muted:#486A64;
+}
 
 /* Der App-Rahmen bleibt bewusst neutral. Die wechselnden Farbpaare leben
    innerhalb der Seite; Logo, Header und Dock bilden dadurch auf jeder Route
@@ -9189,6 +9195,43 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root:is([data-seite="reminders"],[data-seite="body"]) .app-dex-menu{
   border-left-color:#0A1330!important;
   color:#0A1330!important;
+}
+
+/* Auf dem dunklen TRAINING-Grün bleibt dieselbe neutrale Bedienebene weiß,
+   während die cremefarbene Druckfarbe ausschließlich im Inhalt arbeitet. */
+:root[data-seite="training"] .app-dex-header{
+  --dex-ink:#fff;
+  background:var(--dex-seitenfarbe)!important;
+  border-color:#fff!important;
+  color:#fff!important;
+}
+:root[data-seite="training"] .app-dex-header .nav-av{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="training"] .app-dex-dock{
+  --dex-ink:#fff;
+  color:#fff!important;
+}
+:root[data-seite="training"] .app-dex-dock::after{
+  background:var(--dex-seitenfarbe)!important;
+}
+:root[data-seite="training"] .app-dex-dock-inner::before{
+  border-color:#fff!important;
+  background:color-mix(in srgb,var(--dex-seitenfarbe) 84%,transparent)!important;
+}
+:root[data-seite="training"] .app-dex-tab{color:#fff!important}
+:root[data-seite="training"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 12%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
+}
+:root[data-seite="training"] .app-dex-tab.aktiv>span{
+  filter:drop-shadow(2px 2px 0 #fff)!important;
+}
+:root[data-seite="training"] .app-dex-menu{
+  border-left-color:#fff!important;
+  color:#fff!important;
 }
 
 /* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */
@@ -9315,32 +9358,109 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dex-accent-ink,#FFF7E6)!important;
 }
 
+/* TRAINING: tiefes Grün mit dem aus der Vorlage entnommenen Creme #FCEFBB.
+   Rasterkarten invertieren das Paar, damit auch längere Notizen und
+   Vorschauen ruhig lesbar bleiben. */
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page){
+  --surface:#FCEFBB;
+  --surface2:color-mix(in srgb,#013E37 5%,#FCEFBB);
+  --text:#013E37;
+  --ink:#013E37;
+  --muted:#486A64;
+  color:var(--dex-ink,#FCEFBB)!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is(
+  .dex-sammlungskopf,
+  .unter-sammlungen-block>h2,
+  .sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2,
+  .sammlung-leer,
+  .sammlung-leer strong,
+  .sammlung-leer span
+){
+  color:var(--dex-ink,#FCEFBB)!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
+  border-color:var(--dex-ink,#FCEFBB)!important;
+  background:var(--dex-ink,#FCEFBB)!important;
+  color:var(--dex-seitenfarbe,#013E37)!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
+  border-color:#013E37!important;
+  background:#FCEFBB!important;
+  color:#013E37!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
+  border-color:#013E37!important;
+  background:#013E37!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
+  color:#013E37!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
+  filter:drop-shadow(0 3.5px 0 #FCEFBB)!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form path{
+  stroke:#013E37!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
+  fill:#013E37!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
+  border-color:#013E37!important;
+  background:#FCEFBB!important;
+  box-shadow:0 3.5px 0 #FCEFBB!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
+  background:#013E37!important;
+}
+:root[data-seite="training"] .dex-detail-popup{
+  border-color:#013E37!important;
+  background:#FCEFBB!important;
+  color:#013E37!important;
+}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
+  color:#013E37!important;
+}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
+  border-color:#013E37!important;
+}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
+  border-color:#013E37!important;
+  background:#013E37!important;
+  color:#FCEFBB!important;
+}
+:root[data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
+  color:#013E37!important;
+}
+
 /* Kontextmenüs sind eine neutrale Systemebene. Überschrift, Menüzeilen und
    Icons bleiben schwarz; nur klar erkennbare Aktionsbuttons greifen das
    jeweilige Seitenpaar aus Hintergrund und Druckfarbe wieder auf. */
-:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet){
+:root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
   border-color:#111!important;
   background:#fff!important;
   color:#111!important;
 }
-:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet)>header,
-:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *){
+:root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *){
   color:#111!important;
   fill:currentColor!important;
 }
-:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+:root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
   border-bottom-color:#111!important;
   background:transparent!important;
   color:#111!important;
 }
-:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button :is(b,strong,.material-svg,svg,svg *){
+:root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button :is(b,strong,.material-svg,svg,svg *){
   color:inherit!important;
   fill:currentColor!important;
 }
-:root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
-  border-color:var(--dex-accent,var(--dex-ink))!important;
+:root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:var(--dex-ink)!important;
   background:var(--dex-seitenfarbe)!important;
-  color:var(--dex-accent,var(--dex-ink))!important;
+  color:var(--dex-ink)!important;
 }

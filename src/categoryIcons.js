@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#E3B505',
-  recipes: '#E3B505', essen: '#800020', training: '#006D77', supps: '#FF6B6B', habits: '#4B0082',
+  recipes: '#E3B505', essen: '#800020', training: '#013E37', supps: '#FF6B6B', habits: '#4B0082',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -65,7 +65,7 @@ const fixedSystemColors = {
   body: '#FFF7E6',
   'food-log': '#E3B505',
   essen: '#800020',
-  training: '#006D77',
+  training: '#013E37',
   supps: '#FF6B6B',
   reminders: '#FEEFB8',
   habits: '#4B0082',
@@ -82,10 +82,17 @@ const fixedSystemColors = {
 const fixedSystemInks = {
   body: '#991B1B',
   reminders: '#4E342E',
+  training: '#FCEFBB',
+};
+const fixedSystemAccents = {
+  body: '#991B1B',
+  reminders: '#4E342E',
+  training: '#013E37',
 };
 const fixedSystemAccentInks = {
   body: '#FFF7E6',
   reminders: '#FEEFB8',
+  training: '#FCEFBB',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',
@@ -262,7 +269,7 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   return {
     color,
     ink,
-    accent: fixedSystemInks[scope] || color,
+    accent: fixedSystemAccents[scope] || fixedSystemInks[scope] || color,
     accentInk: fixedSystemAccentInks[scope] || readableInkFor(color),
     // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
     // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.

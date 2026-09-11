@@ -973,7 +973,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],
     shopping: ['#00C2CB', 'wallpaper-brokkoli', '🛒'],
     habits: ['#4B0082', 'wallpaper-wolke', '🧠'],
-    training: ['#006D77', 'wallpaper-dumbbell', '💪🏻'],
+    training: ['#013E37', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#FFF7E6', 'wallpaper-comp', '📐'],
     coins: ['#E6D6FF', 'wallpaper-game', '🎮'],
   };

@@ -43,7 +43,7 @@ describe('Anbieter- und Farbkontrast', () => {
       habits: '#4B0082',
       shopping: '#00C2CB',
       essen: '#800020',
-      training: '#006D77',
+      training: '#013E37',
       supps: '#FF6B6B',
       body: '#FFF7E6',
       stress: '#FF2E88',
@@ -52,12 +52,15 @@ describe('Anbieter- und Farbkontrast', () => {
     });
   });
 
-  it('verwendet für TRACKER und COMP feste Retro-Farbpaare', () => {
+  it('verwendet für TRACKER, COMP und TRAINING feste Retro-Farbpaare', () => {
     expect(pageLook('reminders', '#000000', 'wallpaper-burger')).toEqual(expect.objectContaining({
       color: '#FEEFB8', ink: '#4E342E', accent: '#4E342E', accentInk: '#FEEFB8',
     }));
     expect(pageLook('body', '#000000', 'wallpaper-comp')).toEqual(expect.objectContaining({
       color: '#FFF7E6', ink: '#991B1B', accent: '#991B1B', accentInk: '#FFF7E6',
+    }));
+    expect(pageLook('training', '#000000', 'wallpaper-dumbbell')).toEqual(expect.objectContaining({
+      color: '#013E37', ink: '#FCEFBB', accent: '#013E37', accentInk: '#FCEFBB',
     }));
   });
 });

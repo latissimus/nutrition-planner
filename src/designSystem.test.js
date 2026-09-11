@@ -149,13 +149,21 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('color:var(--dex-accent-ink,#FEEFB8)!important;');
   });
 
+  it('verwendet auf TRAINING das feste Grün-Creme-Paar', () => {
+    expect(categoryIcons).toContain("training: '#013E37'");
+    expect(categoryIcons).toContain("training: '#FCEFBB'");
+    expect(designSystem).toContain(':root[data-seite="training"]{');
+    expect(designSystem).toContain('--cap-card:#FCEFBB;');
+    expect(designSystem).toContain('background:#013E37!important;\n  color:#FCEFBB!important;');
+  });
+
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
     expect(designSystem).toContain('--dex-ink:#0A1330;');
     expect(designSystem).toContain('border-color:#0A1330!important;');
     expect(designSystem).toContain(':is(.special-dex-sheet,.kategorie-sheet){');
     expect(designSystem).toContain('background:#fff!important;\n  color:#111!important;');
     expect(designSystem).toContain('background:transparent!important;\n  color:#111!important;');
-    expect(designSystem).toContain('background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-accent,var(--dex-ink))!important;');
+    expect(designSystem).toContain('background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-ink)!important;');
   });
 
   it('bindet die festen COMP- und STRESS-Tapeten statt der Alt-Motive ein', () => {
