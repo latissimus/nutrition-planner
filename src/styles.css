@@ -9150,10 +9150,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-muted:#75565A;
 }
 :root[data-seite="food-log"]{
-  --cap-card:#552626;
-  --cap-tint:color-mix(in srgb,#F1DF71 8%,#552626);
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,#F1DF71 18%,#FFFCF5);
   --cap-card-border:1.5px solid #000;
-  --cap-muted:#D5C56D;
+  --cap-muted:#705B55;
 }
 :root[data-seite="training"]{
   --cap-card:#FCEFBB;
@@ -9404,15 +9404,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
   border-color:#000!important;
-  background:#552626!important;
-  color:#F1DF71!important;
+  background:#FFFCF5!important;
+  color:#552626!important;
 }
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:#000!important;
   background:#F1DF71!important;
 }
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
-  color:#F1DF71!important;
+  color:#552626!important;
 }
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
   filter:drop-shadow(0 3.5px 0 #000)!important;
@@ -9434,11 +9434,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="food-log"] .dex-detail-popup{
   border-color:#000!important;
-  background:#552626!important;
-  color:#F1DF71!important;
+  background:#FFFCF5!important;
+  color:#552626!important;
 }
 :root[data-seite="food-log"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
-  color:#F1DF71!important;
+  color:#552626!important;
 }
 :root[data-seite="food-log"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
   border-color:#000!important;
@@ -9454,7 +9454,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="food-log"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
-  color:#F1DF71!important;
+  color:#552626!important;
+}
+:root[data-seite="food-log"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
+  border-color:#000!important;
+  background:#F1DF71!important;
+  color:#552626!important;
+}
+:root[data-seite="food-log"] .dex-detail-popup .dex-detail-zutaten{
+  border:2px solid #000!important;
+  background:#FFFCF5!important;
+  color:#552626!important;
+}
+:root[data-seite="food-log"] .dex-detail-popup .dex-detail-zutaten :is(h2,li,span,strong,small,p){
+  color:#552626!important;
+}
+:root[data-seite="food-log"] .dex-detail-popup .dex-zutaten-summe{
+  border-top-color:color-mix(in srgb,#552626 35%,transparent)!important;
 }
 
 /* TRAINING: tiefes Grün mit dem aus der Vorlage entnommenen Creme #FCEFBB.

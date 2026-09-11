@@ -168,8 +168,8 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("'food-log': '#F1DF71'");
     expect(categoryIcons).toContain("'food-log': '#552626'");
     expect(designSystem).toContain(':root[data-seite="food-log"]{');
-    expect(designSystem).toContain('--cap-card:#552626;');
-    expect(designSystem).toContain('background:#552626!important;\n  color:#F1DF71!important;');
+    expect(designSystem).toContain('--cap-card:#FFFCF5;');
+    expect(designSystem).toContain('background:#FFFCF5!important;\n  color:#552626!important;');
     expect(designSystem).toContain('background:#F1DF71!important;\n  color:#552626!important;');
   });
 

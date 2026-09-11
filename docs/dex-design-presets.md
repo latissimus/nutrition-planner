@@ -99,8 +99,10 @@ TRAINING, ESSEN, SUPPS und STRESS.
 
 - Seitenfarbe: `#F1DF71`
 - Druckfarbe: `#552626`
-- Karten und inaktive Chips: Braun mit gelber Schrift
+- Übersichtskarten und Rezeptdetails: Warmweiß mit brauner Schrift
+- Inaktive Chips: Braun mit gelber Schrift
 - Aktiver Chip und hervorgehobene Detailfelder: Gelb mit brauner Schrift
+- Zutatenflächen: Warmweiß mit brauner Schrift für längere, gut lesbare Listen
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
 ## Hero-Seiten
