@@ -157,6 +157,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#013E37!important;\n  color:#FCEFBB!important;');
     expect(designSystem).toContain('border-color:#000!important;');
     expect(designSystem).toContain('filter:drop-shadow(2px 2px 0 #000)!important;');
+    expect(designSystem).toContain('background:#FCEFBB!important;\n  color:#013E37!important;');
+    expect(designSystem).toContain('background:#013E37!important;\n  color:#FCEFBB!important;');
   });
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {

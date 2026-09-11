@@ -9383,7 +9383,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dex-ink,#FCEFBB)!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
-  border-color:var(--dex-ink,#FCEFBB)!important;
+  border-color:#000!important;
   background:var(--dex-ink,#FCEFBB)!important;
   color:var(--dex-seitenfarbe,#013E37)!important;
 }
@@ -9394,12 +9394,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#000!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
-  border-color:#013E37!important;
+  border-color:#000!important;
   background:#FCEFBB!important;
   color:#013E37!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
-  border-color:#013E37!important;
+  border-color:#000!important;
   background:#013E37!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
@@ -9471,4 +9471,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#000!important;
   background:var(--dex-seitenfarbe)!important;
   color:var(--dex-ink)!important;
+}
+:root[data-seite="training"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;
+  background:#013E37!important;
+  color:#FCEFBB!important;
+}
+:root[data-seite="training"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:currentColor!important;
 }
