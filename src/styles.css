@@ -9315,9 +9315,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dex-accent-ink,#FFF7E6)!important;
 }
 
-/* Kontextmenüs sind eine neutrale Systemebene. Lediglich ihre klickbaren
-   Aktionen greifen das jeweilige Seitenpaar wieder auf: Zeilen über die
-   Druckfarbe, ausgefüllte Buttons über Hintergrund und Druckfarbe. */
+/* Kontextmenüs sind eine neutrale Systemebene. Überschrift, Menüzeilen und
+   Icons bleiben schwarz; nur klar erkennbare Aktionsbuttons greifen das
+   jeweilige Seitenpaar aus Hintergrund und Druckfarbe wieder auf. */
 :root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
@@ -9333,7 +9333,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
   border-bottom-color:#111!important;
   background:transparent!important;
-  color:var(--dex-accent,var(--dex-ink))!important;
+  color:#111!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button :is(b,strong,.material-svg,svg,svg *){
   color:inherit!important;

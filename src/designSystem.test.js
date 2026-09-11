@@ -154,6 +154,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('border-color:#0A1330!important;');
     expect(designSystem).toContain(':is(.special-dex-sheet,.kategorie-sheet){');
     expect(designSystem).toContain('background:#fff!important;\n  color:#111!important;');
+    expect(designSystem).toContain('background:transparent!important;\n  color:#111!important;');
     expect(designSystem).toContain('background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-accent,var(--dex-ink))!important;');
   });
 
