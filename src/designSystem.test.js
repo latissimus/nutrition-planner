@@ -116,8 +116,16 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("rootKey === 'supps'");
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
-    expect(designSystem).toContain('background:#991B1B!important;\n  color:#FFF7E6!important;');
+    expect(designSystem).toContain('--supps-card:color-mix(in srgb,#991B1B 7%,#FFF7E6);');
+    expect(designSystem).toContain('background:var(--supps-card)!important;\n  color:#991B1B!important;');
     expect(designSystem).toContain('background:#FFF7E6!important;\n  color:#991B1B!important;');
+  });
+
+  it('verwendet auf EINKAUF das feste Soft-Blush-Braun-Paar', () => {
+    expect(categoryIcons).toContain("shopping: '#FFEDE3'");
+    expect(categoryIcons).toContain("shopping: '#49251E'");
+    expect(designSystem).toContain(':root[data-seite="shopping"]{\n  --cap-card:#FFFCF5;');
+    expect(designSystem).toContain('background:#FFEDE3!important;\n  color:#49251E!important;');
   });
 
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {

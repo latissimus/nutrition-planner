@@ -121,8 +121,18 @@ TRAINING, ESSEN, SUPPS und STRESS.
 - Übernimmt das frühere COMP-Farbpaar
 - Seitenfarbe: Milk `#FFF7E6`
 - Druckfarbe: Dunkelrot `#991B1B`
-- Karten und Unterordner: Dunkelrot mit Milk-Schrift
+- Karten und Detailansicht: sehr heller Milk-Rot-Ton mit dunkelroter Schrift
+- Unterordner: Dunkelrot mit Milk-Schrift
 - Aktiver Chip und hervorgehobene Detailfelder: Milk mit dunkelroter Schrift
+- Sämtliche Konturen und Retro-Schatten: Schwarz
+
+### Referenz EINKAUF
+
+- Seitenfarbe: Soft Blush `#FFEDE3`
+- Druckfarbe: Braun `#49251E`
+- Listen- und Gruppenflächen: Warmweiß mit brauner Schrift
+- Inaktive Chips: Braun mit Soft-Blush-Schrift
+- Aktiver Chip und primäre Kontextaktionen: Soft Blush mit brauner Schrift
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
 ## Hero-Seiten

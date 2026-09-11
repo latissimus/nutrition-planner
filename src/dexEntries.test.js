@@ -41,7 +41,7 @@ describe('Anbieter- und Farbkontrast', () => {
       reminders: '#FEEFB8',
       sleep: '#1E3A8A',
       habits: '#4B125C',
-      shopping: '#00C2CB',
+      shopping: '#FFEDE3',
       essen: '#3C153B',
       training: '#013E37',
       supps: '#FFF7E6',
@@ -70,6 +70,9 @@ describe('Anbieter- und Farbkontrast', () => {
     }));
     expect(pageLook('supps', '#000000', 'wallpaper-supps')).toEqual(expect.objectContaining({
       color: '#FFF7E6', ink: '#991B1B', accent: '#FFF7E6', accentInk: '#991B1B',
+    }));
+    expect(pageLook('shopping', '#000000', 'wallpaper-brokkoli')).toEqual(expect.objectContaining({
+      color: '#FFEDE3', ink: '#49251E', accent: '#FFEDE3', accentInk: '#49251E',
     }));
   });
 });

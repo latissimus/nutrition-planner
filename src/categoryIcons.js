@@ -55,7 +55,7 @@ const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FEEFB8', 'food-log': '#F0C987',
   recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FFF7E6', habits: '#4B125C',
-  shopping: '#00C2CB',
+  shopping: '#FFEDE3',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
   coins: '#E6D6FF',
@@ -69,7 +69,7 @@ const fixedSystemColors = {
   supps: '#FFF7E6',
   reminders: '#FEEFB8',
   habits: '#4B125C',
-  shopping: '#00C2CB',
+  shopping: '#FFEDE3',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
   coins: '#E6D6FF',
@@ -87,6 +87,7 @@ const fixedSystemInks = {
   training: '#FCEFBB',
   habits: '#FCEFBB',
   supps: '#991B1B',
+  shopping: '#49251E',
 };
 const fixedSystemAccents = {
   body: '#FF277F',
@@ -96,6 +97,7 @@ const fixedSystemAccents = {
   training: '#013E37',
   habits: '#4B125C',
   supps: '#FFF7E6',
+  shopping: '#FFEDE3',
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
@@ -105,6 +107,7 @@ const fixedSystemAccentInks = {
   training: '#FCEFBB',
   habits: '#FCEFBB',
   supps: '#991B1B',
+  shopping: '#49251E',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',

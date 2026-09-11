@@ -9656,19 +9656,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* SUPPS übernimmt das frühere COMP-Paar, bleibt strukturell aber eine
-   Grid-Seite: Milk trägt die Seite, Dunkelrot die Sammelkarten. */
+   Grid-Seite: Milk trägt die Seite; große Leseflächen bleiben nur sanft
+   rot getönt, während Chips und Ordner die kräftige Druckfarbe behalten. */
 :root[data-seite="supps"]{
-  --cap-card:#991B1B;
-  --cap-tint:color-mix(in srgb,#FFF7E6 8%,#991B1B);
+  --supps-card:color-mix(in srgb,#991B1B 7%,#FFF7E6);
+  --cap-card:var(--supps-card);
+  --cap-tint:color-mix(in srgb,#991B1B 11%,#FFF7E6);
   --cap-card-border:1.5px solid #000;
   --cap-muted:#7A5A5A;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
-  --surface:#991B1B;
-  --surface2:color-mix(in srgb,#FFF7E6 8%,#991B1B);
-  --text:#FFF7E6;
+  --surface:var(--supps-card);
+  --surface2:color-mix(in srgb,#991B1B 11%,#FFF7E6);
+  --text:#991B1B;
   --ink:#991B1B;
-  --muted:#E5CFC8;
+  --muted:#7A5A5A;
   color:#991B1B!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(
@@ -9699,15 +9701,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
   border-color:#000!important;
-  background:#991B1B!important;
-  color:#FFF7E6!important;
+  background:var(--supps-card)!important;
+  color:#991B1B!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:#000!important;
   background:#FFF7E6!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
-  color:#FFF7E6!important;
+  color:#991B1B!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
   filter:drop-shadow(0 3.5px 0 #000)!important;
@@ -9736,11 +9738,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] .dex-detail-popup{
   border-color:#000!important;
-  background:#991B1B!important;
-  color:#FFF7E6!important;
+  background:var(--supps-card)!important;
+  color:#991B1B!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
-  color:#FFF7E6!important;
+  color:#991B1B!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
   border-color:#000!important;
@@ -9756,7 +9758,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
-  color:#FFF7E6!important;
+  color:#991B1B!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
   border-color:#000!important;
@@ -10168,4 +10170,121 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#4B125C!important;
   color:#FCEFBB!important;
   -webkit-text-fill-color:#FCEFBB!important;
+}
+
+/* EINKAUF: Soft Blush und Braun. Die Seite bleibt luftig; längere Listen
+   liegen auf Warmweiß, während Chips und Aktionen das Farbpaar deutlicher
+   zeigen. Header, Dock und neutrale Kontextmenüs bleiben schwarz/weiß. */
+:root[data-seite="shopping"]{
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#765E58;
+}
+:root[data-seite="shopping"] .shopping-dex-wrap{
+  --surface:#FFFCF5;
+  --surface2:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --text:#49251E;
+  --ink:#49251E;
+  --muted:#765E58;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-suche{
+  border-color:#000!important;
+  background:#FFFCF5!important;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-suche :is(input,.material-svg,svg,svg *){
+  color:#49251E!important;
+  fill:currentColor!important;
+}
+:root[data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn,.einkauf-reset){
+  border-color:#000!important;
+  background:#49251E!important;
+  color:#FFEDE3!important;
+  box-shadow:0 2px 0 #000!important;
+}
+:root[data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn).aktiv{
+  border-color:#000!important;
+  background:#FFEDE3!important;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-kopfzeile{color:#765E58!important}
+:root[data-seite="shopping"] .einkauf-gruppe{
+  border:1.5px solid #000!important;
+  background:#FFFCF5!important;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head{
+  background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-icon{
+  background:#FFEDE3!important;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head :is(b,em,.reminder-group-chevron,.material-svg,svg,svg *){
+  color:#49251E!important;
+  fill:currentColor!important;
+}
+:root[data-seite="shopping"] .einkauf-row-inhalt{
+  background:#FFFCF5!important;
+  color:#49251E!important;
+}
+:root[data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt{
+  background:color-mix(in srgb,#FFEDE3 70%,#FFFCF5)!important;
+}
+:root[data-seite="shopping"] .einkauf-row-name{color:#49251E!important}
+:root[data-seite="shopping"] .app-dex-header{
+  --dex-ink:#0A1330;
+  border-color:#0A1330!important;
+  color:#0A1330!important;
+  --brand-outline:#0A1330;
+}
+:root[data-seite="shopping"] .app-dex-header .nav-av{
+  border-color:#0A1330!important;
+  background:#FFFCF5!important;
+  color:#0A1330!important;
+}
+:root[data-seite="shopping"] .app-dex-dock{
+  --dex-ink:#0A1330;
+  color:#0A1330!important;
+}
+:root[data-seite="shopping"] .app-dex-dock-inner::before{
+  border-color:#0A1330!important;
+  background:color-mix(in srgb,#FFEDE3 82%,transparent)!important;
+}
+:root[data-seite="shopping"] .app-dex-tab{color:#0A1330!important}
+:root[data-seite="shopping"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#0A1330 8%,#FFEDE3)!important;
+  box-shadow:inset 0 0 0 1.25px #0A1330!important;
+}
+:root[data-seite="shopping"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #0A1330)!important}
+:root[data-seite="shopping"] .app-dex-menu{
+  border-left-color:#0A1330!important;
+  color:#0A1330!important;
+}
+:root[data-seite="shopping"] :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="shopping"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-seite="shopping"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
+:root[data-seite="shopping"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;
+  background:#FFEDE3!important;
+  color:#49251E!important;
+  -webkit-text-fill-color:#49251E!important;
+  box-shadow:0 5px 0 #000!important;
+}
+:root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#49251E!important;
+  fill:currentColor!important;
 }
