@@ -128,11 +128,12 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#FFEDE3!important;\n  color:#49251E!important;');
   });
 
-  it('verwendet auf SCHLAF das feste Midnight-Off-White-Paar', () => {
+  it('verwendet auf SCHLAF das feste Midnight-Creme-Paar ohne Logo-Einfaerbung', () => {
     expect(categoryIcons).toContain("sleep: '#0E1D47'");
-    expect(categoryIcons).toContain("sleep: '#FFFCF3'");
-    expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#FFFCF3;');
-    expect(designSystem).toContain('background:#0E1D47!important;\n  color:#FFFCF3!important;');
+    expect(categoryIcons).toContain("sleep: '#FCEFBB'");
+    expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#FCEFBB;');
+    expect(designSystem).toContain('background:#0E1D47!important;\n  color:#FCEFBB!important;');
+    expect(designSystem).toContain(':root[data-seite="sleep"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:none;');
   });
 
   it('haelt auf COMP alle Kontextmenue-Konturen neutral schwarz', () => {

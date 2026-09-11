@@ -10288,41 +10288,41 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* SCHLAF: tiefes Midnight #0E1D47 mit warmem Off-White #FFFCF3.
+/* SCHLAF: tiefes Midnight #0E1D47 mit warmem Creme #FCEFBB.
    Der Hero bleibt dunkel und plakativ; längere Daten- und Leseflächen
    invertieren das Paar, damit die Seite ruhig und klar bleibt. */
 :root[data-seite="sleep"]{
-  --sleep-paper:#FFFCF3;
-  --cap-card:#FFFCF3;
-  --cap-tint:color-mix(in srgb,#FFFCF3 7%,#0E1D47);
-  --cap-card-border:1.5px solid #FFFCF3;
+  --sleep-paper:#FCEFBB;
+  --cap-card:#FCEFBB;
+  --cap-tint:color-mix(in srgb,#FCEFBB 7%,#0E1D47);
+  --cap-card-border:1.5px solid #FCEFBB;
   --cap-muted:#B8B8C2;
 }
 :root[data-seite="sleep"] .sleep-dex-page{
-  --surface:#FFFCF3;
-  --surface2:color-mix(in srgb,#0E1D47 7%,#FFFCF3);
+  --surface:#FCEFBB;
+  --surface2:color-mix(in srgb,#0E1D47 7%,#FCEFBB);
   --text:#0E1D47;
-  --ink:#FFFCF3;
+  --ink:#FCEFBB;
   --muted:#B8B8C2;
-  color:#FFFCF3!important;
+  color:#FCEFBB!important;
 }
 :root[data-seite="sleep"] .sleep-tonight{
-  border-color:#FFFCF3!important;
+  border-color:#FCEFBB!important;
   background:#0E1D47!important;
-  color:#FFFCF3!important;
+  color:#FCEFBB!important;
 }
 :root[data-seite="sleep"] .sleep-tonight :is(.sleep-tonight-value small,.sleep-tonight-value strong,.sleep-tonight-value b){
-  color:#FFFCF3!important;
+  color:#FCEFBB!important;
 }
 :root[data-seite="sleep"] .sleep-duration-ring{
-  background:conic-gradient(#FFFCF3 var(--sleep-progress),color-mix(in srgb,#FFFCF3 20%,transparent) 0)!important;
+  background:conic-gradient(#FCEFBB var(--sleep-progress),color-mix(in srgb,#FCEFBB 20%,transparent) 0)!important;
 }
 :root[data-seite="sleep"] .sleep-duration-ring::after{background:#0E1D47!important}
 :root[data-seite="sleep"] .sleep-duration-ring>span,
-:root[data-seite="sleep"] .sleep-duration-ring small{color:#FFFCF3!important}
+:root[data-seite="sleep"] .sleep-duration-ring small{color:#FCEFBB!important}
 :root[data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info){
   border-color:#000!important;
-  background:#FFFCF3!important;
+  background:#FCEFBB!important;
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info) :is(.material-svg,svg,svg *){
@@ -10330,15 +10330,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section){
-  border-color:#FFFCF3!important;
-  background:#FFFCF3!important;
+  border-color:#FCEFBB!important;
+  background:#FCEFBB!important;
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-overview>summary,.sleep-section>header){
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] .sleep-checkin-overview>summary{
-  background:color-mix(in srgb,#0E1D47 7%,#FFFCF3)!important;
+  background:color-mix(in srgb,#0E1D47 7%,#FCEFBB)!important;
 }
 :root[data-seite="sleep"] :is(
   .sleep-checkin-overview>summary b,
@@ -10365,50 +10365,54 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p){
-  background:color-mix(in srgb,#0E1D47 7%,#FFFCF3)!important;
+  background:color-mix(in srgb,#0E1D47 7%,#FCEFBB)!important;
 }
 :root[data-seite="sleep"] .sleep-analysis-help{
   border-color:#000!important;
-  background:#FFFCF3!important;
+  background:#FCEFBB!important;
   color:#0E1D47!important;
 }
 
-/* Dunkle Seite: App-Chrome verwendet die Off-White-Bedienfarbe; der harte
+/* Dunkle Seite: App-Chrome verwendet die Creme-Bedienfarbe; der harte
    Schatten der Menü-Symbole bleibt wie bei TRAINING neutral schwarz. */
 :root[data-seite="sleep"] .app-dex-header{
-  --dex-ink:#FFFCF3;
+  --dex-ink:#FCEFBB;
   background:#0E1D47!important;
-  border-color:#FFFCF3!important;
-  color:#FFFCF3!important;
-  --brand-outline:#FFFCF3;
+  border-color:#FCEFBB!important;
+  color:#FCEFBB!important;
+  --brand-outline:#0A1330;
+}
+:root[data-seite="sleep"] .app-dex-brand .brand{
+  --brand-outline:#0A1330;
+  --sil-filter:none;
 }
 :root[data-seite="sleep"] .app-dex-header .nav-av{
-  border-color:#FFFCF3!important;
-  background:#FFFCF3!important;
+  border-color:#FCEFBB!important;
+  background:#FCEFBB!important;
   color:#0E1D47!important;
 }
 :root[data-seite="sleep"] .app-dex-dock{
-  --dex-ink:#FFFCF3;
-  color:#FFFCF3!important;
+  --dex-ink:#FCEFBB;
+  color:#FCEFBB!important;
 }
 :root[data-seite="sleep"] .app-dex-dock::after{background:#0E1D47!important}
 :root[data-seite="sleep"] .app-dex-dock-inner::before{
-  border-color:#FFFCF3!important;
+  border-color:#FCEFBB!important;
   background:color-mix(in srgb,#0E1D47 84%,transparent)!important;
 }
-:root[data-seite="sleep"] .app-dex-tab{color:#FFFCF3!important}
+:root[data-seite="sleep"] .app-dex-tab{color:#FCEFBB!important}
 :root[data-seite="sleep"] .app-dex-tab.aktiv{
-  background:color-mix(in srgb,#FFFCF3 12%,#0E1D47)!important;
-  box-shadow:inset 0 0 0 1.25px #FFFCF3!important;
+  background:color-mix(in srgb,#FCEFBB 12%,#0E1D47)!important;
+  box-shadow:inset 0 0 0 1.25px #FCEFBB!important;
 }
 :root[data-seite="sleep"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
 :root[data-seite="sleep"] .app-dex-menu{
-  border-left-color:#FFFCF3!important;
-  color:#FFFCF3!important;
+  border-left-color:#FCEFBB!important;
+  color:#FCEFBB!important;
 }
 
 /* SCHLAF-Sheets bleiben neutrale Systemflächen. Nur echte Primäraktionen
-   nehmen das Midnight-/Off-White-Paar wieder auf. */
+   nehmen das Midnight-/Creme-Paar wieder auf. */
 :root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
@@ -10426,19 +10430,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .special-dex-overlay .btn-primary{
   border-color:#000!important;
   background:#0E1D47!important;
-  color:#FFFCF3!important;
-  -webkit-text-fill-color:#FFFCF3!important;
+  color:#FCEFBB!important;
+  -webkit-text-fill-color:#FCEFBB!important;
   box-shadow:0 5px 0 #000!important;
 }
 :root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
 :root[data-seite="sleep"] .special-dex-overlay .btn-primary :is(span,b,strong,.material-svg,svg,svg *){
-  color:#FFFCF3!important;
+  color:#FCEFBB!important;
   fill:currentColor!important;
 }
 :root[data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span){
   border-color:#000!important;
   background:#0E1D47!important;
-  color:#FFFCF3!important;
+  color:#FCEFBB!important;
 }
 
 /* COMP-Kontextmenüs sind eine neutrale Ebene: keine pinkfarbenen Rahmen an

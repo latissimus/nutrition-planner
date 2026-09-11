@@ -88,7 +88,7 @@ const fixedSystemInks = {
   habits: '#FCEFBB',
   supps: '#5C0702',
   shopping: '#49251E',
-  sleep: '#FFFCF3',
+  sleep: '#FCEFBB',
 };
 const fixedSystemAccents = {
   body: '#FF277F',
@@ -110,7 +110,7 @@ const fixedSystemAccentInks = {
   habits: '#FCEFBB',
   supps: '#5C0702',
   shopping: '#49251E',
-  sleep: '#FFFCF3',
+  sleep: '#FCEFBB',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',

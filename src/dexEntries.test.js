@@ -75,7 +75,7 @@ describe('Anbieter- und Farbkontrast', () => {
       color: '#FFEDE3', ink: '#49251E', accent: '#FFEDE3', accentInk: '#49251E',
     }));
     expect(pageLook('sleep', '#000000', 'wallpaper-moon')).toEqual(expect.objectContaining({
-      color: '#0E1D47', ink: '#FFFCF3', accent: '#0E1D47', accentInk: '#FFFCF3',
+      color: '#0E1D47', ink: '#FCEFBB', accent: '#0E1D47', accentInk: '#FCEFBB',
     }));
   });
 });
