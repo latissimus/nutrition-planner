@@ -10467,3 +10467,166 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] :is(.body-add-overlay,.body-entry-overlay,.special-dex-overlay) :is(.kategorie-sheet-menu>button,.body-add-menu>button):not(:last-child){
   border-bottom-color:#000!important;
 }
+
+/* STRESS / MINDSET: Deep Blush mit warmem Gelb. Das direkte Farbpaar trägt
+   Kopf, Tapete, Chips und Aktionen. Für längere Kartentexte wird das Blush
+   abgedunkelt, weil Gelb und helles Blush dort allein zu wenig Kontrast haben. */
+:root[data-seite="stress"]{
+  --stress-card:color-mix(in srgb,#FFE08C 58%,#FFFCF5);
+  --stress-card-ink:#7A2940;
+  --cap-card:var(--stress-card);
+  --cap-tint:color-mix(in srgb,#E36887 12%,var(--stress-card));
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#7A2940;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page){
+  --surface:var(--stress-card);
+  --surface2:color-mix(in srgb,#E36887 12%,var(--stress-card));
+  --text:var(--stress-card-ink);
+  --ink:#FFE08C;
+  --muted:var(--stress-card-ink);
+  color:#FFE08C!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) :is(
+  .dex-sammlungskopf,
+  .unter-sammlungen-block>h2,
+  .sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2,
+  .sammlung-leer,
+  .sammlung-leer strong,
+  .sammlung-leer span
+){
+  color:#FFE08C!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
+  border-color:#000!important;
+  background:#FFE08C!important;
+  color:#7A2940!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
+  border-color:#000!important;
+  background:#7A2940!important;
+  color:#FFE08C!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
+  background:#FFE08C!important;
+  color:#7A2940!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
+  border-color:#000!important;
+  background:var(--stress-card)!important;
+  color:var(--stress-card-ink)!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
+  border-color:#000!important;
+  background:#E36887!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
+  color:var(--stress-card-ink)!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
+  filter:drop-shadow(0 3.5px 0 #000)!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form path{stroke:#000!important}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){
+  fill:var(--stress-card)!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#E36887!important}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
+  color:var(--stress-card-ink)!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
+  border-color:#000!important;
+  background:#7A2940!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
+  background:#FFE08C!important;
+}
+:root[data-seite="stress"] .dex-detail-popup{
+  border-color:#000!important;
+  background:var(--stress-card)!important;
+  color:var(--stress-card-ink)!important;
+}
+:root[data-seite="stress"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
+  color:var(--stress-card-ink)!important;
+}
+:root[data-seite="stress"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
+  border-color:#000!important;
+}
+:root[data-seite="stress"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){
+  border-color:#000!important;
+  background:#E36887!important;
+  color:#FFE08C!important;
+}
+:root[data-seite="stress"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FFE08C!important;
+  fill:currentColor!important;
+}
+:root[data-seite="stress"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
+  color:var(--stress-card-ink)!important;
+}
+
+/* Das mittlere Blush trägt neutrale dunkle App-Bedienung. Dadurch bleibt das
+   Logo original und die gelbe Inhaltsdruckfarbe endet sauber am Seiteninhalt. */
+:root[data-seite="stress"] .app-dex-header{
+  --dex-ink:#0A1330;
+  background:#E36887!important;
+  border-color:#0A1330!important;
+  color:#0A1330!important;
+  --brand-outline:#0A1330;
+}
+:root[data-seite="stress"] .app-dex-brand .brand{
+  --brand-outline:#0A1330;
+  --sil-filter:none;
+}
+:root[data-seite="stress"] .app-dex-header .nav-av{
+  border-color:#0A1330!important;
+  background:#FFFCF5!important;
+  color:#0A1330!important;
+}
+:root[data-seite="stress"] .app-dex-dock{--dex-ink:#0A1330;color:#0A1330!important}
+:root[data-seite="stress"] .app-dex-dock::after{background:#E36887!important}
+:root[data-seite="stress"] .app-dex-dock-inner::before{
+  border-color:#0A1330!important;
+  background:color-mix(in srgb,#E36887 84%,transparent)!important;
+}
+:root[data-seite="stress"] .app-dex-tab{color:#0A1330!important}
+:root[data-seite="stress"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#0A1330 8%,#E36887)!important;
+  box-shadow:inset 0 0 0 1.25px #0A1330!important;
+}
+:root[data-seite="stress"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
+:root[data-seite="stress"] .app-dex-menu{border-left-color:#0A1330!important;color:#0A1330!important}
+
+/* Kontextmenüs bleiben neutral; ausschließlich echte Primäraktionen greifen
+   Deep Blush und Gelb wieder auf. */
+:root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
+:root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  border-bottom-color:#111!important;
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;
+  background:#E36887!important;
+  color:#FFE08C!important;
+  -webkit-text-fill-color:#FFE08C!important;
+  box-shadow:0 5px 0 #000!important;
+}
+:root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FFE08C!important;
+  fill:currentColor!important;
+}

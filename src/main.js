@@ -975,6 +975,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     habits: ['#4B125C', 'wallpaper-wolke', '🧠'],
     training: ['#013E37', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#94DEFF', 'wallpaper-comp', '📐'],
+    stress: ['#E36887', 'wallpaper-stress', '⚡'],
     coins: ['#E6D6FF', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {

@@ -125,6 +125,18 @@ TRAINING, ESSEN, SUPPS und STRESS.
 - Aktiver Chip und hervorgehobene Detailfelder: Butternut mit dunkelroter Schrift
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
+### Referenz STRESS / MINDSET
+
+- Seitenfarbe: Deep Blush `#E36887`
+- Druck- und Akzentfarbe: warmes Gelb `#FFE08C`
+- Seitenüberschriften und Tapete verwenden das Gelb direkt
+- Karten und Detailansicht: helles Gelb-Papier mit abgedunkeltem Blush für
+  barriereärmere längere Texte
+- Chips und Primäraktionen verwenden das kräftige Farbpaar
+- App-Header, Dock und Kontextmenüs bleiben neutral
+- Empfohlener künftiger Seitenname: `MINDSET`, weil er Motivation, mentale
+  Stärke und Stressmanagement gemeinsam abdeckt
+
 ### Referenz EINKAUF
 
 - Seitenfarbe: Soft Blush `#FFEDE3`

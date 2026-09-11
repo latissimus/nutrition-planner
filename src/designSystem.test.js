@@ -141,6 +141,15 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('border-color:#000!important;');
   });
 
+  it('verwendet auf STRESS das feste Deep-Blush-Gelb-Paar mit lesbaren Karten', () => {
+    expect(categoryIcons).toContain("stress: '#E36887'");
+    expect(categoryIcons).toContain("stress: '#FFE08C'");
+    expect(designSystem).toContain(':root[data-seite="stress"]{\n  --stress-card:color-mix(in srgb,#FFE08C 58%,#FFFCF5);');
+    expect(designSystem).toContain('--stress-card-ink:#7A2940;');
+    expect(designSystem).toContain('background:#E36887!important;');
+    expect(designSystem).toContain('color:#FFE08C!important;');
+  });
+
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
     expect(categoryIcons).toContain("essen: '#3C153B'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");

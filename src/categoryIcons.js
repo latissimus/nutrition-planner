@@ -57,7 +57,7 @@ const defaultColors = {
   recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FFA175', habits: '#4B125C',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
-  stress: '#FF2E88',
+  stress: '#E36887',
   coins: '#E6D6FF',
   profile: '#A7C957',
 };
@@ -71,7 +71,7 @@ const fixedSystemColors = {
   habits: '#4B125C',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
-  stress: '#FF2E88',
+  stress: '#E36887',
   coins: '#E6D6FF',
   profile: '#A7C957',
 };
@@ -89,6 +89,7 @@ const fixedSystemInks = {
   supps: '#5C0702',
   shopping: '#49251E',
   sleep: '#FCEFBB',
+  stress: '#FFE08C',
 };
 const fixedSystemAccents = {
   body: '#FF277F',
@@ -100,6 +101,7 @@ const fixedSystemAccents = {
   supps: '#FFA175',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
+  stress: '#E36887',
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
@@ -111,6 +113,7 @@ const fixedSystemAccentInks = {
   supps: '#5C0702',
   shopping: '#49251E',
   sleep: '#FCEFBB',
+  stress: '#FFE08C',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',

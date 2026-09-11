@@ -46,7 +46,7 @@ describe('Anbieter- und Farbkontrast', () => {
       training: '#013E37',
       supps: '#FFA175',
       body: '#94DEFF',
-      stress: '#FF2E88',
+      stress: '#E36887',
       coins: '#E6D6FF',
       profile: '#A7C957',
     });
@@ -76,6 +76,9 @@ describe('Anbieter- und Farbkontrast', () => {
     }));
     expect(pageLook('sleep', '#000000', 'wallpaper-moon')).toEqual(expect.objectContaining({
       color: '#0E1D47', ink: '#FCEFBB', accent: '#0E1D47', accentInk: '#FCEFBB',
+    }));
+    expect(pageLook('stress', '#000000', 'wallpaper-stress')).toEqual(expect.objectContaining({
+      color: '#E36887', ink: '#FFE08C', accent: '#E36887', accentInk: '#FFE08C',
     }));
   });
 });
