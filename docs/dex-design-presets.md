@@ -97,13 +97,13 @@ TRAINING, ESSEN, SUPPS und STRESS.
 
 ### Referenz REZEPTE
 
-- Seitenfarbe: `#F1DF71`
-- Druckfarbe: `#552626`
-- Übersichtskarten und Rezeptdetails: Warmweiß mit brauner Schrift
-- Unterordner: Warmweiß mit brauner Schrift und gelbem Einsatz
-- Inaktive Chips: Braun mit gelber Schrift
-- Aktiver Chip und hervorgehobene Detailfelder: Gelb mit brauner Schrift
-- Zutatenflächen: Warmweiß mit brauner Schrift für längere, gut lesbare Listen
+- Seitenfarbe: Honey Dawn `#F0C987`
+- Druckfarbe: Aubergine `#3C153B`
+- Übersichtskarten und Rezeptdetails: Warmweiß mit auberginefarbener Schrift
+- Unterordner: Warmweiß mit auberginefarbener Schrift und Honey-Dawn-Einsatz
+- Inaktive Chips: Aubergine mit Honey-Dawn-Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Honey Dawn mit Aubergine-Schrift
+- Zutatenflächen: Warmweiß mit auberginefarbener Schrift für längere, gut lesbare Listen
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
 ## Hero-Seiten
