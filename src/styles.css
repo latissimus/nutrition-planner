@@ -9468,7 +9468,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root:is([data-seite="reminders"],[data-seite="body"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
-  border-color:var(--dex-ink)!important;
+  border-color:#000!important;
   background:var(--dex-seitenfarbe)!important;
   color:var(--dex-ink)!important;
 }
