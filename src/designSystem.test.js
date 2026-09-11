@@ -106,9 +106,9 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("['food-log', 'essen', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)");
   });
 
-  it('registriert SUPPS als feste Chocolate-Powder-Blue-Wissensseite mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("supps: '#47230F'");
-    expect(categoryIcons).toContain("supps: '#B5D0F3'");
+  it('registriert SUPPS als umgekehrte TRACKER-Farbwelt mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("supps: '#4E342E'");
+    expect(categoryIcons).toContain("supps: '#FEEFB8'");
     expect(categoryIcons).toContain("supps: 'wallpaper-supps'");
     expect(main).toContain("['essen', 'training', 'supps'].includes(route)");
     expect(main).toContain("supps: { title: 'SUPPS', pattern: 'wallpaper-supps' }");
@@ -116,9 +116,9 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("rootKey === 'supps'");
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
-    expect(designSystem).toContain('--supps-card:#B5D0F3;');
-    expect(designSystem).toContain('background:var(--supps-card)!important;\n  color:#47230F!important;');
-    expect(designSystem).toContain('background:#47230F!important;\n  color:#B5D0F3!important;');
+    expect(designSystem).toContain('--supps-card:#FEEFB8;');
+    expect(designSystem).toContain('background:var(--supps-card)!important;\n  color:#4E342E!important;');
+    expect(designSystem).toContain('background:#4E342E!important;\n  color:#FEEFB8!important;');
   });
 
   it('verwendet auf EINKAUF das feste Soft-Blush-Braun-Paar', () => {

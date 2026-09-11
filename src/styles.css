@@ -9655,23 +9655,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* SUPPS: Chocolate #47230F mit Powder Blue #B5D0F3. Die dunkle Seite
+/* SUPPS: das TRACKER-Paar in umgekehrter Richtung – Chocolate Brown #4E342E
+   als Seitenfarbe und Butter #FEEFB8 als Druckfarbe. Die dunkle Seite
    trägt die helle Druckfarbe; Karten invertieren das Paar für ruhige,
    gut lesbare Sammlungs- und Detailflächen. */
 :root[data-seite="supps"]{
-  --supps-card:#B5D0F3;
+  --supps-card:#FEEFB8;
   --cap-card:var(--supps-card);
-  --cap-tint:color-mix(in srgb,#47230F 8%,#B5D0F3);
+  --cap-tint:color-mix(in srgb,#4E342E 8%,#FEEFB8);
   --cap-card-border:1.5px solid #000;
   --cap-muted:#624437;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
   --surface:var(--supps-card);
-  --surface2:color-mix(in srgb,#47230F 8%,#B5D0F3);
-  --text:#47230F;
-  --ink:#B5D0F3;
+  --surface2:color-mix(in srgb,#4E342E 8%,#FEEFB8);
+  --text:#4E342E;
+  --ink:#FEEFB8;
   --muted:#624437;
-  color:#B5D0F3!important;
+  color:#FEEFB8!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(
   .dex-sammlungskopf,
@@ -9682,34 +9683,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .sammlung-leer strong,
   .sammlung-leer span
 ){
-  color:#B5D0F3!important;
+  color:#FEEFB8!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
   border-color:#000!important;
-  background:#B5D0F3!important;
-  color:#47230F!important;
+  background:#FEEFB8!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
   border-color:#000!important;
-  background:#B5D0F3!important;
-  color:#47230F!important;
+  background:#FEEFB8!important;
+  color:#4E342E!important;
   box-shadow:0 3.5px 0 #000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
-  background:#47230F!important;
-  color:#B5D0F3!important;
+  background:#4E342E!important;
+  color:#FEEFB8!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
   border-color:#000!important;
   background:var(--supps-card)!important;
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:#000!important;
-  background:#47230F!important;
+  background:#4E342E!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
   filter:drop-shadow(0 3.5px 0 #000)!important;
@@ -9718,56 +9719,56 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   stroke:#000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){
-  fill:#B5D0F3!important;
+  fill:#FEEFB8!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
-  fill:#47230F!important;
+  fill:#4E342E!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
   border-color:#000!important;
-  background:#B5D0F3!important;
+  background:#FEEFB8!important;
   box-shadow:0 3.5px 0 #000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
-  background:#47230F!important;
+  background:#4E342E!important;
 }
 :root[data-seite="supps"] .dex-detail-popup{
   border-color:#000!important;
   background:var(--supps-card)!important;
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
   border-color:#000!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
   border-color:#000!important;
-  background:#47230F!important;
-  color:#B5D0F3!important;
+  background:#4E342E!important;
+  color:#FEEFB8!important;
 }
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-herkunft :is(span,b),
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-link :is(span,b,strong,.material-svg,svg,svg *){
-  color:#B5D0F3!important;
+  color:#FEEFB8!important;
   fill:currentColor!important;
 }
 :root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
   border-color:#000!important;
-  background:#47230F!important;
-  color:#B5D0F3!important;
+  background:#4E342E!important;
+  color:#FEEFB8!important;
 }
 
 /* Auf der dunklen SUPPS-Seite bleibt das App-Chrome neutral weiß; die
-   Powder-Blue-Farbe gehört ausschließlich zur Inhalts- und Aktionsebene. */
+   Butter-Farbe gehört ausschließlich zur Inhalts- und Aktionsebene. */
 :root[data-seite="supps"] .app-dex-header{
   --dex-ink:#fff;
   background:var(--dex-seitenfarbe)!important;
@@ -9778,7 +9779,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="supps"] .app-dex-header .nav-av{
   border-color:#fff!important;
   background:#fff!important;
-  color:#47230F!important;
+  color:#4E342E!important;
 }
 :root[data-seite="supps"] .app-dex-dock{
   --dex-ink:#fff;
@@ -9801,7 +9802,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* Kontextmenüs bleiben neutral; nur echte Primäraktionen verwenden das
-   Chocolate-Powder-Blue-Paar. */
+   umgekehrte TRACKER-Paar. */
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
@@ -9825,11 +9826,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   border-color:#000!important;
-  background:#47230F!important;
-  color:#B5D0F3!important;
+  background:#4E342E!important;
+  color:#FEEFB8!important;
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
-  color:#B5D0F3!important;
+  color:#FEEFB8!important;
   fill:currentColor!important;
 }
 

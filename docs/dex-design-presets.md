@@ -118,12 +118,13 @@ TRAINING, ESSEN, SUPPS und MIND.
 
 ### Referenz SUPPS
 
-- Seitenfarbe: Chocolate `#47230F`
-- Druckfarbe: Powder Blue `#B5D0F3`
-- Karten und Detailansicht: Powder Blue mit Chocolate-Schrift
-- Unterordner: Powder Blue mit Chocolate-Schrift und dunklem Einsatz
-- Inaktive Chips: Powder Blue mit Chocolate-Schrift
-- Aktiver Chip und hervorgehobene Detailfelder: Chocolate mit Powder-Blue-Schrift
+- Umkehrung des TRACKER-Farbpaares
+- Seitenfarbe: Chocolate Brown `#4E342E`
+- Druckfarbe: Butter `#FEEFB8`
+- Karten und Detailansicht: Butter mit Chocolate-Brown-Schrift
+- Unterordner: Butter mit Chocolate-Brown-Schrift und dunklem Einsatz
+- Inaktive Chips: Butter mit Chocolate-Brown-Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Chocolate Brown mit Butter-Schrift
 - App-Header und Dock bleiben neutral weiß; Iconschatten bleiben Schwarz
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
