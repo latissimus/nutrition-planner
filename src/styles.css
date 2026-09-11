@@ -9406,10 +9406,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#013E37!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
-  filter:drop-shadow(0 3.5px 0 #FCEFBB)!important;
+  filter:drop-shadow(0 3.5px 0 #000)!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form path{
-  stroke:#013E37!important;
+  stroke:#000!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
   fill:#013E37!important;
@@ -9438,6 +9438,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#013E37!important;
   background:#013E37!important;
   color:#FCEFBB!important;
+}
+:root[data-seite="training"] .dex-detail-popup .dex-detail-herkunft :is(span,b),
+:root[data-seite="training"] .dex-detail-popup .dex-detail-link :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:currentColor!important;
 }
 :root[data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
   color:#013E37!important;
