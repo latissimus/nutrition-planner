@@ -9633,8 +9633,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --muted:#715D75;
   color:#FCEFBB!important;
 }
+/* Wolken-Tapete auf dem violetten Grund als deutliches Creme-Akzent. Die
+   globale opacity:.065 wuerde die Cremes hier fast verschwinden lassen —
+   wie auf COMP ist die Tapete das Signal fuer den Farb-Zweiklang. */
 :root[data-seite="habits"] .routine-dex-page::before{
   background:#FCEFBB!important;
+  opacity:.22!important;
 }
 :root[data-seite="habits"] .routine-dex-page .routine-hero{
   border-color:#000!important;
