@@ -106,6 +106,16 @@ TRAINING, ESSEN, SUPPS und STRESS.
 - Zutatenflächen: Warmweiß mit auberginefarbener Schrift für längere, gut lesbare Listen
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
+### Referenz ESSEN
+
+- Umkehrung des REZEPTE-Farbpaares
+- Seitenfarbe: Aubergine `#3C153B`
+- Druckfarbe: Honey Dawn `#F0C987`
+- Karten und Unterordner: Honey Dawn mit auberginefarbener Schrift
+- Inaktive Chips und Infoelement: Honey Dawn mit Aubergine-Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Aubergine mit Honey-Dawn-Schrift
+- Sämtliche Konturen und Retro-Schatten: Schwarz
+
 ## Hero-Seiten
 
 Hero-Seiten stellen einen aktuellen Zustand oder eine Kennzahl in den

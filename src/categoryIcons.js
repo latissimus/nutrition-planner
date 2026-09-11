@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#800020', training: '#013E37', supps: '#FF6B6B', habits: '#4B125C',
+  recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FF6B6B', habits: '#4B125C',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -64,7 +64,7 @@ const defaultColors = {
 const fixedSystemColors = {
   body: '#FFF7E6',
   'food-log': '#F0C987',
-  essen: '#800020',
+  essen: '#3C153B',
   training: '#013E37',
   supps: '#FF6B6B',
   reminders: '#FEEFB8',
@@ -82,6 +82,7 @@ const fixedSystemColors = {
 const fixedSystemInks = {
   body: '#991B1B',
   'food-log': '#3C153B',
+  essen: '#F0C987',
   reminders: '#4E342E',
   training: '#FCEFBB',
   habits: '#FCEFBB',
@@ -89,6 +90,7 @@ const fixedSystemInks = {
 const fixedSystemAccents = {
   body: '#991B1B',
   'food-log': '#F0C987',
+  essen: '#3C153B',
   reminders: '#4E342E',
   training: '#013E37',
   habits: '#4B125C',
@@ -96,6 +98,7 @@ const fixedSystemAccents = {
 const fixedSystemAccentInks = {
   body: '#FFF7E6',
   'food-log': '#3C153B',
+  essen: '#F0C987',
   reminders: '#FEEFB8',
   training: '#FCEFBB',
   habits: '#FCEFBB',

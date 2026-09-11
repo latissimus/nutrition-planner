@@ -967,7 +967,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   setPreference('muscledex:coin-dex-sichtbar', true);
   const looks = {
     'food-log': ['#F0C987', 'wallpaper-pizza', '🍕'],
-    essen: ['#800020', 'wallpaper-essen', '🍽️'],
+    essen: ['#3C153B', 'wallpaper-essen', '🍽️'],
     reminders: ['#FEEFB8', 'wallpaper-burger', '🍔'],
     supps: ['#FF6B6B', 'wallpaper-supps', '💊'],
     sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],

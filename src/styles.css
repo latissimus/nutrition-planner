@@ -9480,6 +9480,181 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-top-color:color-mix(in srgb,#3C153B 35%,transparent)!important;
 }
 
+/* ESSEN kehrt das REZEPTE-Paar um: Aubergine traegt die Seite, Honey Dawn
+   wird zur Druck- und Kartenfarbe. Als Grid-Seite bleiben alle konstruktiven
+   Konturen und harten Schatten neutral schwarz. */
+:root[data-seite="essen"]{
+  --cap-card:#F0C987;
+  --cap-tint:color-mix(in srgb,#3C153B 8%,#F0C987);
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#684761;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){
+  --surface:#F0C987;
+  --surface2:color-mix(in srgb,#3C153B 8%,#F0C987);
+  --text:#3C153B;
+  --ink:#3C153B;
+  --muted:#684761;
+  color:#F0C987!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(
+  .dex-sammlungskopf,
+  .unter-sammlungen-block>h2,
+  .sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2,
+  .sammlung-leer,
+  .sammlung-leer strong,
+  .sammlung-leer span
+){
+  color:#F0C987!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
+  border-color:#000!important;
+  background:#F0C987!important;
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
+  border-color:#000!important;
+  background:#F0C987!important;
+  color:#3C153B!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
+  background:#3C153B!important;
+  color:#F0C987!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
+  border-color:#000!important;
+  background:#F0C987!important;
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
+  border-color:#000!important;
+  background:#3C153B!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
+  filter:drop-shadow(0 3.5px 0 #000)!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form path{
+  stroke:#000!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){
+  fill:#F0C987!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
+  fill:#3C153B!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
+  border-color:#000!important;
+  background:#F0C987!important;
+  box-shadow:0 3.5px 0 #000!important;
+}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
+  background:#3C153B!important;
+}
+:root[data-seite="essen"] .dex-detail-popup{
+  border-color:#000!important;
+  background:#F0C987!important;
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
+  border-color:#000!important;
+}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
+  border-color:#000!important;
+  background:#3C153B!important;
+  color:#F0C987!important;
+}
+:root[data-seite="essen"] .dex-detail-popup .dex-detail-herkunft :is(span,b),
+:root[data-seite="essen"] .dex-detail-popup .dex-detail-link :is(span,b,strong,.material-svg,svg,svg *){
+  color:#F0C987!important;
+  fill:currentColor!important;
+}
+:root[data-seite="essen"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
+  color:#3C153B!important;
+}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
+  border-color:#000!important;
+  background:#3C153B!important;
+  color:#F0C987!important;
+}
+
+/* ESSEN liegt auf einem dunklen Grund. Header und Dock bleiben als globale
+   Bedienebene neutral weiss; der harte Iconschatten bleibt schwarz. */
+:root[data-seite="essen"] .app-dex-header{
+  --dex-ink:#fff;
+  background:var(--dex-seitenfarbe)!important;
+  border-color:#fff!important;
+  color:#fff!important;
+}
+:root[data-seite="essen"] .app-dex-header .nav-av{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="essen"] .app-dex-dock{
+  --dex-ink:#fff;
+  color:#fff!important;
+}
+:root[data-seite="essen"] .app-dex-dock::after{background:var(--dex-seitenfarbe)!important}
+:root[data-seite="essen"] .app-dex-dock-inner::before{
+  border-color:#fff!important;
+  background:color-mix(in srgb,var(--dex-seitenfarbe) 84%,transparent)!important;
+}
+:root[data-seite="essen"] .app-dex-tab{color:#fff!important}
+:root[data-seite="essen"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 12%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
+}
+:root[data-seite="essen"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
+:root[data-seite="essen"] .app-dex-menu{
+  border-left-color:#fff!important;
+  color:#fff!important;
+}
+
+/* Neutrale Kontextmenüs; nur echte Primäraktionen zeigen das Seitenpaar. */
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *){
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  border-bottom-color:#111!important;
+  background:transparent!important;
+  color:#111!important;
+}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button :is(b,strong,.material-svg,svg,svg *){
+  color:inherit!important;
+  fill:currentColor!important;
+}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;
+  background:#3C153B!important;
+  color:#F0C987!important;
+}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#F0C987!important;
+  fill:currentColor!important;
+}
+
 /* TRAINING: tiefes Grün mit dem aus der Vorlage entnommenen Creme #FCEFBB.
    Rasterkarten invertieren das Paar, damit auch längere Notizen und
    Vorschauen ruhig lesbar bleiben. */

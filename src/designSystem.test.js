@@ -118,7 +118,7 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("essen: '#800020'");
+    expect(categoryIcons).toContain("essen: '#3C153B'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");
     expect(main).toContain("essen: { title: 'ESSEN', pattern: 'wallpaper-essen' }");
     expect(entryDetail).toContain("essen: 'ESSEN'");
@@ -172,6 +172,14 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#FFFCF5!important;\n  color:#3C153B!important;');
     expect(designSystem).toContain('background:#F0C987!important;\n  color:#3C153B!important;');
     expect(designSystem).toContain('fill:#FFFCF5!important;');
+  });
+
+  it('kehrt auf ESSEN das Honey-Dawn-Paar nach den Grid-Regeln um', () => {
+    expect(categoryIcons).toContain("essen: '#3C153B'");
+    expect(categoryIcons).toContain("essen: '#F0C987'");
+    expect(designSystem).toContain(':root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){');
+    expect(designSystem).toContain('background:#F0C987!important;\n  color:#3C153B!important;');
+    expect(designSystem).toContain('background:#3C153B!important;\n  color:#F0C987!important;');
   });
 
   it('verwendet auf ROUTINEN das feste Blueberry-Creme-Paar nach den Hero-Regeln', () => {
