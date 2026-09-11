@@ -183,6 +183,10 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#4B125C!important;\n  color:#FCEFBB!important;');
     expect(designSystem).toContain('background:#FFFCF5!important;\n  color:#4B125C!important;');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
+    expect(designSystem).toContain('button.btn.btn-primary[type="submit"]{');
+    expect(designSystem).toContain('button.routine-start :is(.material-svg,svg,svg *){');
+    expect(designSystem).toContain('.routine-timer-exercises li>span{');
+    expect(designSystem).toContain('-webkit-text-fill-color:#FCEFBB!important;');
   });
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {

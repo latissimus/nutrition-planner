@@ -9789,3 +9789,32 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#FCEFBB!important;
   fill:currentColor!important;
 }
+
+/* Letzte iOS-/Altregel-Faelle im ROUTINEN-Farbpaar: Die globale historische
+   .btn-primary-Regel setzt Text und SVG auf Reinweiss. Diese drei sichtbaren
+   Aktionsarten erhalten deshalb die Druckfarbe auch als Text-Fill explizit. */
+:root[data-seite="habits"] .routine-editor-backdrop .kategorie-sheet button.btn.btn-primary[type="submit"]{
+  color:#FCEFBB!important;
+  -webkit-text-fill-color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page button.routine-start{
+  border-color:#000!important;
+  background:#4B125C!important;
+  color:#FCEFBB!important;
+  -webkit-text-fill-color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page button.routine-start :is(.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:#FCEFBB!important;
+}
+:root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .meditation-controls .btn-primary,
+:root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .meditation-controls .btn-primary :is(span,.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:#FCEFBB!important;
+  -webkit-text-fill-color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .routine-timer-exercises li>span{
+  background:#4B125C!important;
+  color:#FCEFBB!important;
+  -webkit-text-fill-color:#FCEFBB!important;
+}
