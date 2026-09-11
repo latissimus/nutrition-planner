@@ -173,6 +173,17 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - Druckfarbe: Pink `#FF277F`
 - Hero, Kartenkonturen, Werte und Aktionen verwenden das Blau-Pink-Paar
 - Längere Inhaltsflächen bleiben warmweiß und lesefreundlich
+- Kontextmenüs bleiben Weiß/Schwarz; auch Eingabefelder, Trenner und
+  Untergruppen verwenden schwarze statt pinkfarbener Konturen
+
+### Referenz SCHLAF
+
+- Seitenfarbe: Midnight `#0E1D47`
+- Druckfarbe: Off-White `#FFFCF3`
+- Hero und Seitenüberschriften: Midnight mit Off-White-Schrift
+- Längere Schlafkarten: Off-White mit Midnight-Schrift
+- Kartenkonturen sowie App-Header und Dock: Off-White; Iconschatten Schwarz
+- Kontextmenüs: neutral Weiß/Schwarz; Primäraktionen Midnight mit Off-White
 
 ### Referenz ROUTINEN
 

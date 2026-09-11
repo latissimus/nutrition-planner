@@ -6181,9 +6181,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Meal-Log. Schlafspezifische Diagramme und Routinen bleiben eigenständig.
    ============================================================ */
 :root[data-seite="sleep"],:root[data-seite="sleep"] body{
-  --food-page-purple:var(--dex-seitenfarbe,#1E3A8A);
+  --food-page-purple:var(--dex-seitenfarbe,#0E1D47);
   --food-vozzy-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/moon.svg"));
-  background-color:var(--dex-seitenfarbe,#1E3A8A)!important;
+  background-color:var(--dex-seitenfarbe,#0E1D47)!important;
   background-image:none!important;
 }
 :root[data-seite="sleep"] :is(#app,#view){
@@ -10287,4 +10287,180 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
   color:#49251E!important;
   fill:currentColor!important;
+}
+
+/* SCHLAF: tiefes Midnight #0E1D47 mit warmem Off-White #FFFCF3.
+   Der Hero bleibt dunkel und plakativ; längere Daten- und Leseflächen
+   invertieren das Paar, damit die Seite ruhig und klar bleibt. */
+:root[data-seite="sleep"]{
+  --sleep-paper:#FFFCF3;
+  --cap-card:#FFFCF3;
+  --cap-tint:color-mix(in srgb,#FFFCF3 7%,#0E1D47);
+  --cap-card-border:1.5px solid #FFFCF3;
+  --cap-muted:#B8B8C2;
+}
+:root[data-seite="sleep"] .sleep-dex-page{
+  --surface:#FFFCF3;
+  --surface2:color-mix(in srgb,#0E1D47 7%,#FFFCF3);
+  --text:#0E1D47;
+  --ink:#FFFCF3;
+  --muted:#B8B8C2;
+  color:#FFFCF3!important;
+}
+:root[data-seite="sleep"] .sleep-tonight{
+  border-color:#FFFCF3!important;
+  background:#0E1D47!important;
+  color:#FFFCF3!important;
+}
+:root[data-seite="sleep"] .sleep-tonight :is(.sleep-tonight-value small,.sleep-tonight-value strong,.sleep-tonight-value b){
+  color:#FFFCF3!important;
+}
+:root[data-seite="sleep"] .sleep-duration-ring{
+  background:conic-gradient(#FFFCF3 var(--sleep-progress),color-mix(in srgb,#FFFCF3 20%,transparent) 0)!important;
+}
+:root[data-seite="sleep"] .sleep-duration-ring::after{background:#0E1D47!important}
+:root[data-seite="sleep"] .sleep-duration-ring>span,
+:root[data-seite="sleep"] .sleep-duration-ring small{color:#FFFCF3!important}
+:root[data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info){
+  border-color:#000!important;
+  background:#FFFCF3!important;
+  color:#0E1D47!important;
+}
+:root[data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info) :is(.material-svg,svg,svg *){
+  color:#0E1D47!important;
+  fill:currentColor!important;
+}
+:root[data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section){
+  border-color:#FFFCF3!important;
+  background:#FFFCF3!important;
+  color:#0E1D47!important;
+}
+:root[data-seite="sleep"] :is(.sleep-checkin-overview>summary,.sleep-section>header){
+  color:#0E1D47!important;
+}
+:root[data-seite="sleep"] .sleep-checkin-overview>summary{
+  background:color-mix(in srgb,#0E1D47 7%,#FFFCF3)!important;
+}
+:root[data-seite="sleep"] :is(
+  .sleep-checkin-overview>summary b,
+  .sleep-checkin-overview>summary small,
+  .sleep-checkin-overview>summary>.material-svg,
+  .sleep-section>header h2,
+  .sleep-section>header>small,
+  .sleep-insights>header>small,
+  .sleep-checkin-values b,
+  .sleep-checkin-values small,
+  .sleep-plan-comparison b,
+  .sleep-plan-comparison small,
+  .sleep-checkin-empty b,
+  .sleep-checkin-empty span,
+  .sleep-stats strong,
+  .sleep-stats small,
+  .sleep-chart-empty,
+  .sleep-empty,
+  .sleep-insights p,
+  .sleep-history button,
+  .sleep-history button>em
+){
+  color:#0E1D47!important;
+  fill:currentColor!important;
+}
+:root[data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p){
+  background:color-mix(in srgb,#0E1D47 7%,#FFFCF3)!important;
+}
+:root[data-seite="sleep"] .sleep-analysis-help{
+  border-color:#000!important;
+  background:#FFFCF3!important;
+  color:#0E1D47!important;
+}
+
+/* Dunkle Seite: App-Chrome verwendet die Off-White-Bedienfarbe; der harte
+   Schatten der Menü-Symbole bleibt wie bei TRAINING neutral schwarz. */
+:root[data-seite="sleep"] .app-dex-header{
+  --dex-ink:#FFFCF3;
+  background:#0E1D47!important;
+  border-color:#FFFCF3!important;
+  color:#FFFCF3!important;
+  --brand-outline:#FFFCF3;
+}
+:root[data-seite="sleep"] .app-dex-header .nav-av{
+  border-color:#FFFCF3!important;
+  background:#FFFCF3!important;
+  color:#0E1D47!important;
+}
+:root[data-seite="sleep"] .app-dex-dock{
+  --dex-ink:#FFFCF3;
+  color:#FFFCF3!important;
+}
+:root[data-seite="sleep"] .app-dex-dock::after{background:#0E1D47!important}
+:root[data-seite="sleep"] .app-dex-dock-inner::before{
+  border-color:#FFFCF3!important;
+  background:color-mix(in srgb,#0E1D47 84%,transparent)!important;
+}
+:root[data-seite="sleep"] .app-dex-tab{color:#FFFCF3!important}
+:root[data-seite="sleep"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#FFFCF3 12%,#0E1D47)!important;
+  box-shadow:inset 0 0 0 1.25px #FFFCF3!important;
+}
+:root[data-seite="sleep"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
+:root[data-seite="sleep"] .app-dex-menu{
+  border-left-color:#FFFCF3!important;
+  color:#FFFCF3!important;
+}
+
+/* SCHLAF-Sheets bleiben neutrale Systemflächen. Nur echte Primäraktionen
+   nehmen das Midnight-/Off-White-Paar wieder auf. */
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save),
+:root[data-seite="sleep"] .special-dex-overlay .btn-primary{
+  border-color:#000!important;
+  background:#0E1D47!important;
+  color:#FFFCF3!important;
+  -webkit-text-fill-color:#FFFCF3!important;
+  box-shadow:0 5px 0 #000!important;
+}
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
+:root[data-seite="sleep"] .special-dex-overlay .btn-primary :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FFFCF3!important;
+  fill:currentColor!important;
+}
+:root[data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span){
+  border-color:#000!important;
+  background:#0E1D47!important;
+  color:#FFFCF3!important;
+}
+
+/* COMP-Kontextmenüs sind eine neutrale Ebene: keine pinkfarbenen Rahmen an
+   Sheet, Trennern, Eingaben oder Untergruppen. Aktionsflächen behalten das
+   Cotton-Cloud-/Pink-Paar, aber ebenfalls eine schwarze Konstruktion. */
+:root[data-seite="body"] :is(.body-add-overlay,.body-entry-overlay,.special-dex-overlay) :is(
+  .kategorie-sheet,
+  .special-dex-sheet,
+  .kategorie-sheet-menu>button,
+  .body-add-menu>button,
+  fieldset,
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .input,
+  .falten-summe,
+  .btn,
+  .btn-primary
+){
+  border-color:#000!important;
+}
+:root[data-seite="body"] :is(.body-add-overlay,.body-entry-overlay,.special-dex-overlay) :is(.kategorie-sheet-menu>button,.body-add-menu>button):not(:last-child){
+  border-bottom-color:#000!important;
 }

@@ -128,6 +128,18 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#FFEDE3!important;\n  color:#49251E!important;');
   });
 
+  it('verwendet auf SCHLAF das feste Midnight-Off-White-Paar', () => {
+    expect(categoryIcons).toContain("sleep: '#0E1D47'");
+    expect(categoryIcons).toContain("sleep: '#FFFCF3'");
+    expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#FFFCF3;');
+    expect(designSystem).toContain('background:#0E1D47!important;\n  color:#FFFCF3!important;');
+  });
+
+  it('haelt auf COMP alle Kontextmenue-Konturen neutral schwarz', () => {
+    expect(designSystem).toContain(':root[data-seite="body"] :is(.body-add-overlay,.body-entry-overlay,.special-dex-overlay)');
+    expect(designSystem).toContain('border-color:#000!important;');
+  });
+
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
     expect(categoryIcons).toContain("essen: '#3C153B'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");

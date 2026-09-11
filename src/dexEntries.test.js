@@ -39,7 +39,7 @@ describe('Anbieter- und Farbkontrast', () => {
     ].map((route) => [route, categoryColor(route)]))).toEqual({
       'food-log': '#F0C987',
       reminders: '#FEEFB8',
-      sleep: '#1E3A8A',
+      sleep: '#0E1D47',
       habits: '#4B125C',
       shopping: '#FFEDE3',
       essen: '#3C153B',
@@ -73,6 +73,9 @@ describe('Anbieter- und Farbkontrast', () => {
     }));
     expect(pageLook('shopping', '#000000', 'wallpaper-brokkoli')).toEqual(expect.objectContaining({
       color: '#FFEDE3', ink: '#49251E', accent: '#FFEDE3', accentInk: '#49251E',
+    }));
+    expect(pageLook('sleep', '#000000', 'wallpaper-moon')).toEqual(expect.objectContaining({
+      color: '#0E1D47', ink: '#FFFCF3', accent: '#0E1D47', accentInk: '#FFFCF3',
     }));
   });
 });
