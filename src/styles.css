@@ -5931,6 +5931,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#59606b!important;
   font:500 11.5px/1.45 var(--tech)!important;
 }
+:root[data-seite="body"] .body-weight-history>p{
+  margin-bottom:8px!important;
+}
+:root[data-seite="body"] .body-weight-history>ol{
+  display:grid;
+  margin:0;
+  padding:0;
+  list-style:none;
+  border:1px solid #d8d8d8;
+  border-radius:10px;
+  background:#fff;
+}
+:root[data-seite="body"] .body-weight-history li{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:40px;
+  padding:8px 11px;
+  border-bottom:1px dashed #c7c7c7;
+  color:#111;
+  font-family:var(--tech);
+  font-size:12px;
+  font-variant-numeric:slashed-zero tabular-nums;
+}
+:root[data-seite="body"] .body-weight-history li:last-child{border-bottom:0}
+:root[data-seite="body"] .body-weight-history time{color:#60656f;font-weight:600}
+:root[data-seite="body"] .body-weight-history li>b{font-weight:800}
 :root[data-seite="body"] .input{
   min-height:46px;
   border:1px solid var(--app-outline);

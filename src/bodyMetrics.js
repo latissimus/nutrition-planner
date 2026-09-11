@@ -24,7 +24,11 @@ async function queryState(userId, signal) {
   const abort = (query) => signal ? query.abortSignal(signal) : query;
   const results = await Promise.all([
     abort(supabase.from('skinfolds').select('*').eq('user_id', userId).order('gemessen_am').limit(60)),
-    abort(supabase.from('weights').select('*').eq('user_id', userId).order('gemessen_am').limit(180)),
+    // Erst die neuesten 180 Datensaetze laden. Bei aufsteigender Sortierung vor
+    // dem Limit gingen nach laengerer Nutzung ausgerechnet die aktuellen Werte
+    // verloren. Fuer Berechnung und Kurve werden sie danach chronologisch
+    // sortiert.
+    abort(supabase.from('weights').select('*').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(180)),
     abort(supabase.from('waist_measurements').select('*').eq('user_id', userId).order('gemessen_am').limit(60)),
     abort(supabase.from('logman_performance').select('*').eq('user_id', userId).order('performed_on').limit(500)),
     abort(supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(60)),
@@ -35,7 +39,9 @@ async function queryState(userId, signal) {
   if (error) throw error;
   return {
     skinfolds: (results[0].data || []).map((row) => ({ ...row, total: summe(row.falten) })),
-    weights: (results[1].data || []).map((row) => ({ ...row, date: row.gemessen_am, kg: Number(row.kg) })),
+    weights: (results[1].data || [])
+      .map((row) => ({ ...row, date: row.gemessen_am, kg: Number(row.kg) }))
+      .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am)),
     waists: results[2].data || [], performance: results[3].data || [],
     sleep: results[4].data || [], checkins: results[5].data || [], settings: results[6].data || {},
   };
@@ -117,6 +123,21 @@ function logmanEntryMarkup() {
   return `<div class="body-entry-form"><p>Wähle einen JSON-Export aus LOGMAN. Vorhandene Werte desselben Tages werden aktualisiert.</p><label class="body-file-input"><span>LOGMAN-JSON-Export auswählen</span><input type="file" accept="application/json,.json" data-logman-import></label><p data-logman-status></p></div>`;
 }
 
+export function weightHistoryMarkup(weights = []) {
+  if (!weights.length) return '';
+  const rows = [...weights]
+    .sort((a, b) => String(b.gemessen_am || b.date || '').localeCompare(String(a.gemessen_am || a.date || '')))
+    .map((row) => {
+      const date = row.gemessen_am || row.date;
+      return `<li><time datetime="${escapeHtml(date)}">${datumKurz(date)}</time><b>${display(row.kg)} kg</b></li>`;
+    }).join('');
+  return `<details class="body-inner-details body-weight-history">
+    <summary><span>Einzelne Wiegungen</span>${materialIconMarkup('chevron_right')}</summary>
+    <p>Neueste Messung zuerst. Ein erneuter Eintrag für dasselbe Datum aktualisiert den vorhandenen Wert.</p>
+    <ol>${rows}</ol>
+  </details>`;
+}
+
 function weightMarkup(state) {
   const trend = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined); const latest = state.weights.at(-1);
   const interpretation = goalWeightInterpretation(trend, state.settings.goal || 'maintain');
@@ -127,6 +148,7 @@ function weightMarkup(state) {
     <p class="body-goal-status" data-tone="${interpretation.tone}"><b>${interpretation.label}</b><span>${interpretation.text}</span></p>
     ${curveSvg([{ values: state.weights.map((row) => ({ datum: row.gemessen_am, wert: row.kg })), className: 'roh', points: true }, { values: trend.points?.map((row) => ({ datum: row.date, wert: row.kg })) || [], className: 'trend' }], { unit: 'kg' })}
     <p class="body-chart-legend"><b>Punkte:</b> einzelne Wiegungen · <b>kräftige Linie:</b> geglätteter 7-Tage-Schnitt</p></div>
+    ${weightHistoryMarkup(state.weights)}
     ${infoDetails('Warum bewertet CAPBOY den Trend?', `${BODY_EXPLANATIONS.dailyWeight} ${BODY_EXPLANATIONS.average7} ${BODY_EXPLANATIONS.trend28}`)}
     ${infoDetails('Wie oft wiegen?', BODY_EXPLANATIONS.weighingFrequency)}
     <button class="body-reset-mini" type="button" data-reset-body="weights">Gewichtsverlauf zurücksetzen</button>
