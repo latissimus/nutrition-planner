@@ -118,12 +118,11 @@ TRAINING, ESSEN, SUPPS und STRESS.
 
 ### Referenz SUPPS
 
-- Übernimmt das frühere COMP-Farbpaar
-- Seitenfarbe: Milk `#FFF7E6`
-- Druckfarbe: Dunkelrot `#991B1B`
-- Karten und Detailansicht: sehr heller Milk-Rot-Ton mit dunkelroter Schrift
-- Unterordner: Dunkelrot mit Milk-Schrift
-- Aktiver Chip und hervorgehobene Detailfelder: Milk mit dunkelroter Schrift
+- Seitenfarbe: Butternut `#FFA175`
+- Druckfarbe: Dunkelrot `#5C0702`
+- Karten und Detailansicht: sehr heller Butternut-Ton mit dunkelroter Schrift
+- Unterordner: Dunkelrot mit Butternut-Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Butternut mit dunkelroter Schrift
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
 ### Referenz EINKAUF

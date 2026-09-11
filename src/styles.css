@@ -9655,23 +9655,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* SUPPS übernimmt das frühere COMP-Paar, bleibt strukturell aber eine
-   Grid-Seite: Milk trägt die Seite; große Leseflächen bleiben nur sanft
-   rot getönt, während Chips und Ordner die kräftige Druckfarbe behalten. */
+/* SUPPS: warmes Butternut mit dunkelroter Druckfarbe. Große Leseflächen
+   bleiben sanft pfirsichfarben; Chips und Ordner tragen das kräftige Paar. */
 :root[data-seite="supps"]{
-  --supps-card:color-mix(in srgb,#991B1B 7%,#FFF7E6);
+  --supps-card:color-mix(in srgb,#FFA175 18%,#FFF9F3);
   --cap-card:var(--supps-card);
-  --cap-tint:color-mix(in srgb,#991B1B 11%,#FFF7E6);
+  --cap-tint:color-mix(in srgb,#FFA175 26%,#FFF9F3);
   --cap-card-border:1.5px solid #000;
-  --cap-muted:#7A5A5A;
+  --cap-muted:#84534D;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
   --surface:var(--supps-card);
-  --surface2:color-mix(in srgb,#991B1B 11%,#FFF7E6);
-  --text:#991B1B;
-  --ink:#991B1B;
-  --muted:#7A5A5A;
-  color:#991B1B!important;
+  --surface2:color-mix(in srgb,#FFA175 26%,#FFF9F3);
+  --text:#5C0702;
+  --ink:#5C0702;
+  --muted:#84534D;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(
   .dex-sammlungskopf,
@@ -9682,34 +9681,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .sammlung-leer strong,
   .sammlung-leer span
 ){
-  color:#991B1B!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
   border-color:#000!important;
-  background:#991B1B!important;
-  color:#FFF7E6!important;
+  background:#5C0702!important;
+  color:#FFA175!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
   border-color:#000!important;
-  background:#991B1B!important;
-  color:#FFF7E6!important;
+  background:#5C0702!important;
+  color:#FFA175!important;
   box-shadow:0 3.5px 0 #000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
-  background:#FFF7E6!important;
-  color:#991B1B!important;
+  background:#FFA175!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
   border-color:#000!important;
   background:var(--supps-card)!important;
-  color:#991B1B!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:#000!important;
-  background:#FFF7E6!important;
+  background:#FFF9F3!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
-  color:#991B1B!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
   filter:drop-shadow(0 3.5px 0 #000)!important;
@@ -9718,52 +9717,52 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   stroke:#000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){
-  fill:#991B1B!important;
+  fill:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
-  fill:#FFF7E6!important;
+  fill:#FFA175!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
-  color:#FFF7E6!important;
+  color:#FFA175!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
   border-color:#000!important;
-  background:#991B1B!important;
+  background:#5C0702!important;
   box-shadow:0 3.5px 0 #000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
-  background:#FFF7E6!important;
+  background:#FFA175!important;
 }
 :root[data-seite="supps"] .dex-detail-popup{
   border-color:#000!important;
   background:var(--supps-card)!important;
-  color:#991B1B!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
-  color:#991B1B!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
   border-color:#000!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
   border-color:#000!important;
-  background:#FFF7E6!important;
-  color:#991B1B!important;
+  background:#FFA175!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-herkunft :is(span,b),
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-link :is(span,b,strong,.material-svg,svg,svg *){
-  color:#991B1B!important;
+  color:#5C0702!important;
   fill:currentColor!important;
 }
 :root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
-  color:#991B1B!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
   border-color:#000!important;
-  background:#FFF7E6!important;
-  color:#991B1B!important;
+  background:#FFA175!important;
+  color:#5C0702!important;
 }
 
 /* SUPPS ist hell: App-Header und Dock verwenden die neutrale Navy-Schwarz-
@@ -9801,7 +9800,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* Kontextmenüs bleiben neutral; nur ihre echten Primäraktionen verwenden
-   Milk als Fläche und Dunkelrot für Schrift und Icon. */
+   Butternut als Fläche und Dunkelrot für Schrift und Icon. */
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
@@ -9825,11 +9824,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   border-color:#000!important;
-  background:#FFF7E6!important;
-  color:#991B1B!important;
+  background:#FFA175!important;
+  color:#5C0702!important;
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
-  color:#991B1B!important;
+  color:#5C0702!important;
   fill:currentColor!important;
 }
 

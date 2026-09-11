@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FEEFB8', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FFF7E6', habits: '#4B125C',
+  recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FFA175', habits: '#4B125C',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#FF2E88',
@@ -66,7 +66,7 @@ const fixedSystemColors = {
   'food-log': '#F0C987',
   essen: '#3C153B',
   training: '#013E37',
-  supps: '#FFF7E6',
+  supps: '#FFA175',
   reminders: '#FEEFB8',
   habits: '#4B125C',
   shopping: '#FFEDE3',
@@ -86,7 +86,7 @@ const fixedSystemInks = {
   reminders: '#4E342E',
   training: '#FCEFBB',
   habits: '#FCEFBB',
-  supps: '#991B1B',
+  supps: '#5C0702',
   shopping: '#49251E',
   sleep: '#FFFCF3',
 };
@@ -97,7 +97,7 @@ const fixedSystemAccents = {
   reminders: '#4E342E',
   training: '#013E37',
   habits: '#4B125C',
-  supps: '#FFF7E6',
+  supps: '#FFA175',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
 };
@@ -108,7 +108,7 @@ const fixedSystemAccentInks = {
   reminders: '#FEEFB8',
   training: '#FCEFBB',
   habits: '#FCEFBB',
-  supps: '#991B1B',
+  supps: '#5C0702',
   shopping: '#49251E',
   sleep: '#FFFCF3',
 };
