@@ -35,7 +35,7 @@ Die individuelle Druckfarbe ersetzt diese Konturen nicht.
 ## Grid-Seiten
 
 Grid-Seiten sind Sammlungen für Videos, Bilder, Links und Notizen, zum Beispiel
-TRAINING, ESSEN, SUPPS und STRESS.
+TRAINING, ESSEN, SUPPS und MIND.
 
 ### Inhaltsseite
 
@@ -118,14 +118,16 @@ TRAINING, ESSEN, SUPPS und STRESS.
 
 ### Referenz SUPPS
 
-- Seitenfarbe: Butternut `#FFA175`
-- Druckfarbe: Dunkelrot `#5C0702`
-- Karten und Detailansicht: sehr heller Butternut-Ton mit dunkelroter Schrift
-- Unterordner: Dunkelrot mit Butternut-Schrift
-- Aktiver Chip und hervorgehobene Detailfelder: Butternut mit dunkelroter Schrift
+- Seitenfarbe: Chocolate `#47230F`
+- Druckfarbe: Powder Blue `#B5D0F3`
+- Karten und Detailansicht: Powder Blue mit Chocolate-Schrift
+- Unterordner: Powder Blue mit Chocolate-Schrift und dunklem Einsatz
+- Inaktive Chips: Powder Blue mit Chocolate-Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Chocolate mit Powder-Blue-Schrift
+- App-Header und Dock bleiben neutral weiß; Iconschatten bleiben Schwarz
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
-### Referenz STRESS / MINDSET
+### Referenz MIND
 
 - Seitenfarbe: Deep Blush `#E36887`
 - Druck- und Akzentfarbe: warmes Gelb `#FFE08C`
@@ -134,8 +136,8 @@ TRAINING, ESSEN, SUPPS und STRESS.
   barriereärmere längere Texte
 - Chips und Primäraktionen verwenden das kräftige Farbpaar
 - App-Header, Dock und Kontextmenüs bleiben neutral
-- Empfohlener künftiger Seitenname: `MINDSET`, weil er Motivation, mentale
-  Stärke und Stressmanagement gemeinsam abdeckt
+- Sichtbarer Seitenname: `MIND`; der interne Schlüssel `stress` bleibt zur
+  Kompatibilität mit bestehenden Einträgen und Links erhalten
 
 ### Referenz EINKAUF
 
@@ -192,7 +194,7 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - Seitenfarbe: Midnight `#0E1D47`
 - Druck- und Akzentfarbe: warmes Creme `#FCEFBB`
 - Hero und Seitenüberschriften: Midnight mit Creme-Schrift
-- Längere Schlafkarten: Weiß mit Midnight-Schrift und schwarzer Kontur
+- Längere Schlafkarten: Weiß mit Midnight-Schrift und cremefarbener Kontur
 - App-Header und Dock: neutrales Weiß statt Creme; Iconschatten Schwarz
 - Die CAPBOY-Wortmarke bleibt original; nur die Silhouette wird auf dem
   dunklen Header für Sichtbarkeit weiß dargestellt

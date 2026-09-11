@@ -9655,22 +9655,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* SUPPS: warmes Butternut mit dunkelroter Druckfarbe. Große Leseflächen
-   bleiben sanft pfirsichfarben; Chips und Ordner tragen das kräftige Paar. */
+/* SUPPS: Chocolate #47230F mit Powder Blue #B5D0F3. Die dunkle Seite
+   trägt die helle Druckfarbe; Karten invertieren das Paar für ruhige,
+   gut lesbare Sammlungs- und Detailflächen. */
 :root[data-seite="supps"]{
-  --supps-card:color-mix(in srgb,#FFA175 18%,#FFF9F3);
+  --supps-card:#B5D0F3;
   --cap-card:var(--supps-card);
-  --cap-tint:color-mix(in srgb,#FFA175 26%,#FFF9F3);
+  --cap-tint:color-mix(in srgb,#47230F 8%,#B5D0F3);
   --cap-card-border:1.5px solid #000;
-  --cap-muted:#84534D;
+  --cap-muted:#624437;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
   --surface:var(--supps-card);
-  --surface2:color-mix(in srgb,#FFA175 26%,#FFF9F3);
-  --text:#5C0702;
-  --ink:#5C0702;
-  --muted:#84534D;
-  color:#5C0702!important;
+  --surface2:color-mix(in srgb,#47230F 8%,#B5D0F3);
+  --text:#47230F;
+  --ink:#B5D0F3;
+  --muted:#624437;
+  color:#B5D0F3!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(
   .dex-sammlungskopf,
@@ -9681,34 +9682,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .sammlung-leer strong,
   .sammlung-leer span
 ){
-  color:#5C0702!important;
+  color:#B5D0F3!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
   border-color:#000!important;
-  background:#5C0702!important;
-  color:#FFA175!important;
+  background:#B5D0F3!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
   border-color:#000!important;
-  background:#5C0702!important;
-  color:#FFA175!important;
+  background:#B5D0F3!important;
+  color:#47230F!important;
   box-shadow:0 3.5px 0 #000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
-  background:#FFA175!important;
-  color:#5C0702!important;
+  background:#47230F!important;
+  color:#B5D0F3!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
   border-color:#000!important;
   background:var(--supps-card)!important;
-  color:#5C0702!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:#000!important;
-  background:#FFF9F3!important;
+  background:#47230F!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
-  color:#5C0702!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form{
   filter:drop-shadow(0 3.5px 0 #000)!important;
@@ -9717,90 +9718,90 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   stroke:#000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){
-  fill:#5C0702!important;
+  fill:#B5D0F3!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
-  fill:#FFA175!important;
+  fill:#47230F!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
-  color:#FFA175!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
   border-color:#000!important;
-  background:#5C0702!important;
+  background:#B5D0F3!important;
   box-shadow:0 3.5px 0 #000!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
-  background:#FFA175!important;
+  background:#47230F!important;
 }
 :root[data-seite="supps"] .dex-detail-popup{
   border-color:#000!important;
   background:var(--supps-card)!important;
-  color:#5C0702!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){
-  color:#5C0702!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){
   border-color:#000!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
   border-color:#000!important;
-  background:#FFA175!important;
-  color:#5C0702!important;
+  background:#47230F!important;
+  color:#B5D0F3!important;
 }
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-herkunft :is(span,b),
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-link :is(span,b,strong,.material-svg,svg,svg *){
-  color:#5C0702!important;
+  color:#B5D0F3!important;
   fill:currentColor!important;
 }
 :root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){
-  color:#5C0702!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
   border-color:#000!important;
-  background:#FFA175!important;
-  color:#5C0702!important;
+  background:#47230F!important;
+  color:#B5D0F3!important;
 }
 
-/* SUPPS ist hell: App-Header und Dock verwenden die neutrale Navy-Schwarz-
-   Ebene statt der dunkelroten Inhaltsdruckfarbe. */
+/* Auf der dunklen SUPPS-Seite bleibt das App-Chrome neutral weiß; die
+   Powder-Blue-Farbe gehört ausschließlich zur Inhalts- und Aktionsebene. */
 :root[data-seite="supps"] .app-dex-header{
-  --dex-ink:#0A1330;
+  --dex-ink:#fff;
   background:var(--dex-seitenfarbe)!important;
-  border-color:#0A1330!important;
-  color:#0A1330!important;
+  border-color:#fff!important;
+  color:#fff!important;
   --brand-outline:#0A1330;
 }
 :root[data-seite="supps"] .app-dex-header .nav-av{
-  border-color:#0A1330!important;
-  background:#FFFCF5!important;
-  color:#0A1330!important;
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#47230F!important;
 }
 :root[data-seite="supps"] .app-dex-dock{
-  --dex-ink:#0A1330;
-  color:#0A1330!important;
+  --dex-ink:#fff;
+  color:#fff!important;
 }
 :root[data-seite="supps"] .app-dex-dock::after{background:var(--dex-seitenfarbe)!important}
 :root[data-seite="supps"] .app-dex-dock-inner::before{
-  border-color:#0A1330!important;
+  border-color:#fff!important;
   background:color-mix(in srgb,var(--dex-seitenfarbe) 82%,transparent)!important;
 }
-:root[data-seite="supps"] .app-dex-tab{color:#0A1330!important}
+:root[data-seite="supps"] .app-dex-tab{color:#fff!important}
 :root[data-seite="supps"] .app-dex-tab.aktiv{
-  background:color-mix(in srgb,#0A1330 8%,var(--dex-seitenfarbe))!important;
-  box-shadow:inset 0 0 0 1.25px #0A1330!important;
+  background:color-mix(in srgb,#fff 12%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
 }
-:root[data-seite="supps"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #0A1330)!important}
+:root[data-seite="supps"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
 :root[data-seite="supps"] .app-dex-menu{
-  border-left-color:#0A1330!important;
-  color:#0A1330!important;
+  border-left-color:#fff!important;
+  color:#fff!important;
 }
 
-/* Kontextmenüs bleiben neutral; nur ihre echten Primäraktionen verwenden
-   Butternut als Fläche und Dunkelrot für Schrift und Icon. */
+/* Kontextmenüs bleiben neutral; nur echte Primäraktionen verwenden das
+   Chocolate-Powder-Blue-Paar. */
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
@@ -9824,11 +9825,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   border-color:#000!important;
-  background:#FFA175!important;
-  color:#5C0702!important;
+  background:#47230F!important;
+  color:#B5D0F3!important;
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
-  color:#5C0702!important;
+  color:#B5D0F3!important;
   fill:currentColor!important;
 }
 
@@ -10295,7 +10296,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --sleep-paper:#fff;
   --cap-card:#fff;
   --cap-tint:color-mix(in srgb,#FCEFBB 7%,#0E1D47);
-  --cap-card-border:1.5px solid #000;
+  --cap-card-border:1.5px solid #FCEFBB;
   --cap-muted:#5E6880;
 }
 :root[data-seite="sleep"] .sleep-dex-page{
@@ -10330,7 +10331,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 :root[data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section){
-  border-color:#000!important;
+  border-color:#FCEFBB!important;
   background:#fff!important;
   color:#0E1D47!important;
 }
@@ -10368,7 +10369,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:color-mix(in srgb,#0E1D47 7%,#fff)!important;
 }
 :root[data-seite="sleep"] .sleep-analysis-help{
-  border-color:#000!important;
+  border-color:#FCEFBB!important;
   background:#fff!important;
   color:#0E1D47!important;
 }
@@ -10484,7 +10485,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom-color:#000!important;
 }
 
-/* STRESS / MINDSET: Deep Blush mit warmem Gelb. Das direkte Farbpaar trägt
+/* MIND: Deep Blush mit warmem Gelb. Das direkte Farbpaar trägt
    Kopf, Tapete, Chips und Aktionen. Für längere Kartentexte wird das Blush
    abgedunkelt, weil Gelb und helles Blush dort allein zu wenig Kontrast haben. */
 :root[data-seite="stress"]{

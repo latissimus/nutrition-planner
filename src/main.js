@@ -582,7 +582,7 @@ const sammlungen = [
   ['shopping', 'EINKAUF', 'Alles fuer den naechsten Wocheneinkauf.', 'shopping', 'gruen', 'Aktiv'],
   ['habits', 'ROUTINEN', 'Kleine Routinen täglich abhaken.', 'habits', 'gelb', 'Aktiv'],
   ['sleep', 'SCHLAF', 'Schlaf planen, einchecken und Zusammenhänge erkennen.', 'sleep', 'navy', 'Aktiv'],
-  ['stress', 'STRESS', 'Stress und Entspannung festhalten.', 'stress', 'periwinkle', 'Aktiv'],
+  ['stress', 'MIND', 'Motivation, mentale Stärke und Stressmanagement.', 'stress', 'periwinkle', 'Aktiv'],
 ];
 const bereiche = sammlungen.map(([route, titel]) => [route, titel]);
 const sichtbareSammlungen = () => {
@@ -969,7 +969,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     'food-log': ['#F0C987', 'wallpaper-pizza', '🍕'],
     essen: ['#3C153B', 'wallpaper-essen', '🍽️'],
     reminders: ['#FEEFB8', 'wallpaper-burger', '🍔'],
-    supps: ['#FFA175', 'wallpaper-supps', '💊'],
+    supps: ['#47230F', 'wallpaper-supps', '💊'],
     sleep: ['#0E1D47', 'wallpaper-moon', '😴'],
     shopping: ['#FFEDE3', 'wallpaper-brokkoli', '🛒'],
     habits: ['#4B125C', 'wallpaper-wolke', '🧠'],
@@ -1032,7 +1032,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : essen ? 'ESSEN' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'STRESS' : coins ? 'COINS' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : essen ? 'ESSEN' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'MIND' : coins ? 'COINS' : 'REZEPTE');
   const copy = body
     ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -1050,7 +1050,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     : habits
     ? `<p>Auf der Seite <b>ROUTINEN</b> planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
     : stress
-    ? `<p>Auf der Seite <b>STRESS</b> hältst du <b>Belastungen</b>, <b>Auslöser</b> und <b>Entspannung</b> fest.</p><p>Mit <b>Tags</b> und <b>Unterordnern</b> ordnest du, was dich stresst oder herunterfährt, und findest Muster über Wochen hinweg.</p>`
+    ? `<p>Auf der Seite <b>MIND</b> sammelst du <b>Motivation</b>, mentale Stärke und Strategien für den Umgang mit Stress.</p><p>Mit <b>Tags</b> und <b>Unterordnern</b> ordnest du Impulse, Belastungen, Auslöser und Entspannung so, dass du hilfreiche Muster schnell wiederfindest.</p>`
     : coins
     ? `<p>Auf der Seite <b>COINS</b> sammelst du CAPCOINS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
@@ -1647,12 +1647,12 @@ async function renderRoute() {
     if (signal?.aborted) return;
     view.classList.add('neo-dex-page', 'food-dex-page');
     view.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
-      ${gridCollectionMastheadMarkup('STRESS', children.length)}
+      ${gridCollectionMastheadMarkup('MIND', children.length)}
       ${collectionGridMarkup(children, { inheritedColor: categoryColor('stress'), counts: childStats })}${dexEntriesSlotMarkup()}</div>`;
-    mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'STRESS' });
+    mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'MIND' });
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'stress', onSaved: refresh });
-    mountCategoryChrome(view, route, 'STRESS', {
+    mountCategoryChrome(view, route, 'MIND', {
       pageLookScope: route, pageLookPattern: 'wallpaper-stress',
       meta: `${children.length} Unterordner`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
@@ -1661,10 +1661,10 @@ async function renderRoute() {
       onSelect: () => startDexSelection(view, { userId: session.user.id, rootKey: 'stress', onChanged: refresh }),
     });
     installNeoDexChrome(view, {
-      title: 'STRESS',
+      title: 'MIND',
       meta: `0 Einträge · ${children.length} Unterordner`,
       closeHref: '#home',
-      editLabel: 'STRESS bearbeiten',
+      editLabel: 'MIND bearbeiten',
       infoKind: 'stress',
     });
     bindLongPress(view.querySelector('.unter-sammlungen-grid'), '.dex-ordner-test', unterordnerEinstellungenOeffner({

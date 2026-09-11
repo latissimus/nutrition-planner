@@ -42,7 +42,7 @@ describe('CAPBOY Design-System', () => {
     expect(main).toContain('gridCollectionMastheadMarkup');
     expect(main).toContain('Wissenssammlung');
     expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'food', title: 'REZEPTE' })");
-    expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'STRESS' })");
+    expect(main).toContain("mountGridCollectionMasthead(view, { infoKind: 'stress', title: 'MIND' })");
     expect(main).toContain('class="som-info-knopf" type="button" data-grid-collection-info');
     expect(designSystem).toContain('.neo-dex-page .dex-sammlungskopf{');
     expect(designSystem).toContain('.neo-dex-page .dex-sammlungskopf h1{');
@@ -101,14 +101,14 @@ describe('CAPBOY Design-System', () => {
     expect(actionCss).toContain('background:currentColor!important;');
   });
 
-  it('verwendet fuer STRESS dasselbe Detail-Popover wie fuer TRAINING', () => {
+  it('verwendet fuer MIND dasselbe Detail-Popover wie fuer TRAINING', () => {
     expect(entryDetail).toContain("container.classList.add('neo-dex-entry-view', 'food-dex-entry-view')");
     expect(entryDetail).toContain("['food-log', 'essen', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)");
   });
 
-  it('registriert SUPPS als feste Butternut-Dunkelrot-Wissensseite mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("supps: '#FFA175'");
-    expect(categoryIcons).toContain("supps: '#5C0702'");
+  it('registriert SUPPS als feste Chocolate-Powder-Blue-Wissensseite mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("supps: '#47230F'");
+    expect(categoryIcons).toContain("supps: '#B5D0F3'");
     expect(categoryIcons).toContain("supps: 'wallpaper-supps'");
     expect(main).toContain("['essen', 'training', 'supps'].includes(route)");
     expect(main).toContain("supps: { title: 'SUPPS', pattern: 'wallpaper-supps' }");
@@ -116,9 +116,9 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("rootKey === 'supps'");
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
-    expect(designSystem).toContain('--supps-card:color-mix(in srgb,#FFA175 18%,#FFF9F3);');
-    expect(designSystem).toContain('background:var(--supps-card)!important;\n  color:#5C0702!important;');
-    expect(designSystem).toContain('background:#FFA175!important;\n  color:#5C0702!important;');
+    expect(designSystem).toContain('--supps-card:#B5D0F3;');
+    expect(designSystem).toContain('background:var(--supps-card)!important;\n  color:#47230F!important;');
+    expect(designSystem).toContain('background:#47230F!important;\n  color:#B5D0F3!important;');
   });
 
   it('verwendet auf EINKAUF das feste Soft-Blush-Braun-Paar', () => {
@@ -132,6 +132,7 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("sleep: '#0E1D47'");
     expect(categoryIcons).toContain("sleep: '#FCEFBB'");
     expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#fff;\n  --cap-card:#fff;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #FCEFBB;');
     expect(designSystem).toContain('background:#0E1D47!important;\n  color:#FCEFBB!important;');
     expect(designSystem).toContain(':root[data-seite="sleep"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:brightness(0) invert(1);');
     expect(designSystem).toContain(':root[data-seite="sleep"] .sleep-chart polyline{\n  stroke:#0E1D47!important;');
@@ -142,7 +143,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('border-color:#000!important;');
   });
 
-  it('verwendet auf STRESS das feste Deep-Blush-Gelb-Paar mit lesbaren Karten', () => {
+  it('verwendet auf MIND das feste Deep-Blush-Gelb-Paar mit lesbaren Karten', () => {
     expect(categoryIcons).toContain("stress: '#E36887'");
     expect(categoryIcons).toContain("stress: '#FFE08C'");
     expect(designSystem).toContain(':root[data-seite="stress"]{\n  --stress-card:color-mix(in srgb,#FFE08C 58%,#FFFCF5);');
@@ -240,7 +241,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('border-color:#000!important;\n  background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-ink)!important;');
   });
 
-  it('bindet die festen COMP- und STRESS-Tapeten statt der Alt-Motive ein', () => {
+  it('bindet die festen COMP- und MIND-Tapeten statt der Alt-Motive ein', () => {
     expect(categoryIcons).toContain("body: 'wallpaper-comp'");
     expect(categoryIcons).toContain("stress: 'wallpaper-stress'");
     expect(main).toContain("applyPageLook('body', categoryColor('body'), 'wallpaper-comp')");

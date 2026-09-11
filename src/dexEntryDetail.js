@@ -94,7 +94,7 @@ async function loadEntry(userId, id, signal) {
   if (error) throw error;
   if (!data) return null;
   data.color = categoryColor(data.root_key);
-  const rootNames = { home: 'Meine Einträge', 'food-log': 'REZEPTE', essen: 'ESSEN', training: 'TRAINING', supps: 'SUPPS', reminders: 'TRACKER', body: 'COMP', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'STRESS' };
+  const rootNames = { home: 'Meine Einträge', 'food-log': 'REZEPTE', essen: 'ESSEN', training: 'TRAINING', supps: 'SUPPS', reminders: 'TRACKER', body: 'COMP', habits: 'ROUTINEN', sleep: 'SCHLAF', stress: 'MIND' };
   data.dex_name = rootNames[data.root_key] || 'CAPBOY';
   if (data.collection_id) {
     const { data: collection } = await supabase.from('collections').select('name,color').eq('id', data.collection_id).maybeSingle();
@@ -394,7 +394,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   // Keep the originating page token active so the full entry page (including
   // the iOS safe-area) uses the same Dex background instead of the neutral
   // collection/cream fallback.
-  // Jede Beitragsdetailseite verwendet dieselbe Aktionskomponente. STRESS
+  // Jede Beitragsdetailseite verwendet dieselbe Aktionskomponente. MIND
   // fehlte hier bislang; dadurch griffen beim Oeffnen des Drei-Punkte-Menues
   // alte allgemeine Buttonregeln und verteilten die Aktionen einzeln ueber
   // der Karte. Mit denselben View-Klassen sitzt das Menue exakt wie bei

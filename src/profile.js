@@ -260,7 +260,7 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   const sammlungsNamen = new Map([
     ['body', 'COMP'], ['reminders', 'TRACKER'], ['food-log', 'REZEPTE'], ['essen', 'ESSEN'],
     ['training', 'TRAINING'], ['supps', 'SUPPS'], ['shopping', 'EINKAUF'], ['habits', 'ROUTINEN'],
-    ['sleep', 'SCHLAF'], ['stress', 'STRESS'],
+    ['sleep', 'SCHLAF'], ['stress', 'MIND'],
   ]);
   const sammlungsListe = document.createElement('div');
   sammlungsListe.className = 'sammlungs-sortierung';
