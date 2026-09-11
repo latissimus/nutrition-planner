@@ -969,12 +969,12 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     'food-log': ['#F0C987', 'wallpaper-pizza', '🍕'],
     essen: ['#3C153B', 'wallpaper-essen', '🍽️'],
     reminders: ['#FEEFB8', 'wallpaper-burger', '🍔'],
-    supps: ['#FF6B6B', 'wallpaper-supps', '💊'],
+    supps: ['#FFF7E6', 'wallpaper-supps', '💊'],
     sleep: ['#1E3A8A', 'wallpaper-moon', '😴'],
     shopping: ['#00C2CB', 'wallpaper-brokkoli', '🛒'],
     habits: ['#4B125C', 'wallpaper-wolke', '🧠'],
     training: ['#013E37', 'wallpaper-dumbbell', '💪🏻'],
-    body: ['#FFF7E6', 'wallpaper-comp', '📐'],
+    body: ['#94DEFF', 'wallpaper-comp', '📐'],
     coins: ['#E6D6FF', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {

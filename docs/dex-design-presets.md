@@ -116,6 +116,15 @@ TRAINING, ESSEN, SUPPS und STRESS.
 - Aktiver Chip und hervorgehobene Detailfelder: Aubergine mit Honey-Dawn-Schrift
 - Sämtliche Konturen und Retro-Schatten: Schwarz
 
+### Referenz SUPPS
+
+- Übernimmt das frühere COMP-Farbpaar
+- Seitenfarbe: Milk `#FFF7E6`
+- Druckfarbe: Dunkelrot `#991B1B`
+- Karten und Unterordner: Dunkelrot mit Milk-Schrift
+- Aktiver Chip und hervorgehobene Detailfelder: Milk mit dunkelroter Schrift
+- Sämtliche Konturen und Retro-Schatten: Schwarz
+
 ## Hero-Seiten
 
 Hero-Seiten stellen einen aktuellen Zustand oder eine Kennzahl in den
@@ -147,6 +156,13 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - Buttons mit hartem Retro-Schatten behalten eine schwarze Kontur und einen
   schwarzen Schatten.
 - Eingabefelder und große Textflächen bleiben ruhig und kontrastreich.
+
+### Referenz COMP
+
+- Seitenfarbe: Cotton Cloud `#94DEFF`
+- Druckfarbe: Pink `#FF277F`
+- Hero, Kartenkonturen, Werte und Aktionen verwenden das Blau-Pink-Paar
+- Längere Inhaltsflächen bleiben warmweiß und lesefreundlich
 
 ### Referenz ROUTINEN
 

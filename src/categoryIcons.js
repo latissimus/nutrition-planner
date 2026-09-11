@@ -53,8 +53,8 @@ const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
-  body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FF6B6B', habits: '#4B125C',
+  body: '#94DEFF', reminders: '#FEEFB8', 'food-log': '#F0C987',
+  recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#FFF7E6', habits: '#4B125C',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -62,11 +62,11 @@ const defaultColors = {
   profile: '#A7C957',
 };
 const fixedSystemColors = {
-  body: '#FFF7E6',
+  body: '#94DEFF',
   'food-log': '#F0C987',
   essen: '#3C153B',
   training: '#013E37',
-  supps: '#FF6B6B',
+  supps: '#FFF7E6',
   reminders: '#FEEFB8',
   habits: '#4B125C',
   shopping: '#00C2CB',
@@ -80,28 +80,31 @@ const fixedSystemColors = {
 // `ink` traegt Text, Konturen, Icons und Tapete; `accentInk` steht auf den
 // mit ink gefuellten Buttons und Toggles.
 const fixedSystemInks = {
-  body: '#991B1B',
+  body: '#FF277F',
   'food-log': '#3C153B',
   essen: '#F0C987',
   reminders: '#4E342E',
   training: '#FCEFBB',
   habits: '#FCEFBB',
+  supps: '#991B1B',
 };
 const fixedSystemAccents = {
-  body: '#991B1B',
+  body: '#FF277F',
   'food-log': '#F0C987',
   essen: '#3C153B',
   reminders: '#4E342E',
   training: '#013E37',
   habits: '#4B125C',
+  supps: '#FFF7E6',
 };
 const fixedSystemAccentInks = {
-  body: '#FFF7E6',
+  body: '#94DEFF',
   'food-log': '#3C153B',
   essen: '#F0C987',
   reminders: '#FEEFB8',
   training: '#FCEFBB',
   habits: '#FCEFBB',
+  supps: '#991B1B',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',

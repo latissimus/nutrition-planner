@@ -44,8 +44,8 @@ describe('Anbieter- und Farbkontrast', () => {
       shopping: '#00C2CB',
       essen: '#3C153B',
       training: '#013E37',
-      supps: '#FF6B6B',
-      body: '#FFF7E6',
+      supps: '#FFF7E6',
+      body: '#94DEFF',
       stress: '#FF2E88',
       coins: '#E6D6FF',
       profile: '#A7C957',
@@ -57,7 +57,7 @@ describe('Anbieter- und Farbkontrast', () => {
       color: '#FEEFB8', ink: '#4E342E', accent: '#4E342E', accentInk: '#FEEFB8',
     }));
     expect(pageLook('body', '#000000', 'wallpaper-comp')).toEqual(expect.objectContaining({
-      color: '#FFF7E6', ink: '#991B1B', accent: '#991B1B', accentInk: '#FFF7E6',
+      color: '#94DEFF', ink: '#FF277F', accent: '#FF277F', accentInk: '#94DEFF',
     }));
     expect(pageLook('food-log', '#000000', 'wallpaper-pizza')).toEqual(expect.objectContaining({
       color: '#F0C987', ink: '#3C153B', accent: '#F0C987', accentInk: '#3C153B',
@@ -67,6 +67,9 @@ describe('Anbieter- und Farbkontrast', () => {
     }));
     expect(pageLook('training', '#000000', 'wallpaper-dumbbell')).toEqual(expect.objectContaining({
       color: '#013E37', ink: '#FCEFBB', accent: '#013E37', accentInk: '#FCEFBB',
+    }));
+    expect(pageLook('supps', '#000000', 'wallpaper-supps')).toEqual(expect.objectContaining({
+      color: '#FFF7E6', ink: '#991B1B', accent: '#FFF7E6', accentInk: '#991B1B',
     }));
   });
 });

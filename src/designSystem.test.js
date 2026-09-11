@@ -106,8 +106,9 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("['food-log', 'essen', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)");
   });
 
-  it('registriert SUPPS als feste Coral-Wissensseite mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("supps: '#FF6B6B'");
+  it('registriert SUPPS als feste Milk-Dunkelrot-Wissensseite mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("supps: '#FFF7E6'");
+    expect(categoryIcons).toContain("supps: '#991B1B'");
     expect(categoryIcons).toContain("supps: 'wallpaper-supps'");
     expect(main).toContain("['essen', 'training', 'supps'].includes(route)");
     expect(main).toContain("supps: { title: 'SUPPS', pattern: 'wallpaper-supps' }");
@@ -115,6 +116,8 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("rootKey === 'supps'");
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
+    expect(designSystem).toContain('background:#991B1B!important;\n  color:#FFF7E6!important;');
+    expect(designSystem).toContain('background:#FFF7E6!important;\n  color:#991B1B!important;');
   });
 
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
@@ -126,13 +129,13 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page)::before');
   });
 
-  it('verwendet auf COMP das feste Milk-Rot-Paar und die gemeinsame Hero-Schrift', () => {
+  it('verwendet auf COMP das feste Cotton-Cloud-Pink-Paar und die gemeinsame Hero-Schrift', () => {
     expect(css).toContain('.app-dex-menu .menue-computer-text{fill:var(--dex-ink,#111)!important}');
-    expect(categoryIcons).toContain("body: '#FFF7E6'");
-    expect(categoryIcons).toContain("body: '#991B1B'");
+    expect(categoryIcons).toContain("body: '#94DEFF'");
+    expect(categoryIcons).toContain("body: '#FF277F'");
     expect(designSystem).toContain(':root[data-seite="body"]{');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid var(--dex-ink,#991B1B)');
-    expect(designSystem).toContain('color:var(--dex-accent-ink,#FFF7E6)!important;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid var(--dex-ink,#FF277F)');
+    expect(designSystem).toContain('color:var(--dex-accent-ink,#94DEFF)!important;');
     const heroStart = css.indexOf(':root[data-seite="body"] .body-v2-hero-value>small{');
     const heroEnd = css.indexOf('}', heroStart);
     const heroCss = css.slice(heroStart, heroEnd);
