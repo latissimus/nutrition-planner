@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#FFF7E6', reminders: '#FEEFB8', 'food-log': '#F1DF71',
-  recipes: '#F1DF71', essen: '#800020', training: '#013E37', supps: '#FF6B6B', habits: '#4B0082',
+  recipes: '#F1DF71', essen: '#800020', training: '#013E37', supps: '#FF6B6B', habits: '#4B125C',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -68,7 +68,7 @@ const fixedSystemColors = {
   training: '#013E37',
   supps: '#FF6B6B',
   reminders: '#FEEFB8',
-  habits: '#4B0082',
+  habits: '#4B125C',
   shopping: '#00C2CB',
   sleep: '#1E3A8A',
   stress: '#FF2E88',
@@ -84,18 +84,21 @@ const fixedSystemInks = {
   'food-log': '#552626',
   reminders: '#4E342E',
   training: '#FCEFBB',
+  habits: '#FCEFBB',
 };
 const fixedSystemAccents = {
   body: '#991B1B',
   'food-log': '#F1DF71',
   reminders: '#4E342E',
   training: '#013E37',
+  habits: '#4B125C',
 };
 const fixedSystemAccentInks = {
   body: '#FFF7E6',
   'food-log': '#552626',
   reminders: '#FEEFB8',
   training: '#FCEFBB',
+  habits: '#FCEFBB',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',
@@ -163,7 +166,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && saved?.toUpperCase() === '#245953') return '#4B0082';
+  if (route === 'habits' && ['#245953', '#4B0082'].includes(saved?.toUpperCase())) return '#4B125C';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }

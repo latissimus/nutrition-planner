@@ -9615,3 +9615,163 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#FCEFBB!important;
   fill:currentColor!important;
 }
+
+/* ROUTINEN: Blueberry #4B125C mit warmem Creme #FCEFBB. Als Hero-Seite
+   bleibt die lange Listenebene hell und ruhig; Status, Tapete und Aktionen
+   tragen das Farbpaar. App-Chrome und Kontextmenüs bleiben neutral. */
+:root[data-seite="habits"]{
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,#4B125C 10%,#FFFCF5);
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#715D75;
+}
+:root[data-seite="habits"] .routine-dex-page{
+  --surface:#FFFCF5;
+  --surface2:color-mix(in srgb,#4B125C 8%,#FFFCF5);
+  --text:#4B125C;
+  --ink:#4B125C;
+  --muted:#715D75;
+  color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page::before{
+  background:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-hero{
+  border-color:#000!important;
+  background:color-mix(in srgb,#4B125C 10%,#FFFCF5)!important;
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(
+  .routine-hero-value small,
+  .routine-hero-value strong,
+  .routine-hero-value b,
+  .routine-progress-ring>span
+){
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{
+  background:conic-gradient(#4B125C var(--routine-progress),#dedede 0)!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{
+  background:#FFFCF5!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-info-button{
+  border-color:#000!important;
+  background:#4B125C!important;
+  color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help{
+  border-color:#000!important;
+  background:#FFFCF5!important;
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{
+  border-color:#000!important;
+  background:#FFFCF5!important;
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{
+  border-bottom-color:color-mix(in srgb,#4B125C 22%,transparent)!important;
+  background:color-mix(in srgb,#4B125C 8%,#FFFCF5)!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(
+  .routine-zeitblock>header h2,
+  .routine-zeitblock>header small,
+  .routine-copy b,
+  .routine-copy small,
+  .routine-zeitblock-leer
+){
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge){
+  background:#FFFCF5!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-row{
+  border-bottom-color:color-mix(in srgb,#4B125C 35%,transparent)!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){
+  border-color:#000!important;
+  background:#FFFCF5!important;
+  color:#4B125C!important;
+}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){
+  color:#4B125C!important;
+  fill:currentColor!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{
+  background:#4B125C!important;
+  color:#FCEFBB!important;
+}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:currentColor!important;
+}
+
+/* Dunkler Hintergrund: App-Header und Dock bleiben neutral weiß, der harte
+   Schatten der Navigationsicons bleibt wie im System festgelegt schwarz. */
+:root[data-seite="habits"] .app-dex-header{
+  --dex-ink:#fff;
+  background:var(--dex-seitenfarbe)!important;
+  border-color:#fff!important;
+  color:#fff!important;
+}
+:root[data-seite="habits"] .app-dex-header .nav-av{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="habits"] .app-dex-dock{
+  --dex-ink:#fff;
+  color:#fff!important;
+}
+:root[data-seite="habits"] .app-dex-dock::after{background:var(--dex-seitenfarbe)!important}
+:root[data-seite="habits"] .app-dex-dock-inner::before{
+  border-color:#fff!important;
+  background:color-mix(in srgb,var(--dex-seitenfarbe) 84%,transparent)!important;
+}
+:root[data-seite="habits"] .app-dex-tab{color:#fff!important}
+:root[data-seite="habits"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 12%,var(--dex-seitenfarbe))!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
+}
+:root[data-seite="habits"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
+:root[data-seite="habits"] .app-dex-menu{
+  border-left-color:#fff!important;
+  color:#fff!important;
+}
+
+/* Neutrale Sheets; ausschließlich echte Primäraktionen verwenden
+   Blueberry als Fläche und Creme als Schrift/Icon. */
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *){
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button{
+  border-bottom-color:#111!important;
+  background:transparent!important;
+  color:#111!important;
+}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button :is(b,strong,.material-svg,svg,svg *){
+  color:inherit!important;
+  fill:currentColor!important;
+}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;
+  background:#4B125C!important;
+  color:#FCEFBB!important;
+}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FCEFBB!important;
+  fill:currentColor!important;
+}

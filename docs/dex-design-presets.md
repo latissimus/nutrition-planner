@@ -138,6 +138,16 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
   schwarzen Schatten.
 - Eingabefelder und große Textflächen bleiben ruhig und kontrastreich.
 
+### Referenz ROUTINEN
+
+- Seitenfarbe: Blueberry `#4B125C`
+- Druckfarbe: warmes Creme `#FCEFBB`
+- Hero und Kartenköpfe: leicht violett getönt mit violetter Schrift
+- Längere Routinenkarten: Warmweiß mit violetter Schrift
+- Infoelement und primäre Aktionen: Blueberry mit cremefarbener Schrift
+- App-Header und Dock: neutral Weiß; Iconschatten bleiben Schwarz
+- Kontextmenüs: neutral Weiß/Schwarz; nur Primäraktionen verwenden das Farbpaar
+
 ## App-Header und unteres Menü
 
 Header und Dock bilden eine globale Bedienebene und übernehmen nicht die

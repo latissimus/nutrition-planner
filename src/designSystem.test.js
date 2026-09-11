@@ -174,6 +174,15 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('fill:#FFFCF5!important;');
   });
 
+  it('verwendet auf ROUTINEN das feste Blueberry-Creme-Paar nach den Hero-Regeln', () => {
+    expect(categoryIcons).toContain("habits: '#4B125C'");
+    expect(categoryIcons).toContain("habits: '#FCEFBB'");
+    expect(designSystem).toContain(':root[data-seite="habits"]{');
+    expect(designSystem).toContain('--cap-card:#FFFCF5;');
+    expect(designSystem).toContain('background:#4B125C!important;\n  color:#FCEFBB!important;');
+    expect(designSystem).toContain('background:#FFFCF5!important;\n  color:#4B125C!important;');
+  });
+
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
     expect(designSystem).toContain('--dex-ink:#0A1330;');
     expect(designSystem).toContain('border-color:#0A1330!important;');

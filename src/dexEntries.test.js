@@ -40,7 +40,7 @@ describe('Anbieter- und Farbkontrast', () => {
       'food-log': '#F1DF71',
       reminders: '#FEEFB8',
       sleep: '#1E3A8A',
-      habits: '#4B0082',
+      habits: '#4B125C',
       shopping: '#00C2CB',
       essen: '#800020',
       training: '#013E37',
