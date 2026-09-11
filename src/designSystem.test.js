@@ -153,9 +153,11 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("training: '#013E37'");
     expect(categoryIcons).toContain("training: '#FCEFBB'");
     expect(designSystem).toContain(':root[data-seite="training"]{');
-    expect(designSystem).toContain('--cap-card:#FCEFBB;');
-    expect(designSystem).toContain('background:#013E37!important;\n  color:#FCEFBB!important;');
-  });
+  expect(designSystem).toContain('--cap-card:#FCEFBB;');
+  expect(designSystem).toContain('background:#013E37!important;\n  color:#FCEFBB!important;');
+  expect(designSystem).toContain('border-color:#000!important;');
+  expect(designSystem).toContain('filter:drop-shadow(2px 2px 0 #000)!important;');
+});
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
     expect(designSystem).toContain('--dex-ink:#0A1330;');

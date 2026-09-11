@@ -9227,7 +9227,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:inset 0 0 0 1.25px #fff!important;
 }
 :root[data-seite="training"] .app-dex-tab.aktiv>span{
-  filter:drop-shadow(2px 2px 0 #fff)!important;
+  /* Die Bedienfarbe ist weiß, der plastische Retro-Schatten bleibt jedoch
+     neutral schwarz. So wird das SVG nicht als weiße Doppelkontur gelesen. */
+  filter:drop-shadow(2px 2px 0 #000)!important;
 }
 :root[data-seite="training"] .app-dex-menu{
   border-left-color:#fff!important;
@@ -9384,6 +9386,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:var(--dex-ink,#FCEFBB)!important;
   background:var(--dex-ink,#FCEFBB)!important;
   color:var(--dex-seitenfarbe,#013E37)!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
+  /* Die Filter sind Bedienelemente und erhalten deshalb die neutrale,
+     schwarze LOGMAN-Kontur statt einer mit dem Hintergrund verschmelzenden
+     grünen Kante. Füllung und Schrift bleiben im Grün-Creme-Paar. */
+  border-color:#000!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
   border-color:#013E37!important;
