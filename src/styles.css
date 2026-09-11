@@ -9420,8 +9420,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form path{
   stroke:#000!important;
 }
+:root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){
+  fill:#FFFCF5!important;
+}
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
   fill:#F1DF71!important;
+}
+:root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
+:root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
+  color:#552626!important;
 }
 :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){
   border-color:#000!important;

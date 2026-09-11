@@ -100,6 +100,7 @@ TRAINING, ESSEN, SUPPS und STRESS.
 - Seitenfarbe: `#F1DF71`
 - Druckfarbe: `#552626`
 - Übersichtskarten und Rezeptdetails: Warmweiß mit brauner Schrift
+- Unterordner: Warmweiß mit brauner Schrift und gelbem Einsatz
 - Inaktive Chips: Braun mit gelber Schrift
 - Aktiver Chip und hervorgehobene Detailfelder: Gelb mit brauner Schrift
 - Zutatenflächen: Warmweiß mit brauner Schrift für längere, gut lesbare Listen
