@@ -203,7 +203,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
     closeSelector: '[data-sheet-close]',
     ariaLabel: 'Morgen-Check-in',
     markup: `
-    <header><div><small>+3 CAPCOINS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <header><div><small>+3 CAPSTARS</small><h2>Morgen-Check-in</h2></div><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form data-sleep-checkin-form>
       <label class="dex-entry-field"><span>Datum</span><input class="input" type="date" data-sleep-date value="${date}" required></label>
       <div class="sleep-time-pair"><label class="dex-entry-field"><span>Eingeschlafen</span><input class="input" type="time" data-sleep-bedtime value="${String(existing?.bedtime || schedule?.bedtime || '22:30').slice(0, 5)}" required></label><label class="dex-entry-field"><span>Aufgewacht</span><input class="input" type="time" data-sleep-wake value="${String(existing?.wake_time || schedule?.wake_time || '06:30').slice(0, 5)}" required></label></div>
@@ -239,7 +239,7 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
       if (submit) submit.disabled = false;
       return;
     }
-    closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 CAPCOINS'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 CAPSTARS'); await onSaved?.();
     playInterfaceSound('bonus', { retrigger: 'restart' });
   };
   backdrop.querySelector('[data-sleep-delete]')?.addEventListener('click', async () => {

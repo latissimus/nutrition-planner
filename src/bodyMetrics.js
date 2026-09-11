@@ -290,7 +290,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         if (error) return toast('Gewicht konnte nicht gespeichert werden');
         notifyHomeCountsChanged();
         if (isNew) notifyCoinBalanceChanged();
-        toast(isNew ? 'Gewicht gespeichert · +1 CAPCOIN' : 'Gewicht aktualisiert');
+        toast(isNew ? 'Gewicht gespeichert · +1 CAPSTAR' : 'Gewicht aktualisiert');
         await closeAndRender();
       });
     };
@@ -306,7 +306,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' });
         if (error) return toast('Taillenumfang konnte nicht gespeichert werden');
         if (isNew) notifyCoinBalanceChanged();
-        toast(isNew ? 'Taillenumfang gespeichert · +1 CAPCOIN' : 'Taillenumfang aktualisiert');
+        toast(isNew ? 'Taillenumfang gespeichert · +1 CAPSTAR' : 'Taillenumfang aktualisiert');
         await closeAndRender();
       });
     };
@@ -340,7 +340,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           if (error) return toast('Messung konnte nicht gespeichert werden');
           notifyHomeCountsChanged();
           if (isNew) notifyCoinBalanceChanged();
-          toast(isNew ? '12-Falten-Summe gespeichert · +1 CAPCOIN' : '12-Falten-Summe aktualisiert');
+          toast(isNew ? '12-Falten-Summe gespeichert · +1 CAPSTAR' : '12-Falten-Summe aktualisiert');
           await closeAndRender();
         });
       };

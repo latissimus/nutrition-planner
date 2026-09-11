@@ -1795,7 +1795,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .coin-kopfstand strong{min-width:13px;font-size:12px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
 .coin-kopfstand:active{transform:translateY(1px)}
 /* Selektiert (Route #coins): derselbe harte Schlagschatten wie die aktiven
-   Menü-Icons — filter:drop-shadow folgt der Alpha-Kante des CAPCOIN-SVGs. */
+   Menü-Icons — filter:drop-shadow folgt der Alpha-Kante des CAPSTARS-SVGs. */
 .coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
 :root[data-theme="dark"] .coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #EDF0F6)}
 
@@ -5183,7 +5183,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ============================================================
    SPECIAL-DEX-VORLAGE
    Gemeinsamer, anpassbarer Rahmen für Dex mit breiten Karten und Hero.
-   Einkauf, Schlaf, Routinen, Körperwerte und Coins können ausschließlich
+   Einkauf, Schlaf, Routinen, Körperwerte und CAPSTARS können ausschließlich
    diese Primitiven übernehmen; ihre Fachinhalte bleiben eigene Module.
    ============================================================ */
 .special-dex-page{
@@ -7416,7 +7416,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Tapete und Bedienung folgen Meal-, Sleep- und Body-Log.
    ============================================================ */
 :root[data-seite="coins"],:root[data-seite="coins"] body{
-  background-color:var(--dex-seitenfarbe,#E6D6FF)!important;
+  background-color:var(--dex-seitenfarbe,#4F5B8C)!important;
   background-image:none!important;
 }
 :root[data-seite="coins"] :is(#app,#view){
@@ -7426,7 +7426,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coin-dex-page{
   --special-dex-inline:36px!important;
   --special-dex-gap:18px!important;
-  --special-dex-hero-bg:color-mix(in srgb,var(--ordner,#E6D6FF) 9%,#fff);
+  --special-dex-hero-bg:color-mix(in srgb,var(--ordner,#4F5B8C) 9%,#fff);
   --special-dex-card-bg:#fff;
   isolation:isolate;
   color:var(--dex-ink,#111);
@@ -7577,11 +7577,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .coin-dex-page .coin-reward-actions .coin-redeem{
   border-color:#111;
-  background:var(--ordner,var(--dex-seitenfarbe,#E6D6FF));
+  background:var(--ordner,var(--dex-seitenfarbe,#4F5B8C));
   color:#111;
 }
 :root[data-seite="coins"] .coin-editor-backdrop{
-  --ordner:var(--dex-seitenfarbe,#E6D6FF);
+  --ordner:var(--dex-seitenfarbe,#4F5B8C);
   --ordner-ink:var(--dex-ink,#111);
 }
 @media(max-width:390px){
@@ -8551,7 +8551,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #EDF0F6)}
 
-/* Breite Karten: TRACKER, SCHLAF, ROUTINEN, KOERPER und CAPCOINS. */
+/* Breite Karten: TRACKER, SCHLAF, ROUTINEN, KOERPER und CAPSTARS. */
 .special-dex-page{
   --special-dex-inline:var(--cap-page-inline)!important;
   --special-dex-gap:var(--cap-stack-gap)!important;
@@ -10645,5 +10645,152 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
   color:#FFE08C!important;
+  fill:currentColor!important;
+}
+
+/* CAPSTARS: Twilight Berry #4F5B8C mit dem hellen Gelb #EDEBA4.
+   Der Hero trägt das direkte Paar; längere Karten bleiben weiß und verwenden
+   Twilight als Textfarbe. App-Chrome und Kontextmenüs bleiben neutral. */
+:root[data-seite="coins"]{
+  --cap-card:#fff;
+  --cap-tint:color-mix(in srgb,#EDEBA4 10%,#4F5B8C);
+  --cap-card-border:1.5px solid #EDEBA4;
+  --cap-muted:#667099;
+}
+:root[data-seite="coins"] .coin-dex-page{
+  --surface:#fff;
+  --surface2:color-mix(in srgb,#4F5B8C 8%,#fff);
+  --text:#4F5B8C;
+  --ink:#EDEBA4;
+  --muted:#667099;
+  color:#EDEBA4!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-balance-card{
+  border-color:#EDEBA4!important;
+  background:color-mix(in srgb,#EDEBA4 10%,#4F5B8C)!important;
+  color:#EDEBA4!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-balance-card :is(small,strong,b){
+  color:#EDEBA4!important;
+}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty){
+  border-color:#EDEBA4!important;
+  background:#fff!important;
+  color:#4F5B8C!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-verdienst>summary{
+  background:color-mix(in srgb,#4F5B8C 8%,#fff)!important;
+  color:#4F5B8C!important;
+}
+:root[data-seite="coins"] .coin-dex-page :is(
+  .coin-verdienst>summary b,
+  .coin-verdienst>summary small,
+  .coin-verdienst>summary .material-svg,
+  .coin-verdienst>summary svg,
+  .coin-verdienst-hinweis,
+  .coin-verdienst-titel b,
+  .coin-verdienst-gruppe small,
+  .coin-verdienst-gruppe strong,
+  .coin-verdienst-frei b,
+  .coin-verdienst-frei small,
+  .coin-next b,
+  .coin-next small,
+  .coin-next>strong,
+  .coin-reward-kopf b,
+  .coin-reward-kopf small,
+  .coin-reward-kopf>strong,
+  .coin-reward p,
+  .coin-empty b,
+  .coin-empty span
+){
+  color:#4F5B8C!important;
+  fill:currentColor!important;
+}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst-gruppe>div>span,.coin-verdienst-frei){
+  background:color-mix(in srgb,#4F5B8C 8%,#fff)!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-verdienst-gruppe{
+  border-top-color:color-mix(in srgb,#4F5B8C 28%,transparent)!important;
+}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-section-title h2,.coin-history-title){
+  color:#EDEBA4!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-progress{
+  background:color-mix(in srgb,#4F5B8C 18%,transparent)!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-progress i{background:#4F5B8C!important}
+:root[data-seite="coins"] .coin-dex-page .coin-reward-actions button{
+  border-color:#000!important;
+  background:#fff!important;
+  color:#4F5B8C!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-reward-actions .coin-redeem{
+  background:#4F5B8C!important;
+  color:#EDEBA4!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-history,
+:root[data-seite="coins"] .coin-dex-page .coin-history :is(span,small,b,.plus,.minus){
+  color:#EDEBA4!important;
+}
+:root[data-seite="coins"] .coin-dex-page .coin-history,
+:root[data-seite="coins"] .coin-dex-page .coin-history>div{
+  border-color:color-mix(in srgb,#EDEBA4 34%,transparent)!important;
+}
+
+/* Dunkle Seite: Header und Dock verwenden Weiß; die individuelle gelbe
+   Druckfarbe endet an der Inhaltsebene. Wortmarke bleibt original, die
+   Athleten-Silhouette wird für Sichtbarkeit weiß. */
+:root[data-seite="coins"] .app-dex-header{
+  --dex-ink:#fff;
+  background:#4F5B8C!important;
+  border-color:#fff!important;
+  color:#fff!important;
+  --brand-outline:#0A1330;
+}
+:root[data-seite="coins"] .app-dex-brand .brand{
+  --brand-outline:#0A1330;
+  --sil-filter:brightness(0) invert(1);
+}
+:root[data-seite="coins"] .app-dex-header .nav-av{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#4F5B8C!important;
+}
+:root[data-seite="coins"] .app-dex-dock{--dex-ink:#fff;color:#fff!important}
+:root[data-seite="coins"] .app-dex-dock::after{background:#4F5B8C!important}
+:root[data-seite="coins"] .app-dex-dock-inner::before{
+  border-color:#fff!important;
+  background:color-mix(in srgb,#4F5B8C 84%,transparent)!important;
+}
+:root[data-seite="coins"] .app-dex-tab{color:#fff!important}
+:root[data-seite="coins"] .app-dex-tab.aktiv{
+  background:color-mix(in srgb,#fff 12%,#4F5B8C)!important;
+  box-shadow:inset 0 0 0 1.25px #fff!important;
+}
+:root[data-seite="coins"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
+:root[data-seite="coins"] .app-dex-menu{border-left-color:#fff!important;color:#fff!important}
+
+/* Formulare bleiben eine neutrale weiße Systemebene. Nur die primäre Aktion
+   verwendet Twilight Berry als Fläche und CAPSTARS-Gelb als Beschriftung. */
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet){
+  --cap-muted:#586274;
+  --muted:#586274;
+  border-color:#111!important;
+  background:#fff!important;
+  color:#111!important;
+}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *){
+  color:#111!important;
+  fill:currentColor!important;
+}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;
+  background:#4F5B8C!important;
+  color:#EDEBA4!important;
+  box-shadow:0 5px 0 #000!important;
+}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#EDEBA4!important;
   fill:currentColor!important;
 }

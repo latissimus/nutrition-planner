@@ -195,7 +195,7 @@ function notificationText(reminder) {
   if (reminder.type === 'sleep') {
     const phase = reminder.metadata?.phase;
     const body = phase === 'wind-down' ? 'Zeit, Bildschirm und Tempo langsam herunterzufahren.'
-      : phase === 'check-in' ? 'Wie war deine Nacht? Dein Check-in bringt 3 CAPCOINS.'
+      : phase === 'check-in' ? 'Wie war deine Nacht? Dein Check-in bringt 3 CAPSTARS.'
         : 'Dein geplanter Schlaf beginnt jetzt.';
     return { title: `${notificationSymbol(reminder)} ${reminder.label.split(' · ')[0]}`, body };
   }

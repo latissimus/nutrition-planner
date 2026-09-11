@@ -58,7 +58,7 @@ const defaultColors = {
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#E6D6FF',
+  coins: '#4F5B8C',
   profile: '#A7C957',
 };
 const fixedSystemColors = {
@@ -72,7 +72,7 @@ const fixedSystemColors = {
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#E6D6FF',
+  coins: '#4F5B8C',
   profile: '#A7C957',
 };
 // Einige feste Seiten funktionieren bewusst als zweifarbige Retro-Paare
@@ -90,6 +90,7 @@ const fixedSystemInks = {
   shopping: '#49251E',
   sleep: '#FCEFBB',
   stress: '#FFE08C',
+  coins: '#EDEBA4',
 };
 const fixedSystemAccents = {
   body: '#FF277F',
@@ -102,6 +103,7 @@ const fixedSystemAccents = {
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
+  coins: '#4F5B8C',
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
@@ -114,6 +116,7 @@ const fixedSystemAccentInks = {
   shopping: '#49251E',
   sleep: '#FCEFBB',
   stress: '#FFE08C',
+  coins: '#EDEBA4',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',

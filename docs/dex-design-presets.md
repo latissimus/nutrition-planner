@@ -201,6 +201,18 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - Diagrammlinie und Datenpunkte im 7-Tage-Verlauf: Midnight auf Weiß
 - Kontextmenüs: neutral Weiß/Schwarz; Primäraktionen Midnight mit Creme
 
+### Referenz CAPSTARS
+
+- Sichtbarer Seiten- und Währungsname: `CAPSTARS`; Route, Datenbanktabellen und
+  interne Schlüssel behalten aus Kompatibilitätsgründen den Namen `coins`
+- Seitenfarbe: Twilight Berry `#4F5B8C`
+- Druckfarbe: helles Gelb `#EDEBA4`
+- Hero: leicht aufgehelltes Twilight Berry mit gelber Schrift
+- Längere Karten: Weiß mit Twilight-Schrift und gelber Kontur
+- Werte, Tapete und Inhaltsüberschriften auf der Seitenfläche: helles Gelb
+- App-Header und Dock: neutrales Weiß; Silhouette Weiß, Wortmarke original
+- Kontextmenüs: neutral Weiß/Schwarz; Primäraktionen Twilight Berry mit Gelb
+
 ### Referenz ROUTINEN
 
 - Seitenfarbe: Blueberry `#4B125C`

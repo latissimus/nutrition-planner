@@ -152,6 +152,15 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('color:#FFE08C!important;');
   });
 
+  it('verwendet für CAPSTARS Twilight Berry mit hellem Gelb und neutralen Karten', () => {
+    expect(categoryIcons).toContain("coins: '#4F5B8C'");
+    expect(categoryIcons).toContain("coins: '#EDEBA4'");
+    expect(main).toContain("title: 'CAPSTARS'");
+    expect(designSystem).toContain(':root[data-seite="coins"]{\n  --cap-card:#fff;');
+    expect(designSystem).toContain('background:color-mix(in srgb,#EDEBA4 10%,#4F5B8C)!important;');
+    expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:brightness(0) invert(1);');
+  });
+
   it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
     expect(categoryIcons).toContain("essen: '#3C153B'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");

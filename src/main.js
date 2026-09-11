@@ -628,7 +628,7 @@ function appDockTitel(route) {
     return appDockEigene.find((item) => `collection/${item.id}` === route)?.name || 'Seite';
   }
   return sammlungen.find(([key]) => key === route)?.[1]
-    || (route === 'coins' ? 'COINS' : 'Seite');
+    || (route === 'coins' ? 'CAPSTARS' : 'Seite');
 }
 
 function appDockEintraegeMarkup(aktiveDockRoute) {
@@ -658,7 +658,7 @@ function appSyncStatusAktualisieren() {
   const online = navigator.onLine;
   /* Der erfolgreiche Normalzustand bleibt still. Ein permanenter Haken war
      mehrdeutig (online, gespeichert oder erledigt?) und konkurrierte mit den
-     CAPCOINS. Sichtbar wird der Platz nur, wenn wirklich Aufmerksamkeit nötig
+     CAPSTARS. Sichtbar wird der Platz nur, wenn wirklich Aufmerksamkeit nötig
      ist. Die Offline-Fähigkeit und der Service Worker bleiben davon unberührt. */
   status.hidden = online;
   status.textContent = online ? '' : 'OFFLINE';
@@ -976,7 +976,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     training: ['#013E37', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#94DEFF', 'wallpaper-comp', '📐'],
     stress: ['#E36887', 'wallpaper-stress', '⚡'],
-    coins: ['#E6D6FF', 'wallpaper-game', '🎮'],
+    coins: ['#4F5B8C', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
     setPreference(`muscledex:kategorie-farbe:${route}`, color);
@@ -1032,7 +1032,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const habits = kind === 'habits';
   const coins = kind === 'coins';
   const stress = kind === 'stress';
-  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : essen ? 'ESSEN' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'MIND' : coins ? 'COINS' : 'REZEPTE');
+  const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : essen ? 'ESSEN' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'MIND' : coins ? 'CAPSTARS' : 'REZEPTE');
   const copy = body
     ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
@@ -1052,7 +1052,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     : stress
     ? `<p>Auf der Seite <b>MIND</b> sammelst du <b>Motivation</b>, mentale Stärke und Strategien für den Umgang mit Stress.</p><p>Mit <b>Tags</b> und <b>Unterordnern</b> ordnest du Impulse, Belastungen, Auslöser und Entspannung so, dass du hilfreiche Muster schnell wiederfindest.</p>`
     : coins
-    ? `<p>Auf der Seite <b>COINS</b> sammelst du CAPCOINS für erledigte Routinen, Check-ins und Messungen.</p>
+    ? `<p>Auf der Seite <b>CAPSTARS</b> sammelst du CAPSTARS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>
       <p>Dein Kontostand bleibt auch im festen App-Header sichtbar.</p>`
     : custom
@@ -1377,7 +1377,7 @@ async function renderRoute() {
     prepareSpecialDexPage(view, 'coin-dex');
     const coinActions = await mountCoinDex(view, { userId: session.user.id, signal, mountChrome: mountCategoryChrome });
     installNeoDexChrome(view, {
-      title: 'COINS',
+      title: 'CAPSTARS',
       meta: coinActions?.meta || 'Belohnungen',
       closeHref: '#home',
     });
