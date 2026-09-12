@@ -73,6 +73,7 @@ describe('Anbieter- und Farbkontrast', () => {
     }));
     expect(pageLook('habits', '#000000', 'wallpaper-wolke')).toEqual(expect.objectContaining({
       color: '#3F236F', ink: '#FFF8ED', accent: '#3F236F', accentInk: '#FFF8ED',
+      pattern: 'wallpaper-stress',
     }));
     expect(pageLook('shopping', '#000000', 'wallpaper-brokkoli')).toEqual(expect.objectContaining({
       color: '#FFEFB3', ink: '#013E37', accent: '#013E37', accentInk: '#FFEFB3',
@@ -82,6 +83,7 @@ describe('Anbieter- und Farbkontrast', () => {
     }));
     expect(pageLook('stress', '#000000', 'wallpaper-stress')).toEqual(expect.objectContaining({
       color: '#E36887', ink: '#FFE08C', accent: '#E36887', accentInk: '#FFE08C',
+      pattern: 'wallpaper-wolke',
     }));
     expect(pageLook('coins', '#000000', 'wallpaper-game')).toEqual(expect.objectContaining({
       color: '#432C5E', ink: '#FFD400', accent: '#432C5E', accentInk: '#FFD400',

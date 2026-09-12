@@ -276,11 +276,12 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('border-color:#000!important;\n  background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-ink)!important;');
   });
 
-  it('bindet die festen COMP- und MIND-Tapeten statt der Alt-Motive ein', () => {
+  it('bindet die festen COMP- sowie getauschten ROUTINEN- und MIND-Tapeten ein', () => {
     expect(categoryIcons).toContain("body: 'wallpaper-comp'");
-    expect(categoryIcons).toContain("stress: 'wallpaper-stress'");
+    expect(categoryIcons).toContain("habits: 'wallpaper-stress'");
+    expect(categoryIcons).toContain("stress: 'wallpaper-wolke'");
     expect(main).toContain("applyPageLook('body', categoryColor('body'), 'wallpaper-comp')");
-    expect(main).toContain("applyPageLook('stress', categoryColor('stress'), 'wallpaper-stress')");
+    expect(main).toContain("applyPageLook('stress', categoryColor('stress'), 'wallpaper-wolke')");
     expect(css).toContain('--body-pattern:var(--dex-tapete,url("../MUSCLEDEX-TAPETEN/Comp.svg"))');
     expect(designSystem).toContain(':root[data-seite="stress"] .neo-dex-page.dex-tapete-datei .kategorie-scrollinhalt::before');
   });

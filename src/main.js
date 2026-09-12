@@ -981,10 +981,10 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     supps: ['#D8BFD8', 'wallpaper-supps', '💊'],
     sleep: ['#0E1D47', 'wallpaper-moon', '😴'],
     shopping: ['#FFEFB3', 'wallpaper-brokkoli', '🛒'],
-    habits: ['#3F236F', 'wallpaper-wolke', '🧠'],
+    habits: ['#3F236F', 'wallpaper-stress', '🧠'],
     training: ['#203C3D', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#94DEFF', 'wallpaper-comp', '📐'],
-    stress: ['#E36887', 'wallpaper-stress', '⚡'],
+    stress: ['#E36887', 'wallpaper-wolke', '⚡'],
     coins: ['#432C5E', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
@@ -1140,7 +1140,7 @@ async function mountCustomCollection(container, item, signal) {
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
   const inheritedColor = inheritsSystemDexLook ? categoryColor(item.root_key) : (lookRoot.color || item.color);
   let inheritedPattern = inheritsSystemDexLook
-    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : essenDexSkin ? 'wallpaper-essen' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : stressDexSkin ? 'wallpaper-stress' : 'drops').pattern
+    ? pageLook(item.root_key, inheritedColor, foodDexSkin ? 'wallpaper-pizza' : essenDexSkin ? 'wallpaper-essen' : trainingDexSkin ? 'wallpaper-dumbbell' : suppsDexSkin ? 'wallpaper-supps' : stressDexSkin ? 'wallpaper-wolke' : 'drops').pattern
     : 'setometer-triangles';
   if (customDexSkin) {
     // Eigene Haupt-Dex bestimmen ihre Farbe in der Datenbank. Die Tapete ist
@@ -1606,7 +1606,7 @@ async function renderRoute() {
     const { mountRoutines } = await routinesModule();
     const routineActions = await mountRoutines(view, { session, signal });
     mountCategoryChrome(view, route, 'ROUTINEN', {
-      pageLookScope: route, pageLookPattern: 'triangles',
+      pageLookScope: route, pageLookPattern: 'wallpaper-stress',
       onPlus: () => routineActions?.openRoutineEditor?.(),
     });
     installNeoDexChrome(view, {
@@ -1650,7 +1650,7 @@ async function renderRoute() {
     setSeite('stress');
     // Fixierte Farbe und Tapete zuerst setzen, damit waehrend des Ladens
     // (siehe TRAINING-Muster) niemals der neutrale Sammlungs-Look aufblitzt.
-    applyPageLook('stress', categoryColor('stress'), 'wallpaper-stress');
+    applyPageLook('stress', categoryColor('stress'), 'wallpaper-wolke');
     const children = await loadCollections(session.user.id, { rootKey: 'stress', signal });
     const childStats = await dexSammlungsStatistik(session.user.id, 'stress', children, signal);
     if (signal?.aborted) return;
@@ -1662,7 +1662,7 @@ async function renderRoute() {
     const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
     const openEntry = (type) => openDexEntryEditor({ type, userId: session.user.id, rootKey: 'stress', onSaved: refresh });
     mountCategoryChrome(view, route, 'MIND', {
-      pageLookScope: route, pageLookPattern: 'wallpaper-stress',
+      pageLookScope: route, pageLookPattern: 'wallpaper-wolke',
       meta: `${children.length} Unterordner`,
       onAddNote: () => openEntry('note'), onAddLink: () => openEntry('link'), onAddImage: () => openEntry('image'),
       onAddAudio: () => openEntry('audio'),

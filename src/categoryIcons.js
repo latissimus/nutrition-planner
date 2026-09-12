@@ -129,7 +129,8 @@ const fixedSystemPatterns = {
   supps: 'wallpaper-supps',
   reminders: 'wallpaper-burger',
   sleep: 'wallpaper-moon',
-  stress: 'wallpaper-stress',
+  habits: 'wallpaper-stress',
+  stress: 'wallpaper-wolke',
 };
 const colorGroups = [
   ['Seitenfarben', [
