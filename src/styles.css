@@ -11009,42 +11009,42 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    lange Inhalte auf hellen, ruhigen Leseflächen.
    ============================================================ */
 
-/* TRACKER · Cinnamon #945B39 / Warmweiß #F6EFE9 */
+/* TRACKER · Soft Blush #FFEDE3 / Braun #49251E */
 :root[data-seite="reminders"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#945B39 9%,#F6EFE9);
-  --cap-card-border:1.5px solid #945B39;
-  --cap-muted:#7B675B;
+  --cap-tint:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --cap-card-border:1.5px solid #49251E;
+  --cap-muted:#765E58;
 }
-:root[data-seite="reminders"],:root[data-seite="reminders"] body,:root[data-seite="reminders"] :is(#app,#view){background-color:#945B39!important}
+:root[data-seite="reminders"],:root[data-seite="reminders"] body,:root[data-seite="reminders"] :is(#app,#view){background-color:#FFEDE3!important}
 :root[data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#FFFCF5;
-  --tracker-tint:color-mix(in srgb,#945B39 9%,#F6EFE9);
-  --text:#945B39;
-  --ink:#F6EFE9;
-  --muted:#7B675B;
-  color:#F6EFE9!important;
+  --tracker-tint:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --text:#49251E;
+  --ink:#49251E;
+  --muted:#765E58;
+  color:#49251E!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
   .nutrition-coin-overview,.nutrition-card,.mahl-zeitblock
-){border-color:#945B39!important;background:#FFFCF5!important;color:#945B39!important}
+){border-color:#49251E!important;background:#FFFCF5!important;color:#49251E!important}
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
-  border-color:#F6EFE9!important;
-  background:color-mix(in srgb,#F6EFE9 8%,#945B39)!important;
-  color:#F6EFE9!important;
+  border-color:#49251E!important;
+  background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;
+  color:#49251E!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
   .nutrition-coin-overview>summary b,
   .mahl-zeitblock>header h2,.rem-row-titel b,.nutrition-entry b,.nutrition-entry strong
-){color:#945B39!important}
-:root[data-seite="reminders"] .meal-log-dex-page :is(.nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,.nutrition-coin-hero-value b,.nutrition-ring>span){color:#F6EFE9!important}
-:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after{background:color-mix(in srgb,#F6EFE9 8%,#945B39)!important}
+){color:#49251E!important}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,.nutrition-coin-hero-value b,.nutrition-ring>span){color:#49251E!important}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after{background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
 :root[data-seite="reminders"] .nutrition-portionen button.aktiv,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
-  border-color:#945B39!important;
-  background:#945B39!important;
-  color:#F6EFE9!important;
+  border-color:#49251E!important;
+  background:#49251E!important;
+  color:#FFEDE3!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info :is(.material-svg,svg,svg *){
@@ -11055,53 +11055,53 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:#fff!important;
 }
-:root[data-seite="reminders"] .app-dex-header{--dex-ink:#F6EFE9;background:#945B39!important;border-color:#F6EFE9!important;color:#F6EFE9!important}
-:root[data-seite="reminders"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
-:root[data-seite="reminders"] .app-dex-header .nav-av{border-color:#F6EFE9!important;background:#fff!important;color:#945B39!important}
-:root[data-seite="reminders"] .app-dex-dock{--dex-ink:#F6EFE9;color:#F6EFE9!important}
-:root[data-seite="reminders"] .app-dex-dock::after{background:#945B39!important}
-:root[data-seite="reminders"] .app-dex-dock-inner::before{border-color:#F6EFE9!important;background:color-mix(in srgb,#945B39 90%,transparent)!important}
-:root[data-seite="reminders"] .app-dex-tab{color:#F6EFE9!important}
-:root[data-seite="reminders"] .app-dex-tab.aktiv{background:color-mix(in srgb,#F6EFE9 12%,#945B39)!important;box-shadow:inset 0 0 0 1.25px #F6EFE9!important}
-:root[data-seite="reminders"] .app-dex-menu{border-left-color:#F6EFE9!important;color:#F6EFE9!important}
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#945B39!important;background:#945B39!important;color:#F6EFE9!important}
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#F6EFE9!important;fill:currentColor!important}
+:root[data-seite="reminders"] .app-dex-header{--dex-ink:#49251E;background:#FFEDE3!important;border-color:#49251E!important;color:#49251E!important}
+:root[data-seite="reminders"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
+:root[data-seite="reminders"] .app-dex-header .nav-av{border-color:#49251E!important;background:#fff!important;color:#49251E!important}
+:root[data-seite="reminders"] .app-dex-dock{--dex-ink:#49251E;color:#49251E!important}
+:root[data-seite="reminders"] .app-dex-dock::after{background:#FFEDE3!important}
+:root[data-seite="reminders"] .app-dex-dock-inner::before{border-color:#49251E!important;background:color-mix(in srgb,#FFEDE3 90%,transparent)!important}
+:root[data-seite="reminders"] .app-dex-tab{color:#49251E!important}
+:root[data-seite="reminders"] .app-dex-tab.aktiv{background:color-mix(in srgb,#49251E 9%,#FFEDE3)!important;box-shadow:inset 0 0 0 1.25px #49251E!important}
+:root[data-seite="reminders"] .app-dex-menu{border-left-color:#49251E!important;color:#49251E!important}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#49251E!important;background:#49251E!important;color:#FFEDE3!important}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEDE3!important;fill:currentColor!important}
 
-/* ESSEN · Butter #FFEFB3 / Dunkelgrün #013E37 */
+/* ESSEN · Cinnamon #945B39 / Warmweiß #F6EFE9 */
 :root[data-seite="essen"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#013E37 7%,#FFEFB3);
-  --cap-card-border:1.5px solid #013E37;
-  --cap-muted:#526D68;
+  --cap-tint:color-mix(in srgb,#F6EFE9 8%,#945B39);
+  --cap-card-border:1.5px solid #945B39;
+  --cap-muted:#7B675B;
 }
-:root[data-seite="essen"],:root[data-seite="essen"] body,:root[data-seite="essen"] :is(#app,#view){background-color:#FFEFB3!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){--surface:#FFFCF5;--surface2:color-mix(in srgb,#013E37 7%,#FFEFB3);--text:#013E37;--ink:#013E37;--muted:#526D68;color:#013E37!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span){color:#013E37!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button){border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{background:#013E37!important;color:#FFEFB3!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{border-color:#013E37!important;background:#013E37!important}
+:root[data-seite="essen"],:root[data-seite="essen"] body,:root[data-seite="essen"] :is(#app,#view){background-color:#945B39!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){--surface:#FFFCF5;--surface2:color-mix(in srgb,#945B39 7%,#FFFCF5);--text:#945B39;--ink:#F6EFE9;--muted:#7B675B;color:#F6EFE9!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span){color:#F6EFE9!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button){border-color:#000!important;background:#F6EFE9!important;color:#945B39!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{background:#945B39!important;color:#F6EFE9!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{border-color:#000!important;background:#FFFCF5!important;color:#945B39!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{border-color:#000!important;background:#945B39!important}
 :root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text),
 :root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){color:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){color:#945B39!important}
 :root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){fill:#FFFCF5!important}
-:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#013E37!important}
-:root[data-seite="essen"] .dex-detail-popup{border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
-:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#013E37!important}
-:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important}
-:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEFB3!important;fill:currentColor!important}
-:root[data-seite="essen"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#013E37!important}
-:root[data-seite="essen"] .app-dex-header{--dex-ink:#013E37;background:#FFEFB3!important;border-color:#013E37!important;color:#013E37!important}
-:root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
-:root[data-seite="essen"] .app-dex-header .nav-av{border-color:#013E37!important;background:#fff!important;color:#013E37!important}
-:root[data-seite="essen"] .app-dex-dock{--dex-ink:#013E37;color:#013E37!important}
-:root[data-seite="essen"] .app-dex-dock::after{background:#FFEFB3!important}
-:root[data-seite="essen"] .app-dex-dock-inner::before{border-color:#013E37!important;background:color-mix(in srgb,#FFEFB3 90%,transparent)!important}
-:root[data-seite="essen"] .app-dex-tab{color:#013E37!important}
-:root[data-seite="essen"] .app-dex-tab.aktiv{background:color-mix(in srgb,#013E37 9%,#FFEFB3)!important;box-shadow:inset 0 0 0 1.25px #013E37!important}
-:root[data-seite="essen"] .app-dex-menu{border-left-color:#013E37!important;color:#013E37!important}
-:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important}
-:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEFB3!important;fill:currentColor!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#945B39!important}
+:root[data-seite="essen"] .dex-detail-popup{border-color:#000!important;background:#FFFCF5!important;color:#945B39!important}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#945B39!important}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){border-color:#000!important;background:#945B39!important;color:#F6EFE9!important}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){color:#F6EFE9!important;fill:currentColor!important}
+:root[data-seite="essen"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#945B39!important}
+:root[data-seite="essen"] .app-dex-header{--dex-ink:#F6EFE9;background:#945B39!important;border-color:#F6EFE9!important;color:#F6EFE9!important}
+:root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
+:root[data-seite="essen"] .app-dex-header .nav-av{border-color:#F6EFE9!important;background:#fff!important;color:#945B39!important}
+:root[data-seite="essen"] .app-dex-dock{--dex-ink:#F6EFE9;color:#F6EFE9!important}
+:root[data-seite="essen"] .app-dex-dock::after{background:#945B39!important}
+:root[data-seite="essen"] .app-dex-dock-inner::before{border-color:#F6EFE9!important;background:color-mix(in srgb,#945B39 90%,transparent)!important}
+:root[data-seite="essen"] .app-dex-tab{color:#F6EFE9!important}
+:root[data-seite="essen"] .app-dex-tab.aktiv{background:color-mix(in srgb,#F6EFE9 12%,#945B39)!important;box-shadow:inset 0 0 0 1.25px #F6EFE9!important}
+:root[data-seite="essen"] .app-dex-menu{border-left-color:#F6EFE9!important;color:#F6EFE9!important}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#945B39!important;background:#945B39!important;color:#F6EFE9!important}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#F6EFE9!important;fill:currentColor!important}
 
 /* SUPPS · Thistle #D8BFD8 / Tiefviolett #2A1E5C */
 :root[data-seite="supps"]{

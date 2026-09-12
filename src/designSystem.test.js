@@ -174,8 +174,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="profile"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
   });
 
-  it('registriert ESSEN als feste Butter-Wissensseite mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("essen: '#FFEFB3'");
+  it('registriert ESSEN als feste Cinnamon-Wissensseite mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("essen: '#945B39'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");
     expect(main).toContain("essen: { title: 'ESSEN', pattern: 'wallpaper-essen' }");
     expect(entryDetail).toContain("essen: 'ESSEN'");
@@ -198,12 +198,12 @@ describe('CAPBOY Design-System', () => {
     expect(heroCss).toContain('font-weight:700!important;');
   });
 
-  it('verwendet auf TRACKER das feste Cinnamon-Warmweiß-Paar', () => {
-    expect(categoryIcons).toContain("reminders: '#945B39'");
-    expect(categoryIcons).toContain("reminders: '#F6EFE9'");
+  it('verwendet auf TRACKER das feste Soft-Blush-Braun-Paar', () => {
+    expect(categoryIcons).toContain("reminders: '#FFEDE3'");
+    expect(categoryIcons).toContain("reminders: '#49251E'");
     expect(designSystem).toContain(':root[data-seite="reminders"]{');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #945B39;');
-    expect(designSystem).toContain('background:color-mix(in srgb,#F6EFE9 8%,#945B39)!important;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #49251E;');
+    expect(designSystem).toContain('background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;');
     expect(designSystem).toContain('.nutrition-calibration-info :is(.material-svg,svg,svg *){\n  color:#fff!important;');
     expect(designSystem).toContain('.mahl-mini-switch input:checked+.mahl-mini-switch-track::after{\n  background:#fff!important;');
   });
@@ -233,13 +233,13 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('fill:#FFFCF5!important;');
   });
 
-  it('verwendet auf ESSEN Butter und Dunkelgrün nach den Grid-Regeln', () => {
-    expect(categoryIcons).toContain("essen: '#FFEFB3'");
-    expect(categoryIcons).toContain("essen: '#013E37'");
+  it('verwendet auf ESSEN Cinnamon und Warmweiß nach den Grid-Regeln', () => {
+    expect(categoryIcons).toContain("essen: '#945B39'");
+    expect(categoryIcons).toContain("essen: '#F6EFE9'");
     expect(designSystem).toContain(':root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){');
-    expect(designSystem).toContain('background-color:#FFEFB3!important');
-    expect(designSystem).toContain('background:#013E37!important;color:#FFEFB3!important');
-    expect(designSystem).toContain(':root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
+    expect(designSystem).toContain('background-color:#945B39!important');
+    expect(designSystem).toContain('background:#945B39!important;color:#F6EFE9!important');
+    expect(designSystem).toContain(':root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
   });
 
   it('verwendet auf ROUTINEN Aubergine und Honey Dawn nach den Hero-Regeln', () => {
