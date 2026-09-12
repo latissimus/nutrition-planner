@@ -977,7 +977,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   const looks = {
     'food-log': ['#F0C987', 'wallpaper-pizza', '🍕'],
     essen: ['#FFEFB3', 'wallpaper-essen', '🍽️'],
-    reminders: ['#FFA175', 'wallpaper-burger', '🍔'],
+    reminders: ['#945B39', 'wallpaper-burger', '🍔'],
     supps: ['#D8BFD8', 'wallpaper-supps', '💊'],
     sleep: ['#0E1D47', 'wallpaper-moon', '😴'],
     shopping: ['#FFEDE3', 'wallpaper-brokkoli', '🛒'],

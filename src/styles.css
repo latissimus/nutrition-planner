@@ -11009,43 +11009,63 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    lange Inhalte auf hellen, ruhigen Leseflächen.
    ============================================================ */
 
-/* TRACKER · Butternut #FFA175 / Dunkelrot #5C0702 */
+/* TRACKER · Cinnamon #945B39 / Warmweiß #F6EFE9 */
 :root[data-seite="reminders"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#5C0702 8%,#FFFCF5);
-  --cap-card-border:1.5px solid #5C0702;
-  --cap-muted:#765552;
+  --cap-tint:color-mix(in srgb,#945B39 9%,#F6EFE9);
+  --cap-card-border:1.5px solid #945B39;
+  --cap-muted:#7B675B;
 }
+:root[data-seite="reminders"],:root[data-seite="reminders"] body,:root[data-seite="reminders"] :is(#app,#view){background-color:#945B39!important}
 :root[data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#FFFCF5;
-  --tracker-tint:color-mix(in srgb,#5C0702 8%,#FFFCF5);
-  --text:#5C0702;
-  --ink:#5C0702;
-  --muted:#765552;
-  color:#5C0702!important;
+  --tracker-tint:color-mix(in srgb,#945B39 9%,#F6EFE9);
+  --text:#945B39;
+  --ink:#F6EFE9;
+  --muted:#7B675B;
+  color:#F6EFE9!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
-  .nutrition-coin-hero,.nutrition-coin-overview,.nutrition-card,.mahl-zeitblock
-){border-color:#5C0702!important;color:#5C0702!important}
+  .nutrition-coin-overview,.nutrition-card,.mahl-zeitblock
+){border-color:#945B39!important;background:#FFFCF5!important;color:#945B39!important}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
+  border-color:#F6EFE9!important;
+  background:color-mix(in srgb,#F6EFE9 8%,#945B39)!important;
+  color:#F6EFE9!important;
+}
 :root[data-seite="reminders"] .meal-log-dex-page :is(
-  .nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,
-  .nutrition-coin-hero-value b,.nutrition-coin-overview>summary b,
+  .nutrition-coin-overview>summary b,
   .mahl-zeitblock>header h2,.rem-row-titel b,.nutrition-entry b,.nutrition-entry strong
-){color:#5C0702!important}
+){color:#945B39!important}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,.nutrition-coin-hero-value b,.nutrition-ring>span){color:#F6EFE9!important}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after{background:color-mix(in srgb,#F6EFE9 8%,#945B39)!important}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
 :root[data-seite="reminders"] .nutrition-portionen button.aktiv,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
-  border-color:#000!important;
-  background:#5C0702!important;
-  color:#FFA175!important;
+  border-color:#945B39!important;
+  background:#945B39!important;
+  color:#F6EFE9!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info,
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info :is(.material-svg,svg,svg *){
   color:#fff!important;
+  fill:currentColor!important;
   -webkit-text-fill-color:#fff!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:#fff!important;
 }
+:root[data-seite="reminders"] .app-dex-header{--dex-ink:#F6EFE9;background:#945B39!important;border-color:#F6EFE9!important;color:#F6EFE9!important}
+:root[data-seite="reminders"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
+:root[data-seite="reminders"] .app-dex-header .nav-av{border-color:#F6EFE9!important;background:#fff!important;color:#945B39!important}
+:root[data-seite="reminders"] .app-dex-dock{--dex-ink:#F6EFE9;color:#F6EFE9!important}
+:root[data-seite="reminders"] .app-dex-dock::after{background:#945B39!important}
+:root[data-seite="reminders"] .app-dex-dock-inner::before{border-color:#F6EFE9!important;background:color-mix(in srgb,#945B39 90%,transparent)!important}
+:root[data-seite="reminders"] .app-dex-tab{color:#F6EFE9!important}
+:root[data-seite="reminders"] .app-dex-tab.aktiv{background:color-mix(in srgb,#F6EFE9 12%,#945B39)!important;box-shadow:inset 0 0 0 1.25px #F6EFE9!important}
+:root[data-seite="reminders"] .app-dex-menu{border-left-color:#F6EFE9!important;color:#F6EFE9!important}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#945B39!important;background:#945B39!important;color:#F6EFE9!important}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#F6EFE9!important;fill:currentColor!important}
 
 /* ESSEN · Butter #FFEFB3 / Dunkelgrün #013E37 */
 :root[data-seite="essen"]{

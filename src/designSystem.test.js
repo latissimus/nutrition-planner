@@ -198,13 +198,13 @@ describe('CAPBOY Design-System', () => {
     expect(heroCss).toContain('font-weight:700!important;');
   });
 
-  it('verwendet auf TRACKER das feste Butternut-Dunkelrot-Paar', () => {
-    expect(categoryIcons).toContain("reminders: '#FFA175'");
-    expect(categoryIcons).toContain("reminders: '#5C0702'");
+  it('verwendet auf TRACKER das feste Cinnamon-Warmweiß-Paar', () => {
+    expect(categoryIcons).toContain("reminders: '#945B39'");
+    expect(categoryIcons).toContain("reminders: '#F6EFE9'");
     expect(designSystem).toContain(':root[data-seite="reminders"]{');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #5C0702;');
-    expect(designSystem).toContain('background:#5C0702!important;\n  color:#FFA175!important;');
-    expect(designSystem).toContain('.nutrition-calibration-info{\n  color:#fff!important;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #945B39;');
+    expect(designSystem).toContain('background:color-mix(in srgb,#F6EFE9 8%,#945B39)!important;');
+    expect(designSystem).toContain('.nutrition-calibration-info :is(.material-svg,svg,svg *){\n  color:#fff!important;');
     expect(designSystem).toContain('.mahl-mini-switch input:checked+.mahl-mini-switch-track::after{\n  background:#fff!important;');
   });
 
