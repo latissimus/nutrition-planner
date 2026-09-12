@@ -11039,8 +11039,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#5C0702!important;
   color:#FFA175!important;
 }
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
-  background:#FFA175!important;
+  background:#fff!important;
 }
 
 /* SUPPS · Chocolate #47230F / Hellblau #B5D0F3 */

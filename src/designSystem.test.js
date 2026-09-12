@@ -203,6 +203,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="reminders"]{');
     expect(designSystem).toContain('--cap-card-border:1.5px solid #5C0702;');
     expect(designSystem).toContain('background:#5C0702!important;\n  color:#FFA175!important;');
+    expect(designSystem).toContain('.nutrition-calibration-info{\n  color:#fff!important;');
+    expect(designSystem).toContain('.mahl-mini-switch input:checked+.mahl-mini-switch-track::after{\n  background:#fff!important;');
   });
 
   it('verwendet auf TRAINING das feste Slate-Pfirsich-Paar', () => {
