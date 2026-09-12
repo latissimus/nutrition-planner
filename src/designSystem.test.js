@@ -245,15 +245,17 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('verwendet auf ROUTINEN Tekhelet und warmes Creme nach den Hero-Regeln', () => {
-    expect(categoryIcons).toContain("habits: '#4C2A85'");
+    expect(categoryIcons).toContain("habits: '#3F236F'");
     expect(categoryIcons).toContain("habits: '#FFF8ED'");
     expect(designSystem).toContain(':root[data-seite="habits"]{');
     expect(designSystem).toContain('--routine-panel:#FFF8ED;');
-    expect(designSystem).toContain('background:var(--routine-panel)!important;color:#4C2A85!important}');
+    expect(designSystem).toContain('background:var(--routine-panel)!important;color:#3F236F!important}');
     expect(designSystem).toContain('--cap-card:#fff;');
     expect(designSystem).toContain('--cap-card-border:1.5px solid #FFF8ED;');
     expect(designSystem).toContain('background:#FFF8ED!important}');
-    expect(designSystem).toContain('background:#4C2A85!important;color:#FFF8ED!important;');
+    expect(designSystem).toContain('background:#3F236F!important;color:#FFF8ED!important;');
+    expect(designSystem).toContain(':is(.routine-days,.routine-duration) button{');
+    expect(designSystem).toContain('.routine-copy small{');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
     expect(designSystem).toContain('button.btn.btn-primary[type="submit"]{');
     expect(designSystem).toContain('button.routine-start :is(.material-svg,svg,svg *){');

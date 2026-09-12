@@ -10157,7 +10157,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   border-color:#000!important;
-  background:#4C2A85!important;
+  background:#3F236F!important;
   color:#FFF8ED!important;
 }
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
@@ -10166,7 +10166,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv{
   border-color:#000!important;
-  background:#4C2A85!important;
+  background:#3F236F!important;
   color:#FFF8ED!important;
 }
 :root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.routine-attachment-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv :is(span,b,strong,.material-svg,svg,svg *){
@@ -10183,7 +10183,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="habits"] .routine-dex-page button.routine-start{
   border-color:#000!important;
-  background:#4C2A85!important;
+  background:#3F236F!important;
   color:#FFF8ED!important;
   -webkit-text-fill-color:#FFF8ED!important;
 }
@@ -10198,7 +10198,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-text-fill-color:#FFF8ED!important;
 }
 :root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .routine-timer-exercises li>span{
-  background:#4C2A85!important;
+  background:#3F236F!important;
   color:#FFF8ED!important;
   -webkit-text-fill-color:#FFF8ED!important;
 }
@@ -11246,45 +11246,47 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#203C3D!important}
 
-/* ROUTINEN · Tekhelet #4C2A85 / warmes Creme #FFF8ED */
+/* ROUTINEN · dunkles Tekhelet #3F236F / warmes Creme #FFF8ED */
 :root[data-seite="habits"]{
   --routine-panel:#FFF8ED;
   --cap-card:#fff;
-  --cap-tint:color-mix(in srgb,#4C2A85 7%,#fff);
+  --cap-tint:color-mix(in srgb,#3F236F 7%,#fff);
   --cap-card-border:1.5px solid #FFF8ED;
   --cap-muted:#766B91;
 }
-:root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page{--surface:#fff;--surface2:color-mix(in srgb,#4C2A85 7%,#fff);--text:#4C2A85;--ink:#FFF8ED;--muted:#766B91;color:#FFF8ED!important}
+:root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page{--surface:#fff;--surface2:color-mix(in srgb,#3F236F 7%,#fff);--text:#3F236F;--ink:#FFF8ED;--muted:#766B91;color:#FFF8ED!important}
 :root[data-seite="habits"] .routine-dex-page::before{background:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#FFF8ED!important;background:var(--routine-panel)!important;color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#4C2A85 var(--routine-progress),color-mix(in srgb,#4C2A85 18%,#FFF8ED) 0)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#FFF8ED!important;background:var(--routine-panel)!important;color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#3F236F var(--routine-progress),color-mix(in srgb,#3F236F 18%,#FFF8ED) 0)!important}
 :root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#4C2A85!important;color:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#fff!important;color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#FFF8ED!important;background:#fff!important;color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#4C2A85 24%,#FFF8ED)!important;background:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#4C2A85!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#3F236F!important;color:#FFF8ED!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#fff!important;color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#FFF8ED!important;background:#fff!important;color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#3F236F 24%,#FFF8ED)!important;background:#FFF8ED!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-zeitblock-leer){color:#3F236F!important}
 :root[data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge){background:#fff!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#4C2A85 35%,transparent)!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){border-color:#4C2A85!important;background:#fff!important;color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#4C2A85!important;fill:currentColor!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#4C2A85!important;color:#FFF8ED!important}
+:root[data-seite="habits"] .routine-dex-page .routine-copy small{display:inline-flex;align-self:flex-start;max-width:100%;padding:3px 7px;border-radius:999px;background:#3F236F!important;color:#FFF8ED!important;-webkit-text-fill-color:#FFF8ED!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#3F236F 35%,transparent)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-check{border-color:#3F236F!important;background:#fff!important;color:#3F236F!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach){border-color:#3F236F!important;background:#3F236F!important;color:#FFF8ED!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#FFF8ED!important;fill:currentColor!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#3F236F!important;color:#FFF8ED!important}
 :root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){color:#FFF8ED!important;fill:currentColor!important}
-:root[data-seite="habits"] .app-dex-header{--dex-ink:#FFF8ED;background:#4C2A85!important;border-color:#FFF8ED!important;color:#FFF8ED!important}
+:root[data-seite="habits"] .app-dex-header{--dex-ink:#FFF8ED;background:#3F236F!important;border-color:#FFF8ED!important;color:#FFF8ED!important}
 :root[data-seite="habits"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
-:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#FFF8ED!important;background:#fff!important;color:#4C2A85!important}
+:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#FFF8ED!important;background:#fff!important;color:#3F236F!important}
 :root[data-seite="habits"] .app-dex-dock{--dex-ink:#FFF8ED;color:#FFF8ED!important}
-:root[data-seite="habits"] .app-dex-dock::after{background:#4C2A85!important}
-:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#FFF8ED!important;background:color-mix(in srgb,#4C2A85 90%,transparent)!important}
+:root[data-seite="habits"] .app-dex-dock::after{background:#3F236F!important}
+:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#FFF8ED!important;background:color-mix(in srgb,#3F236F 90%,transparent)!important}
 :root[data-seite="habits"] .app-dex-tab{color:#FFF8ED!important}
-:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#FFF8ED 12%,#4C2A85)!important;box-shadow:inset 0 0 0 1.25px #FFF8ED!important}
+:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#FFF8ED 12%,#3F236F)!important;box-shadow:inset 0 0 0 1.25px #FFF8ED!important}
 :root[data-seite="habits"] .app-dex-menu{border-left-color:#FFF8ED!important;color:#FFF8ED!important}
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save),
 :root[data-seite="habits"] .routine-dex-page button.routine-start{
-  border-color:#4C2A85!important;background:#4C2A85!important;color:#FFF8ED!important;-webkit-text-fill-color:#FFF8ED!important;
+  border-color:#3F236F!important;background:#3F236F!important;color:#FFF8ED!important;-webkit-text-fill-color:#FFF8ED!important;
 }
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
 :root[data-seite="habits"] .routine-dex-page button.routine-start :is(.material-svg,svg,svg *){
@@ -11292,7 +11294,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="habits"] .routine-editor-backdrop .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv,
 :root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .routine-timer-exercises li>span{
-  background:#4C2A85!important;color:#FFF8ED!important;-webkit-text-fill-color:#FFF8ED!important;
+  background:#3F236F!important;color:#FFF8ED!important;-webkit-text-fill-color:#FFF8ED!important;
+}
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button{
+  border-color:#3F236F!important;background:#3F236F!important;color:#FFF8ED!important;-webkit-text-fill-color:#FFF8ED!important;
+}
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button :is(span,b,strong,.material-svg,svg,svg *){
+  color:#FFF8ED!important;fill:currentColor!important;
+}
+:root[data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv{
+  background:color-mix(in srgb,#FFF8ED 14%,#3F236F)!important;box-shadow:inset 0 0 0 1.5px #FFF8ED!important;
 }
 
 /* SCHLAF · Midnight #0E1D47 / Creme #FFFCF3 */

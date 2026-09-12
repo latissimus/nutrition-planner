@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FFEDE3', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#945B39', training: '#203C3D', supps: '#D8BFD8', habits: '#4C2A85',
+  recipes: '#F0C987', essen: '#945B39', training: '#203C3D', supps: '#D8BFD8', habits: '#3F236F',
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -68,7 +68,7 @@ const fixedSystemColors = {
   training: '#203C3D',
   supps: '#D8BFD8',
   reminders: '#FFEDE3',
-  habits: '#4C2A85',
+  habits: '#3F236F',
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -99,7 +99,7 @@ const fixedSystemAccents = {
   essen: '#945B39',
   reminders: '#49251E',
   training: '#203C3D',
-  habits: '#4C2A85',
+  habits: '#3F236F',
   supps: '#2A1E5C',
   shopping: '#013E37',
   sleep: '#0E1D47',
@@ -187,7 +187,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#3C153B', '#D8BFD8', '#4F5B8C'].includes(saved?.toUpperCase())) return '#4C2A85';
+  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#3C153B', '#D8BFD8', '#4F5B8C', '#4C2A85'].includes(saved?.toUpperCase())) return '#3F236F';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }
