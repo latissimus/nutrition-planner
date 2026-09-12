@@ -296,15 +296,26 @@ function editor(userId, { existing = null, templateType = 'custom', onSaved }) {
 }
 
 function routineRow(item, completed, attachments = [], darkColor = false) {
-  const dayNames = item.weekdays?.length === 7 ? 'Täglich' : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label).join(' · ');
+  const dayLabels = item.weekdays?.length === 7
+    ? ['Täglich']
+    : days.filter(([value]) => item.weekdays?.includes(Number(value))).map(([, label]) => label);
   const mobility = item.template_type === 'mobility';
   const timed = Number(item.duration_minutes || 0) > 0;
   const exerciseCount = mobility ? normalizeMobilityExercises(item.mobility_exercises).length : 0;
+  const metadata = [
+    ...(mobility ? [`${exerciseCount} Übungen`, `${Number(item.duration_minutes || 5)} min`] : []),
+    ...(item.time ? [item.time.slice(0, 5)] : []),
+    ...dayLabels,
+  ];
+  const metadataMarkup = metadata.length
+    ? `<span class="routine-meta">${metadata.map((label) => `<small>${escapeHtml(label)}</small>`).join('')}</span>`
+    : '';
+  const noteMarkup = item.note ? `<small class="routine-note">${escapeHtml(item.note)}</small>` : '';
   return `<article class="routine-row${completed ? ' erledigt' : ''}${timed ? ' hat-timer' : ''}" data-routine-id="${item.id}">
     <div class="routine-row-inhalt">
       <button class="routine-check${completed && darkColor ? ' kontrast-weiss' : ''}" type="button" data-routine-check aria-pressed="${completed}" aria-label="${escapeHtml(item.name)} ${completed ? 'als offen markieren' : 'erledigen'}">${completed ? materialIconMarkup('check_small') : ''}</button>
       <span class="routine-icon" aria-hidden="true">${reminderIconMarkup(item.icon || 'emoji:✓')}</span>
-      <span class="routine-copy"><b>${escapeHtml(item.name)}</b><small>${mobility ? `${exerciseCount} Übungen · ${Number(item.duration_minutes || 5)} min · ` : ''}${item.time ? item.time.slice(0, 5) + ' · ' : ''}${escapeHtml(dayNames)}${item.note ? ` · ${escapeHtml(item.note)}` : ''}</small></span>
+      <span class="routine-copy"><b>${escapeHtml(item.name)}</b>${metadataMarkup}${noteMarkup}</span>
       ${timed ? `<button class="routine-start" type="button" data-routine-start aria-label="${escapeHtml(item.name)}-Timer starten">${materialIconMarkup('play_arrow')}</button>` : ''}
       <button class="routine-attach" type="button" data-routine-attach aria-label="Bild oder Link hinzufügen">${materialIconMarkup('place_item')}</button>
     </div>

@@ -985,7 +985,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     training: ['#203C3D', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#94DEFF', 'wallpaper-comp', '📐'],
     stress: ['#E36887', 'wallpaper-stress', '⚡'],
-    coins: ['#FFD400', 'wallpaper-game', '🎮'],
+    coins: ['#432C5E', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
     setPreference(`muscledex:kategorie-farbe:${route}`, color);

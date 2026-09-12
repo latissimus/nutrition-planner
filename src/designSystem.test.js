@@ -159,13 +159,13 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('verwendet für CAPSTARS leuchtendes Gelb und dunkles Violett', () => {
-    expect(categoryIcons).toContain("coins: '#FFD400'");
     expect(categoryIcons).toContain("coins: '#432C5E'");
+    expect(categoryIcons).toContain("coins: '#FFD400'");
     expect(main).toContain("title: 'CAPSTARS'");
     expect(designSystem).toContain(':root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;');
     expect(designSystem).toContain('background:#432C5E!important;color:#FFD400!important');
-    expect(designSystem).toContain('--cap-tint:color-mix(in srgb,#432C5E 9%,#FFD400);');
-    expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
+    expect(designSystem).toContain('--cap-tint:color-mix(in srgb,#FFD400 9%,#432C5E);');
+    expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
   });
 
   it('hält PROFIL als neutrale warme Systemseite', () => {
@@ -256,7 +256,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#FFF8ED!important}');
     expect(designSystem).toContain('background:#3F236F!important;color:#FFF8ED!important;');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button{');
-    expect(designSystem).toContain('.routine-copy small{');
+    expect(designSystem).toContain('.routine-meta{');
+    expect(designSystem).toContain('.routine-meta small{');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
     expect(designSystem).toContain('button.btn.btn-primary[type="submit"]{');
     expect(designSystem).toContain('button.routine-start :is(.material-svg,svg,svg *){');

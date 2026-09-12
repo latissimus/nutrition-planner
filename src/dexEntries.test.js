@@ -47,7 +47,7 @@ describe('Anbieter- und Farbkontrast', () => {
       supps: '#D8BFD8',
       body: '#94DEFF',
       stress: '#E36887',
-      coins: '#FFD400',
+      coins: '#432C5E',
       profile: '#F7F3EA',
     });
   });
@@ -84,7 +84,7 @@ describe('Anbieter- und Farbkontrast', () => {
       color: '#E36887', ink: '#FFE08C', accent: '#E36887', accentInk: '#FFE08C',
     }));
     expect(pageLook('coins', '#000000', 'wallpaper-game')).toEqual(expect.objectContaining({
-      color: '#FFD400', ink: '#432C5E', accent: '#432C5E', accentInk: '#FFD400',
+      color: '#432C5E', ink: '#FFD400', accent: '#432C5E', accentInk: '#FFD400',
     }));
     expect(pageLook('profile', '#000000', 'drops')).toEqual(expect.objectContaining({
       color: '#F7F3EA', ink: '#0A1330', accent: '#0A1330', accentInk: '#FFFCF5',

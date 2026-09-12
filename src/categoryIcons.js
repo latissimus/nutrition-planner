@@ -58,7 +58,7 @@ const defaultColors = {
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#FFD400',
+  coins: '#432C5E',
   profile: '#F7F3EA',
 };
 const fixedSystemColors = {
@@ -72,7 +72,7 @@ const fixedSystemColors = {
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#FFD400',
+  coins: '#432C5E',
   profile: '#F7F3EA',
 };
 // Einige feste Seiten funktionieren bewusst als zweifarbige Retro-Paare
@@ -90,7 +90,7 @@ const fixedSystemInks = {
   shopping: '#013E37',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#432C5E',
+  coins: '#FFD400',
   profile: '#0A1330',
 };
 const fixedSystemAccents = {
