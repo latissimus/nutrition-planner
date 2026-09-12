@@ -163,9 +163,11 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("coins: '#FFD400'");
     expect(main).toContain("title: 'CAPSTARS'");
     expect(designSystem).toContain(':root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #000;');
     expect(designSystem).toContain('background:#432C5E!important;color:#FFD400!important');
     expect(designSystem).toContain('--cap-tint:color-mix(in srgb,#FFD400 9%,#432C5E);');
     expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
+    expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-header{--dex-ink:#fff;background:#432C5E!important;border-color:#fff!important;color:#fff!important}');
   });
 
   it('hält PROFIL als neutrale warme Systemseite', () => {
