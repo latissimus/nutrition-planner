@@ -11324,30 +11324,30 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .special-dex-overlay .btn-primary :is(span,b,strong,.material-svg,svg,svg *){color:#FFFCF3!important}
 :root[data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span){background:#0E1D47!important;color:#FFFCF3!important}
 
-/* CAPSTARS · Naples Yellow #F9DC5C / Korallrot #FE4A49 */
-:root[data-seite="coins"]{--coin-readable:#7D2A2A;--cap-card:#fff;--cap-tint:color-mix(in srgb,#FE4A49 10%,#F9DC5C);--cap-card-border:1.5px solid #FE4A49;--cap-muted:#7D2A2A}
-:root[data-seite="coins"],:root[data-seite="coins"] body,:root[data-seite="coins"] :is(#app,#view){background-color:#F9DC5C!important}
-:root[data-seite="coins"] .coin-dex-page{--surface:#fff;--surface2:#FFF8D2;--text:var(--coin-readable);--ink:#FE4A49;--muted:#7D2A2A;color:#FE4A49!important}
-:root[data-seite="coins"] .coin-dex-page .coin-balance-card{border-color:#FE4A49!important;background:color-mix(in srgb,#FE4A49 10%,#F9DC5C)!important;color:#FE4A49!important}
-:root[data-seite="coins"] .coin-dex-page .coin-balance-card :is(small,strong,b){color:#FE4A49!important}
-:root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty){border-color:#FE4A49!important;background:#fff!important;color:var(--coin-readable)!important}
-:root[data-seite="coins"] .coin-dex-page .coin-verdienst>summary{background:#FFF8D2!important;color:#FE4A49!important}
+/* CAPSTARS · leuchtendes Gelb #FFD400 / dunkles Violett #432C5E */
+:root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;--cap-tint:color-mix(in srgb,#432C5E 9%,#FFD400);--cap-card-border:1.5px solid #432C5E;--cap-muted:#6E617D}
+:root[data-seite="coins"],:root[data-seite="coins"] body,:root[data-seite="coins"] :is(#app,#view){background-color:#FFD400!important}
+:root[data-seite="coins"] .coin-dex-page{--surface:#fff;--surface2:#FFF7CC;--text:#432C5E;--ink:#432C5E;--muted:#6E617D;color:#432C5E!important}
+:root[data-seite="coins"] .coin-dex-page .coin-balance-card{border-color:#432C5E!important;background:#432C5E!important;color:#FFD400!important}
+:root[data-seite="coins"] .coin-dex-page .coin-balance-card :is(small,strong,b){color:#FFD400!important}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty){border-color:#432C5E!important;background:#fff!important;color:#432C5E!important}
+:root[data-seite="coins"] .coin-dex-page .coin-verdienst>summary{background:#FFF7CC!important;color:#432C5E!important}
 :root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst>summary b,.coin-verdienst>summary small,.coin-verdienst>summary .material-svg,.coin-verdienst-hinweis,.coin-verdienst-titel b,.coin-verdienst-gruppe small,.coin-verdienst-gruppe strong,.coin-verdienst-frei b,.coin-verdienst-frei small,.coin-next b,.coin-next small,.coin-next>strong,.coin-reward-kopf b,.coin-reward-kopf small,.coin-reward-kopf>strong,.coin-reward p,.coin-empty b,.coin-empty span){color:var(--coin-readable)!important}
-:root[data-seite="coins"] .coin-dex-page :is(.coin-section-title h2,.coin-history-title,.coin-history,.coin-history :is(span,small,b,.plus,.minus)){color:#FE4A49!important}
-:root[data-seite="coins"] .coin-dex-page .coin-progress i{background:#FE4A49!important}
-:root[data-seite="coins"] .coin-dex-page .coin-reward-actions button{border-color:#FE4A49!important;color:#FE4A49!important}
-:root[data-seite="coins"] .coin-dex-page .coin-reward-actions .coin-redeem{background:#FE4A49!important;color:#F9DC5C!important}
-:root[data-seite="coins"] .app-dex-header{--dex-ink:#0A1330;background:#F9DC5C!important;border-color:#0A1330!important;color:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-section-title h2,.coin-history-title,.coin-history,.coin-history :is(span,small,b,.plus,.minus)){color:#432C5E!important}
+:root[data-seite="coins"] .coin-dex-page .coin-progress i{background:#432C5E!important}
+:root[data-seite="coins"] .coin-dex-page .coin-reward-actions button{border-color:#432C5E!important;color:#432C5E!important}
+:root[data-seite="coins"] .coin-dex-page .coin-reward-actions .coin-redeem{background:#432C5E!important;color:#FFD400!important}
+:root[data-seite="coins"] .app-dex-header{--dex-ink:#432C5E;background:#FFD400!important;border-color:#432C5E!important;color:#432C5E!important}
 :root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
-:root[data-seite="coins"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#fff!important;color:#0A1330!important}
-:root[data-seite="coins"] .app-dex-dock{--dex-ink:#0A1330;color:#0A1330!important}
-:root[data-seite="coins"] .app-dex-dock::after{background:#F9DC5C!important}
-:root[data-seite="coins"] .app-dex-dock-inner::before{border-color:#0A1330!important;background:color-mix(in srgb,#F9DC5C 90%,transparent)!important}
-:root[data-seite="coins"] .app-dex-tab{color:#0A1330!important}
-:root[data-seite="coins"] .app-dex-tab.aktiv{background:color-mix(in srgb,#0A1330 9%,#F9DC5C)!important;box-shadow:inset 0 0 0 1.25px #0A1330!important}
-:root[data-seite="coins"] .app-dex-menu{border-left-color:#0A1330!important;color:#0A1330!important}
-:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:#FE4A49!important;color:#F9DC5C!important}
-:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#F9DC5C!important}
+:root[data-seite="coins"] .app-dex-header .nav-av{border-color:#432C5E!important;background:#fff!important;color:#432C5E!important}
+:root[data-seite="coins"] .app-dex-dock{--dex-ink:#432C5E;color:#432C5E!important}
+:root[data-seite="coins"] .app-dex-dock::after{background:#FFD400!important}
+:root[data-seite="coins"] .app-dex-dock-inner::before{border-color:#432C5E!important;background:color-mix(in srgb,#FFD400 90%,transparent)!important}
+:root[data-seite="coins"] .app-dex-tab{color:#432C5E!important}
+:root[data-seite="coins"] .app-dex-tab.aktiv{background:color-mix(in srgb,#432C5E 9%,#FFD400)!important;box-shadow:inset 0 0 0 1.25px #432C5E!important}
+:root[data-seite="coins"] .app-dex-menu{border-left-color:#432C5E!important;color:#432C5E!important}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:#432C5E!important;color:#FFD400!important}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFD400!important}
 
 /* PROFIL · neutrale Systemseite */
 :root[data-seite="profile"]{--profile-accent:#0A1330!important;--akzent:#0A1330!important;--akzent-ink:#FFFCF5!important;--cap-card:#fff;--cap-tint:#F0F1F4;--cap-card-border:1.5px solid #0A1330;--cap-muted:#667085}

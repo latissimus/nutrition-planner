@@ -158,12 +158,13 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.dex-detail-popup{\n  border-color:#000!important;\n  background:var(--stress-card)!important;');
   });
 
-  it('verwendet für CAPSTARS Naples Yellow und Korallrot', () => {
-    expect(categoryIcons).toContain("coins: '#F9DC5C'");
-    expect(categoryIcons).toContain("coins: '#FE4A49'");
+  it('verwendet für CAPSTARS leuchtendes Gelb und dunkles Violett', () => {
+    expect(categoryIcons).toContain("coins: '#FFD400'");
+    expect(categoryIcons).toContain("coins: '#432C5E'");
     expect(main).toContain("title: 'CAPSTARS'");
-    expect(designSystem).toContain(':root[data-seite="coins"]{--coin-readable:#7D2A2A;--cap-card:#fff;');
-    expect(designSystem).toContain('background:color-mix(in srgb,#FE4A49 10%,#F9DC5C)!important;');
+    expect(designSystem).toContain(':root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;');
+    expect(designSystem).toContain('background:#432C5E!important;color:#FFD400!important');
+    expect(designSystem).toContain('--cap-tint:color-mix(in srgb,#432C5E 9%,#FFD400);');
     expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
   });
 

@@ -58,7 +58,7 @@ const defaultColors = {
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#F9DC5C',
+  coins: '#FFD400',
   profile: '#F7F3EA',
 };
 const fixedSystemColors = {
@@ -72,7 +72,7 @@ const fixedSystemColors = {
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#F9DC5C',
+  coins: '#FFD400',
   profile: '#F7F3EA',
 };
 // Einige feste Seiten funktionieren bewusst als zweifarbige Retro-Paare
@@ -90,7 +90,7 @@ const fixedSystemInks = {
   shopping: '#013E37',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#FE4A49',
+  coins: '#432C5E',
   profile: '#0A1330',
 };
 const fixedSystemAccents = {
@@ -104,7 +104,7 @@ const fixedSystemAccents = {
   shopping: '#013E37',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#FE4A49',
+  coins: '#432C5E',
   profile: '#0A1330',
 };
 const fixedSystemAccentInks = {
@@ -118,7 +118,7 @@ const fixedSystemAccentInks = {
   shopping: '#FFEFB3',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#F9DC5C',
+  coins: '#FFD400',
   profile: '#FFFCF5',
 };
 const fixedSystemPatterns = {
