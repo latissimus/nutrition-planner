@@ -129,6 +129,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background-color:#FFEFB3!important');
     expect(designSystem).toContain('.einkauf-row input[type="checkbox"]{');
     expect(designSystem).toContain('background-color:#013E37!important;background-image:');
+    expect(designSystem).toContain('.einkauf-add-form>button.btn-primary[type="submit"]{color:#FFEFB3!important;-webkit-text-fill-color:#FFEFB3!important}');
   });
 
   it('verwendet auf SCHLAF Midnight, einen Creme-Hero und neutrale weiße Karten', () => {
@@ -149,12 +150,12 @@ describe('CAPBOY Design-System', () => {
   it('verwendet auf MIND das feste Deep-Blush-Gelb-Paar mit lesbaren Karten', () => {
     expect(categoryIcons).toContain("stress: '#E36887'");
     expect(categoryIcons).toContain("stress: '#FFE08C'");
-    expect(designSystem).toContain(':root[data-seite="stress"]{\n  --stress-card:color-mix(in srgb,#FFE08C 58%,#FFFCF5);');
+    expect(designSystem).toContain(':root[data-seite="stress"]{\n  --stress-card:#fff;');
     expect(designSystem).toContain('--stress-card-ink:#7A2940;');
     expect(designSystem).toContain('background:#E36887!important;');
     expect(designSystem).toContain('color:#FFE08C!important;');
     expect(designSystem).toContain('.dex-sammlungskopf-text :is(span,small)');
-    expect(designSystem).toContain('box-shadow:none!important;');
+    expect(designSystem).toContain('.dex-detail-popup{\n  border-color:#000!important;\n  background:var(--stress-card)!important;');
   });
 
   it('verwendet für CAPSTARS Naples Yellow und Korallrot', () => {
@@ -212,13 +213,14 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("training: '#203C3D'");
     expect(categoryIcons).toContain("training: '#F9DBBA'");
     expect(designSystem).toContain(':root[data-seite="training"]{');
-    expect(designSystem).toContain('--cap-card:#F9DBBA;');
+    expect(designSystem).toContain('--cap-card:#fff;');
     expect(designSystem).toContain('--text:#203C3D;\n  --ink:#203C3D;');
     expect(designSystem).toContain('border-color:#000!important;');
     expect(designSystem).toContain('filter:drop-shadow(2px 2px 0 #000)!important;');
     expect(designSystem).toContain('filter:drop-shadow(0 3.5px 0 #000)!important;');
     expect(designSystem).toContain('stroke:#000!important;');
-    expect(designSystem).toContain('background:#F9DBBA!important;color:#203C3D!important;');
+    expect(designSystem).toContain('background:#fff!important;color:#203C3D!important;');
+    expect(designSystem).toContain('.dex-detail-popup{border-color:#000!important;background:#fff!important;color:#203C3D!important}');
     expect(designSystem).toContain('background:#203C3D!important;color:#F9DBBA!important;');
     expect(designSystem).toContain('color:#F9DBBA!important;fill:currentColor!important;');
   });

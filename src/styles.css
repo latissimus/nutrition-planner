@@ -10568,16 +10568,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Kopf, Tapete, Chips und Aktionen. Für längere Kartentexte wird das Blush
    abgedunkelt, weil Gelb und helles Blush dort allein zu wenig Kontrast haben. */
 :root[data-seite="stress"]{
-  --stress-card:color-mix(in srgb,#FFE08C 58%,#FFFCF5);
+  --stress-card:#fff;
   --stress-card-ink:#7A2940;
   --cap-card:var(--stress-card);
-  --cap-tint:color-mix(in srgb,#E36887 12%,var(--stress-card));
+  --cap-tint:color-mix(in srgb,#E36887 8%,#fff);
   --cap-card-border:1.5px solid #000;
   --cap-muted:#7A2940;
 }
 :root[data-seite="stress"] :is(.neo-dex-page,.food-dex-page){
   --surface:var(--stress-card);
-  --surface2:color-mix(in srgb,#E36887 12%,var(--stress-card));
+  --surface2:color-mix(in srgb,#E36887 8%,#fff);
   --text:var(--stress-card-ink);
   --ink:#FFE08C;
   --muted:var(--stress-card-ink);
@@ -11132,6 +11132,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="shopping"] .app-dex-menu{border-left-color:#013E37!important;color:#013E37!important}
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important}
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEFB3!important;fill:currentColor!important}
+:root[data-seite="shopping"] .einkauf-add-sheet .einkauf-add-form>button.btn-primary[type="submit"]{color:#FFEFB3!important;-webkit-text-fill-color:#FFEFB3!important}
 
 /* SUPPS · Thistle #D8BFD8 / Tiefviolett #2A1E5C */
 :root[data-seite="supps"]{
@@ -11204,14 +11205,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* TRAINING · Slate Gray #203C3D / Pfirsich-Creme #F9DBBA */
 :root[data-seite="training"]{
-  --cap-card:#F9DBBA;
-  --cap-tint:color-mix(in srgb,#203C3D 6%,#F9DBBA);
+  --cap-card:#fff;
+  --cap-tint:color-mix(in srgb,#203C3D 6%,#fff);
   --cap-card-border:1.5px solid #000;
   --cap-muted:#526A69;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page){
-  --surface:#F9DBBA;
-  --surface2:color-mix(in srgb,#203C3D 6%,#F9DBBA);
+  --surface:#fff;
+  --surface2:color-mix(in srgb,#203C3D 6%,#fff);
   --text:#203C3D;
   --ink:#203C3D;
   --muted:#526A69;
@@ -11225,15 +11226,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:#000!important;background:#F9DBBA!important;color:#203C3D!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
-  border-color:#000!important;background:#F9DBBA!important;color:#203C3D!important;
+  border-color:#000!important;background:#fff!important;color:#203C3D!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{border-color:#000!important;background:#203C3D!important}
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){color:#203C3D!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){fill:#fff!important}
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#203C3D!important}
-:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){border-color:#000!important;background:#F9DBBA!important;box-shadow:0 3.5px 0 #000!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){border-color:#000!important;background:#fff!important;box-shadow:0 3.5px 0 #000!important}
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{background:#203C3D!important}
-:root[data-seite="training"] .dex-detail-popup{border-color:#000!important;background:#F9DBBA!important;color:#203C3D!important}
+:root[data-seite="training"] .dex-detail-popup{border-color:#000!important;background:#fff!important;color:#203C3D!important}
 :root[data-seite="training"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#203C3D!important}
 :root[data-seite="training"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){border-color:#000!important}
 :root[data-seite="training"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){
