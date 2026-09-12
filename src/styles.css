@@ -9005,7 +9005,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Auf den dunklen Seiten bleibt die pinke Wortmarke unveraendert. Nur die
    dahinterliegende Athleten-Silhouette wird fuer klaren Kontrast weiss. */
-:root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="training"]) .app-dex-brand .brand{
+:root:is([data-seite="sleep"],[data-seite="training"]) .app-dex-brand .brand{
   --sil-filter:brightness(0) invert(1);
 }
 
@@ -11047,73 +11047,109 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:#fff!important;
 }
 
-/* SUPPS · Honeydew #EDFFEC / Dunkelgrün #1E3F20 */
+/* ESSEN · Butter #FFEFB3 / Dunkelgrün #013E37 */
+:root[data-seite="essen"]{
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,#013E37 7%,#FFEFB3);
+  --cap-card-border:1.5px solid #013E37;
+  --cap-muted:#526D68;
+}
+:root[data-seite="essen"],:root[data-seite="essen"] body,:root[data-seite="essen"] :is(#app,#view){background-color:#FFEFB3!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){--surface:#FFFCF5;--surface2:color-mix(in srgb,#013E37 7%,#FFEFB3);--text:#013E37;--ink:#013E37;--muted:#526D68;color:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span){color:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button){border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{background:#013E37!important;color:#FFEFB3!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{border-color:#013E37!important;background:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text),
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){color:#013E37!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){fill:#FFFCF5!important}
+:root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#013E37!important}
+:root[data-seite="essen"] .dex-detail-popup{border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#013E37!important}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important}
+:root[data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEFB3!important;fill:currentColor!important}
+:root[data-seite="essen"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#013E37!important}
+:root[data-seite="essen"] .app-dex-header{--dex-ink:#013E37;background:#FFEFB3!important;border-color:#013E37!important;color:#013E37!important}
+:root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
+:root[data-seite="essen"] .app-dex-header .nav-av{border-color:#013E37!important;background:#fff!important;color:#013E37!important}
+:root[data-seite="essen"] .app-dex-dock{--dex-ink:#013E37;color:#013E37!important}
+:root[data-seite="essen"] .app-dex-dock::after{background:#FFEFB3!important}
+:root[data-seite="essen"] .app-dex-dock-inner::before{border-color:#013E37!important;background:color-mix(in srgb,#FFEFB3 90%,transparent)!important}
+:root[data-seite="essen"] .app-dex-tab{color:#013E37!important}
+:root[data-seite="essen"] .app-dex-tab.aktiv{background:color-mix(in srgb,#013E37 9%,#FFEFB3)!important;box-shadow:inset 0 0 0 1.25px #013E37!important}
+:root[data-seite="essen"] .app-dex-menu{border-left-color:#013E37!important;color:#013E37!important}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important}
+:root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEFB3!important;fill:currentColor!important}
+
+/* SUPPS · Thistle #D8BFD8 / Tiefviolett #2A1E5C */
 :root[data-seite="supps"]{
   --supps-card:#FFFCF5;
   --cap-card:var(--supps-card);
-  --cap-tint:color-mix(in srgb,#1E3F20 7%,#EDFFEC);
-  --cap-card-border:1.5px solid #1E3F20;
-  --cap-muted:#58705A;
+  --cap-tint:color-mix(in srgb,#2A1E5C 7%,#D8BFD8);
+  --cap-card-border:1.5px solid #2A1E5C;
+  --cap-muted:#6F628D;
 }
-:root[data-seite="supps"],:root[data-seite="supps"] body,:root[data-seite="supps"] :is(#app,#view){background-color:#EDFFEC!important}
+:root[data-seite="supps"],:root[data-seite="supps"] body,:root[data-seite="supps"] :is(#app,#view){background-color:#D8BFD8!important}
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
   --surface:var(--supps-card);
-  --surface2:color-mix(in srgb,#1E3F20 7%,#EDFFEC);
-  --text:#1E3F20;
-  --ink:#1E3F20;
-  --muted:#58705A;
-  color:#1E3F20!important;
+  --surface2:color-mix(in srgb,#2A1E5C 7%,#D8BFD8);
+  --text:#2A1E5C;
+  --ink:#2A1E5C;
+  --muted:#6F628D;
+  color:#2A1E5C!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(
   .dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,
   .dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span
-){color:#1E3F20!important}
+){color:#2A1E5C!important}
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button){
-  border-color:#1E3F20!important;
+  border-color:#2A1E5C!important;
   background:#FFFCF5!important;
-  color:#1E3F20!important;
+  color:#2A1E5C!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
-  background:#1E3F20!important;
-  color:#EDFFEC!important;
+  background:#2A1E5C!important;
+  color:#D8BFD8!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
-  border-color:#1E3F20!important;background:var(--supps-card)!important;color:#1E3F20!important;
+  border-color:#2A1E5C!important;background:var(--supps-card)!important;color:#2A1E5C!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
-  border-color:#1E3F20!important;background:#1E3F20!important;
+  border-color:#2A1E5C!important;background:#2A1E5C!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text),
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
-:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){color:#1E3F20!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){color:#2A1E5C!important}
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){fill:var(--supps-card)!important}
-:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#1E3F20!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#2A1E5C!important}
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){background:var(--supps-card)!important}
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
-:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{background:#1E3F20!important}
-:root[data-seite="supps"] .dex-detail-popup{border-color:#1E3F20!important;background:var(--supps-card)!important;color:#1E3F20!important}
-:root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#1E3F20!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{background:#2A1E5C!important}
+:root[data-seite="supps"] .dex-detail-popup{border-color:#2A1E5C!important;background:var(--supps-card)!important;color:#2A1E5C!important}
+:root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#2A1E5C!important}
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){
-  border-color:#1E3F20!important;background:#1E3F20!important;color:#EDFFEC!important;
+  border-color:#2A1E5C!important;background:#2A1E5C!important;color:#D8BFD8!important;
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){
-  color:#EDFFEC!important;fill:currentColor!important;
+  color:#D8BFD8!important;fill:currentColor!important;
 }
-:root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#1E3F20!important}
-:root[data-seite="supps"] .app-dex-header{--dex-ink:#1E3F20;background:#EDFFEC!important;border-color:#1E3F20!important;color:#1E3F20!important}
+:root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#2A1E5C!important}
+:root[data-seite="supps"] .app-dex-header{--dex-ink:#2A1E5C;background:#D8BFD8!important;border-color:#2A1E5C!important;color:#2A1E5C!important}
 :root[data-seite="supps"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
-:root[data-seite="supps"] .app-dex-header .nav-av{border-color:#1E3F20!important;background:#fff!important;color:#1E3F20!important}
-:root[data-seite="supps"] .app-dex-dock{--dex-ink:#1E3F20;color:#1E3F20!important}
-:root[data-seite="supps"] .app-dex-dock::after{background:#EDFFEC!important}
-:root[data-seite="supps"] .app-dex-dock-inner::before{border-color:#1E3F20!important;background:color-mix(in srgb,#EDFFEC 90%,transparent)!important}
-:root[data-seite="supps"] .app-dex-tab{color:#1E3F20!important}
-:root[data-seite="supps"] .app-dex-tab.aktiv{background:color-mix(in srgb,#1E3F20 9%,#EDFFEC)!important;box-shadow:inset 0 0 0 1.25px #1E3F20!important}
-:root[data-seite="supps"] .app-dex-menu{border-left-color:#1E3F20!important;color:#1E3F20!important}
+:root[data-seite="supps"] .app-dex-header .nav-av{border-color:#2A1E5C!important;background:#fff!important;color:#2A1E5C!important}
+:root[data-seite="supps"] .app-dex-dock{--dex-ink:#2A1E5C;color:#2A1E5C!important}
+:root[data-seite="supps"] .app-dex-dock::after{background:#D8BFD8!important}
+:root[data-seite="supps"] .app-dex-dock-inner::before{border-color:#2A1E5C!important;background:color-mix(in srgb,#D8BFD8 90%,transparent)!important}
+:root[data-seite="supps"] .app-dex-tab{color:#2A1E5C!important}
+:root[data-seite="supps"] .app-dex-tab.aktiv{background:color-mix(in srgb,#2A1E5C 9%,#D8BFD8)!important;box-shadow:inset 0 0 0 1.25px #2A1E5C!important}
+:root[data-seite="supps"] .app-dex-menu{border-left-color:#2A1E5C!important;color:#2A1E5C!important}
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
-  border-color:#1E3F20!important;background:#1E3F20!important;color:#EDFFEC!important;
+  border-color:#2A1E5C!important;background:#2A1E5C!important;color:#D8BFD8!important;
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
-  color:#EDFFEC!important;fill:currentColor!important;
+  color:#D8BFD8!important;fill:currentColor!important;
 }
 
 /* TRAINING · Slate Gray #203C3D / Pfirsich-Creme #F9DBBA */
@@ -11158,52 +11194,52 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#203C3D!important}
 
-/* ROUTINEN · Thistle #D8BFD8 / Tiefviolett #2A1E5C */
+/* ROUTINEN · Aubergine #3C153B / Honey Dawn #F0C987 */
 :root[data-seite="habits"]{
-  --routine-panel:color-mix(in srgb,#D8BFD8 82%,#2A1E5C);
+  --routine-panel:#F0C987;
   --cap-card:#FFFCF5;
   --cap-tint:var(--routine-panel);
-  --cap-card-border:1.5px solid #2A1E5C;
-  --cap-muted:#6F628D;
+  --cap-card-border:1.5px solid #F0C987;
+  --cap-muted:#74546D;
 }
-:root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#D8BFD8!important}
-:root[data-seite="habits"] .routine-dex-page{--text:#2A1E5C;--ink:#2A1E5C;--muted:#6F628D;color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page::before{background:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#2A1E5C!important;background:var(--routine-panel)!important;color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#2A1E5C var(--routine-progress),color-mix(in srgb,#2A1E5C 20%,var(--routine-panel)) 0)!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:var(--routine-panel)!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#2A1E5C!important;color:#D8BFD8!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#FFFCF5!important;color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#2A1E5C!important;background:#FFFCF5!important;color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#2A1E5C 24%,#D8BFD8)!important;background:var(--routine-panel)!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#2A1E5C 35%,transparent)!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){border-color:#2A1E5C!important;background:#FFFCF5!important;color:#2A1E5C!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#2A1E5C!important;fill:currentColor!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#2A1E5C!important;color:#D8BFD8!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){color:#D8BFD8!important;fill:currentColor!important}
-:root[data-seite="habits"] .app-dex-header{--dex-ink:#2A1E5C;background:#D8BFD8!important;border-color:#2A1E5C!important;color:#2A1E5C!important}
-:root[data-seite="habits"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
-:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#2A1E5C!important;background:#fff!important;color:#2A1E5C!important}
-:root[data-seite="habits"] .app-dex-dock{--dex-ink:#2A1E5C;color:#2A1E5C!important}
-:root[data-seite="habits"] .app-dex-dock::after{background:#D8BFD8!important}
-:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#2A1E5C!important;background:color-mix(in srgb,#D8BFD8 90%,transparent)!important}
-:root[data-seite="habits"] .app-dex-tab{color:#2A1E5C!important}
-:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#2A1E5C 9%,#D8BFD8)!important;box-shadow:inset 0 0 0 1.25px #2A1E5C!important}
-:root[data-seite="habits"] .app-dex-menu{border-left-color:#2A1E5C!important;color:#2A1E5C!important}
+:root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page{--text:#3C153B;--ink:#F0C987;--muted:#74546D;color:#F0C987!important}
+:root[data-seite="habits"] .routine-dex-page::before{background:#F0C987!important}
+:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#F0C987!important;background:color-mix(in srgb,#F0C987 12%,#3C153B)!important;color:#F0C987!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#F0C987!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#F0C987 var(--routine-progress),color-mix(in srgb,#F0C987 20%,#3C153B) 0)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:color-mix(in srgb,#F0C987 12%,#3C153B)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#F0C987!important;color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#FFFCF5!important;color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#F0C987!important;background:#FFFCF5!important;color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#3C153B 24%,#F0C987)!important;background:#F0C987!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#3C153B 35%,transparent)!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){border-color:#3C153B!important;background:#FFFCF5!important;color:#3C153B!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#3C153B!important;fill:currentColor!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#3C153B!important;color:#F0C987!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){color:#F0C987!important;fill:currentColor!important}
+:root[data-seite="habits"] .app-dex-header{--dex-ink:#F0C987;background:#3C153B!important;border-color:#F0C987!important;color:#F0C987!important}
+:root[data-seite="habits"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
+:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#F0C987!important;background:#fff!important;color:#3C153B!important}
+:root[data-seite="habits"] .app-dex-dock{--dex-ink:#F0C987;color:#F0C987!important}
+:root[data-seite="habits"] .app-dex-dock::after{background:#3C153B!important}
+:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#F0C987!important;background:color-mix(in srgb,#3C153B 90%,transparent)!important}
+:root[data-seite="habits"] .app-dex-tab{color:#F0C987!important}
+:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#F0C987 12%,#3C153B)!important;box-shadow:inset 0 0 0 1.25px #F0C987!important}
+:root[data-seite="habits"] .app-dex-menu{border-left-color:#F0C987!important;color:#F0C987!important}
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save),
 :root[data-seite="habits"] .routine-dex-page button.routine-start{
-  border-color:#2A1E5C!important;background:#2A1E5C!important;color:#D8BFD8!important;-webkit-text-fill-color:#D8BFD8!important;
+  border-color:#3C153B!important;background:#3C153B!important;color:#F0C987!important;-webkit-text-fill-color:#F0C987!important;
 }
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
 :root[data-seite="habits"] .routine-dex-page button.routine-start :is(.material-svg,svg,svg *){
-  color:#D8BFD8!important;fill:#D8BFD8!important;
+  color:#F0C987!important;fill:#F0C987!important;
 }
 :root[data-seite="habits"] .routine-editor-backdrop .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv,
 :root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .routine-timer-exercises li>span{
-  background:#2A1E5C!important;color:#D8BFD8!important;-webkit-text-fill-color:#D8BFD8!important;
+  background:#3C153B!important;color:#F0C987!important;-webkit-text-fill-color:#F0C987!important;
 }
 
 /* SCHLAF · Midnight #0E1D47 / Creme #FFFCF3 */

@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FFA175', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#3C153B', training: '#203C3D', supps: '#EDFFEC', habits: '#D8BFD8',
+  recipes: '#F0C987', essen: '#FFEFB3', training: '#203C3D', supps: '#D8BFD8', habits: '#3C153B',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -64,11 +64,11 @@ const defaultColors = {
 const fixedSystemColors = {
   body: '#94DEFF',
   'food-log': '#F0C987',
-  essen: '#3C153B',
+  essen: '#FFEFB3',
   training: '#203C3D',
-  supps: '#EDFFEC',
+  supps: '#D8BFD8',
   reminders: '#FFA175',
-  habits: '#D8BFD8',
+  habits: '#3C153B',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -82,11 +82,11 @@ const fixedSystemColors = {
 const fixedSystemInks = {
   body: '#FF277F',
   'food-log': '#3C153B',
-  essen: '#F0C987',
+  essen: '#013E37',
   reminders: '#5C0702',
   training: '#F9DBBA',
-  habits: '#2A1E5C',
-  supps: '#1E3F20',
+  habits: '#F0C987',
+  supps: '#2A1E5C',
   shopping: '#49251E',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
@@ -96,11 +96,11 @@ const fixedSystemInks = {
 const fixedSystemAccents = {
   body: '#FF277F',
   'food-log': '#F0C987',
-  essen: '#3C153B',
+  essen: '#013E37',
   reminders: '#5C0702',
   training: '#203C3D',
-  habits: '#2A1E5C',
-  supps: '#1E3F20',
+  habits: '#3C153B',
+  supps: '#2A1E5C',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -110,11 +110,11 @@ const fixedSystemAccents = {
 const fixedSystemAccentInks = {
   body: '#94DEFF',
   'food-log': '#3C153B',
-  essen: '#F0C987',
+  essen: '#FFEFB3',
   reminders: '#FFA175',
   training: '#F9DBBA',
-  habits: '#D8BFD8',
-  supps: '#EDFFEC',
+  habits: '#F0C987',
+  supps: '#D8BFD8',
   shopping: '#49251E',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
@@ -187,7 +187,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#4F5B8C'].includes(saved?.toUpperCase())) return '#D8BFD8';
+  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#4F5B8C', '#D8BFD8'].includes(saved?.toUpperCase())) return '#3C153B';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }

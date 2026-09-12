@@ -106,9 +106,9 @@ describe('CAPBOY Design-System', () => {
     expect(entryDetail).toContain("['food-log', 'essen', 'training', 'supps', 'stress', 'home'].includes(entry.root_key)");
   });
 
-  it('registriert SUPPS als helle Honeydew-Dunkelgrün-Farbwelt mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("supps: '#EDFFEC'");
-    expect(categoryIcons).toContain("supps: '#1E3F20'");
+  it('registriert SUPPS als helle Thistle-Tiefviolett-Farbwelt mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("supps: '#D8BFD8'");
+    expect(categoryIcons).toContain("supps: '#2A1E5C'");
     expect(categoryIcons).toContain("supps: 'wallpaper-supps'");
     expect(main).toContain("['essen', 'training', 'supps'].includes(route)");
     expect(main).toContain("supps: { title: 'SUPPS', pattern: 'wallpaper-supps' }");
@@ -117,8 +117,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page)::before');
     expect(designSystem).toContain('mask-size:700px auto!important');
     expect(designSystem).toContain('--supps-card:#FFFCF5;');
-    expect(designSystem).toContain('--text:#1E3F20;\n  --ink:#1E3F20;');
-    expect(designSystem).toContain('background:#1E3F20!important;color:#EDFFEC!important;');
+    expect(designSystem).toContain('--text:#2A1E5C;\n  --ink:#2A1E5C;');
+    expect(designSystem).toContain('background:#2A1E5C!important;color:#D8BFD8!important;');
     expect(designSystem).toContain(':root[data-seite="supps"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
   });
 
@@ -174,8 +174,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="profile"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
   });
 
-  it('registriert ESSEN als feste Burgundy-Wissensseite mit eigener Tapete', () => {
-    expect(categoryIcons).toContain("essen: '#3C153B'");
+  it('registriert ESSEN als feste Butter-Wissensseite mit eigener Tapete', () => {
+    expect(categoryIcons).toContain("essen: '#FFEFB3'");
     expect(categoryIcons).toContain("essen: 'wallpaper-essen'");
     expect(main).toContain("essen: { title: 'ESSEN', pattern: 'wallpaper-essen' }");
     expect(entryDetail).toContain("essen: 'ESSEN'");
@@ -233,28 +233,29 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('fill:#FFFCF5!important;');
   });
 
-  it('kehrt auf ESSEN das Honey-Dawn-Paar nach den Grid-Regeln um', () => {
-    expect(categoryIcons).toContain("essen: '#3C153B'");
-    expect(categoryIcons).toContain("essen: '#F0C987'");
+  it('verwendet auf ESSEN Butter und Dunkelgrün nach den Grid-Regeln', () => {
+    expect(categoryIcons).toContain("essen: '#FFEFB3'");
+    expect(categoryIcons).toContain("essen: '#013E37'");
     expect(designSystem).toContain(':root[data-seite="essen"] :is(.neo-dex-page,.food-dex-page){');
-    expect(designSystem).toContain('background:#F0C987!important;\n  color:#3C153B!important;');
-    expect(designSystem).toContain('background:#3C153B!important;\n  color:#F0C987!important;');
+    expect(designSystem).toContain('background-color:#FFEFB3!important');
+    expect(designSystem).toContain('background:#013E37!important;color:#FFEFB3!important');
+    expect(designSystem).toContain(':root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
   });
 
-  it('verwendet auf ROUTINEN Thistle und Tiefviolett nach den Hero-Regeln', () => {
-    expect(categoryIcons).toContain("habits: '#D8BFD8'");
-    expect(categoryIcons).toContain("habits: '#2A1E5C'");
+  it('verwendet auf ROUTINEN Aubergine und Honey Dawn nach den Hero-Regeln', () => {
+    expect(categoryIcons).toContain("habits: '#3C153B'");
+    expect(categoryIcons).toContain("habits: '#F0C987'");
     expect(designSystem).toContain(':root[data-seite="habits"]{');
-    expect(designSystem).toContain('--routine-panel:color-mix(in srgb,#D8BFD8 82%,#2A1E5C);');
-    expect(designSystem).toContain('background:var(--routine-panel)!important;color:#2A1E5C!important}');
+    expect(designSystem).toContain('--routine-panel:#F0C987;');
+    expect(designSystem).toContain('background:color-mix(in srgb,#F0C987 12%,#3C153B)!important;color:#F0C987!important}');
     expect(designSystem).toContain('--cap-card:#FFFCF5;');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #2A1E5C;');
-    expect(designSystem).toContain('background:#2A1E5C!important;color:#D8BFD8!important;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #F0C987;');
+    expect(designSystem).toContain('background:#3C153B!important;color:#F0C987!important;');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
     expect(designSystem).toContain('button.btn.btn-primary[type="submit"]{');
     expect(designSystem).toContain('button.routine-start :is(.material-svg,svg,svg *){');
     expect(designSystem).toContain('.routine-timer-exercises li>span{');
-    expect(designSystem).toContain('-webkit-text-fill-color:#D8BFD8!important;');
+    expect(designSystem).toContain('-webkit-text-fill-color:#F0C987!important;');
   });
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
@@ -276,7 +277,7 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('hellt auf den festgelegten dunklen Seiten die Logo-Silhouette auf', () => {
-    expect(designSystem).toContain(':root:is([data-seite="essen"],[data-seite="sleep"],[data-seite="training"]) .app-dex-brand .brand');
+    expect(designSystem).toContain(':root:is([data-seite="sleep"],[data-seite="training"]) .app-dex-brand .brand');
     expect(designSystem).not.toContain(':root:is([data-seite="body"],[data-seite="essen"]');
     expect(designSystem).toContain('--sil-filter:brightness(0) invert(1)');
   });
