@@ -54,7 +54,7 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FFEDE3', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#945B39', training: '#203C3D', supps: '#D8BFD8', habits: '#4F5B8C',
+  recipes: '#F0C987', essen: '#945B39', training: '#203C3D', supps: '#D8BFD8', habits: '#4C2A85',
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -68,7 +68,7 @@ const fixedSystemColors = {
   training: '#203C3D',
   supps: '#D8BFD8',
   reminders: '#FFEDE3',
-  habits: '#4F5B8C',
+  habits: '#4C2A85',
   shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
@@ -85,7 +85,7 @@ const fixedSystemInks = {
   essen: '#F6EFE9',
   reminders: '#49251E',
   training: '#F9DBBA',
-  habits: '#EDEBA4',
+  habits: '#FFF8ED',
   supps: '#2A1E5C',
   shopping: '#013E37',
   sleep: '#FFFCF3',
@@ -99,7 +99,7 @@ const fixedSystemAccents = {
   essen: '#945B39',
   reminders: '#49251E',
   training: '#203C3D',
-  habits: '#4F5B8C',
+  habits: '#4C2A85',
   supps: '#2A1E5C',
   shopping: '#013E37',
   sleep: '#0E1D47',
@@ -113,7 +113,7 @@ const fixedSystemAccentInks = {
   essen: '#F6EFE9',
   reminders: '#FFEDE3',
   training: '#F9DBBA',
-  habits: '#EDEBA4',
+  habits: '#FFF8ED',
   supps: '#D8BFD8',
   shopping: '#FFEFB3',
   sleep: '#FFFCF3',
@@ -187,7 +187,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#3C153B', '#D8BFD8'].includes(saved?.toUpperCase())) return '#4F5B8C';
+  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#3C153B', '#D8BFD8', '#4F5B8C'].includes(saved?.toUpperCase())) return '#4C2A85';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }

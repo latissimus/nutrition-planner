@@ -981,7 +981,7 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
     supps: ['#D8BFD8', 'wallpaper-supps', '💊'],
     sleep: ['#0E1D47', 'wallpaper-moon', '😴'],
     shopping: ['#FFEFB3', 'wallpaper-brokkoli', '🛒'],
-    habits: ['#4F5B8C', 'wallpaper-wolke', '🧠'],
+    habits: ['#4C2A85', 'wallpaper-wolke', '🧠'],
     training: ['#203C3D', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#94DEFF', 'wallpaper-comp', '📐'],
     stress: ['#E36887', 'wallpaper-stress', '⚡'],

@@ -244,20 +244,20 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
   });
 
-  it('verwendet auf ROUTINEN Twilight Berry und Gelb nach den Hero-Regeln', () => {
-    expect(categoryIcons).toContain("habits: '#4F5B8C'");
-    expect(categoryIcons).toContain("habits: '#EDEBA4'");
+  it('verwendet auf ROUTINEN Tekhelet und warmes Creme nach den Hero-Regeln', () => {
+    expect(categoryIcons).toContain("habits: '#4C2A85'");
+    expect(categoryIcons).toContain("habits: '#FFF8ED'");
     expect(designSystem).toContain(':root[data-seite="habits"]{');
-    expect(designSystem).toContain('--routine-panel:#EDEBA4;');
-    expect(designSystem).toContain('background:color-mix(in srgb,#EDEBA4 12%,#4F5B8C)!important;color:#EDEBA4!important}');
-    expect(designSystem).toContain('--cap-card:#FFFCF5;');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #EDEBA4;');
-    expect(designSystem).toContain('background:#4F5B8C!important;color:#EDEBA4!important;');
+    expect(designSystem).toContain('--routine-panel:#4C2A85;');
+    expect(designSystem).toContain('background:#4C2A85!important;color:#FFF8ED!important}');
+    expect(designSystem).toContain('--cap-card:#fff;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #FFF8ED;');
+    expect(designSystem).toContain('background:#4C2A85!important;color:#FFF8ED!important;');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
     expect(designSystem).toContain('button.btn.btn-primary[type="submit"]{');
     expect(designSystem).toContain('button.routine-start :is(.material-svg,svg,svg *){');
     expect(designSystem).toContain('.routine-timer-exercises li>span{');
-    expect(designSystem).toContain('-webkit-text-fill-color:#EDEBA4!important;');
+    expect(designSystem).toContain('-webkit-text-fill-color:#FFF8ED!important;');
   });
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
