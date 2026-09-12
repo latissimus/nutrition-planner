@@ -977,15 +977,15 @@ async function initialeDexNavigationEinrichten(userId, signal, existing = []) {
   const looks = {
     'food-log': ['#F0C987', 'wallpaper-pizza', '🍕'],
     essen: ['#3C153B', 'wallpaper-essen', '🍽️'],
-    reminders: ['#FEEFB8', 'wallpaper-burger', '🍔'],
-    supps: ['#4E342E', 'wallpaper-supps', '💊'],
+    reminders: ['#FFA175', 'wallpaper-burger', '🍔'],
+    supps: ['#47230F', 'wallpaper-supps', '💊'],
     sleep: ['#0E1D47', 'wallpaper-moon', '😴'],
     shopping: ['#FFEDE3', 'wallpaper-brokkoli', '🛒'],
-    habits: ['#4B125C', 'wallpaper-wolke', '🧠'],
-    training: ['#013E37', 'wallpaper-dumbbell', '💪🏻'],
+    habits: ['#4F5B8C', 'wallpaper-wolke', '🧠'],
+    training: ['#203C3D', 'wallpaper-dumbbell', '💪🏻'],
     body: ['#94DEFF', 'wallpaper-comp', '📐'],
     stress: ['#E36887', 'wallpaper-stress', '⚡'],
-    coins: ['#4F5B8C', 'wallpaper-game', '🎮'],
+    coins: ['#0A1330', 'wallpaper-game', '🎮'],
   };
   Object.entries(looks).forEach(([route, [color, pattern, emoji]]) => {
     setPreference(`muscledex:kategorie-farbe:${route}`, color);

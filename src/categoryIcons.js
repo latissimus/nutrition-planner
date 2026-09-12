@@ -53,27 +53,27 @@ const colorKey = (route) => `muscledex:kategorie-farbe:${route}`;
 const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
-  body: '#94DEFF', reminders: '#FEEFB8', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#3C153B', training: '#013E37', supps: '#4E342E', habits: '#4B125C',
+  body: '#94DEFF', reminders: '#FFA175', 'food-log': '#F0C987',
+  recipes: '#F0C987', essen: '#3C153B', training: '#203C3D', supps: '#47230F', habits: '#4F5B8C',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#4F5B8C',
-  profile: '#203C3D',
+  coins: '#0A1330',
+  profile: '#F7F3EA',
 };
 const fixedSystemColors = {
   body: '#94DEFF',
   'food-log': '#F0C987',
   essen: '#3C153B',
-  training: '#013E37',
-  supps: '#4E342E',
-  reminders: '#FEEFB8',
-  habits: '#4B125C',
+  training: '#203C3D',
+  supps: '#47230F',
+  reminders: '#FFA175',
+  habits: '#4F5B8C',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#4F5B8C',
-  profile: '#203C3D',
+  coins: '#0A1330',
+  profile: '#F7F3EA',
 };
 // Einige feste Seiten funktionieren bewusst als zweifarbige Retro-Paare
 // statt nur als farbige Flaeche mit automatisch schwarzer/weisser Schrift.
@@ -83,43 +83,43 @@ const fixedSystemInks = {
   body: '#FF277F',
   'food-log': '#3C153B',
   essen: '#F0C987',
-  reminders: '#4E342E',
-  training: '#FCEFBB',
-  habits: '#FCEFBB',
-  supps: '#FEEFB8',
+  reminders: '#5C0702',
+  training: '#F9DBBA',
+  habits: '#EDEBA4',
+  supps: '#B5D0F3',
   shopping: '#49251E',
-  sleep: '#FCEFBB',
+  sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#EDEBA4',
-  profile: '#F9DBBA',
+  coins: '#FFE88A',
+  profile: '#0A1330',
 };
 const fixedSystemAccents = {
   body: '#FF277F',
   'food-log': '#F0C987',
   essen: '#3C153B',
-  reminders: '#4E342E',
-  training: '#013E37',
-  habits: '#4B125C',
-  supps: '#4E342E',
+  reminders: '#5C0702',
+  training: '#203C3D',
+  habits: '#4F5B8C',
+  supps: '#47230F',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#4F5B8C',
-  profile: '#203C3D',
+  coins: '#FFE88A',
+  profile: '#0A1330',
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
   'food-log': '#3C153B',
   essen: '#F0C987',
-  reminders: '#FEEFB8',
-  training: '#FCEFBB',
-  habits: '#FCEFBB',
-  supps: '#FEEFB8',
+  reminders: '#FFA175',
+  training: '#F9DBBA',
+  habits: '#EDEBA4',
+  supps: '#B5D0F3',
   shopping: '#49251E',
-  sleep: '#FCEFBB',
+  sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#EDEBA4',
-  profile: '#F9DBBA',
+  coins: '#0A1330',
+  profile: '#FFFCF5',
 };
 const fixedSystemPatterns = {
   body: 'wallpaper-comp',
@@ -187,7 +187,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && ['#245953', '#4B0082'].includes(saved?.toUpperCase())) return '#4B125C';
+  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C'].includes(saved?.toUpperCase())) return '#4F5B8C';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }

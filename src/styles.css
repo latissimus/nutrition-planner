@@ -10999,3 +10999,255 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="profile"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #000)!important}
 :root[data-seite="profile"] .app-dex-menu{border-left-color:#fff!important;color:#fff!important}
+
+/* ============================================================
+   VERBINDLICHE PALETTENVERTEILUNG
+
+   Die zehn kuratierten Farbpaare gehören ausschließlich den zehn
+   Hauptbereichen. CAPSTARS und PROFIL bleiben neutrale Utility-Seiten.
+   Diese letzte Schicht ersetzt ältere Einzelfarben vollständig und hält
+   lange Inhalte auf hellen, ruhigen Leseflächen.
+   ============================================================ */
+
+/* TRACKER · Butternut #FFA175 / Dunkelrot #5C0702 */
+:root[data-seite="reminders"]{
+  --cap-card:#FFFCF5;
+  --cap-tint:color-mix(in srgb,#5C0702 8%,#FFFCF5);
+  --cap-card-border:1.5px solid #5C0702;
+  --cap-muted:#765552;
+}
+:root[data-seite="reminders"] .meal-log-dex-page{
+  --tracker-card:#FFFCF5;
+  --tracker-tint:color-mix(in srgb,#5C0702 8%,#FFFCF5);
+  --text:#5C0702;
+  --ink:#5C0702;
+  --muted:#765552;
+  color:#5C0702!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-hero,.nutrition-coin-overview,.nutrition-card,.mahl-zeitblock
+){border-color:#5C0702!important;color:#5C0702!important}
+:root[data-seite="reminders"] .meal-log-dex-page :is(
+  .nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,
+  .nutrition-coin-hero-value b,.nutrition-coin-overview>summary b,
+  .mahl-zeitblock>header h2,.rem-row-titel b,.nutrition-entry b,.nutrition-entry strong
+){color:#5C0702!important}
+:root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
+:root[data-seite="reminders"] .nutrition-portionen button.aktiv,
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
+  border-color:#000!important;
+  background:#5C0702!important;
+  color:#FFA175!important;
+}
+:root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+  background:#FFA175!important;
+}
+
+/* SUPPS · Chocolate #47230F / Hellblau #B5D0F3 */
+:root[data-seite="supps"]{
+  --supps-card:color-mix(in srgb,#B5D0F3 68%,#FFFCF5);
+  --cap-card:var(--supps-card);
+  --cap-tint:color-mix(in srgb,#47230F 7%,var(--supps-card));
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#675550;
+}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
+  --surface:var(--supps-card);
+  --surface2:color-mix(in srgb,#47230F 7%,var(--supps-card));
+  --text:#47230F;
+  --ink:#B5D0F3;
+  --muted:#675550;
+  color:#B5D0F3!important;
+}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(
+  .dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span
+){color:#B5D0F3!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button){
+  border-color:#000!important;
+  background:#B5D0F3!important;
+  color:#47230F!important;
+}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
+  background:#47230F!important;
+  color:#B5D0F3!important;
+}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
+  border-color:#000!important;background:var(--supps-card)!important;color:#47230F!important;
+}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
+  border-color:#000!important;background:#47230F!important;
+}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text),
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){color:#47230F!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-form :is(.dex-ordner-rueckblatt,.dex-ordner-front){fill:var(--supps-card)!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#47230F!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){background:var(--supps-card)!important}
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{background:#47230F!important}
+:root[data-seite="supps"] .dex-detail-popup{border-color:#000!important;background:var(--supps-card)!important;color:#47230F!important}
+:root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#47230F!important}
+:root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){
+  border-color:#000!important;background:#47230F!important;color:#B5D0F3!important;
+}
+:root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#B5D0F3!important;fill:currentColor!important;
+}
+:root[data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#47230F!important}
+:root[data-seite="supps"] .app-dex-header .nav-av{color:#47230F!important}
+:root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
+  border-color:#000!important;background:#47230F!important;color:#B5D0F3!important;
+}
+:root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#B5D0F3!important;fill:currentColor!important;
+}
+
+/* TRAINING · Slate Gray #203C3D / Pfirsich-Creme #F9DBBA */
+:root[data-seite="training"]{
+  --cap-card:#F9DBBA;
+  --cap-tint:color-mix(in srgb,#203C3D 6%,#F9DBBA);
+  --cap-card-border:1.5px solid #000;
+  --cap-muted:#526A69;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page){
+  --surface:#F9DBBA;
+  --surface2:color-mix(in srgb,#203C3D 6%,#F9DBBA);
+  --text:#203C3D;
+  --ink:#203C3D;
+  --muted:#526A69;
+  color:#F9DBBA!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is(
+  .dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span
+){color:#F9DBBA!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
+  border-color:#000!important;background:#F9DBBA!important;color:#203C3D!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
+  border-color:#000!important;background:#F9DBBA!important;color:#203C3D!important;
+}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{border-color:#000!important;background:#203C3D!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){color:#203C3D!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{fill:#203C3D!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b){border-color:#000!important;background:#F9DBBA!important;box-shadow:0 3.5px 0 #000!important}
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{background:#203C3D!important}
+:root[data-seite="training"] .dex-detail-popup{border-color:#000!important;background:#F9DBBA!important;color:#203C3D!important}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2){color:#203C3D!important}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio){border-color:#000!important}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){
+  border-color:#000!important;background:#203C3D!important;color:#F9DBBA!important;
+}
+:root[data-seite="training"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span) :is(span,b,strong,.material-svg,svg,svg *){
+  color:#F9DBBA!important;fill:currentColor!important;
+}
+:root[data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#203C3D!important}
+
+/* ROUTINEN · Twilight Berry #4F5B8C / Gelb #EDEBA4 */
+:root[data-seite="habits"]{
+  --routine-panel:color-mix(in srgb,#EDEBA4 90%,#4F5B8C);
+  --cap-card:#FFFCF5;
+  --cap-tint:var(--routine-panel);
+  --cap-card-border:1.5px solid #EDEBA4;
+  --cap-muted:#6D718A;
+}
+:root[data-seite="habits"] .routine-dex-page{--text:#4F5B8C;--ink:#4F5B8C;--muted:#6D718A;color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page::before{background:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#EDEBA4!important;background:var(--routine-panel)!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#4F5B8C var(--routine-progress),color-mix(in srgb,#4F5B8C 20%,var(--routine-panel)) 0)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:var(--routine-panel)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#4F5B8C!important;color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#FFFCF5!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#EDEBA4!important;background:#FFFCF5!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#4F5B8C 24%,#EDEBA4)!important;background:var(--routine-panel)!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#4F5B8C 35%,transparent)!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){border-color:#000!important;background:#FFFCF5!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#4F5B8C!important;fill:currentColor!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#4F5B8C!important;color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){color:#EDEBA4!important;fill:currentColor!important}
+:root[data-seite="habits"] .app-dex-header{--dex-ink:#EDEBA4;border-color:#EDEBA4!important;color:#EDEBA4!important}
+:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#EDEBA4!important;color:#111!important}
+:root[data-seite="habits"] .app-dex-dock{--dex-ink:#EDEBA4;color:#EDEBA4!important}
+:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#EDEBA4!important}
+:root[data-seite="habits"] .app-dex-tab{color:#EDEBA4!important}
+:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#EDEBA4 12%,var(--dex-seitenfarbe))!important;box-shadow:inset 0 0 0 1.25px #EDEBA4!important}
+:root[data-seite="habits"] .app-dex-menu{border-left-color:#EDEBA4!important;color:#EDEBA4!important}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save),
+:root[data-seite="habits"] .routine-dex-page button.routine-start{
+  border-color:#000!important;background:#4F5B8C!important;color:#EDEBA4!important;-webkit-text-fill-color:#EDEBA4!important;
+}
+:root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
+:root[data-seite="habits"] .routine-dex-page button.routine-start :is(.material-svg,svg,svg *){
+  color:#EDEBA4!important;fill:#EDEBA4!important;
+}
+:root[data-seite="habits"] .routine-editor-backdrop .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv,
+:root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .routine-timer-exercises li>span{
+  background:#4F5B8C!important;color:#EDEBA4!important;-webkit-text-fill-color:#EDEBA4!important;
+}
+
+/* SCHLAF · Midnight #0E1D47 / Creme #FFFCF3 */
+:root[data-seite="sleep"]{--cap-tint:color-mix(in srgb,#FFFCF3 7%,#0E1D47);--cap-card-border:1.5px solid #FFFCF3}
+:root[data-seite="sleep"] .sleep-dex-page{--ink:#FFFCF3;color:#FFFCF3!important}
+:root[data-seite="sleep"] .sleep-tonight{border-color:#FFFCF3!important;color:#FFFCF3!important}
+:root[data-seite="sleep"] .sleep-tonight :is(.sleep-tonight-value small,.sleep-tonight-value strong,.sleep-tonight-value b),
+:root[data-seite="sleep"] .sleep-duration-ring>span,
+:root[data-seite="sleep"] .sleep-duration-ring small{color:#FFFCF3!important}
+:root[data-seite="sleep"] .sleep-duration-ring{background:conic-gradient(#FFFCF3 var(--sleep-progress),color-mix(in srgb,#FFFCF3 20%,transparent) 0)!important}
+:root[data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info){background:#FFFCF3!important;color:#0E1D47!important}
+:root[data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section,.sleep-analysis-help){border-color:#FFFCF3!important}
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save),
+:root[data-seite="sleep"] .special-dex-overlay .btn-primary{
+  background:#0E1D47!important;color:#FFFCF3!important;-webkit-text-fill-color:#FFFCF3!important;
+}
+:root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
+:root[data-seite="sleep"] .special-dex-overlay .btn-primary :is(span,b,strong,.material-svg,svg,svg *){color:#FFFCF3!important}
+:root[data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span){background:#0E1D47!important;color:#FFFCF3!important}
+
+/* CAPSTARS · neutrale Brand-/Belohnungsebene */
+:root[data-seite="coins"]{--cap-card:#fff;--cap-tint:color-mix(in srgb,#FFE88A 10%,#0A1330);--cap-card-border:1.5px solid #0A1330;--cap-muted:#667085}
+:root[data-seite="coins"],:root[data-seite="coins"] body,:root[data-seite="coins"] :is(#app,#view){background-color:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page{--surface:#fff;--surface2:#F2F3F6;--text:#0A1330;--ink:#FFE88A;--muted:#667085;color:#FFE88A!important}
+:root[data-seite="coins"] .coin-dex-page .coin-balance-card{border-color:#FFE88A!important;background:color-mix(in srgb,#FFE88A 10%,#0A1330)!important;color:#FFE88A!important}
+:root[data-seite="coins"] .coin-dex-page .coin-balance-card :is(small,strong,b){color:#FFE88A!important}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty){border-color:#0A1330!important;background:#fff!important;color:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page .coin-verdienst>summary{background:#F2F3F6!important;color:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-verdienst>summary b,.coin-verdienst>summary small,.coin-verdienst>summary .material-svg,.coin-verdienst-hinweis,.coin-verdienst-titel b,.coin-verdienst-gruppe small,.coin-verdienst-gruppe strong,.coin-verdienst-frei b,.coin-verdienst-frei small,.coin-next b,.coin-next small,.coin-next>strong,.coin-reward-kopf b,.coin-reward-kopf small,.coin-reward-kopf>strong,.coin-reward p,.coin-empty b,.coin-empty span){color:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page :is(.coin-section-title h2,.coin-history-title,.coin-history,.coin-history :is(span,small,b,.plus,.minus)){color:#FFE88A!important}
+:root[data-seite="coins"] .coin-dex-page .coin-progress i{background:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page .coin-reward-actions button{color:#0A1330!important}
+:root[data-seite="coins"] .coin-dex-page .coin-reward-actions .coin-redeem{background:#0A1330!important;color:#FFE88A!important}
+:root[data-seite="coins"] .app-dex-header{background:#0A1330!important}
+:root[data-seite="coins"] .app-dex-header .nav-av{color:#0A1330!important}
+:root[data-seite="coins"] .app-dex-dock::after{background:#0A1330!important}
+:root[data-seite="coins"] .app-dex-dock-inner::before{background:color-mix(in srgb,#0A1330 84%,transparent)!important}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:#0A1330!important;color:#FFE88A!important}
+:root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFE88A!important}
+
+/* PROFIL · neutrale Systemseite */
+:root[data-seite="profile"]{--profile-accent:#0A1330!important;--akzent:#0A1330!important;--akzent-ink:#FFFCF5!important;--cap-card:#fff;--cap-tint:#F0F1F4;--cap-card-border:1.5px solid #0A1330;--cap-muted:#667085}
+:root[data-seite="profile"],:root[data-seite="profile"] body,:root[data-seite="profile"] :is(#app,#view){background-color:#F7F3EA!important}
+:root[data-seite="profile"] .profil-fixkopf-view{color:#0A1330!important}
+:root[data-seite="profile"] .profile-abschnitt,:root[data-seite="profile"] .profile-abschnitt.profile-konto{border-color:#0A1330!important;background:#fff!important;color:#0A1330!important}
+:root[data-seite="profile"] .profile-abschnitt>summary{border-bottom-color:color-mix(in srgb,#0A1330 20%,transparent)!important;background:#F0F1F4!important;color:#0A1330!important}
+:root[data-seite="profile"] .profile-abschnitt>summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%230A1330' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")!important}
+:root[data-seite="profile"] :is(.profile-name,.profile-abschnitt .fld-l,.profile-untertitel,.sammlung-sichtbarkeit>.switchline,.interface-sound-setting,.interface-sound-setting :is(b,small)){color:#0A1330!important}
+:root[data-seite="profile"] :is(.profile-datei,.themeseg,.sammlungs-sortierung,.themebtn,.sortier-tasten button,.profile-abschnitt .input,.profile-abschnitt .btn,.profile-ausloggen .btn){color:#0A1330!important}
+:root[data-seite="profile"] :is(.role-tag,.profile-datei-knopf,.themebtn.on,.profile-abschnitt .btn-primary){background:#0A1330!important;color:#FFFCF5!important}
+:root[data-seite="profile"] :is(.role-tag,.profile-datei-knopf,.themebtn.on,.profile-abschnitt .btn-primary) :is(span,b,strong,.material-svg,svg,svg *){color:#FFFCF5!important}
+:root[data-seite="profile"] .switchline input:checked~.switchline-track{background:#0A1330!important}
+:root[data-seite="profile"] .switchline-track::after,:root[data-seite="profile"] .switchline input:checked~.switchline-track::after{background:#FFFCF5!important}
+:root[data-seite="profile"] .buildinfo{color:#0A1330!important}
+:root[data-seite="profile"] .app-dex-header{--dex-ink:#0A1330;background:#F7F3EA!important;border-color:#0A1330!important;color:#0A1330!important}
+:root[data-seite="profile"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
+:root[data-seite="profile"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#fff!important;color:#0A1330!important}
+:root[data-seite="profile"] .app-dex-dock{--dex-ink:#0A1330;color:#0A1330!important}
+:root[data-seite="profile"] .app-dex-dock::after{background:#F7F3EA!important}
+:root[data-seite="profile"] .app-dex-dock-inner::before{border-color:#0A1330!important;background:color-mix(in srgb,#F7F3EA 88%,transparent)!important}
+:root[data-seite="profile"] .app-dex-tab{color:#0A1330!important}
+:root[data-seite="profile"] .app-dex-tab.aktiv{background:color-mix(in srgb,#0A1330 8%,#F7F3EA)!important;box-shadow:inset 0 0 0 1.25px #0A1330!important}
+:root[data-seite="profile"] .app-dex-menu{border-left-color:#0A1330!important;color:#0A1330!important}
