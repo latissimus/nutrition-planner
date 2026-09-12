@@ -54,11 +54,11 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FFA175', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#3C153B', training: '#203C3D', supps: '#47230F', habits: '#4F5B8C',
+  recipes: '#F0C987', essen: '#3C153B', training: '#203C3D', supps: '#EDFFEC', habits: '#D8BFD8',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#0A1330',
+  coins: '#F9DC5C',
   profile: '#F7F3EA',
 };
 const fixedSystemColors = {
@@ -66,13 +66,13 @@ const fixedSystemColors = {
   'food-log': '#F0C987',
   essen: '#3C153B',
   training: '#203C3D',
-  supps: '#47230F',
+  supps: '#EDFFEC',
   reminders: '#FFA175',
-  habits: '#4F5B8C',
+  habits: '#D8BFD8',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#0A1330',
+  coins: '#F9DC5C',
   profile: '#F7F3EA',
 };
 // Einige feste Seiten funktionieren bewusst als zweifarbige Retro-Paare
@@ -85,12 +85,12 @@ const fixedSystemInks = {
   essen: '#F0C987',
   reminders: '#5C0702',
   training: '#F9DBBA',
-  habits: '#EDEBA4',
-  supps: '#B5D0F3',
+  habits: '#2A1E5C',
+  supps: '#1E3F20',
   shopping: '#49251E',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#FFE88A',
+  coins: '#FE4A49',
   profile: '#0A1330',
 };
 const fixedSystemAccents = {
@@ -99,12 +99,12 @@ const fixedSystemAccents = {
   essen: '#3C153B',
   reminders: '#5C0702',
   training: '#203C3D',
-  habits: '#4F5B8C',
-  supps: '#47230F',
+  habits: '#2A1E5C',
+  supps: '#1E3F20',
   shopping: '#FFEDE3',
   sleep: '#0E1D47',
   stress: '#E36887',
-  coins: '#FFE88A',
+  coins: '#FE4A49',
   profile: '#0A1330',
 };
 const fixedSystemAccentInks = {
@@ -113,12 +113,12 @@ const fixedSystemAccentInks = {
   essen: '#F0C987',
   reminders: '#FFA175',
   training: '#F9DBBA',
-  habits: '#EDEBA4',
-  supps: '#B5D0F3',
+  habits: '#D8BFD8',
+  supps: '#EDFFEC',
   shopping: '#49251E',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
-  coins: '#0A1330',
+  coins: '#F9DC5C',
   profile: '#FFFCF5',
 };
 const fixedSystemPatterns = {
@@ -187,7 +187,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C'].includes(saved?.toUpperCase())) return '#4F5B8C';
+  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#4F5B8C'].includes(saved?.toUpperCase())) return '#D8BFD8';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }
