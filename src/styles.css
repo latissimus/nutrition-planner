@@ -1795,7 +1795,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .coin-kopfstand strong{min-width:13px;font-size:12px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
 .coin-kopfstand:active{transform:translateY(1px)}
 /* Selektiert (Route #coins): derselbe harte Schlagschatten wie die aktiven
-   Menü-Icons — filter:drop-shadow folgt der Alpha-Kante des CAPSTARS-SVGs. */
+   Menü-Icons — filter:drop-shadow folgt der Alpha-Kante des CAPCOIN-SVGs. */
 .coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
 :root[data-theme="dark"] .coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #EDF0F6)}
 
@@ -5183,7 +5183,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ============================================================
    SPECIAL-DEX-VORLAGE
    Gemeinsamer, anpassbarer Rahmen für Dex mit breiten Karten und Hero.
-   Einkauf, Schlaf, Routinen, Körperwerte und CAPSTARS können ausschließlich
+   Einkauf, Schlaf, Routinen, Körperwerte und CAPCOINS können ausschließlich
    diese Primitiven übernehmen; ihre Fachinhalte bleiben eigene Module.
    ============================================================ */
 .special-dex-page{
@@ -8580,7 +8580,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #EDF0F6)}
 
-/* Breite Karten: TRACKER, SCHLAF, ROUTINEN, KOERPER und CAPSTARS. */
+/* Breite Karten: TRACKER, SCHLAF, ROUTINEN, KOERPER und CAPCOINS. */
 .special-dex-page{
   --special-dex-inline:var(--cap-page-inline)!important;
   --special-dex-gap:var(--cap-stack-gap)!important;
@@ -10738,7 +10738,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* CAPSTARS: Twilight Berry #4F5B8C mit dem hellen Gelb #EDEBA4.
+/* CAPCOINS: Twilight Berry #4F5B8C mit dem hellen Gelb #EDEBA4.
    Der Hero trägt das direkte Paar; längere Karten bleiben weiß und verwenden
    Twilight als Textfarbe. App-Chrome und Kontextmenüs bleiben neutral. */
 :root[data-seite="coins"]{
@@ -10861,7 +10861,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="coins"] .app-dex-menu{border-left-color:#fff!important;color:#fff!important}
 
 /* Formulare bleiben eine neutrale weiße Systemebene. Nur die primäre Aktion
-   verwendet Twilight Berry als Fläche und CAPSTARS-Gelb als Beschriftung. */
+   verwendet Twilight Berry als Fläche und CAPCOIN-Gelb als Beschriftung. */
 :root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet){
   --cap-muted:#586274;
   --muted:#586274;
@@ -11004,7 +11004,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    VERBINDLICHE PALETTENVERTEILUNG
 
    Die zehn kuratierten Farbpaare gehören ausschließlich den zehn
-   Hauptbereichen. CAPSTARS und PROFIL bleiben neutrale Utility-Seiten.
+   Hauptbereichen. CAPCOINS und PROFIL bleiben neutrale Utility-Seiten.
    Diese letzte Schicht ersetzt ältere Einzelfarben vollständig und hält
    lange Inhalte auf hellen, ruhigen Leseflächen.
    ============================================================ */
@@ -11326,7 +11326,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="sleep"] .special-dex-overlay .btn-primary :is(span,b,strong,.material-svg,svg,svg *){color:#FFFCF3!important}
 :root[data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span){background:#0E1D47!important;color:#FFFCF3!important}
 
-/* CAPSTARS · dunkles Violett #432C5E / leuchtendes Gelb #FFD400 */
+/* CAPCOINS · dunkles Violett #432C5E / leuchtendes Gelb #FFD400 */
 :root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;--cap-tint:color-mix(in srgb,#FFD400 9%,#432C5E);--cap-card-border:1.5px solid #000;--cap-muted:#6E617D}
 :root[data-seite="coins"],:root[data-seite="coins"] body,:root[data-seite="coins"] :is(#app,#view){background-color:#432C5E!important}
 :root[data-seite="coins"] .coin-dex-page{--surface:#fff;--surface2:color-mix(in srgb,#432C5E 6%,#fff);--text:#432C5E;--ink:#FFD400;--muted:#6E617D;color:#FFD400!important}

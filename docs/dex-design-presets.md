@@ -202,9 +202,9 @@ Mittelpunkt, zum Beispiel TRACKER, SCHLAF, ROUTINEN und COMP.
 - Diagrammlinie und Datenpunkte im 7-Tage-Verlauf: Midnight auf Weiß
 - Kontextmenüs: neutral Weiß/Schwarz; Primäraktionen Midnight mit Creme
 
-### Referenz CAPSTARS
+### Referenz CAPCOINS
 
-- Sichtbarer Seiten- und Währungsname: `CAPSTARS`; Route, Datenbanktabellen und
+- Sichtbarer Seiten- und Währungsname: `CAPCOINS`; Route, Datenbanktabellen und
   interne Schlüssel behalten aus Kompatibilitätsgründen den Namen `coins`
 - Seitenfarbe: Twilight Berry `#4F5B8C`
 - Druckfarbe: helles Gelb `#EDEBA4`

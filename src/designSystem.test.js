@@ -158,10 +158,10 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.dex-detail-popup{\n  border-color:#000!important;\n  background:var(--stress-card)!important;');
   });
 
-  it('verwendet für CAPSTARS leuchtendes Gelb und dunkles Violett', () => {
+  it('verwendet für CAPCOINS leuchtendes Gelb und dunkles Violett', () => {
     expect(categoryIcons).toContain("coins: '#432C5E'");
     expect(categoryIcons).toContain("coins: '#FFD400'");
-    expect(main).toContain("title: 'CAPSTARS'");
+    expect(main).toContain("title: 'CAPCOINS'");
     expect(designSystem).toContain(':root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;');
     expect(designSystem).toContain('--cap-card-border:1.5px solid #000;');
     expect(designSystem).toContain('background:#432C5E!important;color:#FFD400!important');
