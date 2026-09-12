@@ -11103,6 +11103,36 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#945B39!important;background:#945B39!important;color:#F6EFE9!important}
 :root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#F6EFE9!important;fill:currentColor!important}
 
+/* EINKAUF · Butter #FFEFB3 / Dunkelgrün #013E37 */
+:root[data-seite="shopping"]{--cap-card:#FFFCF5;--cap-tint:color-mix(in srgb,#013E37 7%,#FFFCF5);--cap-card-border:1.5px solid #013E37;--cap-muted:#526D68}
+:root[data-seite="shopping"],:root[data-seite="shopping"] body,:root[data-seite="shopping"] :is(#app,#view){background-color:#FFEFB3!important}
+:root[data-seite="shopping"] .shopping-dex-wrap{--surface:#FFFCF5;--surface2:color-mix(in srgb,#013E37 7%,#FFFCF5);--text:#013E37;--ink:#013E37;--muted:#526D68;color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-suche{border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-suche :is(input,.material-svg,svg,svg *){color:#013E37!important;fill:currentColor!important}
+:root[data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn,.einkauf-reset){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important;-webkit-text-fill-color:#FFEFB3!important}
+:root[data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn).aktiv{background:#FFEFB3!important;color:#013E37!important;-webkit-text-fill-color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-kopfzeile{color:#526D68!important}
+:root[data-seite="shopping"] .einkauf-gruppe{border-color:#013E37!important;background:#FFFCF5!important;color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head{background:color-mix(in srgb,#013E37 7%,#FFFCF5)!important;color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-icon{background:#FFEFB3!important;color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head :is(b,em,.reminder-group-chevron,.material-svg,svg,svg *){color:#013E37!important;fill:currentColor!important}
+:root[data-seite="shopping"] .einkauf-row-inhalt{background:#FFFCF5!important;color:#013E37!important}
+:root[data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt{background:color-mix(in srgb,#FFEFB3 70%,#FFFCF5)!important}
+:root[data-seite="shopping"] .einkauf-row input[type="checkbox"]{border-color:#013E37!important;background-color:#FFFCF5!important}
+:root[data-seite="shopping"] .einkauf-row input[type="checkbox"]:checked{background-color:#013E37!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4L19 6' fill='none' stroke='%23FFEFB3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important}
+:root[data-seite="shopping"] .einkauf-row-name{color:#013E37!important}
+:root[data-seite="shopping"] .app-dex-header{--dex-ink:#013E37;background:#FFEFB3!important;border-color:#013E37!important;color:#013E37!important}
+:root[data-seite="shopping"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
+:root[data-seite="shopping"] .app-dex-header .nav-av{border-color:#013E37!important;background:#fff!important;color:#013E37!important}
+:root[data-seite="shopping"] .app-dex-dock{--dex-ink:#013E37;color:#013E37!important}
+:root[data-seite="shopping"] .app-dex-dock::after{background:#FFEFB3!important}
+:root[data-seite="shopping"] .app-dex-dock-inner::before{border-color:#013E37!important;background:color-mix(in srgb,#FFEFB3 90%,transparent)!important}
+:root[data-seite="shopping"] .app-dex-tab{color:#013E37!important}
+:root[data-seite="shopping"] .app-dex-tab.aktiv{background:color-mix(in srgb,#013E37 9%,#FFEFB3)!important;box-shadow:inset 0 0 0 1.25px #013E37!important}
+:root[data-seite="shopping"] .app-dex-menu{border-left-color:#013E37!important;color:#013E37!important}
+:root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:#013E37!important;background:#013E37!important;color:#FFEFB3!important}
+:root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop,.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFEFB3!important;fill:currentColor!important}
+
 /* SUPPS · Thistle #D8BFD8 / Tiefviolett #2A1E5C */
 :root[data-seite="supps"]{
   --supps-card:#FFFCF5;
@@ -11214,52 +11244,52 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button){color:#203C3D!important}
 
-/* ROUTINEN · Aubergine #3C153B / Honey Dawn #F0C987 */
+/* ROUTINEN · Twilight Berry #4F5B8C / Gelb #EDEBA4 */
 :root[data-seite="habits"]{
-  --routine-panel:#F0C987;
+  --routine-panel:#EDEBA4;
   --cap-card:#FFFCF5;
   --cap-tint:var(--routine-panel);
-  --cap-card-border:1.5px solid #F0C987;
-  --cap-muted:#74546D;
+  --cap-card-border:1.5px solid #EDEBA4;
+  --cap-muted:#6D718A;
 }
-:root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page{--text:#3C153B;--ink:#F0C987;--muted:#74546D;color:#F0C987!important}
-:root[data-seite="habits"] .routine-dex-page::before{background:#F0C987!important}
-:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#F0C987!important;background:color-mix(in srgb,#F0C987 12%,#3C153B)!important;color:#F0C987!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#F0C987!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#F0C987 var(--routine-progress),color-mix(in srgb,#F0C987 20%,#3C153B) 0)!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:color-mix(in srgb,#F0C987 12%,#3C153B)!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#F0C987!important;color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#FFFCF5!important;color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#F0C987!important;background:#FFFCF5!important;color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#3C153B 24%,#F0C987)!important;background:#F0C987!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#3C153B 35%,transparent)!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){border-color:#3C153B!important;background:#FFFCF5!important;color:#3C153B!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#3C153B!important;fill:currentColor!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#3C153B!important;color:#F0C987!important}
-:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){color:#F0C987!important;fill:currentColor!important}
-:root[data-seite="habits"] .app-dex-header{--dex-ink:#F0C987;background:#3C153B!important;border-color:#F0C987!important;color:#F0C987!important}
+:root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page{--text:#4F5B8C;--ink:#EDEBA4;--muted:#6D718A;color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page::before{background:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#EDEBA4!important;background:color-mix(in srgb,#EDEBA4 12%,#4F5B8C)!important;color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#EDEBA4 var(--routine-progress),color-mix(in srgb,#EDEBA4 20%,#4F5B8C) 0)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:color-mix(in srgb,#EDEBA4 12%,#4F5B8C)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#EDEBA4!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#FFFCF5!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#EDEBA4!important;background:#FFFCF5!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#4F5B8C 24%,#EDEBA4)!important;background:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#4F5B8C 35%,transparent)!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach){border-color:#4F5B8C!important;background:#FFFCF5!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){color:#4F5B8C!important;fill:currentColor!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check{background:#4F5B8C!important;color:#EDEBA4!important}
+:root[data-seite="habits"] .routine-dex-page .routine-row.erledigt .routine-check :is(.material-svg,svg,svg *){color:#EDEBA4!important;fill:currentColor!important}
+:root[data-seite="habits"] .app-dex-header{--dex-ink:#EDEBA4;background:#4F5B8C!important;border-color:#EDEBA4!important;color:#EDEBA4!important}
 :root[data-seite="habits"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
-:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#F0C987!important;background:#fff!important;color:#3C153B!important}
-:root[data-seite="habits"] .app-dex-dock{--dex-ink:#F0C987;color:#F0C987!important}
-:root[data-seite="habits"] .app-dex-dock::after{background:#3C153B!important}
-:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#F0C987!important;background:color-mix(in srgb,#3C153B 90%,transparent)!important}
-:root[data-seite="habits"] .app-dex-tab{color:#F0C987!important}
-:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#F0C987 12%,#3C153B)!important;box-shadow:inset 0 0 0 1.25px #F0C987!important}
-:root[data-seite="habits"] .app-dex-menu{border-left-color:#F0C987!important;color:#F0C987!important}
+:root[data-seite="habits"] .app-dex-header .nav-av{border-color:#EDEBA4!important;background:#fff!important;color:#4F5B8C!important}
+:root[data-seite="habits"] .app-dex-dock{--dex-ink:#EDEBA4;color:#EDEBA4!important}
+:root[data-seite="habits"] .app-dex-dock::after{background:#4F5B8C!important}
+:root[data-seite="habits"] .app-dex-dock-inner::before{border-color:#EDEBA4!important;background:color-mix(in srgb,#4F5B8C 90%,transparent)!important}
+:root[data-seite="habits"] .app-dex-tab{color:#EDEBA4!important}
+:root[data-seite="habits"] .app-dex-tab.aktiv{background:color-mix(in srgb,#EDEBA4 12%,#4F5B8C)!important;box-shadow:inset 0 0 0 1.25px #EDEBA4!important}
+:root[data-seite="habits"] .app-dex-menu{border-left-color:#EDEBA4!important;color:#EDEBA4!important}
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save),
 :root[data-seite="habits"] .routine-dex-page button.routine-start{
-  border-color:#3C153B!important;background:#3C153B!important;color:#F0C987!important;-webkit-text-fill-color:#F0C987!important;
+  border-color:#4F5B8C!important;background:#4F5B8C!important;color:#EDEBA4!important;-webkit-text-fill-color:#EDEBA4!important;
 }
 :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *),
 :root[data-seite="habits"] .routine-dex-page button.routine-start :is(.material-svg,svg,svg *){
-  color:#F0C987!important;fill:#F0C987!important;
+  color:#EDEBA4!important;fill:#EDEBA4!important;
 }
 :root[data-seite="habits"] .routine-editor-backdrop .kategorie-sheet :is(.routine-days,.routine-duration) button.aktiv,
 :root[data-seite="habits"] .meditation-timer-backdrop .kategorie-sheet .routine-timer-exercises li>span{
-  background:#3C153B!important;color:#F0C987!important;-webkit-text-fill-color:#F0C987!important;
+  background:#4F5B8C!important;color:#EDEBA4!important;-webkit-text-fill-color:#EDEBA4!important;
 }
 
 /* SCHLAF · Midnight #0E1D47 / Creme #FFFCF3 */

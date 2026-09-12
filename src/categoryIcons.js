@@ -54,8 +54,8 @@ const pageColorKey = (scope) => `muscledex:seitenfarbe:${scope}`;
 const pagePatternKey = (scope) => `muscledex:seitenmuster:${scope}`;
 const defaultColors = {
   body: '#94DEFF', reminders: '#FFEDE3', 'food-log': '#F0C987',
-  recipes: '#F0C987', essen: '#945B39', training: '#203C3D', supps: '#D8BFD8', habits: '#3C153B',
-  shopping: '#FFEDE3',
+  recipes: '#F0C987', essen: '#945B39', training: '#203C3D', supps: '#D8BFD8', habits: '#4F5B8C',
+  shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
   coins: '#F9DC5C',
@@ -68,8 +68,8 @@ const fixedSystemColors = {
   training: '#203C3D',
   supps: '#D8BFD8',
   reminders: '#FFEDE3',
-  habits: '#3C153B',
-  shopping: '#FFEDE3',
+  habits: '#4F5B8C',
+  shopping: '#FFEFB3',
   sleep: '#0E1D47',
   stress: '#E36887',
   coins: '#F9DC5C',
@@ -85,9 +85,9 @@ const fixedSystemInks = {
   essen: '#F6EFE9',
   reminders: '#49251E',
   training: '#F9DBBA',
-  habits: '#F0C987',
+  habits: '#EDEBA4',
   supps: '#2A1E5C',
-  shopping: '#49251E',
+  shopping: '#013E37',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
   coins: '#FE4A49',
@@ -99,9 +99,9 @@ const fixedSystemAccents = {
   essen: '#945B39',
   reminders: '#49251E',
   training: '#203C3D',
-  habits: '#3C153B',
+  habits: '#4F5B8C',
   supps: '#2A1E5C',
-  shopping: '#FFEDE3',
+  shopping: '#013E37',
   sleep: '#0E1D47',
   stress: '#E36887',
   coins: '#FE4A49',
@@ -113,9 +113,9 @@ const fixedSystemAccentInks = {
   essen: '#F6EFE9',
   reminders: '#FFEDE3',
   training: '#F9DBBA',
-  habits: '#F0C987',
+  habits: '#EDEBA4',
   supps: '#D8BFD8',
-  shopping: '#49251E',
+  shopping: '#FFEFB3',
   sleep: '#FFFCF3',
   stress: '#FFE08C',
   coins: '#F9DC5C',
@@ -187,7 +187,7 @@ export function categoryColor(route) {
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
-  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#4F5B8C', '#D8BFD8'].includes(saved?.toUpperCase())) return '#3C153B';
+  if (route === 'habits' && ['#245953', '#4B0082', '#4B125C', '#3C153B', '#D8BFD8'].includes(saved?.toUpperCase())) return '#4F5B8C';
   const valid = saved && retroColors.some(([, color]) => color === saved.toUpperCase());
   return valid ? saved.toUpperCase() : (defaultColors[route] || '#F1DF71');
 }

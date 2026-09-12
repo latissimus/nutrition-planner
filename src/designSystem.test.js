@@ -122,13 +122,13 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="supps"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}');
   });
 
-  it('verwendet auf EINKAUF das feste Soft-Blush-Braun-Paar', () => {
-    expect(categoryIcons).toContain("shopping: '#FFEDE3'");
-    expect(categoryIcons).toContain("shopping: '#49251E'");
-    expect(designSystem).toContain(':root[data-seite="shopping"]{\n  --cap-card:#FFFCF5;');
-    expect(designSystem).toContain('background:#FFEDE3!important;\n  color:#49251E!important;');
+  it('verwendet auf EINKAUF das feste Butter-Dunkelgrün-Paar', () => {
+    expect(categoryIcons).toContain("shopping: '#FFEFB3'");
+    expect(categoryIcons).toContain("shopping: '#013E37'");
+    expect(designSystem).toContain(':root[data-seite="shopping"]{--cap-card:#FFFCF5;');
+    expect(designSystem).toContain('background-color:#FFEFB3!important');
     expect(designSystem).toContain('.einkauf-row input[type="checkbox"]{');
-    expect(designSystem).toContain('border:2px solid #49251E!important;');
+    expect(designSystem).toContain('background-color:#013E37!important;background-image:');
   });
 
   it('verwendet auf SCHLAF Midnight, einen Creme-Hero und neutrale weiße Karten', () => {
@@ -242,20 +242,20 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':root[data-seite="essen"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
   });
 
-  it('verwendet auf ROUTINEN Aubergine und Honey Dawn nach den Hero-Regeln', () => {
-    expect(categoryIcons).toContain("habits: '#3C153B'");
-    expect(categoryIcons).toContain("habits: '#F0C987'");
+  it('verwendet auf ROUTINEN Twilight Berry und Gelb nach den Hero-Regeln', () => {
+    expect(categoryIcons).toContain("habits: '#4F5B8C'");
+    expect(categoryIcons).toContain("habits: '#EDEBA4'");
     expect(designSystem).toContain(':root[data-seite="habits"]{');
-    expect(designSystem).toContain('--routine-panel:#F0C987;');
-    expect(designSystem).toContain('background:color-mix(in srgb,#F0C987 12%,#3C153B)!important;color:#F0C987!important}');
+    expect(designSystem).toContain('--routine-panel:#EDEBA4;');
+    expect(designSystem).toContain('background:color-mix(in srgb,#EDEBA4 12%,#4F5B8C)!important;color:#EDEBA4!important}');
     expect(designSystem).toContain('--cap-card:#FFFCF5;');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #F0C987;');
-    expect(designSystem).toContain('background:#3C153B!important;color:#F0C987!important;');
+    expect(designSystem).toContain('--cap-card-border:1.5px solid #EDEBA4;');
+    expect(designSystem).toContain('background:#4F5B8C!important;color:#EDEBA4!important;');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button.aktiv{');
     expect(designSystem).toContain('button.btn.btn-primary[type="submit"]{');
     expect(designSystem).toContain('button.routine-start :is(.material-svg,svg,svg *){');
     expect(designSystem).toContain('.routine-timer-exercises li>span{');
-    expect(designSystem).toContain('-webkit-text-fill-color:#F0C987!important;');
+    expect(designSystem).toContain('-webkit-text-fill-color:#EDEBA4!important;');
   });
 
   it('hält App-Rahmen und Menüflächen neutral und färbt nur deren Aktionen', () => {
