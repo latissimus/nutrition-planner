@@ -11248,7 +11248,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* ROUTINEN · Tekhelet #4C2A85 / warmes Creme #FFF8ED */
 :root[data-seite="habits"]{
-  --routine-panel:#4C2A85;
+  --routine-panel:#FFF8ED;
   --cap-card:#fff;
   --cap-tint:color-mix(in srgb,#4C2A85 7%,#fff);
   --cap-card-border:1.5px solid #FFF8ED;
@@ -11257,15 +11257,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="habits"],:root[data-seite="habits"] body,:root[data-seite="habits"] :is(#app,#view){background-color:#4C2A85!important}
 :root[data-seite="habits"] .routine-dex-page{--surface:#fff;--surface2:color-mix(in srgb,#4C2A85 7%,#fff);--text:#4C2A85;--ink:#FFF8ED;--muted:#766B91;color:#FFF8ED!important}
 :root[data-seite="habits"] .routine-dex-page::before{background:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#FFF8ED!important;background:#4C2A85!important;color:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#FFF8ED!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#FFF8ED var(--routine-progress),color-mix(in srgb,#FFF8ED 20%,#4C2A85) 0)!important}
-:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#FFF8ED!important;color:#4C2A85!important}
+:root[data-seite="habits"] .routine-dex-page .routine-hero{border-color:#FFF8ED!important;background:var(--routine-panel)!important;color:#4C2A85!important}
+:root[data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span){color:#4C2A85!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring{background:conic-gradient(#4C2A85 var(--routine-progress),color-mix(in srgb,#4C2A85 18%,#FFF8ED) 0)!important}
+:root[data-seite="habits"] .routine-dex-page .routine-progress-ring::after{background:#FFF8ED!important}
+:root[data-seite="habits"] .routine-dex-page .routine-info-button{background:#4C2A85!important;color:#FFF8ED!important}
 :root[data-seite="habits"] .routine-dex-page .routine-info-help{background:#fff!important;color:#4C2A85!important}
 :root[data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span){color:#4C2A85!important}
 :root[data-seite="habits"] .routine-dex-page .routine-zeitblock{border-color:#FFF8ED!important;background:#fff!important;color:#4C2A85!important}
-:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#4C2A85 24%,#fff)!important;background:#fff!important}
+:root[data-seite="habits"] .routine-dex-page .routine-zeitblock>header{border-bottom-color:color-mix(in srgb,#4C2A85 24%,#FFF8ED)!important;background:#FFF8ED!important}
 :root[data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-copy small,.routine-zeitblock-leer){color:#4C2A85!important}
 :root[data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge){background:#fff!important}
 :root[data-seite="habits"] .routine-dex-page .routine-row{border-bottom-color:color-mix(in srgb,#4C2A85 35%,transparent)!important}
