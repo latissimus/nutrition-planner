@@ -7,8 +7,22 @@ import { parseLogmanExport, performanceTrend } from './logmanImport.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
+import { getPreference, setPreference } from './userPreferences.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
+import {
+  assessSkinfoldPriorities,
+  bravermanComplete,
+  bravermanRecommendations,
+  scoreBravermanAssessment,
+  supplementName,
+  supplementSafety,
+  BRAVERMAN_BEREICHE,
+  BRAVERMAN_DEFIZIT_FRAGEN,
+  BRAVERMAN_REIHENFOLGE,
+} from './ypsiAssessment.js';
+
+const BRAVERMAN_PREFERENCE = 'comp:braverman-defizit-v1';
 
 const FALTEN_HILFE = {
   kinn: 'Mittig unter dem Kinn eine senkrechte Falte greifen.', wange: 'Seitlich an der Wange immer dieselbe Position verwenden.',
@@ -215,6 +229,51 @@ function faltenLegendeMarkup(state) {
   </details>`;
 }
 
+function ypsiPriorityMarkup(state) {
+  const latest = state.skinfolds.filter((row) => row.total != null).at(-1);
+  if (!latest) return `<section class="ypsi-priority-empty">
+    <b>YPSI-Prioritäten</b>
+    <span>Nach deiner ersten vollständigen Messung ordnet CAPBOY die vier Protokollgruppen und zeigt die passende Startphase.</span>
+  </section>`;
+  const priorities = assessSkinfoldPriorities(latest.falten, state.settings.calculation_basis);
+  if (!priorities.length) return '';
+  return `<section class="ypsi-priority-block">
+    <header><span><small>YPSI-ASSESSMENT</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(latest.gemessen_am)}</em></header>
+    <p>Die Rangfolge vergleicht deine vier protokollierten YPSI-Gruppen innerhalb derselben Messung. Tippe eine Priorität an, um Phasen, Ernährung, Schlaf und Supplements aus den Seminarunterlagen zu sehen.</p>
+    <div class="ypsi-priority-list">${priorities.map((priority) => {
+      const phaseOne = priority.protocols.find((protocol) => Number(protocol.phase) === 1);
+      const values = priority.details.map((item) => `${item.label} ${display(item.value)} mm`).join(' · ');
+      return `<button type="button" data-ypsi-priority="${priority.id}">
+        <i>${priority.priority}</i><span><b>${escapeHtml(priority.label)}</b><small>${escapeHtml(values)}</small>${phaseOne?.fokus ? `<em>${escapeHtml(phaseOne.fokus)}</em>` : ''}</span>${materialIconMarkup('chevron_right')}
+      </button>`;
+    }).join('')}</div>
+    <p class="ypsi-method-note"><b>Zusammenspiel:</b> Die YPSI-Strategie ergänzt deine Kalorien- und Gewichtssteuerung. Sie ersetzt weder das Energiedefizit noch die Verlaufskontrolle.</p>
+  </section>`;
+}
+
+function ypsiPriorityDetailMarkup(priority) {
+  const foldInfo = priority.details.map((item) => hautfaltenData.falten[item.slug]).filter(Boolean);
+  const lifestyle = [...new Set(foldInfo.flatMap((info) => info.interpretation?.hebel || []))];
+  const causes = [...new Set(foldInfo.flatMap((info) => info.interpretation?.hauptursachen || []))];
+  const protocolsByPhase = [1, 2, 3, 4].map((phase) => ({
+    phase,
+    protocols: priority.protocols.filter((protocol) => Number(protocol.phase) === phase),
+  })).filter((group) => group.protocols.length);
+  return `<header class="falten-detail-header"><div><small>YPSI-PRIORITÄT ${priority.priority}</small><h2>${escapeHtml(priority.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="falten-detail-body ypsi-priority-detail">
+      <section class="ypsi-detail-values">${priority.details.map((item) => `<span><small>${escapeHtml(item.label)}</small><b>${display(item.value)} mm</b></span>`).join('')}</section>
+      ${causes.length ? `<section class="falten-detail-section"><h3>Kontext aus dem Seminar</h3><div class="falten-detail-tags">${causes.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div></section>` : ''}
+      ${lifestyle.length ? `<section class="falten-detail-section"><h3>Ernährung, Alltag & Schlaf</h3><ul class="falten-detail-hinweise">${lifestyle.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
+      <section class="falten-detail-section"><h3>Phasenprotokolle</h3><p class="falten-detail-hinweis">Beginne nicht mit allen Phasen gleichzeitig. Die Unterlagen sehen Phase 1 bis 3 als aufeinanderfolgende Schritte; Phase 4+ dient der gezielten Feinjustierung.</p>
+        <div class="falten-detail-protokolle">${protocolsByPhase.map((phaseGroup) => `<section class="ypsi-phase-group"><h4>Phase ${phaseGroup.phase === 4 ? '4+' : phaseGroup.phase}</h4>${phaseGroup.protocols.map((protocol) => `<details class="falten-protokoll-item"${phaseGroup.phase === 1 ? ' open' : ''}><summary><span><b>${escapeHtml(protocol.name)}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</span>${materialIconMarkup('chevron_right')}</summary><ul>${(protocol.supplemente || []).map((supplement) => {
+          const safety = supplementSafety(supplement.slug);
+          return `<li><span><b>${escapeHtml(supplementName(supplement.slug))}</b>${safety ? `<small>${escapeHtml(safety)}</small>` : ''}</span>${supplement.dosierung ? `<strong>${escapeHtml(supplement.dosierung)}</strong>` : ''}</li>`;
+        }).join('')}</ul>${protocol.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(protocol.notiz)}</p>` : ''}</details>`).join('')}</section>`).join('')}</div>
+      </section>
+      <p class="falten-detail-disclaimer">Praxisstrategie aus deinen YPSI-Seminarunterlagen. Prüfe Produkte, Dosierungen, Erkrankungen und Medikamente vor der Einnahme fachlich. Die Kaloriensteuerung in TRACKER läuft unabhängig weiter.</p>
+    </div>`;
+}
+
 function skinfoldMarkup(state) {
   const valid = state.skinfolds.filter((row) => row.total != null); const latest = valid.at(-1); const previous = valid.at(-2);
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
@@ -223,6 +282,7 @@ function skinfoldMarkup(state) {
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 12-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 12 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
+    ${ypsiPriorityMarkup(state)}
     ${faltenLegendeMarkup(state)}
     ${skinfoldHistoryMarkup(valid)}
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
@@ -266,10 +326,6 @@ function faltenDetailMarkup(slug, state) {
   const protokolle = (info.protokoll_ids || [])
     .map((id) => ypsiProtokolle.protokolle[id])
     .filter(Boolean);
-
-  const protokollKurz = (p) => (p.supplemente || [])
-    .map((s) => `${s.slug}${s.dosierung ? ` (${s.dosierung})` : ''}`)
-    .join(', ');
 
   return `
     <header class="falten-detail-header">
@@ -319,7 +375,7 @@ function faltenDetailMarkup(slug, state) {
         <div class="falten-detail-protokolle">
           ${protokolle.map((p) => `<div class="falten-protokoll-item">
             <header><b>${escapeHtml(p.name)}</b>${p.fokus ? `<small>${escapeHtml(p.fokus)}</small>` : ''}</header>
-            <ul>${(p.supplemente || []).map((s) => `<li><span>${escapeHtml(s.slug)}</span>${s.dosierung ? `<b>${escapeHtml(s.dosierung)}</b>` : ''}</li>`).join('')}</ul>
+            <ul>${(p.supplemente || []).map((s) => `<li><span><b>${escapeHtml(supplementName(s.slug))}</b>${supplementSafety(s.slug) ? `<small>${escapeHtml(supplementSafety(s.slug))}</small>` : ''}</span>${s.dosierung ? `<strong>${escapeHtml(s.dosierung)}</strong>` : ''}</li>`).join('')}</ul>
             ${p.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(p.notiz)}</p>` : ''}
           </div>`).join('')}
         </div>
@@ -329,6 +385,82 @@ function faltenDetailMarkup(slug, state) {
       <p class="falten-detail-disclaimer">Angaben aus dem YPSI-System (Wolfgang Unsöld) und BioSignature (Charles Poliquin). Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose. Bei ernsthaften Beschwerden ärztlich abklären lassen.</p>
     </div>
   `;
+}
+
+function emptyBravermanState() {
+  return {
+    version: 1,
+    answers: Object.fromEntries(BRAVERMAN_REIHENFOLGE.map((key) => [key, []])),
+    currentType: BRAVERMAN_REIHENFOLGE[0],
+    currentIndex: 0,
+    completedAt: null,
+    safetyNotice: false,
+  };
+}
+
+function bravermanState() {
+  const saved = getPreference(BRAVERMAN_PREFERENCE, null);
+  const initial = emptyBravermanState();
+  if (!saved || saved.version !== 1 || typeof saved !== 'object') return initial;
+  return {
+    ...initial,
+    ...saved,
+    answers: Object.fromEntries(BRAVERMAN_REIHENFOLGE.map((key) => [key, Array.isArray(saved.answers?.[key]) ? saved.answers[key] : []])),
+  };
+}
+
+const bravermanPositions = () => BRAVERMAN_REIHENFOLGE.flatMap((type) => BRAVERMAN_DEFIZIT_FRAGEN[type].map((_, index) => ({ type, index })));
+
+function bravermanQuestionMarkup(test) {
+  const positions = bravermanPositions();
+  const currentPosition = Math.max(0, positions.findIndex((position) => position.type === test.currentType && position.index === test.currentIndex));
+  const position = positions[currentPosition] || positions[0];
+  const question = BRAVERMAN_DEFIZIT_FRAGEN[position.type][position.index];
+  const area = BRAVERMAN_BEREICHE[position.type];
+  const answered = positions.filter(({ type, index }) => typeof test.answers?.[type]?.[index] === 'boolean').length;
+  const selected = test.answers?.[position.type]?.[position.index];
+  return `<header class="falten-detail-header braverman-sheet-header"><div><small>BRAVERMAN-DEFIZITPROFIL</small><h2>${escapeHtml(area.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <div class="braverman-test-body">
+      <div class="braverman-progress"><span style="--braverman-progress:${Math.round(answered / positions.length * 100)}%"></span><small>${answered} von ${positions.length}</small></div>
+      ${test.safetyNotice ? `<aside class="braverman-safety"><b>Du musst damit nicht allein bleiben.</b><p>Wenn du akut daran denkst, dir etwas anzutun, rufe bitte sofort 112 oder wende dich an eine Krisenhilfe. Dieser Test kann keine Unterstützung durch einen Menschen ersetzen.</p><button type="button" data-dismiss-safety>Hinweis schließen</button></aside>` : ''}
+      <section class="braverman-question"><small>${position.index + 1} von ${BRAVERMAN_DEFIZIT_FRAGEN[position.type].length} · ${escapeHtml(area.kurz)}</small><h3>${escapeHtml(question)}</h3><p>Trifft diese Aussage aktuell auf dich zu?</p>
+        <div><button type="button" data-braverman-answer="false"${selected === false ? ' class="selected"' : ''}>Nein</button><button type="button" data-braverman-answer="true"${selected === true ? ' class="selected"' : ''}>Ja</button></div>
+      </section>
+      <footer class="braverman-nav"><button type="button" data-braverman-prev${currentPosition === 0 ? ' disabled' : ''}>Zurück</button><button type="button" data-braverman-pause>Speichern & schließen</button></footer>
+      <p class="falten-detail-disclaimer">Die Aussagen stammen sinngemäß aus Teil 2 des Braverman Personality Type Assessment. Antworte nach deinem aktuellen Zustand, nicht nach einem einzelnen ungewöhnlichen Tag.</p>
+    </div>`;
+}
+
+function bravermanResultMarkup(test, { sheet = false } = {}) {
+  const result = scoreBravermanAssessment(test.answers);
+  const scored = BRAVERMAN_REIHENFOLGE.map((key) => ({ key, score: result.scores[key], ...result.severity[key] }));
+  const focusRecommendations = bravermanRecommendations(result.focus, result.severity[result.focus].id);
+  const heading = sheet ? `<header class="falten-detail-header braverman-sheet-header"><div><small>BRAVERMAN-DEFIZITPROFIL</small><h2>Dein Ergebnis</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>` : '';
+  return `${heading}<div class="${sheet ? 'braverman-test-body ' : ''}braverman-result">
+    ${sheet && test.safetyNotice ? `<aside class="braverman-safety"><b>Du musst damit nicht allein bleiben.</b><p>Wenn du akut daran denkst, dir etwas anzutun, rufe bitte sofort 112 oder wende dich an eine Krisenhilfe. Dieser Test kann keine Unterstützung durch einen Menschen ersetzen.</p><button type="button" data-dismiss-safety>Hinweis schließen</button></aside>` : ''}
+    <section class="braverman-result-focus"><small>STÄRKSTER AKTUELLER FOKUS</small><b>${escapeHtml(BRAVERMAN_BEREICHE[result.focus].label)}</b><span>${escapeHtml(BRAVERMAN_BEREICHE[result.focus].kurz)}</span></section>
+    <div class="braverman-score-list">${scored.map((item) => {
+      const total = BRAVERMAN_DEFIZIT_FRAGEN[item.key].length;
+      return `<div data-tone="${item.tone}"><span><b>${escapeHtml(BRAVERMAN_BEREICHE[item.key].label)}</b><small>${item.score} von ${total} · ${item.label}</small></span><i><em style="width:${Math.round(item.score / total * 100)}%"></em></i></div>`;
+    }).join('')}</div>
+    ${sheet ? `<section class="falten-detail-section braverman-foods"><h3>Ernährung aus den Unterlagen</h3><p>Als erste, niedrigschwellige Strategie nennt das Material für ${escapeHtml(focusRecommendations.area.label)}:</p><div class="falten-detail-tags">${focusRecommendations.foods.map((food) => `<span>${escapeHtml(food)}</span>`).join('')}</div></section>
+      <section class="falten-detail-section"><h3>Supplement-Optionen der Vorlage</h3><p class="falten-detail-hinweis">Die Dosis entspricht der historischen Tabelle für die ermittelte Ausprägung. Sie ist keine automatische Einnahmeanweisung.</p><div class="braverman-supplements">${focusRecommendations.supplements.map((supplement) => `<details><summary><span><b>${escapeHtml(supplement.name)}</b><small>${escapeHtml(supplement.dose)}</small></span>${materialIconMarkup('chevron_right')}</summary>${supplement.notiz ? `<p>${escapeHtml(supplement.notiz)}</p>` : ''}${supplement.safety ? `<p class="braverman-warning">${escapeHtml(supplement.safety)}</p>` : '<p>Vor der Einnahme Produktangaben, Medikamente und persönliche Kontraindikationen prüfen.</p>'}</details>`).join('')}</div></section>
+      <p class="falten-detail-disclaimer">Das Ergebnis beschreibt das Antwortmuster des Braverman-Modells und keine im Gehirn gemessenen Neurotransmitterwerte. Ernährung, Schlaf und Training stehen vor einer Supplement-Auswahl.</p>
+      <div class="braverman-result-actions"><button class="btn btn-primary" type="button" data-close>Fertig</button><button type="button" data-braverman-reset>Test neu starten</button></div>` : ''}
+  </div>`;
+}
+
+function neurotransmitterMarkup() {
+  const test = bravermanState();
+  const complete = bravermanComplete(test.answers);
+  const answered = bravermanPositions().filter(({ type, index }) => typeof test.answers?.[type]?.[index] === 'boolean').length;
+  const completedLabel = test.completedAt ? `Ausgewertet · ${datumKurz(String(test.completedAt).slice(0, 10))}` : 'Ausgewertet';
+  return `<section class="body-v2-card neurotransmitter-card ${SPECIAL_DEX_CLASSES.content}" data-neurotransmitter-card><header><span><b>Neurotransmitter-Profil</b><small>${complete ? completedLabel : answered ? `${answered} Aussagen beantwortet` : 'Braverman-Assessment'}</small></span></header><div class="body-v2-card-body">
+    <p class="body-explain">Der Test nutzt Teil 2 des Braverman-Assessments und verbindet dein Antwortmuster mit Ernährungs- und Supplement-Strategien aus deinen Seminarunterlagen.</p>
+    ${complete ? bravermanResultMarkup(test) : `<div class="braverman-intro"><span aria-hidden="true">🧠</span><div><b>Vier aktuelle Bereiche</b><p>Dopamin, Acetylcholin, GABA und Serotonin. Du kannst den Test jederzeit unterbrechen und später fortsetzen.</p></div></div>`}
+    <button class="btn btn-primary btn-block" type="button" data-braverman-open>${complete ? 'Ergebnis und Strategien öffnen' : answered ? 'Test fortsetzen' : 'Test starten'}</button>
+    <p class="ypsi-method-note">Deine Antworten werden in deinen persönlichen Einstellungen gespeichert. Das Profil ist eine YPSI-/Braverman-Praxisorientierung, kein Labortest.</p>
+  </div></section>`;
 }
 
 function waistMarkup(state) {
@@ -399,6 +531,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       ${bodyCompMarkup(state)}
       ${weightMarkup(state)}
       ${skinfoldMarkup(state)}
+      ${neurotransmitterMarkup()}
       ${waistMarkup(state)}
       ${logmanMarkup(state)}`;
     const content = container.querySelector(':scope > .body-metrics-wrap > .kategorie-scrollinhalt');
@@ -603,6 +736,86 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     }).dataset.faltenDetailOverlay = '';
   };
 
+  const openYpsiPriority = (groupId) => {
+    const latest = state.skinfolds.filter((row) => row.total != null).at(-1);
+    const priority = latest && assessSkinfoldPriorities(latest.falten, state.settings.calculation_basis)
+      .find((item) => item.id === groupId);
+    if (!priority) return;
+    createSpecialDexOverlay({
+      colorScope: 'body',
+      replaceSelector: '[data-ypsi-priority-overlay]',
+      className: 'body-entry-overlay falten-detail-overlay ypsi-priority-overlay',
+      sheetClassName: 'body-entry-sheet falten-detail-sheet ypsi-priority-sheet',
+      ariaLabel: `YPSI-Priorität ${priority.priority}: ${priority.label}`,
+      markup: ypsiPriorityDetailMarkup(priority),
+    }).dataset.ypsiPriorityOverlay = '';
+  };
+
+  const openBraverman = () => {
+    let test = bravermanState();
+    const overlay = createSpecialDexOverlay({
+      colorScope: 'body',
+      replaceSelector: '[data-braverman-overlay]',
+      className: 'body-entry-overlay falten-detail-overlay braverman-overlay',
+      sheetClassName: 'body-entry-sheet falten-detail-sheet braverman-sheet',
+      ariaLabel: 'Braverman-Defizitprofil',
+      markup: '',
+    });
+    overlay.dataset.bravermanOverlay = '';
+    const sheet = overlay.querySelector('.braverman-sheet');
+    const positions = bravermanPositions();
+    const persist = () => setPreference(BRAVERMAN_PREFERENCE, test, { syncDelay: 0 });
+    const show = () => {
+      const isComplete = bravermanComplete(test.answers);
+      sheet.innerHTML = isComplete ? bravermanResultMarkup(test, { sheet: true }) : bravermanQuestionMarkup(test);
+      sheet.scrollTop = 0;
+      sheet.querySelectorAll('[data-braverman-answer]').forEach((button) => {
+        button.onclick = () => {
+          const currentIndex = positions.findIndex((position) => position.type === test.currentType && position.index === test.currentIndex);
+          const position = positions[Math.max(0, currentIndex)];
+          const value = button.dataset.bravermanAnswer === 'true';
+          const answers = { ...test.answers, [position.type]: [...(test.answers[position.type] || [])] };
+          answers[position.type][position.index] = value;
+          const riskAnswer = value && position.type === 'serotonin' && [19, 20].includes(position.index);
+          const next = positions[currentIndex + 1];
+          test = {
+            ...test,
+            answers,
+            safetyNotice: test.safetyNotice || riskAnswer,
+            currentType: next?.type || position.type,
+            currentIndex: next?.index ?? position.index,
+          };
+          if (bravermanComplete(answers)) test.completedAt = new Date().toISOString();
+          persist();
+          show();
+        };
+      });
+      const previous = sheet.querySelector('[data-braverman-prev]');
+      if (previous) previous.onclick = () => {
+        const currentIndex = positions.findIndex((position) => position.type === test.currentType && position.index === test.currentIndex);
+        const target = positions[Math.max(0, currentIndex - 1)];
+        test = { ...test, currentType: target.type, currentIndex: target.index };
+        persist();
+        show();
+      };
+      const pause = sheet.querySelector('[data-braverman-pause]');
+      if (pause) pause.onclick = async () => { persist(); overlay.remove(); await render(); };
+      const dismissSafety = sheet.querySelector('[data-dismiss-safety]');
+      if (dismissSafety) dismissSafety.onclick = () => { test = { ...test, safetyNotice: false }; persist(); show(); };
+      const reset = sheet.querySelector('[data-braverman-reset]');
+      if (reset) reset.onclick = () => {
+        if (!confirm('Braverman-Test wirklich neu starten? Das bisherige Ergebnis wird ersetzt.')) return;
+        test = emptyBravermanState();
+        persist();
+        show();
+      };
+    };
+    overlay.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close]')) requestAnimationFrame(() => render());
+    });
+    show();
+  };
+
   const openAddMenu = () => {
     const overlay = createSpecialDexOverlay({
       colorScope: 'body',
@@ -652,6 +865,12 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     };
     container.querySelectorAll('[data-falten-detail]').forEach((button) => {
       button.onclick = () => openFaltenDetail(button.dataset.faltenDetail);
+    });
+    container.querySelectorAll('[data-ypsi-priority]').forEach((button) => {
+      button.onclick = () => openYpsiPriority(button.dataset.ypsiPriority);
+    });
+    container.querySelectorAll('[data-braverman-open]').forEach((button) => {
+      button.onclick = openBraverman;
     });
     container.querySelectorAll('[data-reset-body]').forEach((button) => {
       button.onclick = async () => {
