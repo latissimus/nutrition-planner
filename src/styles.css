@@ -8534,7 +8534,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-search-icon,.app-dex-search-icon>svg{display:block;width:29px;height:29px}
 .app-dex-search:active{transform:translateY(1px)}
 .app-dex-search.aktiv{background:color-mix(in srgb,#fff 62%,var(--dex-seitenfarbe,#FFF8ED))}
-.app-dex-search .app-dex-search-icon{filter:none!important}
+.app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
+:root[data-theme="dark"] .app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(2.5px 2.5px 0 #EDF0F6)}
 .app-dex-header .coin-kopfstand{gap:0;height:34px}
 .app-dex-header .coin-kopfstand .coin-kopf-symbol{
   width:25px;
