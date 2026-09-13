@@ -5991,6 +5991,44 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .body-weight-history li:last-child{border-bottom:0}
 :root[data-seite="body"] .body-weight-history time{color:#60656f;font-weight:600}
 :root[data-seite="body"] .body-weight-history li>b{font-weight:800}
+:root[data-seite="body"] .body-skinfold-history>ol{gap:0}
+:root[data-seite="body"] .body-skinfold-history>ol>li{
+  display:block;
+  padding:0;
+}
+:root[data-seite="body"] .body-skinfold-history-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:42px;
+  padding:8px 11px;
+  cursor:pointer;
+  list-style:none;
+}
+:root[data-seite="body"] .body-skinfold-history-head::-webkit-details-marker{display:none}
+:root[data-seite="body"] .body-skinfold-history dl{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0 14px;
+  margin:0;
+  padding:0 11px 10px;
+}
+:root[data-seite="body"] .body-skinfold-history dl>div{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  padding:5px 0;
+  border-top:1px dashed #dedede;
+}
+:root[data-seite="body"] .body-skinfold-history :is(dt,dd){margin:0}
+:root[data-seite="body"] .body-skinfold-history dt{color:#60656f;font-size:10px}
+:root[data-seite="body"] .body-skinfold-history dd{font-weight:750;white-space:nowrap}
+@media(max-width:370px){
+  :root[data-seite="body"] .body-skinfold-history dl{grid-template-columns:minmax(0,1fr)}
+}
 :root[data-seite="body"] .input{
   min-height:46px;
   border:1px solid var(--app-outline);

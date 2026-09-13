@@ -23,7 +23,7 @@ const day = (value) => Math.floor(new Date(`${value}T12:00:00`).getTime() / 86_4
 async function queryState(userId, signal) {
   const abort = (query) => signal ? query.abortSignal(signal) : query;
   const results = await Promise.all([
-    abort(supabase.from('skinfolds').select('*').eq('user_id', userId).order('gemessen_am').limit(60)),
+    abort(supabase.from('skinfolds').select('*').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(60)),
     // Erst die neuesten 180 Datensaetze laden. Bei aufsteigender Sortierung vor
     // dem Limit gingen nach laengerer Nutzung ausgerechnet die aktuellen Werte
     // verloren. Fuer Berechnung und Kurve werden sie danach chronologisch
@@ -38,7 +38,9 @@ async function queryState(userId, signal) {
   const error = results.find((result) => result.error)?.error;
   if (error) throw error;
   return {
-    skinfolds: (results[0].data || []).map((row) => ({ ...row, total: summe(row.falten) })),
+    skinfolds: (results[0].data || [])
+      .map((row) => ({ ...row, total: summe(row.falten) }))
+      .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am)),
     weights: (results[1].data || [])
       .map((row) => ({ ...row, date: row.gemessen_am, kg: Number(row.kg) }))
       .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am)),
@@ -99,12 +101,12 @@ function waistEntryMarkup() {
   </form>`;
 }
 
-function skinfoldEntryMarkup() {
+export function skinfoldEntryMarkup() {
   return `<form class="body-entry-form" data-skinfold-form>
     <p class="body-guide">Alle zwei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p>
     <label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label>
     <label class="body-standard"><input type="checkbox" data-skinfold-standard><span>Standardisierte Bedingungen eingehalten</span></label>
-    <div class="guided-fold-grid">${FALTEN.map(([key, label]) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" placeholder="mm" aria-label="${label} in Millimetern" data-fold="${key}"></div></fieldset>`).join('')}</div>
+    <div class="guided-fold-grid">${FALTEN.map(([key, label], index) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" enterkeyhint="${index === FALTEN.length - 1 ? 'done' : 'next'}" autocomplete="off" id="skinfold-${key}" name="skinfold-${key}" placeholder="mm" aria-label="${label} in Millimetern" data-fold="${key}"></div></fieldset>`).join('')}</div>
     <div class="falten-summe" data-skinfold-quality>0 von 12 Falten eingetragen.</div>
     <button class="btn btn-primary btn-block" type="submit" disabled>Messung speichern</button>
   </form>`;
@@ -138,6 +140,39 @@ export function weightHistoryMarkup(weights = []) {
   </details>`;
 }
 
+export function skinfoldHistoryMarkup(skinfolds = []) {
+  if (!skinfolds.length) return '';
+  const rows = [...skinfolds]
+    .sort((a, b) => String(b.gemessen_am || '').localeCompare(String(a.gemessen_am || '')))
+    .map((row) => {
+      const total = row.total ?? summe(row.falten);
+      const values = FALTEN.map(([key, label]) => `<div><dt>${label}</dt><dd>${display(row.falten?.[key])} mm</dd></div>`).join('');
+      return `<li><details><summary class="body-skinfold-history-head"><time datetime="${escapeHtml(row.gemessen_am)}">${datumKurz(row.gemessen_am)}</time><b>${display(total)} mm</b></summary><dl>${values}</dl></details></li>`;
+    }).join('');
+  return `<details class="body-inner-details body-weight-history body-skinfold-history">
+    <summary><span>Einzelne Hautfaltenmessungen</span>${materialIconMarkup('chevron_right')}</summary>
+    <p>Neueste Messung zuerst. Tippe ein Datum an, um alle zwölf Einzelwerte zu sehen.</p>
+    <ol>${rows}</ol>
+  </details>`;
+}
+
+export function skinfoldRecord({ userId, date, values, standardisiert }) {
+  const readings = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, [value]]));
+  return {
+    user_id: userId,
+    gemessen_am: date,
+    falten: values,
+    messreihen: readings,
+    messqualitaet: standardisiert ? 'hoch' : 'niedrig',
+    standardisiert,
+    bedingungen: {
+      gleiche_tageszeit: standardisiert,
+      gleiche_seite: standardisiert,
+      gleicher_caliper: standardisiert,
+    },
+  };
+}
+
 function weightMarkup(state) {
   const trend = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined); const latest = state.weights.at(-1);
   const interpretation = goalWeightInterpretation(trend, state.settings.goal || 'maintain');
@@ -163,6 +198,7 @@ function skinfoldMarkup(state) {
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 12-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 12 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
+    ${skinfoldHistoryMarkup(valid)}
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
     <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle zwei bis vier Wochen an eine neue 12-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
     <button class="body-reset-mini" type="button" data-reset-body="skinfolds">12-Falten-Werte zurücksetzen</button>
@@ -349,6 +385,20 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         return { values, complete };
       };
       skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
+      const foldInputs = [...skinfoldForm.querySelectorAll('[data-fold]')];
+      foldInputs.forEach((input, index) => {
+        input.onkeydown = (event) => {
+          if (event.key !== 'Enter') return;
+          event.preventDefault();
+          const next = foldInputs[index + 1];
+          if (next) {
+            next.focus({ preventScroll: true });
+            next.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          } else {
+            input.blur();
+          }
+        };
+      });
       skinfoldForm.onsubmit = async (event) => {
         event.preventDefault();
         await withBusySubmit(skinfoldForm, async () => {
@@ -357,9 +407,9 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
           const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
           const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
-          const readings = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, [value]]));
-          const { error } = await supabase.from('skinfolds').upsert({ user_id: userId, gemessen_am: date, falten: values, messreihen: readings, messqualitaet: standardisiert ? 'standardisiert' : 'nicht standardisiert', standardisiert, bedingungen: { gleiche_tageszeit: standardisiert, gleiche_seite: standardisiert, gleicher_caliper: standardisiert } }, { onConflict: 'user_id,gemessen_am' });
-          if (error) return toast('Messung konnte nicht gespeichert werden');
+          const record = skinfoldRecord({ userId, date, values, standardisiert });
+          const { error } = await supabase.from('skinfolds').upsert(record, { onConflict: 'user_id,gemessen_am' });
+          if (error) return toast(`Messung konnte nicht gespeichert werden: ${error.message}`);
           notifyHomeCountsChanged();
           if (isNew) notifyCoinBalanceChanged();
           toast(isNew ? '12-Falten-Summe gespeichert · +1 CAPCOIN' : '12-Falten-Summe aktualisiert');
