@@ -10,6 +10,7 @@ import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesCha
 import { getPreference, setPreference } from './userPreferences.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
+import { erwarteteFaltensumme, koerperfettAnteil, magermasse } from './ypsiFormel.js';
 import {
   buildSkinfoldPlan,
   bravermanComplete,
@@ -50,20 +51,36 @@ async function queryState(userId, signal) {
     abort(supabase.from('logman_performance').select('*').eq('user_id', userId).order('performed_on').limit(500)),
     abort(supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(60)),
     abort(supabase.from('bodycomp_checkins').select('*').eq('user_id', userId).order('checkin_date').limit(60)),
-    abort(supabase.from('nutrition_settings').select('goal,bodycomp_thresholds,calculation_basis').eq('user_id', userId).maybeSingle()),
+    abort(supabase.from('nutrition_settings').select('goal,bodycomp_thresholds,calculation_basis,height_cm').eq('user_id', userId).maybeSingle()),
   ]);
   const error = results.find((result) => result.error)?.error;
   if (error) throw error;
+  const weights = (results[1].data || [])
+    .map((row) => ({ ...row, date: row.gemessen_am, kg: Number(row.kg) }))
+    .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am));
   return {
     skinfolds: (results[0].data || [])
-      .map((row) => ({ ...row, total: summe(row.falten) }))
+      .map((row) => ({ ...row, total: summe(row.falten), gewichtKg: gewichtZumDatum(weights, row.gemessen_am) }))
       .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am)),
-    weights: (results[1].data || [])
-      .map((row) => ({ ...row, date: row.gemessen_am, kg: Number(row.kg) }))
-      .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am)),
+    weights,
     waists: results[2].data || [], performance: results[3].data || [],
     sleep: results[4].data || [], checkins: results[5].data || [], settings: results[6].data || {},
   };
+}
+
+/* Gewicht zur Hautfaltenmessung: die naechstgelegene Wiegung innerhalb von
+   sieben Tagen. Ohne passende Wiegung bleibt der Wert leer – die
+   Koerperfettformel rechnet dann nicht, statt zu raten. */
+function gewichtZumDatum(weights = [], datum, maxAbstandTage = 7) {
+  if (!datum) return null;
+  const ziel = day(datum);
+  let treffer = null;
+  let abstand = Infinity;
+  for (const row of weights) {
+    const distanz = Math.abs(day(row.gemessen_am) - ziel);
+    if (distanz < abstand && distanz <= maxAbstandTage) { abstand = distanz; treffer = row; }
+  }
+  return treffer ? Number(treffer.kg) : null;
 }
 
 function recoveryTrend(sleep, checkins) {
@@ -93,9 +110,9 @@ function bodyHeroMarkup(state) {
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="COMP-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
-    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>13-Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
+    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>10-Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
     <p><b>COMP</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
-    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>13-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
+    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>10-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
     <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und <b>keine medizinische Diagnose</b>.</p>
   </div></div>`;
 }
@@ -118,10 +135,11 @@ function waistEntryMarkup() {
   </form>`;
 }
 
-export function skinfoldEntryMarkup() {
+export function skinfoldEntryMarkup(groesseCm = '') {
   return `<form class="body-entry-form" data-skinfold-form>
     <p class="body-guide">Alle zwei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p>
     <label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label>
+    <label class="fld-l">Körpergröße<span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="180" autocomplete="off" value="${escapeHtml(String(groesseCm ?? ''))}" data-skinfold-height><i>cm</i></span></label>
     <label class="body-standard"><input type="checkbox" data-skinfold-standard><span>Standardisierte Bedingungen eingehalten</span></label>
     <div class="guided-fold-grid">${FALTEN.map(([key, label], index) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" enterkeyhint="${index === FALTEN.length - 1 ? 'done' : 'next'}" autocomplete="off" id="skinfold-${key}" name="skinfold-${key}" placeholder="mm" aria-label="${label} in Millimetern" data-fold="${key}"></div></fieldset>`).join('')}</div>
     <div class="falten-summe" data-skinfold-quality>0 von ${FALTEN.length} Falten eingetragen.</div>
@@ -177,12 +195,13 @@ export function skinfoldHistoryMarkup(skinfolds = []) {
   </details>`;
 }
 
-export function skinfoldRecord({ userId, date, values, standardisiert }) {
+export function skinfoldRecord({ userId, date, values, standardisiert, groesseCm = null }) {
   const readings = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, [value]]));
   return {
     user_id: userId,
     gemessen_am: date,
     falten: values,
+    groesse_cm: groesseCm,
     messreihen: readings,
     messqualitaet: standardisiert ? 'hoch' : 'niedrig',
     standardisiert,
@@ -211,6 +230,57 @@ function weightMarkup(state) {
   </div></section>`;
 }
 
+/* Körperfett nach der YPSI-Formel. Rechnet nur, wenn Größe, Gewicht und alle
+   zehn Summenfalten vorliegen; sonst bleibt die Zeile leer. */
+function ypsiKfaReihe(state) {
+  return state.skinfolds
+    .map((row) => {
+      const kfa = koerperfettAnteil({
+        groesseCm: row.groesse_cm,
+        gewichtKg: row.gewichtKg,
+        summe: row.total,
+      });
+      return kfa == null ? null : {
+        datum: row.gemessen_am,
+        kfa,
+        magermasse: magermasse(row.gewichtKg, kfa),
+        gewicht: row.gewichtKg,
+        groesse: row.groesse_cm,
+        summe: row.total,
+        erwartet: erwarteteFaltensumme(row.groesse_cm, row.gewichtKg),
+      };
+    })
+    .filter(Boolean);
+}
+
+function ypsiKfaMarkup(state) {
+  const reihe = ypsiKfaReihe(state);
+  const latest = reihe.at(-1);
+  const previous = reihe.at(-2);
+  const delta = latest && previous ? latest.kfa - previous.kfa : null;
+  const letzteMessung = state.skinfolds.at(-1);
+  const fehlt = [];
+  if (letzteMessung) {
+    if (letzteMessung.groesse_cm == null) fehlt.push('Körpergröße');
+    if (letzteMessung.gewichtKg == null) fehlt.push('eine Wiegung im Umkreis von 7 Tagen');
+    if (letzteMessung.total == null) fehlt.push('vollständige Faltenwerte');
+  }
+  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-kfa-card><header><span><b>Körperfett-Schätzung</b><small>${latest ? `${display(latest.kfa)} % · ${datumKurz(latest.datum)}` : 'Noch nicht berechenbar'}</small></span></header><div class="body-v2-card-body">
+    <p class="body-explain">Schätzung nach der YPSI-Formel aus Körpergröße, Gewicht und der Summe der zehn Rumpf- und Wadenfalten. Der <b>Verlauf</b> ist die Aussage — der absolute Wert ist eine Regression aus dem Seminar, keine Messung.</p>
+    ${latest ? `<div class="body-metric-grid">
+      <span><small>KÖRPERFETT</small><b>${display(latest.kfa)} %</b></span>
+      <span><small>MAGERMASSE</small><b>${display(latest.magermasse)} kg</b></span>
+      <span><small>FALTENSUMME</small><b>${display(latest.summe)} mm</b></span>
+      <span><small>ERWARTET</small><b>${display(latest.erwartet)} mm</b></span>
+    </div>
+    ${delta != null ? `<p class="body-neutral-note">Gegenüber der vorigen Messung: ${delta > 0 ? '+' : ''}${display(delta, 2)} Prozentpunkte.</p>` : ''}
+    <div class="body-chart-block"><header><b>VERLAUF</b><small>Körperfett in Prozent</small></header>${curveSvg([{ values: reihe.map((row) => ({ datum: row.datum, wert: row.kfa })), className: 'trend', points: true }], { unit: '%' })}</div>
+    <p class="body-chart-legend">Berechnet aus <b>${display(latest.groesse)} cm</b> und <b>${display(latest.gewicht)} kg</b> zum Messdatum.</p>`
+    : `<div class="body-chart-empty"><b>Noch keine Schätzung</b><span>${fehlt.length ? `Für die letzte Messung fehlt ${escapeHtml(fehlt.join(' und '))}.` : 'Nach der ersten vollständigen Messung mit Körpergröße und passender Wiegung erscheint hier die Schätzung.'}</span></div>`}
+    ${infoDetails('Wie wird gerechnet?', 'Die Formel bildet zuerst aus Größe und Gewicht eine erwartete Faltensumme und bewertet dann den Betrag der Abweichung. Weil der Betrag eingeht, erhöht eine Summe unterhalb der Erwartung den Wert genauso wie eine darüber. Das Geschlecht geht nicht ein. Quelle: Formel.xlsx (YPSI), Blatt „Tracking“. Die Schätzung ersetzt keine Messung wie DEXA oder BodPod und ist keine medizinische Diagnose.')}
+  </div></section>`;
+}
+
 function faltenLegendeMarkup(state) {
   const latest = state.skinfolds.filter((row) => row.total != null).at(-1);
   const sex = state.settings.calculation_basis === 'female' ? 'frau' : 'mann';
@@ -234,6 +304,14 @@ function faltenLegendeMarkup(state) {
   </details>`;
 }
 
+/* Die YPSI-Rangformel bewertet |Wert/4 − Referenz| und unterscheidet nicht,
+   ob die Abweichung nach oben oder unten geht. Fuer die Handlung ist das der
+   Unterschied, deshalb wird die Richtung im UI immer mitgenannt. */
+function richtungsText(fold) {
+  if (!fold || fold.richtung === 'exakt') return 'auf Referenz';
+  return `${display(fold.score, 2)} ${fold.richtung === 'unter' ? 'unter' : 'über'} Referenz`;
+}
+
 function ypsiPriorityMarkup(state) {
   const recentSleep = state.sleep.slice(-7);
   const average = (values) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
@@ -247,7 +325,8 @@ function ypsiPriorityMarkup(state) {
   </section>`;
   return `<section class="ypsi-priority-block">
     <header><span><small>YPSI-ASSESSMENT</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(plan.date)}</em></header>
-    <div class="ypsi-top-fold"><small>PRIORISIERTE PROTOKOLLFALTE</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm · Rang 1 im Protokollassessment${plan.topFold.foldPriority > 1 ? ` · interner Faltenrang ${plan.topFold.foldPriority}` : ''}</span></div>
+    <div class="ypsi-top-fold"><small>PRIORISIERTE PROTOKOLLFALTE</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm · ${richtungsText(plan.topFold)} · Rang 1 im Protokollassessment${plan.topFold.foldPriority > 1 ? ` · interner Faltenrang ${plan.topFold.foldPriority}` : ''}</span></div>
+    ${plan.topFold.richtung === 'unter' ? '<p class="body-neutral-note">Diese Falte ist priorisiert, weil sie <b>unter</b> dem Referenzwert liegt. Die YPSI-Rangformel bewertet den Betrag der Abweichung und unterscheidet die Richtung nicht — für die Handlung ist sie aber entscheidend. Ein Wert unter der Referenz ist in der Regel kein Ansatzpunkt für Fettabbau.</p>' : ''}
     <p>Die App verknüpft die führende Falte mit den vier protokollierten Gruppen, früheren Messungen und den Gegenfalten aus den Seminarunterlagen. Tippe eine Gruppe an, um Ernährung, Schlaf, Supplements und die Begründung zu sehen.</p>
     <div class="ypsi-priority-list">${plan.priorities.map((priority) => {
       const currentProtocol = priority.recommendedProtocols[0] || priority.phaseProtocols[0];
@@ -301,12 +380,12 @@ function skinfoldMarkup(state) {
   const valid = state.skinfolds.filter((row) => row.total != null); const latest = valid.at(-1); const previous = valid.at(-2);
   const unvollstaendig = state.skinfolds.filter((row) => row.total == null);
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
-  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>13-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">13-Falten-Summe in mm – keine KFA-Schätzung</h2>
-    <p class="body-explain">Die Karte zeigt die Summe deiner 13 Hautfalten. Sie ist ein Verlaufswert für Unterhautfett und wird nur sinnvoll, wenn du unter ähnlichen Bedingungen misst.</p>
+  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>10-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">10-Falten-Summe in mm</h2>
+    <p class="body-explain">Gemessen werden 13 Falten. In die Summe gehen nach der YPSI-Vorlage die zehn von Kinn bis Wade ein — Oberschenkel und Bizeps bleiben bewusst draußen, damit Summe und Körperfettformel zusammenpassen. Der Verlauf wird nur sinnvoll, wenn du unter ähnlichen Bedingungen misst.</p>
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 13-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     ${unvollstaendig.length ? `<p class="body-neutral-note">${unvollstaendig.length} ältere ${unvollstaendig.length === 1 ? 'Messung hat' : 'Messungen haben'} noch nicht alle 13 Werte und ${unvollstaendig.length === 1 ? 'fehlt' : 'fehlen'} deshalb im Verlauf. Du findest ${unvollstaendig.length === 1 ? 'sie' : 'sie'} unten unter „Einzelne Hautfaltenmessungen“ zum Nachtragen.</p>` : ''}
-    <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 13 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
+    <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe der zehn Falten Kinn bis Wade</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
     ${ypsiPriorityMarkup(state)}
     ${faltenLegendeMarkup(state)}
     ${skinfoldHistoryMarkup(state.skinfolds)}
@@ -560,6 +639,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       ${bodyCompMarkup(state)}
       ${weightMarkup(state)}
       ${skinfoldMarkup(state)}
+      ${ypsiKfaMarkup(state)}
       ${neurotransmitterMarkup()}
       ${waistMarkup(state)}
       ${logmanMarkup(state)}`;
@@ -607,7 +687,15 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   const entryOptions = {
     weight: { title: 'Gewicht eintragen', markup: weightEntryMarkup },
     waist: { title: 'Taillenumfang eintragen', markup: waistEntryMarkup },
-    skinfold: { title: '13-Falten-Messung', markup: skinfoldEntryMarkup },
+    skinfold: {
+      title: '13-Falten-Messung',
+      // Groesse aus der letzten Messung vorbelegen, ersatzweise aus dem Profil.
+      markup: () => skinfoldEntryMarkup(
+        state.skinfolds.findLast((row) => row.groesse_cm != null)?.groesse_cm
+        ?? state.settings.height_cm
+        ?? '',
+      ),
+    },
     recovery: { title: 'Erholung protokollieren', markup: recoveryEntryMarkup },
     logman: { title: 'LOGMAN-Import', markup: logmanEntryMarkup },
   };
@@ -693,14 +781,16 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           const { values, complete } = updateSkinfold();
           if (complete !== FALTEN.length) return;
           const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
+          const groesseCm = zahl(skinfoldForm.querySelector('[data-skinfold-height]').value);
+          if (groesseCm == null || groesseCm < 100 || groesseCm > 250) return toast('Bitte eine Körpergröße zwischen 100 und 250 cm eintragen');
           const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
           const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
-          const record = skinfoldRecord({ userId, date, values, standardisiert });
+          const record = skinfoldRecord({ userId, date, values, standardisiert, groesseCm });
           const { error } = await supabase.from('skinfolds').upsert(record, { onConflict: 'user_id,gemessen_am' });
           if (error) return toast(`Messung konnte nicht gespeichert werden: ${error.message}`);
           notifyHomeCountsChanged();
           if (isNew) notifyCoinBalanceChanged();
-          toast(isNew ? '13-Falten-Summe gespeichert · +1 CAPCOIN' : '13-Falten-Summe aktualisiert');
+          toast(isNew ? 'Hautfaltenmessung gespeichert · +1 CAPCOIN' : 'Hautfaltenmessung aktualisiert');
           await closeAndRender();
         });
       };

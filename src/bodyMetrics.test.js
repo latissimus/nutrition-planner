@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
 import { FALTEN, summe } from './measurements.js';
+import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
 describe('Gewichtsverlauf', () => {
   it('zeigt gespeicherte Wiegungen mit der neuesten zuerst', () => {
@@ -59,11 +60,16 @@ describe('Hautfaltenverlauf', () => {
     expect(markup.match(/enterkeyhint="done"/g)).toHaveLength(1);
   });
 
-  it('rechnet das Knie als reguläre Falte in die Summe', () => {
+  it('rechnet das Knie in die Summe, Oberschenkel und Bizeps aber nicht', () => {
     expect(FALTEN.map(([key]) => key)).toContain('knie');
+    expect(SUMMEN_FALTEN).toContain('knie');
 
     const vollstaendig = Object.fromEntries(FALTEN.map(([key]) => [key, 10]));
-    expect(summe(vollstaendig)).toBe(130);
+    expect(summe(vollstaendig)).toBe(SUMMEN_FALTEN.length * 10);
+
+    // Quadrizeps, Beinbizeps und Bizeps aendern die Summe nicht.
+    expect(summe({ ...vollstaendig, quadrizeps: 40, beinbizeps: 40, bizeps: 40 }))
+      .toBe(SUMMEN_FALTEN.length * 10);
 
     const { knie, ...ohneKnie } = vollstaendig;
     expect(summe(ohneKnie)).toBeNull();

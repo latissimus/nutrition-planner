@@ -1053,7 +1053,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
   const stress = kind === 'stress';
   const title = customTitle || (custom ? 'Eigene Seite' : body ? 'COMP' : sleep ? 'SCHLAF' : meal ? 'TRACKER' : training ? 'TRAINING' : supps ? 'SUPPS' : essen ? 'ESSEN' : shopping ? 'EINKAUF' : habits ? 'ROUTINEN' : stress ? 'MIND' : coins ? 'CAPCOINS' : 'REZEPTE');
   const copy = body
-    ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>13-Falten-Summe</b> fest.</p>
+    ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>10-Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
       <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und keine medizinische Diagnose.</p>`
     : sleep

@@ -1,6 +1,9 @@
 // Rechenlogik fuer Hautfalten und Gewicht. Direkt aus dem LOGMAN-Template
 // uebernommen und fuer die neue App isoliert.
+import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
+// Alle dreizehn Messpunkte. Gemessen und im Ranking verwendet werden sie alle;
+// in die Summe gehen nur die zehn aus SUMMEN_FALTEN ein (siehe summe()).
 export const FALTEN = [
   ['kinn', 'Kinn'],
   ['wange', 'Wange'],
@@ -22,8 +25,11 @@ export const zahl = (value) => {
   return Number.isFinite(number) ? number : null;
 };
 
+/* Faltensumme nach der YPSI-Vorlage: nur Kinn bis Wade (SUM(J:S) im Sheet).
+   Quadrizeps, Beinbizeps und Bizeps bleiben bewusst draussen, damit die Summe
+   und die daraus abgeleitete Koerperfettformel zusammenpassen. */
 export function summe(falten) {
-  const werte = FALTEN.map(([key]) => zahl(falten?.[key]));
+  const werte = SUMMEN_FALTEN.map((key) => zahl(falten?.[key]));
   if (werte.some((value) => value === null)) return null;
   return Math.round(werte.reduce((total, value) => total + value, 0) * 10) / 10;
 }

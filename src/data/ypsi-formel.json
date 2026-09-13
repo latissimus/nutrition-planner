@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "quelle": "Formel.xlsx (YPSI) – Blätter \"Tracking\" und \"Grafik\", 1:1 übernommen",
+  "hinweis": "Alle Werte stammen unverändert aus der Vorlage. Die Körperfettformel ist eine Regression aus dem YPSI-System, keine validierte Messmethode. Der Verlauf ist aussagekräftiger als der Absolutwert.",
+  "summenfalten": {
+    "slugs": ["kinn", "wange", "brust", "trizeps", "ruecken", "rippe", "huefte", "bauch", "knie", "wade"],
+    "hinweis": "Entspricht SUM(J:S) auf Blatt \"Tracking\". Quadrizeps, Beinbizeps und Bizeps gehen bewusst nicht in die Summe ein, werden aber gemessen und im Ranking verwendet."
+  },
+  "konstanten": {
+    "J7": 40,
+    "J8": 11.2778452215,
+    "J9": -0.7245728728,
+    "J10": 0.575084,
+    "K9": 7.8112059319,
+    "K10": -0.2881566503,
+    "L9": 0.3039697518,
+    "L10": 0.3621642462,
+    "M10": 0.5,
+    "O10": 0.48261056945833591,
+    "P10": -0.0061956362526380815
+  },
+  "formeln": {
+    "erwartete_summe": "(J8 * groesse^J9) * gewicht^J10 + J7",
+    "koerperfett": "O10 * ((K9 * gewicht^K10) * (L9 * groesse^L10) * |summe - erwartete_summe|^M10) + P10",
+    "magermasse": "gewicht * (1 - koerperfett / 100)",
+    "rang_score": "|wert / 4 - referenz_mittel(geschlecht)|",
+    "excel_koerperfett": "=IF(F14=\"\",\"\",IF(E14=\"\",\"\",IF(W14=\"\",\"\",$O$10*(($K$9*F14^$K$10)*($L$9*E14^$L$10)*(ABS(W14-(($J$8*E14^$J$9)*F14^$J$10+$J$7)))^$M$10)+$P$10)))",
+    "excel_rang_score": "=IF(Tracking!J14=\"\",\"\",IF(Person!$C$20=\"m\",ABS((Tracking!J14/4-D$45)),ABS((Tracking!J14/4-D$48))))"
+  },
+  "referenzen": {
+    "hinweis": "Blatt \"Grafik\", Zeilen 44–49. MITTEL ist in der Vorlage für Kinn per =AVERAGE(MIN,MAX) gebildet, die übrigen Spalten sind fest eingetragen. Die Werte sind dimensionslose Scoring-Anker der Vorlage, keine Millimeter-Normen.",
+    "mann": {
+      "kinn":       { "min": 1.3,  "mittel": 1.405, "max": 1.51 },
+      "wange":      { "min": 1.97, "mittel": 1.985, "max": 2.0 },
+      "brust":      { "min": 0.78, "mittel": 0.795, "max": 0.81 },
+      "trizeps":    { "min": 1.0,  "mittel": 1.0,   "max": 1.0 },
+      "ruecken":    { "min": 2.1,  "mittel": 2.255, "max": 2.41 },
+      "rippe":      { "min": 1.23, "mittel": 1.405, "max": 1.58 },
+      "huefte":     { "min": 2.0,  "mittel": 2.15,  "max": 2.3 },
+      "bauch":      { "min": 1.96, "mittel": 2.01,  "max": 2.06 },
+      "knie":       { "min": 1.51, "mittel": 1.625, "max": 1.74 },
+      "wade":       { "min": 0.91, "mittel": 0.95,  "max": 0.99 },
+      "quadrizeps": { "min": 1.25, "mittel": 1.325, "max": 1.4 },
+      "beinbizeps": { "min": 1.25, "mittel": 1.325, "max": 1.4 },
+      "bizeps":     { "min": 0.83, "mittel": 0.84,  "max": 0.85 }
+    },
+    "frau": {
+      "kinn":       { "min": 0.59, "mittel": 0.655, "max": 0.72 },
+      "wange":      { "min": 0.82, "mittel": 0.87,  "max": 0.92 },
+      "brust":      { "min": 0.33, "mittel": 0.34,  "max": 0.35 },
+      "trizeps":    { "min": 1.0,  "mittel": 1.0,   "max": 1.0 },
+      "ruecken":    { "min": 0.74, "mittel": 0.87,  "max": 1.0 },
+      "rippe":      { "min": 0.6,  "mittel": 0.705, "max": 0.81 },
+      "huefte":     { "min": 0.64, "mittel": 0.775, "max": 0.91 },
+      "bauch":      { "min": 0.71, "mittel": 0.815, "max": 0.92 },
+      "knie":       { "min": 0.58, "mittel": 0.6,   "max": 0.62 },
+      "wade":       { "min": 0.82, "mittel": 0.865, "max": 0.91 },
+      "quadrizeps": { "min": 1.69, "mittel": 1.745, "max": 1.8 },
+      "beinbizeps": { "min": 1.69, "mittel": 1.745, "max": 1.8 },
+      "bizeps":     { "min": 0.41, "mittel": 0.45,  "max": 0.49 }
+    }
+  }
+}

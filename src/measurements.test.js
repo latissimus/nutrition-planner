@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FALTEN, schnitt7, summe, zahl } from './measurements.js';
+import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
 describe('measurements', () => {
   it('parses decimal commas', () => {
@@ -9,7 +10,7 @@ describe('measurements', () => {
 
   it('only sums complete skinfold sets', () => {
     const complete = Object.fromEntries(FALTEN.map(([key]) => [key, 10]));
-    expect(summe(complete)).toBe(FALTEN.length * 10);
+    expect(summe(complete)).toBe(SUMMEN_FALTEN.length * 10);
     expect(summe({ ...complete, kinn: '' })).toBeNull();
   });
 

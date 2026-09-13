@@ -23,7 +23,7 @@ export const BODY_EXPLANATIONS = Object.freeze({
   average7: 'Der 7-Tage-Schnitt reduziert tägliche Schwankungen und zeigt die kurzfristige Gewichtsentwicklung.',
   trend28: 'Der 28-Tage-Trend hilft zu beurteilen, ob dein Gewicht langfristig stabil bleibt, langsam fällt oder steigt.',
   weighingFrequency: 'Drei Wiegungen pro Woche reichen für eine grundlegende Verlaufskontrolle. Fünf bis sieben Wiegungen verbessern die Kalorienkalibrierung. Wiege dich möglichst morgens nach dem Toilettengang und vor dem Essen.',
-  skinfolds: 'Die 13-Falten-Summe ist ein Verlaufswert für das Unterhautfett. Sie ist keine direkte Messung des Körperfettanteils. Vergleiche sind nur sinnvoll, wenn die Messungen unter ähnlichen Bedingungen durchgeführt werden.',
+  skinfolds: 'Die 10-Falten-Summe (Kinn bis Wade) ist ein Verlaufswert für das Unterhautfett. Sie ist keine direkte Messung des Körperfettanteils. Vergleiche sind nur sinnvoll, wenn die Messungen unter ähnlichen Bedingungen durchgeführt werden.',
   waist: 'Der Taillenumfang ergänzt die Hautfaltenmessung. Er kann Veränderungen im Bauchbereich zeigen, wird aber ebenfalls durch Messposition, Verdauung und Atmung beeinflusst.',
   performance: 'Steigende Kraft kann durch Muskelaufbau, bessere Technik oder neuronale Anpassungen entstehen. CAPBOY verwendet die LOGMAN-Leistung deshalb nur gemeinsam mit Körper- und Erholungswerten.',
   recovery: 'Schlaf und Erholung beweisen keinen Muskelaufbau. Sie zeigen, ob die Voraussetzungen für Training, Regeneration und eine kontrollierte Diät wahrscheinlich ausreichend sind.',
@@ -250,7 +250,7 @@ export function evaluateBodyComp({ weight, skinfoldDelta = null, waistDelta = nu
     limitations: [
       'Schlaf und Erholung sind Voraussetzungen, aber kein Beweis für Muskelaufbau.',
       'Steigende Kraft kann auch aus Technik oder neuronaler Anpassung entstehen.',
-      'Die 13-Falten-Summe erfasst überwiegend Unterhautfett und nicht das gesamte Körperfett.',
+      'Die 10-Falten-Summe erfasst überwiegend Unterhautfett und nicht das gesamte Körperfett.',
       'Einzelne Messungen lösen keine Körperzusammensetzungsdiagnose aus.',
     ],
   };

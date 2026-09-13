@@ -1,4 +1,5 @@
 import { FALTEN } from './measurements.js';
+import { faltenRang } from './ypsiFormel.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import supplementKatalog from './data/supplements-katalog.json';
@@ -42,43 +43,33 @@ const SICHERHEITS_HINWEISE = Object.freeze({
   glycin: 'Die sehr hohe Protokoll-Dosis nur nach individueller Prüfung und mit langsamem Verträglichkeitstest verwenden.',
 });
 
-const median = (values) => {
-  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
-  if (!sorted.length) return 1;
-  const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
-};
-
 export function assessmentSex(calculationBasis) {
   return calculationBasis === 'female' ? 'frau' : 'mann';
 }
 
+/* Priorisierung nach Formel.xlsx: Score = |Wert/4 − Referenz-MITTEL| je
+   Geschlecht, absteigend. Die Vorlage unterscheidet nicht, ob die Abweichung
+   nach oben oder unten geht; `richtung` haelt das fest, ohne den Rang zu
+   aendern, weil die Handlung daraus eine andere ist. */
 function foldAssessment(folds = {}, calculationBasis = 'male') {
-  const sex = assessmentSex(calculationBasis);
   const allValues = FALTEN.map(([slug]) => Number(folds?.[slug])).filter((value) => Number.isFinite(value) && value >= 0);
   if (allValues.length !== FALTEN.length) return null;
-  const typical = Math.max(1, median(allValues));
-  const details = FALTEN.map(([slug]) => {
-    const value = Number(folds[slug]);
-    const info = hautfaltenData.falten[slug] || {};
-    const norm = Number(info.norm?.[`${sex}_mm`]);
-    const limit = Number(info.norm?.grenzwert_mm);
-    const reference = Number.isFinite(norm) && norm > 0
-      ? norm
-      : Number.isFinite(limit) && limit > 0 ? limit : typical;
-    return {
-      slug,
-      label: info.label || slug,
-      value,
-      relative: value / reference,
-      reference,
-      hasFixedReference: (Number.isFinite(norm) && norm > 0) || (Number.isFinite(limit) && limit > 0),
-    };
-  });
-  const ranked = [...details]
-    .sort((a, b) => b.relative - a.relative)
-    .map((item, index) => ({ ...item, foldPriority: index + 1 }));
-  return { details, ranked, bySlug: Object.fromEntries(ranked.map((item) => [item.slug, item])), typical };
+  const ranked = faltenRang(folds, calculationBasis).map((eintrag) => ({
+    slug: eintrag.slug,
+    label: hautfaltenData.falten[eintrag.slug]?.label || eintrag.slug,
+    value: eintrag.wert,
+    reference: eintrag.referenz,
+    score: eintrag.score,
+    richtung: eintrag.richtung,
+    // Verhaeltniszahl bleibt fuer die Wechselbeziehungen unten erhalten.
+    relative: eintrag.wert / 4 / eintrag.referenz,
+    foldPriority: eintrag.rang,
+  }));
+  return {
+    details: ranked,
+    ranked,
+    bySlug: Object.fromEntries(ranked.map((item) => [item.slug, item])),
+  };
 }
 
 export function rankSkinfolds(folds = {}, calculationBasis = 'male') {
@@ -92,8 +83,8 @@ export function assessSkinfoldPriorities(folds = {}, calculationBasis = 'male') 
   return PROTOKOLL_GRUPPEN.map((group) => {
     const details = group.falten.map((slug) => assessment.bySlug[slug]).filter(Boolean);
     if (!details.length) return null;
-    const score = Math.max(...details.map((item) => item.relative));
-    const primaryFold = [...details].sort((a, b) => b.relative - a.relative)[0];
+    const score = Math.max(...details.map((item) => item.score));
+    const primaryFold = [...details].sort((a, b) => b.score - a.score)[0];
     const protocols = Object.values(ypsiProtokolle.protokolle)
       .filter((protocol) => protocol.gruppe === group.id)
       .sort((a, b) => Number(a.phase) - Number(b.phase));
@@ -124,7 +115,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       id: 'bauch-trizeps-darmzweig',
       title: 'Bauch priorisiert · Trizeps im Zielbereich',
       summary: `Der Energie-/Testosteron-Kontext ist über den Trizeps weniger auffällig. Dadurch gewinnt nach der Seminarlogik der Darmzweig an Gewicht${recentEnergy >= 4 ? '; deine zuletzt protokollierte Energie stützt diese Abzweigung' : ''}.`,
-      basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm (Referenz ${f.trizeps.reference} mm)`,
+      basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm (Abweichung ${f.trizeps.score} ${f.trizeps.richtung === 'unter' ? 'unter' : 'über'} Referenz)`,
       actions: [
         'Zuerst bestätigen: Du wachst gut auf und dein Aktivitäts- bzw. Energielevel ist gut.',
         'Zusätzlich Verdauung, Verträglichkeit von Getreide/Milch/Fruktose und mögliche Darmbeschwerden prüfen.',
@@ -262,7 +253,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       id: 'rippe-gegenpruefung',
       title: 'Rippe ist die priorisierte Falte',
       summary: 'Die Unterlagen verknüpfen sie mit Schilddrüse/Stoffwechsel, verlangen aber Gegenprüfungen für Stress, Toxine, Schlaf, Zucker und wiederholte Lebensmittel.',
-      basis: `Rippe ${f.rippe.value} mm · Referenz ${f.rippe.reference} mm`,
+      basis: `Rippe ${f.rippe.value} mm · Abweichung ${f.rippe.score} ${f.rippe.richtung === 'unter' ? 'unter' : 'über'} Referenz`,
       actions: ['Bauch/Trizeps für Stress und Energie prüfen.', 'Bein-/Wadenfalten für Toxine und Schlaf prüfen.', 'Hüfte für Zucker-/Blutzuckerkontext und Ernährung auf häufig wiederholte Lebensmittel prüfen.'],
     });
   }
