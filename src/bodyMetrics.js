@@ -10,7 +10,7 @@ import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesCha
 import { getPreference, setPreference } from './userPreferences.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
-import { erwarteteFaltensumme, koerperfettAnteil, magermasse } from './ypsiFormel.js';
+import { koerperfettAnteil, magermasse } from './ypsiFormel.js';
 import {
   buildSkinfoldPlan,
   bravermanComplete,
@@ -240,14 +240,16 @@ function ypsiKfaReihe(state) {
         gewichtKg: row.gewichtKg,
         summe: row.total,
       });
-      return kfa == null ? null : {
+      if (kfa == null) return null;
+      const mager = magermasse(row.gewichtKg, kfa);
+      return {
         datum: row.gemessen_am,
         kfa,
-        magermasse: magermasse(row.gewichtKg, kfa),
+        magermasse: mager,
+        fettmasse: mager == null ? null : Math.round((row.gewichtKg - mager) * 10) / 10,
         gewicht: row.gewichtKg,
         groesse: row.groesse_cm,
         summe: row.total,
-        erwartet: erwarteteFaltensumme(row.groesse_cm, row.gewichtKg),
       };
     })
     .filter(Boolean);
@@ -269,15 +271,15 @@ function ypsiKfaMarkup(state) {
     <p class="body-explain">Schätzung nach der YPSI-Formel aus Körpergröße, Gewicht und der Summe der zehn Rumpf- und Wadenfalten. Der <b>Verlauf</b> ist die Aussage — der absolute Wert ist eine Regression aus dem Seminar, keine Messung.</p>
     ${latest ? `<div class="body-metric-grid">
       <span><small>KÖRPERFETT</small><b>${display(latest.kfa)} %</b></span>
+      <span><small>FETTMASSE</small><b>${display(latest.fettmasse)} kg</b></span>
       <span><small>MAGERMASSE</small><b>${display(latest.magermasse)} kg</b></span>
       <span><small>FALTENSUMME</small><b>${display(latest.summe)} mm</b></span>
-      <span><small>ERWARTET</small><b>${display(latest.erwartet)} mm</b></span>
     </div>
     ${delta != null ? `<p class="body-neutral-note">Gegenüber der vorigen Messung: ${delta > 0 ? '+' : ''}${display(delta, 2)} Prozentpunkte.</p>` : ''}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Körperfett in Prozent</small></header>${curveSvg([{ values: reihe.map((row) => ({ datum: row.datum, wert: row.kfa })), className: 'trend', points: true }], { unit: '%' })}</div>
     <p class="body-chart-legend">Berechnet aus <b>${display(latest.groesse)} cm</b> und <b>${display(latest.gewicht)} kg</b> zum Messdatum.</p>`
     : `<div class="body-chart-empty"><b>Noch keine Schätzung</b><span>${fehlt.length ? `Für die letzte Messung fehlt ${escapeHtml(fehlt.join(' und '))}.` : 'Nach der ersten vollständigen Messung mit Körpergröße und passender Wiegung erscheint hier die Schätzung.'}</span></div>`}
-    ${infoDetails('Wie wird gerechnet?', 'Die Formel bildet zuerst aus Größe und Gewicht eine erwartete Faltensumme und bewertet dann den Betrag der Abweichung. Weil der Betrag eingeht, erhöht eine Summe unterhalb der Erwartung den Wert genauso wie eine darüber. Das Geschlecht geht nicht ein. Quelle: Formel.xlsx (YPSI), Blatt „Tracking“. Die Schätzung ersetzt keine Messung wie DEXA oder BodPod und ist keine medizinische Diagnose.')}
+    ${infoDetails('Wie wird gerechnet?', 'Die Formel bildet aus Größe und Gewicht einen Nullpunkt und bewertet dann, wie weit deine Faltensumme davon entfernt liegt: Körperfett steigt mit der Wurzel dieses Abstands. Zwei Eigenheiten der Vorlage sind wichtig. Erstens liegt der Nullpunkt über alle realistischen Größen und Gewichte hinweg nur zwischen etwa 42 und 45 mm – er ist also fast eine Konstante und keine persönliche Erwartung. Zweitens geht nur der Betrag des Abstands ein, eine Summe unterhalb des Nullpunkts erhöht den Wert deshalb genauso wie eine darüber. Das Geschlecht geht nicht ein. Quelle: Formel.xlsx (YPSI), Blatt „Tracking“. Die Schätzung ersetzt keine Messung wie DEXA oder BodPod und ist keine medizinische Diagnose.')}
   </div></section>`;
 }
 

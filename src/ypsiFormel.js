@@ -61,7 +61,13 @@ export function magermasse(gewichtKg, kfaProzent) {
 /* Rangformel der Vorlage: |Wert / 4 − MITTEL| absteigend, Rang 1 = größte
    Abweichung. Die Vorlage unterscheidet nicht, ob die Abweichung nach oben oder
    unten geht; `richtung` hält das als Zusatzinformation fest, ohne den Rang zu
-   verändern. */
+   verändern.
+
+   Die Rangvergabe bildet Grafik!D51 nach: dort wird der Score der Reihe nach
+   gegen LARGE(1..13) geprüft und die erste Übereinstimmung gewinnt. Gleiche
+   Scores bekommen dadurch denselben Rang, und die folgenden Ränge werden
+   übersprungen (zwei Erste, dann Rang 3). Der Score bleibt dafür ungerundet –
+   gerundet würden Beinahe-Gleichstände zu echten, die Excel nicht kennt. */
 export function faltenRang(falten = {}, calculationBasis = 'male') {
   const geschlecht = geschlechtSchluessel(calculationBasis);
   const tabelle = referenzen[geschlecht];
@@ -70,21 +76,21 @@ export function faltenRang(falten = {}, calculationBasis = 'male') {
       const wert = zahl(falten?.[slug]);
       if (wert == null || wert < 0) return null;
       const skaliert = wert / 4;
-      const score = Math.abs(skaliert - referenz.mittel);
       return {
         slug,
         wert,
         referenz: referenz.mittel,
         referenzMin: referenz.min,
         referenzMax: referenz.max,
-        score: Math.round(score * 10000) / 10000,
+        score: Math.abs(skaliert - referenz.mittel),
         richtung: skaliert > referenz.mittel ? 'ueber' : skaliert < referenz.mittel ? 'unter' : 'exakt',
       };
     })
     .filter(Boolean);
+  const absteigend = bewertet.map((eintrag) => eintrag.score).sort((a, b) => b - a);
   return bewertet
-    .sort((a, b) => b.score - a.score)
-    .map((eintrag, index) => ({ ...eintrag, rang: index + 1 }));
+    .map((eintrag) => ({ ...eintrag, rang: absteigend.indexOf(eintrag.score) + 1 }))
+    .sort((a, b) => a.rang - b.rang || b.score - a.score);
 }
 
 /* Komplette Auswertung einer Messung. Gibt null zurück, solange Größe, Gewicht
