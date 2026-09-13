@@ -133,7 +133,7 @@ export async function mountKnowledgeSearch(view, { signal } = {}) {
       <label class="wissenssuche-feld" for="wissenssuche-input">
         <span aria-hidden="true"></span>
         <input id="wissenssuche-input" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Titel, Notizen, Tags …">
-        <button type="button" data-search-clear aria-label="Suche leeren" hidden>×</button>
+        <button type="button" data-search-clear aria-label="Suche leeren" hidden><span aria-hidden="true"></span></button>
       </label>
       <nav class="wissenssuche-filter" aria-label="Wissensbereich filtern">
         <button type="button" class="aktiv" data-search-root="all" aria-pressed="true">Alle</button>

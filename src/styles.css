@@ -8525,14 +8525,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   flex:0 0 32px;
   width:32px;
   height:32px;
+  margin-right:5px;
   border:0;
   border-radius:9px;
   color:var(--dex-ink,#24304A);
   text-decoration:none;
 }
 .app-dex-search-icon,.app-dex-search-icon>svg{display:block;width:29px;height:29px}
+.app-dex-search-icon{filter:drop-shadow(2px 2px 0 var(--dex-ink,#24304A))}
+.app-dex-search:active{transform:translate(2px,2px)}
+.app-dex-search:active .app-dex-search-icon{filter:none}
 .app-dex-search.aktiv{background:color-mix(in srgb,#fff 62%,var(--dex-seitenfarbe,#FFF8ED))}
-.app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(1.5px 1.5px 0 currentColor)}
+.app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(2px 2px 0 currentColor)}
+.app-dex-search.aktiv:active .app-dex-search-icon{filter:none}
 .app-dex-header .coin-kopfstand{gap:0;height:34px}
 .app-dex-header .coin-kopfstand .coin-kopf-symbol{
   width:25px;
@@ -8580,7 +8585,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .wissenssuche-feld input{min-width:0;height:54px;border:0;outline:0;background:transparent;color:#241B2F;font:700 16px/1 var(--ui)}
 .wissenssuche-feld input::placeholder{color:#968D9B}
 .wissenssuche-feld input::-webkit-search-cancel-button{display:none}
-.wissenssuche-feld button{width:34px;height:34px;border:0;border-radius:50%;background:#EEE8F0;color:#241B2F;font:700 23px/1 var(--ui)}
+.wissenssuche-feld button{position:relative;display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent;color:#241B2F}
+.wissenssuche-feld button>span{position:relative;display:block;width:18px;height:18px}
+.wissenssuche-feld button>span::before,.wissenssuche-feld button>span::after{content:"";position:absolute;top:50%;left:50%;width:17px;height:3px;border-radius:2px;background:currentColor;transform-origin:center}
+.wissenssuche-feld button>span::before{transform:translate(-50%,-50%) rotate(45deg)}
+.wissenssuche-feld button>span::after{transform:translate(-50%,-50%) rotate(-45deg)}
 .wissenssuche-filter{
   display:flex;align-items:center;gap:8px;box-sizing:border-box;
   width:100vw;max-width:100vw;min-height:65px;
@@ -8594,6 +8603,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .wissenssuche-filter button{flex:0 0 auto;min-height:39px;padding:0 15px;border:1.5px solid #241B2F;border-radius:999px;background:#fff;color:#241B2F;font:800 12px/1 var(--ui);scroll-snap-align:start}
 .wissenssuche-filter button.aktiv{background:#241B2F;color:#FFF8ED}
 .wissenssuche-status{display:grid;gap:7px;min-height:140px;place-content:center;padding:24px;text-align:center}
+.wissenssuche-status[hidden]{display:none}
 .wissenssuche-status b{font:800 17px/1.2 var(--ui)}
 .wissenssuche-status span{max-width:310px;color:#665C70;font:600 13px/1.45 var(--ui)}
 .wissenssuche-gruppe{margin:0 0 24px}
