@@ -11478,3 +11478,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="profile"] .app-dex-tab{color:#0A1330!important}
 :root[data-seite="profile"] .app-dex-tab.aktiv{background:color-mix(in srgb,#0A1330 8%,#F7F3EA)!important;box-shadow:inset 0 0 0 1.25px #0A1330!important}
 :root[data-seite="profile"] .app-dex-menu{border-left-color:#0A1330!important;color:#0A1330!important}
+
+/* AUTH · exakt derselbe Hintergrund wie CAPCOINS, unabhängig vom Systemmodus */
+:root[data-seite="auth"],
+:root[data-seite="auth"] body,
+:root[data-seite="auth"] #app,
+:root[data-seite="auth"] .auth-shell{
+  background-color:#432C5E!important;
+  background-image:none!important;
+}
+:root[data-seite="auth"] .auth-marquee{
+  background:#fff!important;
+  color:#111!important;
+  border-bottom-color:#111!important;
+}

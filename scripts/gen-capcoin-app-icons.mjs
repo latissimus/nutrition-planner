@@ -1,5 +1,11 @@
 import { Resvg } from '@resvg/resvg-js';
-import { readFile, writeFile } from 'node:fs/promises';
+import ffmpegPath from 'ffmpeg-static';
+import { execFile } from 'node:child_process';
+import { readFile, unlink, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
+
+const run = promisify(execFile);
 
 const source = await readFile(new URL('../SeitenIcons/CAPCOIN.svg', import.meta.url));
 const coinPng = new Resvg(source, { fitTo: { mode: 'width', value: 800 } }).render().asPng();
@@ -17,12 +23,23 @@ const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="10
   <image href="data:image/png;base64,${coinData}" x="152" y="142" width="720" height="720" filter="url(#capcoin-shadow)"/>
 </svg>`;
 
-await writeFile(new URL('../public/capboy-app-icon-v5.svg', import.meta.url), iconSvg);
+await writeFile(new URL('../public/capboy-app-icon-v6.svg', import.meta.url), iconSvg);
 for (const [name, size] of [
-  ['capboy-icon-192-v5.png', 192],
-  ['capboy-icon-512-v5.png', 512],
-  ['capboy-apple-touch-icon-v5.png', 180],
+  ['capboy-icon-192-v6.png', 192],
+  ['capboy-icon-512-v6.png', 512],
+  ['capboy-apple-touch-icon-v6.png', 180],
 ]) {
   const png = new Resvg(iconSvg, { fitTo: { mode: 'width', value: size } }).render().asPng();
-  await writeFile(new URL(`../public/${name}`, import.meta.url), png);
+  const outputUrl = new URL(`../public/${name}`, import.meta.url);
+  const rgbaUrl = new URL(`../public/.${name}.rgba.png`, import.meta.url);
+  await writeFile(rgbaUrl, png);
+  await run(ffmpegPath, [
+    '-y',
+    '-i', fileURLToPath(rgbaUrl),
+    '-frames:v', '1',
+    '-pix_fmt', 'rgb24',
+    '-update', '1',
+    fileURLToPath(outputUrl),
+  ]);
+  await unlink(rgbaUrl);
 }

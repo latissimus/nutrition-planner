@@ -28,11 +28,11 @@ describe('CAPBOY Design-System', () => {
   it('installiert die PWA als CAPBOY mit dem freigegebenen CAPCOIN-Icon', () => {
     expect(manifest).toContain('"name": "CAPBOY"');
     expect(manifest).toContain('"short_name": "CAPBOY"');
-    expect(manifest).toContain('"src": "capboy-icon-192-v5.png"');
-    expect(manifest).toContain('"src": "capboy-icon-512-v5.png"');
+    expect(manifest).toContain('"src": "capboy-icon-192-v6.png"');
+    expect(manifest).toContain('"src": "capboy-icon-512-v6.png"');
     expect(indexHtml).toContain('name="apple-mobile-web-app-title" content="CAPBOY"');
-    expect(indexHtml).toContain('href="./capboy-apple-touch-icon-v5.png"');
-    expect(indexHtml).toContain('href="./capboy-app-icon-v5.svg"');
+    expect(indexHtml).toContain('href="./capboy-apple-touch-icon-v6.png"');
+    expect(indexHtml).toContain('href="./capboy-app-icon-v6.svg"');
   });
 
   it('legt die gemeinsame Kartenachse zentral fest', () => {
