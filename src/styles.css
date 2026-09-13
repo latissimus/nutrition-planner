@@ -8524,6 +8524,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   width:25px;
   height:25px;
   flex-basis:25px;
+  transform:translate(-2px,2px);
 }
 .app-dex-header .coin-kopfstand strong{
   min-width:10px;

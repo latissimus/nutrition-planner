@@ -52,6 +52,7 @@ describe('CAPBOY Design-System', () => {
 
   it('haelt Header, Dock und Sheets global statt seitenspezifisch', () => {
     expect(designSystem).toContain('.app-dex-header-actions{gap:4px}');
+    expect(designSystem).toContain('transform:translate(-2px,2px);');
     expect(designSystem).toContain('.app-dex-dock-inner{');
     expect(designSystem).toContain('.kategorie-sheet{');
     expect(designSystem).toContain('--cap-sheet-inline:28px');
