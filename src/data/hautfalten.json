@@ -1,0 +1,438 @@
+{
+  "version": "1.0",
+  "quellen": [
+    "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop, Stuttgart Februar 2017 (Wolfgang Unsöld)",
+    "YPSI Trainer A-Lizenz Modul 4 – Hormone, Hormonhaushalt & Hautfaltenmessung, Stuttgart Februar 2017",
+    "\"Was deine Hautfalten über Dich aussagen\" – Wolfgang Unsöld, yourpersonalstrengthcoach.com (2010)"
+  ],
+  "hinweis": "Die BioSignature-Methodik (Charles Poliquin 2004, YPSI-Adaption durch Wolfgang Unsöld) verknüpft Hautfaltendicke mit hormonellen und metabolischen Signalen. Es handelt sich um Praxis-Erfahrungswerte, keine klinisch validierten Diagnostiktests. Alle Angaben sind Orientierung, keine medizinische Diagnose.",
+  "messgrundlagen": {
+    "standardisierung": "Immer dieselbe Person am selben Wochentag zur selben Tageszeit, gleiche Körperseite, gleicher Caliper, gleicher Griff, gleiche Faltenposition.",
+    "griff": "Messzange in der rechten Hand halten, Hautfalte mit der linken Hand und einem pronierten Griff greifen.",
+    "zangenwinkel": "Die Messzange immer exakt vertikal zur Falte halten (90° zum Körper).",
+    "haut_faszie_fett": "Nicht nur Haut greifen, sondern Haut/Faszie/Fett. Körperfett ist zwischen den Faszienschichten gespeichert – die Faszie muss mitgemessen werden.",
+    "kurzfristige_einflussfaktoren": [
+      "Jetlag (bis zu 5 % Einfluss)",
+      "Akutes Schlafdefizit",
+      "Training in den letzten 3 h vor der Messung",
+      "Stress (Aldosteron)",
+      "Außentemperatur"
+    ],
+    "messintervall": "Alle 3–4 Wochen. Kürzere Intervalle verringern den Motivationseffekt, längere die Compliance.",
+    "griffkraft": "Griffkraft ist der limitierendste Faktor für eine exakte Messung – je größer die Falte, desto mehr Kraft ist nötig.",
+    "erfahrungswert": "Ca. 2000 Messungen sind nötig, um den eigenen Griff zu standardisieren (\"Perfect Practice makes Perfect\")."
+  },
+  "falten": {
+    "kinn": {
+      "slug": "kinn",
+      "label": "Kinn",
+      "reihenfolge": 1,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Vertikale Falte am Mittelpunkt zwischen Kinn und Hals. Kunde muss den Kopf leicht anheben.",
+        "seite": "rechts",
+        "hinweise": [
+          "Kinn beginnt am untersten Punkt; darüber beginnt bereits der Hals (Kehlkopf).",
+          "Im äußeren Griff messen.",
+          "Bei Bart: Haut abziehen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "gewichtsdynamik",
+        "kontext_tags": ["gewichtszunahme", "gewichtsabnahme", "kurzzeit-stress"],
+        "kurzbeschreibung": "Reagiert als eine der ersten Falten auf Gewichtsveränderungen und Kurzzeit-Stress.",
+        "ausfuehrlich": "Kinn und Wange geben direkten Aufschluss über Gewichtszu- oder abnahme. Nimmst du ab, nehmen diese beiden Falten als Erstes ab.",
+        "hauptursachen": []
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": null },
+      "rohstoffe": [],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 3"
+    },
+    "wange": {
+      "slug": "wange",
+      "label": "Wange",
+      "reihenfolge": 2,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Vertikale Falte am Schnittpunkt der vertikalen Linie des lateralen Augenwinkels mit der horizontalen Linie des Mundwinkels.",
+        "seite": "rechts",
+        "hinweise": [
+          "Lateral = von der Körpermitte weg (seitlich).",
+          "Ggf. muss sich der Kunde setzen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "gewichtsdynamik",
+        "kontext_tags": ["gewichtszunahme", "gewichtsabnahme", "kurzzeit-stress"],
+        "kurzbeschreibung": "Wie Kinn: reagiert früh auf Gewichtsveränderungen und Kurzzeit-Stress.",
+        "ausfuehrlich": "Kinn und Wange sind die ersten beiden Falten, die sich verändern, wenn du etwas veränderst.",
+        "hauptursachen": []
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": null },
+      "rohstoffe": [],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 4"
+    },
+    "brust": {
+      "slug": "brust",
+      "label": "Brust",
+      "reihenfolge": 3,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Hautfalte in einer Linie mit der Brustfalte greifen. Bei Männern 2 Finger breit von der Brustwarze entfernt, bei Frauen 2 Finger breit von der Achsel entfernt.",
+        "seite": "rechts",
+        "hinweise": [
+          "Mit 2 Fingern abmessen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "aromatase_zink",
+        "kontext_tags": ["aromatase", "zink", "testosteron-oestrogen-konvertierung", "stress", "entzuendung"],
+        "kurzbeschreibung": "Indikator für Aromatase-Aktivität (Konvertierung von Testosteron in Östrogen) und den Zinkbedarf.",
+        "ausfuehrlich": "Die Brustfalte ist ein Indikator für den Bedarf an Zink – Zink ist Vorläufer für Testosteron. Zudem entscheidend für Immunsystem, Regeneration, Nägel und Haare. Je höher die Falte, desto höher der Zinkbedarf. Bauch- und Brustfalte hängen zusammen.",
+        "hauptursachen": [
+          "Stress",
+          "Hohes Körperfett (Aromatase-Aktivität ist im Fettgewebe erhöht)",
+          "Hohes Entzündungslevel",
+          "PGE2",
+          "cAMP"
+        ]
+      },
+      "norm": { "mann_mm": 3, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "3 mm bei Männern gilt als optimal (Zinklevel)." },
+      "rohstoffe": ["zink"],
+      "hilfreich": ["brennnesseltee_gegen_aromatase"],
+      "protokoll_ids": ["bauch-brust-phase-1", "bauch-brust-phase-2", "bauch-brust-phase-3", "bauch-brust-phase-4-chlorella", "bauch-brust-phase-4-neuromag", "bauch-brust-phase-4-licorice"],
+      "quelle": "Körperfett-Assessment S. 4, Hormone S. 2"
+    },
+    "trizeps": {
+      "slug": "trizeps",
+      "label": "Trizeps",
+      "reihenfolge": 4,
+      "leitfalte": true,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Vertikale Falte am Mittelpunkt zwischen Olekranon (knöcherne Verstärkung zwischen Humerus und Ulna, spürbarer Vorsprung hinten am Ellbogen) und Schultergelenk (hinten).",
+        "seite": "rechts",
+        "hinweise": [
+          "Ggf. Trizeps kontrahieren.",
+          "Ggf. \"Weglauftechnik\" anwenden."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "testosteron_dhea",
+        "kontext_tags": ["testosteron", "dhea", "leitfalte", "hormonell", "schlaf"],
+        "kurzbeschreibung": "Wichtigste Falte – Indikator für Testosteron und DHEA. Alle anderen Falten stehen mit ihr in Verbindung.",
+        "ausfuehrlich": "Testosteron ist der Haupt-Androgen und ein ausgezeichneter Indikator für die Gesamt-Gesundheit von Körper und Nervensystem. Je niedriger der Trizeps, desto höher Testosteron. Erhöht man Testosteron, erhöht sich automatisch Dopamin – und umgekehrt. Kein Training des Arms hilft, nur ein ganzheitlicher Ansatz.",
+        "hauptursachen": [
+          "Schlechter Schlaf",
+          "Alkohol",
+          "Chronischer Stress",
+          "Mikronährstoffdefizite"
+        ],
+        "vier_hebel": [
+          "Bewegung (intuitiv, je höher die Intensität desto besser)",
+          "Ernährung (v. a. Magnesium)",
+          "Schlaf (Meditation kann helfen)",
+          "Sonne (je mehr Sonne, desto niedriger die Trizepsfalte – via Vitamin D)"
+        ],
+        "besonderheiten": [
+          "Sehr hohe Trizepsfalte behandeln wie Prio 1 Bauch, da Schlaf/Darm/Ernährung nicht stimmen werden.",
+          "Rote Punkte auf dem Trizeps deuten auf Leber-Entgiftungsstau hin (dann wie Entgiftungsfalten vorgehen)."
+        ]
+      },
+      "norm": { "mann_mm": 4, "frau_mm": 10, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Optimale Faltendicke laut Unsöld: 4 mm ♂ / 10 mm ♀." },
+      "rohstoffe": ["b6", "zink", "cholesterin_fett"],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 4, Hormone S. 2, Supplements S. 26"
+    },
+    "ruecken": {
+      "slug": "ruecken",
+      "label": "Rücken",
+      "reihenfolge": 5,
+      "messung": {
+        "typ": "45-grad",
+        "position": "45°-Falte, einen Finger breit von der Scapula entfernt, im 45°-Winkel zwischen vertikaler und horizontaler Linie.",
+        "seite": "rechts",
+        "hinweise": [
+          "Mit 1 Finger abmessen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "kh_toleranz_genetisch",
+        "kontext_tags": ["kohlenhydrat-toleranz", "genetik", "entzuendung"],
+        "kurzbeschreibung": "Indikator für die genetische Kohlenhydrattoleranz und das Entzündungslevel.",
+        "ausfuehrlich": "Je geringer die Rückenfalte, desto besser verstoffwechselt dein Körper Kohlenhydrate. Bei 6 mm bist du jemand, der bestens mit hochwertigen Kohlenhydraten zurechtkommt. Bei 14 mm funktioniert dein Körper besser mit Fisch, Fleisch, Eiern, Nüssen, Gemüse und Salat (\"Höhlenmenschen-Ernährung\"). Da sie genetisch ist, wird sie sich nicht groß verändern.",
+        "hauptursachen": [
+          "Genetisch schlechte KH-Toleranz",
+          "Erhöhte Entzündungswerte"
+        ],
+        "praxisregel": "Rücken + Hüfte gemeinsam unter 18 mm = grundsätzlich Kohlenhydrate raus."
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": 10, "katastrophal_mm": null, "notiz": "Grenzwert 10 mm ♂/♀. Ab 14 mm klarer Hinweis auf sehr schlechte KH-Toleranz." },
+      "rohstoffe": [],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 5, Hormone S. 12"
+    },
+    "rippe": {
+      "slug": "rippe",
+      "label": "Rippe",
+      "reihenfolge": 6,
+      "messung": {
+        "typ": "45-grad",
+        "position": "45°-Falte am lateralen Mittelpunkt der vertikalen Linie zwischen Achsel und Becken (Spitze des Beckens).",
+        "seite": "rechts",
+        "hinweise": [
+          "Lateral = von der Körpermitte weg / seitlich."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "schilddruese_stoffwechsel",
+        "kontext_tags": ["schilddruese", "stoffwechsel", "amalgam", "vergiftung"],
+        "kurzbeschreibung": "Steht in Verbindung mit der Schilddrüsenfunktion und der Geschwindigkeit deines Stoffwechsels.",
+        "ausfuehrlich": "Eine niedrige Rippenfalte bedeutet, dass dein Stoffwechsel optimal funktioniert. Amalgamfüllungen, Stress und Zucker senken die Schilddrüsenfunktion und erhöhen diese Falte. Ist die Rippenfalte hoch, ist das ein Indikator dafür, dass insgesamt etwas nicht stimmt. Cortisol konvertiert T4 zu rT3 statt zu T3 – deshalb muss Cortisol gesenkt werden, um T3 zu bilden.",
+        "hauptursachen": [
+          "Stress",
+          "Amalgam / Schwermetalle",
+          "Zucker",
+          "Jede Form von Vergiftung"
+        ]
+      },
+      "norm": { "mann_mm": 5, "frau_mm": 5, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Norm 5 mm ♂/♀." },
+      "rohstoffe": ["tyrosin", "selen"],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 5, Hormone S. 13"
+    },
+    "huefte": {
+      "slug": "huefte",
+      "label": "Hüfte",
+      "reihenfolge": 7,
+      "messung": {
+        "typ": "45-grad",
+        "position": "45°-Falte lateral 1 cm oberhalb des Beckens (Spitze des Beckens).",
+        "seite": "rechts",
+        "hinweise": [
+          "Lateral = von der Körpermitte weg / seitlich."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "kh_toleranz_temporaer",
+        "kontext_tags": ["blutzucker", "insulin", "temporaere-kh-toleranz", "heisshunger"],
+        "kurzbeschreibung": "Zeigt temporäres Blutzucker-Management bzw. temporäre KH-Toleranz. Reagiert schnell auf Anpassungen.",
+        "ausfuehrlich": "Heißhungerattacken, Lust auf Süßes, regelmäßige Blutzuckerschwankungen und Konzentrationsprobleme sind Zeichen dafür, dass die Falte oberhalb des Beckenkamms Aufmerksamkeit verdient. Sie ist die Falte, die am einfachsten und schnellsten Erfolge erzielt. Ernährung, Schlaf & Bewegung sind entscheidend fürs Blutzuckermanagement.",
+        "hauptursachen": [
+          "Unregelmäßiges Essen (BZ-Spiegel schwankt, Cortisol steigt)",
+          "Zu viele/schnelle Kohlenhydrate",
+          "Zu wenig Aktivität"
+        ],
+        "praxisregel": "Norm: je niedriger, desto besser. Anpassen an KH-Richtlinien und Gefühl des Klienten. Regelmäßiger essen, Protein, Frühstück."
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Keine feste Norm – je niedriger, desto besser." },
+      "rohstoffe": [],
+      "protokoll_ids": ["huefte-phase-1", "huefte-phase-2", "huefte-phase-3"],
+      "quelle": "Körperfett-Assessment S. 5, S. 11"
+    },
+    "bauch": {
+      "slug": "bauch",
+      "label": "Bauch",
+      "reihenfolge": 8,
+      "prioritaet_wenn_hoch": 1,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Vertikale Falte 2 cm neben und 2 cm oberhalb des Bauchnabels greifen.",
+        "seite": "rechts",
+        "hinweise": [
+          "2-Finger-breit abmessen.",
+          "Keinen Muskel mitnehmen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "cortisol_stress_darm",
+        "kontext_tags": ["cortisol", "stress", "energielevel", "darmgesundheit", "mikronaehrstoffe", "leaky-gut"],
+        "kurzbeschreibung": "Bester Indikator für Stressmanagement, Energielevel und Darmgesundheit – Prio 1 wenn hoch.",
+        "ausfuehrlich": "Bist du häufig schlapp, kommst morgens schwer in die Gänge und dein Kopf funktioniert nicht so wie schon einmal – das sind deutliche Zeichen dafür, dass deinem Körper vor allem die Mikronährstoffe fehlen, um mit Stress umzugehen. Diese Falte ist der beste Indikator für deine Leistungsfähigkeit in Beruf, Sport und Alltag. Wenn Cortisol ansteigt, sinkt Testosteron, Immunsystem wird kompromittiert, anaboler Drive sinkt, Darmwand wird durchlässiger (Leaky Gut). Cortisol erhöht Bauchfett und viszerales Fett.",
+        "hauptursachen": [
+          "Chronischer Stress",
+          "Schlechter Schlaf",
+          "Toxine, Candida, Unverträglichkeiten, Leaky Gut",
+          "Kaffee (übermäßig – erhöht Cortisol)",
+          "Mikronährstoffdefizite"
+        ],
+        "hebel": [
+          "Cortisol senken",
+          "Mikronährstoff-Level optimieren",
+          "Regelmäßig essen (max. 3 h Abstand)",
+          "Darm sanieren (siehe Darm-Sanierungs-Protokoll)"
+        ]
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Keine feste Norm – je niedriger, desto besser." },
+      "rohstoffe": [],
+      "protokoll_ids": ["bauch-brust-phase-1", "bauch-brust-phase-2", "bauch-brust-phase-3", "bauch-brust-phase-4-chlorella", "bauch-brust-phase-4-neuromag", "bauch-brust-phase-4-licorice", "darm-sanierung-phase-1", "darm-sanierung-phase-2", "darm-sanierung-phase-3", "darm-sanierung-phase-4", "darm-sanierung-phase-5"],
+      "quelle": "Körperfett-Assessment S. 6, Hormone S. 5–8"
+    },
+    "knie": {
+      "slug": "knie",
+      "label": "Knie",
+      "reihenfolge": 9,
+      "hinweis_app": "Nicht Teil der bestehenden 12-Falten-Erfassung (FALTEN in src/measurements.js). Trotzdem hier als Referenz gelistet – falls später integriert.",
+      "aktiv_in_app": false,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Vertikale Falte direkt auf der Kniescheibe (Mittelpunkt).",
+        "seite": "rechts",
+        "hinweise": []
+      },
+      "interpretation": {
+        "primaerkontext": "leber_phase_1",
+        "kontext_tags": ["leber", "entgiftung-phase-1", "korreliert-mit-oberschenkel"],
+        "kurzbeschreibung": "Spiegelt die Leberfunktion wieder, insbesondere Phase 1 der Entgiftung. Korreliert mit Oberschenkel.",
+        "ausfuehrlich": "Das Knie zeigt vor allem die Phase 1 der Leber-Entgiftung. Mikronährstoffe + Magnesium sind wichtig.",
+        "hauptursachen": [
+          "Belastung der Leber Phase 1",
+          "Mikronährstoffmangel"
+        ]
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": null },
+      "rohstoffe": ["magnesium", "mikronaehrstoffe"],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 6"
+    },
+    "wade": {
+      "slug": "wade",
+      "label": "Wade",
+      "reihenfolge": 10,
+      "messung": {
+        "typ": "vertikal",
+        "position": "Vertikale Falte medial am Mittelpunkt des Muskelbauchs des Gastrocnemius.",
+        "seite": "rechts",
+        "hinweise": [
+          "Bein nicht eindrücken.",
+          "Medial = zur Körpermitte hin / innen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "tiefschlaf_hgh",
+        "kontext_tags": ["tiefschlaf", "hgh", "wachstumshormon", "magnesium", "elektrosmog"],
+        "kurzbeschreibung": "Steht mit dem in der Tiefschlafphase ausgeschütteten Wachstumshormon (HGH) in Verbindung.",
+        "ausfuehrlich": "Wenn du nicht tief schläfst, produzierst du weniger HGH, und die Falte ist höher. Magnesium ist der entscheidende Mineralstoff, um tief zu schlafen. Bei gutem Schlaf ist die Falte <10 mm ♀ / <5 mm ♂. Organuhr beachten (5–7 Uhr Dickdarm etc.).",
+        "hauptursachen": [
+          "Unzureichender Tiefschlaf",
+          "Magnesiummangel",
+          "Elektrosmog (Handy/WLAN im Schlafzimmer)"
+        ],
+        "hebel": [
+          "Handy nicht im Schlafzimmer",
+          "WLAN nachts ausschalten",
+          "Magnesium (Bisglycinat unterdrückt Cortisol – ideal vor dem Schlafen)"
+        ]
+      },
+      "norm": { "mann_mm": 5, "frau_mm": 8, "grenzwert_mm": null, "katastrophal_mm": 25, "notiz": "Norm 5 mm ♂ / 8 mm ♀. Katastrophal >20 ♂ / >30 ♀ (fragmentarische Notiz)." },
+      "rohstoffe": ["magnesium"],
+      "protokoll_ids": ["wade-phase-1", "wade-phase-2", "wade-phase-3", "wade-phase-4-neuromag", "wade-phase-4-methylkomplex", "wade-phase-4-glycin", "wade-phase-4-taurin", "wade-phase-4-lipo-melatonin", "wade-phase-4-greens"],
+      "quelle": "Körperfett-Assessment S. 6, S. 14, Hormone S. 14"
+    },
+    "quadrizeps": {
+      "slug": "quadrizeps",
+      "label": "Quadrizeps",
+      "reihenfolge": 11,
+      "messung": {
+        "typ": "sagittal",
+        "position": "Sagittale Falte am Mittelpunkt zwischen Knie und Hüftgelenk.",
+        "seite": "links",
+        "hinweise": [
+          "Sagittal = parallel zur Körperachse.",
+          "Ausnahme: einzige Falte, die primär links gemessen wird."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "leber_entgiftung",
+        "kontext_tags": ["leber", "darm", "entgiftung", "umweltgifte", "xenoestrogene", "schwermetalle", "protein", "fett"],
+        "kurzbeschreibung": "Zeigt Umweltgifte, Xenoöstrogene, Schwermetalle und die Fähigkeit deiner Leber, diese Stoffe zu entgiften.",
+        "ausfuehrlich": "Die Falte hängt mit der Fähigkeit zusammen, diese Stoffe durch die Leber zu entgiften. Insbesondere Phase 2. Das beste Mittel diese Falte zu verringern ist ein Frühstück aus hochwertigem Protein und gesunden Fetten. Niedrige Proteinaufnahme erhöht Oberschenkelfalten.",
+        "hauptursachen": [
+          "Belastung mit Umweltgiften, Xenoöstrogenen, Schwermetallen",
+          "Suboptimale Leber-Phase-2-Entgiftung",
+          "Niedrige Proteinaufnahme"
+        ],
+        "hebel": [
+          "Hochwertiges Frühstück (Protein + gesunde Fette)",
+          "Leber-Phase-2 unterstützen (Glutathion, Glycin, NAC, SAMe)"
+        ]
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Keine feste Norm." },
+      "rohstoffe": ["protein_frueckstueck", "gesunde_fette"],
+      "protokoll_ids": ["quad-beinbizeps-phase-1", "quad-beinbizeps-phase-2", "quad-beinbizeps-phase-3", "quad-beinbizeps-phase-4-methylkomplex", "quad-beinbizeps-phase-4-glutamin", "quad-beinbizeps-phase-4-liv52", "quad-beinbizeps-phase-4-glycin", "quad-beinbizeps-phase-4-lipo-gsh"],
+      "quelle": "Körperfett-Assessment S. 7, S. 9–12"
+    },
+    "beinbizeps": {
+      "slug": "beinbizeps",
+      "label": "Beinbizeps",
+      "reihenfolge": 12,
+      "messung": {
+        "typ": "sagittal",
+        "position": "Sagittale Falte 1 cm unterhalb des Übergangs von Glutaeus Maximus in Beinbizeps.",
+        "seite": "rechts",
+        "hinweise": [
+          "Sagittal = parallel zur Körperachse.",
+          "1-Finger-breit abmessen."
+        ]
+      },
+      "interpretation": {
+        "primaerkontext": "leber_entgiftung_tiefschlaf",
+        "kontext_tags": ["leber", "darm", "entgiftung", "tiefschlaf", "b-vitamine"],
+        "kurzbeschreibung": "Gibt wie der vordere Oberschenkel Aufschluss über den Entgiftungsstatus. Zusätzlich Tiefschlaf-Indikator.",
+        "ausfuehrlich": "Das Verhältnis von vorderer zu hinterer Oberschenkelfalte ist ein zuverlässiger Indikator für den individuellen Bedarf an B-Vitaminen. Die hintere Falte ist zusätzlich stärker mit Tiefschlaf verknüpft.",
+        "hauptursachen": [
+          "Belastung mit Umweltgiften, Xenoöstrogenen, Schwermetallen",
+          "Suboptimale Leber-Phase-2-Entgiftung",
+          "Unzureichender Tiefschlaf",
+          "B-Vitamin-Defizit"
+        ]
+      },
+      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Keine feste Norm." },
+      "rohstoffe": ["b_vitamine_komplex"],
+      "protokoll_ids": ["quad-beinbizeps-phase-1", "quad-beinbizeps-phase-2", "quad-beinbizeps-phase-3", "quad-beinbizeps-phase-4-methylkomplex", "quad-beinbizeps-phase-4-glutamin", "quad-beinbizeps-phase-4-liv52", "quad-beinbizeps-phase-4-glycin", "quad-beinbizeps-phase-4-lipo-gsh"],
+      "quelle": "Körperfett-Assessment S. 7, S. 9–12"
+    },
+    "bizeps": {
+      "slug": "bizeps",
+      "label": "Bizeps",
+      "reihenfolge": 13,
+      "messung": {
+        "typ": "sagittal",
+        "position": "Vertikale/sagittale Falte am sagittalen Mittelpunkt zwischen Schulter- und Ellbogengelenk (Vorderseite Oberarm).",
+        "seite": "rechts",
+        "hinweise": []
+      },
+      "interpretation": {
+        "primaerkontext": "freies_testosteron",
+        "kontext_tags": ["freies-testosteron", "hormonell"],
+        "kurzbeschreibung": "Indikator für freies Testosteron.",
+        "ausfuehrlich": "Bizepsfalte ergänzt die Trizepsfalte: Trizeps steht für Gesamt-Testosteron/DHEA, Bizeps für den frei verfügbaren Anteil.",
+        "hauptursachen": []
+      },
+      "norm": { "mann_mm": 2, "frau_mm": 5, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Orientierungswerte: 2 mm ♂ / 5 mm ♀ (fragmentarische Notiz)." },
+      "rohstoffe": [],
+      "protokoll_ids": [],
+      "quelle": "Körperfett-Assessment S. 7, Hormone S. 2"
+    }
+  },
+  "prioritaetsregeln": {
+    "beschreibung": "Falten werden chronologisch nach Priorität abgearbeitet – Prio 1 zuerst, danach Prio 2, usw. In jeder Phase wird die Prio-1-Falte behandelt, dann in der nächsten Phase die nächste Prio.",
+    "beispiel": "Wenn Bauch = 1, Trizeps = 2, Brust = 3: Phase 1 arbeitet an Bauch, Phase 2 wieder an Bauch (nächster Level), Phase 3 wechselt zu Trizeps.",
+    "spezialfaelle": [
+      {
+        "situation": "Sehr hohe Trizepsfalte",
+        "regel": "Wie Prio 1 Bauch behandeln, weil Schlaf/Darm/Ernährung nicht stimmen werden."
+      },
+      {
+        "situation": "Rote Punkte auf Trizeps",
+        "regel": "Leber-Entgiftungsstau – wie Entgiftungsfalten (Quad/Beinbizeps) behandeln."
+      },
+      {
+        "situation": "Rücken + Hüfte gemeinsam unter 18 mm",
+        "regel": "Grundsätzlich Kohlenhydrate erlaubt."
+      }
+    ]
+  }
+}
