@@ -1,6 +1,7 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "quellen": [
+    "Hautfalten Notizen – strukturierte Seminarzusammenfassung (14 Seiten)",
     "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop, Stuttgart Februar 2017 (Wolfgang Unsöld)",
     "YPSI Trainer A-Lizenz Modul 4 – Hormone, Hormonhaushalt & Hautfaltenmessung, Stuttgart Februar 2017",
     "\"Was deine Hautfalten über Dich aussagen\" – Wolfgang Unsöld, yourpersonalstrengthcoach.com (2010)"
@@ -97,6 +98,13 @@
           "Hohes Entzündungslevel",
           "PGE2",
           "cAMP"
+        ],
+        "hebel": [
+          "Energielevel und DHEA/Testosteron über die Trizepsfalte gegenprüfen",
+          "Stress/Cortisol über die Bauchfalte gegenprüfen",
+          "Glukose/Insulin über die Hüftfalte gegenprüfen",
+          "Entzündung über die Rückenfalte gegenprüfen",
+          "Zinkbedarf nicht allein aus der Falte ableiten"
         ]
       },
       "norm": { "mann_mm": 3, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "3 mm bei Männern gilt als optimal (Zinklevel)." },
@@ -139,11 +147,17 @@
         "besonderheiten": [
           "Sehr hohe Trizepsfalte behandeln wie Prio 1 Bauch, da Schlaf/Darm/Ernährung nicht stimmen werden.",
           "Rote Punkte auf dem Trizeps deuten auf Leber-Entgiftungsstau hin (dann wie Entgiftungsfalten vorgehen)."
+        ],
+        "hebel": [
+          "Rohstoffe für Testosteron sichern: Magnesium, Vitamin B6, Zink sowie ausreichend Cholesterin/Fett",
+          "Cortisol managen und DHEA-/Energiekontext über die Bauchfalte gegenprüfen",
+          "Schlaf über die Wadenfalte gegenprüfen",
+          "Alkoholkonsum reduzieren"
         ]
       },
       "norm": { "mann_mm": 4, "frau_mm": 10, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Optimale Faltendicke laut Unsöld: 4 mm ♂ / 10 mm ♀." },
       "rohstoffe": ["b6", "zink", "cholesterin_fett"],
-      "protokoll_ids": [],
+      "protokoll_ids": ["bauch-brust-phase-1", "bauch-brust-phase-2", "bauch-brust-phase-3", "bauch-brust-phase-4-chlorella", "bauch-brust-phase-4-neuromag", "bauch-brust-phase-4-licorice"],
       "quelle": "Körperfett-Assessment S. 4, Hormone S. 2, Supplements S. 26"
     },
     "ruecken": {
@@ -167,7 +181,7 @@
           "Genetisch schlechte KH-Toleranz",
           "Erhöhte Entzündungswerte"
         ],
-        "praxisregel": "Rücken + Hüfte gemeinsam unter 18 mm = grundsätzlich Kohlenhydrate raus."
+        "praxisregel": "Rücken + Hüfte gemeinsam unter 18 mm = grundsätzlich Kohlenhydrate erlaubt; Menge und Auswahl weiter am Verlauf ausrichten."
       },
       "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": 10, "katastrophal_mm": null, "notiz": "Grenzwert 10 mm ♂/♀. Ab 14 mm klarer Hinweis auf sehr schlechte KH-Toleranz." },
       "rohstoffe": [],
@@ -224,6 +238,12 @@
           "Unregelmäßiges Essen (BZ-Spiegel schwankt, Cortisol steigt)",
           "Zu viele/schnelle Kohlenhydrate",
           "Zu wenig Aktivität"
+        ],
+        "hebel": [
+          "Regelmäßig essen und jede Mahlzeit mit ausreichend Protein planen",
+          "Protein- und fettreiches Frühstück",
+          "Kohlenhydratmenge an Training, Hunger, Energie und Verlauf anpassen",
+          "Optional CGM-Werte zur Gegenprüfung nutzen"
         ],
         "praxisregel": "Norm: je niedriger, desto besser. Anpassen an KH-Richtlinien und Gefühl des Klienten. Regelmäßiger essen, Protein, Frühstück."
       },
@@ -326,7 +346,7 @@
           "Magnesium (Bisglycinat unterdrückt Cortisol – ideal vor dem Schlafen)"
         ]
       },
-      "norm": { "mann_mm": 5, "frau_mm": 8, "grenzwert_mm": null, "katastrophal_mm": 25, "notiz": "Norm 5 mm ♂ / 8 mm ♀. Katastrophal >20 ♂ / >30 ♀ (fragmentarische Notiz)." },
+      "norm": { "mann_mm": 5, "frau_mm": 8, "grenzwert_mm": null, "katastrophal_mm": null, "mann_katastrophal_mm": 20, "frau_katastrophal_mm": 30, "notiz": "Norm 5 mm ♂ / 8 mm ♀. Als sehr hoch notiert: >20 mm ♂ / >30 mm ♀." },
       "rohstoffe": ["magnesium"],
       "protokoll_ids": ["wade-phase-1", "wade-phase-2", "wade-phase-3", "wade-phase-4-neuromag", "wade-phase-4-methylkomplex", "wade-phase-4-glycin", "wade-phase-4-taurin", "wade-phase-4-lipo-melatonin", "wade-phase-4-greens"],
       "quelle": "Körperfett-Assessment S. 6, S. 14, Hormone S. 14"
@@ -359,9 +379,9 @@
           "Leber-Phase-2 unterstützen (Glutathion, Glycin, NAC, SAMe)"
         ]
       },
-      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Keine feste Norm." },
+      "norm": { "mann_mm": 15, "frau_mm": 30, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Bereich laut Notizen: Männer 10–15 mm normal; Frauen <15 mm herausragend, 15–30 mm normal, >30 mm zu hoch." },
       "rohstoffe": ["protein_frueckstueck", "gesunde_fette"],
-      "protokoll_ids": ["quad-beinbizeps-phase-1", "quad-beinbizeps-phase-2", "quad-beinbizeps-phase-3", "quad-beinbizeps-phase-4-methylkomplex", "quad-beinbizeps-phase-4-glutamin", "quad-beinbizeps-phase-4-liv52", "quad-beinbizeps-phase-4-glycin", "quad-beinbizeps-phase-4-lipo-gsh"],
+      "protokoll_ids": ["quad-beinbizeps-phase-1", "quad-beinbizeps-phase-2", "quad-beinbizeps-phase-3", "quad-beinbizeps-phase-4-methylkomplex", "quad-beinbizeps-phase-4-pectasol", "quad-beinbizeps-phase-4-glutamin", "quad-beinbizeps-phase-4-liv52", "quad-beinbizeps-phase-4-glycin", "quad-beinbizeps-phase-4-lipo-gsh"],
       "quelle": "Körperfett-Assessment S. 7, S. 9–12"
     },
     "beinbizeps": {
@@ -387,11 +407,16 @@
           "Suboptimale Leber-Phase-2-Entgiftung",
           "Unzureichender Tiefschlaf",
           "B-Vitamin-Defizit"
+        ],
+        "hebel": [
+          "Verhältnis von Beinbizeps zu Quadrizeps für den B‑Vitamin-/Methylierungszweig nutzen",
+          "Schlaf über die Wadenfalte gegenprüfen",
+          "Bei wiederkehrender Priorität Leber-Phase-2-Varianten prüfen"
         ]
       },
-      "norm": { "mann_mm": null, "frau_mm": null, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Keine feste Norm." },
+      "norm": { "mann_mm": 15, "frau_mm": 30, "grenzwert_mm": null, "katastrophal_mm": null, "notiz": "Bereich laut Notizen: Männer 10–15 mm normal; Frauen <15 mm herausragend, 15–30 mm normal, >30 mm zu hoch." },
       "rohstoffe": ["b_vitamine_komplex"],
-      "protokoll_ids": ["quad-beinbizeps-phase-1", "quad-beinbizeps-phase-2", "quad-beinbizeps-phase-3", "quad-beinbizeps-phase-4-methylkomplex", "quad-beinbizeps-phase-4-glutamin", "quad-beinbizeps-phase-4-liv52", "quad-beinbizeps-phase-4-glycin", "quad-beinbizeps-phase-4-lipo-gsh"],
+      "protokoll_ids": ["quad-beinbizeps-phase-1", "quad-beinbizeps-phase-2", "quad-beinbizeps-phase-3", "quad-beinbizeps-phase-4-methylkomplex", "quad-beinbizeps-phase-4-pectasol", "quad-beinbizeps-phase-4-glutamin", "quad-beinbizeps-phase-4-liv52", "quad-beinbizeps-phase-4-glycin", "quad-beinbizeps-phase-4-lipo-gsh"],
       "quelle": "Körperfett-Assessment S. 7, S. 9–12"
     },
     "bizeps": {
@@ -417,9 +442,58 @@
       "quelle": "Körperfett-Assessment S. 7, Hormone S. 2"
     }
   },
+  "wechselbeziehungen": [
+    {
+      "id": "bauch-trizeps",
+      "regel": "Bauch zuerst auf Stress/Cortisol, Glukose, Mikronährstoffe, Energie und Schlaf prüfen. Ist Bauch hoch, die Person wacht aber gut auf, ist fit und aktiv, gewinnt der Darmzweig an Gewicht. Ein Trizeps im Zielbereich schwächt den Energie-/Testosteron-Hinweis und unterstützt diese Abzweigung, beweist sie aber nicht.",
+      "falten": ["bauch", "trizeps", "huefte", "wade", "quadrizeps", "beinbizeps"]
+    },
+    {
+      "id": "brust-gegenfalten",
+      "regel": "Brust wird wie Bauch behandelt und über Trizeps (Energie/Aromatase), Bauch (Cortisol), Hüfte (Glukose/Insulin) und Rücken (Entzündung) differenziert.",
+      "falten": ["brust", "trizeps", "bauch", "huefte", "ruecken"]
+    },
+    {
+      "id": "quad-ham-verhaeltnis",
+      "regel": "Das Verhältnis Quadrizeps zu Beinbizeps steuert Phase-4-Zweige: Ham > Quad → MethylKomplex; Quad > Ham → Darm/Glutamin oder bei erneutem Quad Leber Phase 2/Liv.52; Quad > Ham plus Bauch unter den ersten drei Prioritäten → Pectasol-Zweig; Quad + Ham plus Einschlafproblem → Glycin; wiederkehrender Ham → liposomales Glutathion.",
+      "falten": ["quadrizeps", "beinbizeps", "bauch"]
+    },
+    {
+      "id": "wade-beine",
+      "regel": "Wade plus Beinbizeps führt zum MethylKomplex-Zweig; Wade plus Quadrizeps und Beinbizeps zum Glycin-Zweig. Ohne Beinfalten entscheidet das konkrete Schlafmuster zwischen Neuromag/Taurin, liposomalem Melatonin und Greens/Chlorella.",
+      "falten": ["wade", "quadrizeps", "beinbizeps"]
+    },
+    {
+      "id": "ruecken-huefte",
+      "regel": "Rücken + Hüfte unter 18 mm bedeutet laut Seminarregel, dass grundsätzlich Kohlenhydrate möglich sind; Kalorienziel, Qualität, Training und Verlauf bleiben entscheidend.",
+      "falten": ["ruecken", "huefte"]
+    }
+  ],
+  "quellenkonflikte": [
+    {
+      "thema": "Waden-Norm Frauen",
+      "varianten": ["8 mm in den strukturierten Hautfalten-Notizen", "unter 10 mm im älteren Übersichtsartikel"],
+      "entscheidung_app": "8 mm als konservativer Zielwert; der ältere 10-mm-Wert bleibt als Quellenhinweis dokumentiert."
+    },
+    {
+      "thema": "ChloroMalat in Quad/Beinbizeps Phase 3",
+      "varianten": ["4 vs in den strukturierten Hautfalten-Notizen", "6 vs in den späteren Workshop-Notizen"],
+      "entscheidung_app": "6 vs aus den späteren Workshop-Notizen, mit dokumentiertem Ausschleichen; fachliche Produkt- und Verträglichkeitsprüfung erforderlich."
+    },
+    {
+      "thema": "Magnesium in Bauch/Brust/Trizeps Phase 3",
+      "varianten": ["2 vs in den strukturierten Hautfalten-Notizen", "4 vs in einer Workshop-Fassung"],
+      "entscheidung_app": "2 vs aus der strukturierten Zusammenfassung; Gesamtzufuhr und Verträglichkeit fachlich prüfen."
+    },
+    {
+      "thema": "Bizeps-Norm",
+      "varianten": ["keine feste Norm in einer Workshop-Folie", "2 mm Männer / 5 mm Frauen in den strukturierten Notizen"],
+      "entscheidung_app": "2/5 mm als Orientierungswert, ausdrücklich nicht als harte Norm."
+    }
+  ],
   "prioritaetsregeln": {
-    "beschreibung": "Falten werden chronologisch nach Priorität abgearbeitet – Prio 1 zuerst, danach Prio 2, usw. In jeder Phase wird die Prio-1-Falte behandelt, dann in der nächsten Phase die nächste Prio.",
-    "beispiel": "Wenn Bauch = 1, Trizeps = 2, Brust = 3: Phase 1 arbeitet an Bauch, Phase 2 wieder an Bauch (nächster Level), Phase 3 wechselt zu Trizeps.",
+    "beschreibung": "Bei jeder vollständigen Messung wird die aktuell führende Protokollgruppe behandelt. Wird dieselbe Gruppe bei einer späteren Messung erneut Priorität 1, steigt sie chronologisch von Phase 1 auf Phase 2, danach Phase 3 und anschließend in die bedingungsabhängigen Phase-4+-Varianten.",
+    "beispiel": "Messung 1: Quad/Beinbizeps ist Priorität 1 → Phase 1. Messung 2: Bauch/Brust/Trizeps ist Priorität 1 → dort Phase 1. Messung 3: Quad/Beinbizeps ist erneut Priorität 1 → dort Phase 2.",
     "spezialfaelle": [
       {
         "situation": "Sehr hohe Trizepsfalte",

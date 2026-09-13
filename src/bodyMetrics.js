@@ -11,7 +11,7 @@ import { getPreference, setPreference } from './userPreferences.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import {
-  assessSkinfoldPriorities,
+  buildSkinfoldPlan,
   bravermanComplete,
   bravermanRecommendations,
   scoreBravermanAssessment,
@@ -230,25 +230,42 @@ function faltenLegendeMarkup(state) {
 }
 
 function ypsiPriorityMarkup(state) {
-  const latest = state.skinfolds.filter((row) => row.total != null).at(-1);
-  if (!latest) return `<section class="ypsi-priority-empty">
+  const recentSleep = state.sleep.slice(-7);
+  const average = (values) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
+  const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, {
+    recentEnergy: average(recentSleep.map((row) => Number(row.energy)).filter(Number.isFinite)),
+    recentSleep: average(recentSleep.map((row) => Number(row.quality)).filter(Number.isFinite)),
+  });
+  if (!plan) return `<section class="ypsi-priority-empty">
     <b>YPSI-Prioritäten</b>
     <span>Nach deiner ersten vollständigen Messung ordnet CAPBOY die vier Protokollgruppen und zeigt die passende Startphase.</span>
   </section>`;
-  const priorities = assessSkinfoldPriorities(latest.falten, state.settings.calculation_basis);
-  if (!priorities.length) return '';
   return `<section class="ypsi-priority-block">
-    <header><span><small>YPSI-ASSESSMENT</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(latest.gemessen_am)}</em></header>
-    <p>Die Rangfolge vergleicht deine vier protokollierten YPSI-Gruppen innerhalb derselben Messung. Tippe eine Priorität an, um Phasen, Ernährung, Schlaf und Supplements aus den Seminarunterlagen zu sehen.</p>
-    <div class="ypsi-priority-list">${priorities.map((priority) => {
-      const phaseOne = priority.protocols.find((protocol) => Number(protocol.phase) === 1);
+    <header><span><small>YPSI-ASSESSMENT</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(plan.date)}</em></header>
+    <div class="ypsi-top-fold"><small>PRIORISIERTE PROTOKOLLFALTE</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm · Rang 1 im Protokollassessment${plan.topFold.foldPriority > 1 ? ` · interner Faltenrang ${plan.topFold.foldPriority}` : ''}</span></div>
+    <p>Die App verknüpft die führende Falte mit den vier protokollierten Gruppen, früheren Messungen und den Gegenfalten aus den Seminarunterlagen. Tippe eine Gruppe an, um Ernährung, Schlaf, Supplements und die Begründung zu sehen.</p>
+    <div class="ypsi-priority-list">${plan.priorities.map((priority) => {
+      const currentProtocol = priority.recommendedProtocols[0] || priority.phaseProtocols[0];
       const values = priority.details.map((item) => `${item.label} ${display(item.value)} mm`).join(' · ');
       return `<button type="button" data-ypsi-priority="${priority.id}">
-        <i>${priority.priority}</i><span><b>${escapeHtml(priority.label)}</b><small>${escapeHtml(values)}</small>${phaseOne?.fokus ? `<em>${escapeHtml(phaseOne.fokus)}</em>` : ''}</span>${materialIconMarkup('chevron_right')}
+        <i>${priority.priority}</i><span><b>${escapeHtml(priority.label)}</b><small>Führend: ${escapeHtml(priority.primaryFold.label)} · ${escapeHtml(values)}</small>${priority.priority === 1 ? `<em>Aktueller Schritt: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}${currentProtocol?.fokus ? ` · ${escapeHtml(currentProtocol.fokus)}` : ''}</em>` : `<em>Nächster möglicher Einstieg: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</em>`}</span>${materialIconMarkup('chevron_right')}
       </button>`;
     }).join('')}</div>
-    <p class="ypsi-method-note"><b>Zusammenspiel:</b> Die YPSI-Strategie ergänzt deine Kalorien- und Gewichtssteuerung. Sie ersetzt weder das Energiedefizit noch die Verlaufskontrolle.</p>
+    <p class="ypsi-method-note"><b>Phasenlogik:</b> Wird dieselbe Gruppe bei einer späteren Messung erneut Priorität 1, folgt dort die nächste Phase. Die YPSI-Strategie ergänzt deine Kalorien- und Gewichtssteuerung; sie ersetzt sie nicht.</p>
   </section>`;
+}
+
+function ypsiProtocolMarkup(protocol, open = false) {
+  const supplements = [
+    ...(protocol.supplemente || []).map((item) => ({ ...item, optional: false })),
+    ...(protocol.optionale_supplemente || []).map((item) => ({ ...item, optional: true })),
+  ];
+  return `<details class="falten-protokoll-item"${open ? ' open' : ''}><summary><span><b>${escapeHtml(protocol.name)}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</span>${materialIconMarkup('chevron_right')}</summary>
+    ${protocol.bedingungen?.length ? `<div class="ypsi-protocol-conditions"><b>Passt nur, wenn:</b><ul>${protocol.bedingungen.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>` : ''}
+    <ul>${supplements.map((supplement) => {
+      const safety = supplementSafety(supplement.slug);
+      return `<li><span><b>${escapeHtml(supplementName(supplement.slug))}${supplement.optional ? ' · optional' : ''}</b>${safety ? `<small>${escapeHtml(safety)}</small>` : ''}</span>${supplement.dosierung ? `<strong>${escapeHtml(supplement.dosierung)}</strong>` : ''}</li>`;
+    }).join('')}</ul>${protocol.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(protocol.notiz)}</p>` : ''}</details>`;
 }
 
 function ypsiPriorityDetailMarkup(priority) {
@@ -259,16 +276,17 @@ function ypsiPriorityDetailMarkup(priority) {
     phase,
     protocols: priority.protocols.filter((protocol) => Number(protocol.phase) === phase),
   })).filter((group) => group.protocols.length);
-  return `<header class="falten-detail-header"><div><small>YPSI-PRIORITÄT ${priority.priority}</small><h2>${escapeHtml(priority.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const currentProtocols = priority.recommendedProtocols.length ? priority.recommendedProtocols : priority.phaseProtocols;
+  return `<header class="falten-detail-header"><div><small>YPSI-PRIORITÄT ${priority.priority} · PHASE ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</small><h2>${escapeHtml(priority.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="falten-detail-body ypsi-priority-detail">
-      <section class="ypsi-detail-values">${priority.details.map((item) => `<span><small>${escapeHtml(item.label)}</small><b>${display(item.value)} mm</b></span>`).join('')}</section>
+      <section class="ypsi-primary-fold"><small>PRIORISIERTE FALTE DIESER GRUPPE</small><b>${escapeHtml(priority.primaryFold.label)}</b><span>${display(priority.primaryFold.value)} mm · Faltenrang ${priority.primaryFold.foldPriority}</span></section>
+      <section class="ypsi-detail-values">${priority.details.map((item) => `<span${item.slug === priority.primaryFold.slug ? ' class="is-primary"' : ''}><small>${escapeHtml(item.label)}</small><b>${display(item.value)} mm</b></span>`).join('')}</section>
+      ${priority.priority === 1 ? `<section class="falten-detail-section ypsi-current-step"><h3>Aktueller Vorschlag: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</h3><p>Diese Gruppe war in ${priority.occurrences} vollständigen Messung${priority.occurrences === 1 ? '' : 'en'} Priorität 1. ${priority.suggestedPhase < 4 ? 'Daraus folgt der nächste chronologische Basisschritt.' : 'Ab Phase 4 entscheidet die passende Wechselbeziehung bzw. Symptomatik über die Variante.'}</p>${currentProtocols.length ? `<div class="falten-detail-protokolle">${currentProtocols.map((protocol) => ypsiProtocolMarkup(protocol, true)).join('')}</div>` : '<p><b>Noch keine Variante automatisch gewählt.</b> Die Messwerte allein unterscheiden die Phase-4-Zweige nicht sicher. Prüfe die Bedingungen unter „Wechselbeziehungen“.</p>'}</section>` : `<section class="falten-detail-section"><h3>Noch nicht der aktive Schritt</h3><p>Diese Gruppe liegt aktuell auf Rang ${priority.priority}. Wird sie in einer späteren Messung Priorität 1, wäre Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase} der aus dem Verlauf abgeleitete Einstieg.</p></section>`}
+      ${priority.relationships.length ? `<section class="falten-detail-section ypsi-relations"><h3>Wechselbeziehungen aus den Unterlagen</h3>${priority.relationships.map((relation) => `<article class="ypsi-relation is-${relation.tone}"><b>${escapeHtml(relation.title)}</b><p>${escapeHtml(relation.summary)}</p><small>${escapeHtml(relation.basis)}</small>${relation.actions.length ? `<ul>${relation.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}</article>`).join('')}</section>` : ''}
       ${causes.length ? `<section class="falten-detail-section"><h3>Kontext aus dem Seminar</h3><div class="falten-detail-tags">${causes.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div></section>` : ''}
       ${lifestyle.length ? `<section class="falten-detail-section"><h3>Ernährung, Alltag & Schlaf</h3><ul class="falten-detail-hinweise">${lifestyle.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
-      <section class="falten-detail-section"><h3>Phasenprotokolle</h3><p class="falten-detail-hinweis">Beginne nicht mit allen Phasen gleichzeitig. Die Unterlagen sehen Phase 1 bis 3 als aufeinanderfolgende Schritte; Phase 4+ dient der gezielten Feinjustierung.</p>
-        <div class="falten-detail-protokolle">${protocolsByPhase.map((phaseGroup) => `<section class="ypsi-phase-group"><h4>Phase ${phaseGroup.phase === 4 ? '4+' : phaseGroup.phase}</h4>${phaseGroup.protocols.map((protocol) => `<details class="falten-protokoll-item"${phaseGroup.phase === 1 ? ' open' : ''}><summary><span><b>${escapeHtml(protocol.name)}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</span>${materialIconMarkup('chevron_right')}</summary><ul>${(protocol.supplemente || []).map((supplement) => {
-          const safety = supplementSafety(supplement.slug);
-          return `<li><span><b>${escapeHtml(supplementName(supplement.slug))}</b>${safety ? `<small>${escapeHtml(safety)}</small>` : ''}</span>${supplement.dosierung ? `<strong>${escapeHtml(supplement.dosierung)}</strong>` : ''}</li>`;
-        }).join('')}</ul>${protocol.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(protocol.notiz)}</p>` : ''}</details>`).join('')}</section>`).join('')}</div>
+      <section class="falten-detail-section"><h3>Alle Phasen zum Nachschlagen</h3><p class="falten-detail-hinweis">Nicht gleichzeitig beginnen: Phase 1 bis 3 werden nur bei wiederkehrender Priorität chronologisch durchlaufen. Phase 4+ ist eine bedingungsabhängige Auswahl.</p>
+        <div class="falten-detail-protokolle">${protocolsByPhase.map((phaseGroup) => `<section class="ypsi-phase-group"><h4>Phase ${phaseGroup.phase === 4 ? '4+' : phaseGroup.phase}</h4>${phaseGroup.protocols.map((protocol) => ypsiProtocolMarkup(protocol, phaseGroup.phase === priority.suggestedPhase && priority.priority === 1)).join('')}</section>`).join('')}</div>
       </section>
       <p class="falten-detail-disclaimer">Praxisstrategie aus deinen YPSI-Seminarunterlagen. Prüfe Produkte, Dosierungen, Erkrankungen und Medikamente vor der Einnahme fachlich. Die Kaloriensteuerung in TRACKER läuft unabhängig weiter.</p>
     </div>`;
@@ -737,9 +755,13 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   };
 
   const openYpsiPriority = (groupId) => {
-    const latest = state.skinfolds.filter((row) => row.total != null).at(-1);
-    const priority = latest && assessSkinfoldPriorities(latest.falten, state.settings.calculation_basis)
-      .find((item) => item.id === groupId);
+    const recentSleep = state.sleep.slice(-7);
+    const average = (values) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
+    const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, {
+      recentEnergy: average(recentSleep.map((row) => Number(row.energy)).filter(Number.isFinite)),
+      recentSleep: average(recentSleep.map((row) => Number(row.quality)).filter(Number.isFinite)),
+    });
+    const priority = plan?.priorities.find((item) => item.id === groupId);
     if (!priority) return;
     createSpecialDexOverlay({
       colorScope: 'body',

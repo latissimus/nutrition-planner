@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "quelle": "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop & Advanced Supplementation, Stuttgart Februar/Juli 2017 (Wolfgang Unsöld)",
   "hinweis": "Alle Protokolle sind Praxis-Empfehlungen aus dem YPSI-System. Sie ersetzen keine ärztliche/therapeutische Beratung. Standard-Timing: F = zum Frühstück, vs = vor dem Schlafen, PWO = Post-Workout. Ohne Timing = über den Tag verteilt.",
   "abkuerzungen": {
@@ -78,6 +78,7 @@
       "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
       "phase": 4,
       "variant": "methylkomplex",
+      "bedingungen": ["Beinbizeps ist höher als Quadrizeps", "oder Wade und Beinbizeps sind gemeinsam auffällig"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -87,6 +88,24 @@
       "fokus": "MethylKomplex – wirkt v. a. auf Beinbizeps (Ham) und Quadrizeps",
       "quelle": "Körperfett-Assessment S. 12"
     },
+    "quad-beinbizeps-phase-4-pectasol": {
+      "id": "quad-beinbizeps-phase-4-pectasol",
+      "name": "Quad/Beinb. – Phase 4+ · Pectasol",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps", "bauch"],
+      "phase": 4,
+      "variant": "pectasol",
+      "bedingungen": ["Quadrizeps ist höher als Beinbizeps", "Bauch gehört in der internen Faltenrangfolge zu den ersten drei", "Darm-/Verdauungs- und Quecksilberkontext passt", "Basisphasen mit Chlorenergy und Chlorella wurden zuvor bearbeitet"],
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "pectasol", "dosierung": "20 g F" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Darm/Verdauung/Quecksilber – nur nach den Basisphasen und passender Konstellation",
+      "notiz": "Nur Econugenics-Produkt. Pectasol laut Unterlagen nicht vor Chlorenergy und Chlorella einsetzen.",
+      "quelle": "Hautfalten Notizen S. 10, Supplements S. 2"
+    },
     "quad-beinbizeps-phase-4-glutamin": {
       "id": "quad-beinbizeps-phase-4-glutamin",
       "name": "Quad/Beinb. – Phase 4+ · Glutamin",
@@ -94,6 +113,7 @@
       "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
       "phase": 4,
       "variant": "glutamin",
+      "bedingungen": ["Quadrizeps ist höher als Beinbizeps", "Darm-/Verdauungs- oder Leaky-Gut-Zeichen passen"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -110,6 +130,7 @@
       "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
       "phase": 4,
       "variant": "liv52",
+      "bedingungen": ["Quadrizeps wird nach vorheriger Bearbeitung erneut Priorität 1", "Leber-Phase-2-Kontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -127,6 +148,7 @@
       "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
       "phase": 4,
       "variant": "glycin",
+      "bedingungen": ["Quadrizeps und Beinbizeps sind gemeinsam auffällig", "Einschlafproblem passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -143,6 +165,7 @@
       "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
       "phase": 4,
       "variant": "lipo-gsh",
+      "bedingungen": ["Beinbizeps wird nach vorheriger Bearbeitung erneut Priorität 1", "Leber-Phase-2-/Entgiftungskontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -155,9 +178,9 @@
     },
     "bauch-brust-phase-1": {
       "id": "bauch-brust-phase-1",
-      "name": "Bauch/Brust – Phase 1",
+      "name": "Bauch/Brust/Trizeps – Phase 1",
       "gruppe": "bauch-brust",
-      "gilt_fuer_falten": ["bauch", "brust"],
+      "gilt_fuer_falten": ["bauch", "brust", "trizeps"],
       "phase": 1,
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
@@ -169,9 +192,9 @@
     },
     "bauch-brust-phase-2": {
       "id": "bauch-brust-phase-2",
-      "name": "Bauch/Brust – Phase 2",
+      "name": "Bauch/Brust/Trizeps – Phase 2",
       "gruppe": "bauch-brust",
-      "gilt_fuer_falten": ["bauch", "brust"],
+      "gilt_fuer_falten": ["bauch", "brust", "trizeps"],
       "phase": 2,
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
@@ -184,13 +207,13 @@
     },
     "bauch-brust-phase-3": {
       "id": "bauch-brust-phase-3",
-      "name": "Bauch/Brust – Phase 3",
+      "name": "Bauch/Brust/Trizeps – Phase 3",
       "gruppe": "bauch-brust",
-      "gilt_fuer_falten": ["bauch", "brust"],
+      "gilt_fuer_falten": ["bauch", "brust", "trizeps"],
       "phase": 3,
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
-        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "ypsi-magnesium", "dosierung": "2 vs" },
         { "slug": "chlorenergy", "dosierung": "3×6" },
         { "slug": "vitamin-d-k", "dosierung": "10 F" }
       ],
@@ -199,27 +222,29 @@
     },
     "bauch-brust-phase-4-chlorella": {
       "id": "bauch-brust-phase-4-chlorella",
-      "name": "Bauch/Brust – Phase 4+ · Chlorella",
+      "name": "Bauch/Brust/Trizeps – Phase 4+ · Chlorella",
       "gruppe": "bauch-brust",
-      "gilt_fuer_falten": ["bauch", "brust"],
+      "gilt_fuer_falten": ["bauch", "brust", "trizeps"],
       "phase": 4,
       "variant": "chlorella",
+      "bedingungen": ["Bauch ist hoch", "die Person wacht gut auf und hat ein gutes Aktivitäts-/Energielevel", "Darm-/Verdauungskontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
         { "slug": "chlorella-komplex", "dosierung": "3×4" },
         { "slug": "vitamin-d-k", "dosierung": "10 F" }
       ],
-      "fokus": "Darm/Verdauung – wenn Bauch das Problem ist und man 'schlechte Flüssigkeit' hat",
+      "fokus": "Darm/Verdauung – wenn Bauch hoch ist, Aufwachen und Aktivitätslevel aber gut sind",
       "quelle": "Körperfett-Assessment S. 13"
     },
     "bauch-brust-phase-4-neuromag": {
       "id": "bauch-brust-phase-4-neuromag",
-      "name": "Bauch/Brust – Phase 4+ · Neuromag",
+      "name": "Bauch/Brust/Trizeps – Phase 4+ · Neuromag",
       "gruppe": "bauch-brust",
-      "gilt_fuer_falten": ["bauch", "brust"],
+      "gilt_fuer_falten": ["bauch", "brust", "trizeps"],
       "phase": 4,
       "variant": "neuromag",
+      "bedingungen": ["Bauch ist hoch", "die Person kommt schlecht zur Ruhe", "Einschlaf-/GABA-Kontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "neuromag", "dosierung": "6 vs" },
@@ -231,18 +256,23 @@
     },
     "bauch-brust-phase-4-licorice": {
       "id": "bauch-brust-phase-4-licorice",
-      "name": "Bauch/Brust – Phase 4+ · Licorice",
+      "name": "Bauch/Brust/Trizeps – Phase 4+ · Licorice",
       "gruppe": "bauch-brust",
-      "gilt_fuer_falten": ["bauch", "brust"],
+      "gilt_fuer_falten": ["bauch", "brust", "trizeps"],
       "phase": 4,
       "variant": "licorice",
+      "bedingungen": ["Morgenenergie/Drive ist das Hauptproblem"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-inositol", "dosierung": "1 vs" },
         { "slug": "licorice-komplex", "dosierung": "1 F" },
         { "slug": "vitamin-d-k", "dosierung": "10 F" }
       ],
-      "fokus": "Energie am Morgen (wenn Drive morgens großes Problem ist)",
+      "optionale_supplemente": [
+        { "slug": "bacopa-monnieri", "dosierung": "bei sehr großem Drive-Problem im Wechsel mit Licorice; Produktdosis fachlich prüfen" }
+      ],
+      "fokus": "Energie am Morgen (wenn Drive morgens das Hauptproblem ist)",
+      "notiz": "Ist der fehlende Drive morgens ein sehr großes Problem, nennen die Unterlagen Licorice und Bacopa Monnieri im Wechsel. Nicht automatisch kombinieren; Kontraindikationen und Blutdruck prüfen.",
       "quelle": "Körperfett-Assessment S. 13"
     },
     "huefte-phase-1": {
@@ -342,6 +372,7 @@
       "gilt_fuer_falten": ["wade"],
       "phase": 4,
       "variant": "neuromag",
+      "bedingungen": ["Einschlafen und Durchschlafen sind problematisch", "GABA-Kontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "neuromag", "dosierung": "6 vs" },
@@ -358,6 +389,7 @@
       "gilt_fuer_falten": ["wade"],
       "phase": 4,
       "variant": "methylkomplex",
+      "bedingungen": ["Wade und Beinbizeps sind gemeinsam auffällig"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -374,6 +406,7 @@
       "gilt_fuer_falten": ["wade"],
       "phase": 4,
       "variant": "glycin",
+      "bedingungen": ["Wade, Quadrizeps und Beinbizeps sind gemeinsam auffällig", "Einschlafproblem passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -390,6 +423,7 @@
       "gilt_fuer_falten": ["wade"],
       "phase": 4,
       "variant": "taurin",
+      "bedingungen": ["Einschlafproblem mit GABA-Kontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "taurin", "dosierung": "6 vs" },
@@ -407,6 +441,7 @@
       "gilt_fuer_falten": ["wade"],
       "phase": 4,
       "variant": "lipo-melatonin",
+      "bedingungen": ["Einschlafproblem mit Serotonin-Kontext passt"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
@@ -423,6 +458,7 @@
       "gilt_fuer_falten": ["wade"],
       "phase": 4,
       "variant": "greens",
+      "bedingungen": ["Durchschlafproblem bzw. Aufwachen zwischen 3 und 7 Uhr"],
       "supplemente": [
         { "slug": "multikomplex", "dosierung": "3×2" },
         { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
