@@ -333,7 +333,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
    aufgebaut werden, und verschwindet erst beim atomaren Seitenwechsel. */
 .app-start-splash{
   position:fixed;z-index:2000;inset:0;display:flex;align-items:center;
-  justify-content:center;background:#4B0082;
+  justify-content:center;background:#432C5E;
   padding:20px 20px calc(20px + env(safe-area-inset-bottom));
 }
 .app-start-splash .brand{
@@ -1205,6 +1205,24 @@ label.fld-l,.falte span{font-family:var(--ui);color:var(--app-secondary)}
 .auth-title{color:var(--app-purple);font-style:normal}
 .auth-sub{color:var(--app-secondary)}
 .auth-switch button{color:var(--app-purple)}
+
+/* Anmeldung und Recovery greifen das CAPCOIN-Violett auf. Formularflächen
+   bleiben weiß und lesbar; das Laufband fährt als klare weiße Ebene ab. */
+:root[data-seite="auth"],:root[data-seite="auth"] body,:root[data-seite="auth"] #app{
+  background:#432C5E!important;
+}
+:root[data-seite="auth"] .auth-marquee{
+  background:#fff!important;
+  color:#111!important;
+  border-bottom-color:#111!important;
+}
+:root[data-seite="auth"] .auth-shell{color:#fff}
+:root[data-seite="auth"] .auth-marke .brand{--sil-filter:brightness(0) invert(1)}
+:root[data-seite="auth"] .auth-sub{color:rgba(255,255,255,.78)}
+:root[data-seite="auth"] .auth-shell [data-auth-form]{background:#fff;color:#111;border-color:#111}
+:root[data-seite="auth"] .auth-shell [data-auth-form] :is(.fld-l,label){color:#4E4557}
+:root[data-seite="auth"] .auth-shell [data-auth-form] .input{background:#fff;color:#111;border-color:#111}
+:root[data-seite="auth"] .auth-switch button{color:#FFF8ED}
 
 @media(max-width:520px){
   .wrap{padding-inline:12px}

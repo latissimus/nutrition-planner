@@ -17,6 +17,24 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.app-dex-tab[data-sammlung="stress"] .app-dex-tab-icon{transform:scale(1.09)}');
   });
 
+  it('verwendet das CAPCOIN-Violett auf Splash und Anmeldung', () => {
+    expect(indexHtml).toContain('<meta name="theme-color" content="#432C5E">');
+    expect(indexHtml).toContain('background:#432C5E!important');
+    expect(manifest).toContain('"background_color": "#432C5E"');
+    expect(css).toContain(':root[data-seite="auth"] .auth-marquee{');
+    expect(css).toContain('background:#fff!important;\n  color:#111!important;');
+  });
+
+  it('installiert die PWA als CAPBOY mit dem freigegebenen CAPCOIN-Icon', () => {
+    expect(manifest).toContain('"name": "CAPBOY"');
+    expect(manifest).toContain('"short_name": "CAPBOY"');
+    expect(manifest).toContain('"src": "capboy-icon-192-v5.png"');
+    expect(manifest).toContain('"src": "capboy-icon-512-v5.png"');
+    expect(indexHtml).toContain('name="apple-mobile-web-app-title" content="CAPBOY"');
+    expect(indexHtml).toContain('href="./capboy-apple-touch-icon-v5.png"');
+    expect(indexHtml).toContain('href="./capboy-app-icon-v5.svg"');
+  });
+
   it('legt die gemeinsame Kartenachse zentral fest', () => {
     expect(designSystem).toContain('--cap-page-inline:28px');
     expect(designSystem).toContain('--cap-reference-inline:18.5px');
@@ -88,14 +106,14 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("actions.title || 'Seite bearbeiten'");
   });
 
-  it('verwendet ROUTINEN-Lila und eine weisse Silhouette im Splash', () => {
+  it('verwendet CAPCOIN-Violett und eine weisse Silhouette im Splash', () => {
     const splashStart = css.indexOf('.app-start-splash{');
     const splashEnd = css.indexOf('.app-logo-font-ready', splashStart);
     const splashCss = css.slice(splashStart, splashEnd);
-    expect(indexHtml).toContain('name="theme-color" content="#4B0082"');
-    expect(indexHtml).toContain('background:#4B0082!important');
-    expect(manifest).toContain('"background_color": "#4B0082"');
-    expect(splashCss).toContain('background:#4B0082');
+    expect(indexHtml).toContain('name="theme-color" content="#432C5E"');
+    expect(indexHtml).toContain('background:#432C5E!important');
+    expect(manifest).toContain('"background_color": "#432C5E"');
+    expect(splashCss).toContain('background:#432C5E');
     expect(splashCss).toContain('.app-start-splash .brand{');
     expect(splashCss).toContain('--sil-filter:brightness(0) invert(1)');
   });
