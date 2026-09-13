@@ -17,6 +17,7 @@ export async function registriereServiceWorker() {
   const registration = await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
   let neuerWorker = registration.waiting || null;
   let wechselGestartet = false;
+  let schnellePruefung = null;
   const beobachteteWorker = new WeakSet();
 
   const updateButton = document.querySelector('.pwa-update-button') || document.createElement('button');
@@ -35,6 +36,10 @@ export async function registriereServiceWorker() {
     updateButton.disabled = false;
     updateButton.querySelector('small').textContent = 'Jetzt aktualisieren';
     updateButton.hidden = false;
+    if (schnellePruefung != null) {
+      clearInterval(schnellePruefung);
+      schnellePruefung = null;
+    }
   };
 
   // register() kann bereits eine Installation anstossen, bevor sein Promise
@@ -88,7 +93,22 @@ export async function registriereServiceWorker() {
     if (document.visibilityState === 'visible') void aufUpdatePruefen();
   });
   window.addEventListener('pageshow', aufUpdatePruefen);
+  window.addEventListener('focus', aufUpdatePruefen);
   window.addEventListener('online', aufUpdatePruefen);
+
+  // GitHub Pages liefert sw.js mit bis zu zehn Minuten Cachezeit aus. Wird die
+  // PWA direkt nach einem Deployment geöffnet, kann der erste Check deshalb
+  // noch den alten Worker sehen. Während dieser Phase prüfen wir minütlich;
+  // danach genügt wieder das reguläre 15-Minuten-Intervall.
+  let schnellePruefungen = 0;
+  schnellePruefung = setInterval(() => {
+    schnellePruefungen += 1;
+    void aufUpdatePruefen();
+    if (schnellePruefungen >= 12 && schnellePruefung != null) {
+      clearInterval(schnellePruefung);
+      schnellePruefung = null;
+    }
+  }, 60 * 1000);
   setInterval(aufUpdatePruefen, 15 * 60 * 1000);
 
   // Der Listener steht jetzt, bevor aktiv geprueft wird. So kann auch ein
