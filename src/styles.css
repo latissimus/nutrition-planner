@@ -8519,6 +8519,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Header: dieselbe ruhige Statushierarchie wie im fertigen TRACKER. */
 .app-dex-header-actions{gap:4px}
+.app-dex-search{
+  display:grid;
+  place-items:center;
+  flex:0 0 32px;
+  width:32px;
+  height:32px;
+  border:0;
+  border-radius:9px;
+  color:var(--dex-ink,#24304A);
+  text-decoration:none;
+}
+.app-dex-search-icon,.app-dex-search-icon>svg{display:block;width:29px;height:29px}
+.app-dex-search.aktiv{background:color-mix(in srgb,#fff 62%,var(--dex-seitenfarbe,#FFF8ED))}
+.app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(1.5px 1.5px 0 currentColor)}
 .app-dex-header .coin-kopfstand{gap:0;height:34px}
 .app-dex-header .coin-kopfstand .coin-kopf-symbol{
   width:25px;
@@ -8535,6 +8549,62 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .app-dex-sync{height:21px}
 :root[data-theme="dark"] .app-dex-header .coin-kopfstand strong{color:#C7CFDC}
+
+/* Das MIND-Piktogramm ist im gelieferten SVG optisch kleiner als die übrigen
+   Seitenicons. Nur seine innere Zeichnung wächst, das 56-px-Tabraster bleibt
+   unverändert. */
+.app-dex-tab[data-sammlung="stress"] .app-dex-tab-icon{transform:scale(1.09)}
+
+/* Globale Suche, bewusst als neutrale Wissensansicht statt als elfter Dex. */
+:root[data-seite="search"],:root[data-seite="search"] body{
+  background:#FFF8ED!important;
+  color:#241B2F;
+}
+:root[data-seite="search"] .app-dex-header{background:#FFF8ED!important;color:#241B2F!important;--dex-ink:#241B2F}
+:root[data-seite="search"] .app-dex-dock{--dex-ink:#241B2F;color:#241B2F!important}
+.wissenssuche-seite{background:#FFF8ED;color:#241B2F;overflow:hidden}
+.wissenssuche-scroll{
+  box-sizing:border-box;width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 24px) 0 calc(96px + env(safe-area-inset-bottom));
+}
+.wissenssuche-wrap{width:min(calc(100% - (2 * var(--cap-reference-inline))),604px);margin-inline:auto}
+.wissenssuche-titel{position:relative;padding:4px 2px 18px}
+.wissenssuche-titel>span{display:block;color:#665C70;font:850 10px/1 var(--tech);letter-spacing:.12em;text-transform:uppercase}
+.wissenssuche-titel h1{max-width:78%;margin:7px 0 0;font:850 clamp(25px,7.8vw,38px)/.98 var(--display);font-style:italic;letter-spacing:-.035em}
+.wissenssuche-titel a{position:absolute;right:2px;bottom:20px;color:#241B2F;font:800 12px/1 var(--ui);text-decoration:none}
+.wissenssuche-feld{
+  display:grid;grid-template-columns:34px minmax(0,1fr) 36px;align-items:center;min-height:58px;padding:0 10px 0 14px;
+  border:2px solid #111;border-radius:16px;background:#fff;box-shadow:0 3px 0 #111;
+}
+.wissenssuche-feld>span{position:relative;width:19px;height:19px;border:3px solid #241B2F;border-radius:50%}
+.wissenssuche-feld>span::after{content:"";position:absolute;width:9px;height:3px;right:-7px;bottom:-4px;border-radius:2px;background:#241B2F;transform:rotate(45deg)}
+.wissenssuche-feld input{min-width:0;height:54px;border:0;outline:0;background:transparent;color:#241B2F;font:700 16px/1 var(--ui)}
+.wissenssuche-feld input::placeholder{color:#968D9B}
+.wissenssuche-feld input::-webkit-search-cancel-button{display:none}
+.wissenssuche-feld button{width:34px;height:34px;border:0;border-radius:50%;background:#EEE8F0;color:#241B2F;font:700 23px/1 var(--ui)}
+.wissenssuche-filter{display:flex;gap:8px;margin:18px 0 20px;overflow-x:auto;scrollbar-width:none}
+.wissenssuche-filter::-webkit-scrollbar{display:none}
+.wissenssuche-filter button{flex:0 0 auto;min-height:39px;padding:0 15px;border:1.5px solid #241B2F;border-radius:999px;background:#fff;color:#241B2F;font:800 12px/1 var(--ui)}
+.wissenssuche-filter button.aktiv{background:#241B2F;color:#FFF8ED}
+.wissenssuche-status{display:grid;gap:7px;min-height:140px;place-content:center;padding:24px;text-align:center}
+.wissenssuche-status b{font:800 17px/1.2 var(--ui)}
+.wissenssuche-status span{max-width:310px;color:#665C70;font:600 13px/1.45 var(--ui)}
+.wissenssuche-gruppe{margin:0 0 24px}
+.wissenssuche-gruppe h2{display:flex;align-items:baseline;gap:8px;margin:0 0 10px;padding-inline:2px;font:850 18px/1 var(--display);font-style:italic}
+.wissenssuche-gruppe h2 span{color:#665C70;font:750 11px/1 var(--tech);font-style:normal}
+.wissenssuche-gruppe>div{overflow:hidden;border:1.5px solid #111;border-radius:15px;background:#fff;box-shadow:0 3px 0 #111}
+.wissenssuche-treffer{display:grid;gap:5px;padding:14px 16px;color:#241B2F;text-decoration:none}
+.wissenssuche-treffer+.wissenssuche-treffer{border-top:1px solid #D9D3DC}
+.wissenssuche-treffer-kopf{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wissenssuche-treffer-kopf small{font:850 9px/1 var(--tech);letter-spacing:.08em}
+.wissenssuche-treffer-kopf i{color:#766C7C;font:750 8px/1 var(--tech);font-style:normal;letter-spacing:.07em}
+.wissenssuche-treffer strong{font:800 16px/1.15 var(--ui)}
+.wissenssuche-treffer>span:not(.wissenssuche-treffer-kopf){color:#4F4657;font:600 12px/1.4 var(--ui)}
+.wissenssuche-treffer em{overflow:hidden;color:#766C7C;font:650 10px/1.25 var(--ui);font-style:normal;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:390px){
+  .app-dex-search{flex-basis:29px;width:29px}.app-dex-search-icon,.app-dex-search-icon>svg{width:26px;height:26px}
+  .wissenssuche-titel h1{font-size:25px}.wissenssuche-filter button{padding-inline:13px}
+}
 
 /* Globales Milchglas-Menue: feste Menue-Spalte, unverrueckbare Trennlinie
    und identische Tab-Typografie auf jeder Seite. */

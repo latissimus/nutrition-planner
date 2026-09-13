@@ -40,7 +40,7 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
-import { entryButtonMarkup, hasMenuIcon, menuIconMarkup } from './menuIcons.js';
+import { entryButtonMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup } from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -50,6 +50,7 @@ const remindersModule = () => import('./reminders.js');
 const shoppingModule = () => import('./shoppingList.js');
 const routinesModule = () => import('./routines.js');
 const sleepModule = () => import('./sleep.js');
+const knowledgeSearchModule = () => import('./knowledgeSearch.js');
 
 function dexModulVorbereiten(route = '') {
   const loader = ({
@@ -612,7 +613,7 @@ function appLetzteDexRoute() {
 }
 
 function istAppHauptDex(route, view) {
-  if (route === 'profile') return true;
+  if (route === 'profile' || route === 'search') return true;
   if (APP_DEX_ROUTES.has(route)) return true;
   return route.startsWith('collection/') && Boolean(view?.dataset.appDockRoute);
 }
@@ -680,6 +681,8 @@ function appDexShellZeichnen(route, view) {
   const aktiveDockRoute = view.dataset.appDockRoute || route;
   const istProfil = route === 'profile';
   const istCoins = route === 'coins';
+  const istSuche = route === 'search';
+  const istNebenansicht = istProfil || istSuche;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
@@ -698,6 +701,8 @@ function appDexShellZeichnen(route, view) {
     <div class="app-dex-header-inner">
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
+        <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
+           aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         <span class="app-dex-sync save-dot" role="status"></span>
         <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
@@ -715,7 +720,7 @@ function appDexShellZeichnen(route, view) {
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
       <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
-      <button class="app-dex-menu" type="button" aria-label="${istProfil
+      <button class="app-dex-menu" type="button" aria-label="${istNebenansicht
         ? `Zurück zu ${escapeHtml(appDockTitel(aktiveDockRoute))}`
         : `Menü für ${escapeHtml(appDockTitel(aktiveDockRoute))} öffnen`}">
         ${entryButtonMarkup()}
@@ -752,7 +757,7 @@ function appDexShellZeichnen(route, view) {
   });
 
   dock.querySelector('.app-dex-menu').onclick = () => {
-    if (istProfil) {
+    if (istNebenansicht) {
       location.hash = aktiveDockRoute;
       return;
     }
@@ -807,7 +812,7 @@ function appDexShellAktualisieren(route, view, signal) {
   // Während eines schnellen Durchblätterns zählt nur der zuletzt erreichte
   // Dex. Lokal ist er sofort gespeichert; die Serverkopie folgt gesammelt,
   // sobald die Navigation fünf Sekunden ruht.
-  if (route !== 'profile') {
+  if (route !== 'profile' && route !== 'search') {
     setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
   }
   appDexShellDatenLaden(route, view, signal);
@@ -1305,12 +1310,12 @@ async function renderRoute() {
   // Die frühere Startseite ist durch die feste Dex-Navigation ersetzt. Ein
   // Einstieg über #home landet deshalb beim zuletzt verwendeten Haupt-Dex;
   // neue Konten beginnen im TRACKER-Dex.
-  if ((angefragt === 'home' || angefragt === 'search')) {
+  if (angefragt === 'home') {
     angefragt = appLetzteDexRoute();
     history.replaceState(history.state, '', `#${angefragt}`);
   }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  const istBekannteRoute = ['profile', 'coins'].includes(angefragt)
+  const istBekannteRoute = ['profile', 'coins', 'search'].includes(angefragt)
     || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/');
   let route = istBekannteRoute ? angefragt : appDexFallbackRoute();
@@ -1358,7 +1363,13 @@ async function renderRoute() {
       }
     }
   }
-  if (route === 'profile') {
+  if (route === 'search') {
+    setSeite('search');
+    applyPageLook('search', '#FFF8ED', 'none');
+    view.dataset.appDockRoute = appLetzteDexRoute();
+    const { mountKnowledgeSearch } = await knowledgeSearchModule();
+    await mountKnowledgeSearch(view, { signal, backHref: `#${appLetzteDexRoute()}` });
+  } else if (route === 'profile') {
     setSeite('profile');
     applyPageLook('profile', categoryColor('profile'), 'drops');
     // Das Profil bleibt Teil derselben festen App-Schale. Im Menüband bleibt

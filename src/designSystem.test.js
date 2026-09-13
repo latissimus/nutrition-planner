@@ -10,6 +10,13 @@ const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8'
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 
 describe('CAPBOY Design-System', () => {
+  it('bindet die globale Wissenssuche mit dem gelieferten Seitenicon ein', () => {
+    expect(main).toContain("const knowledgeSearchModule = () => import('./knowledgeSearch.js')");
+    expect(main).toContain("['profile', 'coins', 'search'].includes(angefragt)");
+    expect(main).toContain('aria-label="Wissen durchsuchen"');
+    expect(designSystem).toContain('.app-dex-tab[data-sammlung="stress"] .app-dex-tab-icon{transform:scale(1.09)}');
+  });
+
   it('legt die gemeinsame Kartenachse zentral fest', () => {
     expect(designSystem).toContain('--cap-page-inline:28px');
     expect(designSystem).toContain('--cap-reference-inline:18.5px');

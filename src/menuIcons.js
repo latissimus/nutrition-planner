@@ -43,6 +43,9 @@ for (const [route, file] of Object.entries(routeToFile)) {
   svgByRoute.set(route, prefixInterneIds(entry[1], prefix));
 }
 
+const searchEntry = Object.entries(modules).find(([path]) => path.endsWith('/SUCHE.svg'));
+const searchSvg = searchEntry ? prefixInterneIds(searchEntry[1], 'mdxm-search-') : '';
+
 export function menuIconMarkup(route, className = 'app-dex-tab-icon') {
   const svg = svgByRoute.get(route);
   if (!svg) return '';
@@ -51,6 +54,11 @@ export function menuIconMarkup(route, className = 'app-dex-tab-icon') {
 
 export function hasMenuIcon(route) {
   return svgByRoute.has(route);
+}
+
+export function searchIconMarkup(className = 'app-dex-search-icon') {
+  if (!searchSvg) return '';
+  return `<span class="${className} icon-originalfarben" aria-hidden="true">${searchSvg}</span>`;
 }
 
 export function entryButtonMarkup(className = 'app-dex-menu-icon') {
