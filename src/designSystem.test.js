@@ -28,11 +28,21 @@ describe('CAPBOY Design-System', () => {
   it('installiert die PWA als CAPBOY mit dem freigegebenen CAPCOIN-Icon', () => {
     expect(manifest).toContain('"name": "CAPBOY"');
     expect(manifest).toContain('"short_name": "CAPBOY"');
-    expect(manifest).toContain('"src": "capboy-icon-192-v6.png"');
-    expect(manifest).toContain('"src": "capboy-icon-512-v6.png"');
+    expect(manifest).toContain('"src": "capboy-icon-192-v7.png"');
+    expect(manifest).toContain('"src": "capboy-icon-512-v7.png"');
+    expect(manifest).not.toContain('"purpose": "any maskable"');
     expect(indexHtml).toContain('name="apple-mobile-web-app-title" content="CAPBOY"');
-    expect(indexHtml).toContain('href="./capboy-apple-touch-icon-v6.png"');
-    expect(indexHtml).toContain('href="./capboy-app-icon-v6.svg"');
+    expect(indexHtml).toContain('rel="apple-touch-icon" sizes="180x180" href="./capboy-apple-touch-icon-v7.png"');
+    expect(indexHtml).toContain('rel="apple-touch-icon-precomposed" sizes="180x180" href="./capboy-apple-touch-icon-v7.png"');
+    expect(indexHtml).toContain('href="./capboy-app-icon-v7.svg"');
+  });
+
+  it('entfernt die Auth-Ansicht beim ersten Rendern nach der Anmeldung', () => {
+    const renderChromeStart = main.indexOf('function renderChrome()');
+    const renderChromeEnd = main.indexOf('function ansichtMerken', renderChromeStart);
+    const renderChrome = main.slice(renderChromeStart, renderChromeEnd);
+    expect(renderChrome).toContain("app.querySelector(':scope > .auth-marquee')?.remove()");
+    expect(renderChrome).toContain("app.querySelector(':scope > .auth-shell')?.remove()");
   });
 
   it('legt die gemeinsame Kartenachse zentral fest', () => {

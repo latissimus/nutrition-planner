@@ -832,6 +832,11 @@ window.addEventListener('online', appSyncStatusAktualisieren);
 window.addEventListener('offline', appSyncStatusAktualisieren);
 
 function renderChrome() {
+  // Beim ersten Rendern nach SIGNED_IN existiert noch kein #view, sondern
+  // die eigenständige Auth-Ansicht. Sie muss vollständig verschwinden,
+  // bevor Header, Dock und die angemeldete Seite aufgebaut werden.
+  app.querySelector(':scope > .auth-marquee')?.remove();
+  app.querySelector(':scope > .auth-shell')?.remove();
   app.classList.add('app-shell');
   // Die sichtbare Seite behält ihre ID und sämtliche Layoutregeln bis zum Tausch.
   const view = document.createElement('main');

@@ -23,11 +23,12 @@ const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="10
   <image href="data:image/png;base64,${coinData}" x="152" y="142" width="720" height="720" filter="url(#capcoin-shadow)"/>
 </svg>`;
 
-await writeFile(new URL('../public/capboy-app-icon-v6.svg', import.meta.url), iconSvg);
+await writeFile(new URL('../public/capboy-app-icon-v7.svg', import.meta.url), iconSvg);
 for (const [name, size] of [
-  ['capboy-icon-192-v6.png', 192],
-  ['capboy-icon-512-v6.png', 512],
-  ['capboy-apple-touch-icon-v6.png', 180],
+  ['capboy-icon-192-v7.png', 192],
+  ['capboy-icon-512-v7.png', 512],
+  ['capboy-apple-touch-icon-v7.png', 180],
+  ['apple-touch-icon.png', 180],
 ]) {
   const png = new Resvg(iconSvg, { fitTo: { mode: 'width', value: size } }).render().asPng();
   const outputUrl = new URL(`../public/${name}`, import.meta.url);
