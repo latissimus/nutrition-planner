@@ -122,14 +122,13 @@ function groupedResultsMarkup(items) {
   }).join('');
 }
 
-export async function mountKnowledgeSearch(view, { signal, backHref = '#home' } = {}) {
+export async function mountKnowledgeSearch(view, { signal } = {}) {
   view.classList.add('wissenssuche-seite');
   view.innerHTML = `<div class="wissenssuche-scroll">
     <div class="wissenssuche-wrap">
       <header class="wissenssuche-titel">
         <span>Wissenssammlung</span>
         <h1>WISSEN DURCHSUCHEN</h1>
-        <a href="${escapeHtml(backHref)}" aria-label="Suche schließen">Schließen</a>
       </header>
       <label class="wissenssuche-feld" for="wissenssuche-input">
         <span aria-hidden="true"></span>
@@ -157,7 +156,7 @@ export async function mountKnowledgeSearch(view, { signal, backHref = '#home' } 
     results.innerHTML = '';
     if (!query) {
       status.hidden = false;
-      status.innerHTML = '<b>Dein gesammeltes Wissen an einem Ort.</b><span>Durchsuche REZEPTE, ESSEN, TRAINING, SUPPS und MIND.</span>';
+      status.innerHTML = '<b>Dein gesammeltes Wissen an einem Ort.</b>';
       return;
     }
     const matches = filterKnowledgeItems(items, query, activeRoot);

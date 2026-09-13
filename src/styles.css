@@ -8570,8 +8570,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .wissenssuche-wrap{width:min(calc(100% - (2 * var(--cap-reference-inline))),604px);margin-inline:auto}
 .wissenssuche-titel{position:relative;padding:4px 2px 18px}
 .wissenssuche-titel>span{display:block;color:#665C70;font:850 10px/1 var(--tech);letter-spacing:.12em;text-transform:uppercase}
-.wissenssuche-titel h1{max-width:78%;margin:7px 0 0;font:850 clamp(25px,7.8vw,38px)/.98 var(--display);font-style:italic;letter-spacing:-.035em}
-.wissenssuche-titel a{position:absolute;right:2px;bottom:20px;color:#241B2F;font:800 12px/1 var(--ui);text-decoration:none}
+.wissenssuche-titel h1{margin:7px 0 0;font:850 clamp(25px,7.8vw,38px)/.98 var(--display);font-style:italic;letter-spacing:-.035em}
 .wissenssuche-feld{
   display:grid;grid-template-columns:34px minmax(0,1fr) 36px;align-items:center;min-height:58px;padding:0 10px 0 14px;
   border:2px solid #111;border-radius:16px;background:#fff;box-shadow:0 3px 0 #111;
@@ -8582,9 +8581,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .wissenssuche-feld input::placeholder{color:#968D9B}
 .wissenssuche-feld input::-webkit-search-cancel-button{display:none}
 .wissenssuche-feld button{width:34px;height:34px;border:0;border-radius:50%;background:#EEE8F0;color:#241B2F;font:700 23px/1 var(--ui)}
-.wissenssuche-filter{display:flex;gap:8px;margin:18px 0 20px;overflow-x:auto;scrollbar-width:none}
+.wissenssuche-filter{
+  display:flex;align-items:center;gap:8px;box-sizing:border-box;
+  width:100vw;max-width:100vw;min-height:65px;
+  margin:10px calc(50% - 50vw) 12px;
+  padding:9px var(--cap-reference-inline) 13px;
+  overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+  scroll-padding-inline:var(--cap-reference-inline);scroll-snap-type:x proximity;
+  touch-action:pan-x;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
 .wissenssuche-filter::-webkit-scrollbar{display:none}
-.wissenssuche-filter button{flex:0 0 auto;min-height:39px;padding:0 15px;border:1.5px solid #241B2F;border-radius:999px;background:#fff;color:#241B2F;font:800 12px/1 var(--ui)}
+.wissenssuche-filter button{flex:0 0 auto;min-height:39px;padding:0 15px;border:1.5px solid #241B2F;border-radius:999px;background:#fff;color:#241B2F;font:800 12px/1 var(--ui);scroll-snap-align:start}
 .wissenssuche-filter button.aktiv{background:#241B2F;color:#FFF8ED}
 .wissenssuche-status{display:grid;gap:7px;min-height:140px;place-content:center;padding:24px;text-align:center}
 .wissenssuche-status b{font:800 17px/1.2 var(--ui)}

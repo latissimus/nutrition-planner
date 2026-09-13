@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { filterKnowledgeItems, KNOWLEDGE_ROOTS, normalizeKnowledgeSearch } from './knowledgeSearch.js';
+import { readFileSync } from 'node:fs';
+
+const source = readFileSync(new URL('./knowledgeSearch.js', import.meta.url), 'utf8');
 
 describe('Wissenssuche', () => {
   it('ist auf die fünf Wissensbereiche begrenzt', () => {
     expect(KNOWLEDGE_ROOTS).toEqual(['food-log', 'essen', 'training', 'supps', 'stress']);
+    expect(source).not.toContain('>Schließen</a>');
+    expect(source).not.toContain('Durchsuche REZEPTE');
   });
 
   it('findet Begriffe unabhängig von Umlauten und Großschreibung', () => {

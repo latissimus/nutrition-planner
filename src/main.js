@@ -1368,7 +1368,7 @@ async function renderRoute() {
     applyPageLook('search', '#FFF8ED', 'none');
     view.dataset.appDockRoute = appLetzteDexRoute();
     const { mountKnowledgeSearch } = await knowledgeSearchModule();
-    await mountKnowledgeSearch(view, { signal, backHref: `#${appLetzteDexRoute()}` });
+    await mountKnowledgeSearch(view, { signal });
   } else if (route === 'profile') {
     setSeite('profile');
     applyPageLook('profile', categoryColor('profile'), 'drops');
