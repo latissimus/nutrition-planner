@@ -1216,6 +1216,20 @@ label.fld-l,.falte span{font-family:var(--ui);color:var(--app-secondary)}
   color:#111!important;
   border-bottom-color:#111!important;
 }
+:root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]){
+  box-shadow:none!important;
+}
+:root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]) .btn-primary{
+  border-color:#111!important;
+  background:#432C5E!important;
+  color:#FFD400!important;
+  -webkit-text-fill-color:#FFD400!important;
+  box-shadow:0 4px 0 #111!important;
+}
+:root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]) .btn-primary:active:not(:disabled){
+  transform:translateY(4px)!important;
+  box-shadow:none!important;
+}
 :root[data-seite="auth"] .auth-shell{color:#fff}
 :root[data-seite="auth"] .auth-marke .brand{--sil-filter:brightness(0) invert(1)}
 :root[data-seite="auth"] .auth-sub{color:rgba(255,255,255,.78)}

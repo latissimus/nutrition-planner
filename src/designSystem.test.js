@@ -23,6 +23,9 @@ describe('CAPBOY Design-System', () => {
     expect(manifest).toContain('"background_color": "#432C5E"');
     expect(css).toContain(':root[data-seite="auth"] .auth-marquee{');
     expect(css).toContain('background:#fff!important;\n  color:#111!important;');
+    expect(css).toContain(':root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]){');
+    expect(css).toContain('box-shadow:0 4px 0 #111!important;');
+    expect(css).toContain('background:#432C5E!important;\n  color:#FFD400!important;');
   });
 
   it('installiert die PWA als CAPBOY mit dem freigegebenen CAPCOIN-Icon', () => {
