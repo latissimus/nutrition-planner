@@ -11,6 +11,7 @@ export const FALTEN = [
   ['bauch', 'Bauch'],
   ['trizeps', 'Trizeps'],
   ['bizeps', 'Bizeps'],
+  ['knie', 'Knie'],
   ['wade', 'Wade'],
   ['quadrizeps', 'Quadrizeps'],
   ['beinbizeps', 'Beinbizeps'],

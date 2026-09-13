@@ -6029,6 +6029,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:370px){
   :root[data-seite="body"] .body-skinfold-history dl{grid-template-columns:minmax(0,1fr)}
 }
+:root[data-seite="body"] .body-skinfold-history .ist-unvollstaendig>summary{
+  background:color-mix(in srgb,var(--ordner) 12%,#fff);
+}
+:root[data-seite="body"] .body-skinfold-history b.unvollstaendig{
+  color:#8a5a00;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+}
+:root[data-seite="body"] .body-skinfold-nachtragen{
+  margin:0;
+  padding:8px 11px 0;
+  color:#59606b;
+  font:500 11px/1.45 var(--tech);
+}
+:root[data-seite="body"] .body-skinfold-history dl>div.fehlt dd{color:#8a5a00}
 :root[data-seite="body"] .input{
   min-height:46px;
   border:1px solid var(--app-outline);

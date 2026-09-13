@@ -5,10 +5,11 @@ import supplementKatalog from './data/supplements-katalog.json';
 import { BRAVERMAN_BEREICHE, BRAVERMAN_DEFIZIT_FRAGEN, BRAVERMAN_REIHENFOLGE } from './data/braverman-test.js';
 
 const PROTOKOLL_GRUPPEN = Object.freeze([
-  { id: 'bauch-brust', label: 'Bauch, Brust & Trizeps', falten: ['bauch', 'brust', 'trizeps'] },
+  { id: 'bauch-brust-trizeps', label: 'Bauch, Brust & Trizeps', falten: ['bauch', 'brust', 'trizeps'] },
   { id: 'huefte', label: 'Hüfte', falten: ['huefte'] },
   { id: 'wade', label: 'Wade', falten: ['wade'] },
   { id: 'quad-beinbizeps', label: 'Vorderer & hinterer Oberschenkel', falten: ['quadrizeps', 'beinbizeps'] },
+  { id: 'knie', label: 'Knie', falten: ['knie'] },
 ]);
 
 const SUPPLEMENT_NAMEN = Object.freeze({
@@ -89,14 +90,15 @@ export function assessSkinfoldPriorities(folds = {}, calculationBasis = 'male') 
   if (!assessment) return [];
 
   return PROTOKOLL_GRUPPEN.map((group) => {
-    const details = group.falten.map((slug) => assessment.bySlug[slug]);
+    const details = group.falten.map((slug) => assessment.bySlug[slug]).filter(Boolean);
+    if (!details.length) return null;
     const score = Math.max(...details.map((item) => item.relative));
     const primaryFold = [...details].sort((a, b) => b.relative - a.relative)[0];
     const protocols = Object.values(ypsiProtokolle.protokolle)
       .filter((protocol) => protocol.gruppe === group.id)
       .sort((a, b) => Number(a.phase) - Number(b.phase));
     return { ...group, score, details, primaryFold, protocols };
-  }).sort((a, b) => b.score - a.score).map((item, index) => ({ ...item, priority: index + 1 }));
+  }).filter(Boolean).sort((a, b) => b.score - a.score).map((item, index) => ({ ...item, priority: index + 1 }));
 }
 
 const relativeAtLeast = (fold, threshold = 1.05) => Number(fold?.relative) >= threshold;
@@ -112,7 +114,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
   const relations = [];
   const topGroup = priorities[0];
   const topFold = assessment.ranked[0];
-  const abdominalTop = topGroup.id === 'bauch-brust' && topGroup.primaryFold.slug === 'bauch';
+  const abdominalTop = topGroup.id === 'bauch-brust-trizeps' && topGroup.primaryFold.slug === 'bauch';
   const recentEnergy = Number(context.recentEnergy);
   const recentSleep = Number(context.recentSleep);
   const push = (relation) => relations.push({ tone: 'info', protocolIds: [], actions: [], groupIds: [], ...relation });
@@ -128,8 +130,8 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
         'Zusätzlich Verdauung, Verträglichkeit von Getreide/Milch/Fruktose und mögliche Darmbeschwerden prüfen.',
         'Nur wenn diese Bedingungen passen, den Chlorella-/Darm-Zweig statt einer pauschalen Cortisol-Erklärung wählen.',
       ],
-      protocolIds: ['bauch-brust-phase-4-chlorella', 'darm-sanierung-phase-1'],
-      groupIds: ['bauch-brust'],
+      protocolIds: ['bauch-brust-trizeps-phase-4-chlorella', 'darm-sanierung-phase-1'],
+      groupIds: ['bauch-brust-trizeps'],
       tone: 'branch',
     });
   } else if (abdominalTop && relativeAtLeast(f.trizeps)) {
@@ -143,30 +145,30 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
         'Schlaf über die Wadenfalte und Blutzucker über die Hüftfalte gegenprüfen.',
         'Den Darmzweig erst nach Cortisol- und Energiekontext einordnen.',
       ],
-      groupIds: ['bauch-brust'],
+      groupIds: ['bauch-brust-trizeps'],
       tone: 'attention',
     });
   }
 
-  if (topGroup.id === 'bauch-brust' && relativeAtLeast(f.huefte)) {
+  if (topGroup.id === 'bauch-brust-trizeps' && relativeAtLeast(f.huefte)) {
     push({
       id: 'bauch-huefte-blutzucker',
       title: 'Bauch mit auffälliger Hüfte',
       summary: 'Die Kombination passt in den Unterlagen zum Glukose-/Insulinzweig – auch durch unregelmäßiges oder zu knappes Essen, nicht nur durch zu viele Kohlenhydrate.',
       basis: `Bauch ${f.bauch.value} mm · Hüfte ${f.huefte.value} mm`,
       actions: ['Regelmäßige Mahlzeiten mit ausreichend Protein und Fett prüfen.', 'Kohlenhydratmenge, Heißhunger und Energieverlauf gemeinsam beurteilen.'],
-      groupIds: ['bauch-brust', 'huefte'],
+      groupIds: ['bauch-brust-trizeps', 'huefte'],
     });
   }
 
-  if (topGroup.id === 'bauch-brust' && (relativeAtLeast(f.wade) || recentSleep > 0 && recentSleep < 3)) {
+  if (topGroup.id === 'bauch-brust-trizeps' && (relativeAtLeast(f.wade) || recentSleep > 0 && recentSleep < 3)) {
     push({
       id: 'bauch-wade-schlaf',
       title: 'Schlaf als Mitfaktor prüfen',
       summary: 'Bauch/Brust/Trizeps werden in den Unterlagen mit der Waden- und Beinfaltenlage gegengeprüft, bevor nur Stress oder Darm angenommen wird.',
       basis: `Wade ${f.wade.value} mm${Number.isFinite(recentSleep) ? ` · letzte Schlafqualität ${recentSleep}/5` : ''}`,
       actions: ['Tiefschlaf, Einschlafen, nächtliches Aufwachen und Morgenenergie getrennt betrachten.'],
-      groupIds: ['bauch-brust', 'wade'],
+      groupIds: ['bauch-brust-trizeps', 'wade'],
     });
   }
 
@@ -183,7 +185,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       summary: links.length ? `Auffällige Gegenprüfungen: ${links.join(' · ')}.` : 'Die zugeordneten Gegenfalten sind derzeit nicht deutlich auffälliger; Zink-/Aromatase-Kontext bleibt eine mögliche, nicht diagnostische Seminarhypothese.',
       basis: `Brust ${f.brust.value} mm`,
       actions: ['Zuerst Trizeps, Bauch, Hüfte und Rücken als Gegenfalten prüfen.', 'Zinkbedarf nicht allein aus der Falte ableiten; Ernährung und gegebenenfalls Laborwerte einbeziehen.'],
-      groupIds: ['bauch-brust'],
+      groupIds: ['bauch-brust-trizeps'],
     });
   }
 
@@ -209,7 +211,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       basis: `Quadrizeps ${f.quadrizeps.value} mm · Beinbizeps ${f.beinbizeps.value} mm · Bauch Rang ${f.bauch.foldPriority}`,
       actions: ['Bei Verdauungs-/Leaky-Gut-Zeichen Glutamin-Zweig prüfen.', 'Wenn Quadrizeps nach früherer Arbeit erneut Priorität wird, Liv.52-Zweig prüfen.', ...(bellyTopThree ? ['Pectasol-Zweig nur nach den vorherigen Basisphasen und passender Darm-/Belastungsanamnese prüfen.'] : [])],
       protocolIds: ['quad-beinbizeps-phase-4-glutamin', 'quad-beinbizeps-phase-4-liv52', ...(bellyTopThree ? ['quad-beinbizeps-phase-4-pectasol'] : [])],
-      groupIds: ['quad-beinbizeps', 'bauch-brust'],
+      groupIds: ['quad-beinbizeps', 'bauch-brust-trizeps'],
       tone: legGroup?.priority === 1 ? 'attention' : 'info',
     });
   } else {

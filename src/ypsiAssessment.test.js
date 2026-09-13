@@ -14,14 +14,14 @@ import { BRAVERMAN_DEFIZIT_FRAGEN } from './data/braverman-test.js';
 
 const folds = {
   kinn: 4, wange: 4, brust: 3, ruecken: 8, rippe: 5, huefte: 9,
-  bauch: 22, trizeps: 4, bizeps: 2, wade: 5, quadrizeps: 8, beinbizeps: 8,
+  bauch: 22, trizeps: 4, bizeps: 2, knie: 5, wade: 5, quadrizeps: 8, beinbizeps: 8,
 };
 
 describe('YPSI-Hautfaltenprioritäten', () => {
   it('priorisiert die auffälligste Protokollgruppe', () => {
     const priorities = assessSkinfoldPriorities(folds, 'male');
-    expect(priorities).toHaveLength(4);
-    expect(priorities[0]).toMatchObject({ id: 'bauch-brust', priority: 1 });
+    expect(priorities).toHaveLength(5);
+    expect(priorities[0]).toMatchObject({ id: 'bauch-brust-trizeps', priority: 1 });
     expect(priorities[0].primaryFold).toMatchObject({ slug: 'bauch', foldPriority: 1 });
     expect(priorities[0].falten).toContain('trizeps');
     expect(priorities[0].protocols.some((protocol) => protocol.phase === 1)).toBe(true);
@@ -34,7 +34,7 @@ describe('YPSI-Hautfaltenprioritäten', () => {
   it('ordnet Bauch plus guten Trizeps dem zu bestätigenden Darmzweig zu', () => {
     const relationships = buildSkinfoldRelationships(folds, 'male');
     expect(relationships.find((item) => item.id === 'bauch-trizeps-darmzweig')).toEqual(expect.objectContaining({
-      protocolIds: expect.arrayContaining(['bauch-brust-phase-4-chlorella']),
+      protocolIds: expect.arrayContaining(['bauch-brust-trizeps-phase-4-chlorella']),
     }));
   });
 
@@ -55,8 +55,8 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     const history = [1, 2, 3, 4].map((day) => ({ gemessen_am: `2026-0${day}-01`, falten: folds }));
     const plan = buildSkinfoldPlan(history, 'male', { recentEnergy: 4 });
     expect(plan.topFold.slug).toBe('bauch');
-    expect(plan.priorities[0]).toMatchObject({ id: 'bauch-brust', suggestedPhase: 4, occurrences: 4 });
-    expect(plan.priorities[0].recommendedProtocols.map((item) => item.id)).toContain('bauch-brust-phase-4-chlorella');
+    expect(plan.priorities[0]).toMatchObject({ id: 'bauch-brust-trizeps', suggestedPhase: 4, occurrences: 4 });
+    expect(plan.priorities[0].recommendedProtocols.map((item) => item.id)).toContain('bauch-brust-trizeps-phase-4-chlorella');
   });
 
   it('setzt eine zwischenzeitlich andere Priorität nicht als Phase derselben Gruppe fort', () => {

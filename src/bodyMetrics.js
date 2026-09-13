@@ -31,6 +31,7 @@ const FALTEN_HILFE = {
   bauch: 'Senkrechte Falte wenige Zentimeter neben dem Bauchnabel.', trizeps: 'Senkrechte Falte mittig an der Rückseite des Oberarms.',
   bizeps: 'Senkrechte Falte mittig an der Vorderseite des Oberarms.', wade: 'Senkrechte Falte an der Innenseite der Wade auf größtem Umfang.',
   quadrizeps: 'Senkrechte Falte mittig an der Vorderseite des Oberschenkels.', beinbizeps: 'Senkrechte Falte mittig an der Rückseite des Oberschenkels.',
+  knie: 'Senkrechte Falte direkt auf der Mitte der Kniescheibe.',
 };
 const escapeHtml = (value = '') => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const display = (value, digits = 1) => Number(value || 0).toLocaleString('de-DE', { maximumFractionDigits: digits });
@@ -92,9 +93,9 @@ function bodyHeroMarkup(state) {
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="COMP-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
-    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>12-Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
+    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>13-Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
     <p><b>COMP</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
-    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>12-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
+    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>13-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
     <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und <b>keine medizinische Diagnose</b>.</p>
   </div></div>`;
 }
@@ -123,7 +124,7 @@ export function skinfoldEntryMarkup() {
     <label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label>
     <label class="body-standard"><input type="checkbox" data-skinfold-standard><span>Standardisierte Bedingungen eingehalten</span></label>
     <div class="guided-fold-grid">${FALTEN.map(([key, label], index) => `<fieldset><legend>${label}</legend><small>${FALTEN_HILFE[key]}</small><div><input class="input" type="text" inputmode="decimal" enterkeyhint="${index === FALTEN.length - 1 ? 'done' : 'next'}" autocomplete="off" id="skinfold-${key}" name="skinfold-${key}" placeholder="mm" aria-label="${label} in Millimetern" data-fold="${key}"></div></fieldset>`).join('')}</div>
-    <div class="falten-summe" data-skinfold-quality>0 von 12 Falten eingetragen.</div>
+    <div class="falten-summe" data-skinfold-quality>0 von ${FALTEN.length} Falten eingetragen.</div>
     <button class="btn btn-primary btn-block" type="submit" disabled>Messung speichern</button>
   </form>`;
 }
@@ -162,12 +163,16 @@ export function skinfoldHistoryMarkup(skinfolds = []) {
     .sort((a, b) => String(b.gemessen_am || '').localeCompare(String(a.gemessen_am || '')))
     .map((row) => {
       const total = row.total ?? summe(row.falten);
-      const values = FALTEN.map(([key, label]) => `<div><dt>${label}</dt><dd>${display(row.falten?.[key])} mm</dd></div>`).join('');
-      return `<li><details><summary class="body-skinfold-history-head"><time datetime="${escapeHtml(row.gemessen_am)}">${datumKurz(row.gemessen_am)}</time><b>${display(total)} mm</b></summary><dl>${values}</dl></details></li>`;
+      const fehlend = FALTEN.filter(([key]) => zahl(row.falten?.[key]) == null).map(([, label]) => label);
+      const values = FALTEN.map(([key, label]) => `<div${zahl(row.falten?.[key]) == null ? ' class="fehlt"' : ''}><dt>${label}</dt><dd>${zahl(row.falten?.[key]) != null ? `${display(row.falten[key])} mm` : '–'}</dd></div>`).join('');
+      const kopf = total != null
+        ? `<b>${display(total)} mm</b>`
+        : `<b class="unvollstaendig">${fehlend.length} fehlt${fehlend.length === 1 ? '' : 'en'}</b>`;
+      return `<li><details${total == null ? ' class="ist-unvollstaendig"' : ''}><summary class="body-skinfold-history-head"><time datetime="${escapeHtml(row.gemessen_am)}">${datumKurz(row.gemessen_am)}</time>${kopf}</summary>${total == null ? `<p class="body-skinfold-nachtragen">Ohne ${escapeHtml(fehlend.join(', '))} ergibt sich keine vergleichbare Summe. Trage die Messung über den Hinzufügen-Button mit demselben Datum erneut ein, um sie zu vervollständigen.</p>` : ''}<dl>${values}</dl></details></li>`;
     }).join('');
   return `<details class="body-inner-details body-weight-history body-skinfold-history">
     <summary><span>Einzelne Hautfaltenmessungen</span>${materialIconMarkup('chevron_right')}</summary>
-    <p>Neueste Messung zuerst. Tippe ein Datum an, um alle zwölf Einzelwerte zu sehen.</p>
+    <p>Neueste Messung zuerst. Tippe ein Datum an, um alle dreizehn Einzelwerte zu sehen.</p>
     <ol>${rows}</ol>
   </details>`;
 }
@@ -294,18 +299,20 @@ function ypsiPriorityDetailMarkup(priority) {
 
 function skinfoldMarkup(state) {
   const valid = state.skinfolds.filter((row) => row.total != null); const latest = valid.at(-1); const previous = valid.at(-2);
+  const unvollstaendig = state.skinfolds.filter((row) => row.total == null);
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
-  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>12-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">12-Falten-Summe in mm – keine KFA-Schätzung</h2>
-    <p class="body-explain">Die Karte zeigt die Summe deiner 12 Hautfalten. Sie ist ein Verlaufswert für Unterhautfett und wird nur sinnvoll, wenn du unter ähnlichen Bedingungen misst.</p>
-    ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 12-Falten-Messung erscheint hier die Summe.</span></div>'}
+  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>13-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">13-Falten-Summe in mm – keine KFA-Schätzung</h2>
+    <p class="body-explain">Die Karte zeigt die Summe deiner 13 Hautfalten. Sie ist ein Verlaufswert für Unterhautfett und wird nur sinnvoll, wenn du unter ähnlichen Bedingungen misst.</p>
+    ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 13-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
-    <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 12 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
+    ${unvollstaendig.length ? `<p class="body-neutral-note">${unvollstaendig.length} ältere ${unvollstaendig.length === 1 ? 'Messung hat' : 'Messungen haben'} noch nicht alle 13 Werte und ${unvollstaendig.length === 1 ? 'fehlt' : 'fehlen'} deshalb im Verlauf. Du findest ${unvollstaendig.length === 1 ? 'sie' : 'sie'} unten unter „Einzelne Hautfaltenmessungen“ zum Nachtragen.</p>` : ''}
+    <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 13 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
     ${ypsiPriorityMarkup(state)}
     ${faltenLegendeMarkup(state)}
-    ${skinfoldHistoryMarkup(valid)}
+    ${skinfoldHistoryMarkup(state.skinfolds)}
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
-    <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle zwei bis vier Wochen an eine neue 12-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
-    <button class="body-reset-mini" type="button" data-reset-body="skinfolds">12-Falten-Werte zurücksetzen</button>
+    <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle zwei bis vier Wochen an eine neue 13-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
+    <button class="body-reset-mini" type="button" data-reset-body="skinfolds">13-Falten-Werte zurücksetzen</button>
   </div></section>`;
 }
 
@@ -372,8 +379,11 @@ function faltenDetailMarkup(slug, state) {
       ${normEigenerWert != null || norm.grenzwert_mm != null || norm.notiz ? `<section class="falten-detail-section">
         <h3>Norm & Orientierung</h3>
         <div class="falten-detail-norm">
-          ${normEigenerWert != null ? `<div><small>Norm ${sexLabel} (du)</small><b>${normEigenerWert} mm</b></div>` : ''}
-          ${normAnderer != null ? `<div><small>Norm ${otherSexLabel}</small><b>${normAnderer} mm</b></div>` : ''}
+          ${norm.ziel_mm?.[sex] != null ? `<div><small>Ziel ${sexLabel} (du)</small><b>&lt; ${norm.ziel_mm[sex]} mm</b></div>` : ''}
+          ${norm.normal_bis_mm?.[sex] != null
+            ? `<div><small>Normal bis ${sexLabel}</small><b>${norm.normal_bis_mm[sex]} mm</b></div>`
+            : normEigenerWert != null ? `<div><small>Norm ${sexLabel} (du)</small><b>${normEigenerWert} mm</b></div>` : ''}
+          ${norm.normal_bis_mm == null && normAnderer != null ? `<div><small>Norm ${otherSexLabel}</small><b>${normAnderer} mm</b></div>` : ''}
           ${norm.grenzwert_mm != null ? `<div><small>Grenzwert</small><b>${norm.grenzwert_mm} mm</b></div>` : ''}
           ${norm.katastrophal_mm != null ? `<div><small>Kritisch ab</small><b>${norm.katastrophal_mm} mm</b></div>` : ''}
         </div>
@@ -389,6 +399,7 @@ function faltenDetailMarkup(slug, state) {
 
       ${protokolle.length ? `<section class="falten-detail-section">
         <h3>YPSI-Protokolle</h3>
+        ${info.protokoll_hinweis ? `<p class="falten-detail-hinweis">${escapeHtml(info.protokoll_hinweis)}</p>` : ''}
         <p class="falten-detail-hinweis">Chronologisch abarbeiten: Phase 1 → 2 → 3, dann Phase 4+ nach Symptomatik wählen. Nicht alles gleichzeitig einnehmen.</p>
         <div class="falten-detail-protokolle">
           ${protokolle.map((p) => `<div class="falten-protokoll-item">
@@ -596,7 +607,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   const entryOptions = {
     weight: { title: 'Gewicht eintragen', markup: weightEntryMarkup },
     waist: { title: 'Taillenumfang eintragen', markup: waistEntryMarkup },
-    skinfold: { title: '12-Falten-Messung', markup: skinfoldEntryMarkup },
+    skinfold: { title: '13-Falten-Messung', markup: skinfoldEntryMarkup },
     recovery: { title: 'Erholung protokollieren', markup: recoveryEntryMarkup },
     logman: { title: 'LOGMAN-Import', markup: logmanEntryMarkup },
   };
@@ -654,11 +665,11 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           const value = zahl(input.value);
           if (value != null && value >= 0) values[input.dataset.fold] = value;
         });
-        const complete = Object.keys(values).length;
+        const complete = FALTEN.filter(([key]) => values[key] != null).length;
         const total = summe(values);
-        const message = `${complete} von 12 Falten eingetragen`;
-        skinfoldForm.querySelector('[data-skinfold-quality]').innerHTML = `${escapeHtml(message)}${total != null ? ` · <b>${display(total)} mm</b>` : ''}`;
-        skinfoldForm.querySelector('button[type="submit"]').disabled = complete !== 12;
+        const message = `${complete} von ${FALTEN.length} Falten eingetragen`;
+        skinfoldForm.querySelector('[data-skinfold-quality]').innerHTML = `${escapeHtml(message)}${total != null ? ` · <b>${display(total)} mm</b> Summe` : ''}`;
+        skinfoldForm.querySelector('button[type="submit"]').disabled = complete !== FALTEN.length;
         return { values, complete };
       };
       skinfoldForm.querySelectorAll('[data-fold]').forEach((input) => { input.oninput = updateSkinfold; });
@@ -680,7 +691,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         event.preventDefault();
         await withBusySubmit(skinfoldForm, async () => {
           const { values, complete } = updateSkinfold();
-          if (complete !== 12) return;
+          if (complete !== FALTEN.length) return;
           const date = skinfoldForm.querySelector('[data-skinfold-date]').value;
           const isNew = !state.skinfolds.some((row) => row.gemessen_am === date);
           const standardisiert = skinfoldForm.querySelector('[data-skinfold-standard]').checked;
@@ -689,7 +700,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           if (error) return toast(`Messung konnte nicht gespeichert werden: ${error.message}`);
           notifyHomeCountsChanged();
           if (isNew) notifyCoinBalanceChanged();
-          toast(isNew ? '12-Falten-Summe gespeichert · +1 CAPCOIN' : '12-Falten-Summe aktualisiert');
+          toast(isNew ? '13-Falten-Summe gespeichert · +1 CAPCOIN' : '13-Falten-Summe aktualisiert');
           await closeAndRender();
         });
       };
@@ -849,7 +860,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         <div class="kategorie-sheet-menu body-add-menu">
           <button type="button" data-body-add="weight">${materialIconMarkup('monitor_weight')}<span><b>Gewicht</b><small>Neue Wiegung eintragen</small></span></button>
           <button type="button" data-body-add="waist">${materialIconMarkup('measuring_tape')}<span><b>Taillenumfang</b><small>Umfang dokumentieren</small></span></button>
-          <button type="button" data-body-add="skinfold">${materialIconMarkup('body_fat')}<span><b>12-Falten-Messung</b><small>Geführte Messung starten</small></span></button>
+          <button type="button" data-body-add="skinfold">${materialIconMarkup('body_fat')}<span><b>13-Falten-Messung</b><small>Geführte Messung starten</small></span></button>
           <button type="button" data-body-add="recovery">${materialIconMarkup('favorite')}<span><b>Erholungs-Check-in</b><small>Erholung, Stimmung und Hunger</small></span></button>
           <button type="button" data-body-add="logman">${materialIconMarkup('upload_file')}<span><b>LOGMAN-Import</b><small>Leistungsdaten ergänzen</small></span></button>
         </div>`,
@@ -881,7 +892,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     }
     const resetConfig = {
       weights: { table: 'weights', label: 'alle Gewichtswerte', toast: 'Gewichtsverlauf zurückgesetzt' },
-      skinfolds: { table: 'skinfolds', label: 'alle 12-Falten-Messungen', toast: '12-Falten-Werte zurückgesetzt' },
+      skinfolds: { table: 'skinfolds', label: 'alle 13-Falten-Messungen', toast: '13-Falten-Werte zurückgesetzt' },
       waist: { table: 'waist_measurements', label: 'alle Taillenmessungen', toast: 'Taillenumfang zurückgesetzt' },
       logman: { table: 'logman_performance', label: 'alle importierten LOGMAN-Leistungsdaten', toast: 'LOGMAN-Importe zurückgesetzt' },
     };

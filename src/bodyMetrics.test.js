@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
+import { FALTEN, summe } from './measurements.js';
 
 describe('Gewichtsverlauf', () => {
   it('zeigt gespeicherte Wiegungen mit der neuesten zuerst', () => {
@@ -50,11 +51,30 @@ describe('Hautfaltenverlauf', () => {
     expect(skinfoldHistoryMarkup([])).toBe('');
   });
 
-  it('gibt allen zwölf Feldern eine stabile mobile Weiter-Reihenfolge', () => {
+  it('gibt jedem Messfeld eine stabile mobile Weiter-Reihenfolge', () => {
     const markup = skinfoldEntryMarkup();
 
-    expect(markup.match(/name="skinfold-/g)).toHaveLength(12);
-    expect(markup.match(/enterkeyhint="next"/g)).toHaveLength(11);
+    expect(markup.match(/name="skinfold-/g)).toHaveLength(FALTEN.length);
+    expect(markup.match(/enterkeyhint="next"/g)).toHaveLength(FALTEN.length - 1);
     expect(markup.match(/enterkeyhint="done"/g)).toHaveLength(1);
+  });
+
+  it('rechnet das Knie als reguläre Falte in die Summe', () => {
+    expect(FALTEN.map(([key]) => key)).toContain('knie');
+
+    const vollstaendig = Object.fromEntries(FALTEN.map(([key]) => [key, 10]));
+    expect(summe(vollstaendig)).toBe(130);
+
+    const { knie, ...ohneKnie } = vollstaendig;
+    expect(summe(ohneKnie)).toBeNull();
+  });
+
+  it('weist unvollständige Altmessungen zum Nachtragen aus', () => {
+    const ohneKnie = Object.fromEntries(FALTEN.filter(([key]) => key !== 'knie').map(([key]) => [key, 10]));
+    const markup = skinfoldHistoryMarkup([{ gemessen_am: '2026-05-04', falten: ohneKnie, total: null }]);
+
+    expect(markup).toContain('ist-unvollstaendig');
+    expect(markup).toContain('Knie');
+    expect(markup).toContain('1 fehlt');
   });
 });

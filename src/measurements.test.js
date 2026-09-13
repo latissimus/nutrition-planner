@@ -9,7 +9,7 @@ describe('measurements', () => {
 
   it('only sums complete skinfold sets', () => {
     const complete = Object.fromEntries(FALTEN.map(([key]) => [key, 10]));
-    expect(summe(complete)).toBe(120);
+    expect(summe(complete)).toBe(FALTEN.length * 10);
     expect(summe({ ...complete, kinn: '' })).toBeNull();
   });
 
