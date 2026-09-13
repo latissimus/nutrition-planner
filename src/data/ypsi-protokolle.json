@@ -1,0 +1,569 @@
+{
+  "version": "1.0",
+  "quelle": "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop & Advanced Supplementation, Stuttgart Februar/Juli 2017 (Wolfgang Unsöld)",
+  "hinweis": "Alle Protokolle sind Praxis-Empfehlungen aus dem YPSI-System. Sie ersetzen keine ärztliche/therapeutische Beratung. Standard-Timing: F = zum Frühstück, vs = vor dem Schlafen, PWO = Post-Workout. Ohne Timing = über den Tag verteilt.",
+  "abkuerzungen": {
+    "F": "zum Frühstück",
+    "vs": "vor dem Schlafen",
+    "PWO": "Post-Workout",
+    "PreWo": "Pre-Workout"
+  },
+  "phasen_erlaeuterung": {
+    "phase_1": "Basis-Sanierung – erste Aufräum-Phase mit Chlorenergy für den 'großen Dreck'.",
+    "phase_2": "Vertiefung – kleinerer 'Dreck' mit ChlorellaKomplex und/oder Umstellung auf Vitamin-D/K-Basis.",
+    "phase_3": "Feinjustierung – ChloroMalat für Aluminium-Bindung, spezifischere Kombinationen.",
+    "phase_4_plus": "Advanced – gezielte Interventionen wenn Phase 1–3 kein Ergebnis mehr bringen. Auswahl abhängig von Symptomatik (Schlaf, Darm, Leber-Phase-2 etc.)."
+  },
+  "basis_immer_dabei": {
+    "beschreibung": "Diese 6 Grundlagen müssen vor Advanced-Methoden sitzen. Werden von jedem YPSI-Kunden und Athleten verwendet.",
+    "supplemente": [
+      { "slug": "vitamin-d-k", "dosierung": "10 Tropfen F Standard, nach 6–8 Wochen per Labortest anpassen" },
+      { "slug": "ypsi-magnesium", "dosierung": "4 Kapseln vs (Standard)" },
+      { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+      { "slug": "chlorella-komplex", "dosierung": "einschleichen 1 → 3×3 → 3×5" },
+      { "slug": "licorice-komplex", "dosierung": "1–4 Kapseln F, ausschließlich morgens" },
+      { "slug": "adaptogene-5", "dosierung": "je nach Bedarf – Yamswurzel (DHEA-Booster), Ginseng, Schisandra u. a." }
+    ]
+  },
+  "protokolle": {
+    "quad-beinbizeps-phase-1": {
+      "id": "quad-beinbizeps-phase-1",
+      "name": "Quadrizeps/Beinbizeps – Phase 1",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 1,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "chlorenergy", "dosierung": "3×6" }
+      ],
+      "fokus": "Basis-Sanierung, Entgiftung starten",
+      "quelle": "Körperfett-Assessment S. 9"
+    },
+    "quad-beinbizeps-phase-2": {
+      "id": "quad-beinbizeps-phase-2",
+      "name": "Quadrizeps/Beinbizeps – Phase 2",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 2,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "chlorella-komplex", "dosierung": "3×3 bis 3×4" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Chlorella-Aufbau, Vitamin D/K rein",
+      "quelle": "Körperfett-Assessment S. 9, 12"
+    },
+    "quad-beinbizeps-phase-3": {
+      "id": "quad-beinbizeps-phase-3",
+      "name": "Quadrizeps/Beinbizeps – Phase 3",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 3,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "2 vs" },
+        { "slug": "chloromalat", "dosierung": "6 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Aluminium binden (ChloroMalat), Darm und Schlaf entscheidend",
+      "notiz": "ChloroMalat 6 vs für 3–6 Wochen, dann 2 vs für 3–6 Wochen.",
+      "quelle": "Körperfett-Assessment S. 9"
+    },
+    "quad-beinbizeps-phase-4-methylkomplex": {
+      "id": "quad-beinbizeps-phase-4-methylkomplex",
+      "name": "Quad/Beinb. – Phase 4+ · MethylKomplex",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 4,
+      "variant": "methylkomplex",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "methylkomplex", "dosierung": "2 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "MethylKomplex – wirkt v. a. auf Beinbizeps (Ham) und Quadrizeps",
+      "quelle": "Körperfett-Assessment S. 12"
+    },
+    "quad-beinbizeps-phase-4-glutamin": {
+      "id": "quad-beinbizeps-phase-4-glutamin",
+      "name": "Quad/Beinb. – Phase 4+ · Glutamin",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 4,
+      "variant": "glutamin",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "glutamin", "dosierung": "bis 80 g über den Tag verteilt" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Darm/Verdauung/Leaky Gut – wirkt auf Quad und Ham",
+      "quelle": "Körperfett-Assessment S. 12"
+    },
+    "quad-beinbizeps-phase-4-liv52": {
+      "id": "quad-beinbizeps-phase-4-liv52",
+      "name": "Quad/Beinb. – Phase 4+ · Liv.52",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 4,
+      "variant": "liv52",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "liv52", "dosierung": "3×2 (einschleichen 1→3×4 möglich)" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Hepatische Phase 2 – v. a. Quad",
+      "notiz": "Nur europäisches Produkt aus Riga verwenden.",
+      "quelle": "Körperfett-Assessment S. 12, Supplements S. 2"
+    },
+    "quad-beinbizeps-phase-4-glycin": {
+      "id": "quad-beinbizeps-phase-4-glycin",
+      "name": "Quad/Beinb. – Phase 4+ · Glycin",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 4,
+      "variant": "glycin",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "glycin", "dosierung": "2 Essl. vs (einschleichen ab 1/4 Teel.)" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Hepatische Phase 2 / Ham / Quad / Einschlafen",
+      "quelle": "Körperfett-Assessment S. 12, Supplements S. 25"
+    },
+    "quad-beinbizeps-phase-4-lipo-gsh": {
+      "id": "quad-beinbizeps-phase-4-lipo-gsh",
+      "name": "Quad/Beinb. – Phase 4+ · Liposomales Glutathion",
+      "gruppe": "quad-beinbizeps",
+      "gilt_fuer_falten": ["quadrizeps", "beinbizeps"],
+      "phase": 4,
+      "variant": "lipo-gsh",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "lipo-glutathion", "dosierung": "1–2 Essl. vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Hepatische Phase 2 / Ham (Beinbizeps) – Prio bei Entgiftung Leber",
+      "notiz": "Von Readisorb (UK).",
+      "quelle": "Körperfett-Assessment S. 12, Supplements S. 2"
+    },
+    "bauch-brust-phase-1": {
+      "id": "bauch-brust-phase-1",
+      "name": "Bauch/Brust – Phase 1",
+      "gruppe": "bauch-brust",
+      "gilt_fuer_falten": ["bauch", "brust"],
+      "phase": 1,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "licorice-komplex", "dosierung": "1 F" }
+      ],
+      "fokus": "Nebennieren entlasten, Cortisol-Regulation starten",
+      "quelle": "Körperfett-Assessment S. 10, 13"
+    },
+    "bauch-brust-phase-2": {
+      "id": "bauch-brust-phase-2",
+      "name": "Bauch/Brust – Phase 2",
+      "gruppe": "bauch-brust",
+      "gilt_fuer_falten": ["bauch", "brust"],
+      "phase": 2,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Cortisol senken, Schlaf-Basis",
+      "quelle": "Körperfett-Assessment S. 10, 13"
+    },
+    "bauch-brust-phase-3": {
+      "id": "bauch-brust-phase-3",
+      "name": "Bauch/Brust – Phase 3",
+      "gruppe": "bauch-brust",
+      "gilt_fuer_falten": ["bauch", "brust"],
+      "phase": 3,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "chlorenergy", "dosierung": "3×6" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Energie-Level maximieren, Stressmanagement optimieren",
+      "quelle": "Körperfett-Assessment S. 10, 13"
+    },
+    "bauch-brust-phase-4-chlorella": {
+      "id": "bauch-brust-phase-4-chlorella",
+      "name": "Bauch/Brust – Phase 4+ · Chlorella",
+      "gruppe": "bauch-brust",
+      "gilt_fuer_falten": ["bauch", "brust"],
+      "phase": 4,
+      "variant": "chlorella",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "chlorella-komplex", "dosierung": "3×4" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Darm/Verdauung – wenn Bauch das Problem ist und man 'schlechte Flüssigkeit' hat",
+      "quelle": "Körperfett-Assessment S. 13"
+    },
+    "bauch-brust-phase-4-neuromag": {
+      "id": "bauch-brust-phase-4-neuromag",
+      "name": "Bauch/Brust – Phase 4+ · Neuromag",
+      "gruppe": "bauch-brust",
+      "gilt_fuer_falten": ["bauch", "brust"],
+      "phase": 4,
+      "variant": "neuromag",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "neuromag", "dosierung": "6 vs" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Einschlafen durch GABA-Defizit",
+      "quelle": "Körperfett-Assessment S. 13"
+    },
+    "bauch-brust-phase-4-licorice": {
+      "id": "bauch-brust-phase-4-licorice",
+      "name": "Bauch/Brust – Phase 4+ · Licorice",
+      "gruppe": "bauch-brust",
+      "gilt_fuer_falten": ["bauch", "brust"],
+      "phase": 4,
+      "variant": "licorice",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "licorice-komplex", "dosierung": "1 F" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Energie am Morgen (wenn Drive morgens großes Problem ist)",
+      "quelle": "Körperfett-Assessment S. 13"
+    },
+    "huefte-phase-1": {
+      "id": "huefte-phase-1",
+      "name": "Hüfte – Phase 1",
+      "gruppe": "huefte",
+      "gilt_fuer_falten": ["huefte"],
+      "phase": 1,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" }
+      ],
+      "fokus": "Blutzucker-Basis stabilisieren",
+      "quelle": "Körperfett-Assessment S. 10, 13"
+    },
+    "huefte-phase-2": {
+      "id": "huefte-phase-2",
+      "name": "Hüfte – Phase 2",
+      "gruppe": "huefte",
+      "gilt_fuer_falten": ["huefte"],
+      "phase": 2,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "chlorenergy", "dosierung": "3×6" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Basis-Entgiftung, Insulin-Sensitivität",
+      "quelle": "Körperfett-Assessment S. 10, 13"
+    },
+    "huefte-phase-3": {
+      "id": "huefte-phase-3",
+      "name": "Hüfte – Phase 3",
+      "gruppe": "huefte",
+      "gilt_fuer_falten": ["huefte"],
+      "phase": 3,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "chlorella-komplex", "dosierung": "3×3 bis 3×4" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Ernährung, Schlaf & Bewegung sind entscheidend für das Blutzuckermanagement",
+      "quelle": "Körperfett-Assessment S. 11, 13"
+    },
+    "wade-phase-1": {
+      "id": "wade-phase-1",
+      "name": "Wade – Phase 1",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 1,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" }
+      ],
+      "fokus": "Magnesium-Basis für Tiefschlaf",
+      "notiz": "Zusätzlich: Handy nicht im Schlafzimmer, WLAN nachts aus.",
+      "quelle": "Körperfett-Assessment S. 11, 14"
+    },
+    "wade-phase-2": {
+      "id": "wade-phase-2",
+      "name": "Wade – Phase 2",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 2,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "chlorenergy", "dosierung": "3×6" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Basis-Sanierung + Schlaf-Basis",
+      "quelle": "Körperfett-Assessment S. 11, 14"
+    },
+    "wade-phase-3": {
+      "id": "wade-phase-3",
+      "name": "Wade – Phase 3",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 3,
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "chloromalat", "dosierung": "6 vs" },
+        { "slug": "taurin", "dosierung": "4 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Taurin ergänzt (GABA-Vorstufe) – Tiefschlaf vertiefen",
+      "quelle": "Körperfett-Assessment S. 11"
+    },
+    "wade-phase-4-neuromag": {
+      "id": "wade-phase-4-neuromag",
+      "name": "Wade – Phase 4+ · Neuromag",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 4,
+      "variant": "neuromag",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "neuromag", "dosierung": "6 vs" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Einschlafprobleme durch GABA-Defizit",
+      "quelle": "Körperfett-Assessment S. 14"
+    },
+    "wade-phase-4-methylkomplex": {
+      "id": "wade-phase-4-methylkomplex",
+      "name": "Wade – Phase 4+ · MethylKomplex",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 4,
+      "variant": "methylkomplex",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "methylkomplex", "dosierung": "2 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Einschlafen/Durchschlafen (wirkt auch auf Ham)",
+      "quelle": "Körperfett-Assessment S. 14"
+    },
+    "wade-phase-4-glycin": {
+      "id": "wade-phase-4-glycin",
+      "name": "Wade – Phase 4+ · Glycin",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 4,
+      "variant": "glycin",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "glycin", "dosierung": "2 Essl. vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Ham / Quad / Einschlafen",
+      "quelle": "Körperfett-Assessment S. 14"
+    },
+    "wade-phase-4-taurin": {
+      "id": "wade-phase-4-taurin",
+      "name": "Wade – Phase 4+ · Taurin (GABA-Boost)",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 4,
+      "variant": "taurin",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "taurin", "dosierung": "6 vs" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "ypsi-magnesium", "dosierung": "6 vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Einschlafen durch GABA-Defizit",
+      "quelle": "Körperfett-Assessment S. 14"
+    },
+    "wade-phase-4-lipo-melatonin": {
+      "id": "wade-phase-4-lipo-melatonin",
+      "name": "Wade – Phase 4+ · Liposomales Melatonin",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 4,
+      "variant": "lipo-melatonin",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "lipo-melatonin", "dosierung": "6 Pumps vs" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Einschlafen durch Serotonin-Defizit",
+      "quelle": "Körperfett-Assessment S. 14"
+    },
+    "wade-phase-4-greens": {
+      "id": "wade-phase-4-greens",
+      "name": "Wade – Phase 4+ · Greens",
+      "gruppe": "wade",
+      "gilt_fuer_falten": ["wade"],
+      "phase": 4,
+      "variant": "greens",
+      "supplemente": [
+        { "slug": "multikomplex", "dosierung": "3×2" },
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "greens", "dosierung": "2×1 Tel. (3–5 Uhr Dickdarm-Antiox)" },
+        { "slug": "vitamin-d-k", "dosierung": "10 F" }
+      ],
+      "fokus": "Durchschlafen (3–5 & 5–7 Dickdarm-Antioxidans)",
+      "notiz": "Auch in Kombination mit Chlorella wirksam.",
+      "quelle": "Körperfett-Assessment S. 14"
+    },
+    "darm-sanierung-phase-1": {
+      "id": "darm-sanierung-phase-1",
+      "name": "Darm-Sanierung – Phase 1 · Chlorenergy",
+      "gruppe": "darm-sanierung",
+      "gilt_fuer_falten": ["bauch"],
+      "phase": 1,
+      "dauer": "3–6 Wochen",
+      "supplemente": [
+        { "slug": "chlorenergy", "dosierung": "3×6 bis 3×10" }
+      ],
+      "fokus": "Grober Dreck raus",
+      "quelle": "Hormone S. 6"
+    },
+    "darm-sanierung-phase-2": {
+      "id": "darm-sanierung-phase-2",
+      "name": "Darm-Sanierung – Phase 2 · ChlorellaKomplex",
+      "gruppe": "darm-sanierung",
+      "gilt_fuer_falten": ["bauch"],
+      "phase": 2,
+      "dauer": "3–6 Wochen",
+      "supplemente": [
+        { "slug": "chlorella-komplex", "dosierung": "3×3 bis 3×5" }
+      ],
+      "fokus": "Kleiner Dreck raus",
+      "quelle": "Hormone S. 6"
+    },
+    "darm-sanierung-phase-3": {
+      "id": "darm-sanierung-phase-3",
+      "name": "Darm-Sanierung – Phase 3 · Pectasol (optional)",
+      "gruppe": "darm-sanierung",
+      "gilt_fuer_falten": ["bauch"],
+      "phase": 3,
+      "dauer": "1 Dose",
+      "supplemente": [
+        { "slug": "pectasol", "dosierung": "15–30 g pro Tag morgens nüchtern in Wasser" }
+      ],
+      "fokus": "Modified Citrus Pectin – Schwermetalle im Darm binden",
+      "notiz": "Nur Econugenics-Produkt. Immer zuerst Chlorenergy und Chlorella.",
+      "quelle": "Hormone S. 6, Supplements S. 2"
+    },
+    "darm-sanierung-phase-4": {
+      "id": "darm-sanierung-phase-4",
+      "name": "Darm-Sanierung – Phase 4 · Glutamin (optional)",
+      "gruppe": "darm-sanierung",
+      "gilt_fuer_falten": ["bauch"],
+      "phase": 4,
+      "dauer": "3 Wochen",
+      "supplemente": [
+        { "slug": "glutamin", "dosierung": "bis 80 g pro Tag" }
+      ],
+      "fokus": "Leaky Gut versiegeln – Darmwand reparieren",
+      "quelle": "Hormone S. 6"
+    },
+    "darm-sanierung-phase-5": {
+      "id": "darm-sanierung-phase-5",
+      "name": "Darm-Sanierung – Phase 5 · Probiotika (optional)",
+      "gruppe": "darm-sanierung",
+      "gilt_fuer_falten": ["bauch"],
+      "phase": 5,
+      "supplemente": [
+        { "slug": "probiotika", "dosierung": "je nach Präparat" }
+      ],
+      "fokus": "Darmflora aufbauen (v. a. nach längerer Sanierung)",
+      "quelle": "Hormone S. 6"
+    },
+    "jetlag-west": {
+      "id": "jetlag-west",
+      "name": "Jetlag-Protokoll · nach Westen (z. B. USA)",
+      "gruppe": "spezialprotokolle",
+      "gilt_fuer_falten": [],
+      "situation": "Man kommt früher an – Aufwachen erschwert",
+      "supplemente_morgens": [
+        { "slug": "multikomplex", "dosierung": "3 F" }
+      ],
+      "supplemente_abends": [
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" },
+        { "slug": "ypsi-inositol", "dosierung": "1 vs" },
+        { "slug": "lipo-melatonin", "dosierung": "6 vs" }
+      ],
+      "regel": "Immer zu Ortszeit schlafen gehen und aufstehen.",
+      "quelle": "Hormone S. 16"
+    },
+    "jetlag-ost": {
+      "id": "jetlag-ost",
+      "name": "Jetlag-Protokoll · nach Osten (Asien / USA zurück)",
+      "gruppe": "spezialprotokolle",
+      "gilt_fuer_falten": [],
+      "situation": "Später ins Bett, Cortisol morgens tief",
+      "supplemente_morgens": [
+        { "slug": "multikomplex", "dosierung": "4 F" },
+        { "slug": "licorice-komplex", "dosierung": "1 F" },
+        { "slug": "kaffee", "dosierung": "1 Tasse" }
+      ],
+      "supplemente_abends": [
+        { "slug": "ypsi-magnesium", "dosierung": "4 vs" }
+      ],
+      "regel": "Immer zu Ortszeit schlafen gehen und aufstehen.",
+      "quelle": "Hormone S. 16"
+    },
+    "green-week": {
+      "id": "green-week",
+      "name": "YPSI Green Week (Functional Fasting)",
+      "gruppe": "spezialprotokolle",
+      "gilt_fuer_falten": ["bauch", "quadrizeps", "beinbizeps"],
+      "situation": "Intelligentes Fasten für Detox, Darmruhe, Regeneration – ideal wenn Kunde bei Plateau über 20 % Körperfett steht.",
+      "dauer": "min. 3 Tage, max. 21 Tage; Standard 5 Tage",
+      "mahlzeit_a": {
+        "name": "Shake",
+        "zutaten": [
+          "1–3 Esslöffel Veganes Protein",
+          "1–2 Teel. YPSI AminoElektrolytKomplex",
+          "Wasser"
+        ]
+      },
+      "mahlzeit_b": {
+        "name": "Greens-Drink im Wechsel",
+        "zutaten": [
+          "1 Essl. Dynamic Greens (o. ä.)",
+          "1–2 Teel. YPSI AminoElektrolytKomplex",
+          "Wasser"
+        ]
+      },
+      "gemuese": "Ein grünes Gemüse pro Tag, dampfgaren, jeden Tag rotieren",
+      "regeln": [
+        "Mind. 3 Shakes pro Tag, im Wechsel mit Greens",
+        "Trink viel Wasser – kein Tee, kein Kaffee. Herbal Infusions ok. Lime/Lemon-Saft ok.",
+        "Trainingsvolumen ggf. reduzieren",
+        "Min. 8 h Schlaf pro Nacht",
+        "Supplement-Auswahl auf Basis der YPSI-Hautfaltenmessung"
+      ],
+      "quelle": "Funktionelle Ernährung S. 2, Makro/Mikro S. 4"
+    }
+  }
+}

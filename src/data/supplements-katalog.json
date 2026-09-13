@@ -1,0 +1,618 @@
+{
+  "version": "1.0",
+  "quellen": [
+    "YPSI Advanced Supplementation, Stuttgart Juli 2017 (Wolfgang Unsöld)",
+    "YPSI Trainer A-Lizenz Modul 4 – Neurotransmitter, Stuttgart Februar 2017",
+    "Braverman Personality Type Assessment – Dr. Eric R. Braverman, The Edge Effect (2005)"
+  ],
+  "hinweis": "Dosisangaben sind Praxis-Empfehlungen aus dem YPSI-System bzw. Bravermans Buch. Sie ersetzen keine ärztliche/therapeutische Beratung. Timing-Abkürzungen: F = Frühstück, vs = vor dem Schlafen, PreWo = Pre-Workout, PWO = Post-Workout.",
+  "kategorien": {
+    "basis": "Grundlagen-Präparate, die zu fast jedem Protokoll gehören",
+    "entgiftung": "Chlorophyll-basiert, Leber-Support, Schwermetalle",
+    "adaptogene": "Stress-/Nebennieren-Support",
+    "schlaf-gaba": "Schlaf-fördernd, GABA-System",
+    "neurotransmitter-dopamin": "Dopamin-fördernd",
+    "neurotransmitter-acetylcholin": "Acetylcholin/Cholin-Spender",
+    "neurotransmitter-serotonin": "Serotonin-fördernd",
+    "hormone": "Testosteron, DHEA, Wachstumshormon",
+    "verdauung": "Darm-Sanierung, antibakteriell",
+    "training": "Pre-/Post-Workout, Kraft, Volumen",
+    "spezial": "Einzelfälle, akute Fragestellungen"
+  },
+  "supplemente": {
+    "multikomplex": {
+      "name": "YPSI MultiKomplex",
+      "kategorie": "basis",
+      "standard_dosis": "3×2 Kapseln über den Tag",
+      "wirkung": "Multivitamin/-mineral-Basis. Kein Mikronährstoff kommt isoliert im Körper vor – Multis sind die Basis. Die Menge an Stress bestimmt den Bedarf.",
+      "marke_empfehlung": "YPSI",
+      "quelle": "Supplements S. 1"
+    },
+    "ypsi-magnesium": {
+      "name": "YPSI Magnesium (Bisglycinat)",
+      "kategorie": "basis",
+      "standard_dosis": "4 Kapseln vs",
+      "wirkung": "Bisglycinat unterdrückt Cortisol – beste Unterstützung für den Schlaf. Kombination mit Aspartat für Muskulatur-Aufnahme.",
+      "formen": {
+        "bisglycinat": "Cortisol-Unterdrückung",
+        "aspartat": "Aufnahme in Muskulatur",
+        "citrat": "GABA",
+        "threonat": "GABA + Konzentration"
+      },
+      "marke_empfehlung": "YPSI",
+      "quelle": "Supplements S. 1, Hormone S. 16"
+    },
+    "ypsi-inositol": {
+      "name": "YPSI Inositol plus Magnesium",
+      "kategorie": "basis",
+      "standard_dosis": "1 Kapsel vs",
+      "wirkung": "Inositol ist Rohstoff für Neurotransmitter – sorgt dafür, dass man abends müde wird, nachts gut schläft und morgens fit ist. Beeinflusst Cortisol.",
+      "marke_empfehlung": "YPSI",
+      "quelle": "Neurotransmitter S. 1, Hormone S. 8"
+    },
+    "vitamin-d-k": {
+      "name": "Vitamin D3 + K2",
+      "kategorie": "basis",
+      "standard_dosis": "10 Tropfen F Standard, per Labortest anpassen (Ziel 80–120 im Blut)",
+      "dosis_nach_test": {
+        "unter_80": "1 Pipette Vit D",
+        "80_bis_120": "1/4 Pipette Vit D",
+        "ueber_120": "0 Pipette (nur Vit K)"
+      },
+      "wirkung": "Aktiviert GCMAF, das Makrophagen aktiviert (Immunsystem). K2 (MK7) aktiviert Osteocalcin (Ca in Knochen) und MGP (Ca aus Gefäßen ab).",
+      "marke_hinweis": "Olimp NICHT empfohlen – Kapseln enthalten krebserregendes Titan.",
+      "einnahme_regel": "1 Flasche pro Monat komplett trinken; nach 6–8 Wochen Labortest.",
+      "quelle": "Supplements S. 6, S. 24"
+    },
+    "chlorenergy": {
+      "name": "Chlorenergy",
+      "kategorie": "entgiftung",
+      "standard_dosis": "3×6 (bis 3×10) für 3–6 Wochen",
+      "wirkung": "Entgiftung Phase 1 – 'großer Dreck weg'. Klorella-Komplex. Verbessert Leberfunktion, Nährstoffabsorption.",
+      "notiz": "Einschleichen wegen Nebenwirkungen (Durchfall, Zittern) bei sehr starker Entgiftung.",
+      "quelle": "Supplements S. 1, Hormone S. 6"
+    },
+    "chlorella-komplex": {
+      "name": "YPSI ChlorellaKomplex",
+      "kategorie": "entgiftung",
+      "standard_dosis": "3×3 bis 3×5 (bis 3×10) für 3–6 Wochen",
+      "wirkung": "Entgiftung Phase 2 – 'kleiner Dreck weg'. Bindet in Kombi mit Chlorella Metalle.",
+      "quelle": "Supplements S. 3, Hormone S. 6"
+    },
+    "chloromalat": {
+      "name": "ChloroMalat (Magnesium-Malat)",
+      "kategorie": "entgiftung",
+      "standard_dosis": "6 vs für 3–6 Wochen, dann 2 vs für 3–6 Wochen",
+      "wirkung": "Bindet Aluminium. Bioverfügbare Magnesium-Quelle. Positiver Effekt auf Schlafqualität.",
+      "quelle": "Supplements S. 3"
+    },
+    "licorice-komplex": {
+      "name": "LicoriceKomplex (Süßholzwurzel)",
+      "kategorie": "adaptogene",
+      "standard_dosis": "1–4 Kapseln F, ausschließlich morgens",
+      "wirkung": "Verdoppelt die Halbwertszeit des Cortisol. Erhöht Energielevel ohne die Nebenniere zu stimulieren. Regeneriert die Nebenniere. Resettet den Biorhythmus.",
+      "kontraindikation": "Nicht abends – stört Cortisol-Abend-Kurve.",
+      "hinweis_toleranz": "Je schwerer / fitter / dunklere Haare, desto besser wird Licorice vertragen.",
+      "quelle": "Supplements S. 1, S. 10"
+    },
+    "licorice-creme": {
+      "name": "Licorice Creme (Wise Women Herbals)",
+      "kategorie": "adaptogene",
+      "standard_dosis": "1× am Morgen auf Bauchnabel",
+      "wirkung": "Nährt/regeneriert Nebenniere. Verdoppelt die Halbwertszeit von Cortisol. Einziges Supplement das Cortisol/Energie erhöht ohne die Nebenniere zu stimulieren.",
+      "marke_empfehlung": "Wise Women Herbals – Licorice Lysine 1oz",
+      "quelle": "Supplements S. 10"
+    },
+    "adaptogene-5": {
+      "name": "5 Adaptogene (Yamswurzel, Ginseng, Schisandra u. a.)",
+      "kategorie": "adaptogene",
+      "wirkung": "Alle: PHER (=Nebennieren) unterstützen. Yamswurzel z. B. DHEA-Booster.",
+      "quelle": "Supplements S. 1"
+    },
+    "ashwagandha": {
+      "name": "Ashwagandha (HerbPharm 1 Pipette)",
+      "kategorie": "adaptogene",
+      "standard_dosis": "1–3 Pipetten mit Kohlenhydraten vs; max. 1 Woche am Stück (besser 1–2 Phasen)",
+      "wirkung": "Yin-Spender. 'Knockout'-Effekt. Ideal bei Übertraining oder nach langen Projekten.",
+      "quelle": "Supplements S. 20"
+    },
+    "neuromag": {
+      "name": "Neuromag (Magnesium-L-Threonat)",
+      "kategorie": "schlaf-gaba",
+      "standard_dosis": "4–8 Kapseln vs für 2–3 Wochen",
+      "wirkung": "Höchste Mg-Konzentration in der Spinal-Flüssigkeit. Erhöht GABA. Hemmender Effekt auf das Neuron.",
+      "ergaenzung": "Ergänzend zu YPSI Magnesium.",
+      "quelle": "Supplements S. 12"
+    },
+    "taurin": {
+      "name": "Taurin",
+      "kategorie": "schlaf-gaba",
+      "standard_dosis": "bis 6 g",
+      "wirkung": "Vorstufe von GABA – Nr.-1-Defizit-Neurotransmitter statistisch. Fördert Gallen-Funktion. Höchste Defizite in Speed-Sportarten (viel Acetylcholin).",
+      "beste_quelle_natur": "Hummer",
+      "quelle": "Supplements S. 6, Neurotransmitter S. 4"
+    },
+    "glycin": {
+      "name": "Glycin",
+      "kategorie": "schlaf-gaba",
+      "standard_dosis": "bis 40 g pre-bed (immer einschleichen ab 1/4 Teel.)",
+      "wirkung": "Neurotransmitter (ähnlich GABA). Bewirkt Wachstumshormon-Ausschub, besseren Schlaf. Unterstützt hepatische Phase 2. Reinigender Effekt auf die Faszie. Bindet Pestizide/Insektizide.",
+      "kombinationen": "Prio 1–3: Quad/Ben/Wade",
+      "notiz": "Glycintoleranz ist guter Indikator für Leberfunktion.",
+      "quelle": "Supplements S. 25"
+    },
+    "lipo-melatonin": {
+      "name": "Liposomales Melatonin",
+      "kategorie": "neurotransmitter-serotonin",
+      "standard_dosis": "4–8 Pumps vs",
+      "wirkung": "Für ZNS bioverfügbares Melatonin durch Phospholipide. Effektivstes Serotonin-Supplement. Ideal für Jetlag zum Reset des Biorhythmus.",
+      "marke_empfehlung": "Readisorb (UK) – in Kombination mit liposomalem B6",
+      "quelle": "Supplements S. 25"
+    },
+    "5-htp": {
+      "name": "5-HTP (mit Decarboxylase-Inhibitor)",
+      "kategorie": "neurotransmitter-serotonin",
+      "dosierung": {
+        "minor": "100 mg",
+        "moderate": "200 mg",
+        "major": "500 mg"
+      },
+      "wirkung": "Serotonin-Vorstufe.",
+      "quelle": "Braverman-Test"
+    },
+    "l-tyrosin": {
+      "name": "L-Tyrosin",
+      "kategorie": "neurotransmitter-dopamin",
+      "dosierung": {
+        "minor": "500 mg",
+        "moderate": "1000 mg",
+        "major": "1000–2000 mg"
+      },
+      "wirkung": "Dopamin-Vorstufe. Rohstoff für Schilddrüse.",
+      "quelle": "Braverman-Test, Neurotransmitter S. 3"
+    },
+    "dl-phenylalanin": {
+      "name": "DL-Phenylalanin",
+      "kategorie": "neurotransmitter-dopamin",
+      "dosierung": {
+        "minor": "500 mg",
+        "moderate": "1000 mg",
+        "major": "1000–2000 mg"
+      },
+      "wirkung": "Dopamin-Vorstufe.",
+      "quelle": "Braverman-Test, Neurotransmitter S. 3"
+    },
+    "bacopa-monnieri": {
+      "name": "Bacopa Monnieri",
+      "kategorie": "neurotransmitter-dopamin",
+      "standard_dosis": "2–6 Tabs F oder PreWo",
+      "wirkung": "Erhöht Dopamin. Funktioniert primär bei einem Dopamin-Defizit.",
+      "marke_empfehlung": "Planetary Herbals oder Himalaya",
+      "quelle": "Supplements S. 8, Neurotransmitter S. 3"
+    },
+    "alpha-gpc": {
+      "name": "Alpha GPC",
+      "kategorie": "neurotransmitter-acetylcholin",
+      "standard_dosis": "1200 mg Standard, bis 3+ g",
+      "wirkung": "Cholin-Spender. Erhöht HGH. Primär in Verbindung mit ACh-erhöhenden Supplements.",
+      "timing": "Auf nüchternen Magen oder PreWo",
+      "quelle": "Supplements S. 8, Neurotransmitter S. 4"
+    },
+    "huperzine-a": {
+      "name": "Huperzine A",
+      "kategorie": "neurotransmitter-acetylcholin",
+      "standard_dosis": "2–6 Tabs F oder PreWo",
+      "wirkung": "Acetylcholinesterase-Hemmer. Verbessert Aufmerksamkeit, Konzentration und Informationsaufnahme.",
+      "notiz": "Hirn-Supps immer rotieren.",
+      "quelle": "Supplements S. 8, Neurotransmitter S. 4"
+    },
+    "acetyl-l-carnitin": {
+      "name": "Acetyl-L-Carnitin",
+      "kategorie": "neurotransmitter-acetylcholin",
+      "standard_dosis": "Bei ACh-Defizit bis zu 8 g",
+      "wirkung": "Spendet Acetyl-Gruppe für ACh. Hohe Absorption ins ZNS. Milde kognitive und geistige Leistungssteigerung.",
+      "timing": "Frühstück oder PreWo",
+      "hinweis": "ACh-dominante Personen haben eine geringe Toleranz.",
+      "quelle": "Supplements S. 24, Neurotransmitter S. 4"
+    },
+    "dmae": {
+      "name": "DMAE",
+      "kategorie": "neurotransmitter-acetylcholin",
+      "standard_dosis": "bis 3 g PreWo",
+      "wirkung": "Cholin-Spender. Ausgezeichnet in Verbindung mit Noopept.",
+      "quelle": "Supplements S. 23"
+    },
+    "cdp-choline": {
+      "name": "CDP Choline",
+      "kategorie": "neurotransmitter-acetylcholin",
+      "standard_dosis": "PreWo",
+      "wirkung": "Cholin-Spender. Primär mit ACh-erhöhenden Supplements.",
+      "quelle": "Supplements S. 23"
+    },
+    "catuaba": {
+      "name": "Catuaba",
+      "kategorie": "hormone",
+      "standard_dosis": "4 Kaps PreWo bzw. 3×2, max. 1 Woche am Stück",
+      "wirkung": "Aus dem Amazonas. Erhöht Dopamin und Testosteron.",
+      "marke_hinweis": "Duazon (HerbPharm)",
+      "quelle": "Supplements S. 23"
+    },
+    "raponticum": {
+      "name": "Raponticum (Beta Ecdysteron)",
+      "kategorie": "hormone",
+      "standard_dosis": "4–8 Caps PreWO oder 3×2",
+      "wirkung": "Funktioniert nur bei hohem Testosteron (Trizeps <8 mm). Training-Drive und Look ändern sich dramatisch.",
+      "marke_empfehlung": "YPSI (nicht auf Reseller-Liste)",
+      "quelle": "Funktionelle Ernährung S. 7"
+    },
+    "n-acetyl-cystein": {
+      "name": "N-Acetyl-Cystein (NAC)",
+      "kategorie": "entgiftung",
+      "standard_dosis": "Standarddosis 1 F Mann / 4 F Frau, bis zu 8 Caps",
+      "wirkung": "Rohstoff für Glutathion – günstigster Weg GSH zu erhöhen. Primär für Beinfalten (Leber/Entgiftung). Kann Dopamin erhöhen.",
+      "timing": "Frühstück",
+      "marke_empfehlung": "Duazon",
+      "einsatz": [
+        "Wenn Bauch das Problem ist – Energielevel morgens",
+        "In stresslichen Phasen"
+      ],
+      "quelle": "Supplements S. 17"
+    },
+    "lipo-glutathion": {
+      "name": "Liposomales Glutathion (GSH)",
+      "kategorie": "entgiftung",
+      "standard_dosis": "1–2 Essl. vs (bei Unruhe auf 1 Teel. reduzieren)",
+      "wirkung": "Bioverfügbare Form von GSH. Unterstützt hepatische Phase 2. Senkt Beinfalten (v. a. Hams). Verbessert Tiefschlaf.",
+      "marke_empfehlung": "Readisorb (UK)",
+      "hinweis": "Immer in Verbindung mit Chlorella. Bei hohem Serotonin-Defizit → Melatonin-Spray.",
+      "quelle": "Supplements S. 2"
+    },
+    "liv52": {
+      "name": "Liv.52 (Himalaya)",
+      "kategorie": "entgiftung",
+      "standard_dosis": "1 bis 3×4 (immer einschleichen)",
+      "wirkung": "Unterstützt Leber Phase 2. Senkt u. a. die Quadrizeps-Falte. Sehr aggressiver Oxidant der Leber.",
+      "marke_hinweis": "Nur das europäische Produkt (Riga) verwenden.",
+      "nebenwirkung": "Übelkeit (Magenkrämpfe) möglich.",
+      "quelle": "Supplements S. 2"
+    },
+    "methylkomplex": {
+      "name": "MethylKomplex (SAMe / MTHF / P5P / B12)",
+      "kategorie": "entgiftung",
+      "standard_dosis": "2 vs",
+      "wirkung": "Methylgruppen-Spender. Abbau von Homocystein. Dopamin- und Serotonin-Synthese. Wirkt auf Beinfalten (koronarer hinterer).",
+      "komponenten": ["same", "mthf", "p5p", "b12"],
+      "notiz": "Zu viel Methyl-Spender = auch zu viel Cortisol. Nicht zu viel.",
+      "quelle": "Supplements S. 3–4"
+    },
+    "same": {
+      "name": "SAMe (S-Adenosyl-Methionin)",
+      "kategorie": "entgiftung",
+      "wirkung": "Stoffwechselaktive Form der schwefelhaltigen Aminosäure Methionin. Methylgruppen-Spender. Dopamin- und Serotonin-Synthese. Hepatische Phase 2.",
+      "quelle": "Supplements S. 3"
+    },
+    "mthf": {
+      "name": "Methyltetrahydrofolat (MTHF)",
+      "kategorie": "entgiftung",
+      "wirkung": "Methylierte Folsäure. Erhöhter Bedarf durch MTHFR-Gen-Polymorphismus (bis zu 50× erhöht). Dopamin- und Serotonin-Synthese.",
+      "quelle": "Supplements S. 4"
+    },
+    "p5p": {
+      "name": "P5P (Pyridoxal-5-Phosphat / aktives B6)",
+      "kategorie": "basis",
+      "wirkung": "Aktive Coenzym-Form von B6. Wichtig für Homocystein-Abbau, Blutbildung, Sauerstofftransport, Herz- und Skelettmuskelfunktionen, Energiestoffwechsel in Mitochondrien, Zellteilung, Immunsystem, Endokrines System, Nervensystem (Monoamin-Neurotransmitter, Sphingolipide, Taurin).",
+      "notiz": "Isoliert nehmen macht keinen Sinn. B6, B9, B12 immer zusammen.",
+      "quelle": "Supplements S. 4"
+    },
+    "b12": {
+      "name": "Vitamin B12",
+      "kategorie": "basis",
+      "dosierung": {
+        "minor": "100 mg",
+        "moderate": "200 mg",
+        "major": "500 mg"
+      },
+      "quelle": "Braverman-Test"
+    },
+    "glutamin": {
+      "name": "Glutamin",
+      "kategorie": "verdauung",
+      "standard_dosis": "bis 80 g/Tag (in Darm-Sanierung bis 3 Wochen)",
+      "wirkung": "Immunsystem-Wenn-krank. Leber baut es in andere Aminos um. Speichert Aminos in Zellen. Versiegelt Leaky Gut / Darmwand.",
+      "einsatz": [
+        "Akute Verletzungen (bis 3×3)",
+        "Hochvolumige Trainingsphasen"
+      ],
+      "quelle": "Supplements S. 19, Hormone S. 6"
+    },
+    "pectasol": {
+      "name": "Pectasol (Modified Citrus Pectin)",
+      "kategorie": "verdauung",
+      "standard_dosis": "20–35 g in H2O morgens nüchtern",
+      "wirkung": "Bindet Hg in den Microvilli der Darmwand. Aus der Prostatakrebs-Forschung. Großer Effekt auf Dickdarm (Bauchnabel-Bereich).",
+      "marke_hinweis": "Nur Econugenics-Produkt.",
+      "hinweis": "Immer zuerst Chlorenergy und Chlorella.",
+      "quelle": "Supplements S. 2"
+    },
+    "probiotika": {
+      "name": "Probiotika",
+      "kategorie": "verdauung",
+      "wirkung": "Darmflora aufbauen. Nach längerer Sanierung.",
+      "quelle": "Hormone S. 6"
+    },
+    "knoblauch-extrakt": {
+      "name": "Knoblauch Extrakt",
+      "kategorie": "verdauung",
+      "standard_dosis": "Bis 3×2 pro Tag für 1 Woche",
+      "wirkung": "Antimikrobiellste Substanz in der Natur. Funktioniert oft besser als Antibiotika.",
+      "einsatz": [
+        "Auf Reisen",
+        "Bei Krankheit / bakterielle Infekte"
+      ],
+      "notiz": "Noch effizienter: Kapseln öffnen und 2 min in Wasser auflösen.",
+      "quelle": "Supplements S. 6"
+    },
+    "biotics-adp": {
+      "name": "Biotics A.D.P. (Oregano Öl emulsified)",
+      "kategorie": "verdauung",
+      "standard_dosis": "3×2 bis 3×6",
+      "wirkung": "Stark antibakteriell. Fungizid (Candida, Darmschimmelsporen).",
+      "einsatz": ["Reisen", "Erkältungen", "Darmsanierung 2. Reihe"],
+      "nebenwirkung": "Durchfall, Krämpfe möglich.",
+      "quelle": "Supplements S. 20"
+    },
+    "coptis-chinensis": {
+      "name": "Coptis Chinensis",
+      "kategorie": "verdauung",
+      "standard_dosis": "1 Pipette in Wasser 3× pro Tag, max. 1 Woche",
+      "wirkung": "Bitterstes Kraut in der TCM. Aktiviert stagnierende Leber-Chi (Detox).",
+      "marke_empfehlung": "Thorne Research / HerbPharm / CoActiveHealth",
+      "einsatz": "Nur vor dem Schlafen für 1–3-Uhr-Aufwachen (max. 1 Woche 3×/Tag)",
+      "quelle": "Supplements S. 16, Funktionelle Ernährung S. 5"
+    },
+    "aktivkohle": {
+      "name": "Aktivkohle",
+      "kategorie": "spezial",
+      "standard_dosis": "2–6 Tabs vs, max. 5 Tage am Stück",
+      "wirkung": "Bindet 'alles' im Darm.",
+      "hinweis": "Nicht in Kombination mit Mineralien. Ideal bei Herxheimer-Reaktion und Reisedurchfall.",
+      "quelle": "Supplements S. 14"
+    },
+    "honso-h9-h12": {
+      "name": "Honso H9 / H12",
+      "kategorie": "entgiftung",
+      "standard_dosis": "Im Wechsel: H9 morgens, H12 abends, jeweils 1–3 Sachets",
+      "wirkung": "Chinesische Kräuter-Leber-Tonikum. Erhöht GSH in der Leber.",
+      "einsatz": "Beinfalten (fortgeschritten), hohes Trainingspensum",
+      "quelle": "Supplements S. 13, Funktionelle Ernährung S. 5"
+    },
+    "afa-blaugruen-alge": {
+      "name": "AFA (Blaugrünalge)",
+      "kategorie": "entgiftung",
+      "standard_dosis": "3×2 bis 3×6",
+      "wirkung": "Boostet Stammzellenausstoß (Neurogenese). Reich an Phenylethylamin (Dopamin-Vorläufer). Geringerer Entgiftungs-Effekt.",
+      "marke_empfehlung": "Von Hüdelberger (Amazon)",
+      "notiz": "Nicht sonderlich falteneffektiv. Zu späterem Zeitpunkt einbauen für allgemeine Regeneration.",
+      "quelle": "Supplements S. 3"
+    },
+    "greens": {
+      "name": "Greens Drinks",
+      "kategorie": "entgiftung",
+      "standard_dosis": "1 Tel. 1–2× pro Tag (15–17 Uhr, nach Frühstück oder nach Abendessen)",
+      "wirkung": "Chlorophyllreiche Antioxidantien-Mischung. Ideal auf Reisen und in trainingsintensiven Phasen. Antioxidans zur Entgiftung für Beinfalten (starke Diode).",
+      "marke_empfehlung": ["Dynamic Greens von Nutri-Dyn (direkt YPSI)", "Spectra Greens von DaVinci", "Paleo Greens von DFH"],
+      "einsatz": [
+        "15–17 Uhr für Lungenfunktion",
+        "Wenn jemand nachts zwischen 3–5 Uhr aufwacht"
+      ],
+      "quelle": "Supplements S. 18"
+    },
+    "kupfer-chlorophyllin": {
+      "name": "Kupfer-Chlorophyllin",
+      "kategorie": "entgiftung",
+      "standard_dosis": "flüssig",
+      "wirkung": "Supplement-Form von Chlorophyll. Wasser- & fettlöslich. Fungizid, Antioxidant, antikarzinogen.",
+      "notiz": "Alternative zu Chlorophyll. Erst durch Zugabe von Kupfer wasserlöslich.",
+      "quelle": "Supplements S. 4"
+    },
+    "vitamin-c": {
+      "name": "Vitamin C (liposomal)",
+      "kategorie": "spezial",
+      "standard_dosis": "Bis 50 g/Tag",
+      "wirkung": "Bindegewebsregeneration, Immunsystem, Antioxidant.",
+      "notiz": "Ascorbinsäure ist zu sauer (schlecht verträglich). Daher liposomales Vit-C. Immunsystem-Test durch Vit-C-Verträglichkeit: je weniger verträgt, desto besser. Über 10 g einen Schlucks.",
+      "quelle": "Supplements S. 17"
+    },
+    "coq10": {
+      "name": "CoQ10",
+      "kategorie": "spezial",
+      "standard_dosis": "100 mg F (Zielgruppe 40+)",
+      "wirkung": "Hohe Konzentration in den Mitochondrien. Rohstoff für Cholesterin. Für Resistenzsteigerung durch Cortisol.",
+      "quelle": "Supplements S. 18"
+    },
+    "arthoben": {
+      "name": "Arthoben",
+      "kategorie": "spezial",
+      "standard_dosis": "20–40 g pro Tag in Wasser, zwischen Mahlzeiten auf nüchternen Magen",
+      "wirkung": "Medical Food zur Knorpelregeneration. Für Meniskus.",
+      "quelle": "Supplements S. 13"
+    },
+    "ec-matrixx": {
+      "name": "EC Matrixx",
+      "kategorie": "spezial",
+      "standard_dosis": "1 F Basis, 5 F akut, 1–3 PreWo Booster (für 2 Wochen)",
+      "wirkung": "Hauptwirkstoff Tetrase (Harvard-patentiertes Enzym) verstoffwechselt überschüssiges Narben-/Bindegewebe. Erhöht Fast-Twitch-Faser-Rekrutierung.",
+      "marke_empfehlung": "Metagenics",
+      "quelle": "Supplements S. 14"
+    },
+    "ekklonia-cava": {
+      "name": "Ekklonia Cava",
+      "kategorie": "schlaf-gaba",
+      "standard_dosis": "4–8 Kapseln vs",
+      "wirkung": "Braunalge. Repariert cerebrales Endothelium (Gefäßwände der Blutgefäße). Erhöht HGH. Delta-Schlaf.",
+      "einsatz": "Fortgeschrittenes Schlafsupplement",
+      "quelle": "Supplements S. 25"
+    },
+    "beefprotein-isolate": {
+      "name": "Beefprotein Isolate",
+      "kategorie": "training",
+      "wirkung": "Alternative PWO-Proteinquelle. Wird aus Kollagen hergestellt.",
+      "marke_empfehlung": "Paleo Protein von DFH",
+      "notiz": "Immer mit Mixer verwenden. Rotieren.",
+      "quelle": "Supplements S. 12"
+    },
+    "pepto-pro": {
+      "name": "Pepto Pro",
+      "kategorie": "training",
+      "standard_dosis": "10–40 g Intra-/PWO oder als Snack",
+      "wirkung": "Hydrolisiertes Caseinat. Schnell absorbierbar (vorverdaut).",
+      "quelle": "Supplements S. 20"
+    },
+    "creapure": {
+      "name": "Creapure (Kreatin Monohydrat)",
+      "kategorie": "training",
+      "standard_dosis": "20 g PWO",
+      "wirkung": "Steigert PhosphoCreatin-Speicher und Satellitenzellen-Aktivität.",
+      "marke_empfehlung": "myprotein.com",
+      "notiz": "Deutsches Kreatin Monohydrat, metallfrei.",
+      "quelle": "Supplements S. 22"
+    },
+    "kreatin-hcl": {
+      "name": "Kreatin HCL",
+      "kategorie": "training",
+      "standard_dosis": "1 g pro 10 kg KG, auf mehrere Dosierungen verteilen",
+      "wirkung": "Kreatin plus HCL. Hat zusätzlich positiven Effekt auf Verdauung.",
+      "quelle": "Supplements S. 22"
+    },
+    "kalium-aspartat": {
+      "name": "Kalium-Aspartat",
+      "kategorie": "training",
+      "standard_dosis": "1,2–1,8 g PWO oder vs",
+      "wirkung": "Fördert Flüssigkeits-Shift in den intrazellulären Raum (Na-Antagonist). Je mehr Muskelmasse und PWO-KHs, desto größer der Effekt.",
+      "quelle": "Supplements S. 12"
+    },
+    "kalium-citrat": {
+      "name": "Kalium-Citrat",
+      "kategorie": "training",
+      "standard_dosis": "0,8–1,6 g PWO oder vs",
+      "wirkung": "Fördert Flüssigkeits-Shift (Na-Antagonist). Steigert Effekt aller Nootropika.",
+      "marke_empfehlung": "Kalium-Verla",
+      "quelle": "Supplements S. 22"
+    },
+    "citrulline-malate": {
+      "name": "Citrulline Malate",
+      "kategorie": "training",
+      "standard_dosis": "bis 20 g in Wasser PreWo",
+      "wirkung": "Ausgezeichnet in Masse-Phase durch positiven Effekt auf Ammoniak-Last der Leber. Erhöht Work Capacity.",
+      "notiz": "Wirkt sich nicht auf Appetit aus, baut Muskeln auf (je mehr Protein, desto mehr).",
+      "quelle": "Supplements S. 10"
+    },
+    "agmatine-sulfate": {
+      "name": "Agmatine Sulfate",
+      "kategorie": "training",
+      "standard_dosis": "1–2 g PreWo, max. 3 Wochen am Stück",
+      "wirkung": "NO-Booster, steigert Proteinsynthese durch Stretch der Zellmembran.",
+      "marke_empfehlung": "USP-Labs",
+      "quelle": "Supplements S. 14"
+    },
+    "carnitine-l-tartrat": {
+      "name": "Carnitine-L-Tartrat",
+      "kategorie": "training",
+      "standard_dosis": "bis 6 g PWO",
+      "wirkung": "Erhöht die Anzahl der Androgen-Rezeptoren auf der Muskulatur. Bei bis zu 10 g über 6 Monate Sauerstoffaufnahme im Blut erhöht (Fett-Leistung).",
+      "quelle": "Supplements S. 24"
+    },
+    "maltodextrin": {
+      "name": "Maltodextrin",
+      "kategorie": "training",
+      "standard_dosis": "bis 4 g pro kg Körpergewicht",
+      "wirkung": "Als PWO Kohlenhydrat-Pulver. Hohe Verträglichkeit und Löslichkeit.",
+      "marke_empfehlung": "In Bulk bestellen (myprotein)",
+      "quelle": "Supplements S. 16"
+    },
+    "kaffee": {
+      "name": "Kaffee (Koffein)",
+      "kategorie": "neurotransmitter-dopamin",
+      "wirkung": "Der einfachste Weg, Dopamin zu erhöhen. Kann Cortisol/Energie steigern.",
+      "hinweis": "Nicht zu spät am Tag (kann Insomnia auslösen). 1–2 Tassen morgens ok.",
+      "quelle": "Neurotransmitter S. 3, Supplements S. 6"
+    },
+    "phenyl-gaba": {
+      "name": "Phenyl-GABA",
+      "kategorie": "schlaf-gaba",
+      "wirkung": "Einzige GABA-Form die funktioniert – Standard-GABA-Supplements erhöhen GABA nicht (BlutHirnSchranke).",
+      "quelle": "Neurotransmitter S. 4"
+    },
+    "l-theanin": {
+      "name": "L-Theanin",
+      "kategorie": "schlaf-gaba",
+      "wirkung": "GABA-Support. Gefunden in grünem Tee.",
+      "quelle": "Neurotransmitter S. 4"
+    },
+    "ypsi-amino-elektrolyt": {
+      "name": "YPSI AminoElektrolytKomplex",
+      "kategorie": "basis",
+      "wirkung": "Mineralien-Elektrolyte für Hydration, Power-Output (1 % Dehydration = 7 % Power-Verlust), Zellmembranpolarität, Säure-Basen-Haushalt, Informationsübertragung im ZNS/PNS.",
+      "quelle": "Supplements S. 16, Funktionelle Ernährung S. 6"
+    },
+    "brain-power-sours": {
+      "name": "DFH Brain Power Sours",
+      "kategorie": "neurotransmitter-acetylcholin",
+      "standard_dosis": "1–6 pro Tag",
+      "wirkung": "Kaubonbon mit Carnitin, L-Tyrosin und Glycerophosphocholin. Für Dopamin und Acetylcholin.",
+      "timing": "PreWo und in Lern-/Lesephasen",
+      "quelle": "Supplements S. 13"
+    }
+  },
+  "braverman_dosierungstafel": {
+    "beschreibung": "Direkt aus Bravermans Buch – Dosierungen nach Defizit-Schwere pro Neurotransmitter. Nur die einfachen Nährstoff-Booster.",
+    "dopamin": [
+      { "slug": "dl-phenylalanin", "minor": "500 mg", "moderate": "1000 mg", "major": "1000–2000 mg" },
+      { "slug": "l-tyrosin", "minor": "500 mg", "moderate": "1000 mg", "major": "1000–2000 mg" },
+      { "slug": "methionin", "minor": "250 mg", "moderate": "500 mg", "major": "1000 mg" },
+      { "slug": "rhodiola", "minor": "50 mg", "moderate": "100 mg", "major": "200 mg" },
+      { "slug": "pyridoxin", "minor": "5 mg", "moderate": "10 mg", "major": "50 mg" },
+      { "slug": "b-komplex", "minor": "25 mg", "moderate": "50 mg", "major": "100 mg" },
+      { "slug": "phosphatidylserin", "minor": "50 mg", "moderate": "100 mg", "major": "200 mg" },
+      { "slug": "ginkgo-biloba", "minor": "50 mg", "moderate": "75 mg", "major": "100 mg" }
+    ],
+    "acetylcholin": [
+      { "slug": "gpc-choline", "minor": "100 mg", "moderate": "200 mg", "major": "500 mg" },
+      { "slug": "phosphatidylcholin", "minor": "500 mg", "moderate": "1000 mg", "major": "2000 mg" },
+      { "slug": "phosphatidylserin", "minor": "50 mg", "moderate": "100 mg", "major": "200 mg" },
+      { "slug": "acetyl-l-carnitin", "minor": "250 mg", "moderate": "500 mg", "major": "1000 mg" },
+      { "slug": "dha", "minor": "200 mg", "moderate": "500 mg", "major": "1000 mg" },
+      { "slug": "thiamin", "minor": "25 mg", "moderate": "50 mg", "major": "100 mg" },
+      { "slug": "pantothensaeure", "minor": "25 mg", "moderate": "50 mg", "major": "100 mg" },
+      { "slug": "b12", "minor": "100 mg", "moderate": "200 mg", "major": "500 mg" },
+      { "slug": "taurin", "minor": "250 mg", "moderate": "500 mg", "major": "1000 mg" },
+      { "slug": "huperzine-a", "minor": "50 mg", "moderate": "100 mg", "major": "200 mg" },
+      { "slug": "ginkgo-biloba", "minor": "50 mg", "moderate": "75 mg", "major": "100 mg" },
+      { "slug": "koreanischer-ginseng", "minor": "100 mg", "moderate": "200 mg", "major": "500 mg" }
+    ],
+    "gaba": [
+      { "slug": "inositol", "minor": "500 mg", "moderate": "1000 mg", "major": "2000 mg" },
+      { "slug": "gaba-oral", "minor": "100 mg", "moderate": "500 mg", "major": "1000 mg", "notiz": "Schlecht absorbiert" },
+      { "slug": "glutaminsaeure", "minor": "250 mg", "moderate": "500 mg", "major": "1000 mg" },
+      { "slug": "melatonin", "minor": "1 mg", "moderate": "2 mg", "major": "3–6 mg", "timing": "vs" },
+      { "slug": "thiamin", "minor": "200 mg", "moderate": "400 mg", "major": "600 mg" },
+      { "slug": "niacinamid", "minor": "25 mg", "moderate": "100 mg", "major": "500 mg" },
+      { "slug": "pyridoxin", "minor": "5 mg", "moderate": "10 mg", "major": "50 mg" },
+      { "slug": "baldrian", "minor": "100 mg", "moderate": "200 mg", "major": "500 mg" },
+      { "slug": "passionsblume", "minor": "200 mg", "moderate": "500 mg", "major": "1000 mg" }
+    ],
+    "serotonin": [
+      { "slug": "kalzium", "minor": "500 mg", "moderate": "750 mg", "major": "1000 mg" },
+      { "slug": "fischoel", "minor": "500 mg", "moderate": "1000 mg", "major": "2000 mg", "notiz": "Pharmaceutical grade" },
+      { "slug": "5-htp", "minor": "100 mg", "moderate": "200 mg", "major": "500 mg", "notiz": "Mit Decarboxylase-Inhibitor" },
+      { "slug": "magnesium", "minor": "200 mg", "moderate": "400 mg", "major": "600 mg" },
+      { "slug": "melatonin", "minor": "1/3 mg", "moderate": "1/2–2 mg", "major": "1–6 mg", "timing": "vs" },
+      { "slug": "passionsblume", "minor": "200 mg", "moderate": "500 mg", "major": "1000 mg" },
+      { "slug": "pyridoxin", "minor": "5 mg", "moderate": "10 mg", "major": "50 mg" },
+      { "slug": "same", "minor": "50 mg", "moderate": "100 mg", "major": "200 mg" },
+      { "slug": "johanniskraut", "minor": "200 mg", "moderate": "400 mg", "major": "600 mg" },
+      { "slug": "tryptophan", "minor": "500 mg", "moderate": "1000 mg", "major": "1500–2000 mg", "notiz": "Verschreibungspflichtig" },
+      { "slug": "zink", "minor": "15 mg", "moderate": "30 mg", "major": "45 mg" }
+    ]
+  }
+}

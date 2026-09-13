@@ -7,6 +7,8 @@ import { parseLogmanExport, performanceTrend } from './logmanImport.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
+import hautfaltenData from './data/hautfalten.json';
+import ypsiProtokolle from './data/ypsi-protokolle.json';
 
 const FALTEN_HILFE = {
   kinn: 'Mittig unter dem Kinn eine senkrechte Falte greifen.', wange: 'Seitlich an der Wange immer dieselbe Position verwenden.',
@@ -33,7 +35,7 @@ async function queryState(userId, signal) {
     abort(supabase.from('logman_performance').select('*').eq('user_id', userId).order('performed_on').limit(500)),
     abort(supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(60)),
     abort(supabase.from('bodycomp_checkins').select('*').eq('user_id', userId).order('checkin_date').limit(60)),
-    abort(supabase.from('nutrition_settings').select('goal,bodycomp_thresholds').eq('user_id', userId).maybeSingle()),
+    abort(supabase.from('nutrition_settings').select('goal,bodycomp_thresholds,calculation_basis').eq('user_id', userId).maybeSingle()),
   ]);
   const error = results.find((result) => result.error)?.error;
   if (error) throw error;
@@ -190,6 +192,29 @@ function weightMarkup(state) {
   </div></section>`;
 }
 
+function faltenLegendeMarkup(state) {
+  const latest = state.skinfolds.filter((row) => row.total != null).at(-1);
+  const sex = state.settings.calculation_basis === 'female' ? 'frau' : 'mann';
+  const rows = FALTEN.map(([slug, label]) => {
+    const info = hautfaltenData.falten[slug];
+    const kurz = info?.interpretation?.kurzbeschreibung || '';
+    const wert = latest?.falten?.[slug];
+    const norm = info?.norm?.[`${sex}_mm`];
+    let statusKlasse = '';
+    if (wert != null && norm != null) statusKlasse = wert > norm * 1.6 ? 'ist-hoch' : wert > norm ? 'ist-erhoeht' : 'ist-im-ziel';
+    return `<button type="button" class="falten-legende-item ${statusKlasse}" data-falten-detail="${slug}">
+      <span class="falten-item-head"><b>${escapeHtml(label)}</b><small>${escapeHtml(kurz)}</small></span>
+      <span class="falten-item-value">${wert != null ? `<b>${display(wert)}</b><small>mm</small>` : '<em>–</em>'}${materialIconMarkup('chevron_right')}</span>
+    </button>`;
+  }).join('');
+  return `<details class="body-inner-details body-falten-legende">
+    <summary><span>Falten im Detail (YPSI-Interpretation)</span>${materialIconMarkup('chevron_right')}</summary>
+    <p class="body-legende-intro">Tippe auf eine Falte, um zu sehen, was sie laut BioSignature/YPSI aussagt, wie sie gemessen wird und welche Protokolle infrage kommen.</p>
+    <div class="falten-legende-liste">${rows}</div>
+    <p class="body-legende-disclaimer">Erfahrungswerte aus dem YPSI-System (Wolfgang Unsöld, Charles Poliquin). Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose.</p>
+  </details>`;
+}
+
 function skinfoldMarkup(state) {
   const valid = state.skinfolds.filter((row) => row.total != null); const latest = valid.at(-1); const previous = valid.at(-2);
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
@@ -198,11 +223,112 @@ function skinfoldMarkup(state) {
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 12-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Summe aller 12 Falten</small></header>${curveSvg([{ values: valid.map((row) => ({ datum: row.gemessen_am, wert: row.total })), className: 'trend', points: true }], { unit: 'mm' })}</div>
+    ${faltenLegendeMarkup(state)}
     ${skinfoldHistoryMarkup(valid)}
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
     <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle zwei bis vier Wochen an eine neue 12-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
     <button class="body-reset-mini" type="button" data-reset-body="skinfolds">12-Falten-Werte zurücksetzen</button>
   </div></section>`;
+}
+
+function faltenDetailMarkup(slug, state) {
+  const info = hautfaltenData.falten[slug];
+  if (!info) return `<p>Keine Informationen zu dieser Falte hinterlegt.</p>`;
+  const sex = state.settings.calculation_basis === 'female' ? 'frau' : 'mann';
+  const sexLabel = sex === 'frau' ? '♀' : '♂';
+  const otherSexLabel = sex === 'frau' ? '♂' : '♀';
+  const latest = state.skinfolds.filter((row) => row.falten?.[slug] != null).at(-1);
+  const wert = latest?.falten?.[slug];
+  const previous = state.skinfolds.filter((row) => row.falten?.[slug] != null).at(-2);
+  const vorherWert = previous?.falten?.[slug];
+  const delta = wert != null && vorherWert != null ? wert - vorherWert : null;
+
+  const norm = info.norm || {};
+  const normEigenerWert = norm[`${sex}_mm`];
+  const normAnderer = norm[`${sex === 'frau' ? 'mann' : 'frau'}_mm`];
+  let statusText = '';
+  let statusTone = 'neutral';
+  if (wert != null) {
+    if (normEigenerWert != null) {
+      if (wert <= normEigenerWert) { statusText = `Im Zielbereich (≤ ${normEigenerWert} mm ${sexLabel})`; statusTone = 'good'; }
+      else if (wert < normEigenerWert * 1.6) { statusText = `Über Norm (${normEigenerWert} mm ${sexLabel})`; statusTone = 'watch'; }
+      else { statusText = `Deutlich über Norm (${normEigenerWert} mm ${sexLabel})`; statusTone = 'attention'; }
+    } else if (norm.grenzwert_mm != null) {
+      if (wert <= norm.grenzwert_mm) { statusText = `Unter Grenzwert (${norm.grenzwert_mm} mm)`; statusTone = 'good'; }
+      else { statusText = `Über Grenzwert (${norm.grenzwert_mm} mm)`; statusTone = 'attention'; }
+    } else {
+      statusText = 'Keine feste Norm — je niedriger, desto besser';
+    }
+  }
+
+  const messung = info.messung || {};
+  const interp = info.interpretation || {};
+  const protokolle = (info.protokoll_ids || [])
+    .map((id) => ypsiProtokolle.protokolle[id])
+    .filter(Boolean);
+
+  const protokollKurz = (p) => (p.supplemente || [])
+    .map((s) => `${s.slug}${s.dosierung ? ` (${s.dosierung})` : ''}`)
+    .join(', ');
+
+  return `
+    <header class="falten-detail-header">
+      <div>
+        <small>Falte</small>
+        <h2>${escapeHtml(info.label)}</h2>
+      </div>
+      <button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button>
+    </header>
+    <div class="falten-detail-body">
+      ${wert != null ? `<section class="falten-detail-status status-${statusTone}">
+        <div><small>DEIN WERT</small><strong>${display(wert)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}${delta != null ? ` · ${delta > 0 ? '+' : ''}${display(delta)} mm ggü. vorher` : ''}</span></div>
+        ${statusText ? `<div class="falten-detail-status-hint"><span>${escapeHtml(statusText)}</span></div>` : ''}
+      </section>` : `<section class="falten-detail-status status-neutral"><em>Noch keine Messung für diese Falte.</em></section>`}
+
+      <section class="falten-detail-section">
+        <h3>Was diese Falte bedeutet</h3>
+        <p class="falten-detail-kurz"><b>${escapeHtml(interp.kurzbeschreibung || '')}</b></p>
+        ${interp.ausfuehrlich ? `<p>${escapeHtml(interp.ausfuehrlich)}</p>` : ''}
+        ${(interp.hauptursachen || []).length ? `<div class="falten-detail-tags"><b>Hauptursachen:</b>${interp.hauptursachen.map((h) => `<span>${escapeHtml(h)}</span>`).join('')}</div>` : ''}
+        ${(interp.hebel || []).length ? `<div class="falten-detail-tags falten-detail-hebel"><b>Hebel:</b>${interp.hebel.map((h) => `<span>${escapeHtml(h)}</span>`).join('')}</div>` : ''}
+        ${interp.praxisregel ? `<p class="falten-detail-hinweis">${escapeHtml(interp.praxisregel)}</p>` : ''}
+        ${(interp.vier_hebel || []).length ? `<div class="falten-detail-tags"><b>4 Hebel:</b>${interp.vier_hebel.map((h) => `<span>${escapeHtml(h)}</span>`).join('')}</div>` : ''}
+      </section>
+
+      ${normEigenerWert != null || norm.grenzwert_mm != null || norm.notiz ? `<section class="falten-detail-section">
+        <h3>Norm & Orientierung</h3>
+        <div class="falten-detail-norm">
+          ${normEigenerWert != null ? `<div><small>Norm ${sexLabel} (du)</small><b>${normEigenerWert} mm</b></div>` : ''}
+          ${normAnderer != null ? `<div><small>Norm ${otherSexLabel}</small><b>${normAnderer} mm</b></div>` : ''}
+          ${norm.grenzwert_mm != null ? `<div><small>Grenzwert</small><b>${norm.grenzwert_mm} mm</b></div>` : ''}
+          ${norm.katastrophal_mm != null ? `<div><small>Kritisch ab</small><b>${norm.katastrophal_mm} mm</b></div>` : ''}
+        </div>
+        ${norm.notiz ? `<p class="falten-detail-hinweis">${escapeHtml(norm.notiz)}</p>` : ''}
+      </section>` : ''}
+
+      <section class="falten-detail-section">
+        <h3>So wird gemessen</h3>
+        <p><b>Typ:</b> ${escapeHtml(messung.typ || '–')} · <b>Seite:</b> ${escapeHtml(messung.seite || '–')}</p>
+        ${messung.position ? `<p>${escapeHtml(messung.position)}</p>` : ''}
+        ${(messung.hinweise || []).length ? `<ul class="falten-detail-hinweise">${messung.hinweise.map((h) => `<li>${escapeHtml(h)}</li>`).join('')}</ul>` : ''}
+      </section>
+
+      ${protokolle.length ? `<section class="falten-detail-section">
+        <h3>YPSI-Protokolle</h3>
+        <p class="falten-detail-hinweis">Chronologisch abarbeiten: Phase 1 → 2 → 3, dann Phase 4+ nach Symptomatik wählen. Nicht alles gleichzeitig einnehmen.</p>
+        <div class="falten-detail-protokolle">
+          ${protokolle.map((p) => `<div class="falten-protokoll-item">
+            <header><b>${escapeHtml(p.name)}</b>${p.fokus ? `<small>${escapeHtml(p.fokus)}</small>` : ''}</header>
+            <ul>${(p.supplemente || []).map((s) => `<li><span>${escapeHtml(s.slug)}</span>${s.dosierung ? `<b>${escapeHtml(s.dosierung)}</b>` : ''}</li>`).join('')}</ul>
+            ${p.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(p.notiz)}</p>` : ''}
+          </div>`).join('')}
+        </div>
+      </section>` : ''}
+
+      ${info.quelle ? `<p class="falten-detail-quelle">Quelle: ${escapeHtml(info.quelle)}</p>` : ''}
+      <p class="falten-detail-disclaimer">Angaben aus dem YPSI-System (Wolfgang Unsöld) und BioSignature (Charles Poliquin). Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose. Bei ernsthaften Beschwerden ärztlich abklären lassen.</p>
+    </div>
+  `;
 }
 
 function waistMarkup(state) {
@@ -466,6 +592,17 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     bindEntryOverlay(overlay);
   };
 
+  const openFaltenDetail = (slug) => {
+    createSpecialDexOverlay({
+      colorScope: 'body',
+      replaceSelector: '[data-falten-detail-overlay]',
+      className: 'body-entry-overlay falten-detail-overlay',
+      sheetClassName: 'body-entry-sheet falten-detail-sheet',
+      ariaLabel: `Falten-Details: ${hautfaltenData.falten[slug]?.label || slug}`,
+      markup: faltenDetailMarkup(slug, state),
+    }).dataset.faltenDetailOverlay = '';
+  };
+
   const openAddMenu = () => {
     const overlay = createSpecialDexOverlay({
       colorScope: 'body',
@@ -513,6 +650,9 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       waist: { table: 'waist_measurements', label: 'alle Taillenmessungen', toast: 'Taillenumfang zurückgesetzt' },
       logman: { table: 'logman_performance', label: 'alle importierten LOGMAN-Leistungsdaten', toast: 'LOGMAN-Importe zurückgesetzt' },
     };
+    container.querySelectorAll('[data-falten-detail]').forEach((button) => {
+      button.onclick = () => openFaltenDetail(button.dataset.faltenDetail);
+    });
     container.querySelectorAll('[data-reset-body]').forEach((button) => {
       button.onclick = async () => {
         const config = resetConfig[button.dataset.resetBody];
