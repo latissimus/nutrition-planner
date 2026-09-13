@@ -8532,12 +8532,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-decoration:none;
 }
 .app-dex-search-icon,.app-dex-search-icon>svg{display:block;width:29px;height:29px}
-.app-dex-search-icon{filter:drop-shadow(2px 2px 0 var(--dex-ink,#24304A))}
-.app-dex-search:active{transform:translate(2px,2px)}
-.app-dex-search:active .app-dex-search-icon{filter:none}
+.app-dex-search:active{transform:translateY(1px)}
 .app-dex-search.aktiv{background:color-mix(in srgb,#fff 62%,var(--dex-seitenfarbe,#FFF8ED))}
-.app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(2px 2px 0 currentColor)}
-.app-dex-search.aktiv:active .app-dex-search-icon{filter:none}
+.app-dex-search .app-dex-search-icon{filter:none!important}
 .app-dex-header .coin-kopfstand{gap:0;height:34px}
 .app-dex-header .coin-kopfstand .coin-kopf-symbol{
   width:25px;
