@@ -298,7 +298,10 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
   return {
     date: current.gemessen_am,
     priorities: enriched,
-    topFold: enriched[0].primaryFold,
+    // Die sichtbare Hauptpriorität ist Rang 1 der Excel-Formel über alle
+    // dreizehn Falten. Die führende Protokollfalte bleibt separat erhalten.
+    topFold: rankedFolds[0],
+    topProtocolFold: enriched[0].primaryFold,
     overallTopFold: rankedFolds[0],
     rankedFolds,
     relationships,

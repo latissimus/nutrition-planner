@@ -59,6 +59,14 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     expect(plan.priorities[0].recommendedProtocols.map((item) => item.id)).toContain('bauch-brust-trizeps-phase-4-chlorella');
   });
 
+  it('zeigt als Hauptfalte immer Rang 1 aller dreizehn Excel-Falten', () => {
+    const kinnPriorisiert = { ...folds, kinn: 40 };
+    const plan = buildSkinfoldPlan([{ gemessen_am: '2026-09-14', falten: kinnPriorisiert }], 'male');
+    expect(plan.topFold).toMatchObject({ slug: 'kinn', foldPriority: 1 });
+    expect(plan.overallTopFold.slug).toBe('kinn');
+    expect(plan.topProtocolFold.slug).not.toBe('kinn');
+  });
+
   it('setzt eine zwischenzeitlich andere Priorität nicht als Phase derselben Gruppe fort', () => {
     const legPriority = { ...folds, bauch: 5, brust: 3, trizeps: 4, quadrizeps: 40, beinbizeps: 35 };
     const history = [

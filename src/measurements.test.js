@@ -8,10 +8,11 @@ describe('measurements', () => {
     expect(zahl('')).toBeNull();
   });
 
-  it('only sums complete skinfold sets', () => {
+  it('bildet die Excel-Summe, sobald Kinn vorhanden ist', () => {
     const complete = Object.fromEntries(FALTEN.map(([key]) => [key, 10]));
     expect(summe(complete)).toBe(SUMMEN_FALTEN.length * 10);
     expect(summe({ ...complete, kinn: '' })).toBeNull();
+    expect(summe({ kinn: 10, wange: 5 })).toBe(15);
   });
 
   it('calculates a calendar based seven day average', () => {

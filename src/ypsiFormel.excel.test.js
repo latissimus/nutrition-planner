@@ -3,7 +3,7 @@
    im Sheet gelesenen Formeln - und gegen die Implementierung gefuzzt. Zweck ist,
    Abweichungen in den Verzweigungen zu finden, nicht die Formel zu erklaeren. */
 import { describe, expect, it } from 'vitest';
-import { faltenRang, kfaSumme, koerperfettAnteil, magermasse } from './ypsiFormel.js';
+import { alterAmMessdatum, faltenRang, kfaSumme, koerperfettAnteil, magermasse } from './ypsiFormel.js';
 import formelDaten from './data/ypsi-formel.json';
 
 // --- Konstanten woertlich wie im Sheet (Tracking!J7:P10) ---------------------
@@ -42,7 +42,7 @@ const excelRaenge = (f, geschlecht) => {
   const scores = SPALTEN.map((slug) => {
     const wert = f[slug];
     if (wert === '' || wert == null) return '';
-    return Math.abs(wert / 4 - ref[slug].mittel);
+    return Math.abs(wert / 4 - (ref[slug].min + ref[slug].max) / 2);
   });
   const vorhanden = scores.filter((s) => s !== '');
   // LARGE($D50:$P50, k) fuer k = 1..13
@@ -69,7 +69,7 @@ describe('Treue gegen Formel.xlsx', () => {
     for (let i = 0; i < 200; i += 1) {
       const werte = SPALTEN.map(() => Math.round(rnd.next().value * 400) / 10);
       const f = messung(werte);
-      expect(kfaSumme(f)).toBeCloseTo(excelSumme(f), 6);
+      expect(kfaSumme(f)).toBe(excelSumme(f));
     }
   });
 
@@ -80,7 +80,7 @@ describe('Treue gegen Formel.xlsx', () => {
       const F = 45 + rnd.next().value * 80;
       const W = 20 + rnd.next().value * 200;
       expect(koerperfettAnteil({ groesseCm: E, gewichtKg: F, summe: W }))
-        .toBeCloseTo(excelKfa(E, F, W), 2);
+        .toBe(excelKfa(E, F, W));
     }
   });
 
@@ -89,7 +89,7 @@ describe('Treue gegen Formel.xlsx', () => {
     for (let i = 0; i < 200; i += 1) {
       const F = 45 + rnd.next().value * 80;
       const H = rnd.next().value * 45;
-      expect(magermasse(F, H)).toBeCloseTo(excelMuskel(F, H), 1);
+      expect(magermasse(F, H)).toBe(excelMuskel(F, H));
     }
   });
 
@@ -126,5 +126,15 @@ describe('Treue gegen Formel.xlsx', () => {
     expect(koerperfettAnteil({ groesseCm: '', gewichtKg: 85, summe: 98 })).toBeNull();
     expect(koerperfettAnteil({ groesseCm: 180, gewichtKg: '', summe: 98 })).toBeNull();
     expect(kfaSumme({ kinn: '' })).toBeNull();
+  });
+
+  it('behandelt leere Summenzellen nach vorhandenem Kinn wie Excel-SUM als null', () => {
+    expect(kfaSumme({ kinn: 4, wange: 3 })).toBe(7);
+  });
+
+  it('berechnet das Alter in vollen Jahren zum Messdatum', () => {
+    expect(alterAmMessdatum('1990-09-15', '2026-09-14')).toBe(35);
+    expect(alterAmMessdatum('1990-09-14', '2026-09-14')).toBe(36);
+    expect(alterAmMessdatum('', '2026-09-14')).toBeNull();
   });
 });

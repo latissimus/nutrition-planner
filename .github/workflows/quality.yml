@@ -30,5 +30,6 @@ jobs:
       - name: Abhängigkeiten auf hohe Sicherheitslücken prüfen
         run: npm audit --audit-level=high
       - run: npm run check:migrations
+      - run: npm run check:ypsi-formula
       - run: npm test
       - run: npm run build

@@ -24,7 +24,7 @@ describe('Gewichtsverlauf', () => {
 describe('Hautfaltenverlauf', () => {
   const falten = {
     kinn: 3, wange: 4, brust: 5, ruecken: 6, rippe: 7, huefte: 8,
-    bauch: 9, trizeps: 10, bizeps: 11, wade: 12, quadrizeps: 13, beinbizeps: 14,
+    bauch: 9, trizeps: 10, bizeps: 11, knie: 5, wade: 12, quadrizeps: 13, beinbizeps: 14,
   };
 
   it('zeigt frühere Messungen mit Summe und allen Einzelwerten', () => {
@@ -40,12 +40,13 @@ describe('Hautfaltenverlauf', () => {
   });
 
   it('speichert ausschließlich von der Datenbank erlaubte Qualitätswerte', () => {
-    const standardized = skinfoldRecord({ userId: 'user-1', date: '2026-09-13', values: falten, standardisiert: true });
+    const standardized = skinfoldRecord({ userId: 'user-1', date: '2026-09-13', values: falten, standardisiert: true, groesseCm: 180, gewichtKg: 85 });
     const unstandardized = skinfoldRecord({ userId: 'user-1', date: '2026-09-13', values: falten, standardisiert: false });
 
     expect(standardized.messqualitaet).toBe('hoch');
     expect(unstandardized.messqualitaet).toBe('niedrig');
     expect(['niedrig', 'mittel', 'hoch']).toContain(standardized.messqualitaet);
+    expect(standardized).toMatchObject({ groesse_cm: 180, gewicht_kg: 85 });
   });
 
   it('rendert ohne Messungen keine leere Aufklappliste', () => {
@@ -58,6 +59,7 @@ describe('Hautfaltenverlauf', () => {
     expect(markup.match(/name="skinfold-/g)).toHaveLength(FALTEN.length);
     expect(markup.match(/enterkeyhint="next"/g)).toHaveLength(FALTEN.length - 1);
     expect(markup.match(/enterkeyhint="done"/g)).toHaveLength(1);
+    expect(markup).toContain('data-skinfold-weight');
   });
 
   it('rechnet das Knie in die Summe, Oberschenkel und Bizeps aber nicht', () => {
@@ -72,7 +74,7 @@ describe('Hautfaltenverlauf', () => {
       .toBe(SUMMEN_FALTEN.length * 10);
 
     const { knie, ...ohneKnie } = vollstaendig;
-    expect(summe(ohneKnie)).toBeNull();
+    expect(summe(ohneKnie)).toBe((SUMMEN_FALTEN.length - 1) * 10);
   });
 
   it('weist unvollständige Altmessungen zum Nachtragen aus', () => {

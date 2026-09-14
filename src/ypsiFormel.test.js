@@ -28,9 +28,9 @@ describe('YPSI-Summenbildung', () => {
     expect(kfaSumme({ ...messung, quadrizeps: 40, beinbizeps: 40, bizeps: 40 })).toBe(72);
   });
 
-  it('liefert ohne vollständige Summenfalten kein Ergebnis', () => {
+  it('behandelt fehlende Summenzellen nach vorhandenem Kinn wie Excel als null', () => {
     const { knie, ...ohneKnie } = messung;
-    expect(kfaSumme(ohneKnie)).toBeNull();
+    expect(kfaSumme(ohneKnie)).toBe(67);
   });
 });
 
@@ -41,9 +41,9 @@ describe('YPSI-Körperfettformel', () => {
   });
 
   it('berechnet den Körperfettanteil wie die Vorlage', () => {
-    expect(koerperfettAnteil({ groesseCm: 180, gewichtKg: 85, summe: 98 })).toBeCloseTo(15.43, 1);
-    expect(koerperfettAnteil({ groesseCm: 180, gewichtKg: 85, summe: 60 })).toBeCloseTo(8.51, 1);
-    expect(koerperfettAnteil({ groesseCm: 190, gewichtKg: 100, summe: 140 })).toBeCloseTo(19.96, 1);
+    expect(koerperfettAnteil({ groesseCm: 180, gewichtKg: 85, summe: 98 })).toBeCloseTo(15.434364662036112, 12);
+    expect(koerperfettAnteil({ groesseCm: 180, gewichtKg: 85, summe: 60 })).toBeCloseTo(8.512811954590518, 12);
+    expect(koerperfettAnteil({ groesseCm: 190, gewichtKg: 100, summe: 140 })).toBeCloseTo(19.957777062547596, 12);
   });
 
   it('ist wegen ABS symmetrisch um die erwartete Summe', () => {
@@ -54,7 +54,7 @@ describe('YPSI-Körperfettformel', () => {
   });
 
   it('berechnet die Magermasse aus Gewicht und Körperfett', () => {
-    expect(magermasse(85, 15.43)).toBeCloseTo(71.9, 1);
+    expect(magermasse(85, 15.43)).toBeCloseTo(71.8845, 10);
   });
 
   it('schätzt nichts, wenn Größe oder Gewicht fehlen', () => {
@@ -92,6 +92,12 @@ describe('YPSI-Rangformel', () => {
     const frau = faltenRang(messung, 'female').find((item) => item.slug === 'huefte');
     expect(mann.referenz).toBe(2.15);
     expect(frau.referenz).toBe(0.775);
+  });
+
+  it('bildet MITTEL wie Excel aus MIN und MAX statt aus einem gerundeten Anzeigewert', () => {
+    const wange = faltenRang(messung, 'male').find((item) => item.slug === 'wange');
+    expect(wange.referenz).toBe((1.97 + 2) / 2);
+    expect(wange.score).toBe(Math.abs(messung.wange / 4 - (1.97 + 2) / 2));
   });
 
   it('übergeht Falten ohne Messwert', () => {

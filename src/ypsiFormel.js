@@ -22,9 +22,14 @@ export function geschlechtSchluessel(calculationBasis) {
 /* SUM(J:S) der Vorlage: Kinn bis Wade. Oberschenkel und Bizeps bleiben bewusst
    draußen, gehen aber weiterhin ins Ranking ein. */
 export function kfaSumme(falten = {}) {
-  const werte = SUMMEN_FALTEN.map((slug) => zahl(falten?.[slug]));
-  if (werte.some((wert) => wert == null || wert < 0)) return null;
-  return Math.round(werte.reduce((total, wert) => total + wert, 0) * 10) / 10;
+  const ersterWert = zahl(falten?.[SUMMEN_FALTEN[0]]);
+  if (ersterWert == null) return null;
+  return SUMMEN_FALTEN.reduce((total, slug, index) => {
+    if (index === 0) return total + ersterWert;
+    // Excel-SUM ignoriert leere bzw. nichtnumerische Zellen und behandelt sie
+    // damit innerhalb des Bereichs wie null.
+    return total + (zahl(falten?.[slug]) ?? 0);
+  }, 0);
 }
 
 /* Schritt 1: aus Größe und Gewicht erwartete Faltensumme. */
@@ -48,14 +53,27 @@ export function koerperfettAnteil({ groesseCm, gewichtKg, falten, summe }) {
   const prozent = K.O10
     * ((K.K9 * gewicht ** K.K10) * (K.L9 * groesse ** K.L10) * abweichung ** K.M10)
     + K.P10;
-  return Number.isFinite(prozent) ? Math.round(prozent * 100) / 100 : null;
+  return Number.isFinite(prozent) ? prozent : null;
 }
 
 export function magermasse(gewichtKg, kfaProzent) {
   const gewicht = zahl(gewichtKg);
   const kfa = zahl(kfaProzent);
   if (!gewicht || kfa == null) return null;
-  return Math.round(gewicht * (1 - kfa / 100) * 10) / 10;
+  return gewicht * (1 - kfa / 100);
+}
+
+/* Tracking!C14: Alter in vollen Jahren am Messdatum. Entspricht
+   DATEDIF(Person!C22, B14, "y"). */
+export function alterAmMessdatum(geburtsdatum, messdatum) {
+  if (!geburtsdatum || !messdatum) return null;
+  const geburt = new Date(`${geburtsdatum}T12:00:00`);
+  const messung = new Date(`${messdatum}T12:00:00`);
+  if (Number.isNaN(geburt.getTime()) || Number.isNaN(messung.getTime()) || messung < geburt) return null;
+  let alter = messung.getFullYear() - geburt.getFullYear();
+  if (messung.getMonth() < geburt.getMonth()
+    || (messung.getMonth() === geburt.getMonth() && messung.getDate() < geburt.getDate())) alter -= 1;
+  return alter;
 }
 
 /* Rangformel der Vorlage: |Wert / 4 − MITTEL| absteigend, Rang 1 = größte
@@ -76,14 +94,18 @@ export function faltenRang(falten = {}, calculationBasis = 'male') {
       const wert = zahl(falten?.[slug]);
       if (wert == null || wert < 0) return null;
       const skaliert = wert / 4;
+      // Grafik!D45:P45 bzw. D48:P48 verwenden eine geteilte
+      // AVERAGE(MIN,MAX)-Formel. Auch der Mittelwert wird daher berechnet und
+      // nicht aus einem gerundeten Anzeigewert übernommen.
+      const mittel = (referenz.min + referenz.max) / 2;
       return {
         slug,
         wert,
-        referenz: referenz.mittel,
+        referenz: mittel,
         referenzMin: referenz.min,
         referenzMax: referenz.max,
-        score: Math.abs(skaliert - referenz.mittel),
-        richtung: skaliert > referenz.mittel ? 'ueber' : skaliert < referenz.mittel ? 'unter' : 'exakt',
+        score: Math.abs(skaliert - mittel),
+        richtung: skaliert > mittel ? 'ueber' : skaliert < mittel ? 'unter' : 'exakt',
       };
     })
     .filter(Boolean);
@@ -93,16 +115,16 @@ export function faltenRang(falten = {}, calculationBasis = 'male') {
     .sort((a, b) => a.rang - b.rang || b.score - a.score);
 }
 
-/* Komplette Auswertung einer Messung. Gibt null zurück, solange Größe, Gewicht
-   oder eine der zehn Summenfalten fehlen – geschätzt wird nichts. */
+/* Komplette Auswertung einer Messung. Die IF-Wächter der Vorlage werden in den
+   Einzelfunktionen abgebildet; gerundet wird ausschließlich bei der Anzeige. */
 export function auswertung({ falten, groesseCm, gewichtKg, calculationBasis = 'male' }) {
   const summe = kfaSumme(falten);
   const erwartet = erwarteteFaltensumme(groesseCm, gewichtKg);
   const kfa = koerperfettAnteil({ groesseCm, gewichtKg, summe });
   return {
     summe,
-    erwarteteSumme: erwartet == null ? null : Math.round(erwartet * 10) / 10,
-    abweichung: summe != null && erwartet != null ? Math.round((summe - erwartet) * 10) / 10 : null,
+    erwarteteSumme: erwartet,
+    abweichung: summe != null && erwartet != null ? summe - erwartet : null,
     koerperfett: kfa,
     magermasse: magermasse(gewichtKg, kfa),
     raenge: faltenRang(falten, calculationBasis),
