@@ -125,9 +125,9 @@ function bodyHeroMarkup(state) {
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="COMP-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
-    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>10-Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
+    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
     <p><b>COMP</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
-    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>10-Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
+    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
     <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und <b>keine medizinische Diagnose</b>.</p>
   </div></div>`;
 }
@@ -410,9 +410,10 @@ function ypsiPriorityComparisonMarkup(plan) {
   return `<div class="ypsi-priority-comparison">${values.map((item) => `<span${item.slug === plan.topFold.slug ? ' class="is-primary"' : ''}><small>${escapeHtml(item.label)}</small><b>${display(item.value)} mm</b></span>`).join('')}</div>`;
 }
 
-function ypsiObservedFoldsMarkup(plan) {
-  const folds = plan.rankedFolds.filter((item) => item.slug !== plan.topFold.slug);
-  return `<details class="ypsi-observed-folds"><summary><span>Weitere Hautfalten zur Beobachtung</span>${materialIconMarkup('chevron_right')}</summary><div>${folds.map((item) => `<span><small>${escapeHtml(item.label)}</small><b>${display(item.value)} mm</b></span>`).join('')}</div></details>`;
+function ypsiObservedPrioritiesMarkup(plan) {
+  const priorities = plan.rankedFolds.slice(1, 3);
+  if (!priorities.length) return '';
+  return `<section class="ypsi-observed-priorities"><h3>Weitere Prioritäten zur Beobachtung</h3><div>${priorities.map((item) => `<span><small>PRIORITÄT ${item.foldPriority}</small><b>${escapeHtml(item.label)}</b><em>${display(item.value)} mm</em></span>`).join('')}</div></section>`;
 }
 
 function ypsiPriorityMarkup(state) {
@@ -429,7 +430,7 @@ function ypsiPriorityMarkup(state) {
     ${ypsiPriorityComparisonMarkup(plan)}
     ${ypsiPriorityReasonMarkup(plan)}
     ${ypsiActionPlanMarkup(actionPlan, { phase: plan.activeProtocolGroup?.suggestedPhase || null })}
-    ${ypsiObservedFoldsMarkup(plan)}
+    ${ypsiObservedPrioritiesMarkup(plan)}
   </section>`;
 }
 
@@ -450,7 +451,7 @@ function skinfoldMarkup(state) {
   const valid = state.skinfolds.filter((row) => row.total != null && vollstaendigeFalten(row.falten)); const latest = valid.at(-1); const previous = valid.at(-2);
   const unvollstaendig = state.skinfolds.filter((row) => !vollstaendigeFalten(row.falten));
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
-  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>10-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">10-Falten-Summe in mm</h2>
+  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">Falten-Summe in mm</h2>
     <p class="body-explain">Für den Verlaufswert werden zehn Falten von Kinn bis Wade zusammengefasst. Oberschenkel und Bizeps fließen zusätzlich in die Prioritätsauswertung ein. Miss möglichst immer unter ähnlichen Bedingungen.</p>
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 13-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}

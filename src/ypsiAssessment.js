@@ -501,7 +501,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
           ? 'Beide Falten bewegen sich in dieselbe Richtung. Das entspricht der Seminarbeschreibung als frühe Marker einer globalen Fettzu- oder -abnahme.'
           : 'Kinn und Wange bewegen sich nicht gemeinsam. Eine globale Zu-/Abnahme ist daraus noch nicht eindeutig; Messschwankung und Kurzzeitstress mitprüfen.',
         basis: `Kinn ${chinDelta >= 0 ? '+' : ''}${chinDelta.toFixed(1)} mm · Wange ${cheekDelta >= 0 ? '+' : ''}${cheekDelta.toFixed(1)} mm gegenüber der vorherigen vollständigen Messung`,
-        actions: ['Kalorien nur zusammen mit Gewichtstrend und 10-Falten-Summe anpassen.', 'Bei uneinheitlichem Verlauf Messbedingungen und Kurzzeitstress prüfen.'],
+        actions: ['Kalorien nur zusammen mit Gewichtstrend und Falten-Summe anpassen.', 'Bei uneinheitlichem Verlauf Messbedingungen und Kurzzeitstress prüfen.'],
         tone: sameDirection ? 'info' : 'branch',
         source: 'Hautfalten Notizen S. 1; „Was deine Hautfalten über dich aussagen“ S. 1',
       });
@@ -609,7 +609,7 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
   const fold = (slug) => plan.rankedFolds.find((item) => item.slug === slug);
   const elevated = (slug) => isElevated(fold(slug));
 
-  add('nutrition', 'Lass dein Kalorienziel zunächst unverändert und beurteile es weiter über TRACKER, Gewichtstrend und 10-Falten-Summe – nicht über eine einzelne Falte.', 'app');
+  add('nutrition', 'Lass dein Kalorienziel zunächst unverändert und beurteile es weiter über TRACKER, Gewichtstrend und Falten-Summe – nicht über eine einzelne Falte.', 'app');
   add('dailyLife', 'Setze für die nächsten drei bis vier Wochen nur diesen Schwerpunkt um, dokumentiere kurz die Umsetzung und miss dann unter ähnlichen Bedingungen erneut.', 'app');
 
   if (['bauch-brust-trizeps', 'huefte'].includes(groupId) || (actionableTop && ['bauch', 'brust', 'trizeps', 'huefte', 'ruecken', 'rippe'].includes(top.slug))) {
@@ -667,7 +667,7 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
     add('nutrition', 'Prüfe für zwei Wochen, ob Kalorienziel, Protein und Nahrungsfette tatsächlich erreicht werden; leite aus der Bizepsfalte allein keinen Hormonmangel ab.', 'seminar');
   }
   if (actionableTop && ['kinn', 'wange'].includes(top.slug)) {
-    add('dailyLife', 'Bewerte Kinn und Wange nur als gemeinsames Verlaufspaar. Ändere erst etwas, wenn auch Gewichtstrend oder 10-Falten-Summe dieselbe Richtung bestätigen.', 'seminar');
+    add('dailyLife', 'Bewerte Kinn und Wange nur als gemeinsames Verlaufspaar. Ändere erst etwas, wenn auch Gewichtstrend oder Falten-Summe dieselbe Richtung bestätigen.', 'seminar');
   }
 
   const sleepRelevant = groupId === 'wade'
