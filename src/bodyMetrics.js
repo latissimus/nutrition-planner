@@ -643,10 +643,27 @@ function bravermanResultMarkup(test, { sheet = false } = {}) {
       const total = BRAVERMAN_DEFIZIT_FRAGEN[item.key].length;
       return `<div data-tone="${item.tone}"><span><b>${escapeHtml(BRAVERMAN_BEREICHE[item.key].label)}</b><small>${item.score} von ${total} · ${item.label}</small></span><i><em style="width:${Math.round(item.score / total * 100)}%"></em></i></div>`;
     }).join('')}</div>
-    ${sheet ? `<section class="falten-detail-section braverman-foods"><h3>Ernährung aus den Unterlagen</h3><p>Als erste, niedrigschwellige Strategie nennt das Material für ${escapeHtml(focusRecommendations.area.label)}:</p><div class="falten-detail-tags">${focusRecommendations.foods.map((food) => `<span>${escapeHtml(food)}</span>`).join('')}</div></section>
-      <section class="falten-detail-section"><h3>Supplement-Optionen der Vorlage</h3><p class="falten-detail-hinweis">Die Dosis entspricht der historischen Tabelle für die ermittelte Ausprägung. Sie ist keine automatische Einnahmeanweisung.</p><div class="braverman-supplements">${focusRecommendations.supplements.map((supplement) => `<details><summary><span><b>${escapeHtml(supplement.name)}</b><small>${escapeHtml(supplement.dose)}</small></span>${materialIconMarkup('chevron_right')}</summary>${supplement.notiz ? `<p>${escapeHtml(supplement.notiz)}</p>` : ''}${supplement.safety ? `<p class="braverman-warning">${escapeHtml(supplement.safety)}</p>` : '<p>Vor der Einnahme Produktangaben, Medikamente und persönliche Kontraindikationen prüfen.</p>'}</details>`).join('')}</div></section>
+    ${sheet ? `<section class="falten-detail-section braverman-seminar-strategies"><h3>Strategien aus den Seminarunterlagen</h3>
+        ${focusRecommendations.seminarFoods.length ? `<div><h4>Ernährung</h4><div class="falten-detail-tags">${focusRecommendations.seminarFoods.map((food) => `<span>${escapeHtml(food)}</span>`).join('')}</div></div>` : ''}
+        <div><h4>Supplement-Schwerpunkte</h4><div class="falten-detail-tags">${focusRecommendations.seminarSupplements.map((supplement) => `<span>${escapeHtml(supplement)}</span>`).join('')}</div></div>
+        ${focusRecommendations.seminarNote ? `<p class="braverman-warning">${escapeHtml(focusRecommendations.seminarNote)}</p>` : ''}
+      </section>
+      <section class="falten-detail-section"><h3>Dosierungstabelle der Braverman-Vorlage</h3><p class="falten-detail-hinweis">Diese historischen Dosierungen sind eine separate Quelle und keine automatische Einnahmeanweisung.</p><div class="braverman-dose-list">${focusRecommendations.supplements.map((supplement) => `<div><span><b>${escapeHtml(supplement.name)}</b><strong>${escapeHtml(supplement.dose)}</strong></span>${supplement.notiz ? `<small>${escapeHtml(supplement.notiz)}</small>` : ''}${supplement.safety ? `<p class="braverman-warning">${escapeHtml(supplement.safety)}</p>` : ''}</div>`).join('')}</div></section>
       <p class="falten-detail-disclaimer">Das Ergebnis beschreibt das Antwortmuster des Braverman-Modells und keine im Gehirn gemessenen Neurotransmitterwerte. Ernährung, Schlaf und Training stehen vor einer Supplement-Auswahl.</p>
       <div class="braverman-result-actions"><button class="btn btn-primary" type="button" data-close>Fertig</button><button type="button" data-braverman-reset>Test neu starten</button></div>` : ''}
+  </div>`;
+}
+
+function bravermanOverviewMarkup(test) {
+  const result = scoreBravermanAssessment(test.answers);
+  const focus = result.focus;
+  const total = BRAVERMAN_DEFIZIT_FRAGEN[focus].length;
+  const others = BRAVERMAN_REIHENFOLGE
+    .filter((key) => key !== focus)
+    .sort((a, b) => result.scores[b] - result.scores[a]);
+  return `<div class="neurotransmitter-overview">
+    <section class="braverman-result-focus"><small>AKTUELLER SCHWERPUNKT</small><div><b>${escapeHtml(BRAVERMAN_BEREICHE[focus].label)}</b><em>${result.scores[focus]} von ${total} · ${escapeHtml(result.severity[focus].label)}</em></div><span>${escapeHtml(BRAVERMAN_BEREICHE[focus].kurz)}</span></section>
+    <section class="neurotransmitter-other-scores"><small>WEITERE BEREICHE</small><div>${others.map((key) => `<span><b>${escapeHtml(BRAVERMAN_BEREICHE[key].label)}</b><em>${result.scores[key]} · ${escapeHtml(result.severity[key].label)}</em></span>`).join('')}</div></section>
   </div>`;
 }
 
@@ -656,10 +673,9 @@ function neurotransmitterMarkup() {
   const answered = bravermanPositions().filter(({ type, index }) => typeof test.answers?.[type]?.[index] === 'boolean').length;
   const completedLabel = test.completedAt ? `Ausgewertet · ${datumKurz(String(test.completedAt).slice(0, 10))}` : 'Ausgewertet';
   return `<section class="body-v2-card neurotransmitter-card ${SPECIAL_DEX_CLASSES.content}" data-neurotransmitter-card><header><span><b>Neurotransmitter-Profil</b><small>${complete ? completedLabel : answered ? `${answered} Aussagen beantwortet` : 'Braverman-Assessment'}</small></span></header><div class="body-v2-card-body">
-    <p class="body-explain">Der Test nutzt Teil 2 des Braverman-Assessments und verbindet dein Antwortmuster mit Ernährungs- und Supplement-Strategien aus deinen Seminarunterlagen.</p>
-    ${complete ? bravermanResultMarkup(test) : `<div class="braverman-intro"><span aria-hidden="true">🧠</span><div><b>Vier aktuelle Bereiche</b><p>Dopamin, Acetylcholin, GABA und Serotonin. Du kannst den Test jederzeit unterbrechen und später fortsetzen.</p></div></div>`}
-    <button class="btn btn-primary btn-block" type="button" data-braverman-open>${complete ? 'Ergebnis und Strategien öffnen' : answered ? 'Test fortsetzen' : 'Test starten'}</button>
-    <p class="ypsi-method-note">Deine Antworten werden in deinen persönlichen Einstellungen gespeichert. Das Profil ist eine praxisorientierte Selbsteinschätzung, kein Labortest.</p>
+    ${complete ? bravermanOverviewMarkup(test) : `<p class="body-explain">Der Selbsttest betrachtet Dopamin, Acetylcholin, GABA und Serotonin. Du kannst ihn jederzeit unterbrechen und später fortsetzen.</p><div class="braverman-intro"><span aria-hidden="true">🧠</span><div><b>Vier aktuelle Bereiche</b><p>Deine Antworten werden gespeichert und anschließend gemeinsam ausgewertet.</p></div></div>`}
+    <button class="btn btn-primary btn-block neurotransmitter-open" type="button" data-braverman-open>${complete ? 'Strategien ansehen' : answered ? 'Test fortsetzen' : 'Test starten'}</button>
+    <p class="neurotransmitter-note">Praxisorientierte Selbsteinschätzung · kein Labortest</p>
   </div></section>`;
 }
 

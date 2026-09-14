@@ -277,4 +277,18 @@ describe('Braverman-Defizitprofil', () => {
     expect(supplementSafety('licorice-komplex')).toContain('Blutdruck');
     expect(supplementSafety('biotics-adp')).toContain('Durchfall');
   });
+
+  it('liefert die Ernährungs- und Supplementhinweise aus dem Neurotransmitter-Seminar getrennt von der Braverman-Tabelle', () => {
+    const dopamine = bravermanRecommendations('dopamin', 'moderate');
+    expect(dopamine.seminarFoods).toEqual(expect.arrayContaining(['Sardinen', 'Pinienkerne', 'Avocado']));
+    expect(dopamine.seminarSupplements).toEqual(expect.arrayContaining(['Koffein', 'Bacopa Monnieri']));
+
+    const gaba = bravermanRecommendations('gaba', 'major');
+    expect(gaba.seminarSupplements).toEqual(expect.arrayContaining(['Taurin', 'Magnesium-L-Threonat', 'Phenyl-GABA']));
+    expect(gaba.seminarNote).toContain('gewöhnliche GABA-Supplements');
+
+    const serotonin = bravermanRecommendations('serotonin', 'moderate');
+    expect(serotonin.seminarFoods).toContain('Kohlenhydrate');
+    expect(serotonin.seminarSupplements).toContain('Liposomales Melatonin');
+  });
 });

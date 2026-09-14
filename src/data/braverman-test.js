@@ -2,22 +2,27 @@ export const BRAVERMAN_BEREICHE = Object.freeze({
   dopamin: {
     label: 'Dopamin',
     kurz: 'Antrieb, Energie und zielgerichtete Aufmerksamkeit',
-    lebensmittel: ['Rind', 'Eier', 'Geflügel', 'Milchprodukte', 'Walnüsse', 'Hafer'],
+    seminarLebensmittel: ['Rind', 'Sardinen', 'Pinienkerne', 'Bison', 'Büffel', 'Kaffee', 'Avocado', 'Eier'],
+    seminarSupplemente: ['Koffein', 'L-Tyrosin', 'DL-Phenylalanin', 'Bacopa Monnieri'],
   },
   acetylcholin: {
     label: 'Acetylcholin',
     kurz: 'Gedächtnis, Verarbeitungsgeschwindigkeit und Kreativität',
-    lebensmittel: ['Eigelb', 'Beeren', 'Nüsse', 'Geflügel', 'Butter'],
+    seminarLebensmittel: ['Eigelb (Cholin)', 'Beeren', 'Nüsse', 'Butter', 'Geflügel', 'Eiscreme', 'Gesättigte Fette'],
+    seminarSupplemente: ['Cholin (Lecithin)', 'Huperzine A', 'Acetyl-L-Carnitin', 'Alpha GPC'],
   },
   gaba: {
     label: 'GABA',
     kurz: 'Ruhe, Belastbarkeit und gleichmäßiger Rhythmus',
-    lebensmittel: ['Proteinreiche Lebensmittel', 'Fermentierte Lebensmittel', 'Grünes Gemüse'],
+    seminarLebensmittel: [],
+    seminarSupplemente: ['Taurin', 'Inositol', 'B-Vitamine', 'Glycin', 'Magnesium-L-Threonat', 'L-Theanin', 'Phenyl-GABA'],
+    seminarHinweis: 'Die Seminarunterlagen halten ausdrücklich fest, dass gewöhnliche GABA-Supplements GABA nicht erhöhen.',
   },
   serotonin: {
     label: 'Serotonin',
     kurz: 'Wohlbefinden, Schlafrhythmus und Regeneration',
-    lebensmittel: ['Komplexe Kohlenhydrate', 'Eier', 'Fisch', 'Nüsse und Samen'],
+    seminarLebensmittel: ['Kohlenhydrate'],
+    seminarSupplemente: ['Magnesium', 'Vitamin B6', 'Inositol', 'Liposomales Melatonin'],
   },
 });
 

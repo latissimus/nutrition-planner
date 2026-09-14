@@ -786,7 +786,9 @@ export function bravermanRecommendations(type, severityId) {
   const area = BRAVERMAN_BEREICHE[type];
   return {
     area,
-    foods: area?.lebensmittel || [],
+    seminarFoods: area?.seminarLebensmittel || [],
+    seminarSupplements: area?.seminarSupplemente || [],
+    seminarNote: area?.seminarHinweis || '',
     supplements: table.map((item) => ({
       ...item,
       name: supplementName(item.slug),
