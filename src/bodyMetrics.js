@@ -46,6 +46,7 @@ const HAUTFALTEN_CONTEXT_FIELDS = Object.freeze([
   { group: 'Darm & Ernährung', id: 'postMealCrash', label: 'Nach Mahlzeiten treten häufig starke Müdigkeit, Heißhunger oder ein deutlicher Energieeinbruch auf.' },
   { group: 'Weitere Gegenprüfung', id: 'repeatedFoods', label: 'Ich esse sehr häufig dieselben Lebensmittel oder vermute Unverträglichkeiten.' },
   { group: 'Weitere Gegenprüfung', id: 'redDotsTriceps', label: 'Am Trizeps sind rote Punkte sichtbar.' },
+  { group: 'Weitere Gegenprüfung', id: 'moldConcern', label: 'Im Wohn- oder Arbeitsumfeld besteht ein konkreter Feuchte- oder Schimmelverdacht.' },
 ]);
 
 const FALTEN_HILFE = {
@@ -332,19 +333,25 @@ function faltenLegendeMarkup(state) {
   </details>`;
 }
 
-function skinfoldContextState() {
+function skinfoldContextState(measurementId = null) {
   const saved = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, null);
+  const belongsToMeasurement = measurementId == null || saved?.measurementId === measurementId;
   const values = Object.fromEntries(HAUTFALTEN_CONTEXT_FIELDS.map(({ id }) => {
-    const value = saved?.values?.[id];
+    const value = belongsToMeasurement ? saved?.values?.[id] : null;
     return [id, typeof value === 'boolean' ? value : null];
   }));
-  return { version: 2, values, updatedAt: saved?.updatedAt || null };
+  return {
+    version: 3,
+    measurementId,
+    values,
+    updatedAt: belongsToMeasurement ? saved?.updatedAt || null : null,
+  };
 }
 
 function skinfoldAnalysisContext(state) {
   const recentSleep = state.sleep.slice(-7);
   const average = (values) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
-  const context = skinfoldContextState();
+  const context = skinfoldContextState(state.skinfolds.at(-1)?.id || null);
   const test = bravermanState();
   let gabaContext = false;
   let serotoninContext = false;
@@ -385,9 +392,10 @@ function ypsiActionSourceMarkup(action) {
 function ypsiActionPlanMarkup(actionPlan, { showProtocols = true, phase = null } = {}) {
   if (!actionPlan) return '';
   const questionCount = actionPlan.unansweredQuestionIds.length;
+  const hasContextQuestions = actionPlan.requiredQuestionIds.length > 0;
   return `<section class="ypsi-guided-plan">
     <header><small>DEIN HANDLUNGSPLAN</small><h3>${phase ? `Jetzt umsetzen · Phase ${phase === 4 ? '4+' : phase}` : 'Jetzt umsetzen'}</h3></header>
-    ${questionCount ? `<aside class="ypsi-open-questions"><span><b>${questionCount} Frage${questionCount === 1 ? '' : 'n'} für deinen persönlichen Plan</b><small>Mit deinen Antworten werden die Empfehlungen genauer.</small></span><button type="button" data-skinfold-context-open>Beantworten</button></aside>` : ''}
+    ${questionCount ? `<aside class="ypsi-open-questions"><span><b>${questionCount} Frage${questionCount === 1 ? '' : 'n'} für deinen persönlichen Plan</b><small>Mit deinen Antworten werden die Empfehlungen genauer.</small></span><button type="button" data-skinfold-context-open>Beantworten</button></aside>` : hasContextQuestions ? '<aside class="ypsi-open-questions is-complete"><span><b>Kontextfragen berücksichtigt</b><small>Für diese Messung gespeichert.</small></span><button type="button" data-skinfold-context-open>Prüfen / ändern</button></aside>' : ''}
     <div class="ypsi-action-categories">${YPSI_ACTION_CATEGORIES.map((category) => {
       const actions = actionPlan.categories[category.id] || [];
       return `<article data-category="${category.id}"><h4>${materialIconMarkup(category.icon)}<span>${category.label}</span></h4><ol>${actions.map((action) => `<li><span>${escapeHtml(action.text)}</span>${ypsiActionSourceMarkup(action)}</li>`).join('')}</ol>${category.id === 'supplements' && showProtocols && actionPlan.protocols.length ? `<div class="falten-detail-protokolle">${actionPlan.protocols.map((protocol) => ypsiProtocolMarkup(protocol)).join('')}</div>` : ''}</article>`;
@@ -396,11 +404,12 @@ function ypsiActionPlanMarkup(actionPlan, { showProtocols = true, phase = null }
 }
 
 function ypsiPriorityReasonMarkup(plan) {
-  const relations = (plan.activeProtocolGroup?.relationships || plan.relationships || []).slice(0, 2);
+  const relations = plan.topRelationships || [];
   const fallback = hautfaltenData.falten[plan.topFold.slug]?.interpretation?.kurzbeschreibung
     || 'Diese Falte weicht im aktuellen Vergleich am stärksten von ihrem Referenzwert ab.';
   if (!relations.length) return `<section class="ypsi-priority-reason"><small>WARUM DAS DEINE PRIORITÄT IST</small><p>${escapeHtml(fallback)}</p></section>`;
-  return `<section class="ypsi-priority-reason"><small>WARUM DAS DEINE PRIORITÄT IST</small>${relations.map((relation) => `<div><b>${escapeHtml(relation.title)}</b><p>${escapeHtml(relation.summary)}</p></div>`).join('')}</section>`;
+  const [primary, ...secondary] = relations;
+  return `<section class="ypsi-priority-reason"><small>WARUM DAS DEINE PRIORITÄT IST</small><div><b>${escapeHtml(primary.title)}</b><p>${escapeHtml(primary.summary)}</p></div>${secondary.length ? `<aside class="ypsi-secondary-relations"><small>AUẞERDEM IM BLICK · NOCH KEIN ZUSÄTZLICHER SCHRITT</small>${secondary.map((relation) => `<div><b>${escapeHtml(relation.title)}</b><p>${escapeHtml(relation.summary)}</p></div>`).join('')}</aside>` : ''}</section>`;
 }
 
 function ypsiPriorityComparisonMarkup(plan) {
@@ -413,7 +422,7 @@ function ypsiPriorityComparisonMarkup(plan) {
 function ypsiObservedPrioritiesMarkup(plan) {
   const priorities = plan.rankedFolds.slice(1, 3);
   if (!priorities.length) return '';
-  return `<section class="ypsi-observed-priorities"><h3>Weitere Prioritäten zur Beobachtung</h3><div>${priorities.map((item) => `<span><small>PRIORITÄT ${item.foldPriority}</small><b>${escapeHtml(item.label)}</b><em>${display(item.value)} mm</em></span>`).join('')}</div></section>`;
+  return `<section class="ypsi-observed-priorities"><h3>Weitere Hautfalten zur Beobachtung</h3><div>${priorities.map((item) => `<span><b>${escapeHtml(item.label)}</b><em>${display(item.value)} mm</em></span>`).join('')}</div></section>`;
 }
 
 function ypsiPriorityMarkup(state) {
@@ -579,7 +588,7 @@ function skinfoldContextMarkup(context, actionPlan) {
   return `<header class="falten-detail-header"><div><small>MEHRFALTEN-AUSWERTUNG</small><h2>Fragen für deinen Plan</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="falten-detail-body skinfold-context-form" data-skinfold-context-form>
       <p>Beantworte die Fragen ausdrücklich mit <b>Ja oder Nein</b>. Faltenwerte selbst können Stress, Verdauungs- oder Schlafprobleme nicht messen. Erst deine Antworten erlauben der App, zwischen den Zweigen zu unterscheiden.</p>
-      ${relevant.length ? `<section class="skinfold-context-priority"><b>Für Priorität 1 entscheidend</b><small>${actionPlan.unansweredQuestionIds.length} noch nicht beantwortet</small></section>${groupMarkup(relevant)}` : '<p class="body-neutral-note">Für diese Priorität sind aktuell keine zusätzlichen Entscheidungsfragen nötig.</p>'}
+      ${relevant.length ? `<section class="skinfold-context-priority"><b>Für Priorität 1 entscheidend</b><small>${actionPlan.unansweredQuestionIds.length ? `${actionPlan.unansweredQuestionIds.length} noch nicht beantwortet` : 'Alle beantwortet · Änderungen jederzeit möglich'}</small></section>${groupMarkup(relevant)}` : '<p class="body-neutral-note">Für diese Priorität sind aktuell keine zusätzlichen Entscheidungsfragen nötig.</p>'}
       ${additional.length ? `<details class="ypsi-background"><summary><span>Weitere Angaben für spätere Prioritäten</span>${materialIconMarkup('chevron_right')}</summary><div>${groupMarkup(additional)}</div></details>` : ''}
       <p class="falten-detail-hinweis">Ein abgeschlossenes Braverman-Profil wird zusätzlich zur Unterscheidung von GABA- und Serotonin-Kontext verwendet. Es misst keine Neurotransmitterwerte.</p>
       <button class="btn btn-primary btn-block" type="submit">Antworten speichern & Plan aktualisieren</button>
@@ -992,7 +1001,8 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   };
 
   const openSkinfoldContext = () => {
-    let context = skinfoldContextState();
+    const measurementId = state.skinfolds.at(-1)?.id || null;
+    let context = skinfoldContextState(measurementId);
     const analysisContext = skinfoldAnalysisContext(state);
     const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, analysisContext);
     const actionPlan = buildSkinfoldActionPlan(plan, analysisContext);
@@ -1009,7 +1019,8 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     form.onsubmit = async (event) => {
       event.preventDefault();
       context = {
-        version: 2,
+        version: 3,
+        measurementId,
         values: Object.fromEntries(HAUTFALTEN_CONTEXT_FIELDS.map(({ id }) => {
           const selected = form.querySelector(`[name="skinfold-context-${id}"]:checked`);
           return [id, selected ? selected.value === 'true' : null];
@@ -1022,7 +1033,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       await render();
     };
     form.querySelector('[data-skinfold-context-reset]').onclick = async () => {
-      context = { version: 2, values: {}, updatedAt: new Date().toISOString() };
+      context = { version: 3, measurementId, values: {}, updatedAt: new Date().toISOString() };
       setPreference(HAUTFALTEN_CONTEXT_PREFERENCE, context, { syncDelay: 0 });
       overlay.remove();
       toast('Hautfalten-Kontext zurückgesetzt');

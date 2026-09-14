@@ -13,6 +13,59 @@ const PROTOKOLL_GRUPPEN = Object.freeze([
   { id: 'knie', label: 'Knie', falten: ['knie'] },
 ]);
 
+// Ordnet jede angezeigte Wechselbeziehung den Falten zu, fuer deren aktuelle
+// Prioritaet sie tatsaechlich erklaerend ist. Dadurch kann eine allgemeine
+// Nebenregel (z. B. das Quad/Ham-Verhaeltnis) nie versehentlich vor der
+// eigentlichen Begruendung der Rang-1-Falte erscheinen.
+const RELATION_FOCUS = Object.freeze({
+  'bauch-mehrfalten-pruefung': ['bauch'],
+  'bauch-trizeps-darmzweig': ['bauch'],
+  'bauch-trizeps-energie': ['bauch'],
+  'bauch-gaba-einschlafen': ['bauch'],
+  'bauch-morgenenergie': ['bauch'],
+  'bauch-huefte-blutzucker': ['bauch', 'brust', 'trizeps'],
+  'bauch-wade-schlaf': ['bauch', 'brust', 'trizeps'],
+  'brust-korrelationen': ['brust'],
+  'trizeps-leitfalte': ['trizeps'],
+  'trizeps-rote-punkte': ['trizeps'],
+  'ruecken-gegenpruefung': ['ruecken'],
+  'ham-ueber-quad': ['beinbizeps', 'quadrizeps'],
+  'quad-ueber-ham': ['quadrizeps', 'beinbizeps'],
+  'quad-ham-ausgeglichen': ['quadrizeps', 'beinbizeps'],
+  'beinbizeps-knie-wade-kontext': ['beinbizeps'],
+  'wade-quad-ham': ['wade'],
+  'wade-ham': ['wade'],
+  'wade-schlafzweige': ['wade'],
+  'huefte-blutzucker': ['huefte'],
+  'ruecken-huefte-kohlenhydrate': ['ruecken', 'huefte'],
+  'rippe-gegenpruefung': ['rippe'],
+  'knie-oberschenkel': ['knie'],
+  'bizeps-trizeps-schlaf': ['bizeps'],
+  'kinn-wange-verlauf': ['kinn', 'wange'],
+  'wange-umfeld-stress': ['wange'],
+});
+
+const PRIMARY_RELATION = Object.freeze({
+  kinn: 'kinn-wange-verlauf',
+  wange: 'kinn-wange-verlauf',
+  brust: 'brust-korrelationen',
+  trizeps: 'trizeps-leitfalte',
+  ruecken: 'ruecken-gegenpruefung',
+  rippe: 'rippe-gegenpruefung',
+  huefte: 'huefte-blutzucker',
+  bauch: 'bauch-mehrfalten-pruefung',
+  knie: 'knie-oberschenkel',
+  wade: 'wade-',
+  quadrizeps: 'quad-',
+  beinbizeps: 'ham-',
+  bizeps: 'bizeps-trizeps-schlaf',
+});
+
+function primaryRelationForFold(relation, slug) {
+  const expected = PRIMARY_RELATION[slug];
+  return Boolean(expected && (expected.endsWith('-') ? relation.id.startsWith(expected) : relation.id === expected));
+}
+
 const SUPPLEMENT_NAMEN = Object.freeze({
   methionin: 'Methionin', rhodiola: 'Rhodiola', pyridoxin: 'Vitamin B6 (Pyridoxin)',
   'b-komplex': 'Vitamin-B-Komplex', phosphatidylserin: 'Phosphatidylserin',
@@ -170,6 +223,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
     protocolIds: [],
     actions: [],
     groupIds: [],
+    focusSlugs: RELATION_FOCUS[relation.id] || [],
     requiresConfirmation: false,
     source: '',
     ...relation,
@@ -401,6 +455,24 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
     });
   }
 
+  if (topFold.slug === 'beinbizeps' && isElevated(f.beinbizeps)) {
+    const kneeElevated = isElevated(f.knie);
+    const calfElevated = isElevated(f.wade);
+    push({
+      id: 'beinbizeps-knie-wade-kontext',
+      title: 'Leber und Tiefschlaf zusätzlich im Blick',
+      summary: `Die Beinbizepsfalte wird in den Seminarunterlagen neben dem B‑Vitamin-Bedarf auch Leber-Phase 2 und Tiefschlaf zugeordnet. Das Knie ergänzt dabei Leber-Phase 1 und ist aktuell ${kneeElevated ? 'erhöht' : 'nicht erhöht'}; die Wade ergänzt den Tiefschlaf und ist aktuell ${calfElevated ? 'erhöht' : 'nicht erhöht'}. Diese Gegenprüfungen ändern nicht automatisch deinen jetzigen Phasenschritt.`,
+      basis: `Beinbizeps ${f.beinbizeps.value} mm · Knie ${f.knie.value} mm (${foldState(f.knie)}) · Wade ${f.wade.value} mm (${foldState(f.wade)})`,
+      actions: [
+        'Knie als Gegenfalte für Leber-Phase 1 und Mikronährstoff-/Antioxidanzienkontext beobachten.',
+        'Wade zusammen mit Ein- und Durchschlafproblemen als Gegenprüfung für den Tiefschlaf einordnen.',
+      ],
+      groupIds: ['quad-beinbizeps'],
+      tone: kneeElevated || calfElevated ? 'attention' : 'info',
+      source: 'Hautfalten Notizen S. 8 und S. 10–11',
+    });
+  }
+
   if (topFold.slug === 'wade' && isElevated(f.wade)) {
     const hamProminent = isElevated(f.beinbizeps);
     const bothLegsProminent = hamProminent && isElevated(f.quadrizeps);
@@ -433,6 +505,23 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
         ? !answered(context.sleepOnset)
         : !hamProminent && ![context.sleepOnset, context.sleepMaintenance, context.wakes3to7].some(answered),
       source: 'Hautfalten Notizen S. 8–9; Körperfett-Assessment S. 14',
+    });
+  }
+
+  if (topFold.slug === 'huefte' && isElevated(f.huefte)) {
+    push({
+      id: 'huefte-blutzucker',
+      title: 'Hüfte über Ernährung und Verlauf einordnen',
+      summary: 'Die Seminarunterlagen ordnen die Hüfte der vorübergehenden Kohlenhydrat- und Blutzuckertoleranz zu. Regelmäßigkeit der Mahlzeiten, Heißhunger, Energieeinbrüche, Bewegung und der Rücken-Hüfte-Wert entscheiden über die praktische Einordnung.',
+      basis: `Hüfte ${f.huefte.value} mm · Rücken ${f.ruecken.value} mm · zusammen ${f.ruecken.value + f.huefte.value} mm`,
+      actions: [
+        'Regelmäßige proteinreiche Mahlzeiten und den Energieverlauf nach dem Essen prüfen.',
+        'Rücken plus Hüfte als zusätzliche Seminarregel für die grundsätzliche Kohlenhydrattoleranz einordnen.',
+        'Kohlenhydratmenge nicht allein aus einer Falte ableiten, sondern mit Hunger, Training, TRACKER und Gewichtsverlauf abgleichen.',
+      ],
+      groupIds: ['huefte'],
+      tone: 'attention',
+      source: 'Hautfalten Notizen S. 6 und S. 14; Körperfett-Assessment S. 5',
     });
   }
 
@@ -489,23 +578,45 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
     });
   }
 
-  if (['kinn', 'wange'].includes(topFold.slug) && context.previousFolds) {
-    const chinDelta = f.kinn.value - Number(context.previousFolds.kinn);
-    const cheekDelta = f.wange.value - Number(context.previousFolds.wange);
-    if (Number.isFinite(chinDelta) && Number.isFinite(cheekDelta)) {
-      const sameDirection = Math.sign(chinDelta) === Math.sign(cheekDelta);
-      push({
-        id: 'kinn-wange-verlauf',
-        title: 'Kinn und Wange als globales Verlaufspaar',
-        summary: sameDirection
+  if (['kinn', 'wange'].includes(topFold.slug)) {
+    const chinDelta = context.previousFolds ? f.kinn.value - Number(context.previousFolds.kinn) : null;
+    const cheekDelta = context.previousFolds ? f.wange.value - Number(context.previousFolds.wange) : null;
+    const hasTrend = Number.isFinite(chinDelta) && Number.isFinite(cheekDelta);
+    const sameDirection = hasTrend && Math.sign(chinDelta) === Math.sign(cheekDelta);
+    push({
+      id: 'kinn-wange-verlauf',
+      title: 'Kinn und Wange als globales Verlaufspaar',
+      summary: !hasTrend
+        ? 'Dies ist die erste vollständige Vergleichsmessung. Kinn und Wange werden in den Unterlagen als frühe Verlaufsmarker beschrieben; eine Zu- oder Abnahme lässt sich erst mit der nächsten standardisierten Messung beurteilen.'
+        : sameDirection
           ? 'Beide Falten bewegen sich in dieselbe Richtung. Das entspricht der Seminarbeschreibung als frühe Marker einer globalen Fettzu- oder -abnahme.'
           : 'Kinn und Wange bewegen sich nicht gemeinsam. Eine globale Zu-/Abnahme ist daraus noch nicht eindeutig; Messschwankung und Kurzzeitstress mitprüfen.',
-        basis: `Kinn ${chinDelta >= 0 ? '+' : ''}${chinDelta.toFixed(1)} mm · Wange ${cheekDelta >= 0 ? '+' : ''}${cheekDelta.toFixed(1)} mm gegenüber der vorherigen vollständigen Messung`,
-        actions: ['Kalorien nur zusammen mit Gewichtstrend und Falten-Summe anpassen.', 'Bei uneinheitlichem Verlauf Messbedingungen und Kurzzeitstress prüfen.'],
-        tone: sameDirection ? 'info' : 'branch',
-        source: 'Hautfalten Notizen S. 1; „Was deine Hautfalten über dich aussagen“ S. 1',
-      });
-    }
+      basis: hasTrend
+        ? `Kinn ${chinDelta >= 0 ? '+' : ''}${chinDelta.toFixed(1)} mm · Wange ${cheekDelta >= 0 ? '+' : ''}${cheekDelta.toFixed(1)} mm gegenüber der vorherigen vollständigen Messung`
+        : `Kinn ${f.kinn.value} mm · Wange ${f.wange.value} mm · noch kein Vorwert`,
+      actions: ['Kalorien nur zusammen mit Gewichtstrend und Falten-Summe anpassen.', 'Bei uneinheitlichem Verlauf Messbedingungen und Kurzzeitstress prüfen.'],
+      tone: !hasTrend ? 'branch' : sameDirection ? 'info' : 'branch',
+      source: 'Hautfalten Notizen S. 1; „Was deine Hautfalten über dich aussagen“ S. 1',
+    });
+  }
+
+  if (topFold.slug === 'wange' && isElevated(f.wange)) {
+    const environmentConcern = yes(context.moldConcern);
+    const stressConfirmed = yes(context.stressHigh);
+    push({
+      id: 'wange-umfeld-stress',
+      title: 'Isolierte Wangenauffälligkeit zusätzlich einordnen',
+      summary: environmentConcern
+        ? 'Du hast einen Feuchte-/Schimmelverdacht im Wohn- oder Arbeitsumfeld bestätigt. Die Seminarunterlagen nennen das selten als Zusatzkontext; es ist keine Diagnose und sollte sachlich vor Ort geprüft werden.'
+        : stressConfirmed
+          ? 'Du hast eine dauerhaft hohe Stressbelastung bestätigt. Das passt zum seltenen Zusatzkontext der Unterlagen; die Wange bleibt trotzdem vor allem ein Verlaufsmarker zusammen mit dem Kinn.'
+          : 'Bei ungewöhnlich isolierter Wangenauffälligkeit nennen die Unterlagen selten eine belastende Alltagsstruktur oder das Wohnumfeld als Zusatzkontext. Beides muss erfragt werden und darf nicht aus der Falte diagnostiziert werden.',
+      basis: `Wange ${f.wange.value} mm · Kinn ${foldState(f.kinn)}`,
+      actions: ['Dauerstress und ungewöhnliche Belastungen im Wohn-/Arbeitsumfeld getrennt abfragen.', 'Bei bestätigtem baulichem Verdacht eine qualifizierte Vor-Ort-Prüfung veranlassen; keine Selbstdiagnose aus dem Faltenwert ableiten.'],
+      tone: environmentConcern || stressConfirmed ? 'attention' : 'branch',
+      requiresConfirmation: !answered(context.moldConcern) || !answered(context.stressHigh),
+      source: 'Hautfalten Notizen S. 1',
+    });
   }
 
   return relations;
@@ -541,6 +652,9 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
     groupOccurrences: occurrences,
     previousFolds: previous?.falten || null,
   });
+  const topRelationships = relationships
+    .filter((relation) => relation.focusSlugs.includes(topFold.slug))
+    .sort((a, b) => Number(primaryRelationForFold(b, topFold.slug)) - Number(primaryRelationForFold(a, topFold.slug)));
   const enriched = priorities.map((priority) => {
     const previousOccurrences = occurrences[priority.id] || 0;
     const isActive = priority.id === activeProtocolGroup?.id;
@@ -578,6 +692,7 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
     overallTopFold: topFold,
     rankedFolds,
     relationships,
+    topRelationships,
     occurrences,
   };
 }
@@ -632,6 +747,13 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
     }
   }
 
+  if (actionableTop && top.slug === 'brust') {
+    add('nutrition', 'Baue regelmäßig zinkreiche Lebensmittel wie Fleisch, Eier, Hülsenfrüchte, Nüsse oder Kerne ein. Einen Zinkmangel oder eine hohe Supplement-Dosis darf die Brustfalte allein nicht begründen.', 'seminar');
+  }
+  if (actionableTop && top.slug === 'trizeps') {
+    add('nutrition', 'Prüfe, ob Magnesium-, Vitamin-B6- und Zinkquellen sowie ausreichend Nahrungsfett tatsächlich regelmäßig vorkommen. Leite daraus ohne Ernährungskontext oder Laborwert keinen Hormonmangel ab.', 'seminar');
+  }
+
   if (groupId === 'huefte' || (actionableTop && top.slug === 'huefte')) {
     requireAnswers('mealsIrregular', 'postMealCrash');
     add('nutrition', 'Iss für zwei Wochen zu ähnlichen Zeiten und kombiniere jede Hauptmahlzeit mit Protein und ballaststoffreichen Lebensmitteln.', 'seminar');
@@ -639,22 +761,25 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
     add('dailyLife', 'Unterbrich längere Sitzphasen regelmäßig und sammle über die Woche mindestens 150 Minuten moderate Bewegung; Krafttraining zählt zusätzlich.', 'evidence', 'movement');
   }
 
-  if (groupId === 'wade' || groupId === 'quad-beinbizeps' || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'knie', 'bizeps'].includes(top.slug))) {
+  if (groupId === 'wade' || groupId === 'quad-beinbizeps' || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'knie', 'bizeps', 'rippe'].includes(top.slug))) {
     requireAnswers('sleepOnset', 'sleepMaintenance', 'wakes3to7', 'caffeineLate', 'alcoholNearBed', 'snoringBreathing');
   }
   if (groupId === 'quad-beinbizeps' || groupId === 'knie' || (actionableTop && ['quadrizeps', 'beinbizeps', 'knie'].includes(top.slug))) {
     requireAnswers('digestiveSymptoms', 'leakyGut', 'mercuryContext', 'alcoholNearBed');
     add('nutrition', 'Sichere täglich ausreichendes Protein und eine abwechslungsreiche Lebensmittelauswahl; starte keine pauschale „Entgiftungsdiät“ allein aufgrund der Faltenwerte.', 'seminar');
+    add('nutrition', 'Beginne den Tag für zwei Wochen mit einem proteinreichen Frühstück und dokumentiere Hunger, Energie und Verdauung; diese Empfehlung stammt aus dem Leber-Phase-2-Kontext der Beinfalten.', 'seminar');
     add('dailyLife', 'Bewege dich täglich und reduziere vermeidbaren Alkoholkonsum sowie unnötige Expositionen schrittweise, ohne daraus eine medizinische „Entgiftung“ abzuleiten.', 'seminar');
     add('dailyLife', 'Sammle über die Woche mindestens 150 Minuten moderate Bewegung und ergänze an mindestens zwei Tagen Krafttraining.', 'evidence', 'movement');
   }
   if (actionableTop && top.slug === 'trizeps') requireAnswers('redDotsTriceps', 'alcoholNearBed');
-  if (actionableTop && top.slug === 'rippe') requireAnswers('repeatedFoods', 'digestiveSymptoms');
+  if (actionableTop && top.slug === 'rippe') requireAnswers('repeatedFoods', 'digestiveSymptoms', 'stressHigh', 'morningDriveLow', 'mercuryContext');
 
   if (actionableTop && top.slug === 'ruecken') {
-    requireAnswers('stressHigh', 'sleepOnset', 'sleepMaintenance');
+    requireAnswers('stressHigh', 'sleepOnset', 'sleepMaintenance', 'mercuryContext');
     add('nutrition', 'Halte deine Kohlenhydratmenge zunächst zwei Wochen möglichst konstant und notiere zu den Hauptmahlzeiten grob Portion, Hunger, Energie und Trainingsleistung.', 'seminar');
     add('nutrition', 'Reduziere Kohlenhydrate nicht allein wegen der Rückenfalte. Ändere die Menge erst, wenn TRACKER, Gewichtsverlauf, Hunger und Leistung gemeinsam dafür sprechen.', 'app');
+    add('nutrition', 'Sichere eine abwechslungsreiche Lebensmittelauswahl mit Gemüse, Protein und üblichen Mikronährstoffquellen; leite aus der Rückenfalte keine pauschale „Entgiftung“ oder Supplement-Dosis ab.', 'seminar');
+    if (yes(context.stressHigh)) add('dailyLife', 'Plane täglich zehn Minuten ruhige Atmung oder Meditation und entferne für zwei Wochen einen konkret benannten vermeidbaren Stressor.', 'evidence', 'mindfulness');
   }
   if (actionableTop && top.slug === 'rippe') {
     if (yes(context.repeatedFoods) || yes(context.digestiveSymptoms)) {
@@ -662,17 +787,33 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
     } else if (!answered(context.repeatedFoods) || !answered(context.digestiveSymptoms)) {
       add('nutrition', 'Beantworte zuerst die Fragen zu häufig wiederholten Lebensmitteln und Verdauungsbeschwerden; ohne diese Antworten bleibt der Ernährungszweig offen.', 'app');
     }
+    if (yes(context.stressHigh) || yes(context.morningDriveLow)) {
+      add('dailyLife', 'Plane täglich zehn Minuten ruhige Atmung oder Meditation und protokolliere Morgenenergie und Anspannung. Bauch und Trizeps bleiben die Gegenprüfung dafür, ob Stress/Energie gerade wirklich führen.', 'evidence', 'mindfulness');
+    }
+    if (yes(context.mercuryContext)) {
+      add('dailyLife', 'Ein bereits fachlich eingeordneter Schwermetallkontext gehört zur Gegenprüfung über die Beinfalten; veranlasse daraus keine eigenständige Ausleitung.', 'seminar');
+    }
   }
   if (actionableTop && top.slug === 'bizeps') {
+    requireAnswers('stressHigh', 'morningDriveLow');
     add('nutrition', 'Prüfe für zwei Wochen, ob Kalorienziel, Protein und Nahrungsfette tatsächlich erreicht werden; leite aus der Bizepsfalte allein keinen Hormonmangel ab.', 'seminar');
+    if (yes(context.morningDriveLow) || yes(context.stressHigh)) add('dailyLife', 'Dokumentiere zwei Wochen Morgenenergie, Stress und Trainingsleistung. Trizeps und Schlafverlauf entscheiden mit, ob der Energie-/Erholungskontext plausibel ist.', 'seminar');
   }
   if (actionableTop && ['kinn', 'wange'].includes(top.slug)) {
     add('dailyLife', 'Bewerte Kinn und Wange nur als gemeinsames Verlaufspaar. Ändere erst etwas, wenn auch Gewichtstrend oder Falten-Summe dieselbe Richtung bestätigen.', 'seminar');
   }
+  if (actionableTop && top.slug === 'wange') {
+    requireAnswers('stressHigh', 'moldConcern');
+    if (yes(context.stressHigh)) add('dailyLife', 'Mache täglich zehn Minuten eine geführte Achtsamkeitsmeditation oder ruhige Atemübung und notiere deine Anspannung davor und danach.', 'evidence', 'mindfulness');
+    if (yes(context.moldConcern)) add('dailyLife', 'Lass einen konkreten Feuchte-/Schimmelverdacht im Wohn- oder Arbeitsumfeld qualifiziert vor Ort prüfen; die Wangenfalte selbst kann keine Belastung feststellen.', 'app');
+  }
+  if (actionableTop && top.slug === 'knie') {
+    add('nutrition', 'Achte auf tägliche Gemüse- und Obstvielfalt sowie übliche Quellen für Vitamin C, E und B3. Eine konkrete Mikronährstoff-Dosis darf nicht allein aus der Kniefalte folgen.', 'seminar');
+  }
 
   const sleepRelevant = groupId === 'wade'
     || ['bauch-brust-trizeps', 'quad-beinbizeps'].includes(groupId)
-    || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'bauch', 'brust', 'trizeps', 'bizeps', 'ruecken'].includes(top.slug));
+    || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'bauch', 'brust', 'trizeps', 'bizeps', 'ruecken', 'rippe'].includes(top.slug));
   if (sleepRelevant) {
     if (yes(context.sleepOnset) || yes(context.sleepMaintenance)) requireAnswers('caffeineLate', 'alcoholNearBed', 'snoringBreathing');
     if (yes(context.sleepOnset)) {

@@ -66,6 +66,19 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     expect(result.some((item) => item.id === 'ham-ueber-quad')).toBe(true);
   });
 
+  it('zeigt bei priorisiertem Beinbizeps Knie und Wade als zusätzliche Gegenprüfungen', () => {
+    const legFolds = { ...folds, bauch: 4, quadrizeps: 18.4, beinbizeps: 40, knie: 12, wade: 14 };
+    const relationships = buildSkinfoldRelationships(legFolds, 'male');
+    const context = relationships.find((item) => item.id === 'beinbizeps-knie-wade-kontext');
+    expect(context).toMatchObject({
+      groupIds: ['quad-beinbizeps'],
+      protocolIds: [],
+    });
+    expect(context.summary).toContain('Leber-Phase 2');
+    expect(context.summary).toContain('Tiefschlaf');
+    expect(context.summary).toContain('Leber-Phase 1');
+  });
+
   it('steigert eine wiederkehrende Priorität chronologisch und verzweigt erst in Phase 4', () => {
     const history = [1, 2, 3, 4].map((day) => ({ gemessen_am: `2026-0${day}-01`, falten: folds }));
     const plan = buildSkinfoldPlan(history, 'male', { wakesFit: true, digestiveSymptoms: true });
@@ -112,6 +125,34 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     expect(buildSkinfoldRelationships({ ...folds, trizeps: 100 }, 'male').some((item) => item.id === 'trizeps-leitfalte')).toBe(true);
     expect(buildSkinfoldRelationships({ ...folds, wade: 100 }, 'male').some((item) => item.id.startsWith('wade-'))).toBe(true);
     expect(buildSkinfoldRelationships(folds, 'male').some((item) => item.id === 'ruecken-huefte-kohlenhydrate')).toBe(true);
+  });
+
+  it('liefert für jede der 13 möglichen Rang-1-Falten zuerst die passende Hauptbegründung', () => {
+    const scenarios = [
+      ['kinn', 'kinn-wange-verlauf'],
+      ['wange', 'kinn-wange-verlauf'],
+      ['brust', 'brust-korrelationen'],
+      ['trizeps', 'trizeps-leitfalte'],
+      ['ruecken', 'ruecken-gegenpruefung'],
+      ['rippe', 'rippe-gegenpruefung'],
+      ['huefte', 'huefte-blutzucker'],
+      ['bauch', 'bauch-mehrfalten-pruefung'],
+      ['knie', 'knie-oberschenkel'],
+      ['wade', 'wade-'],
+      ['quadrizeps', 'quad-'],
+      ['beinbizeps', 'ham-'],
+      ['bizeps', 'bizeps-trizeps-schlaf'],
+    ];
+    scenarios.forEach(([slug, relationId]) => {
+      const plan = buildSkinfoldPlan([{ gemessen_am: '2026-09-14', falten: { ...folds, [slug]: 100 } }], 'male');
+      expect(plan.topFold.slug, slug).toBe(slug);
+      expect(plan.topRelationships.length, `${slug}: keine Hauptbeziehung`).toBeGreaterThan(0);
+      expect(
+        relationId.endsWith('-') ? plan.topRelationships[0].id.startsWith(relationId) : plan.topRelationships[0].id === relationId,
+        `${slug}: ${plan.topRelationships[0].id} statt ${relationId}`,
+      ).toBe(true);
+      expect(plan.topRelationships.every((relation) => relation.focusSlugs.includes(slug)), `${slug}: irrelevante Nebenbeziehung`).toBe(true);
+    });
   });
 
   it('nutzt den bestätigten Lebensmittelkontext für die Rippen-Verzweigung', () => {
@@ -171,6 +212,35 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     expect(actions.summary).toContain('aktuelle Priorität');
     expect(actions.categories.supplements[0].text).toContain('Phase 1 ist dein aktueller Supplement-Schritt');
     expect(actions.unansweredQuestionIds).toEqual(expect.arrayContaining(['stressHigh', 'sleepOnset', 'digestiveSymptoms']));
+  });
+
+  it('stellt beim Beinbizeps auch Schlaf- und Leberkontextfragen', () => {
+    const legFolds = { ...folds, bauch: 4, quadrizeps: 18.4, beinbizeps: 40 };
+    const plan = buildSkinfoldPlan([{ gemessen_am: '2026-09-14', falten: legFolds }], 'male', {});
+    const actions = buildSkinfoldActionPlan(plan, {});
+    expect(plan.topFold.slug).toBe('beinbizeps');
+    expect(actions.unansweredQuestionIds).toEqual(expect.arrayContaining([
+      'sleepOnset',
+      'sleepMaintenance',
+      'wakes3to7',
+      'digestiveSymptoms',
+      'leakyGut',
+      'mercuryContext',
+    ]));
+  });
+
+  it('stellt auch bei Wange, Rippe, Rücken und Bizeps die quellenabhängigen Gegenfragen', () => {
+    const requiredByFold = {
+      wange: ['stressHigh', 'moldConcern'],
+      rippe: ['stressHigh', 'morningDriveLow', 'sleepOnset', 'sleepMaintenance', 'digestiveSymptoms', 'repeatedFoods', 'mercuryContext'],
+      ruecken: ['stressHigh', 'sleepOnset', 'sleepMaintenance', 'mercuryContext', 'mealsIrregular'],
+      bizeps: ['stressHigh', 'morningDriveLow', 'sleepOnset', 'sleepMaintenance'],
+    };
+    Object.entries(requiredByFold).forEach(([slug, expectedQuestions]) => {
+      const plan = buildSkinfoldPlan([{ gemessen_am: '2026-09-14', falten: { ...folds, [slug]: 100 } }], 'male');
+      const actions = buildSkinfoldActionPlan(plan, {});
+      expect(actions.unansweredQuestionIds, slug).toEqual(expect.arrayContaining(expectedQuestions));
+    });
   });
 
   it('liefert je nach Schlafantwort andere konkrete Schritte', () => {
