@@ -24,6 +24,21 @@ import {
 } from './ypsiAssessment.js';
 
 const BRAVERMAN_PREFERENCE = 'comp:braverman-defizit-v1';
+const HAUTFALTEN_CONTEXT_PREFERENCE = 'comp:hautfalten-kontext-v1';
+
+const HAUTFALTEN_CONTEXT_FIELDS = Object.freeze([
+  { group: 'Energie', id: 'wakesFit', label: 'Ich wache gut auf und bin tagsüber aktiv und fit.' },
+  { group: 'Energie', id: 'morningDriveLow', label: 'Morgenenergie und Antrieb sind ein Hauptproblem.' },
+  { group: 'Schlaf', id: 'troubleWindingDown', label: 'Ich komme abends schlecht zur Ruhe.' },
+  { group: 'Schlaf', id: 'sleepOnset', label: 'Ich habe Probleme einzuschlafen.' },
+  { group: 'Schlaf', id: 'sleepMaintenance', label: 'Ich habe Probleme durchzuschlafen.' },
+  { group: 'Schlaf', id: 'wakes3to7', label: 'Ich wache wiederholt zwischen 3 und 7 Uhr auf.' },
+  { group: 'Darm & Ernährung', id: 'digestiveSymptoms', label: 'Verdauungsbeschwerden oder auffällige Reaktionen auf Getreide, Milch oder Fruchtzucker passen.' },
+  { group: 'Darm & Ernährung', id: 'leakyGut', label: 'Ein Darm-/Leaky-Gut-Kontext wurde fachlich oder anhand deutlicher Beschwerden bereits eingeordnet.' },
+  { group: 'Darm & Ernährung', id: 'mercuryContext', label: 'Ein Quecksilber-/Schwermetallkontext wurde fachlich eingeordnet.' },
+  { group: 'Weitere Gegenprüfung', id: 'repeatedFoods', label: 'Ich esse sehr häufig dieselben Lebensmittel oder vermute Unverträglichkeiten.' },
+  { group: 'Weitere Gegenprüfung', id: 'redDotsTriceps', label: 'Am Trizeps sind rote Punkte sichtbar.' },
+]);
 
 const FALTEN_HILFE = {
   kinn: 'Mittig unter dem Kinn eine senkrechte Falte greifen.', wange: 'Seitlich an der Wange immer dieselbe Position verwenden.',
@@ -129,7 +144,7 @@ function waistEntryMarkup() {
 
 export function skinfoldEntryMarkup(groesseCm = '', gewichtKg = '') {
   return `<form class="body-entry-form" data-skinfold-form>
-    <p class="body-guide">Alle zwei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p>
+    <p class="body-guide">Alle drei bis vier Wochen · gleiche Tageszeit und Körperseite · gleiche Messperson und gleicher Caliper · ähnliche Hydrierungs- und Ernährungsbedingungen.</p>
     <label class="fld-l">Datum<input class="input" type="date" value="${heute()}" data-skinfold-date></label>
     <label class="fld-l">Körpergröße<span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="180" autocomplete="off" value="${escapeHtml(String(groesseCm ?? ''))}" data-skinfold-height><i>cm</i></span></label>
     <label class="fld-l">Körpergewicht bei dieser Messung<span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" placeholder="85,0" autocomplete="off" value="${escapeHtml(String(gewichtKg ?? ''))}" data-skinfold-weight><i>kg</i></span></label>
@@ -316,30 +331,71 @@ function richtungsText(fold) {
   return `${display(fold.score, 2)} ${fold.richtung === 'unter' ? 'unter' : 'über'} Referenz`;
 }
 
-function ypsiPriorityMarkup(state) {
+function skinfoldContextState() {
+  const saved = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, null);
+  const values = Object.fromEntries(HAUTFALTEN_CONTEXT_FIELDS.map(({ id }) => [id, saved?.values?.[id] === true]));
+  return { version: 1, values, updatedAt: saved?.updatedAt || null };
+}
+
+function skinfoldAnalysisContext(state) {
   const recentSleep = state.sleep.slice(-7);
   const average = (values) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
-  const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, {
+  const context = skinfoldContextState();
+  const test = bravermanState();
+  let gabaContext = false;
+  let serotoninContext = false;
+  if (bravermanComplete(test.answers)) {
+    const result = scoreBravermanAssessment(test.answers);
+    gabaContext = result.severity.gaba.id !== 'minor';
+    serotoninContext = result.severity.serotonin.id !== 'minor';
+  }
+  return {
+    ...context.values,
     recentEnergy: average(recentSleep.map((row) => Number(row.energy)).filter(Number.isFinite)),
     recentSleep: average(recentSleep.map((row) => Number(row.quality)).filter(Number.isFinite)),
-  });
+    gabaContext,
+    serotoninContext,
+  };
+}
+
+function ypsiRelationMarkup(relation, { compact = false } = {}) {
+  const linkedProtocols = relation.protocolIds.map((id) => ypsiProtokolle.protokolle[id]).filter(Boolean);
+  const content = `<p>${escapeHtml(relation.summary)}</p><small>${escapeHtml(relation.basis)}</small>${relation.actions.length ? `<ul>${relation.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}${linkedProtocols.length ? `<section class="ypsi-relation-protocols"><b>Zugeordnete Optionen · nicht automatisch der aktuelle Schritt</b>${linkedProtocols.map((protocol) => `<span>${escapeHtml(protocol.name)}</span>`).join('')}</section>` : ''}${relation.source ? `<em>Quelle: ${escapeHtml(relation.source)}</em>` : ''}`;
+  if (compact) return `<details class="ypsi-relation is-${relation.tone}"><summary><span><b>${escapeHtml(relation.title)}</b>${relation.requiresConfirmation ? '<i>Kontext fehlt</i>' : ''}</span>${materialIconMarkup('chevron_right')}</summary><div>${content}</div></details>`;
+  return `<article class="ypsi-relation is-${relation.tone}"><b>${escapeHtml(relation.title)}</b>${relation.requiresConfirmation ? '<i>Kontext fehlt</i>' : ''}${content}</article>`;
+}
+
+function ypsiPriorityMarkup(state) {
+  const contextState = skinfoldContextState();
+  const confirmedContextCount = Object.values(contextState.values).filter(Boolean).length;
+  const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, skinfoldAnalysisContext(state));
   if (!plan) return `<section class="ypsi-priority-empty">
     <b>YPSI-Prioritäten</b>
-    <span>Nach deiner ersten vollständigen Messung ordnet CAPBOY die vier Protokollgruppen und zeigt die passende Startphase.</span>
+    <span>Nach deiner ersten vollständigen Messung ordnet CAPBOY die fünf Protokollgruppen und zeigt die passende Startphase.</span>
   </section>`;
   return `<section class="ypsi-priority-block">
     <header><span><small>YPSI-ASSESSMENT</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(plan.date)}</em></header>
     <div class="ypsi-top-fold"><small>PRIORISIERTE FALTE</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm · ${richtungsText(plan.topFold)} · Rang 1 nach Formel.xlsx</span></div>
+    <p class="body-neutral-note"><b>Zwei Bezugssysteme:</b> Die Excel-Rangformel verwendet eigene geschlechtsspezifische Referenzmittel nach „Messwert ÷ 4“. Diese stimmen nicht überall mit den textlichen Norm-/Zielwerten der Seminar-PDFs überein. Der Rang folgt unverändert der Excel-Datei; die Norm im einzelnen Faltendetail folgt den PDF-Angaben.</p>
     ${plan.topFold.richtung === 'unter' ? '<p class="body-neutral-note">Diese Falte ist priorisiert, weil sie <b>unter</b> dem Referenzwert liegt. Die YPSI-Rangformel bewertet den Betrag der Abweichung und unterscheidet die Richtung nicht — für die Handlung ist sie aber entscheidend. Ein Wert unter der Referenz ist in der Regel kein Ansatzpunkt für Fettabbau.</p>' : ''}
+    ${plan.topFold.richtung === 'exakt' ? '<p class="body-neutral-note">Die führende Falte liegt genau auf dem Excel-Referenzmittel. Daraus wird kein Supplement-Schritt gestartet.</p>' : ''}
+    ${!plan.activeProtocolGroup && plan.topFold.richtung === 'ueber' ? `<p class="body-neutral-note"><b>${escapeHtml(plan.topFold.label)}</b> hat in den Unterlagen kein eigenes chronologisches Supplement-Phasenprotokoll. CAPBOY zeigt deshalb die zugehörigen Gegenprüfungen und startet nicht ersatzweise eine andere Protokollgruppe.</p>` : ''}
     <p>Die App zeigt oben Rang 1 über alle dreizehn Falten. Darunter ordnet sie die fünf vorhandenen Protokollgruppen, frühere Messungen und Gegenfalten aus den Seminarunterlagen ein. Tippe eine Gruppe an, um Ernährung, Schlaf, Supplements und die Begründung zu sehen.</p>
+    <section class="ypsi-relations-overview">
+      <header><span><small>MEHRFALTEN-AUSWERTUNG</small><b>Zusammenhänge & Verzweigungen</b></span><button type="button" data-skinfold-context-open>Kontext ${confirmedContextCount ? `· ${confirmedContextCount}` : 'ergänzen'}</button></header>
+      <p>Diese Auswertung kombiniert die priorisierte Falte mit den Gegenfalten. Symptomabhängige Zweige werden erst als Protokoll empfohlen, wenn der nötige Kontext bestätigt ist.</p>
+      <div>${plan.relationships.length ? plan.relationships.map((relation) => ypsiRelationMarkup(relation, { compact: true })).join('') : '<span>Noch kein zusätzliches Mehrfaltenmuster aktiv.</span>'}</div>
+    </section>
     <div class="ypsi-priority-list">${plan.priorities.map((priority) => {
-      const currentProtocol = priority.recommendedProtocols[0] || priority.phaseProtocols[0];
+      const currentProtocol = priority.isActive
+        ? priority.recommendedProtocols[0] || (priority.suggestedPhase < 4 ? priority.phaseProtocols[0] : null)
+        : null;
       const values = priority.details.map((item) => `${item.label} ${display(item.value)} mm`).join(' · ');
       return `<button type="button" data-ypsi-priority="${priority.id}">
-        <i>${priority.priority}</i><span><b>${escapeHtml(priority.label)}</b><small>Führend: ${escapeHtml(priority.primaryFold.label)} · ${escapeHtml(values)}</small>${priority.priority === 1 ? `<em>Aktueller Schritt: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}${currentProtocol?.fokus ? ` · ${escapeHtml(currentProtocol.fokus)}` : ''}</em>` : `<em>Nächster möglicher Einstieg: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</em>`}</span>${materialIconMarkup('chevron_right')}
+        <i>${priority.priority}</i><span><b>${escapeHtml(priority.label)}</b><small>Führend: ${escapeHtml(priority.primaryFold.label)} · ${escapeHtml(values)}</small>${priority.isActive ? `<em>Aktueller Schritt: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}${currentProtocol?.fokus ? ` · ${escapeHtml(currentProtocol.fokus)}` : ''}</em>` : `<em>Nächster möglicher Einstieg: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</em>`}</span>${materialIconMarkup('chevron_right')}
       </button>`;
     }).join('')}</div>
-    <p class="ypsi-method-note"><b>Phasenlogik:</b> Wird dieselbe Gruppe bei einer späteren Messung erneut Priorität 1, folgt dort die nächste Phase. Die YPSI-Strategie ergänzt deine Kalorien- und Gewichtssteuerung; sie ersetzt sie nicht.</p>
+    <p class="ypsi-method-note"><b>Phasenlogik:</b> Wird dieselbe Gruppe bei einer späteren Messung erneut Priorität 1, folgt dort die nächste belegte Phase. Hüfte endet in den Unterlagen nach Phase 3; für Knie ist nur ein Schritt dokumentiert. Die YPSI-Strategie ergänzt deine Kalorien- und Gewichtssteuerung; sie ersetzt sie nicht.</p>
   </section>`;
 }
 
@@ -364,17 +420,18 @@ function ypsiPriorityDetailMarkup(priority) {
     phase,
     protocols: priority.protocols.filter((protocol) => Number(protocol.phase) === phase),
   })).filter((group) => group.protocols.length);
-  const currentProtocols = priority.recommendedProtocols.length ? priority.recommendedProtocols : priority.phaseProtocols;
-  return `<header class="falten-detail-header"><div><small>YPSI-PRIORITÄT ${priority.priority} · PHASE ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</small><h2>${escapeHtml(priority.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  const currentProtocols = priority.recommendedProtocols;
+  return `<header class="falten-detail-header"><div><small>PROTOKOLLGRUPPE ${priority.priority} · PHASE ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</small><h2>${escapeHtml(priority.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="falten-detail-body ypsi-priority-detail">
       <section class="ypsi-primary-fold"><small>PRIORISIERTE FALTE DIESER GRUPPE</small><b>${escapeHtml(priority.primaryFold.label)}</b><span>${display(priority.primaryFold.value)} mm · Faltenrang ${priority.primaryFold.foldPriority}</span></section>
       <section class="ypsi-detail-values">${priority.details.map((item) => `<span${item.slug === priority.primaryFold.slug ? ' class="is-primary"' : ''}><small>${escapeHtml(item.label)}</small><b>${display(item.value)} mm</b></span>`).join('')}</section>
-      ${priority.priority === 1 ? `<section class="falten-detail-section ypsi-current-step"><h3>Aktueller Vorschlag: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</h3><p>Diese Gruppe war in ${priority.occurrences} vollständigen Messung${priority.occurrences === 1 ? '' : 'en'} Priorität 1. ${priority.suggestedPhase < 4 ? 'Daraus folgt der nächste chronologische Basisschritt.' : 'Ab Phase 4 entscheidet die passende Wechselbeziehung bzw. Symptomatik über die Variante.'}</p>${currentProtocols.length ? `<div class="falten-detail-protokolle">${currentProtocols.map((protocol) => ypsiProtocolMarkup(protocol, true)).join('')}</div>` : '<p><b>Noch keine Variante automatisch gewählt.</b> Die Messwerte allein unterscheiden die Phase-4-Zweige nicht sicher. Prüfe die Bedingungen unter „Wechselbeziehungen“.</p>'}</section>` : `<section class="falten-detail-section"><h3>Noch nicht der aktive Schritt</h3><p>Diese Gruppe liegt aktuell auf Rang ${priority.priority}. Wird sie in einer späteren Messung Priorität 1, wäre Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase} der aus dem Verlauf abgeleitete Einstieg.</p></section>`}
-      ${priority.relationships.length ? `<section class="falten-detail-section ypsi-relations"><h3>Wechselbeziehungen aus den Unterlagen</h3>${priority.relationships.map((relation) => `<article class="ypsi-relation is-${relation.tone}"><b>${escapeHtml(relation.title)}</b><p>${escapeHtml(relation.summary)}</p><small>${escapeHtml(relation.basis)}</small>${relation.actions.length ? `<ul>${relation.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}</article>`).join('')}</section>` : ''}
+      ${priority.isActive ? `<section class="falten-detail-section ypsi-current-step"><h3>Aktueller Vorschlag: Phase ${priority.suggestedPhase === 4 ? '4+' : priority.suggestedPhase}</h3><p>Diese Gruppe war in ${priority.occurrences} vollständigen Messung${priority.occurrences === 1 ? '' : 'en'} tatsächlich über die priorisierte Falte aktiv. ${priority.holdsAtLastDocumentedPhase ? 'Die Unterlagen enthalten für diese Gruppe keine weitere Phase; deshalb bleibt der letzte belegte Schritt sichtbar.' : priority.suggestedPhase < 4 ? 'Daraus folgt der nächste chronologische Basisschritt.' : 'Ab Phase 4 entscheidet die passende Wechselbeziehung beziehungsweise Symptomatik über die Variante.'}</p>${currentProtocols.length ? `<div class="falten-detail-protokolle">${currentProtocols.map((protocol) => ypsiProtocolMarkup(protocol, true)).join('')}</div>` : '<p><b>Noch keine Variante automatisch gewählt.</b> Die Messwerte allein unterscheiden die Phase-4-Zweige nicht sicher. Ergänze den Kontext und prüfe die Bedingungen unter „Wechselbeziehungen“.</p>'}</section>` : `<section class="falten-detail-section"><h3>Noch nicht der aktive Schritt</h3><p>Diese Gruppe liegt in der internen Rangfolge aktuell auf Rang ${priority.priority}. Erst wenn eine zugehörige Falte insgesamt Rang 1 belegt und über der Referenz liegt, wird daraus ein chronologischer Protokollschritt.</p></section>`}
+      ${priority.relationships.length ? `<section class="falten-detail-section ypsi-relations"><h3>Wechselbeziehungen aus den Unterlagen</h3>${priority.relationships.map((relation) => ypsiRelationMarkup(relation)).join('')}</section>` : ''}
       ${causes.length ? `<section class="falten-detail-section"><h3>Kontext aus dem Seminar</h3><div class="falten-detail-tags">${causes.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div></section>` : ''}
       ${lifestyle.length ? `<section class="falten-detail-section"><h3>Ernährung, Alltag & Schlaf</h3><ul class="falten-detail-hinweise">${lifestyle.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
-      <section class="falten-detail-section"><h3>Alle Phasen zum Nachschlagen</h3><p class="falten-detail-hinweis">Nicht gleichzeitig beginnen: Phase 1 bis 3 werden nur bei wiederkehrender Priorität chronologisch durchlaufen. Phase 4+ ist eine bedingungsabhängige Auswahl.</p>
-        <div class="falten-detail-protokolle">${protocolsByPhase.map((phaseGroup) => `<section class="ypsi-phase-group"><h4>Phase ${phaseGroup.phase === 4 ? '4+' : phaseGroup.phase}</h4>${phaseGroup.protocols.map((protocol) => ypsiProtocolMarkup(protocol, phaseGroup.phase === priority.suggestedPhase && priority.priority === 1)).join('')}</section>`).join('')}</div>
+      ${priority.grundlagen ? `<section class="falten-detail-section ypsi-group-foundations"><h3>${escapeHtml(priority.grundlagen.titel)}</h3><ul class="falten-detail-hinweise">${priority.grundlagen.punkte.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul><p class="falten-detail-quelle">Quelle: ${escapeHtml(priority.grundlagen.quelle)}</p></section>` : ''}
+      <section class="falten-detail-section"><h3>Alle Phasen zum Nachschlagen</h3><p class="falten-detail-hinweis">Nicht gleichzeitig beginnen: Phase 1 bis 3 werden nur bei wiederkehrender, tatsächlich aktiver Priorität chronologisch durchlaufen. Phase 4+ ist eine bedingungsabhängige Auswahl.</p>
+        <div class="falten-detail-protokolle">${protocolsByPhase.map((phaseGroup) => `<section class="ypsi-phase-group"><h4>Phase ${phaseGroup.phase === 4 ? '4+' : phaseGroup.phase}</h4>${phaseGroup.protocols.map((protocol) => ypsiProtocolMarkup(protocol, phaseGroup.phase === priority.suggestedPhase && priority.isActive)).join('')}</section>`).join('')}</div>
       </section>
       <p class="falten-detail-disclaimer">Praxisstrategie aus deinen YPSI-Seminarunterlagen. Prüfe Produkte, Dosierungen, Erkrankungen und Medikamente vor der Einnahme fachlich. Die Kaloriensteuerung in TRACKER läuft unabhängig weiter.</p>
     </div>`;
@@ -394,7 +451,7 @@ function skinfoldMarkup(state) {
     ${faltenLegendeMarkup(state)}
     ${skinfoldHistoryMarkup(state.skinfolds)}
     ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
-    <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle zwei bis vier Wochen an eine neue 13-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
+    <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle drei bis vier Wochen an eine neue 13-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
     <button class="body-reset-mini" type="button" data-reset-body="skinfolds">13-Falten-Werte zurücksetzen</button>
   </div></section>`;
 }
@@ -434,6 +491,14 @@ function faltenDetailMarkup(slug, state) {
   const protokolle = (info.protokoll_ids || [])
     .map((id) => ypsiProtokolle.protokolle[id])
     .filter(Boolean);
+  const protocolPhases = protokolle.map((protocol) => Number(protocol.phase)).filter(Number.isFinite);
+  const maxProtocolPhase = protocolPhases.length ? Math.max(...protocolPhases) : 0;
+  const hasConditionalPhase = protocolPhases.includes(4);
+  const protocolSequenceHint = hasConditionalPhase
+    ? 'Chronologisch Phase 1 → 2 → 3 abarbeiten; Phase 4+ anschließend nur nach passender Wechselbeziehung und Symptomatik wählen.'
+    : maxProtocolPhase === 1
+      ? 'Für diese Falte ist in den Unterlagen nur dieser eine Supplement-Schritt dokumentiert.'
+      : `Chronologisch nur bis zur dokumentierten Phase ${maxProtocolPhase} abarbeiten; eine weitere Phase ist in den Unterlagen nicht belegt.`;
 
   return `
     <header class="falten-detail-header">
@@ -471,6 +536,7 @@ function faltenDetailMarkup(slug, state) {
           ${norm.katastrophal_mm != null ? `<div><small>Kritisch ab</small><b>${norm.katastrophal_mm} mm</b></div>` : ''}
         </div>
         ${norm.notiz ? `<p class="falten-detail-hinweis">${escapeHtml(norm.notiz)}</p>` : ''}
+        <p class="falten-detail-hinweis">Diese textliche Orientierung ist nicht überall identisch mit dem Referenzmittel der Excel-Rangformel. Deshalb können Normstatus und Faltenrang unterschiedlich ausfallen.</p>
       </section>` : ''}
 
       <section class="falten-detail-section">
@@ -483,20 +549,26 @@ function faltenDetailMarkup(slug, state) {
       ${protokolle.length ? `<section class="falten-detail-section">
         <h3>YPSI-Protokolle</h3>
         ${info.protokoll_hinweis ? `<p class="falten-detail-hinweis">${escapeHtml(info.protokoll_hinweis)}</p>` : ''}
-        <p class="falten-detail-hinweis">Chronologisch abarbeiten: Phase 1 → 2 → 3, dann Phase 4+ nach Symptomatik wählen. Nicht alles gleichzeitig einnehmen.</p>
-        <div class="falten-detail-protokolle">
-          ${protokolle.map((p) => `<div class="falten-protokoll-item">
-            <header><b>${escapeHtml(p.name)}</b>${p.fokus ? `<small>${escapeHtml(p.fokus)}</small>` : ''}</header>
-            <ul>${(p.supplemente || []).map((s) => `<li><span><b>${escapeHtml(supplementName(s.slug))}</b>${supplementSafety(s.slug) ? `<small>${escapeHtml(supplementSafety(s.slug))}</small>` : ''}</span>${s.dosierung ? `<strong>${escapeHtml(s.dosierung)}</strong>` : ''}</li>`).join('')}</ul>
-            ${p.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(p.notiz)}</p>` : ''}
-          </div>`).join('')}
-        </div>
+        <p class="falten-detail-hinweis">${escapeHtml(protocolSequenceHint)} Nicht alles gleichzeitig einnehmen.</p>
+        <div class="falten-detail-protokolle">${protokolle.map((protocol) => ypsiProtocolMarkup(protocol)).join('')}</div>
       </section>` : ''}
 
       ${info.quelle ? `<p class="falten-detail-quelle">Quelle: ${escapeHtml(info.quelle)}</p>` : ''}
       <p class="falten-detail-disclaimer">Angaben aus dem YPSI-System (Wolfgang Unsöld) und BioSignature (Charles Poliquin). Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose. Bei ernsthaften Beschwerden ärztlich abklären lassen.</p>
     </div>
   `;
+}
+
+function skinfoldContextMarkup(context) {
+  const groups = [...new Set(HAUTFALTEN_CONTEXT_FIELDS.map((item) => item.group))];
+  return `<header class="falten-detail-header"><div><small>MEHRFALTEN-AUSWERTUNG</small><h2>Kontext ergänzen</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <form class="falten-detail-body skinfold-context-form" data-skinfold-context-form>
+      <p>Faltenwerte können Verdauung, Einschlafprobleme oder andere Beschwerden nicht selbst messen. Markiere nur Aussagen, die aktuell wirklich passen. Damit wählt CAPBOY die bedingten Seminarzweige gezielter aus.</p>
+      ${groups.map((group) => `<fieldset><legend>${escapeHtml(group)}</legend>${HAUTFALTEN_CONTEXT_FIELDS.filter((item) => item.group === group).map((item) => `<label><input type="checkbox" data-skinfold-context="${item.id}"${context.values[item.id] ? ' checked' : ''}><span>${escapeHtml(item.label)}</span></label>`).join('')}</fieldset>`).join('')}
+      <p class="falten-detail-hinweis">Ein abgeschlossenes Braverman-Profil wird zusätzlich zur Unterscheidung von GABA- und Serotonin-Kontext verwendet. Es misst keine Neurotransmitterwerte.</p>
+      <button class="btn btn-primary btn-block" type="submit">Kontext speichern</button>
+      <button class="body-reset-mini" type="button" data-skinfold-context-reset>Alle Angaben zurücksetzen</button>
+    </form>`;
 }
 
 function emptyBravermanState() {
@@ -882,12 +954,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   };
 
   const openYpsiPriority = (groupId) => {
-    const recentSleep = state.sleep.slice(-7);
-    const average = (values) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
-    const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, {
-      recentEnergy: average(recentSleep.map((row) => Number(row.energy)).filter(Number.isFinite)),
-      recentSleep: average(recentSleep.map((row) => Number(row.quality)).filter(Number.isFinite)),
-    });
+    const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, skinfoldAnalysisContext(state));
     const priority = plan?.priorities.find((item) => item.id === groupId);
     if (!priority) return;
     createSpecialDexOverlay({
@@ -895,9 +962,42 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       replaceSelector: '[data-ypsi-priority-overlay]',
       className: 'body-entry-overlay falten-detail-overlay ypsi-priority-overlay',
       sheetClassName: 'body-entry-sheet falten-detail-sheet ypsi-priority-sheet',
-      ariaLabel: `YPSI-Priorität ${priority.priority}: ${priority.label}`,
+      ariaLabel: `YPSI-Protokollgruppe ${priority.priority}: ${priority.label}`,
       markup: ypsiPriorityDetailMarkup(priority),
     }).dataset.ypsiPriorityOverlay = '';
+  };
+
+  const openSkinfoldContext = () => {
+    let context = skinfoldContextState();
+    const overlay = createSpecialDexOverlay({
+      colorScope: 'body',
+      replaceSelector: '[data-skinfold-context-overlay]',
+      className: 'body-entry-overlay falten-detail-overlay skinfold-context-overlay',
+      sheetClassName: 'body-entry-sheet falten-detail-sheet skinfold-context-sheet',
+      ariaLabel: 'Kontext für die Mehrfalten-Auswertung',
+      markup: skinfoldContextMarkup(context),
+    });
+    overlay.dataset.skinfoldContextOverlay = '';
+    const form = overlay.querySelector('[data-skinfold-context-form]');
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      context = {
+        version: 1,
+        values: Object.fromEntries(HAUTFALTEN_CONTEXT_FIELDS.map(({ id }) => [id, form.querySelector(`[data-skinfold-context="${id}"]`)?.checked === true])),
+        updatedAt: new Date().toISOString(),
+      };
+      setPreference(HAUTFALTEN_CONTEXT_PREFERENCE, context, { syncDelay: 0 });
+      overlay.remove();
+      toast('Hautfalten-Kontext gespeichert');
+      await render();
+    };
+    form.querySelector('[data-skinfold-context-reset]').onclick = async () => {
+      context = { version: 1, values: {}, updatedAt: new Date().toISOString() };
+      setPreference(HAUTFALTEN_CONTEXT_PREFERENCE, context, { syncDelay: 0 });
+      overlay.remove();
+      toast('Hautfalten-Kontext zurückgesetzt');
+      await render();
+    };
   };
 
   const openBraverman = () => {
@@ -1003,7 +1103,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     if (thresholdForm) thresholdForm.onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const stableLoss = zahl(form.querySelector('[data-threshold-stable-loss]').value); const slowLoss = zahl(form.querySelector('[data-threshold-slow-loss]').value); const stableGain = zahl(form.querySelector('[data-threshold-stable-gain]').value); const slowGain = zahl(form.querySelector('[data-threshold-slow-gain]').value); if (!(stableLoss > 0 && slowLoss > stableLoss && stableGain > 0 && slowGain > stableGain)) return toast('Bitte aufsteigende, positive Prozentgrenzen eintragen'); const bodycomp_thresholds = { stableLoss: -stableLoss, slowLoss: -slowLoss, stableGain, slowGain }; const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, bodycomp_thresholds }, { onConflict: 'user_id' }); if (error) return toast('Orientierungsbereiche konnten nicht gespeichert werden'); toast('Orientierungsbereiche gespeichert'); await render(); };
     const settings = container.querySelector('[data-skinfold-settings]');
     if (settings) {
-      settings.innerHTML = `<div class="mess-einst body-reminder-settings"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i><span>Erinnerung aktiv</span></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;
+      settings.innerHTML = `<div class="mess-einst body-reminder-settings"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i><span>Erinnerung aktiv</span></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen${weeks === 2 ? ' · kürzer als Seminar' : ''}</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;
       settings.querySelectorAll('input,select').forEach((field) => { field.onchange = async () => { const values = { falten_erinnerung: settings.querySelector('[data-reminder-active]').checked, falten_intervall_wochen: Number(settings.querySelector('[data-reminder-weeks]').value), falten_uhrzeit: settings.querySelector('[data-reminder-time]').value, zeitzone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin' }; const { error } = await supabase.from('profiles').update(values).eq('id', userId); if (error) return toast('Einstellung nicht gespeichert'); Object.assign(profile, values); onProfileUpdated?.(profile); toast('Erinnerung gespeichert'); }; });
     }
     const resetConfig = {
@@ -1017,6 +1117,9 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     });
     container.querySelectorAll('[data-ypsi-priority]').forEach((button) => {
       button.onclick = () => openYpsiPriority(button.dataset.ypsiPriority);
+    });
+    container.querySelectorAll('[data-skinfold-context-open]').forEach((button) => {
+      button.onclick = openSkinfoldContext;
     });
     container.querySelectorAll('[data-braverman-open]').forEach((button) => {
       button.onclick = openBraverman;

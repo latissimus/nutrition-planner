@@ -1,5 +1,5 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "quelle": "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop & Advanced Supplementation, Stuttgart Februar/Juli 2017 (Wolfgang Unsöld)",
   "hinweis": "Alle Protokolle sind Praxis-Empfehlungen aus dem YPSI-System. Sie ersetzen keine ärztliche/therapeutische Beratung. Standard-Timing: F = zum Frühstück, vs = vor dem Schlafen, PWO = Post-Workout. Ohne Timing = über den Tag verteilt.",
   "abkuerzungen": {
@@ -9,9 +9,9 @@
     "PreWo": "Pre-Workout"
   },
   "phasen_erlaeuterung": {
-    "phase_1": "Basis-Sanierung – erste Aufräum-Phase mit Chlorenergy für den 'großen Dreck'.",
-    "phase_2": "Vertiefung – kleinerer 'Dreck' mit ChlorellaKomplex und/oder Umstellung auf Vitamin-D/K-Basis.",
-    "phase_3": "Feinjustierung – ChloroMalat für Aluminium-Bindung, spezifischere Kombinationen.",
+    "phase_1": "Erster, je nach Protokollgruppe unterschiedlich zusammengesetzter Basisschritt.",
+    "phase_2": "Zweiter gruppenspezifischer Basisschritt; die Kombination unterscheidet sich zwischen Bauch/Brust/Trizeps, Hüfte, Wade und Beinfalten.",
+    "phase_3": "Dritter gruppenspezifischer Basisschritt. ChloroMalat gehört nur zu Wade und Beinfalten, nicht zu jeder Gruppe.",
     "phase_4_plus": "Advanced – gezielte Interventionen wenn Phase 1–3 kein Ergebnis mehr bringen. Auswahl abhängig von Symptomatik (Schlaf, Darm, Leber-Phase-2 etc.)."
   },
   "basis_immer_dabei": {
@@ -98,7 +98,8 @@
         }
       ],
       "fokus": "Chlorella-Aufbau, Vitamin D/K rein",
-      "quelle": "Körperfett-Assessment S. 9, 12"
+      "notiz": "Hautfalten Notizen S. 12 nennen ChlorellaKomplex 3×3 ohne Vitamin D/K. Die Workshop-Fassungen in Körperfett-Assessment S. 9 und S. 12 nennen 3×3 beziehungsweise 3×4 mit Vitamin D/K. Die App zeigt deshalb den dokumentierten Dosierungsbereich und Vitamin D/K aus den Workshop-Fassungen.",
+      "quelle": "Hautfalten Notizen S. 12; Körperfett-Assessment S. 9 und S. 12"
     },
     "quad-beinbizeps-phase-3": {
       "id": "quad-beinbizeps-phase-3",
@@ -128,8 +129,8 @@
         }
       ],
       "fokus": "Aluminium binden (ChloroMalat), Darm und Schlaf entscheidend",
-      "notiz": "Hautfalten Notizen S. 12 nennen ChloroMalat 4 vs. Das ältere Körperfett-Assessment S. 9 nennt 6 vs für 3–6 Wochen, danach 2 vs für 3–6 Wochen (Titration).",
-      "quelle": "Körperfett-Assessment S. 9"
+      "notiz": "Hautfalten Notizen S. 12 nennen ChloroMalat 4 vs. In Körperfett-Assessment S. 9 und S. 12 steht eine abweichende 6-vs-Fassung. Die App zeigt die strukturierte 4-vs-Fassung; Produkt und Verträglichkeit fachlich prüfen.",
+      "quelle": "Hautfalten Notizen S. 12; Körperfett-Assessment S. 9 und S. 12"
     },
     "quad-beinbizeps-phase-4-methylkomplex": {
       "id": "quad-beinbizeps-phase-4-methylkomplex",
@@ -621,8 +622,8 @@
           "dosierung": "3×2"
         },
         {
-          "slug": "ypsi-inositol",
-          "dosierung": "1 vs"
+          "slug": "ypsi-magnesium",
+          "dosierung": "4 vs"
         },
         {
           "slug": "chlorella-komplex",
@@ -634,7 +635,8 @@
         }
       ],
       "fokus": "Ernährung, Schlaf & Bewegung sind entscheidend für das Blutzuckermanagement",
-      "quelle": "Körperfett-Assessment S. 11, 13"
+      "notiz": "Hautfalten Notizen S. 14 und die spätere Workshop-Fassung in Körperfett-Assessment S. 13 nennen Magnesium 4 vs und ChlorellaKomplex 3×4. Die ältere Fassung auf S. 11 nennt stattdessen Inositol 1 vs und ChlorellaKomplex 3×3. Die App folgt der strukturierten und später wiederholten Magnesium-Fassung.",
+      "quelle": "Hautfalten Notizen S. 14; Körperfett-Assessment S. 11 und S. 13"
     },
     "wade-phase-1": {
       "id": "wade-phase-1",
@@ -713,16 +715,19 @@
           "dosierung": "6 vs"
         },
         {
-          "slug": "taurin",
-          "dosierung": "4 vs"
-        },
-        {
           "slug": "vitamin-d-k",
           "dosierung": "10 F"
         }
       ],
-      "fokus": "Taurin ergänzt (GABA-Vorstufe) – Tiefschlaf vertiefen",
-      "quelle": "Körperfett-Assessment S. 11"
+      "optionale_supplemente": [
+        {
+          "slug": "taurin",
+          "dosierung": "4 vs in der abweichenden Workshop-Fassung"
+        }
+      ],
+      "fokus": "ChloroMalat-Phase für die Schlaf-/Wadenpriorität",
+      "notiz": "Hautfalten Notizen S. 9 führen Phase 3 ohne Taurin. Körperfett-Assessment S. 11 ergänzt Taurin 4 vs. Die App zeigt Taurin deshalb als optionale Workshop-Variante.",
+      "quelle": "Hautfalten Notizen S. 9; Körperfett-Assessment S. 11"
     },
     "wade-phase-4-neuromag": {
       "id": "wade-phase-4-neuromag",
@@ -1136,37 +1141,6 @@
       "abgeleitet": true,
       "notiz": "Die Unterlagen geben für das Knie keine eigene Phasentabelle. Rang 1 lautet dort 'Mikronährstoff-Defizite → MultiKomplex & Magnesium'; diese Phase bildet genau das ab.",
       "quelle": "Hautfalten Notizen S. 8 (Rang 1)"
-    },
-    "knie-phase-2": {
-      "id": "knie-phase-2",
-      "name": "Knie – Phase 2",
-      "gruppe": "knie",
-      "gilt_fuer_falten": [
-        "knie"
-      ],
-      "phase": 2,
-      "supplemente": [
-        {
-          "slug": "multikomplex",
-          "dosierung": "3×2"
-        },
-        {
-          "slug": "ypsi-magnesium",
-          "dosierung": "4 vs"
-        },
-        {
-          "slug": "chlorenergy",
-          "dosierung": "3×6"
-        },
-        {
-          "slug": "vitamin-d-k",
-          "dosierung": "10 F"
-        }
-      ],
-      "fokus": "Toxine reduzieren – Entgiftung Leber Phase 1",
-      "abgeleitet": true,
-      "notiz": "Rang 2 im Knie-Kapitel lautet 'Toxine → Entgiftung & Entzündungen'. Die Supplement-Kombination ist aus den Basisphasen der anderen Gruppen übernommen, nicht wörtlich belegt.",
-      "quelle": "Hautfalten Notizen S. 8 (Rang 2)"
     }
   }
 }

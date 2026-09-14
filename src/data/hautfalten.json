@@ -1,5 +1,5 @@
 {
-  "version": "1.3",
+  "version": "1.4",
   "quellen": [
     "Hautfalten Notizen – strukturierte Seminarzusammenfassung (14 Seiten)",
     "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop, Stuttgart Februar 2017 (Wolfgang Unsöld)",
@@ -47,7 +47,10 @@
         ],
         "kurzbeschreibung": "Reagiert als eine der ersten Falten auf Gewichtsveränderungen und Kurzzeit-Stress.",
         "ausfuehrlich": "Kinn und Wange geben direkten Aufschluss über Gewichtszu- oder abnahme. Nimmst du ab, nehmen diese beiden Falten als Erstes ab.",
-        "hauptursachen": []
+        "hauptursachen": [],
+        "hebel": [
+          "Kalorienmenge nur zusammen mit Gewichtstrend, Wange und Faltensumme gegebenenfalls anpassen"
+        ]
       },
       "norm": {
         "mann_mm": null,
@@ -82,7 +85,13 @@
         ],
         "kurzbeschreibung": "Wie Kinn: reagiert früh auf Gewichtsveränderungen und Kurzzeit-Stress.",
         "ausfuehrlich": "Kinn und Wange sind die ersten beiden Falten, die sich verändern, wenn du etwas veränderst.",
-        "hauptursachen": []
+        "hauptursachen": [
+          "Selten: Schimmelbelastung oder dauerhaft sehr stressige Alltagsstruktur"
+        ],
+        "hebel": [
+          "Kalorienmenge nur zusammen mit Gewichtstrend, Kinn und Faltensumme gegebenenfalls anpassen",
+          "Bei ungewöhnlich isolierter Auffälligkeit Wohnumfeld, Stress, Meditation und GABA-Kontext prüfen"
+        ]
       },
       "norm": {
         "mann_mm": null,
@@ -250,7 +259,17 @@
         "ausfuehrlich": "Je geringer die Rückenfalte, desto besser verstoffwechselt dein Körper Kohlenhydrate. Bei 6 mm bist du jemand, der bestens mit hochwertigen Kohlenhydraten zurechtkommt. Bei 14 mm funktioniert dein Körper besser mit Fisch, Fleisch, Eiern, Nüssen, Gemüse und Salat (\"Höhlenmenschen-Ernährung\"). Da sie genetisch ist, wird sie sich nicht groß verändern.",
         "hauptursachen": [
           "Genetisch schlechte KH-Toleranz",
-          "Erhöhte Entzündungswerte"
+          "Erhöhte Entzündungswerte / Toxine",
+          "Stress",
+          "Schlafdefizit",
+          "Übermäßiger Zucker-/Kohlenhydratkonsum",
+          "Mikronährstoffdefizite"
+        ],
+        "hebel": [
+          "Bauchfalte für Stress/Cortisol gegenprüfen",
+          "Wadenfalte für Schlaf gegenprüfen",
+          "Hüftfalte für Zucker- und Blutzuckerkontext gegenprüfen",
+          "Toxine und Entzündungen reduzieren sowie Mikronährstoffversorgung prüfen"
         ],
         "praxisregel": "Rücken + Hüfte gemeinsam unter 18 mm = grundsätzlich Kohlenhydrate erlaubt; Menge und Auswahl weiter am Verlauf ausrichten."
       },
@@ -291,7 +310,15 @@
           "Stress",
           "Amalgam / Schwermetalle",
           "Zucker",
-          "Jede Form von Vergiftung"
+          "Jede Form von Vergiftung",
+          "Lebensmittelunverträglichkeiten oder häufig wiederholte Lebensmittel"
+        ],
+        "hebel": [
+          "Bauch und Trizeps für Stress und Energie gegenprüfen",
+          "Beinfalten für Toxine und Leberkontext gegenprüfen",
+          "Wade und Beinfalten für Schlaf gegenprüfen",
+          "Hüfte für Zucker und Blutzucker gegenprüfen",
+          "Bei passendem Kontext Rotationsdiät beziehungsweise häufig wiederholte Lebensmittel prüfen"
         ]
       },
       "norm": {
@@ -465,8 +492,7 @@
         "niacin-b3"
       ],
       "protokoll_ids": [
-        "knie-phase-1",
-        "knie-phase-2"
+        "knie-phase-1"
       ],
       "quelle": "Körperfett-Assessment S. 6, Hautfalten Notizen S. 8"
     },
@@ -497,12 +523,15 @@
         "hauptursachen": [
           "Unzureichender Tiefschlaf",
           "Magnesiummangel",
-          "Elektrosmog (Handy/WLAN im Schlafzimmer)"
+          "Elektrosmog (Handy/WLAN im Schlafzimmer)",
+          "Nächtliches Aufwachen im in den Unterlagen beschriebenen Organuhr-Kontext"
         ],
         "hebel": [
           "Handy nicht im Schlafzimmer",
           "WLAN nachts ausschalten",
-          "Magnesium (Bisglycinat unterdrückt Cortisol – ideal vor dem Schlafen)"
+          "Magnesium (Bisglycinat unterdrückt Cortisol – ideal vor dem Schlafen)",
+          "Einschlafen, Durchschlafen und Aufwachen zwischen 3 und 7 Uhr getrennt erfassen",
+          "Quadrizeps und Beinbizeps als Gegenfalten für die Phase-4-Auswahl verwenden"
         ]
       },
       "norm": {
@@ -678,13 +707,24 @@
       },
       "interpretation": {
         "primaerkontext": "freies_testosteron",
-        "kontext_tags": [
-          "freies-testosteron",
-          "hormonell"
-        ],
-        "kurzbeschreibung": "Indikator für freies Testosteron.",
-        "ausfuehrlich": "Bizepsfalte ergänzt die Trizepsfalte: Trizeps steht für Gesamt-Testosteron/DHEA, Bizeps für den frei verfügbaren Anteil.",
-        "hauptursachen": []
+      "kontext_tags": [
+        "freies-testosteron",
+        "hormonell",
+        "dhea",
+        "schlaf"
+      ],
+      "kurzbeschreibung": "Indikator für freies Testosteron.",
+      "ausfuehrlich": "Bizepsfalte ergänzt die Trizepsfalte: Trizeps steht für Gesamt-Testosteron/DHEA, Bizeps für den frei verfügbaren Anteil. Die Unterlagen nennen außerdem Schlafdefizit, Melatonin/Wachstumshormon und abendliche Cortisolschwankungen als Gegenkontext.",
+      "hauptursachen": [
+        "DHEA-/Testosteronmangel",
+        "Schlafdefizit beziehungsweise ungünstiger Melatonin-/Wachstumshormonkontext",
+        "Abendliche Cortisolschwankungen"
+      ],
+      "hebel": [
+        "Trizepsfalte für Energie, DHEA und Gesamttestosteron gegenprüfen",
+        "Wade sowie vordere und hintere Oberschenkelfalte für den Schlafkontext gegenprüfen",
+        "Energielevel, Schlaf und Stressmanagement gemeinsam betrachten"
+      ]
       },
       "norm": {
         "mann_mm": 2,
@@ -695,7 +735,59 @@
       },
       "rohstoffe": [],
       "protokoll_ids": [],
-      "quelle": "Körperfett-Assessment S. 7, Hormone S. 2"
+      "quelle": "Körperfett-Assessment S. 7, Hautfalten Notizen S. 11, Hormone S. 2"
+    }
+  },
+  "gruppenempfehlungen": {
+    "bauch-brust-trizeps": {
+      "titel": "Grundlagen für Bauch, Brust und Trizeps",
+      "punkte": [
+        "Stress/Cortisol, Morgenenergie und DHEA-/Testosteronkontext gemeinsam einordnen",
+        "Regelmäßige protein- und fettreiche Mahlzeiten sowie Blutzuckerverlauf prüfen",
+        "Schlaf über Wade und Beinfalten gegenprüfen",
+        "Darm erst nach Energie/Cortisol einordnen; Ausnahme: Bauch hoch, gutes Aufwachen/Aktivitätslevel und passende Verdauungszeichen"
+      ],
+      "quelle": "Hautfalten Notizen S. 2–3 und S. 7; S. 13"
+    },
+    "huefte": {
+      "titel": "Grundlagen für die Hüfte",
+      "punkte": [
+        "Regelmäßige Mahlzeiten mit Protein und ein protein-/fettreiches Frühstück",
+        "Kohlenhydrate an Training, Hunger, Energie, Kalorienziel und Verlauf anpassen",
+        "Schlaf und Bewegung als Teile des Blutzuckermanagements mitbewerten"
+      ],
+      "quelle": "Hautfalten Notizen S. 6 und S. 14"
+    },
+    "wade": {
+      "titel": "Grundlagen für die Wade",
+      "punkte": [
+        "Einschlafen, Durchschlafen, Tiefschlaf und Morgenenergie getrennt betrachten",
+        "Magnesiumbedarf, abendliches Cortisol und Schlafumfeld prüfen",
+        "Beinbizeps und Quadrizeps bestimmen mit, welcher Phase-4-Zweig infrage kommt"
+      ],
+      "quelle": "Hautfalten Notizen S. 8–9"
+    },
+    "quad-beinbizeps": {
+      "titel": "Sieben Grundlagen für die Beinfalten",
+      "punkte": [
+        "Nährstoffversorgung: B‑Vitamine, Magnesium und Protein",
+        "Darmgesundheit",
+        "Schlaf",
+        "Umwelteinflüsse wie Kosmetika, Hygieneartikel und E‑Smog vermindern",
+        "Alkohol meiden",
+        "Bewegung und Aktivität zur Unterstützung der Lymphe",
+        "Stressmanagement"
+      ],
+      "quelle": "Hautfalten Notizen S. 11"
+    },
+    "knie": {
+      "titel": "Grundlagen für das Knie",
+      "punkte": [
+        "Mikronährstoff- und Antioxidanzienversorgung prüfen",
+        "Quadrizeps und Beinbizeps als Gegenfalten für Leber Phase 2 und Darm mitbewerten",
+        "Toxin- und Entzündungskontext nicht allein aus der Kniefalte ableiten"
+      ],
+      "quelle": "Hautfalten Notizen S. 8 und S. 10"
     }
   },
   "wechselbeziehungen": [
@@ -723,6 +815,40 @@
       ]
     },
     {
+      "id": "trizeps-leitfalte",
+      "regel": "Trizeps ist die Leitfalte. Bauch prüft Stress/Cortisol und Energie, Wade den Schlaf. Rote Punkte am Trizeps führen – wenn dieser sichtbare Kontext bestätigt ist – zum Entgiftungszweig der Oberschenkelfalten.",
+      "falten": [
+        "trizeps",
+        "bauch",
+        "wade",
+        "quadrizeps",
+        "beinbizeps"
+      ]
+    },
+    {
+      "id": "ruecken-gegenfalten",
+      "regel": "Rücken beschreibt primär die genetische Kohlenhydrattoleranz. Bauch, Wade und Hüfte unterscheiden zusätzliche Stress-, Schlaf- und Zucker-/Blutzuckeranteile; Toxine, Entzündungen und Mikronährstoffe bleiben weitere Prüffelder.",
+      "falten": [
+        "ruecken",
+        "bauch",
+        "wade",
+        "huefte"
+      ]
+    },
+    {
+      "id": "rippe-gegenfalten",
+      "regel": "Rippe wird über Bauch/Trizeps (Stress und Energie), Beinfalten (Toxine), Wade plus Beine (Schlaf) sowie Hüfte (Zucker/Blutzucker) differenziert. Häufig wiederholte Lebensmittel werden als weiterer Kontext geprüft.",
+      "falten": [
+        "rippe",
+        "bauch",
+        "trizeps",
+        "huefte",
+        "wade",
+        "quadrizeps",
+        "beinbizeps"
+      ]
+    },
+    {
       "id": "quad-ham-verhaeltnis",
       "regel": "Das Verhältnis Quadrizeps zu Beinbizeps steuert Phase-4-Zweige: Ham > Quad → MethylKomplex; Quad > Ham → Darm/Glutamin oder bei erneutem Quad Leber Phase 2/Liv.52; Quad > Ham plus Bauch unter den ersten drei Prioritäten → Pectasol-Zweig; Quad + Ham plus Einschlafproblem → Glycin; wiederkehrender Ham → liposomales Glutathion.",
       "falten": [
@@ -741,6 +867,34 @@
       ]
     },
     {
+      "id": "knie-oberschenkel",
+      "regel": "Knie wird der Leber-Phase 1 zugeordnet und mit Quadrizeps und Beinbizeps gegengeprüft, die Darm und Leber-Phase 2 ergänzen.",
+      "falten": [
+        "knie",
+        "quadrizeps",
+        "beinbizeps"
+      ]
+    },
+    {
+      "id": "bizeps-trizeps-schlaf",
+      "regel": "Bizeps wird als freies Testosteron interpretiert und über Trizeps für DHEA/Gesamttestosteron sowie über Wade und Beinfalten für Schlaf gegengeprüft.",
+      "falten": [
+        "bizeps",
+        "trizeps",
+        "wade",
+        "quadrizeps",
+        "beinbizeps"
+      ]
+    },
+    {
+      "id": "kinn-wange-verlauf",
+      "regel": "Kinn und Wange bilden ein Verlaufspaar für globale Fettzu- oder -abnahme. Nur wenn beide Falten und der Gewichts-/Summenverlauf zusammenpassen, soll daraus eine Kalorienanpassung abgeleitet werden.",
+      "falten": [
+        "kinn",
+        "wange"
+      ]
+    },
+    {
       "id": "ruecken-huefte",
       "regel": "Rücken + Hüfte unter 18 mm bedeutet laut Seminarregel, dass grundsätzlich Kohlenhydrate möglich sind; Kalorienziel, Qualität, Training und Verlauf bleiben entscheidend.",
       "falten": [
@@ -750,6 +904,14 @@
     }
   ],
   "quellenkonflikte": [
+    {
+      "thema": "Excel-Rangreferenzen gegenüber textlichen Norm-/Zielwerten",
+      "varianten": [
+        "Formel.xlsx rankt nach |Messwert/4 − geschlechtsspezifischem Referenzmittel|",
+        "Die Hautfalten-PDFs nennen davon teilweise deutlich abweichende Norm- und Zielwerte, besonders für weiblichen Trizeps sowie vorderen und hinteren Oberschenkel"
+      ],
+      "entscheidung_app": "Die Rangfolge übernimmt Formel.xlsx unverändert. Faltendetails zeigen separat die textlichen PDF-Normen; die App weist sichtbar darauf hin, dass beide Bezugssysteme zu unterschiedlichen Aussagen führen können."
+    },
     {
       "thema": "Waden-Norm Frauen",
       "varianten": [
@@ -764,7 +926,23 @@
         "4 vs in den strukturierten Hautfalten-Notizen",
         "6 vs in den späteren Workshop-Notizen"
       ],
-      "entscheidung_app": "6 vs aus den späteren Workshop-Notizen, mit dokumentiertem Ausschleichen; fachliche Produkt- und Verträglichkeitsprüfung erforderlich."
+      "entscheidung_app": "4 vs aus der strukturierten Hautfalten-Zusammenfassung; die abweichende 6-vs-Fassung bleibt als Quellenhinweis am Protokoll dokumentiert."
+    },
+    {
+      "thema": "Quad/Beinbizeps Phase 2",
+      "varianten": [
+        "ChlorellaKomplex 3×3 ohne Vitamin D/K in Hautfalten Notizen S. 12",
+        "ChlorellaKomplex 3×3 beziehungsweise 3×4 mit Vitamin D/K in den Workshop-Fassungen"
+      ],
+      "entscheidung_app": "3×3 bis 3×4 sowie Vitamin D/K werden mit einem sichtbaren Quellenhinweis übernommen."
+    },
+    {
+      "thema": "Hüfte Phase 3",
+      "varianten": [
+        "Magnesium 4 vs und ChlorellaKomplex 3×4 in Hautfalten Notizen S. 14 sowie der späteren Workshop-Fassung",
+        "Inositol 1 vs und ChlorellaKomplex 3×3 in einer älteren Workshop-Fassung"
+      ],
+      "entscheidung_app": "Die App folgt der strukturierten und später wiederholten Magnesium-Fassung; die ältere Inositol-Fassung bleibt als Quellenhinweis dokumentiert."
     },
     {
       "thema": "Magnesium in Bauch/Brust/Trizeps Phase 3",
@@ -781,6 +959,14 @@
         "2 mm Männer / 5 mm Frauen in den strukturierten Notizen"
       ],
       "entscheidung_app": "2/5 mm als Orientierungswert, ausdrücklich nicht als harte Norm."
+    },
+    {
+      "thema": "Taurin in Wade Phase 3",
+      "varianten": [
+        "ohne Taurin in der strukturierten Hautfalten-Zusammenfassung",
+        "Taurin 4 vs in einer Workshop-Fassung"
+      ],
+      "entscheidung_app": "Die strukturierte Fassung bleibt das Basisprotokoll; Taurin 4 vs wird als optionale Workshop-Variante mit Quellenhinweis angezeigt."
     }
   ],
   "prioritaetsregeln": {

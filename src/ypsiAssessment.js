@@ -88,11 +88,28 @@ export function assessSkinfoldPriorities(folds = {}, calculationBasis = 'male') 
     const protocols = Object.values(ypsiProtokolle.protokolle)
       .filter((protocol) => protocol.gruppe === group.id)
       .sort((a, b) => Number(a.phase) - Number(b.phase));
-    return { ...group, score, details, primaryFold, protocols };
+    return {
+      ...group,
+      score,
+      details,
+      primaryFold,
+      protocols,
+      grundlagen: hautfaltenData.gruppenempfehlungen?.[group.id] || null,
+    };
   }).filter(Boolean).sort((a, b) => b.score - a.score).map((item, index) => ({ ...item, priority: index + 1 }));
 }
 
-const relativeAtLeast = (fold, threshold = 1.05) => Number(fold?.relative) >= threshold;
+const isElevated = (fold) => fold?.richtung === 'ueber';
+const isTopThree = (fold) => Number(fold?.foldPriority) <= 3;
+const yes = (value) => value === true;
+
+function foldState(fold) {
+  if (!fold) return 'nicht verfügbar';
+  if (fold.richtung === 'ueber') return `über Referenz, Rang ${fold.foldPriority}`;
+  if (fold.richtung === 'unter') return `unter Referenz, Rang ${fold.foldPriority}`;
+  return `auf Referenz, Rang ${fold.foldPriority}`;
+}
+
 /**
  * Bildet die in den Seminarunterlagen beschriebenen Wechselbeziehungen ab.
  * Das Ergebnis bleibt bewusst eine Entscheidungsunterstützung: Falten allein
@@ -103,45 +120,110 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
   if (!assessment || !priorities.length) return [];
   const f = assessment.bySlug;
   const relations = [];
-  const topGroup = priorities[0];
   const topFold = assessment.ranked[0];
-  const abdominalTop = topGroup.id === 'bauch-brust-trizeps' && topGroup.primaryFold.slug === 'bauch';
+  const abdominalTop = topFold.slug === 'bauch'
+    && isElevated(f.bauch);
   const recentEnergy = Number(context.recentEnergy);
   const recentSleep = Number(context.recentSleep);
-  const push = (relation) => relations.push({ tone: 'info', protocolIds: [], actions: [], groupIds: [], ...relation });
+  const wakesFit = yes(context.wakesFit) || recentEnergy >= 4;
+  const morningDriveLow = yes(context.morningDriveLow) || (recentEnergy > 0 && recentEnergy <= 2);
+  const sleepConcern = yes(context.sleepOnset) || yes(context.sleepMaintenance) || (recentSleep > 0 && recentSleep < 3);
+  const gabaContext = yes(context.gabaContext);
+  const serotoninContext = yes(context.serotoninContext);
+  const groupOccurrences = context.groupOccurrences || {};
+  const push = (relation) => relations.push({
+    tone: 'info',
+    protocolIds: [],
+    actions: [],
+    groupIds: [],
+    requiresConfirmation: false,
+    source: '',
+    ...relation,
+  });
 
-  if (abdominalTop && f.trizeps.relative <= 1.05) {
+  if (abdominalTop) {
     push({
-      id: 'bauch-trizeps-darmzweig',
-      title: 'Bauch priorisiert · Trizeps im Zielbereich',
-      summary: `Der Energie-/Testosteron-Kontext ist über den Trizeps weniger auffällig. Dadurch gewinnt nach der Seminarlogik der Darmzweig an Gewicht${recentEnergy >= 4 ? '; deine zuletzt protokollierte Energie stützt diese Abzweigung' : ''}.`,
-      basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm (Abweichung ${f.trizeps.score} ${f.trizeps.richtung === 'unter' ? 'unter' : 'über'} Referenz)`,
+      id: 'bauch-mehrfalten-pruefung',
+      title: 'Bauch im Zusammenspiel prüfen',
+      summary: 'Die Seminarunterlagen verlangen vor der Deutung als Cortisol-, Energie- oder Darmthema Gegenprüfungen über Trizeps, Brust, Hüfte sowie Waden- und Beinfalten.',
+      basis: `Trizeps ${foldState(f.trizeps)} · Brust ${foldState(f.brust)} · Hüfte ${foldState(f.huefte)} · Wade ${foldState(f.wade)} · Quadrizeps ${foldState(f.quadrizeps)} · Beinbizeps ${foldState(f.beinbizeps)}`,
       actions: [
-        'Zuerst bestätigen: Du wachst gut auf und dein Aktivitäts- bzw. Energielevel ist gut.',
-        'Zusätzlich Verdauung, Verträglichkeit von Getreide/Milch/Fruktose und mögliche Darmbeschwerden prüfen.',
-        'Nur wenn diese Bedingungen passen, den Chlorella-/Darm-Zweig statt einer pauschalen Cortisol-Erklärung wählen.',
+        'Trizeps und Brust ordnen Energie, DHEA/Testosteron und Aromatase-/Zinkkontext ein.',
+        'Hüfte prüft Blutzucker und regelmäßige Mahlzeiten gegen.',
+        'Wade und Beinfalten prüfen Schlaf, Darm sowie Leber-/Entgiftungskontext.',
       ],
-      protocolIds: ['bauch-brust-trizeps-phase-4-chlorella', 'darm-sanierung-phase-1'],
       groupIds: ['bauch-brust-trizeps'],
       tone: 'branch',
+      source: 'Hautfalten Notizen S. 7 und S. 13',
     });
-  } else if (abdominalTop && relativeAtLeast(f.trizeps)) {
-    push({
-      id: 'bauch-trizeps-energie',
-      title: 'Bauch und Trizeps gemeinsam auffällig',
-      summary: 'Die Unterlagen priorisieren hier Stress-, Energie-, DHEA-/Testosteron- und Schlafkontext vor einer isolierten Darmdeutung.',
-      basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm`,
-      actions: [
-        'Morgenenergie, Gesamtstress und regelmäßige proteinreiche Mahlzeiten prüfen.',
-        'Schlaf über die Wadenfalte und Blutzucker über die Hüftfalte gegenprüfen.',
-        'Den Darmzweig erst nach Cortisol- und Energiekontext einordnen.',
-      ],
-      groupIds: ['bauch-brust-trizeps'],
-      tone: 'attention',
-    });
+
+    if (!isElevated(f.trizeps)) {
+      const confirmedGutBranch = wakesFit && yes(context.digestiveSymptoms);
+      push({
+        id: 'bauch-trizeps-darmzweig',
+        title: confirmedGutBranch ? 'Darmzweig durch Kontext bestätigt' : 'Darmzweig gezielt gegenprüfen',
+        summary: confirmedGutBranch
+          ? 'Bauch ist priorisiert, der Trizeps ist nicht erhöht, du wachst fit auf und hast Verdauungskontext bestätigt. Das entspricht dem Darm-/Chlorella-Zweig der Unterlagen.'
+          : 'Ein nicht erhöhter Trizeps schwächt die Energie-/Testosterondeutung. Der Darmzweig darf laut Unterlagen aber erst gewählt werden, wenn gutes Aufwachen/Aktivitätslevel und passende Verdauungszeichen bestätigt sind.',
+        basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm (${foldState(f.trizeps)})`,
+        actions: [
+          'Bestätigen, ob du gut aufwachst und tagsüber ein gutes Aktivitäts-/Energielevel hast.',
+          'Verdauung sowie Verträglichkeit von Getreide, Milch und Fruchtzucker prüfen.',
+          'Chlorella-/Darm-Zweig nur wählen, wenn beides passt.',
+        ],
+        protocolIds: confirmedGutBranch ? ['bauch-brust-trizeps-phase-4-chlorella', 'darm-sanierung-phase-1'] : [],
+        groupIds: ['bauch-brust-trizeps'],
+        tone: confirmedGutBranch ? 'attention' : 'branch',
+        requiresConfirmation: !confirmedGutBranch,
+        source: 'Hautfalten Notizen S. 7 und S. 13; Körperfett-Assessment S. 13',
+      });
+    } else {
+      push({
+        id: 'bauch-trizeps-energie',
+        title: 'Bauch und Trizeps gemeinsam auffällig',
+        summary: 'Die Unterlagen priorisieren hier Stress-, Energie-, DHEA-/Testosteron- und Schlafkontext vor einer isolierten Darmdeutung.',
+        basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm`,
+        actions: [
+          'Morgenenergie, Gesamtstress und regelmäßige proteinreiche Mahlzeiten prüfen.',
+          'Schlaf über die Wadenfalte und Blutzucker über die Hüftfalte gegenprüfen.',
+          'Den Darmzweig erst nach Cortisol- und Energiekontext einordnen.',
+        ],
+        groupIds: ['bauch-brust-trizeps'],
+        tone: 'attention',
+        source: 'Hautfalten Notizen S. 3 und S. 7',
+      });
+    }
+
+    if (yes(context.troubleWindingDown) || (yes(context.sleepOnset) && gabaContext)) {
+      push({
+        id: 'bauch-gaba-einschlafen',
+        title: 'Bauch plus schlechtes Zur-Ruhe-Kommen',
+        summary: 'Die bestätigte Einschlaf-/GABA-Konstellation entspricht dem Neuromag-Zweig der Phase 4+.',
+        basis: `Bauch ${f.bauch.value} mm · Einschlafkontext bestätigt${gabaContext ? ' · GABA-Profil auffällig' : ''}`,
+        actions: ['Neuromag-Zweig nur nach den Basisphasen und unter Beachtung der Supplement-Sicherheit prüfen.'],
+        protocolIds: ['bauch-brust-trizeps-phase-4-neuromag'],
+        groupIds: ['bauch-brust-trizeps'],
+        tone: 'branch',
+        source: 'Hautfalten Notizen S. 13; Körperfett-Assessment S. 13',
+      });
+    }
+
+    if (morningDriveLow) {
+      push({
+        id: 'bauch-morgenenergie',
+        title: 'Bauch plus niedrige Morgenenergie',
+        summary: 'Die Unterlagen führen bei schlechtem Aktivitätslevel und Antriebslosigkeit zum Licorice-Zweig; bei sehr großem Drive-Problem wird Bacopa im Wechsel genannt.',
+        basis: `Bauch ${f.bauch.value} mm · Morgenenergie niedrig bestätigt`,
+        actions: ['Blutdruck, Kaliumhaushalt, Medikamente und persönliche Kontraindikationen vor Süßholz fachlich prüfen.'],
+        protocolIds: ['bauch-brust-trizeps-phase-4-licorice'],
+        groupIds: ['bauch-brust-trizeps'],
+        tone: 'branch',
+        source: 'Hautfalten Notizen S. 13; Körperfett-Assessment S. 13',
+      });
+    }
   }
 
-  if (topGroup.id === 'bauch-brust-trizeps' && relativeAtLeast(f.huefte)) {
+  if (['bauch', 'brust', 'trizeps'].includes(topFold.slug) && isElevated(f.huefte)) {
     push({
       id: 'bauch-huefte-blutzucker',
       title: 'Bauch mit auffälliger Hüfte',
@@ -149,10 +231,11 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       basis: `Bauch ${f.bauch.value} mm · Hüfte ${f.huefte.value} mm`,
       actions: ['Regelmäßige Mahlzeiten mit ausreichend Protein und Fett prüfen.', 'Kohlenhydratmenge, Heißhunger und Energieverlauf gemeinsam beurteilen.'],
       groupIds: ['bauch-brust-trizeps', 'huefte'],
+      source: 'Hautfalten Notizen S. 6–7',
     });
   }
 
-  if (topGroup.id === 'bauch-brust-trizeps' && (relativeAtLeast(f.wade) || recentSleep > 0 && recentSleep < 3)) {
+  if (['bauch', 'brust', 'trizeps'].includes(topFold.slug) && (isElevated(f.wade) || isElevated(f.quadrizeps) || isElevated(f.beinbizeps) || sleepConcern)) {
     push({
       id: 'bauch-wade-schlaf',
       title: 'Schlaf als Mitfaktor prüfen',
@@ -160,15 +243,16 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       basis: `Wade ${f.wade.value} mm${Number.isFinite(recentSleep) ? ` · letzte Schlafqualität ${recentSleep}/5` : ''}`,
       actions: ['Tiefschlaf, Einschlafen, nächtliches Aufwachen und Morgenenergie getrennt betrachten.'],
       groupIds: ['bauch-brust-trizeps', 'wade'],
+      source: 'Hautfalten Notizen S. 7',
     });
   }
 
-  if (topGroup.primaryFold.slug === 'brust') {
+  if (topFold.slug === 'brust' && isElevated(f.brust)) {
     const links = [
-      relativeAtLeast(f.trizeps) && 'Trizeps: Energie/DHEA/Testosteron',
-      relativeAtLeast(f.bauch) && 'Bauch: Stress/Cortisol',
-      relativeAtLeast(f.huefte) && 'Hüfte: Glukose/Insulin',
-      relativeAtLeast(f.ruecken) && 'Rücken: Entzündung',
+      isElevated(f.trizeps) && 'Trizeps: Energie/DHEA/Testosteron',
+      isElevated(f.bauch) && 'Bauch: Stress/Cortisol',
+      isElevated(f.huefte) && 'Hüfte: Glukose/Insulin',
+      isElevated(f.ruecken) && 'Rücken: Entzündung',
     ].filter(Boolean);
     push({
       id: 'brust-korrelationen',
@@ -177,62 +261,139 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       basis: `Brust ${f.brust.value} mm`,
       actions: ['Zuerst Trizeps, Bauch, Hüfte und Rücken als Gegenfalten prüfen.', 'Zinkbedarf nicht allein aus der Falte ableiten; Ernährung und gegebenenfalls Laborwerte einbeziehen.'],
       groupIds: ['bauch-brust-trizeps'],
+      source: 'Hautfalten Notizen S. 2',
+    });
+  }
+
+  if (topFold.slug === 'trizeps' && isElevated(f.trizeps)) {
+    push({
+      id: 'trizeps-leitfalte',
+      title: 'Trizeps als Leitfalte',
+      summary: 'Die Unterlagen bezeichnen den Trizeps als wichtigste Falte. Bauch ordnet Stress/Energie ein, Wade den Schlaf und rote Punkte würden auf den Entgiftungszweig verweisen.',
+      basis: `Trizeps ${f.trizeps.value} mm · Bauch ${foldState(f.bauch)} · Wade ${foldState(f.wade)}`,
+      actions: [
+        'Magnesium, Vitamin B6, Zink sowie ausreichendes Cholesterin/Fett in der Ernährung prüfen.',
+        'Bauch und Wade als Gegenfalten für Energie/Cortisol und Schlaf verwenden.',
+        'Alkoholkonsum als eigenen Einflussfaktor prüfen.',
+      ],
+      groupIds: ['bauch-brust-trizeps', 'wade'],
+      tone: 'attention',
+      source: 'Hautfalten Notizen S. 3',
+    });
+    if (yes(context.redDotsTriceps)) {
+      push({
+        id: 'trizeps-rote-punkte',
+        title: 'Rote Punkte am Trizeps bestätigt',
+        summary: 'Dieser sichtbare Befund wird in den Unterlagen dem Leber-/Milz- und Entgiftungskontext zugeordnet und wie die Oberschenkelfalten behandelt.',
+        basis: 'Rote Punkte wurden in der Kontextabfrage bestätigt.',
+        actions: ['Quadrizeps, Beinbizeps und Knie gegenprüfen.', 'Entgiftungsprotokolle nicht allein aus dem Hautbild starten.'],
+        groupIds: ['bauch-brust-trizeps', 'quad-beinbizeps', 'knie'],
+        tone: 'branch',
+        source: 'Hautfalten Notizen S. 3',
+      });
+    }
+  }
+
+  if (topFold.slug === 'ruecken' && isElevated(f.ruecken)) {
+    const links = [
+      isElevated(f.bauch) && 'Bauch: Stress/Cortisol',
+      isElevated(f.wade) && 'Wade: Schlaf',
+      isElevated(f.huefte) && 'Hüfte: Zucker/Blutzucker',
+    ].filter(Boolean);
+    push({
+      id: 'ruecken-gegenpruefung',
+      title: 'Rücken mit Bauch, Wade und Hüfte einordnen',
+      summary: links.length
+        ? `Neben der genetischen Kohlenhydrattoleranz sind folgende Seminar-Gegenprüfungen auffällig: ${links.join(' · ')}.`
+        : 'Die Gegenfalten sind nicht erhöht. Damit bleibt die in den Unterlagen beschriebene genetische Kohlenhydrattoleranz die führende, nicht diagnostische Deutung.',
+      basis: `Rücken ${f.ruecken.value} mm · Bauch ${foldState(f.bauch)} · Wade ${foldState(f.wade)} · Hüfte ${foldState(f.huefte)}`,
+      actions: ['Toxine/Entzündung, Stress, Schlaf, Zuckerzufuhr und Mikronährstoffversorgung getrennt prüfen.', 'Kohlenhydratmenge am Tracker-Verlauf statt an einer einzelnen Falte festlegen.'],
+      source: 'Hautfalten Notizen S. 4',
     });
   }
 
   const legGroup = priorities.find((item) => item.id === 'quad-beinbizeps');
-  const legDifference = (f.beinbizeps.value - f.quadrizeps.value) / Math.max(1, f.beinbizeps.value, f.quadrizeps.value);
-  if (legDifference > 0.05) {
+  const legDifference = f.beinbizeps.value - f.quadrizeps.value;
+  const legRelationRelevant = legGroup?.priority <= 3 || isElevated(f.quadrizeps) || isElevated(f.beinbizeps);
+  if (legRelationRelevant && legDifference > 0) {
+    const hamRepeated = topFold.slug === 'beinbizeps'
+      && isElevated(topFold)
+      && Number(groupOccurrences['quad-beinbizeps']) >= 4;
     push({
       id: 'ham-ueber-quad',
       title: 'Beinbizeps höher als Quadrizeps',
-      summary: 'Dieses Verhältnis ordnen die Unterlagen stärker dem B‑Vitamin-/Methylierungs- und, bei wiederkehrender Priorität, dem Leber-Phase-2-Zweig zu.',
+      summary: `Dieses Verhältnis ordnen die Unterlagen stärker dem B‑Vitamin-/Methylierungszweig zu${hamRepeated ? '; weil der Beinbizeps nach den Basisphasen erneut führt, passt zusätzlich der liposomale-Glutathion-Zweig' : ''}.`,
       basis: `Beinbizeps ${f.beinbizeps.value} mm · Quadrizeps ${f.quadrizeps.value} mm`,
       actions: ['MethylKomplex als Phase-4-Variante prüfen.', 'Bei erneut priorisiertem Beinbizeps wird in den Unterlagen liposomales Glutathion genannt.', 'Eine gleichzeitig auffällige Wade stärkt den Schlafbezug.'],
-      protocolIds: ['quad-beinbizeps-phase-4-methylkomplex', 'quad-beinbizeps-phase-4-lipo-gsh'],
+      protocolIds: ['quad-beinbizeps-phase-4-methylkomplex', ...(hamRepeated ? ['quad-beinbizeps-phase-4-lipo-gsh'] : [])],
       groupIds: ['quad-beinbizeps', 'wade'],
       tone: legGroup?.priority === 1 ? 'attention' : 'info',
+      source: 'Hautfalten Notizen S. 10–12',
     });
-  } else if (legDifference < -0.05) {
-    const bellyTopThree = f.bauch.foldPriority <= 3;
+  } else if (legRelationRelevant && legDifference < 0) {
+    const bellyTopThree = isTopThree(f.bauch);
+    const gutConfirmed = yes(context.digestiveSymptoms) || yes(context.leakyGut);
+    const pectasolConfirmed = bellyTopThree && gutConfirmed && yes(context.mercuryContext);
+    const quadRepeated = topFold.slug === 'quadrizeps'
+      && isElevated(topFold)
+      && Number(groupOccurrences['quad-beinbizeps']) >= 4;
     push({
       id: 'quad-ueber-ham',
       title: 'Quadrizeps höher als Beinbizeps',
-      summary: `Die Unterlagen verzweigen hier zu Darm/Leaky Gut oder Leber Phase 2${bellyTopThree ? '; weil Bauch in deiner internen Faltenrangfolge unter den ersten drei liegt, wird zusätzlich der Pectasol-/Quecksilber-Zweig genannt' : ''}.`,
+      summary: `Die Unterlagen verzweigen hier abhängig vom bestätigten Kontext zu Darm/Leaky Gut oder bei erneutem Quadrizeps zu Leber Phase 2${bellyTopThree ? '; Bauch liegt unter den ersten drei und eröffnet bei zusätzlichem Verdauungs-/Quecksilberkontext den Pectasol-Zweig' : ''}.`,
       basis: `Quadrizeps ${f.quadrizeps.value} mm · Beinbizeps ${f.beinbizeps.value} mm · Bauch Rang ${f.bauch.foldPriority}`,
       actions: ['Bei Verdauungs-/Leaky-Gut-Zeichen Glutamin-Zweig prüfen.', 'Wenn Quadrizeps nach früherer Arbeit erneut Priorität wird, Liv.52-Zweig prüfen.', ...(bellyTopThree ? ['Pectasol-Zweig nur nach den vorherigen Basisphasen und passender Darm-/Belastungsanamnese prüfen.'] : [])],
-      protocolIds: ['quad-beinbizeps-phase-4-glutamin', 'quad-beinbizeps-phase-4-liv52', ...(bellyTopThree ? ['quad-beinbizeps-phase-4-pectasol'] : [])],
+      protocolIds: [
+        ...(gutConfirmed ? ['quad-beinbizeps-phase-4-glutamin'] : []),
+        ...(quadRepeated ? ['quad-beinbizeps-phase-4-liv52'] : []),
+        ...(pectasolConfirmed ? ['quad-beinbizeps-phase-4-pectasol'] : []),
+      ],
       groupIds: ['quad-beinbizeps', 'bauch-brust-trizeps'],
       tone: legGroup?.priority === 1 ? 'attention' : 'info',
+      requiresConfirmation: !gutConfirmed && !quadRepeated,
+      source: 'Hautfalten Notizen S. 10–12',
     });
-  } else {
+  } else if (legRelationRelevant) {
     push({
       id: 'quad-ham-ausgeglichen',
       title: 'Vorder- und hintere Oberschenkelfalte ähnlich',
       summary: 'Aus dem Verhältnis ergibt sich aktuell kein klarer B‑Vitamin- oder Darm-/Leber-Zweig. Verlauf und Symptome entscheiden.',
       basis: `Quadrizeps ${f.quadrizeps.value} mm · Beinbizeps ${f.beinbizeps.value} mm`,
       groupIds: ['quad-beinbizeps'],
+      source: 'Hautfalten Notizen S. 11–12',
     });
   }
 
-  if (priorities.find((item) => item.id === 'wade')?.priority <= 2) {
-    const hamProminent = relativeAtLeast(f.beinbizeps);
-    const bothLegsProminent = hamProminent && relativeAtLeast(f.quadrizeps);
+  if (topFold.slug === 'wade' && isElevated(f.wade)) {
+    const hamProminent = isElevated(f.beinbizeps);
+    const bothLegsProminent = hamProminent && isElevated(f.quadrizeps);
+    const glycinConfirmed = bothLegsProminent && yes(context.sleepOnset);
+    const neuromagConfirmed = yes(context.sleepOnset) && yes(context.sleepMaintenance) && gabaContext;
+    const taurinConfirmed = yes(context.sleepOnset) && gabaContext;
+    const melatoninConfirmed = yes(context.sleepOnset) && serotoninContext;
+    const greensConfirmed = yes(context.wakes3to7) || yes(context.sleepMaintenance);
     push({
       id: bothLegsProminent ? 'wade-quad-ham' : hamProminent ? 'wade-ham' : 'wade-schlafzweige',
       title: bothLegsProminent ? 'Wade mit beiden Oberschenkelfalten' : hamProminent ? 'Wade mit Beinbizeps' : 'Wade priorisiert',
       summary: bothLegsProminent
-        ? 'Diese Kombination führt in den Unterlagen zum Glycin-Zweig.'
+        ? `Diese Kombination führt bei bestätigtem Einschlafproblem zum Glycin-Zweig${glycinConfirmed ? ' – der Kontext ist bestätigt' : ''}.`
         : hamProminent ? 'Diese Kombination führt in den Unterlagen zum MethylKomplex-Zweig.' : 'Für Phase 4 muss zwischen Einschlafen, Durchschlafen, GABA- und Serotonin-Kontext unterschieden werden.',
       basis: `Wade ${f.wade.value} mm · Quadrizeps ${f.quadrizeps.value} mm · Beinbizeps ${f.beinbizeps.value} mm`,
       actions: bothLegsProminent
-        ? ['Glycin-Variante prüfen; Dosis einschleichen und Verträglichkeit beachten.']
+        ? ['Einschlafproblem bestätigen.', 'Glycin-Variante nur dann prüfen; Dosis einschleichen und Verträglichkeit beachten.']
         : hamProminent ? ['MethylKomplex-Variante prüfen.'] : ['Schlecht zur Ruhe/GABA: Neuromag oder Taurin prüfen.', 'Serotoninbezogenes Einschlafen: liposomales Melatonin prüfen.', 'Aufwachen zwischen 3–7 Uhr: Greens, gegebenenfalls mit Chlorella, prüfen.'],
       protocolIds: bothLegsProminent
-        ? ['wade-phase-4-glycin']
-        : hamProminent ? ['wade-phase-4-methylkomplex'] : ['wade-phase-4-neuromag', 'wade-phase-4-taurin', 'wade-phase-4-lipo-melatonin', 'wade-phase-4-greens'],
+        ? (glycinConfirmed ? ['wade-phase-4-glycin'] : [])
+        : hamProminent ? ['wade-phase-4-methylkomplex'] : [
+          ...(neuromagConfirmed ? ['wade-phase-4-neuromag'] : []),
+          ...(taurinConfirmed ? ['wade-phase-4-taurin'] : []),
+          ...(melatoninConfirmed ? ['wade-phase-4-lipo-melatonin'] : []),
+          ...(greensConfirmed ? ['wade-phase-4-greens'] : []),
+        ],
       groupIds: ['wade', 'quad-beinbizeps'],
       tone: 'branch',
+      requiresConfirmation: bothLegsProminent ? !glycinConfirmed : !hamProminent && !(neuromagConfirmed || taurinConfirmed || melatoninConfirmed || greensConfirmed),
+      source: 'Hautfalten Notizen S. 8–9; Körperfett-Assessment S. 14',
     });
   }
 
@@ -245,51 +406,123 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       actions: ['Nicht als Freigabe für unbegrenzte Kohlenhydrate verstehen; TRACKER und Gewichtsverlauf bleiben führend.'],
       groupIds: ['huefte'],
       tone: 'good',
+      source: 'Körperfett-Assessment, handschriftliche Seminarregel S. 15',
     });
   }
 
-  if (topFold.slug === 'rippe') {
+  if (topFold.slug === 'rippe' && isElevated(f.rippe)) {
+    const repeatedFoodsConfirmed = yes(context.repeatedFoods);
     push({
       id: 'rippe-gegenpruefung',
       title: 'Rippe ist die priorisierte Falte',
-      summary: 'Die Unterlagen verknüpfen sie mit Schilddrüse/Stoffwechsel, verlangen aber Gegenprüfungen für Stress, Toxine, Schlaf, Zucker und wiederholte Lebensmittel.',
-      basis: `Rippe ${f.rippe.value} mm · Abweichung ${f.rippe.score} ${f.rippe.richtung === 'unter' ? 'unter' : 'über'} Referenz`,
-      actions: ['Bauch/Trizeps für Stress und Energie prüfen.', 'Bein-/Wadenfalten für Toxine und Schlaf prüfen.', 'Hüfte für Zucker-/Blutzuckerkontext und Ernährung auf häufig wiederholte Lebensmittel prüfen.'],
+      summary: `Die Unterlagen verknüpfen sie mit Schilddrüse/Stoffwechsel, verlangen aber Gegenprüfungen für Stress, Toxine, Schlaf, Zucker und wiederholte Lebensmittel${repeatedFoodsConfirmed ? '; häufig wiederholte Lebensmittel beziehungsweise Unverträglichkeitskontext wurden bestätigt' : ''}.`,
+      basis: `Rippe ${f.rippe.value} mm · Abweichung ${f.rippe.score} ${f.rippe.richtung === 'unter' ? 'unter' : 'über'} Referenz${repeatedFoodsConfirmed ? ' · Lebensmittelkontext bestätigt' : ''}`,
+      actions: ['Bauch/Trizeps für Stress und Energie prüfen.', 'Bein-/Wadenfalten für Toxine und Schlaf prüfen.', 'Hüfte für Zucker-/Blutzuckerkontext prüfen.', repeatedFoodsConfirmed ? 'Eine zeitlich begrenzte, fachlich geplante Rotationsstrategie und konkrete Verträglichkeit beobachten.' : 'Erfassen, ob sehr häufig dieselben Lebensmittel gegessen werden oder reproduzierbare Unverträglichkeiten auftreten.'],
+      tone: repeatedFoodsConfirmed ? 'attention' : 'branch',
+      requiresConfirmation: !repeatedFoodsConfirmed,
+      source: 'Hautfalten Notizen S. 5',
     });
+  }
+
+  if (topFold.slug === 'knie' && isElevated(f.knie)) {
+    push({
+      id: 'knie-oberschenkel',
+      title: 'Knie mit den Oberschenkelfalten einordnen',
+      summary: 'Knie wird der hepatischen Phase 1 zugeordnet und korreliert laut Unterlagen mit den Oberschenkelfalten, die Darm und Leber-Phase-2 ergänzen.',
+      basis: `Knie ${f.knie.value} mm · Quadrizeps ${foldState(f.quadrizeps)} · Beinbizeps ${foldState(f.beinbizeps)}`,
+      actions: ['Mikronährstoff- und Antioxidanzienbasis prüfen.', 'Bei gleichzeitig erhöhten Beinfalten Umweltgifte, Darm, Proteinfrühstück und Leber-Phase 2 mitbewerten.'],
+      groupIds: ['knie', 'quad-beinbizeps'],
+      tone: 'attention',
+      source: 'Hautfalten Notizen S. 8 und S. 10',
+    });
+  }
+
+  if (topFold.slug === 'bizeps' && isElevated(f.bizeps)) {
+    const sleepLinked = isElevated(f.wade) || isElevated(f.quadrizeps) || isElevated(f.beinbizeps);
+    push({
+      id: 'bizeps-trizeps-schlaf',
+      title: 'Bizeps mit Trizeps und Schlaffalten einordnen',
+      summary: `Bizeps wird dem freien Testosteron zugeordnet. Trizeps ergänzt DHEA/Gesamttestosteron${sleepLinked ? '; erhöhte Waden-/Beinfalten stützen zusätzlich den Schlafkontext' : ''}.`,
+      basis: `Bizeps ${f.bizeps.value} mm · Trizeps ${foldState(f.trizeps)} · Wade ${foldState(f.wade)} · Quadrizeps ${foldState(f.quadrizeps)} · Beinbizeps ${foldState(f.beinbizeps)}`,
+      actions: ['Energie-/DHEA-Kontext über Trizeps prüfen.', 'Schlafdefizit nur bei passender Waden- und Beinfaltenlage beziehungsweise Schlafsymptomatik annehmen.'],
+      groupIds: ['bauch-brust-trizeps', 'wade', 'quad-beinbizeps'],
+      source: 'Hautfalten Notizen S. 11',
+    });
+  }
+
+  if (['kinn', 'wange'].includes(topFold.slug) && context.previousFolds) {
+    const chinDelta = f.kinn.value - Number(context.previousFolds.kinn);
+    const cheekDelta = f.wange.value - Number(context.previousFolds.wange);
+    if (Number.isFinite(chinDelta) && Number.isFinite(cheekDelta)) {
+      const sameDirection = Math.sign(chinDelta) === Math.sign(cheekDelta);
+      push({
+        id: 'kinn-wange-verlauf',
+        title: 'Kinn und Wange als globales Verlaufspaar',
+        summary: sameDirection
+          ? 'Beide Falten bewegen sich in dieselbe Richtung. Das entspricht der Seminarbeschreibung als frühe Marker einer globalen Fettzu- oder -abnahme.'
+          : 'Kinn und Wange bewegen sich nicht gemeinsam. Eine globale Zu-/Abnahme ist daraus noch nicht eindeutig; Messschwankung und Kurzzeitstress mitprüfen.',
+        basis: `Kinn ${chinDelta >= 0 ? '+' : ''}${chinDelta.toFixed(1)} mm · Wange ${cheekDelta >= 0 ? '+' : ''}${cheekDelta.toFixed(1)} mm gegenüber der vorherigen vollständigen Messung`,
+        actions: ['Kalorien nur zusammen mit Gewichtstrend und 10-Falten-Summe anpassen.', 'Bei uneinheitlichem Verlauf Messbedingungen und Kurzzeitstress prüfen.'],
+        tone: sameDirection ? 'info' : 'branch',
+        source: 'Hautfalten Notizen S. 1; „Was deine Hautfalten über dich aussagen“ S. 1',
+      });
+    }
   }
 
   return relations;
 }
 
-const completeHistory = (history = []) => history
-  .filter((row) => assessSkinfoldPriorities(row?.falten, 'male').length)
+const completeHistory = (history = [], calculationBasis = 'male') => history
+  .filter((row) => assessSkinfoldPriorities(row?.falten, calculationBasis).length)
   .sort((a, b) => String(a.gemessen_am || '').localeCompare(String(b.gemessen_am || '')));
 
 export function buildSkinfoldPlan(history = [], calculationBasis = 'male', context = {}) {
-  const rows = completeHistory(history);
+  const rows = completeHistory(history, calculationBasis);
   if (!rows.length) return null;
   const occurrences = {};
   let priorities = [];
   rows.forEach((row) => {
     priorities = assessSkinfoldPriorities(row.falten, calculationBasis);
-    const top = priorities[0];
-    occurrences[top.id] = (occurrences[top.id] || 0) + 1;
+    const ranked = rankSkinfolds(row.falten, calculationBasis);
+    const topFold = ranked[0];
+    const activeGroup = topFold?.richtung === 'ueber'
+      ? priorities.find((priority) => priority.falten.includes(topFold.slug))
+      : null;
+    if (activeGroup) occurrences[activeGroup.id] = (occurrences[activeGroup.id] || 0) + 1;
   });
   const current = rows.at(-1);
-  const relationships = buildSkinfoldRelationships(current.falten, calculationBasis, priorities, context);
   const rankedFolds = rankSkinfolds(current.falten, calculationBasis);
+  const topFold = rankedFolds[0];
+  const activeProtocolGroup = topFold?.richtung === 'ueber'
+    ? priorities.find((priority) => priority.falten.includes(topFold.slug)) || null
+    : null;
+  const previous = rows.at(-2);
+  const relationships = buildSkinfoldRelationships(current.falten, calculationBasis, priorities, {
+    ...context,
+    groupOccurrences: occurrences,
+    previousFolds: previous?.falten || null,
+  });
   const enriched = priorities.map((priority) => {
     const previousOccurrences = occurrences[priority.id] || 0;
-    const suggestedPhase = Math.min(4, priority.priority === 1 ? previousOccurrences : previousOccurrences + 1 || 1);
+    const isActive = priority.id === activeProtocolGroup?.id;
+    const requestedPhase = isActive ? Math.max(1, previousOccurrences) : Math.max(1, previousOccurrences + 1);
+    const documentedMaxPhase = Math.max(1, ...priority.protocols.map((item) => Number(item.phase) || 0));
+    const suggestedPhase = Math.min(documentedMaxPhase, requestedPhase);
+    const holdsAtLastDocumentedPhase = requestedPhase > documentedMaxPhase;
     const phaseProtocols = priority.protocols.filter((item) => Number(item.phase) === suggestedPhase);
     const relationProtocolIds = new Set(relationships.flatMap((item) => item.protocolIds));
-    const recommendedProtocols = suggestedPhase < 4
-      ? phaseProtocols.slice(0, 1)
-      : phaseProtocols.filter((item) => relationProtocolIds.has(item.id));
+    const recommendedProtocols = !isActive
+      ? []
+      : suggestedPhase < 4
+        ? phaseProtocols.slice(0, 1)
+        : phaseProtocols.filter((item) => relationProtocolIds.has(item.id));
     return {
       ...priority,
+      isActive,
       occurrences: previousOccurrences,
       suggestedPhase,
+      documentedMaxPhase,
+      holdsAtLastDocumentedPhase,
       phaseProtocols,
       recommendedProtocols,
       relationships: relationships.filter((item) => item.groupIds.includes(priority.id)),
@@ -300,9 +533,10 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
     priorities: enriched,
     // Die sichtbare Hauptpriorität ist Rang 1 der Excel-Formel über alle
     // dreizehn Falten. Die führende Protokollfalte bleibt separat erhalten.
-    topFold: rankedFolds[0],
-    topProtocolFold: enriched[0].primaryFold,
-    overallTopFold: rankedFolds[0],
+    topFold,
+    topProtocolFold: activeProtocolGroup?.primaryFold || null,
+    activeProtocolGroup: activeProtocolGroup ? enriched.find((item) => item.id === activeProtocolGroup.id) : null,
+    overallTopFold: topFold,
     rankedFolds,
     relationships,
     occurrences,
