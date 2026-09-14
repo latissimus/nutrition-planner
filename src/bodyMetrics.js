@@ -390,7 +390,7 @@ function ypsiActionPlanMarkup(actionPlan, { showProtocols = true, phase = null }
     ${questionCount ? `<aside class="ypsi-open-questions"><span><b>${questionCount} Frage${questionCount === 1 ? '' : 'n'} für deinen persönlichen Plan</b><small>Mit deinen Antworten werden die Empfehlungen genauer.</small></span><button type="button" data-skinfold-context-open>Beantworten</button></aside>` : ''}
     <div class="ypsi-action-categories">${YPSI_ACTION_CATEGORIES.map((category) => {
       const actions = actionPlan.categories[category.id] || [];
-      return `<article data-category="${category.id}"><h4>${materialIconMarkup(category.icon)}<span>${category.label}</span></h4><ol>${actions.map((action) => `<li><span>${escapeHtml(action.text)}</span>${ypsiActionSourceMarkup(action)}</li>`).join('')}</ol>${category.id === 'supplements' && showProtocols && actionPlan.protocols.length ? `<div class="falten-detail-protokolle">${actionPlan.protocols.map((protocol) => ypsiProtocolMarkup(protocol, true)).join('')}</div>` : ''}</article>`;
+      return `<article data-category="${category.id}"><h4>${materialIconMarkup(category.icon)}<span>${category.label}</span></h4><ol>${actions.map((action) => `<li><span>${escapeHtml(action.text)}</span>${ypsiActionSourceMarkup(action)}</li>`).join('')}</ol>${category.id === 'supplements' && showProtocols && actionPlan.protocols.length ? `<div class="falten-detail-protokolle">${actionPlan.protocols.map((protocol) => ypsiProtocolMarkup(protocol)).join('')}</div>` : ''}</article>`;
     }).join('')}</div>
   </section>`;
 }
@@ -434,17 +434,17 @@ function ypsiPriorityMarkup(state) {
   </section>`;
 }
 
-function ypsiProtocolMarkup(protocol, open = false) {
+function ypsiProtocolMarkup(protocol) {
   const supplements = [
     ...(protocol.supplemente || []).map((item) => ({ ...item, optional: false })),
     ...(protocol.optionale_supplemente || []).map((item) => ({ ...item, optional: true })),
   ];
-  return `<details class="falten-protokoll-item"${open ? ' open' : ''}><summary><span><b>${escapeHtml(protocol.name.replace(/^YPSI\s+/i, ''))}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</span>${materialIconMarkup('chevron_right')}</summary>
+  return `<section class="falten-protokoll-item"><header><b>${escapeHtml(protocol.name.replace(/^YPSI\s+/i, ''))}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</header>
     ${protocol.bedingungen?.length ? `<div class="ypsi-protocol-conditions"><b>Passt nur, wenn:</b><ul>${protocol.bedingungen.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>` : ''}
     <ul>${supplements.map((supplement) => {
       const safety = supplementSafety(supplement.slug);
       return `<li><span><b>${escapeHtml(supplementName(supplement.slug))}${supplement.optional ? ' · optional' : ''}</b>${safety ? `<small>${escapeHtml(safety)}</small>` : ''}</span>${supplement.dosierung ? `<strong>${escapeHtml(supplement.dosierung)}</strong>` : ''}</li>`;
-    }).join('')}</ul>${protocol.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(protocol.notiz)}</p>` : ''}</details>`;
+    }).join('')}</ul>${protocol.notiz ? `<p class="falten-protokoll-notiz">${escapeHtml(protocol.notiz)}</p>` : ''}</section>`;
 }
 
 function skinfoldMarkup(state) {
@@ -460,7 +460,6 @@ function skinfoldMarkup(state) {
     ${ypsiPriorityMarkup(state)}
     ${faltenLegendeMarkup(state)}
     ${skinfoldHistoryMarkup(state.skinfolds)}
-    ${infoDetails('Was wird gemessen?', BODY_EXPLANATIONS.skinfolds)}
     <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle drei bis vier Wochen an eine neue 13-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
     <button class="body-reset-mini" type="button" data-reset-body="skinfolds">13-Falten-Werte zurücksetzen</button>
   </div></section>`;
