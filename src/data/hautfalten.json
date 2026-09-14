@@ -2,11 +2,11 @@
   "version": "1.4",
   "quellen": [
     "Hautfalten Notizen – strukturierte Seminarzusammenfassung (14 Seiten)",
-    "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop, Stuttgart Februar 2017 (Wolfgang Unsöld)",
-    "YPSI Trainer A-Lizenz Modul 4 – Hormone, Hormonhaushalt & Hautfaltenmessung, Stuttgart Februar 2017",
-    "\"Was deine Hautfalten über Dich aussagen\" – Wolfgang Unsöld, yourpersonalstrengthcoach.com (2010)"
+    "Hautfaltenmessung",
+    "Seminarunterlagen zu Hormonen und Hautfaltenmessung",
+    "Was deine Hautfalten über dich aussagen"
   ],
-  "hinweis": "Die BioSignature-Methodik (Charles Poliquin 2004, YPSI-Adaption durch Wolfgang Unsöld) verknüpft Hautfaltendicke mit hormonellen und metabolischen Signalen. Es handelt sich um Praxis-Erfahrungswerte, keine klinisch validierten Diagnostiktests. Alle Angaben sind Orientierung, keine medizinische Diagnose.",
+  "hinweis": "Die Methode verknüpft Hautfaltendicke mit hormonellen und metabolischen Signalen. Es handelt sich um Praxis-Erfahrungswerte, keine klinisch validierten Diagnostiktests. Alle Angaben sind Orientierung, keine medizinische Diagnose.",
   "messgrundlagen": {
     "standardisierung": "Immer dieselbe Person am selben Wochentag zur selben Tageszeit, gleiche Körperseite, gleicher Caliper, gleicher Griff, gleiche Faltenposition.",
     "griff": "Messzange in der rechten Hand halten, Hautfalte mit der linken Hand und einem pronierten Griff greifen.",
@@ -218,7 +218,7 @@
         "frau_mm": 10,
         "grenzwert_mm": null,
         "katastrophal_mm": null,
-        "notiz": "Optimale Faltendicke laut Unsöld: 4 mm ♂ / 10 mm ♀."
+        "notiz": "Orientierungswert aus den Unterlagen: 4 mm ♂ / 10 mm ♀."
       },
       "rohstoffe": [
         "b6",

@@ -294,7 +294,7 @@ function ypsiKfaMarkup(state) {
     if (!vollstaendigeFalten(letzteMessung.falten)) fehlt.push('vollständige Faltenwerte');
   }
   return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-kfa-card><header><span><b>Körperfett-Schätzung</b><small>${latest ? `${display(latest.kfa)} % · ${datumKurz(latest.datum)}` : 'Noch nicht berechenbar'}</small></span></header><div class="body-v2-card-body">
-    <p class="body-explain">Schätzung nach der YPSI-Formel aus Körpergröße, Gewicht und der Summe der zehn Rumpf- und Wadenfalten. Der <b>Verlauf</b> ist die Aussage — der absolute Wert ist eine Regression aus dem Seminar, keine Messung.</p>
+    <p class="body-explain">Schätzung nach der Formel aus deinen Unterlagen zur Hautfaltenmessung: Sie nutzt Körpergröße, Gewicht und die Summe der zehn Rumpf- und Wadenfalten. Der <b>Verlauf</b> ist die Aussage — der absolute Wert ist eine Regression aus dem Seminar, keine Messung.</p>
     ${latest ? `<div class="body-metric-grid">
       <span><small>KÖRPERFETT</small><b>${display(latest.kfa)} %</b></span>
       <span><small>FETTMASSE</small><b>${display(latest.fettmasse)} kg</b></span>
@@ -305,7 +305,7 @@ function ypsiKfaMarkup(state) {
     <div class="body-chart-block"><header><b>VERLAUF</b><small>Körperfett in Prozent</small></header>${curveSvg([{ values: reihe.map((row) => ({ datum: row.datum, wert: row.kfa })), className: 'trend', points: true }], { unit: '%' })}</div>
     <p class="body-chart-legend">Berechnet aus <b>${display(latest.groesse)} cm</b> und <b>${display(latest.gewicht)} kg</b>, die mit dieser Messung gespeichert wurden${latest.alter == null ? '' : ` · Alter am Messdatum: <b>${latest.alter} Jahre</b>`}.</p>`
     : `<div class="body-chart-empty"><b>Noch keine Schätzung</b><span>${fehlt.length ? `Für die letzte Messung fehlt ${escapeHtml(fehlt.join(' und '))}.` : 'Nach der ersten vollständigen Messung mit Körpergröße und passender Wiegung erscheint hier die Schätzung.'}</span></div>`}
-    ${infoDetails('Wie wird gerechnet?', 'Die Formel bildet aus Größe und Gewicht einen Nullpunkt und bewertet dann, wie weit deine Faltensumme davon entfernt liegt: Körperfett steigt mit der Wurzel dieses Abstands. Zwei Eigenheiten der Vorlage sind wichtig. Erstens liegt der Nullpunkt über alle realistischen Größen und Gewichte hinweg nur zwischen etwa 42 und 45 mm – er ist also fast eine Konstante und keine persönliche Erwartung. Zweitens geht nur der Betrag des Abstands ein, eine Summe unterhalb des Nullpunkts erhöht den Wert deshalb genauso wie eine darüber. Das Geschlecht geht nicht ein. Quelle: Formel.xlsx (YPSI), Blatt „Tracking“. Die Schätzung ersetzt keine Messung wie DEXA oder BodPod und ist keine medizinische Diagnose.')}
+    ${infoDetails('Wie wird gerechnet?', 'Die Formel bildet aus Größe und Gewicht einen Nullpunkt und bewertet dann, wie weit deine Faltensumme davon entfernt liegt: Körperfett steigt mit der Wurzel dieses Abstands. Zwei Eigenheiten der Vorlage sind wichtig. Erstens liegt der Nullpunkt über alle realistischen Größen und Gewichte hinweg nur zwischen etwa 42 und 45 mm – er ist also fast eine Konstante und keine persönliche Erwartung. Zweitens geht nur der Betrag des Abstands ein, eine Summe unterhalb des Nullpunkts erhöht den Wert deshalb genauso wie eine darüber. Das Geschlecht geht nicht ein. Quelle: Formel.xlsx, Blatt „Tracking“. Die Schätzung ersetzt keine Messung wie DEXA oder BodPod und ist keine medizinische Diagnose.')}
   </div></section>`;
 }
 
@@ -325,10 +325,10 @@ function faltenLegendeMarkup(state) {
     </button>`;
   }).join('');
   return `<details class="body-inner-details body-falten-legende">
-    <summary><span>Falten im Detail (YPSI-Interpretation)</span>${materialIconMarkup('chevron_right')}</summary>
-    <p class="body-legende-intro">Tippe auf eine Falte, um zu sehen, was sie laut BioSignature/YPSI aussagt, wie sie gemessen wird und welche Protokolle infrage kommen.</p>
+    <summary><span>Hautfalten im Detail</span>${materialIconMarkup('chevron_right')}</summary>
+    <p class="body-legende-intro">Tippe auf eine Falte, um die Interpretation aus deinen Unterlagen, die Messanleitung und mögliche Protokolle zu sehen.</p>
     <div class="falten-legende-liste">${rows}</div>
-    <p class="body-legende-disclaimer">Erfahrungswerte aus dem YPSI-System (Wolfgang Unsöld, Charles Poliquin). Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose.</p>
+    <p class="body-legende-disclaimer">Praxisorientierte Interpretation der Hautfaltenmessung. Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose.</p>
   </details>`;
 }
 
@@ -374,7 +374,7 @@ function skinfoldAnalysisContext(state) {
 
 function ypsiRelationMarkup(relation, { compact = false } = {}) {
   const linkedProtocols = relation.protocolIds.map((id) => ypsiProtokolle.protokolle[id]).filter(Boolean);
-  const content = `<p>${escapeHtml(relation.summary)}</p><small>${escapeHtml(relation.basis)}</small>${relation.actions.length ? `<ul>${relation.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}${linkedProtocols.length ? `<section class="ypsi-relation-protocols"><b>Zugeordnete Optionen · nicht automatisch der aktuelle Schritt</b>${linkedProtocols.map((protocol) => `<span>${escapeHtml(protocol.name)}</span>`).join('')}</section>` : ''}${relation.source ? `<em>Quelle: ${escapeHtml(relation.source)}</em>` : ''}`;
+  const content = `<p>${escapeHtml(relation.summary)}</p><small>${escapeHtml(relation.basis)}</small>${relation.actions.length ? `<ul>${relation.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}${linkedProtocols.length ? `<section class="ypsi-relation-protocols"><b>Zugeordnete Optionen · nicht automatisch der aktuelle Schritt</b>${linkedProtocols.map((protocol) => `<span>${escapeHtml(protocol.name.replace(/^YPSI\s+/i, ''))}</span>`).join('')}</section>` : ''}${relation.source ? `<em>Quelle: ${escapeHtml(relation.source)}</em>` : ''}`;
   if (compact) return `<details class="ypsi-relation is-${relation.tone}"><summary><span><b>${escapeHtml(relation.title)}</b>${relation.requiresConfirmation ? '<i>Kontext fehlt</i>' : ''}</span>${materialIconMarkup('chevron_right')}</summary><div>${content}</div></details>`;
   return `<article class="ypsi-relation is-${relation.tone}"><b>${escapeHtml(relation.title)}</b>${relation.requiresConfirmation ? '<i>Kontext fehlt</i>' : ''}${content}</article>`;
 }
@@ -407,7 +407,7 @@ function ypsiActionPlanMarkup(actionPlan, { showProtocols = true } = {}) {
       const actions = actionPlan.categories[category.id] || [];
       return `<article data-category="${category.id}"><h4>${materialIconMarkup(category.icon)}<span>${category.label}</span></h4><ol>${actions.map((action) => `<li><span>${escapeHtml(action.text)}</span>${ypsiActionSourceMarkup(action)}</li>`).join('')}</ol>${category.id === 'supplements' && showProtocols && actionPlan.protocols.length ? `<div class="falten-detail-protokolle">${actionPlan.protocols.map((protocol) => ypsiProtocolMarkup(protocol, true)).join('')}</div>` : ''}</article>`;
     }).join('')}</div>
-    <footer><span><i class="is-seminar"></i><b>Deine Unterlagen</b> = YPSI-Praxisstrategie</span><span><i class="is-evidence"></i><b>Allgemeine Evidenz</b> = unabhängig von der Faltendeutung sinnvoll</span><span><i class="is-app"></i><b>App-Logik</b> = Reihenfolge und Sicherheitsregel</span></footer>
+    <footer><span><i class="is-seminar"></i><b>Deine Unterlagen</b> = Praxisstrategie der Hautfaltenmessung</span><span><i class="is-evidence"></i><b>Allgemeine Evidenz</b> = unabhängig von der Faltendeutung sinnvoll</span><span><i class="is-app"></i><b>App-Logik</b> = Reihenfolge und Sicherheitsregel</span></footer>
   </section>`;
 }
 
@@ -415,7 +415,7 @@ function ypsiPriorityMarkup(state) {
   const analysisContext = skinfoldAnalysisContext(state);
   const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, analysisContext);
   if (!plan) return `<section class="ypsi-priority-empty">
-    <b>YPSI-Prioritäten</b>
+    <b>Hautfalten-Prioritäten</b>
     <span>Nach deiner ersten vollständigen Messung ordnet CAPBOY die fünf Protokollgruppen und zeigt die passende Startphase.</span>
   </section>`;
   const actionPlan = buildSkinfoldActionPlan(plan, analysisContext);
@@ -423,7 +423,7 @@ function ypsiPriorityMarkup(state) {
   const basisConfirmed = getPreference(HAUTFALTEN_BASIS_PREFERENCE, null)?.basis === calculationBasis;
   const observedPriorities = plan.priorities.filter((priority) => !priority.isActive);
   return `<section class="ypsi-priority-block">
-    <header><span><small>YPSI-ASSESSMENT</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(plan.date)}</em></header>
+    <header><span><small>HAUTFALTENMESSUNG</small><b>Deine Hautfalten-Prioritäten</b></span><em>${datumKurz(plan.date)}</em></header>
     <div class="ypsi-top-fold"><small>PRIORISIERTE FALTE</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm · ${richtungsText(plan.topFold)} · Rang 1 nach Formel.xlsx</span></div>
     <form class="ypsi-basis-form${basisConfirmed ? '' : ' needs-confirmation'}" data-ypsi-basis-form><label><span><b>Berechnungsbasis</b><small>${basisConfirmed ? 'Von dir bestätigt' : 'Bitte einmal prüfen: Bisher war „männlich“ der technische Standardwert – nicht aus deinem Profil abgeleitet.'}</small></span><select data-ypsi-basis><option value="male"${calculationBasis === 'male' ? ' selected' : ''}>Männlich</option><option value="female"${calculationBasis === 'female' ? ' selected' : ''}>Weiblich</option></select></label><button type="submit">${basisConfirmed ? 'Ändern' : 'Bestätigen'}</button></form>
     ${ypsiActionPlanMarkup(actionPlan)}
@@ -446,7 +446,7 @@ function ypsiProtocolMarkup(protocol, open = false) {
     ...(protocol.supplemente || []).map((item) => ({ ...item, optional: false })),
     ...(protocol.optionale_supplemente || []).map((item) => ({ ...item, optional: true })),
   ];
-  return `<details class="falten-protokoll-item"${open ? ' open' : ''}><summary><span><b>${escapeHtml(protocol.name)}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</span>${materialIconMarkup('chevron_right')}</summary>
+  return `<details class="falten-protokoll-item"${open ? ' open' : ''}><summary><span><b>${escapeHtml(protocol.name.replace(/^YPSI\s+/i, ''))}</b>${protocol.fokus ? `<small>${escapeHtml(protocol.fokus)}</small>` : ''}</span>${materialIconMarkup('chevron_right')}</summary>
     ${protocol.bedingungen?.length ? `<div class="ypsi-protocol-conditions"><b>Passt nur, wenn:</b><ul>${protocol.bedingungen.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>` : ''}
     <ul>${supplements.map((supplement) => {
       const safety = supplementSafety(supplement.slug);
@@ -476,7 +476,7 @@ function ypsiPriorityDetailMarkup(priority, actionPlan) {
       <details class="ypsi-background"><summary><span>Alle Phasen nur zum Nachschlagen</span>${materialIconMarkup('chevron_right')}</summary><div><section class="falten-detail-section"><p class="falten-detail-hinweis">Diese Liste ist <b>keine Aufgabenliste</b>. Phase 1 bis 3 werden nur bei einer wiederkehrenden, tatsächlich aktiven Priorität nacheinander verwendet. Phase 4+ ist eine bedingungsabhängige Auswahl.</p>
         <div class="falten-detail-protokolle">${protocolsByPhase.map((phaseGroup) => `<section class="ypsi-phase-group"><h4>Phase ${phaseGroup.phase === 4 ? '4+' : phaseGroup.phase}</h4>${phaseGroup.protocols.map((protocol) => ypsiProtocolMarkup(protocol, phaseGroup.phase === priority.suggestedPhase && priority.isActive)).join('')}</section>`).join('')}</div>
       </section></div></details>
-      <p class="falten-detail-disclaimer">Praxisstrategie aus deinen YPSI-Seminarunterlagen. Prüfe Produkte, Dosierungen, Erkrankungen und Medikamente vor der Einnahme fachlich. Die Kaloriensteuerung in TRACKER läuft unabhängig weiter.</p>
+      <p class="falten-detail-disclaimer">Praxisstrategie aus deinen Unterlagen zur Hautfaltenmessung. Prüfe Produkte, Dosierungen, Erkrankungen und Medikamente vor der Einnahme fachlich. Die Kaloriensteuerung in TRACKER läuft unabhängig weiter.</p>
     </div>`;
 }
 
@@ -485,7 +485,7 @@ function skinfoldMarkup(state) {
   const unvollstaendig = state.skinfolds.filter((row) => !vollstaendigeFalten(row.falten));
   const smallChange = latest && previous && Math.abs(latest.total - previous.total) < Math.max(2, previous.total * 0.02);
   return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-skinfold-card><header><span><b>10-Falten-Summe</b><small>${latest ? `${display(latest.total)} mm · ${datumKurz(latest.gemessen_am)}` : 'Noch keine Messung'}</small></span></header><div class="body-v2-card-body"><h2 class="section-title mini-title">10-Falten-Summe in mm</h2>
-    <p class="body-explain">Gemessen werden 13 Falten. In die Summe gehen nach der YPSI-Vorlage die zehn von Kinn bis Wade ein — Oberschenkel und Bizeps bleiben bewusst draußen, damit Summe und Körperfettformel zusammenpassen. Der Verlauf wird nur sinnvoll, wenn du unter ähnlichen Bedingungen misst.</p>
+    <p class="body-explain">Gemessen werden 13 Falten. In die Summe gehen nach der vorliegenden Formel die zehn von Kinn bis Wade ein — Oberschenkel und Bizeps bleiben bewusst draußen, damit Summe und Körperfettformel zusammenpassen. Der Verlauf wird nur sinnvoll, wenn du unter ähnlichen Bedingungen misst.</p>
     ${latest ? `<div class="body-latest-value"><small>LETZTE SUMME</small><strong>${display(latest.total)} <b>mm</b></strong><span>${datumKurz(latest.gemessen_am)}</span></div>` : '<div class="body-chart-empty"><b>Noch keine Faltenmessung</b><span>Nach der ersten vollständigen 13-Falten-Messung erscheint hier die Summe.</span></div>'}
     ${smallChange ? '<p class="body-neutral-note">Die Veränderung liegt möglicherweise innerhalb der normalen Messschwankung. Noch keine Anpassung erforderlich.</p>' : ''}
     ${unvollstaendig.length ? `<p class="body-neutral-note">${unvollstaendig.length} ältere ${unvollstaendig.length === 1 ? 'Messung hat' : 'Messungen haben'} noch nicht alle 13 Werte und ${unvollstaendig.length === 1 ? 'fehlt' : 'fehlen'} deshalb im Verlauf. Du findest ${unvollstaendig.length === 1 ? 'sie' : 'sie'} unten unter „Einzelne Hautfaltenmessungen“ zum Nachtragen.</p>` : ''}
@@ -590,14 +590,14 @@ function faltenDetailMarkup(slug, state) {
       </section>
 
       ${protokolle.length ? `<section class="falten-detail-section">
-        <h3>YPSI-Protokolle</h3>
+        <h3>Protokolle der Hautfaltenmessung</h3>
         ${info.protokoll_hinweis ? `<p class="falten-detail-hinweis">${escapeHtml(info.protokoll_hinweis)}</p>` : ''}
         <p class="falten-detail-hinweis">${escapeHtml(protocolSequenceHint)} Nicht alles gleichzeitig einnehmen.</p>
         <div class="falten-detail-protokolle">${protokolle.map((protocol) => ypsiProtocolMarkup(protocol)).join('')}</div>
       </section>` : ''}
 
       ${info.quelle ? `<p class="falten-detail-quelle">Quelle: ${escapeHtml(info.quelle)}</p>` : ''}
-      <p class="falten-detail-disclaimer">Angaben aus dem YPSI-System (Wolfgang Unsöld) und BioSignature (Charles Poliquin). Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose. Bei ernsthaften Beschwerden ärztlich abklären lassen.</p>
+      <p class="falten-detail-disclaimer">Angaben aus deinen Unterlagen zur Hautfaltenmessung. Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose. Bei ernsthaften Beschwerden ärztlich abklären lassen.</p>
     </div>
   `;
 }
@@ -654,7 +654,7 @@ function bravermanQuestionMarkup(test) {
   const area = BRAVERMAN_BEREICHE[position.type];
   const answered = positions.filter(({ type, index }) => typeof test.answers?.[type]?.[index] === 'boolean').length;
   const selected = test.answers?.[position.type]?.[position.index];
-  return `<header class="falten-detail-header braverman-sheet-header"><div><small>BRAVERMAN-DEFIZITPROFIL</small><h2>${escapeHtml(area.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+  return `<header class="falten-detail-header braverman-sheet-header"><div><small>NEUROTRANSMITTER-SELBSTTEST</small><h2>${escapeHtml(area.label)}</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <div class="braverman-test-body">
       <div class="braverman-progress"><span style="--braverman-progress:${Math.round(answered / positions.length * 100)}%"></span><small>${answered} von ${positions.length}</small></div>
       ${test.safetyNotice ? `<aside class="braverman-safety"><b>Du musst damit nicht allein bleiben.</b><p>Wenn du akut daran denkst, dir etwas anzutun, rufe bitte sofort 112 oder wende dich an eine Krisenhilfe. Dieser Test kann keine Unterstützung durch einen Menschen ersetzen.</p><button type="button" data-dismiss-safety>Hinweis schließen</button></aside>` : ''}
@@ -670,7 +670,7 @@ function bravermanResultMarkup(test, { sheet = false } = {}) {
   const result = scoreBravermanAssessment(test.answers);
   const scored = BRAVERMAN_REIHENFOLGE.map((key) => ({ key, score: result.scores[key], ...result.severity[key] }));
   const focusRecommendations = bravermanRecommendations(result.focus, result.severity[result.focus].id);
-  const heading = sheet ? `<header class="falten-detail-header braverman-sheet-header"><div><small>BRAVERMAN-DEFIZITPROFIL</small><h2>Dein Ergebnis</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>` : '';
+  const heading = sheet ? `<header class="falten-detail-header braverman-sheet-header"><div><small>NEUROTRANSMITTER-SELBSTTEST</small><h2>Dein Ergebnis</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>` : '';
   return `${heading}<div class="${sheet ? 'braverman-test-body ' : ''}braverman-result">
     ${sheet && test.safetyNotice ? `<aside class="braverman-safety"><b>Du musst damit nicht allein bleiben.</b><p>Wenn du akut daran denkst, dir etwas anzutun, rufe bitte sofort 112 oder wende dich an eine Krisenhilfe. Dieser Test kann keine Unterstützung durch einen Menschen ersetzen.</p><button type="button" data-dismiss-safety>Hinweis schließen</button></aside>` : ''}
     <section class="braverman-result-focus"><small>STÄRKSTER AKTUELLER FOKUS</small><b>${escapeHtml(BRAVERMAN_BEREICHE[result.focus].label)}</b><span>${escapeHtml(BRAVERMAN_BEREICHE[result.focus].kurz)}</span></section>
@@ -694,7 +694,7 @@ function neurotransmitterMarkup() {
     <p class="body-explain">Der Test nutzt Teil 2 des Braverman-Assessments und verbindet dein Antwortmuster mit Ernährungs- und Supplement-Strategien aus deinen Seminarunterlagen.</p>
     ${complete ? bravermanResultMarkup(test) : `<div class="braverman-intro"><span aria-hidden="true">🧠</span><div><b>Vier aktuelle Bereiche</b><p>Dopamin, Acetylcholin, GABA und Serotonin. Du kannst den Test jederzeit unterbrechen und später fortsetzen.</p></div></div>`}
     <button class="btn btn-primary btn-block" type="button" data-braverman-open>${complete ? 'Ergebnis und Strategien öffnen' : answered ? 'Test fortsetzen' : 'Test starten'}</button>
-    <p class="ypsi-method-note">Deine Antworten werden in deinen persönlichen Einstellungen gespeichert. Das Profil ist eine YPSI-/Braverman-Praxisorientierung, kein Labortest.</p>
+    <p class="ypsi-method-note">Deine Antworten werden in deinen persönlichen Einstellungen gespeichert. Das Profil ist eine praxisorientierte Selbsteinschätzung, kein Labortest.</p>
   </div></section>`;
 }
 
@@ -1015,7 +1015,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       replaceSelector: '[data-ypsi-priority-overlay]',
       className: 'body-entry-overlay falten-detail-overlay ypsi-priority-overlay',
       sheetClassName: 'body-entry-sheet falten-detail-sheet ypsi-priority-sheet',
-      ariaLabel: `YPSI-Protokollgruppe ${priority.priority}: ${priority.label}`,
+      ariaLabel: `Protokollgruppe der Hautfaltenmessung ${priority.priority}: ${priority.label}`,
       markup: ypsiPriorityDetailMarkup(priority, actionPlan),
     });
     overlay.dataset.ypsiPriorityOverlay = '';

@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "quelle": "Formel.xlsx (YPSI) – Blätter \"Tracking\" und \"Grafik\", 1:1 übernommen",
-  "hinweis": "Alle Werte stammen unverändert aus der Vorlage. Die Körperfettformel ist eine Regression aus dem YPSI-System, keine validierte Messmethode. Der Verlauf ist aussagekräftiger als der Absolutwert.",
+  "quelle": "Formel.xlsx zur Hautfaltenmessung – Blätter \"Tracking\" und \"Grafik\", 1:1 übernommen",
+  "hinweis": "Alle Werte stammen unverändert aus der Vorlage. Die Körperfettformel ist eine Regression aus den Unterlagen, keine validierte Messmethode. Der Verlauf ist aussagekräftiger als der Absolutwert.",
   "summenfalten": {
     "slugs": ["kinn", "wange", "brust", "trizeps", "ruecken", "rippe", "huefte", "bauch", "knie", "wade"],
     "hinweis": "Entspricht SUM(J:S) auf Blatt \"Tracking\". Quadrizeps, Beinbizeps und Bizeps gehen bewusst nicht in die Summe ein, werden aber gemessen und im Ranking verwendet."

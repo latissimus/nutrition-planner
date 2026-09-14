@@ -1,7 +1,7 @@
 {
   "version": "1.3",
-  "quelle": "YPSI Trainer A-Lizenz Modul 4 – Körperfett-Assessment-Workshop & Advanced Supplementation, Stuttgart Februar/Juli 2017 (Wolfgang Unsöld)",
-  "hinweis": "Alle Protokolle sind Praxis-Empfehlungen aus dem YPSI-System. Sie ersetzen keine ärztliche/therapeutische Beratung. Standard-Timing: F = zum Frühstück, vs = vor dem Schlafen, PWO = Post-Workout. Ohne Timing = über den Tag verteilt.",
+  "quelle": "Seminarunterlagen zur Hautfaltenmessung und Supplementierung",
+  "hinweis": "Alle Protokolle sind Praxis-Empfehlungen aus den Unterlagen zur Hautfaltenmessung. Sie ersetzen keine ärztliche oder therapeutische Beratung. Standard-Timing: F = zum Frühstück, vs = vor dem Schlafen, PWO = Post-Workout. Ohne Timing = über den Tag verteilt.",
   "abkuerzungen": {
     "F": "zum Frühstück",
     "vs": "vor dem Schlafen",
@@ -15,7 +15,7 @@
     "phase_4_plus": "Advanced – gezielte Interventionen wenn Phase 1–3 kein Ergebnis mehr bringen. Auswahl abhängig von Symptomatik (Schlaf, Darm, Leber-Phase-2 etc.)."
   },
   "basis_immer_dabei": {
-    "beschreibung": "Diese 6 Grundlagen müssen vor Advanced-Methoden sitzen. Werden von jedem YPSI-Kunden und Athleten verwendet.",
+    "beschreibung": "Diese sechs Grundlagen sollen vor fortgeschrittenen Methoden sitzen.",
     "supplemente": [
       {
         "slug": "vitamin-d-k",
@@ -1084,7 +1084,7 @@
     },
     "green-week": {
       "id": "green-week",
-      "name": "YPSI Green Week (Functional Fasting)",
+      "name": "Green Week (Functional Fasting)",
       "gruppe": "spezialprotokolle",
       "gilt_fuer_falten": [
         "bauch",
@@ -1097,7 +1097,7 @@
         "name": "Shake",
         "zutaten": [
           "1–3 Esslöffel Veganes Protein",
-          "1–2 Teel. YPSI AminoElektrolytKomplex",
+          "1–2 Teel. AminoElektrolytKomplex",
           "Wasser"
         ]
       },
@@ -1105,7 +1105,7 @@
         "name": "Greens-Drink im Wechsel",
         "zutaten": [
           "1 Essl. Dynamic Greens (o. ä.)",
-          "1–2 Teel. YPSI AminoElektrolytKomplex",
+          "1–2 Teel. AminoElektrolytKomplex",
           "Wasser"
         ]
       },
@@ -1115,7 +1115,7 @@
         "Trink viel Wasser – kein Tee, kein Kaffee. Herbal Infusions ok. Lime/Lemon-Saft ok.",
         "Trainingsvolumen ggf. reduzieren",
         "Min. 8 h Schlaf pro Nacht",
-        "Supplement-Auswahl auf Basis der YPSI-Hautfaltenmessung"
+        "Supplement-Auswahl auf Basis der Hautfaltenmessung"
       ],
       "quelle": "Funktionelle Ernährung S. 2, Makro/Mikro S. 4"
     },

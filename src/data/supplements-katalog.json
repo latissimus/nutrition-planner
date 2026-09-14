@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "quellen": [
-    "YPSI Advanced Supplementation, Stuttgart Juli 2017 (Wolfgang Unsöld)",
-    "YPSI Trainer A-Lizenz Modul 4 – Neurotransmitter, Stuttgart Februar 2017",
+    "Seminarunterlagen zur Supplementierung",
+    "Seminarunterlagen zum Neurotransmitter-Selbsttest",
     "Braverman Personality Type Assessment – Dr. Eric R. Braverman, The Edge Effect (2005)"
   ],
-  "hinweis": "Dosisangaben sind Praxis-Empfehlungen aus dem YPSI-System bzw. Bravermans Buch. Sie ersetzen keine ärztliche/therapeutische Beratung. Timing-Abkürzungen: F = Frühstück, vs = vor dem Schlafen, PreWo = Pre-Workout, PWO = Post-Workout.",
+  "hinweis": "Dosisangaben sind Praxis-Empfehlungen aus den Seminarunterlagen beziehungsweise der Testvorlage. Sie ersetzen keine ärztliche oder therapeutische Beratung. Timing-Abkürzungen: F = Frühstück, vs = vor dem Schlafen, PreWo = Pre-Workout, PWO = Post-Workout.",
   "kategorien": {
     "basis": "Grundlagen-Präparate, die zu fast jedem Protokoll gehören",
     "entgiftung": "Chlorophyll-basiert, Leber-Support, Schwermetalle",
@@ -21,15 +21,15 @@
   },
   "supplemente": {
     "multikomplex": {
-      "name": "YPSI MultiKomplex",
+      "name": "MultiKomplex",
       "kategorie": "basis",
       "standard_dosis": "3×2 Kapseln über den Tag",
       "wirkung": "Multivitamin/-mineral-Basis. Kein Mikronährstoff kommt isoliert im Körper vor – Multis sind die Basis. Die Menge an Stress bestimmt den Bedarf.",
-      "marke_empfehlung": "YPSI",
+      "marke_empfehlung": "Produkt aus den Unterlagen",
       "quelle": "Supplements S. 1"
     },
     "ypsi-magnesium": {
-      "name": "YPSI Magnesium (Bisglycinat)",
+      "name": "Magnesium (Bisglycinat)",
       "kategorie": "basis",
       "standard_dosis": "4 Kapseln vs",
       "wirkung": "Bisglycinat unterdrückt Cortisol – beste Unterstützung für den Schlaf. Kombination mit Aspartat für Muskulatur-Aufnahme.",
@@ -39,15 +39,15 @@
         "citrat": "GABA",
         "threonat": "GABA + Konzentration"
       },
-      "marke_empfehlung": "YPSI",
+      "marke_empfehlung": "Produkt aus den Unterlagen",
       "quelle": "Supplements S. 1, Hormone S. 16"
     },
     "ypsi-inositol": {
-      "name": "YPSI Inositol plus Magnesium",
+      "name": "Inositol plus Magnesium",
       "kategorie": "basis",
       "standard_dosis": "1 Kapsel vs",
       "wirkung": "Inositol ist Rohstoff für Neurotransmitter – sorgt dafür, dass man abends müde wird, nachts gut schläft und morgens fit ist. Beeinflusst Cortisol.",
-      "marke_empfehlung": "YPSI",
+      "marke_empfehlung": "Produkt aus den Unterlagen",
       "quelle": "Neurotransmitter S. 1, Hormone S. 8"
     },
     "vitamin-d-k": {
@@ -73,7 +73,7 @@
       "quelle": "Supplements S. 1, Hormone S. 6"
     },
     "chlorella-komplex": {
-      "name": "YPSI ChlorellaKomplex",
+      "name": "ChlorellaKomplex",
       "kategorie": "entgiftung",
       "standard_dosis": "3×3 bis 3×5 (bis 3×10) für 3–6 Wochen",
       "wirkung": "Entgiftung Phase 2 – 'kleiner Dreck weg'. Bindet in Kombi mit Chlorella Metalle.",
@@ -121,7 +121,7 @@
       "kategorie": "schlaf-gaba",
       "standard_dosis": "4–8 Kapseln vs für 2–3 Wochen",
       "wirkung": "Höchste Mg-Konzentration in der Spinal-Flüssigkeit. Erhöht GABA. Hemmender Effekt auf das Neuron.",
-      "ergaenzung": "Ergänzend zu YPSI Magnesium.",
+      "ergaenzung": "Ergänzend zu Magnesium.",
       "quelle": "Supplements S. 12"
     },
     "taurin": {
@@ -242,7 +242,7 @@
       "kategorie": "hormone",
       "standard_dosis": "4–8 Caps PreWO oder 3×2",
       "wirkung": "Funktioniert nur bei hohem Testosteron (Trizeps <8 mm). Training-Drive und Look ändern sich dramatisch.",
-      "marke_empfehlung": "YPSI (nicht auf Reseller-Liste)",
+      "marke_empfehlung": "Produkt aus den Unterlagen (nicht auf Reseller-Liste)",
       "quelle": "Funktionelle Ernährung S. 7"
     },
     "n-acetyl-cystein": {
@@ -400,7 +400,7 @@
       "kategorie": "entgiftung",
       "standard_dosis": "1 Tel. 1–2× pro Tag (15–17 Uhr, nach Frühstück oder nach Abendessen)",
       "wirkung": "Chlorophyllreiche Antioxidantien-Mischung. Ideal auf Reisen und in trainingsintensiven Phasen. Antioxidans zur Entgiftung für Beinfalten (starke Diode).",
-      "marke_empfehlung": ["Dynamic Greens von Nutri-Dyn (direkt YPSI)", "Spectra Greens von DaVinci", "Paleo Greens von DFH"],
+      "marke_empfehlung": ["Dynamic Greens von Nutri-Dyn", "Spectra Greens von DaVinci", "Paleo Greens von DFH"],
       "einsatz": [
         "15–17 Uhr für Lungenfunktion",
         "Wenn jemand nachts zwischen 3–5 Uhr aufwacht"
@@ -550,7 +550,7 @@
       "quelle": "Neurotransmitter S. 4"
     },
     "ypsi-amino-elektrolyt": {
-      "name": "YPSI AminoElektrolytKomplex",
+      "name": "AminoElektrolytKomplex",
       "kategorie": "basis",
       "wirkung": "Mineralien-Elektrolyte für Hydration, Power-Output (1 % Dehydration = 7 % Power-Verlust), Zellmembranpolarität, Säure-Basen-Haushalt, Informationsübertragung im ZNS/PNS.",
       "quelle": "Supplements S. 16, Funktionelle Ernährung S. 6"

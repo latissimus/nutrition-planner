@@ -743,9 +743,10 @@ export function protocolForPhase(priority, phase = 1) {
 }
 
 export function supplementName(slug) {
-  return supplementKatalog.supplemente?.[slug]?.name
+  const name = supplementKatalog.supplemente?.[slug]?.name
     || SUPPLEMENT_NAMEN[slug]
     || String(slug).replaceAll('-', ' ').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase());
+  return name.replace(/^YPSI\s+/i, '');
 }
 
 export function supplementSafety(slug) {

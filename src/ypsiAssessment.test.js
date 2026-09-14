@@ -268,6 +268,7 @@ describe('Braverman-Defizitprofil', () => {
 
   it('liefert lesbare Supplementnamen und Sicherheitshinweise', () => {
     expect(supplementName('ginkgo-biloba')).toBe('Ginkgo biloba');
+    expect(supplementName('ypsi-magnesium')).toBe('Magnesium (Bisglycinat)');
     const result = bravermanRecommendations('serotonin', 'major');
     expect(result.supplements.find((item) => item.slug === 'johanniskraut')).toEqual(expect.objectContaining({
       dose: '600 mg',
