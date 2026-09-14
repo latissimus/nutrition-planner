@@ -102,6 +102,38 @@ export function assessSkinfoldPriorities(folds = {}, calculationBasis = 'male') 
 const isElevated = (fold) => fold?.richtung === 'ueber';
 const isTopThree = (fold) => Number(fold?.foldPriority) <= 3;
 const yes = (value) => value === true;
+const answered = (value) => typeof value === 'boolean';
+
+export const YPSI_EVIDENCE_SOURCES = Object.freeze({
+  insomnia: {
+    label: 'AASM-Leitlinie zu Insomnie',
+    url: 'https://doi.org/10.5664/jcsm.8986',
+  },
+  movement: {
+    label: 'WHO-Leitlinie zu Bewegung',
+    url: 'https://www.who.int/publications/i/item/9789240015128',
+  },
+  mindfulness: {
+    label: 'Metaanalyse zu Achtsamkeit und Stress',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/41634335/',
+  },
+  postMealMovement: {
+    label: 'Metaanalyse zu Bewegung nach Mahlzeiten',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/36715875/',
+  },
+  sleepHabits: {
+    label: 'NHLBI: gesunde Schlafgewohnheiten',
+    url: 'https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits',
+  },
+  sleepApnea: {
+    label: 'NHLBI: Symptome einer Schlafapnoe',
+    url: 'https://www.nhlbi.nih.gov/health/sleep-apnea/symptoms',
+  },
+  digestiveDiary: {
+    label: 'NIDDK: Ernährung und Symptomtagebuch',
+    url: 'https://www.niddk.nih.gov/health-information/digestive-diseases/diarrhea/eating-diet-nutrition',
+  },
+});
 
 function foldState(fold) {
   if (!fold) return 'nicht verfügbar';
@@ -125,8 +157,10 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
     && isElevated(f.bauch);
   const recentEnergy = Number(context.recentEnergy);
   const recentSleep = Number(context.recentSleep);
-  const wakesFit = yes(context.wakesFit) || recentEnergy >= 4;
-  const morningDriveLow = yes(context.morningDriveLow) || (recentEnergy > 0 && recentEnergy <= 2);
+  // Schlaf-Logs liefern Zusatzkontext, ersetzen bei einer bedingten
+  // Supplement-Variante aber keine ausdrückliche Ja/Nein-Antwort.
+  const wakesFit = yes(context.wakesFit);
+  const morningDriveLow = yes(context.morningDriveLow);
   const sleepConcern = yes(context.sleepOnset) || yes(context.sleepMaintenance) || (recentSleep > 0 && recentSleep < 3);
   const gabaContext = yes(context.gabaContext);
   const serotoninContext = yes(context.serotoninContext);
@@ -158,13 +192,16 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
     });
 
     if (!isElevated(f.trizeps)) {
+      const gutQuestionsAnswered = answered(context.wakesFit) && answered(context.digestiveSymptoms);
       const confirmedGutBranch = wakesFit && yes(context.digestiveSymptoms);
       push({
         id: 'bauch-trizeps-darmzweig',
-        title: confirmedGutBranch ? 'Darmzweig durch Kontext bestätigt' : 'Darmzweig gezielt gegenprüfen',
+        title: confirmedGutBranch ? 'Darmzweig durch Kontext bestätigt' : gutQuestionsAnswered ? 'Darmzweig passt aktuell nicht' : 'Darmzweig gezielt gegenprüfen',
         summary: confirmedGutBranch
           ? 'Bauch ist priorisiert, der Trizeps ist nicht erhöht, du wachst fit auf und hast Verdauungskontext bestätigt. Das entspricht dem Darm-/Chlorella-Zweig der Unterlagen.'
-          : 'Ein nicht erhöhter Trizeps schwächt die Energie-/Testosterondeutung. Der Darmzweig darf laut Unterlagen aber erst gewählt werden, wenn gutes Aufwachen/Aktivitätslevel und passende Verdauungszeichen bestätigt sind.',
+          : gutQuestionsAnswered
+            ? 'Ein nicht erhöhter Trizeps allein reicht nicht: Nach deinen Antworten fehlen gutes Aufwachen/Aktivitätslevel oder passende Verdauungszeichen. Deshalb wird der Darm-/Chlorella-Zweig nicht gewählt.'
+            : 'Ein nicht erhöhter Trizeps schwächt die Energie-/Testosterondeutung. Der Darmzweig darf laut Unterlagen aber erst gewählt werden, wenn gutes Aufwachen/Aktivitätslevel und passende Verdauungszeichen bestätigt sind.',
         basis: `Bauch ${f.bauch.value} mm · Trizeps ${f.trizeps.value} mm (${foldState(f.trizeps)})`,
         actions: [
           'Bestätigen, ob du gut aufwachst und tagsüber ein gutes Aktivitäts-/Energielevel hast.',
@@ -174,7 +211,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
         protocolIds: confirmedGutBranch ? ['bauch-brust-trizeps-phase-4-chlorella', 'darm-sanierung-phase-1'] : [],
         groupIds: ['bauch-brust-trizeps'],
         tone: confirmedGutBranch ? 'attention' : 'branch',
-        requiresConfirmation: !confirmedGutBranch,
+        requiresConfirmation: !gutQuestionsAnswered,
         source: 'Hautfalten Notizen S. 7 und S. 13; Körperfett-Assessment S. 13',
       });
     } else {
@@ -350,7 +387,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       ],
       groupIds: ['quad-beinbizeps', 'bauch-brust-trizeps'],
       tone: legGroup?.priority === 1 ? 'attention' : 'info',
-      requiresConfirmation: !gutConfirmed && !quadRepeated,
+      requiresConfirmation: !quadRepeated && !answered(context.digestiveSymptoms) && !answered(context.leakyGut),
       source: 'Hautfalten Notizen S. 10–12',
     });
   } else if (legRelationRelevant) {
@@ -392,7 +429,9 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
         ],
       groupIds: ['wade', 'quad-beinbizeps'],
       tone: 'branch',
-      requiresConfirmation: bothLegsProminent ? !glycinConfirmed : !hamProminent && !(neuromagConfirmed || taurinConfirmed || melatoninConfirmed || greensConfirmed),
+      requiresConfirmation: bothLegsProminent
+        ? !answered(context.sleepOnset)
+        : !hamProminent && ![context.sleepOnset, context.sleepMaintenance, context.wakes3to7].some(answered),
       source: 'Hautfalten Notizen S. 8–9; Körperfett-Assessment S. 14',
     });
   }
@@ -419,7 +458,7 @@ export function buildSkinfoldRelationships(folds = {}, calculationBasis = 'male'
       basis: `Rippe ${f.rippe.value} mm · Abweichung ${f.rippe.score} ${f.rippe.richtung === 'unter' ? 'unter' : 'über'} Referenz${repeatedFoodsConfirmed ? ' · Lebensmittelkontext bestätigt' : ''}`,
       actions: ['Bauch/Trizeps für Stress und Energie prüfen.', 'Bein-/Wadenfalten für Toxine und Schlaf prüfen.', 'Hüfte für Zucker-/Blutzuckerkontext prüfen.', repeatedFoodsConfirmed ? 'Eine zeitlich begrenzte, fachlich geplante Rotationsstrategie und konkrete Verträglichkeit beobachten.' : 'Erfassen, ob sehr häufig dieselben Lebensmittel gegessen werden oder reproduzierbare Unverträglichkeiten auftreten.'],
       tone: repeatedFoodsConfirmed ? 'attention' : 'branch',
-      requiresConfirmation: !repeatedFoodsConfirmed,
+      requiresConfirmation: !answered(context.repeatedFoods),
       source: 'Hautfalten Notizen S. 5',
     });
   }
@@ -540,6 +579,161 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
     rankedFolds,
     relationships,
     occurrences,
+  };
+}
+
+const planAction = (text, source = 'seminar', evidence = null) => ({ text, source, evidence });
+
+/**
+ * Übersetzt Rang, Mehrfaltenregeln und beantworteten Kontext in einen bewusst
+ * kurzen Handlungsplan. Nur die insgesamt führende, erhöhte Protokollgruppe
+ * darf einen Supplement-Schritt auslösen; die übrigen vier bleiben Beobachtung.
+ */
+export function buildSkinfoldActionPlan(plan, context = {}) {
+  if (!plan) return null;
+  const top = plan.topFold;
+  const active = plan.activeProtocolGroup;
+  const groupId = active?.id || null;
+  const actionableTop = top.richtung === 'ueber';
+  const requiredQuestionIds = new Set();
+  const categories = {
+    nutrition: [],
+    dailyLife: [],
+    sleep: [],
+    supplements: [],
+  };
+  const add = (category, text, source = 'seminar', evidence = null) => {
+    if (!categories[category].some((item) => item.text === text)) categories[category].push(planAction(text, source, evidence));
+  };
+  const requireAnswers = (...ids) => ids.forEach((id) => requiredQuestionIds.add(id));
+  const fold = (slug) => plan.rankedFolds.find((item) => item.slug === slug);
+  const elevated = (slug) => isElevated(fold(slug));
+
+  add('nutrition', 'Lass dein Kalorienziel zunächst unverändert und beurteile es weiter über TRACKER, Gewichtstrend und 10-Falten-Summe – nicht über eine einzelne Falte.', 'app');
+  add('dailyLife', 'Setze für die nächsten drei bis vier Wochen nur diesen Schwerpunkt um, dokumentiere kurz die Umsetzung und miss dann unter ähnlichen Bedingungen erneut.', 'app');
+
+  if (['bauch-brust-trizeps', 'huefte'].includes(groupId) || (actionableTop && ['bauch', 'brust', 'trizeps', 'huefte', 'ruecken', 'rippe'].includes(top.slug))) {
+    requireAnswers('mealsIrregular', 'postMealCrash');
+  }
+  if (groupId === 'bauch-brust-trizeps' || (actionableTop && ['bauch', 'brust', 'trizeps'].includes(top.slug))) {
+    requireAnswers('stressHigh', 'wakesFit', 'morningDriveLow', 'troubleWindingDown', 'sleepOnset', 'sleepMaintenance', 'digestiveSymptoms');
+    add('nutrition', 'Plane drei verlässliche Mahlzeiten mit einer klaren Proteinquelle; prüfe anhand von Hunger und Energie, ob sehr lange Essenspausen oder zu knappe Mahlzeiten dein Problem verstärken.', 'seminar');
+    if (elevated('huefte') || yes(context.mealsIrregular) || yes(context.postMealCrash)) {
+      add('nutrition', 'Verteile die Mahlzeiten für zwei Wochen regelmäßiger und gehe direkt nach der größten Mahlzeit etwa 10 bis 15 Minuten zügig spazieren.', 'evidence', 'postMealMovement');
+    }
+    if (yes(context.stressHigh) || yes(context.troubleWindingDown)) {
+      add('dailyLife', 'Mache täglich zehn Minuten eine geführte Achtsamkeitsmeditation oder ruhige Atemübung und notiere davor und danach deine Anspannung von 0 bis 5.', 'evidence', 'mindfulness');
+      add('dailyLife', 'Reduziere für zwei Wochen einen konkret benannten, vermeidbaren Stressor statt nur allgemein „weniger Stress“ anzustreben.', 'app');
+    } else if (!answered(context.stressHigh)) {
+      add('dailyLife', 'Beantworte zuerst die Stressfrage. Erst danach entscheidet die App, ob Meditation und Stressmanagement dein Haupthebel sind.', 'app');
+    }
+    if (yes(context.digestiveSymptoms)) {
+      add('nutrition', 'Führe 14 Tage ein Symptomprotokoll mit Mahlzeit, Uhrzeit und Beschwerden. Streiche nicht mehrere Lebensmittelgruppen gleichzeitig; reproduzierbare oder anhaltende Beschwerden fachlich abklären.', 'evidence', 'digestiveDiary');
+    }
+  }
+
+  if (groupId === 'huefte' || (actionableTop && top.slug === 'huefte')) {
+    requireAnswers('mealsIrregular', 'postMealCrash');
+    add('nutrition', 'Iss für zwei Wochen zu ähnlichen Zeiten und kombiniere jede Hauptmahlzeit mit Protein und ballaststoffreichen Lebensmitteln.', 'seminar');
+    add('nutrition', 'Gehe direkt nach mindestens einer Hauptmahlzeit etwa 10 bis 15 Minuten zügig spazieren.', 'evidence', 'postMealMovement');
+    add('dailyLife', 'Unterbrich längere Sitzphasen regelmäßig und sammle über die Woche mindestens 150 Minuten moderate Bewegung; Krafttraining zählt zusätzlich.', 'evidence', 'movement');
+  }
+
+  if (groupId === 'wade' || groupId === 'quad-beinbizeps' || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'knie', 'bizeps'].includes(top.slug))) {
+    requireAnswers('sleepOnset', 'sleepMaintenance', 'wakes3to7', 'caffeineLate', 'alcoholNearBed', 'snoringBreathing');
+  }
+  if (groupId === 'quad-beinbizeps' || groupId === 'knie' || (actionableTop && ['quadrizeps', 'beinbizeps', 'knie'].includes(top.slug))) {
+    requireAnswers('digestiveSymptoms', 'leakyGut', 'mercuryContext', 'alcoholNearBed');
+    add('nutrition', 'Sichere täglich ausreichendes Protein und eine abwechslungsreiche Lebensmittelauswahl; starte keine pauschale „Entgiftungsdiät“ allein aufgrund der Faltenwerte.', 'seminar');
+    add('dailyLife', 'Bewege dich täglich und reduziere vermeidbaren Alkoholkonsum sowie unnötige Expositionen schrittweise, ohne daraus eine medizinische „Entgiftung“ abzuleiten.', 'seminar');
+    add('dailyLife', 'Sammle über die Woche mindestens 150 Minuten moderate Bewegung und ergänze an mindestens zwei Tagen Krafttraining.', 'evidence', 'movement');
+  }
+  if (actionableTop && top.slug === 'trizeps') requireAnswers('redDotsTriceps', 'alcoholNearBed');
+  if (actionableTop && top.slug === 'rippe') requireAnswers('repeatedFoods', 'digestiveSymptoms');
+
+  if (actionableTop && top.slug === 'ruecken') {
+    requireAnswers('stressHigh', 'sleepOnset', 'sleepMaintenance');
+    add('nutrition', 'Halte deine Kohlenhydratmenge zunächst zwei Wochen möglichst konstant und notiere zu den Hauptmahlzeiten grob Portion, Hunger, Energie und Trainingsleistung.', 'seminar');
+    add('nutrition', 'Reduziere Kohlenhydrate nicht allein wegen der Rückenfalte. Ändere die Menge erst, wenn TRACKER, Gewichtsverlauf, Hunger und Leistung gemeinsam dafür sprechen.', 'app');
+  }
+  if (actionableTop && top.slug === 'rippe') {
+    if (yes(context.repeatedFoods) || yes(context.digestiveSymptoms)) {
+      add('nutrition', 'Führe 14 Tage ein Ernährungs- und Symptomtagebuch. Verändere immer nur einen Verdachtsfaktor und besprich größere Ausschlussdiäten fachlich.', 'evidence', 'digestiveDiary');
+    } else if (!answered(context.repeatedFoods) || !answered(context.digestiveSymptoms)) {
+      add('nutrition', 'Beantworte zuerst die Fragen zu häufig wiederholten Lebensmitteln und Verdauungsbeschwerden; ohne diese Antworten bleibt der Ernährungszweig offen.', 'app');
+    }
+  }
+  if (actionableTop && top.slug === 'bizeps') {
+    add('nutrition', 'Prüfe für zwei Wochen, ob Kalorienziel, Protein und Nahrungsfette tatsächlich erreicht werden; leite aus der Bizepsfalte allein keinen Hormonmangel ab.', 'seminar');
+  }
+  if (actionableTop && ['kinn', 'wange'].includes(top.slug)) {
+    add('dailyLife', 'Bewerte Kinn und Wange nur als gemeinsames Verlaufspaar. Ändere erst etwas, wenn auch Gewichtstrend oder 10-Falten-Summe dieselbe Richtung bestätigen.', 'seminar');
+  }
+
+  const sleepRelevant = groupId === 'wade'
+    || ['bauch-brust-trizeps', 'quad-beinbizeps'].includes(groupId)
+    || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'bauch', 'brust', 'trizeps', 'bizeps', 'ruecken'].includes(top.slug));
+  if (sleepRelevant) {
+    if (yes(context.sleepOnset) || yes(context.sleepMaintenance)) requireAnswers('caffeineLate', 'alcoholNearBed', 'snoringBreathing');
+    if (yes(context.sleepOnset)) {
+      add('sleep', 'Halte zwei Wochen eine feste Aufstehzeit ein und beginne 30 bis 60 Minuten vor dem Schlafen eine ruhige, möglichst gleichbleibende Abendroutine.', 'evidence', 'insomnia');
+      add('sleep', 'Wenn du länger wach im Bett liegst, stehe kurz auf und kehre erst bei Schläfrigkeit zurück. Das ist ein Element der Stimulus-Kontrolle.', 'evidence', 'insomnia');
+    }
+    if (yes(context.sleepMaintenance)) {
+      add('sleep', 'Halte die Aufstehzeit auch nach einer schlechten Nacht stabil und dokumentiere zwei Wochen lang Wachphasen, Alkohol und Koffein statt die Bettzeit immer weiter auszudehnen.', 'evidence', 'insomnia');
+    }
+    if (yes(context.wakes3to7)) {
+      add('sleep', 'Notiere Uhrzeit und Dauer des Aufwachens. Die Zuordnung zu „3–7 Uhr“ stammt aus dem Seminar; sie beweist kein Organ- oder Darmproblem.', 'seminar');
+    }
+    if (yes(context.caffeineLate)) add('sleep', 'Verlege Koffein für zwei Wochen vollständig aus den letzten acht Stunden vor deiner geplanten Schlafenszeit.', 'evidence', 'sleepHabits');
+    if (yes(context.alcoholNearBed)) add('sleep', 'Lass Alkohol in den letzten vier Stunden vor dem Schlafen für zwei Wochen weg und vergleiche nächtliche Wachphasen und Morgenenergie.', 'evidence', 'sleepHabits');
+    if (yes(context.snoringBreathing)) add('sleep', 'Lautes Schnarchen oder beobachtete Atempausen gehören medizinisch abgeklärt; ein Supplement-Protokoll ersetzt keine Schlafdiagnostik.', 'evidence', 'sleepApnea');
+    if ([context.sleepOnset, context.sleepMaintenance].every((value) => value === false)) {
+      add('sleep', 'Du hast weder Ein- noch Durchschlafprobleme angegeben. Deshalb wird aktuell kein verhaltensbezogener Schlafzweig empfohlen.', 'app');
+    } else if (![context.sleepOnset, context.sleepMaintenance].some(answered)) {
+      add('sleep', 'Beantworte zuerst getrennt, ob Einschlafen oder Durchschlafen dein Problem ist. Ohne diese Antwort bleibt der Schlafzweig offen.', 'app');
+    }
+    if (yes(context.sleepOnset) || yes(context.sleepMaintenance)) {
+      add('sleep', 'Wenn Schlafprobleme an mindestens drei Nächten pro Woche über Monate bestehen oder dich tagsüber stark beeinträchtigen, lass sie abklären; bei chronischer Insomnie ist CBT‑I die empfohlene Erstbehandlung.', 'evidence', 'insomnia');
+    }
+  } else {
+    add('sleep', 'Aktuell ergibt sich aus Priorität 1 kein eigener Schlafschwerpunkt. Behalte Schlafqualität und Morgenenergie als Verlaufskontrolle im Blick.', 'app');
+  }
+
+  const protocols = active?.recommendedProtocols || [];
+  if (!active) {
+    add('supplements', top.richtung === 'ueber'
+      ? `${top.label} ist zwar Rang 1, gehört aber zu keiner chronologischen Supplement-Protokollgruppe. Starte deshalb keine der anderen vier Gruppen.`
+      : 'Rang 1 liegt nicht über dem Referenzmittel. Daraus wird kein Supplement-Protokoll gestartet.', 'app');
+  } else if (active.suggestedPhase < 4) {
+    add('supplements', `Nur ${active.label}, Phase ${active.suggestedPhase}, ist jetzt aktiv. Die vier anderen Gruppen werden lediglich beobachtet.`, 'seminar');
+  } else if (!protocols.length) {
+    add('supplements', 'Phase 4+ ist erreicht, aber noch keine Variante ist durch deine Antworten eindeutig bestätigt. Starte noch keine neue Supplement-Kombination.', 'app');
+    if (yes(context.sleepOnset) && !yes(context.bravermanCompleted)) {
+      add('supplements', 'Du hast ein Einschlafproblem angegeben. Schließe zusätzlich das Braverman-Defizitprofil ab, bevor die App GABA- und Serotoninvarianten des Seminars unterscheidet.', 'app');
+    }
+  } else if (protocols.length === 1) {
+    add('supplements', `Als einzige aktuelle Seminar-Option passt „${protocols[0].name}“. Prüfe Dosierung, Medikamente und Kontraindikationen vor der Einnahme fachlich.`, 'seminar');
+  } else {
+    add('supplements', 'Mehrere Phase-4+-Bedingungen treffen zu. Sie sind Alternativen, keine gemeinsame Einnahmeanweisung; wähle sie erst nach fachlicher Prüfung.', 'app');
+  }
+
+  const required = [...requiredQuestionIds];
+  const unansweredQuestionIds = required.filter((id) => !answered(context[id]));
+  const focusTitle = active
+    ? `${active.label}: nur Phase ${active.suggestedPhase === 4 ? '4+' : active.suggestedPhase} bearbeiten`
+    : top.richtung === 'ueber'
+      ? `${top.label}: Gegenprüfungen bearbeiten, kein Supplement-Protokoll starten`
+      : `${top.label}: Verlauf beobachten, kein Fettabbau-Protokoll starten`;
+  return {
+    focusTitle,
+    summary: active
+      ? `Priorität 1 ist ${top.label}. Nur die zugehörige Gruppe ${active.label} ist aktiv; die übrigen vier Gruppen sind derzeit reine Beobachtung.`
+      : `Priorität 1 ist ${top.label}. Daraus wird aktuell keine andere Protokollgruppe ersatzweise aktiviert.`,
+    requiredQuestionIds: required,
+    unansweredQuestionIds,
+    categories,
+    protocols,
   };
 }
 

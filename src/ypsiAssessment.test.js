@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   assessSkinfoldPriorities,
   buildSkinfoldPlan,
+  buildSkinfoldActionPlan,
   buildSkinfoldRelationships,
   bravermanComplete,
   bravermanRecommendations,
@@ -67,7 +68,7 @@ describe('YPSI-Hautfaltenprioritäten', () => {
 
   it('steigert eine wiederkehrende Priorität chronologisch und verzweigt erst in Phase 4', () => {
     const history = [1, 2, 3, 4].map((day) => ({ gemessen_am: `2026-0${day}-01`, falten: folds }));
-    const plan = buildSkinfoldPlan(history, 'male', { recentEnergy: 4, digestiveSymptoms: true });
+    const plan = buildSkinfoldPlan(history, 'male', { wakesFit: true, digestiveSymptoms: true });
     expect(plan.topFold.slug).toBe('bauch');
     expect(plan.priorities[0]).toMatchObject({ id: 'bauch-brust-trizeps', suggestedPhase: 4, occurrences: 4 });
     expect(plan.priorities[0].recommendedProtocols.map((item) => item.id)).toContain('bauch-brust-trizeps-phase-4-chlorella');
@@ -161,6 +162,27 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     ];
     const plan = buildSkinfoldPlan(history, 'male');
     expect(plan.priorities[0]).toMatchObject({ id: 'quad-beinbizeps', suggestedPhase: 2, occurrences: 2 });
+  });
+
+  it('macht nur die aktive Rang-1-Gruppe zum umsetzbaren Handlungsplan', () => {
+    const plan = buildSkinfoldPlan([{ gemessen_am: '2026-09-14', falten: folds }], 'male', {});
+    const actions = buildSkinfoldActionPlan(plan, {});
+    expect(actions.focusTitle).toContain('nur Phase 1 bearbeiten');
+    expect(actions.summary).toContain('übrigen vier Gruppen');
+    expect(actions.categories.supplements[0].text).toContain('Nur Bauch, Brust & Trizeps, Phase 1');
+    expect(actions.unansweredQuestionIds).toEqual(expect.arrayContaining(['stressHigh', 'sleepOnset', 'digestiveSymptoms']));
+  });
+
+  it('liefert je nach Schlafantwort andere konkrete Schritte', () => {
+    const history = [{ gemessen_am: '2026-09-14', falten: { ...folds, bauch: 4, wade: 100 } }];
+    const onsetContext = { sleepOnset: true, sleepMaintenance: false, wakes3to7: false, caffeineLate: true, alcoholNearBed: false, snoringBreathing: false };
+    const maintenanceContext = { sleepOnset: false, sleepMaintenance: true, wakes3to7: true, caffeineLate: false, alcoholNearBed: true, snoringBreathing: false };
+    const onset = buildSkinfoldActionPlan(buildSkinfoldPlan(history, 'male', onsetContext), onsetContext);
+    const maintenance = buildSkinfoldActionPlan(buildSkinfoldPlan(history, 'male', maintenanceContext), maintenanceContext);
+    expect(onset.categories.sleep.some((item) => item.text.includes('Stimulus-Kontrolle'))).toBe(true);
+    expect(onset.categories.sleep.some((item) => item.text.includes('Koffein'))).toBe(true);
+    expect(maintenance.categories.sleep.some((item) => item.text.includes('Wachphasen'))).toBe(true);
+    expect(maintenance.categories.sleep.some((item) => item.text.includes('3–7 Uhr'))).toBe(true);
   });
 
   it('aktiviert wiederholungsabhängige Beinvarianten nur bei tatsächlich priorisierter Beinfalte', () => {
