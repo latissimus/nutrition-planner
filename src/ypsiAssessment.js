@@ -703,10 +703,10 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
   const protocols = active?.recommendedProtocols || [];
   if (!active) {
     add('supplements', top.richtung === 'ueber'
-      ? `${top.label} ist zwar Rang 1, gehört aber zu keiner chronologischen Supplement-Protokollgruppe. Starte deshalb keine der anderen vier Gruppen.`
-      : 'Rang 1 liegt nicht über dem Referenzmittel. Daraus wird kein Supplement-Protokoll gestartet.', 'app');
+      ? `Für ${top.label} ergibt sich aus dieser Messung kein eigener Supplement-Schritt.`
+      : 'Aus dieser Messung ergibt sich aktuell kein Supplement-Schritt.', 'app');
   } else if (active.suggestedPhase < 4) {
-    add('supplements', `Nur ${active.label}, Phase ${active.suggestedPhase}, ist jetzt aktiv. Die vier anderen Gruppen werden lediglich beobachtet.`, 'seminar');
+    add('supplements', `Phase ${active.suggestedPhase} ist dein aktueller Supplement-Schritt. Prüfe die aufgeführten Produkte, Dosierungen und persönlichen Kontraindikationen vor der Einnahme.`, 'seminar');
   } else if (!protocols.length) {
     add('supplements', 'Phase 4+ ist erreicht, aber noch keine Variante ist durch deine Antworten eindeutig bestätigt. Starte noch keine neue Supplement-Kombination.', 'app');
     if (yes(context.sleepOnset) && !yes(context.bravermanCompleted)) {
@@ -721,15 +721,15 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
   const required = [...requiredQuestionIds];
   const unansweredQuestionIds = required.filter((id) => !answered(context[id]));
   const focusTitle = active
-    ? `${active.label}: nur Phase ${active.suggestedPhase === 4 ? '4+' : active.suggestedPhase} bearbeiten`
+    ? `${top.label}: Phase ${active.suggestedPhase === 4 ? '4+' : active.suggestedPhase}`
     : top.richtung === 'ueber'
       ? `${top.label}: Gegenprüfungen bearbeiten, kein Supplement-Protokoll starten`
       : `${top.label}: Verlauf beobachten, kein Fettabbau-Protokoll starten`;
   return {
     focusTitle,
     summary: active
-      ? `Priorität 1 ist ${top.label}. Nur die zugehörige Gruppe ${active.label} ist aktiv; die übrigen vier Gruppen sind derzeit reine Beobachtung.`
-      : `Priorität 1 ist ${top.label}. Daraus wird aktuell keine andere Protokollgruppe ersatzweise aktiviert.`,
+      ? `${top.label} ist deine aktuelle Priorität. Die Empfehlungen berücksichtigen die zugehörigen Faltenwerte und deine beantworteten Kontextfragen.`
+      : `${top.label} ist deine aktuelle Priorität. Aus dieser Messung ergibt sich kein eigener Supplement-Schritt.`,
     requiredQuestionIds: required,
     unansweredQuestionIds,
     categories,

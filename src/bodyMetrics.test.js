@@ -60,7 +60,9 @@ describe('Hautfaltenverlauf', () => {
     expect(markup.match(/enterkeyhint="next"/g)).toHaveLength(FALTEN.length - 1);
     expect(markup.match(/enterkeyhint="done"/g)).toHaveLength(1);
     expect(markup).toContain('data-skinfold-weight');
+    expect(markup).toContain('data-skinfold-basis');
     expect(markup).toContain('Alle drei bis vier Wochen');
+    expect(skinfoldEntryMarkup('', '', 'female')).toContain('<option value="female" selected>Weiblich</option>');
   });
 
   it('rechnet das Knie in die Summe, Oberschenkel und Bizeps aber nicht', () => {

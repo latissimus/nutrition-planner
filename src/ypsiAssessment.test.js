@@ -164,12 +164,12 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     expect(plan.priorities[0]).toMatchObject({ id: 'quad-beinbizeps', suggestedPhase: 2, occurrences: 2 });
   });
 
-  it('macht nur die aktive Rang-1-Gruppe zum umsetzbaren Handlungsplan', () => {
+  it('macht nur die aktuelle Priorität zum umsetzbaren Handlungsplan', () => {
     const plan = buildSkinfoldPlan([{ gemessen_am: '2026-09-14', falten: folds }], 'male', {});
     const actions = buildSkinfoldActionPlan(plan, {});
-    expect(actions.focusTitle).toContain('nur Phase 1 bearbeiten');
-    expect(actions.summary).toContain('übrigen vier Gruppen');
-    expect(actions.categories.supplements[0].text).toContain('Nur Bauch, Brust & Trizeps, Phase 1');
+    expect(actions.focusTitle).toContain('Phase 1');
+    expect(actions.summary).toContain('aktuelle Priorität');
+    expect(actions.categories.supplements[0].text).toContain('Phase 1 ist dein aktueller Supplement-Schritt');
     expect(actions.unansweredQuestionIds).toEqual(expect.arrayContaining(['stressHigh', 'sleepOnset', 'digestiveSymptoms']));
   });
 
