@@ -11890,3 +11890,185 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#111!important;
   border-bottom-color:#111!important;
 }
+
+/* ============================================================
+   DARKMODE · Seitenebene (nach dem Vorbild der LOGMAN-App)
+
+   Die Hülle und die App-Tokens schalten bereits korrekt um. Die
+   seitenbezogenen Blöcke weiter oben verdrahten ihre Flächen, Texte und
+   Ränder aber fest (#fff / #111 / #000, überwiegend mit !important) und
+   erreichen den Token-Tausch dadurch nicht – die Karten bleiben hell auf
+   dunklem Grund. Dieser Abschnitt holt genau das nach.
+
+   Er steht bewusst am Dateiende: Bei gleicher Spezifität
+   ([data-theme] und [data-seite] sind beides Attributselektoren auf :root)
+   entscheidet die Quellreihenfolge, und unter !important-Regeln gewinnt
+   ebenfalls die spätere.
+
+   Prinzip wie im LOGMAN:
+   – Flächen auf --app-card, eingelassene Felder auf --app-field
+   – Konturen auf --app-outline: im Dunkeln ruhiger, nicht härter
+   – Text auf --text, Nebentext auf --muted
+   – Akzentfarben der Seiten bleiben unangetastet ("sie sind die Marke")
+   ============================================================ */
+
+/* --- COMP: tragende Flächen ------------------------------------------- */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero,
+  .body-v2-card,
+  .body-v2-overview,
+  .body-v2-card-body,
+  .body-v2-overview .body-v2-card-body,
+  .body-analysis-help
+){
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* Kopfzeilen der Karten tragen im Hellen eine Tönung der Seitenfarbe.
+   Im Dunkeln übernimmt das eingelassene Feld diese Rolle. */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-overview>summary,
+  .body-v2-card>header
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* --- COMP: eingelassene Felder, Kacheln, Listen ----------------------- */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-chart-empty,
+  .body-goal-status,
+  .body-threshold-explanation,
+  .body-neutral-note,
+  .body-latest-value,
+  .body-weight-history>ol,
+  .guided-fold-grid fieldset,
+  .braverman-result-focus,
+  .braverman-intro,
+  .falten-legende-item,
+  .falten-detail-status,
+  .falten-protokoll-item,
+  .ypsi-priority-block,
+  .ypsi-priority-empty
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-metric-grid,
+  .bodycomp-sources,
+  .neurotransmitter-other-scores
+)>span{
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+}
+
+/* --- COMP: Text ------------------------------------------------------- */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero-value strong,
+  .body-v2-hero-value b,
+  .body-latest-value strong,
+  .body-metric-grid b,
+  .bodycomp-sources b,
+  .braverman-result-focus>b,
+  .braverman-result-focus>div>b,
+  .body-goal-status b,
+  .body-inner-details>summary,
+  .body-analysis-help b,
+  .body-explain b,
+  .body-chart-legend b,
+  .body-weight-history li,
+  .body-weight-history li>b,
+  .falten-detail-section h3,
+  .falten-item-head b,
+  .neurotransmitter-other-scores b
+){
+  color:var(--text)!important;
+}
+
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero-value>small,
+  .body-explain,
+  .body-chart-block>header>small,
+  .body-chart-legend,
+  .body-chart-empty>span,
+  .body-latest-value>span,
+  .body-threshold-explanation>p,
+  .body-goal-status span,
+  .body-inner-details>p,
+  .body-weight-history time,
+  .body-metric-grid small,
+  .bodycomp-sources>span,
+  .body-skinfold-history dt,
+  .body-legende-intro,
+  .body-legende-disclaimer,
+  .falten-detail-hinweis,
+  .falten-detail-quelle,
+  .falten-detail-disclaimer,
+  .neurotransmitter-note,
+  .braverman-result-focus>span,
+  .neurotransmitter-other-scores em,
+  .falten-item-head small
+){
+  color:var(--muted)!important;
+}
+
+/* --- COMP: Trennlinien ------------------------------------------------ */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-inner-details,
+  .body-info,
+  .braverman-result>.falten-detail-section
+){
+  border-top-color:var(--app-divider)!important;
+}
+
+:root[data-theme="dark"][data-seite="body"] .body-weight-history li{
+  border-bottom-color:var(--app-divider)!important;
+}
+
+:root[data-theme="dark"][data-seite="body"] .body-skinfold-history dl>div{
+  border-top-color:var(--app-divider)!important;
+}
+
+/* --- COMP: Formulare -------------------------------------------------- */
+:root[data-theme="dark"][data-seite="body"] .body-entry-form :is(
+  input:not([type="checkbox"]):not([type="file"]),
+  select,
+  .input,
+  .falten-summe
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* --- COMP: Sheets ----------------------------------------------------- */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .falten-detail-sheet,
+  .braverman-sheet,
+  .body-entry-sheet
+){
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+}
+
+:root[data-theme="dark"][data-seite="body"] :is(
+  .falten-detail-header h2,
+  .falten-detail-body,
+  .braverman-test-body
+){
+  color:var(--text)!important;
+}
+
+/* Der harte Retro-Versatz braucht auf Navy einen helleren Eigenwert,
+   sonst verschwindet er im Grund. */
+:root[data-theme="dark"][data-seite="body"] .body-reset-mini{
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
