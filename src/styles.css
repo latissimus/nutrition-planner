@@ -12161,3 +12161,193 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--app-card)!important;
   color:var(--text)!important;
 }
+
+/* ============================================================
+   DARKMODE · global, seitenübergreifend
+
+   Vorbild LOGMAN: Im Dunkeln gibt es keine farbigen Karten mehr. Flächen,
+   Ränder und Schrift sind durchgehend neutral; die Seitenfarbe überlebt nur
+   noch auf Chips, Buttons und aktiven Zuständen. Das hält jede Route optisch
+   identisch und macht die Seitenidentität zur Akzentfarbe statt zur Fläche.
+
+   Der Hebel sind die Seiten-Tokens: --cap-card, --cap-tint und
+   --cap-card-border werden pro Seite in :root[data-seite="…"] gesetzt. Einmal
+   hier neu definiert, ziehen alle Karten aller Seiten mit.
+   ============================================================ */
+:root[data-theme="dark"]{
+  --cap-card:var(--app-card);
+  --cap-tint:var(--app-field);
+  --cap-card-border:1.5px solid var(--app-outline);
+  --cap-muted:var(--muted);
+  /* Das Logo bleibt auf jeder Route identisch; die Silhouette ist über
+     --sil-filter im Basis-Dark-Block bereits auf Weiß gedreht. */
+  --brand-outline:#0A1330;
+}
+
+/* --- Flächen ---------------------------------------------------------- */
+:root[data-theme="dark"] :is(
+  .dex-inhaltskarte,
+  .dex-ordner-test,
+  .dex-detail-popup,
+  .dex-leer-symbol,
+  .profile-abschnitt,
+  .routine-zeitblock,
+  .sleep-checkin-overview,
+  .sleep-tonight,
+  .sleep-section,
+  .einkauf-gruppe,
+  .einkauf-row,
+  .coin-verdienst,
+  .coin-next,
+  .coin-reward,
+  .coin-empty,
+  .coin-balance-card,
+  .nutrition-card,
+  .nutrition-coin-hero,
+  .mahl-timeline,
+  .kategorie-sheet,
+  .special-dex-sheet
+){
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* Eingelassenes: Zeilen, Vorschauen, Eingaben, Schalter. */
+:root[data-theme="dark"] :is(
+  .einkauf-row-inhalt,
+  .dex-inhaltskarte-vorschau,
+  .dex-detail-zutaten,
+  .profile-abschnitt>summary,
+  .routine-zeitblock>header,
+  .switchline-track,
+  .input
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* --- Schrift ---------------------------------------------------------- */
+/* Überschriften tragen im Hellen die Seitenfarbe. Im Dunkeln sind sie weiß –
+   sonst steht buntes Pink oder Creme auf Navy und wirkt wie ein Fehler. */
+:root[data-theme="dark"] :is(
+  .dex-inhaltskarte,
+  .dex-detail-popup,
+  .profile-abschnitt,
+  .routine-zeitblock,
+  .sleep-checkin-overview,
+  .einkauf-gruppe,
+  .coin-verdienst,
+  .nutrition-card,
+  .body-v2-card,
+  .body-v2-overview,
+  .kategorie-sheet
+) :is(h1,h2,h3,h4,b,strong,summary,dt,legend){
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] :is(.dex-sammlungskopf,.dex-seitentitel,.section-title){
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] :is(small,.dex-inhaltskarte-quelle,.dex-meta,figcaption){
+  color:var(--muted)!important;
+}
+
+/* --- Ränder ----------------------------------------------------------- */
+/* Keine farbigen Kartenränder mehr: im Dunkeln durchgehend gedeckt. */
+:root[data-theme="dark"] :is(
+  .body-v2-hero,
+  .body-v2-card,
+  .body-v2-overview,
+  .dex-inhaltskarte,
+  .routine-zeitblock,
+  .coin-verdienst,
+  .coin-next,
+  .coin-reward,
+  .coin-balance-card,
+  .sleep-tonight,
+  .sleep-checkin-overview,
+  .sleep-section,
+  .profile-abschnitt,
+  .nutrition-card,
+  .body-reset-mini
+){
+  border-color:var(--app-outline)!important;
+}
+
+/* --- Chips und Buttons: hier bleibt Farbe ----------------------------- */
+/* Neutrale Filter-Chips werden dunkel, der aktive behält seinen Akzent. */
+:root[data-theme="dark"] :is(.neo-dex-filter,.food-dex-filter) button,
+:root[data-theme="dark"] .dex-sammlungskopf button{
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+:root[data-theme="dark"] :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
+  background:var(--dex-accent,var(--dex-ink,var(--app-field)))!important;
+  color:var(--dex-accent-ink,var(--text))!important;
+  border-color:var(--dex-accent,var(--dex-ink,var(--app-outline)))!important;
+}
+
+/* Der aktive Tab war je nach Route mal hell, mal dunkel. Im Dunkeln trägt er
+   überall dieselbe eingelassene Fläche mit gedecktem Rand. */
+:root[data-theme="dark"] .app-dex-tab.aktiv{
+  background:var(--app-field)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+
+/* --- COMP: Regeln mit aufgeblähter :is()-Spezifität überschreiben ------ */
+/* Die beiden Regeln, die Rand und Überschriften auf die Seitenfarbe setzen,
+   führen in ihrer :is()-Liste sehr spezifische Einträge mit
+   (`.body-entry-form input:not([type="checkbox"]):not([type="file"])`,
+   `.body-v2-overview>summary b`). :is() erbt die Spezifität seines stärksten
+   Arguments – die Regeln wiegen dadurch (0,5,1) beziehungsweise (0,3,2) und
+   schlagen jede kürzer geschriebene Gegenregel.
+   Die Listen werden deshalb hier 1:1 gespiegelt: gleiche Spezifität, spätere
+   Quellposition, und beim Lesen ist sofort sichtbar, was überschrieben wird. */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero,
+  .body-v2-overview,
+  .body-v2-card,
+  .body-analysis-help,
+  .body-reset-mini,
+  .guided-fold-grid fieldset,
+  .body-entry-form input:not([type="checkbox"]):not([type="file"]),
+  .body-entry-form select,
+  .body-entry-form .input,
+  .body-entry-form .falten-summe,
+  .body-entry-form .btn-primary
+){
+  border-color:var(--app-outline)!important;
+}
+
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero-value>small,
+  .body-v2-hero-value strong,
+  .body-v2-hero-value b,
+  .body-v2-overview>summary b,
+  .body-v2-card>header b,
+  .body-v2-overview>summary>.material-svg,
+  .body-v2-card-body>.mini-title,
+  .bodycomp-message,
+  .body-latest-value>strong,
+  .body-chart-block>header>b,
+  .body-analysis-help b,
+  .body-explain b,
+  .body-chart-legend b,
+  .body-goal-status b,
+  .body-inner-details>summary
+){
+  color:var(--text)!important;
+}
+
+/* Der Hero-Ring: die weiße Innenfläche liegt auf ::after. */
+:root[data-theme="dark"] .body-v2-ring::after,
+:root[data-theme="dark"] .body-v2-ring>span{
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] .body-v2-ring :is(b,small){
+  color:var(--text)!important;
+}
