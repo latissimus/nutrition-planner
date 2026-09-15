@@ -12072,3 +12072,92 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--text)!important;
   border-color:var(--app-outline)!important;
 }
+
+/* --- Hülle: Header, Dock und Tabs ------------------------------------- */
+/* Die seitenbezogenen Blöcke färben Header und Dock in der jeweiligen
+   Dex-Farbe (54 bzw. 60 Regeln, alle mit !important). Im Dark Mode trägt die
+   Hülle dagegen überall dasselbe Navy – so wie im LOGMAN. Die Seitenfarbe
+   bleibt in --dex-seitenfarbe erhalten und markiert weiterhin den aktiven Tab
+   und kontextbezogene Bedienelemente. */
+:root[data-theme="dark"] .app-dex-header{
+  background:var(--bg)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+  --dex-ink:var(--text);
+  --brand-outline:#0A1330;
+}
+:root[data-theme="dark"] .app-dex-header .nav-av{
+  background:var(--app-field)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] .app-dex-dock{
+  color:var(--text)!important;
+  --dex-ink:var(--text);
+}
+:root[data-theme="dark"] .app-dex-dock::after{
+  background:var(--bg)!important;
+}
+:root[data-theme="dark"] .app-dex-dock-inner::before{
+  background:color-mix(in srgb,var(--app-card) 88%,transparent)!important;
+  border-color:var(--app-outline)!important;
+}
+:root[data-theme="dark"] .app-dex-tab{
+  color:var(--muted)!important;
+}
+/* Der aktive Tab bleibt die Ausnahme: hier trägt die Seitenfarbe weiter. */
+:root[data-theme="dark"] .app-dex-tab.aktiv{
+  color:var(--text)!important;
+}
+
+/* --- Hülle: Seitenfläche ---------------------------------------------- */
+/* Jede Dex-Seite streicht Wurzel, body und ihre eigene Seitenfläche mit
+   --dex-seitenfarbe. Im Dark Mode trägt stattdessen überall --bg. Die
+   Seitenfarbe bleibt als Token erhalten und wirkt weiter auf Akzente. */
+:root[data-theme="dark"],
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] #app,
+:root[data-theme="dark"] #view{
+  background:var(--bg)!important;
+}
+:root[data-theme="dark"] :is(
+  .special-dex-page,
+  .body-log-dex-page,
+  .coin-dex-page,
+  .food-dex-page,
+  .meal-log-dex-page,
+  .neo-dex-page,
+  .routine-dex-page,
+  .shopping-dex-page,
+  .sleep-dex-page,
+  .sleep-log-dex-page,
+  .training-dex-page
+){
+  background:var(--bg)!important;
+  color:var(--text)!important;
+}
+
+/* Die Tapeten sind überwiegend schwarz gezeichnet und würden auf Navy
+   absaufen. --tapeten-schleier hebt sie im Dark-Block bereits an; hier bleibt
+   nur, die Fläche darunter nicht erneut hell zu überstreichen. */
+:root[data-theme="dark"] :is(
+  .body-log-dex-page,
+  .routine-dex-page,
+  .sleep-log-dex-page,
+  .meal-log-dex-page
+)::before{
+  background:var(--bg)!important;
+}
+
+/* Der Ring im Hero trägt eine weiße Innenfläche – auf Navy wäre der Wert
+   darin unlesbar. */
+:root[data-theme="dark"] :is(
+  .body-v2-ring,
+  .body-v2-ring::after,
+  .routine-progress-ring::after,
+  .sleep-duration-ring::after,
+  .nutrition-ring::after
+){
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+}

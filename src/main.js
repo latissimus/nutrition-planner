@@ -15,7 +15,7 @@ import '@fontsource/figtree/latin-800.css';
 // JetBrains Mono (OFL 1.1) for technical values and metadata.
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
-import { getTheme, applyTheme, setTheme } from './theme.js';
+import { getTheme, applyTheme, setTheme, huelleEinfaerben } from './theme.js';
 import { capboyMarkup } from './brand.js';
 import {
   coinDexIsVisible, customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes,
@@ -353,10 +353,7 @@ function dexLookAusAnsichtWiederherstellen(node) {
     const value = node.style.getPropertyValue(property).trim();
     if (value) root.style.setProperty(property, value);
   });
-  root.style.setProperty('--bg', color);
-  root.style.setProperty('--app-bg', color);
-  root.style.setProperty('--app-content-bg', color);
-  root.style.setProperty('--app-chrome-bg', color);
+  huelleEinfaerben(root, color);
   root.style.setProperty('--food-page-purple', color);
   const wallpaper = node.style.getPropertyValue('--dex-tapete').trim();
   if (wallpaper) root.style.setProperty('--dex-tapete', wallpaper);

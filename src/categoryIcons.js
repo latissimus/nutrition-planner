@@ -1,5 +1,6 @@
 import { toast } from './toast.js';
 import { getPreference, setPreference } from './userPreferences.js';
+import { huelleEinfaerben } from './theme.js';
 
 const modules = import.meta.glob('../MUSCLEDEX-ICONS/*.svg', {
   query: '?raw', import: 'default', eager: true,
@@ -315,10 +316,7 @@ function writePageLook(target, look) {
   target.style.setProperty('--dex-accent-ink', accentInk);
   target.style.setProperty('--ordner', accent);
   target.style.setProperty('--ordner-ink', accentInk);
-  target.style.setProperty('--bg', look.color);
-  target.style.setProperty('--app-bg', look.color);
-  target.style.setProperty('--app-content-bg', look.color);
-  target.style.setProperty('--app-chrome-bg', look.color);
+  huelleEinfaerben(target, look.color);
   target.style.setProperty('--food-page-purple', look.color);
   target.dataset.dexMuster = look.pattern;
   const wallpaper = pagePatterns.find(([id]) => id === look.pattern)?.[2];

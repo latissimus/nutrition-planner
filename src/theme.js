@@ -18,6 +18,40 @@ export const THEMES = ['retro', 'dark'];
 
 export const gueltig = (theme) => (THEMES.includes(theme) ? theme : 'retro');
 
+// Die vier Tokens, die Seitenflaeche, Header und Dock einfaerben. Im Retro-Look
+// traegt sie jede Dex-Seite in ihrer eigenen Farbe; im Dark Mode bleibt die
+// Huelle dagegen ueberall dasselbe tiefe Navy, und die Seitenfarben markieren
+// nur noch aktiven Tab und kontextbezogene Bedienelemente.
+//
+// Sie werden per JS inline auf :root gesetzt. Inline schlaegt jede
+// Stylesheet-Regel ohne !important – deshalb laesst sich das nicht in CSS
+// loesen, sondern nur an der Quelle.
+export const HUELLEN_TOKENS = Object.freeze([
+  '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg',
+]);
+
+/* Reine Entscheidung, damit sie ohne DOM pruefbar bleibt: Rueckgabe ist die zu
+   setzende Farbe – oder null, wenn die Tokens weichen sollen. */
+export function huellenFarbe(theme, farbe) {
+  const wert = String(farbe || '').trim();
+  return gueltig(theme) === 'dark' || !wert ? null : wert;
+}
+
+export function huelleFolgtSeitenfarbe() {
+  return document.documentElement.dataset.theme !== 'dark';
+}
+
+/* Setzt die Huellen-Tokens auf die Seitenfarbe – oder raeumt sie weg, damit im
+   Dark Mode der Wert aus dem Stylesheet stehen bleibt. */
+export function huelleEinfaerben(target, farbe) {
+  if (!target) return;
+  const wert = huellenFarbe(document.documentElement.dataset.theme, farbe);
+  HUELLEN_TOKENS.forEach((token) => {
+    if (wert) target.style.setProperty(token, wert);
+    else target.style.removeProperty(token);
+  });
+}
+
 export function getTheme() {
   try { return gueltig(localStorage.getItem(KEY)); }
   catch (e) { return 'retro'; }
@@ -101,6 +135,13 @@ export function applyTheme(theme) {
   delete document.documentElement.dataset.schatten;
   try { localStorage.removeItem('nutrition:schatten'); } catch (e) { /* optionaler Altwert */ }
   document.documentElement.dataset.theme = wert;
+  // Beim Umschalten die inline gesetzten Huellen-Tokens neu bewerten: nach Dark
+  // fallen sie weg, zurueck nach Retro bekommen sie die Seitenfarbe wieder.
+  // Sonst bliebe die alte Huelle bis zum naechsten Seitenwechsel stehen.
+  huelleEinfaerben(
+    document.documentElement,
+    document.documentElement.style.getPropertyValue('--dex-seitenfarbe').trim(),
+  );
   requestAnimationFrame(() => {
     // theme-color folgt nur noch dem Theme. Der Vorbehalt gegen offene Overlays
     // ist entfallen, weil kein Overlay die Farbe mehr ueberschreibt.
