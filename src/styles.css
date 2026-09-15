@@ -11892,489 +11892,53 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* ============================================================
-   DARKMODE · Seitenebene (nach dem Vorbild der LOGMAN-App)
-
-   Die Hülle und die App-Tokens schalten bereits korrekt um. Die
-   seitenbezogenen Blöcke weiter oben verdrahten ihre Flächen, Texte und
-   Ränder aber fest (#fff / #111 / #000, überwiegend mit !important) und
-   erreichen den Token-Tausch dadurch nicht – die Karten bleiben hell auf
-   dunklem Grund. Dieser Abschnitt holt genau das nach.
-
-   Er steht bewusst am Dateiende: Bei gleicher Spezifität
-   ([data-theme] und [data-seite] sind beides Attributselektoren auf :root)
-   entscheidet die Quellreihenfolge, und unter !important-Regeln gewinnt
-   ebenfalls die spätere.
-
-   Prinzip wie im LOGMAN:
-   – Flächen auf --app-card, eingelassene Felder auf --app-field
-   – Konturen auf --app-outline: im Dunkeln ruhiger, nicht härter
-   – Text auf --text, Nebentext auf --muted
-   – Akzentfarben der Seiten bleiben unangetastet ("sie sind die Marke")
-   ============================================================ */
-
-/* --- COMP: tragende Flächen ------------------------------------------- */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-v2-hero,
-  .body-v2-card,
-  .body-v2-overview,
-  .body-v2-card-body,
-  .body-v2-overview .body-v2-card-body,
-  .body-analysis-help
-){
-  background:var(--app-card)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-/* Kopfzeilen der Karten tragen im Hellen eine Tönung der Seitenfarbe.
-   Im Dunkeln übernimmt das eingelassene Feld diese Rolle. */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-v2-overview>summary,
-  .body-v2-card>header
-){
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-/* --- COMP: eingelassene Felder, Kacheln, Listen ----------------------- */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-chart-empty,
-  .body-goal-status,
-  .body-threshold-explanation,
-  .body-neutral-note,
-  .body-latest-value,
-  .body-weight-history>ol,
-  .guided-fold-grid fieldset,
-  .braverman-result-focus,
-  .braverman-intro,
-  .falten-legende-item,
-  .falten-detail-status,
-  .falten-protokoll-item,
-  .ypsi-priority-block,
-  .ypsi-priority-empty
-){
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-metric-grid,
-  .bodycomp-sources,
-  .neurotransmitter-other-scores
-)>span{
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-}
-
-/* --- COMP: Text ------------------------------------------------------- */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-v2-hero-value strong,
-  .body-v2-hero-value b,
-  .body-latest-value strong,
-  .body-metric-grid b,
-  .bodycomp-sources b,
-  .braverman-result-focus>b,
-  .braverman-result-focus>div>b,
-  .body-goal-status b,
-  .body-inner-details>summary,
-  .body-analysis-help b,
-  .body-explain b,
-  .body-chart-legend b,
-  .body-weight-history li,
-  .body-weight-history li>b,
-  .falten-detail-section h3,
-  .falten-item-head b,
-  .neurotransmitter-other-scores b
-){
-  color:var(--text)!important;
-}
-
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-v2-hero-value>small,
-  .body-explain,
-  .body-chart-block>header>small,
-  .body-chart-legend,
-  .body-chart-empty>span,
-  .body-latest-value>span,
-  .body-threshold-explanation>p,
-  .body-goal-status span,
-  .body-inner-details>p,
-  .body-weight-history time,
-  .body-metric-grid small,
-  .bodycomp-sources>span,
-  .body-skinfold-history dt,
-  .body-legende-intro,
-  .body-legende-disclaimer,
-  .falten-detail-hinweis,
-  .falten-detail-quelle,
-  .falten-detail-disclaimer,
-  .neurotransmitter-note,
-  .braverman-result-focus>span,
-  .neurotransmitter-other-scores em,
-  .falten-item-head small
-){
-  color:var(--muted)!important;
-}
-
-/* --- COMP: Trennlinien ------------------------------------------------ */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-inner-details,
-  .body-info,
-  .braverman-result>.falten-detail-section
-){
-  border-top-color:var(--app-divider)!important;
-}
-
-:root[data-theme="dark"][data-seite="body"] .body-weight-history li{
-  border-bottom-color:var(--app-divider)!important;
-}
-
-:root[data-theme="dark"][data-seite="body"] .body-skinfold-history dl>div{
-  border-top-color:var(--app-divider)!important;
-}
-
-/* --- COMP: Formulare -------------------------------------------------- */
-:root[data-theme="dark"][data-seite="body"] .body-entry-form :is(
-  input:not([type="checkbox"]):not([type="file"]),
-  select,
-  .input,
-  .falten-summe
-){
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-/* --- COMP: Sheets ----------------------------------------------------- */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .falten-detail-sheet,
-  .braverman-sheet,
-  .body-entry-sheet
-){
-  background:var(--app-card)!important;
-  color:var(--text)!important;
-}
-
-:root[data-theme="dark"][data-seite="body"] :is(
-  .falten-detail-header h2,
-  .falten-detail-body,
-  .braverman-test-body
-){
-  color:var(--text)!important;
-}
-
-/* Der harte Retro-Versatz braucht auf Navy einen helleren Eigenwert,
-   sonst verschwindet er im Grund. */
-:root[data-theme="dark"][data-seite="body"] .body-reset-mini{
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-/* --- Hülle: Header, Dock und Tabs ------------------------------------- */
-/* Die seitenbezogenen Blöcke färben Header und Dock in der jeweiligen
-   Dex-Farbe (54 bzw. 60 Regeln, alle mit !important). Im Dark Mode trägt die
-   Hülle dagegen überall dasselbe Navy – so wie im LOGMAN. Die Seitenfarbe
-   bleibt in --dex-seitenfarbe erhalten und markiert weiterhin den aktiven Tab
-   und kontextbezogene Bedienelemente. */
-:root[data-theme="dark"] .app-dex-header{
-  background:var(--bg)!important;
-  border-color:var(--app-outline)!important;
-  color:var(--text)!important;
-  --dex-ink:var(--text);
-  --brand-outline:#0A1330;
-}
-:root[data-theme="dark"] .app-dex-header .nav-av{
-  background:var(--app-field)!important;
-  border-color:var(--app-outline)!important;
-  color:var(--text)!important;
-}
-:root[data-theme="dark"] .app-dex-dock{
-  color:var(--text)!important;
-  --dex-ink:var(--text);
-}
-:root[data-theme="dark"] .app-dex-dock::after{
-  background:var(--bg)!important;
-}
-:root[data-theme="dark"] .app-dex-dock-inner::before{
-  background:color-mix(in srgb,var(--app-card) 88%,transparent)!important;
-  border-color:var(--app-outline)!important;
-}
-:root[data-theme="dark"] .app-dex-tab{
-  color:var(--muted)!important;
-}
-/* Der aktive Tab bleibt die Ausnahme: hier trägt die Seitenfarbe weiter. */
-:root[data-theme="dark"] .app-dex-tab.aktiv{
-  color:var(--text)!important;
-}
-
-/* --- Hülle: Seitenfläche ---------------------------------------------- */
-/* Jede Dex-Seite streicht Wurzel, body und ihre eigene Seitenfläche mit
-   --dex-seitenfarbe. Im Dark Mode trägt stattdessen überall --bg. Die
-   Seitenfarbe bleibt als Token erhalten und wirkt weiter auf Akzente. */
-:root[data-theme="dark"],
-:root[data-theme="dark"] body,
-:root[data-theme="dark"] #app,
-:root[data-theme="dark"] #view{
-  background:var(--bg)!important;
-}
-:root[data-theme="dark"] :is(
-  .special-dex-page,
-  .body-log-dex-page,
-  .coin-dex-page,
-  .food-dex-page,
-  .meal-log-dex-page,
-  .neo-dex-page,
-  .routine-dex-page,
-  .shopping-dex-page,
-  .sleep-dex-page,
-  .sleep-log-dex-page,
-  .training-dex-page
-){
-  background:var(--bg)!important;
-  color:var(--text)!important;
-}
-
-/* Die Tapeten sind überwiegend schwarz gezeichnet und würden auf Navy
-   absaufen. --tapeten-schleier hebt sie im Dark-Block bereits an; hier bleibt
-   nur, die Fläche darunter nicht erneut hell zu überstreichen. */
-:root[data-theme="dark"] :is(
-  .body-log-dex-page,
-  .routine-dex-page,
-  .sleep-log-dex-page,
-  .meal-log-dex-page
-)::before{
-  background:var(--bg)!important;
-}
-
-/* Der Ring im Hero trägt eine weiße Innenfläche – auf Navy wäre der Wert
-   darin unlesbar. */
-:root[data-theme="dark"] :is(
-  .body-v2-ring,
-  .body-v2-ring::after,
-  .routine-progress-ring::after,
-  .sleep-duration-ring::after,
-  .nutrition-ring::after
-){
-  background:var(--app-card)!important;
-  color:var(--text)!important;
-}
-
-/* ============================================================
-   DARKMODE · global, seitenübergreifend
-
-   Vorbild LOGMAN: Im Dunkeln gibt es keine farbigen Karten mehr. Flächen,
-   Ränder und Schrift sind durchgehend neutral; die Seitenfarbe überlebt nur
-   noch auf Chips, Buttons und aktiven Zuständen. Das hält jede Route optisch
-   identisch und macht die Seitenidentität zur Akzentfarbe statt zur Fläche.
-
-   Der Hebel sind die Seiten-Tokens: --cap-card, --cap-tint und
-   --cap-card-border werden pro Seite in :root[data-seite="…"] gesetzt. Einmal
-   hier neu definiert, ziehen alle Karten aller Seiten mit.
-   ============================================================ */
-:root[data-theme="dark"]{
-  --cap-card:var(--app-card);
-  --cap-tint:var(--app-field);
-  --cap-card-border:1.5px solid var(--app-outline);
-  --cap-muted:var(--muted);
-  /* Das Logo bleibt auf jeder Route identisch; die Silhouette ist über
-     --sil-filter im Basis-Dark-Block bereits auf Weiß gedreht. */
-  --brand-outline:#0A1330;
-}
-
-/* --- Flächen ---------------------------------------------------------- */
-:root[data-theme="dark"] :is(
-  .dex-inhaltskarte,
-  .dex-ordner-test,
-  .dex-detail-popup,
-  .dex-leer-symbol,
-  .profile-abschnitt,
-  .routine-zeitblock,
-  .sleep-checkin-overview,
-  .sleep-tonight,
-  .sleep-section,
-  .einkauf-gruppe,
-  .einkauf-row,
-  .coin-verdienst,
-  .coin-next,
-  .coin-reward,
-  .coin-empty,
-  .coin-balance-card,
-  .nutrition-card,
-  .nutrition-coin-hero,
-  .mahl-timeline,
-  .kategorie-sheet,
-  .special-dex-sheet
-){
-  background:var(--app-card)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-/* Eingelassenes: Zeilen, Vorschauen, Eingaben, Schalter. */
-:root[data-theme="dark"] :is(
-  .einkauf-row-inhalt,
-  .dex-inhaltskarte-vorschau,
-  .dex-detail-zutaten,
-  .profile-abschnitt>summary,
-  .routine-zeitblock>header,
-  .switchline-track,
-  .input
-){
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-
-/* --- Schrift ---------------------------------------------------------- */
-/* Überschriften tragen im Hellen die Seitenfarbe. Im Dunkeln sind sie weiß –
-   sonst steht buntes Pink oder Creme auf Navy und wirkt wie ein Fehler. */
-:root[data-theme="dark"] :is(
-  .dex-inhaltskarte,
-  .dex-detail-popup,
-  .profile-abschnitt,
-  .routine-zeitblock,
-  .sleep-checkin-overview,
-  .einkauf-gruppe,
-  .coin-verdienst,
-  .nutrition-card,
-  .body-v2-card,
-  .body-v2-overview,
-  .kategorie-sheet
-) :is(h1,h2,h3,h4,b,strong,summary,dt,legend){
-  color:var(--text)!important;
-}
-:root[data-theme="dark"] :is(.dex-sammlungskopf,.dex-seitentitel,.section-title){
-  color:var(--text)!important;
-}
-:root[data-theme="dark"] :is(small,.dex-inhaltskarte-quelle,.dex-meta,figcaption){
-  color:var(--muted)!important;
-}
-
-/* --- Ränder ----------------------------------------------------------- */
-/* Keine farbigen Kartenränder mehr: im Dunkeln durchgehend gedeckt. */
-:root[data-theme="dark"] :is(
-  .body-v2-hero,
-  .body-v2-card,
-  .body-v2-overview,
-  .dex-inhaltskarte,
-  .routine-zeitblock,
-  .coin-verdienst,
-  .coin-next,
-  .coin-reward,
-  .coin-balance-card,
-  .sleep-tonight,
-  .sleep-checkin-overview,
-  .sleep-section,
-  .profile-abschnitt,
-  .nutrition-card,
-  .body-reset-mini
-){
-  border-color:var(--app-outline)!important;
-}
-
-/* --- Chips und Buttons: hier bleibt Farbe ----------------------------- */
-/* Neutrale Filter-Chips werden dunkel, der aktive behält seinen Akzent. */
-:root[data-theme="dark"] :is(.neo-dex-filter,.food-dex-filter) button,
-:root[data-theme="dark"] .dex-sammlungskopf button{
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-  border-color:var(--app-outline)!important;
-}
-:root[data-theme="dark"] :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
-  background:var(--dex-accent,var(--dex-ink,var(--app-field)))!important;
-  color:var(--dex-accent-ink,var(--text))!important;
-  border-color:var(--dex-accent,var(--dex-ink,var(--app-outline)))!important;
-}
-
-/* Der aktive Tab war je nach Route mal hell, mal dunkel. Im Dunkeln trägt er
-   überall dieselbe eingelassene Fläche mit gedecktem Rand. */
-:root[data-theme="dark"] .app-dex-tab.aktiv{
-  background:var(--app-field)!important;
-  border-color:var(--app-outline)!important;
-  color:var(--text)!important;
-}
-
-/* --- COMP: Regeln mit aufgeblähter :is()-Spezifität überschreiben ------ */
-/* Die beiden Regeln, die Rand und Überschriften auf die Seitenfarbe setzen,
-   führen in ihrer :is()-Liste sehr spezifische Einträge mit
-   (`.body-entry-form input:not([type="checkbox"]):not([type="file"])`,
-   `.body-v2-overview>summary b`). :is() erbt die Spezifität seines stärksten
-   Arguments – die Regeln wiegen dadurch (0,5,1) beziehungsweise (0,3,2) und
-   schlagen jede kürzer geschriebene Gegenregel.
-   Die Listen werden deshalb hier 1:1 gespiegelt: gleiche Spezifität, spätere
-   Quellposition, und beim Lesen ist sofort sichtbar, was überschrieben wird. */
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-v2-hero,
-  .body-v2-overview,
-  .body-v2-card,
-  .body-analysis-help,
-  .body-reset-mini,
-  .guided-fold-grid fieldset,
-  .body-entry-form input:not([type="checkbox"]):not([type="file"]),
-  .body-entry-form select,
-  .body-entry-form .input,
-  .body-entry-form .falten-summe,
-  .body-entry-form .btn-primary
-){
-  border-color:var(--app-outline)!important;
-}
-
-:root[data-theme="dark"][data-seite="body"] :is(
-  .body-v2-hero-value>small,
-  .body-v2-hero-value strong,
-  .body-v2-hero-value b,
-  .body-v2-overview>summary b,
-  .body-v2-card>header b,
-  .body-v2-overview>summary>.material-svg,
-  .body-v2-card-body>.mini-title,
-  .bodycomp-message,
-  .body-latest-value>strong,
-  .body-chart-block>header>b,
-  .body-analysis-help b,
-  .body-explain b,
-  .body-chart-legend b,
-  .body-goal-status b,
-  .body-inner-details>summary
-){
-  color:var(--text)!important;
-}
-
-/* Der Hero-Ring: die weiße Innenfläche liegt auf ::after. */
-:root[data-theme="dark"] .body-v2-ring::after,
-:root[data-theme="dark"] .body-v2-ring>span{
-  background:var(--app-card)!important;
-  color:var(--text)!important;
-}
-:root[data-theme="dark"] .body-v2-ring :is(b,small){
-  color:var(--text)!important;
-}
-
-/* ============================================================
    DARKMODE · aus den Seitenregeln abgeleitet
 
-   Maschinell aus den seitenbezogenen Regeln erzeugt: zu jeder Regel, die
-   eine helle Fläche, eine dunkle Schrift oder einen farbigen Rand setzt,
-   steht hier die dunkle Entsprechung. Der Selektor ist identisch, nur um
-   [data-theme="dark"] ergänzt – dadurch liegt die Spezifität immer genau
-   eine Stufe höher als beim Original, unabhängig davon, wie aufgebläht
-   dessen :is()-Liste ist.
+   Maschinell erzeugt: zu jeder Regel, die eine helle Fläche, eine dunkle
+   Schrift oder einen farbigen Rand setzt, steht hier die dunkle
+   Entsprechung. Der Selektor ist identisch, nur um [data-theme="dark"]
+   ergänzt – die Spezifität liegt dadurch immer genau eine Stufe über dem
+   Original, unabhängig davon, wie aufgebläht dessen :is()-Liste ist.
 
-   Aktive Zustände, Primärbuttons und Chips sind ausgenommen: dort trägt
-   die Seitenfarbe weiter, wie im LOGMAN.
+   Hell/dunkel wird über die Helligkeit des Farbwerts bestimmt, nicht über
+   eine Liste bekannter Hex-Werte: Töne wie #fff2d8 oder #e9f6ef fielen
+   sonst durch. Aktive Zustände, Primärbuttons und Chips sind ausgenommen.
    ============================================================ */
+:root[data-theme="dark"][data-seite="auth"] .auth-shell [data-auth-form] :is(.fld-l,label),
+:root[data-theme="dark"] .dex-ordner-kartenicon,
+:root[data-theme="dark"] .dex-audio-status,
+:root[data-theme="dark"] .routine-attach,
+:root[data-theme="dark"] .routine-start,
+:root[data-theme="dark"] /* Flex statt Grid: die Zahl der Knoepfe schwankt (Refresh nur bei Link- Eintraegen),
+:root[data-theme="dark"] ein fester Spaltensatz liess den Teilen-Knopf dann in eine zweite Zeile rutschen. */ .dex-detail-knopf,
+:root[data-theme="dark"] .dex-detail-popup .dex-detail-link,
+:root[data-theme="dark"] .dex-fixkopf .kategorie-kopftitel,
+:root[data-theme="dark"] .coin-history .plus,
+:root[data-theme="dark"] .coin-history .minus,
+:root[data-theme="dark"] .coin-reward-delete,
 :root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page) :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2),
+:root[data-theme="dark"] .food-dex-info-dialog p,
+:root[data-theme="dark"] .food-dex-info-dialog b,
+:root[data-theme="dark"] .food-dex-info-dialog-close,
+:root[data-theme="dark"] .dex-auswahlleiste button,
+:root[data-theme="dark"] .nutrition-knowledge-card li>i,
+:root[data-theme="dark"] .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft,
+:root[data-theme="dark"] .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-link,
 :root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary),
+:root[data-theme="dark"] .kategorie-sheet .dex-entry-file :is(.material-svg,svg,svg *),
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value strong,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value b,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-slot-zeit input,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help b,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-more,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-emoji,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-emoji .reminder-svg svg,
 :root[data-theme="dark"][data-seite="body"] .body-v2-hero-value strong,
 :root[data-theme="dark"][data-seite="body"] .body-v2-hero-value b,
+:root[data-theme="dark"][data-seite="body"] .body-v2-hero-value>span,
+:root[data-theme="dark"][data-seite="body"] .body-analysis-info,
 :root[data-theme="dark"][data-seite="body"] .body-v2-overview>summary>.material-svg,
+:root[data-theme="dark"][data-seite="body"] .body-analysis-help p,
 :root[data-theme="dark"][data-seite="body"] .body-analysis-help b,
 :root[data-theme="dark"][data-seite="body"] .body-explain,
 :root[data-theme="dark"][data-seite="body"] .body-explain b,
@@ -12382,12 +11946,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="body"] .body-chart-legend b,
 :root[data-theme="dark"][data-seite="body"] .body-chart-empty>span,
 :root[data-theme="dark"][data-seite="body"] .body-latest-value>span,
+:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation>p,
 :root[data-theme="dark"][data-seite="body"] .body-goal-status b,
 :root[data-theme="dark"][data-seite="body"] .body-goal-status span,
 :root[data-theme="dark"][data-seite="body"] .body-inner-details>summary,
+:root[data-theme="dark"][data-seite="body"] .body-inner-details>p,
 :root[data-theme="dark"][data-seite="body"] .body-weight-history li,
 :root[data-theme="dark"][data-seite="body"] .body-skinfold-history dt,
+:root[data-theme="dark"][data-seite="body"] .body-skinfold-history b.unvollstaendig,
 :root[data-theme="dark"][data-seite="body"] .body-skinfold-nachtragen,
+:root[data-theme="dark"][data-seite="body"] .body-skinfold-history dl>div.fehlt dd,
 :root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline,
 :root[data-theme="dark"][data-seite="body"] .body-reminder-settings .mess-zeile,
 :root[data-theme="dark"][data-seite="body"] .body-add-menu>button,
@@ -12397,26 +11965,38 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="sleep"] .sleep-dex-page,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-tonight,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-section,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-section-title>.material-svg,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring>span,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-tonight-value strong,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-tonight-value b,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight button,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight button :is(.material-svg,svg,svg *),
 :root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview>summary b,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values b,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison b,
 :root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-empty b,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-empty span,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-chart-empty,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-empty,
 :root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-editor,
 :root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-action-card,
+:root[data-theme="dark"] /* Meal-Log-Erklärung und Kalorien-Kalibrierung teilen exakt dieselbe Infotypografie: ruhiges Grau,
+:root[data-theme="dark"] identischer Absatzrhythmus und Medium als neues lesbares Grundgewicht. Hervorhebungen bleiben klar Bold. */ :is(.food-dex-info-dialog,.nutrition-calibration-help) p,
+:root[data-theme="dark"] :is(.food-dex-info-dialog,.nutrition-calibration-help) p b,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-trinken .rem-row[data-type="drink"] .rem-row-zeit,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page,
 :root[data-theme="dark"][data-seite="habits"] .routine-progress-ring>span,
 :root[data-theme="dark"][data-seite="habits"] .routine-hero-value strong,
 :root[data-theme="dark"][data-seite="habits"] .routine-hero-value b,
+:root[data-theme="dark"][data-seite="habits"] .routine-info-button,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-copy b,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg),
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-suche>.material-svg,
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-suche>.material-svg svg,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-kopfzeile,
 :root[data-theme="dark"][data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-chevron,
 :root[data-theme="dark"][data-seite="shopping"] :is(.einkauf-gruppe,.einkauf-rezepte) .reminder-group-chevron :is(.material-svg,svg),
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"],
 :root[data-theme="dark"] .coin-dex-page,
 :root[data-theme="dark"] .coin-dex-page .kategorie-kopftitel,
 :root[data-theme="dark"] .coin-dex-page :is(.coin-balance-card,.coin-verdienst,.coin-next,.coin-reward,.coin-empty),
@@ -12424,14 +12004,42 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="profile"] .profil-fixkopf-view,
 :root[data-theme="dark"][data-seite="profile"] .avatar-fallback,
 :root[data-theme="dark"][data-seite="profile"] .profile-name,
+:root[data-theme="dark"][data-seite="profile"] .role-tag,
+:root[data-theme="dark"][data-seite="profile"] .profile-datei-knopf,
 :root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .fld-l,
 :root[data-theme="dark"][data-seite="profile"] .profile-untertitel,
 :root[data-theme="dark"][data-seite="profile"] .themebtn.on,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt.gefahr>summary,
+:root[data-theme="dark"][data-seite="profile"] .buildinfo,
+:root[data-theme="dark"] .app-dex-header,
+:root[data-theme="dark"] .app-dex-sync,
+:root[data-theme="dark"] .app-dex-sync.ok,
+:root[data-theme="dark"] .app-dex-sync.wait,
+:root[data-theme="dark"] .app-dex-dock,
+:root[data-theme="dark"] .app-dex-tab,
+:root[data-theme="dark"] .app-dex-menu,
+:root[data-theme="dark"] .app-dex-search,
+:root[data-theme="dark"] .app-dex-header .coin-kopfstand strong,
+:root[data-theme="dark"][data-seite="search"] .app-dex-dock,
+:root[data-theme="dark"] .wissenssuche-titel>span,
+:root[data-theme="dark"] .wissenssuche-feld input,
+:root[data-theme="dark"] .wissenssuche-feld button,
+:root[data-theme="dark"] .wissenssuche-status span,
+:root[data-theme="dark"] .wissenssuche-gruppe h2 span,
+:root[data-theme="dark"] .wissenssuche-treffer,
+:root[data-theme="dark"] .wissenssuche-treffer-kopf i,
+:root[data-theme="dark"] .wissenssuche-treffer>span:not(.wissenssuche-treffer-kopf),
 :root[data-theme="dark"] .neo-dex-page .dex-sammlungskopf,
+:root[data-theme="dark"] .neo-dex-page .dex-sammlungskopf button,
 :root[data-theme="dark"][data-seite="profile"] .profile-abschnitt input[type="checkbox"],
+:root[data-theme="dark"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button),
 :root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-dock,
 :root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-tab,
 :root[data-theme="dark"] /* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */ :root[data-seite="reminders"] .meal-log-dex-page,
+:root[data-theme="dark"] /* COMP: Cotton Cloud mit Pink fuer Daten,
+:root[data-theme="dark"] Konturen und Aktionen. */ :root[data-seite="body"] .body-log-dex-page,
+:root[data-theme="dark"][data-seite="body"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button),
+:root[data-theme="dark"][data-seite="body"] .dex-detail-popup .dex-detail-inhalt h1,
 :root[data-theme="dark"] /* REZEPTE: weiches Yellow mit Chocolate Brown als Druckfarbe. Wie bei allen Grid-Seiten invertieren Karten und Chips das Paar; konstruktive Konturen und harte Schatten bleiben neutral schwarz. */ :root[data-seite="food-log"] :is(.neo-dex-page,.food-dex-page),
 :root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) :is( .dex-sammlungskopf, .unter-sammlungen-block>h2, .sammlung-alle>h2, .dex-eintrag-gruppe>h2, .sammlung-leer, .sammlung-leer strong, .sammlung-leer span ),
 :root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text),
@@ -12455,16 +12063,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="supps"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button),
 :root[data-theme="dark"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet)>header,
 :root[data-theme="dark"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
+:root[data-theme="dark"] /* TRAINING: tiefes Grün mit dem aus der Vorlage entnommenen Creme #FCEFBB. Rasterkarten invertieren das Paar,
+:root[data-theme="dark"] damit auch längere Notizen und Vorschauen ruhig lesbar bleiben. */ :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page),
+:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is( .dex-sammlungskopf, .unter-sammlungen-block>h2, .sammlung-alle>h2, .dex-eintrag-gruppe>h2, .sammlung-leer, .sammlung-leer strong, .sammlung-leer span ),
 :root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text),
 :root[data-theme="dark"][data-seite="training"] .dex-detail-popup :is(.dex-detail-inhalt h1,.dex-detail-notiztext,.dex-detail-tags h2),
 :root[data-theme="dark"][data-seite="training"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button),
 :root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet)>header,
 :root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *),
 :root[data-theme="dark"][data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet)>header,
 :root[data-theme="dark"][data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
 :root[data-theme="dark"][data-seite="shopping"] .shopping-dex-wrap,
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-suche :is(input,.material-svg,svg,svg *),
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-icon,
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-row-name,
 :root[data-theme="dark"][data-seite="shopping"] .app-dex-dock,
 :root[data-theme="dark"][data-seite="shopping"] .app-dex-tab,
@@ -12488,28 +12100,42 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is( .dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2, .dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span ),
 :root[data-theme="dark"][data-seite="supps"] .app-dex-dock,
 :root[data-theme="dark"][data-seite="supps"] .app-dex-tab,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-info-help :is(p,b,strong,span),
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-note,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info),
 :root[data-theme="dark"][data-seite="body"] .ypsi-priority-empty>span,
 :root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>header b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>p,
 :root[data-theme="dark"][data-seite="body"] .ypsi-top-fold>b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-top-fold>span,
 :root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-priority-reason b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-reason p,
 :root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>header b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>p,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button>i,
 :root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button>.material-svg,
 :root[data-theme="dark"][data-seite="body"] .ypsi-method-note,
 :root[data-theme="dark"][data-seite="body"] .ypsi-method-note b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-basis-form b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form>button,
 :root[data-theme="dark"][data-seite="body"] .ypsi-guided-plan>header>h3,
+:root[data-theme="dark"][data-seite="body"] .ypsi-guided-plan>header>p,
 :root[data-theme="dark"][data-seite="body"] .ypsi-open-questions b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-action-categories h4,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories h4>.material-svg,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li>.is-seminar,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li>.is-evidence,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li>.is-app,
 :root[data-theme="dark"][data-seite="body"] .ypsi-guided-plan>footer,
+:root[data-theme="dark"][data-seite="body"] .ypsi-guided-plan>footer b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities>h3,
 :root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-active-priority,
 :root[data-theme="dark"][data-seite="body"] .ypsi-background>summary,
+:root[data-theme="dark"][data-seite="body"] .ypsi-background>div>p,
 :root[data-theme="dark"][data-seite="body"] .ypsi-inactive-notice>b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-inactive-notice>p,
 :root[data-theme="dark"][data-seite="body"] .falten-item-head>b,
 :root[data-theme="dark"][data-seite="body"] .falten-item-value,
 :root[data-theme="dark"][data-seite="body"] .falten-detail-header h2,
@@ -12519,20 +12145,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="body"] .falten-detail-section>h3,
 :root[data-theme="dark"][data-seite="body"] .falten-detail-tags>b,
 :root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values) b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-primary-fold,
 :root[data-theme="dark"][data-seite="body"] .ypsi-relation>summary b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-relation>b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>p,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>div>p,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>ul,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>div>ul,
+:root[data-theme="dark"][data-seite="body"] .ypsi-protocol-conditions>ul,
 :root[data-theme="dark"][data-seite="body"] .ypsi-relation-protocols>b,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-form>p,
 :root[data-theme="dark"][data-seite="body"] .skinfold-context-form fieldset>legend,
 :root[data-theme="dark"][data-seite="body"] .skinfold-context-priority>b,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-question,
 :root[data-theme="dark"][data-seite="body"] .skinfold-context-question label>b,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label:has(input:checked)>b,
+:root[data-theme="dark"][data-seite="body"] .ypsi-phase-group>h4,
 :root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>header>b,
 :root[data-theme="dark"][data-seite="body"] .ypsi-protocol-conditions>b,
 :root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>ul>li b,
 :root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>ul>li>strong,
+:root[data-theme="dark"][data-seite="body"] .falten-protokoll-notiz,
 :root[data-theme="dark"][data-seite="body"] .braverman-intro b,
 :root[data-theme="dark"][data-seite="body"] .braverman-intro p,
 :root[data-theme="dark"][data-seite="body"] .braverman-question>h3,
-:root[data-theme="dark"][data-seite="body"] .braverman-safety,
+:root[data-theme="dark"][data-seite="body"] .braverman-question>p,
 :root[data-theme="dark"][data-seite="body"] .braverman-result-focus>b,
 :root[data-theme="dark"][data-seite="body"] .braverman-result-focus>div>b,
 :root[data-theme="dark"][data-seite="body"] .braverman-result-focus>span,
@@ -12541,43 +12178,221 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="body"] .braverman-score-list b,
 :root[data-theme="dark"][data-seite="body"] .braverman-seminar-strategies h4,
 :root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy>header b,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy>p,
 :root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy h4,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy ul,
 :root[data-theme="dark"][data-seite="body"] .braverman-dose-list b,
+:root[data-theme="dark"][data-seite="body"] .braverman-dose-list strong,
 :root[data-theme="dark"][data-seite="profile"] :is(.profile-datei,.themeseg,.sammlungs-sortierung,.themebtn,.sortier-tasten button,.profile-abschnitt .input,.profile-abschnitt .btn,.profile-ausloggen .btn),
-:root[data-theme="dark"][data-seite="profile"] .buildinfo,
 :root[data-theme="dark"][data-seite="profile"] .app-dex-dock,
 :root[data-theme="dark"][data-seite="profile"] .app-dex-tab{
   color:var(--text)!important;
 }
-:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
-:root[data-theme="dark"] /* Overlays schweben bereits durch die abgedunkelte Rueckflaeche eindeutig ueber dem Inhalt. Ihre Menueflaechen brauchen deshalb nur die Kontur und keinen zusaetzlichen harten Kartenschatten. */ /* Gemeinsamer Standard aller Meal-Log-Karten. Sie bleiben flache Listen: kein Kartenschatten,
-:root[data-theme="dark"] kompakte Köpfe und technische Metadaten klar getrennt von den Mahlzeitennamen. */ /* ============================================================ SPECIAL-DEX-VORLAGE Gemeinsamer,
-:root[data-theme="dark"] anpassbarer Rahmen für Dex mit breiten Karten und Hero. Einkauf,
-:root[data-theme="dark"] Schlaf,
-:root[data-theme="dark"] Routinen,
-:root[data-theme="dark"] Körperwerte und CAPCOINS können ausschließlich diese Primitiven übernehmen; ihre Fachinhalte bleiben eigene Module. ============================================================ */ .special-dex-page,
-:root[data-theme="dark"] .special-dex-page .special-dex-wide-card,
+:root[data-theme="dark"] .dex-detail-audio,
+:root[data-theme="dark"] .coin-verdienst-frei,
+:root[data-theme="dark"] .nutrition-product-head>img,
+:root[data-theme="dark"] .nutrition-product-head>.material-svg,
+:root[data-theme="dark"] .mahl-trinken::before,
+:root[data-theme="dark"] .dex-auswahl-marker,
+:root[data-theme="dark"] /* Meal-Log nutzt denselben vollflaechigen Dex-Rahmen wie Food- und Trainingdex. Seine breiten Zeitfenster bleiben als funktionsspezifische Module erhalten; Tapete,
+:root[data-theme="dark"] Titel und Bedienung folgen dem gemeinsamen Skin. */ :root[data-seite="reminders"],
+:root[data-theme="dark"][data-seite="reminders"] body,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page::before,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is(.mahl-timeline,.nutrition-period-inline),
+:root[data-theme="dark"] /* COIN-DEX als Kartenreferenz: eine hervorgehobene Tagesbilanz mit hartem,
+:root[data-theme="dark"] rein senkrechtem Schatten; die wiederholten Mahlzeiten bleiben flacher. */ :root[data-seite="reminders"] .meal-log-dex-page .nutrition-card,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-card,
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::before,
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after,
+:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::before,
+:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after,
+:root[data-theme="dark"] /* ============================================================ BODY-LOG Breite Special-Dex-Vorlage: Zahlen-Hero,
+:root[data-theme="dark"] eine gerahmte Übersicht und danach ruhige,
+:root[data-theme="dark"] flache Messkarten. Körperfett wird bewusst nicht geschätzt. ============================================================ */ :root[data-seite="body"],
+:root[data-theme="dark"][data-seite="body"] body,
+:root[data-theme="dark"][data-seite="body"] .body-v2-ring,
+:root[data-theme="dark"][data-seite="body"] .body-v2-ring::after,
+:root[data-theme="dark"][data-seite="body"] .body-v2-overview,
+:root[data-theme="dark"][data-seite="body"] .body-v2-card-body,
+:root[data-theme="dark"][data-seite="body"] .body-v2-overview .body-v2-card-body,
+:root[data-theme="dark"][data-seite="body"] .body-analysis-help,
+:root[data-theme="dark"][data-seite="body"] .body-chart-empty,
+:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation,
+:root[data-theme="dark"][data-seite="body"] .body-goal-status,
+:root[data-theme="dark"][data-seite="body"] .body-weight-history>ol,
+:root[data-theme="dark"][data-seite="body"] .guided-fold-grid fieldset,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-log-dex-page::before,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring::after,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values>span,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-section,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-stats>div,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page::before,
+:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring,
+:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring::after,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-anhaenge,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head,
+:root[data-theme="dark"] .coin-dex-page .coin-next,
+:root[data-theme="dark"] .coin-dex-page .coin-reward,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,
+:root[data-theme="dark"][data-seite="profile"] .avatar,
+:root[data-theme="dark"][data-seite="profile"] .profile-datei,
+:root[data-theme="dark"][data-seite="profile"] :is(.themeseg,.sammlungs-sortierung),
+:root[data-theme="dark"][data-seite="body"] :is(.body-v2-overview,.body-v2-card,.body-v2-card-body,.body-analysis-help),
+:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after,
+:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p),
+:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
+:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after,
+:root[data-theme="dark"][data-seite="stress"] .app-dex-dock::after,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst-gruppe>div>span,.coin-verdienst-frei),
+:root[data-theme="dark"][data-seite="reminders"],
+:root[data-theme="dark"][data-seite="reminders"] :is(#app,#view),
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after,
+:root[data-theme="dark"][data-seite="reminders"] .app-dex-dock::after,
+:root[data-theme="dark"][data-seite="shopping"],
+:root[data-theme="dark"][data-seite="shopping"] body,
+:root[data-theme="dark"][data-seite="shopping"] :is(#app,#view),
+:root[data-theme="dark"][data-seite="shopping"] .app-dex-dock::after,
+:root[data-theme="dark"][data-seite="supps"],
+:root[data-theme="dark"][data-seite="supps"] body,
+:root[data-theme="dark"][data-seite="supps"] :is(#app,#view),
+:root[data-theme="dark"][data-seite="supps"] .app-dex-dock::after,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring::after,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block,
+:root[data-theme="dark"][data-seite="body"] .ypsi-top-fold,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison>span,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-reason,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview,
+:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form,
+:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities>div>span,
+:root[data-theme="dark"][data-seite="body"] .ypsi-background,
+:root[data-theme="dark"][data-seite="body"] .ypsi-inactive-notice,
+:root[data-theme="dark"][data-seite="body"] .falten-legende-item:active,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-status,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-section,
+:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values)>div,
+:root[data-theme="dark"][data-seite="body"] .ypsi-detail-values>span,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-form fieldset,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-priority,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label,
+:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item,
+:root[data-theme="dark"][data-seite="body"] .ypsi-protocol-conditions,
+:root[data-theme="dark"][data-seite="body"] .braverman-intro,
+:root[data-theme="dark"][data-seite="body"] .braverman-progress>span,
+:root[data-theme="dark"][data-seite="body"] .braverman-result-focus,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores span,
+:root[data-theme="dark"][data-seite="body"] .braverman-score-list i,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy,
+:root[data-theme="dark"][data-seite="profile"],
+:root[data-theme="dark"][data-seite="profile"] body,
+:root[data-theme="dark"][data-seite="profile"] :is(#app,#view),
+:root[data-theme="dark"][data-seite="profile"] .app-dex-dock::after{
+  background:var(--app-card)!important;
+}
+:root[data-theme="dark"] .routine-timer-exercises li>span,
+:root[data-theme="dark"] .dex-detail-popup .dex-detail-foodmeta span,
+:root[data-theme="dark"] .dex-detail-popup .dex-detail-tags span,
+:root[data-theme="dark"] .kategorie-sheet .dex-entry-file small,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is(.mahl-leerzeile,.rem-row-titel b,.rem-row-titel small,.nutrition-entry b,.nutrition-entry small,.nutrition-entry strong),
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value small,
+:root[data-theme="dark"][data-seite="body"] .body-v2-hero-value>small,
+:root[data-theme="dark"][data-seite="body"] :is(.body-v2-card>header,.body-v2-overview>summary) small,
+:root[data-theme="dark"][data-seite="body"] .body-chart-block>header>small,
+:root[data-theme="dark"][data-seite="body"] .body-weight-history time,
+:root[data-theme="dark"][data-seite="body"] .body-add-menu small,
+:root[data-theme="dark"][data-seite="body"] .guided-fold-grid small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight-value small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview>summary small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-section>header>small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-insights>header>small,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-stats small,
+:root[data-theme="dark"] /* Trinken folgt derselben Typohierarchie wie die Mahlzeiten: Work Sans fuer Bezeichnungen,
+:root[data-theme="dark"] JetBrains Mono nur fuer technische Zeit- und Intervallwerte. Die Werte sind bewusst nicht mehr in der zu leichten Standardstaerke. */ :root[data-seite="reminders"] .meal-log-dex-page .mahl-trinken .rem-row[data-type="drink"] .rem-row-titel>small:not(.rem-row-art),
+:root[data-theme="dark"][data-seite="habits"] .routine-hero-value small,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header small,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-copy small,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head em,
+:root[data-theme="dark"] .coin-dex-page .coin-history,
+:root[data-theme="dark"] .coin-dex-page .coin-history :is(span,small,b,.plus,.minus),
+:root[data-theme="dark"][data-seite="profile"] .profile-email,
+:root[data-theme="dark"][data-seite="profile"] :is(.profile-hinweis,.profile-daten-status,.profile-dateiname),
+:root[data-theme="dark"] .wissenssuche-treffer em,
+:root[data-theme="dark"] .special-dex-page :is(small,.body-explain,.routine-copy small,.sleep-chart-empty),
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero-value small, .nutrition-coin-hero-value strong, .nutrition-coin-hero-value b, .nutrition-coin-overview>summary b, .mahl-zeitblock>header h2, .rem-row-titel b, .nutrition-entry b, .nutrition-entry strong ),
+:root[data-theme="dark"][data-seite="body"] :is( .body-v2-hero-value>small, .body-v2-hero-value strong, .body-v2-hero-value b, .body-v2-overview>summary b, .body-v2-card>header b, .body-v2-overview>summary>.material-svg, .body-v2-card-body>.mini-title, .bodycomp-message, .body-latest-value>strong, .body-chart-block>header>b, .body-analysis-help b, .body-explain b, .body-chart-legend b, .body-goal-status b, .body-inner-details>summary ),
+:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup .dex-detail-zutaten :is(h2,li,span,strong,small,p),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is( .routine-hero-value small, .routine-hero-value strong, .routine-hero-value b, .routine-progress-ring>span ),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is( .routine-zeitblock>header h2, .routine-zeitblock>header small ),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is( .routine-copy b, .routine-copy small, .routine-zeitblock-leer ),
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head :is(b,em,.reminder-group-chevron,.material-svg,svg,svg *),
+:root[data-theme="dark"][data-seite="sleep"] :is( .sleep-checkin-overview>summary b, .sleep-checkin-overview>summary small, .sleep-checkin-overview>summary>.material-svg, .sleep-section>header h2, .sleep-section>header>small, .sleep-insights>header>small, .sleep-checkin-values b, .sleep-checkin-values small, .sleep-plan-comparison b, .sleep-plan-comparison small, .sleep-checkin-empty b, .sleep-checkin-empty span, .sleep-stats strong, .sleep-stats small, .sleep-chart-empty, .sleep-empty, .sleep-insights p, .sleep-history button, .sleep-history button>em ),
+:root[data-theme="dark"] /* Kleine COMP-Beschriftungen brauchen auf Cotton Cloud einen dunkleren Leseton. Pink bleibt den großen Messwerten und eindeutigen Aktionen vorbehalten. Die Gewichtshistorie übernimmt exakt die Typografie der benachbarten Info-Zeile „Wie oft wiegen?“. */ :root[data-seite="body"] :is( .body-v2-hero-value>small, .body-v2-overview>summary b, .body-v2-card>header b, .body-v2-card-body>.mini-title, .body-chart-block>header>b, .body-analysis-help b, .body-explain b, .body-chart-legend b, .body-goal-status b, .body-inner-details>summary ),
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is( .coin-verdienst>summary b, .coin-verdienst>summary small, .coin-verdienst>summary .material-svg, .coin-verdienst>summary svg, .coin-verdienst-hinweis, .coin-verdienst-titel b, .coin-verdienst-gruppe small, .coin-verdienst-gruppe strong, .coin-verdienst-frei b, .coin-verdienst-frei small, .coin-next b, .coin-next small, .coin-next>strong, .coin-reward-kopf b, .coin-reward-kopf small, .coin-reward-kopf>strong, .coin-reward p, .coin-empty b, .coin-empty span ),
+:root[data-theme="dark"][data-seite="profile"] :is( .profile-name, .profile-abschnitt .fld-l, .profile-untertitel, .sammlung-sichtbarkeit>.switchline, .interface-sound-setting, .interface-sound-setting :is(b,small) ),
+:root[data-theme="dark"][data-seite="profile"] :is(.profile-email,.profile-hinweis,.profile-daten-status,.profile-dateiname),
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is(.nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,.nutrition-coin-hero-value b,.nutrition-ring>span),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span),
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-zeitblock-leer),
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>header small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>header>em,
+:root[data-theme="dark"][data-seite="body"] .ypsi-top-fold>small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-reason>small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-secondary-relations>small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>header small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button em,
+:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-guided-plan>header>small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li::before,
+:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li>:is(small,a),
+:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities em,
+:root[data-theme="dark"][data-seite="body"] .body-falten-legende .body-legende-intro,
+:root[data-theme="dark"][data-seite="body"] .body-legende-disclaimer,
+:root[data-theme="dark"][data-seite="body"] .falten-item-head>small,
+:root[data-theme="dark"][data-seite="body"] .falten-legende-item.ist-erhoeht .falten-item-value,
+:root[data-theme="dark"][data-seite="body"] .falten-legende-item.ist-hoch .falten-item-value,
+:root[data-theme="dark"][data-seite="body"] .falten-legende-item.ist-im-ziel .falten-item-value,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-header small,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-status small,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-section>p,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-hinweise,
+:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values) small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>div>small,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>em,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>div>em,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-priority>small,
+:root[data-theme="dark"][data-seite="body"] .skinfold-basis-field>small,
+:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>header>small,
+:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>ul>li small,
+:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-disclaimer,.falten-detail-quelle),
+:root[data-theme="dark"][data-seite="body"] .braverman-progress>small,
+:root[data-theme="dark"][data-seite="body"] .braverman-question>small,
+:root[data-theme="dark"][data-seite="body"] .braverman-result-focus>small,
+:root[data-theme="dark"][data-seite="body"] .braverman-result-focus>div>em,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores>small,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores em,
+:root[data-theme="dark"][data-seite="body"] .braverman-score-list small,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy>header small,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy>header em,
+:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy h4>small,
+:root[data-theme="dark"][data-seite="body"] .braverman-dose-list small,
+:root[data-theme="dark"][data-seite="profile"] :is(.profile-name,.profile-abschnitt .fld-l,.profile-untertitel,.sammlung-sichtbarkeit>.switchline,.interface-sound-setting,.interface-sound-setting :is(b,small)){
+  color:var(--muted)!important;
+}
 :root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol :is(i,b),
 :root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol :is(i,b),
-:root[data-theme="dark"][data-seite="body"] .body-analysis-info,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight button,
-:root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-tags input:checked+span,
-:root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-rating input:checked+span,
-:root[data-theme="dark"][data-seite="habits"] .routine-info-button,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-check,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt.profile-konto,
-:root[data-theme="dark"][data-seite="profile"] .profile-ausloggen .btn,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .btn-danger,
-:root[data-theme="dark"] /* LOGMAN-Rahmen fuer die beiden hervorgehobenen MAHLZEITEN-Karten: feine Kontur statt des bisherigen harten Hero-Schattens. */ :root[data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero, .nutrition-coin-overview, .mahl-zeitblock ),
-:root[data-theme="dark"] /* Eine einzige Kartenfamilie: weisse Flaeche,
-:root[data-theme="dark"] feine LOGMAN-Kontur,
-:root[data-theme="dark"] gleicher Radius und keinerlei Restschatten. */ :root[data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero, .nutrition-coin-overview, .mahl-zeitblock ),
-:root[data-theme="dark"][data-seite="reminders"] .special-dex-overlay>.special-dex-sheet,
-:root[data-theme="dark"] /* ============================================================ ZWEIFARBIGE KERNSEITEN TRACKER und COMP funktionieren wie eigenstaendige Retro-Verpackungen: eine helle Grundflaeche plus eine feste dunkle Druckfarbe. Die Druckfarbe traegt Text,
-:root[data-theme="dark"] Konturen,
-:root[data-theme="dark"] Icons und Tapete; auf gefuellten Aktionen kehrt sich das Paar um. So bleibt die Hierarchie trotz individueller Schriftfarben genauso vorhersagbar wie auf den einfarbigen Dex-Seiten. ============================================================ */ :root[data-seite="reminders"],
-:root[data-theme="dark"][data-seite="food-log"],
-:root[data-theme="dark"][data-seite="training"],
 :root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-dock-inner::before,
 :root[data-theme="dark"] /* Auf dem dunklen TRAINING-Grün bleibt dieselbe neutrale Bedienebene weiß,
 :root[data-theme="dark"] während die cremefarbene Druckfarbe ausschließlich im Inhalt arbeitet. */ :root[data-seite="training"] .app-dex-header,
@@ -12585,24 +12400,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="training"] .app-dex-menu,
 :root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
 :root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button,
-:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
 :root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
 :root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio),
 :root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup .dex-zutaten-summe,
-:root[data-theme="dark"] /* ESSEN kehrt das REZEPTE-Paar um: Aubergine traegt die Seite,
-:root[data-theme="dark"] Honey Dawn wird zur Druck- und Kartenfarbe. Als Grid-Seite bleiben alle konstruktiven Konturen und harten Schatten neutral schwarz. */ :root[data-seite="essen"],
 :root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
 :root[data-theme="dark"][data-seite="essen"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio),
 :root[data-theme="dark"][data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
 :root[data-theme="dark"][data-seite="essen"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span),
 :root[data-theme="dark"] /* ESSEN liegt auf einem dunklen Grund. Header und Dock bleiben als globale Bedienebene neutral weiss; der harte Iconschatten bleibt schwarz. */ :root[data-seite="essen"] .app-dex-header,
 :root[data-theme="dark"][data-seite="essen"] .app-dex-dock-inner::before,
 :root[data-theme="dark"][data-seite="essen"] .app-dex-menu,
-:root[data-theme="dark"] /* SUPPS: das TRACKER-Paar in umgekehrter Richtung – Chocolate Brown #4E342E als Seitenfarbe und Butter #FEEFB8 als Druckfarbe. Die dunkle Seite trägt die helle Druckfarbe; Karten invertieren das Paar für ruhige,
-:root[data-theme="dark"] gut lesbare Sammlungs- und Detailflächen. */ :root[data-seite="supps"],
 :root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
-:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
 :root[data-theme="dark"][data-seite="supps"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio),
 :root[data-theme="dark"][data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
 :root[data-theme="dark"][data-seite="supps"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span),
@@ -12613,42 +12421,28 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
 :root[data-theme="dark"][data-seite="training"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio),
 :root[data-theme="dark"][data-seite="training"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
-:root[data-theme="dark"] /* ROUTINEN: Blueberry #4B125C mit warmem Creme #FCEFBB. Als Hero-Seite bleibt die lange Listenebene hell und ruhig; Status,
-:root[data-theme="dark"] Tapete und Aktionen tragen das Farbpaar. App-Chrome und Kontextmenüs bleiben neutral. */ :root[data-seite="habits"],
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-hero,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-info-button,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-row,
 :root[data-theme="dark"] /* Auf ROUTINEN ersetzt das warme Creme das reine Weiß auch im App-Chrome; der harte Schatten der Navigationsicons bleibt wie im System festgelegt schwarz. */ :root[data-seite="habits"] .app-dex-header,
 :root[data-theme="dark"][data-seite="habits"] .app-dex-dock-inner::before,
 :root[data-theme="dark"][data-seite="habits"] .app-dex-menu,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page button.routine-start,
-:root[data-theme="dark"] /* EINKAUF: Soft Blush und Braun. Die Seite bleibt luftig; längere Listen liegen auf Warmweiß,
-:root[data-theme="dark"] während Chips und Aktionen das Farbpaar deutlicher zeigen. Header,
-:root[data-theme="dark"] Dock und neutrale Kontextmenüs bleiben schwarz/weiß. */ :root[data-seite="shopping"],
 :root[data-theme="dark"][data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn,.einkauf-reset),
-:root[data-theme="dark"][data-seite="shopping"] .app-dex-dock-inner::before,
-:root[data-theme="dark"] /* SCHLAF: tiefes Midnight #0E1D47 mit warmem Creme #FCEFBB. Der Hero bleibt dunkel und plakativ; längere Daten- und Leseflächen invertieren das Paar,
-:root[data-theme="dark"] damit die Seite ruhig und klar bleibt. */ :root[data-seite="sleep"],
 :root[data-theme="dark"][data-seite="sleep"] .sleep-tonight,
 :root[data-theme="dark"] /* Dunkle Seite: App-Chrome verwendet neutrales Weiß; der harte Schatten der Menü-Symbole bleibt wie bei TRAINING neutral schwarz. */ :root[data-seite="sleep"] .app-dex-header,
 :root[data-theme="dark"][data-seite="sleep"] .app-dex-dock-inner::before,
 :root[data-theme="dark"][data-seite="sleep"] .app-dex-menu,
 :root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span),
 :root[data-theme="dark"][data-seite="body"] :is(.body-add-overlay,.body-entry-overlay,.special-dex-overlay) :is(.kategorie-sheet-menu>button,.body-add-menu>button):not(:last-child),
-:root[data-theme="dark"] /* MIND: Deep Blush mit warmem Gelb. Das direkte Farbpaar trägt Kopf,
-:root[data-theme="dark"] Tapete,
-:root[data-theme="dark"] Chips und Aktionen. Für längere Kartentexte wird das Blush abgedunkelt,
-:root[data-theme="dark"] weil Gelb und helles Blush dort allein zu wenig Kontrast haben. */ :root[data-seite="stress"],
-:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
 :root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button,
 :root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
-:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
 :root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
 :root[data-theme="dark"][data-seite="stress"] .dex-detail-popup,
 :root[data-theme="dark"][data-seite="stress"] .dex-detail-popup :is(.dex-detail-bild,.dex-detail-video,.dex-detail-linkvorschau,.dex-detail-provider,.dex-detail-audio),
-:root[data-theme="dark"][data-seite="stress"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span),
-:root[data-theme="dark"][data-seite="stress"] .app-dex-dock-inner::before,
 :root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-verdienst-gruppe,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-history,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-history>div,
 :root[data-theme="dark"] /* Dunkle Seite: Header und Dock verwenden Weiß; die individuelle gelbe Druckfarbe endet an der Inhaltsebene. Wortmarke bleibt original,
 :root[data-theme="dark"] die Athleten-Silhouette wird für Sichtbarkeit weiß. */ :root[data-seite="coins"] .app-dex-header,
 :root[data-theme="dark"][data-seite="coins"] .app-dex-dock-inner::before,
@@ -12657,269 +12451,29 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] /* Auf der dunklen Profilseite bleibt die App-Schale neutral weiß. */ :root[data-seite="profile"] .app-dex-header,
 :root[data-theme="dark"][data-seite="profile"] .app-dex-dock-inner::before,
 :root[data-theme="dark"][data-seite="profile"] .app-dex-menu,
-:root[data-theme="dark"] /* ============================================================ VERBINDLICHE PALETTENVERTEILUNG Die zehn kuratierten Farbpaare gehören ausschließlich den zehn Hauptbereichen. CAPCOINS und PROFIL bleiben neutrale Utility-Seiten. Diese letzte Schicht ersetzt ältere Einzelfarben vollständig und hält lange Inhalte auf hellen,
-:root[data-theme="dark"] ruhigen Leseflächen. ============================================================ */ /* TRACKER · Soft Blush #FFEDE3 / Braun #49251E */ :root[data-seite="reminders"],
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-dock-inner::before,
-:root[data-theme="dark"] /* ESSEN · Cinnamon #945B39 / Warmweiß #F6EFE9 */ :root[data-seite="essen"],
 :root[data-theme="dark"][data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span),
 :root[data-theme="dark"][data-seite="essen"] .app-dex-header,
-:root[data-theme="dark"] /* EINKAUF · Butter #FFEFB3 / Dunkelgrün #013E37 */ :root[data-seite="shopping"],
-:root[data-theme="dark"] /* SUPPS · Thistle #D8BFD8 / Tiefviolett #2A1E5C */ :root[data-seite="supps"],
 :root[data-theme="dark"][data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span),
-:root[data-theme="dark"] /* TRAINING · Slate Gray #203C3D / Pfirsich-Creme #F9DBBA */ :root[data-seite="training"],
 :root[data-theme="dark"][data-seite="training"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span),
-:root[data-theme="dark"] /* ROUTINEN · dunkles Tekhelet #3F236F / warmes Creme #FFF8ED */ :root[data-seite="habits"],
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-row,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach),
 :root[data-theme="dark"][data-seite="habits"] .app-dex-header,
 :root[data-theme="dark"][data-seite="habits"] :is(.routine-editor-backdrop,.routine-template-backdrop,.meditation-timer-backdrop) .kategorie-sheet :is(.routine-days,.routine-duration) button,
-:root[data-theme="dark"] /* CAPCOINS · dunkles Violett #432C5E / leuchtendes Gelb #FFD400 */ :root[data-seite="coins"],
+:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section,.sleep-analysis-help),
 :root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-balance-card,
 :root[data-theme="dark"][data-seite="coins"] .app-dex-header,
-:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form>button,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label:has(input:checked),
-:root[data-theme="dark"][data-seite="body"] .braverman-nav>[data-braverman-pause],
-:root[data-theme="dark"] /* PROFIL · neutrale Systemseite */ :root[data-seite="profile"]{
+:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form.needs-confirmation,
+:root[data-theme="dark"][data-seite="body"] .ypsi-current-step,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation.is-good,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation.is-attention,
+:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label:has(input:checked){
   border-color:var(--app-outline)!important;
 }
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page::before,
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is(.mahl-timeline,.nutrition-period-inline),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-card,
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help,
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::before,
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after,
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::before,
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after,
-:root[data-theme="dark"][data-seite="body"] .body-v2-ring::after,
-:root[data-theme="dark"][data-seite="body"] .body-v2-card-body,
-:root[data-theme="dark"][data-seite="body"] .body-v2-overview .body-v2-card-body,
-:root[data-theme="dark"][data-seite="body"] .body-chart-empty,
-:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation,
-:root[data-theme="dark"][data-seite="body"] .body-goal-status,
-:root[data-theme="dark"][data-seite="body"] .body-weight-history>ol,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-log-dex-page::before,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring::after,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-analysis-help,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values>span,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-section,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-stats>div,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page::before,
-:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring::after,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-anhaenge,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head,
-:root[data-theme="dark"] .coin-dex-page .coin-next,
-:root[data-theme="dark"] .coin-dex-page .coin-reward,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,
-:root[data-theme="dark"] /* Globale Suche,
-:root[data-theme="dark"] bewusst als neutrale Wissensansicht statt als elfter Dex. */ :root[data-seite="search"],
-:root[data-theme="dark"][data-seite="search"] body,
-:root[data-theme="dark"][data-seite="body"] :is(.body-v2-overview,.body-v2-card,.body-v2-card-body,.body-analysis-help),
-:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p),
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst-gruppe>div>span,.coin-verdienst-frei),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring::after,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block,
-:root[data-theme="dark"][data-seite="body"] .ypsi-top-fold,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-factor-list>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button:active,
-:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form,
-:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities>div>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-background,
-:root[data-theme="dark"][data-seite="body"] .falten-legende-item:active,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-status,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-section,
-:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values)>div,
-:root[data-theme="dark"][data-seite="body"] .ypsi-detail-values>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation-protocols>span,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-form fieldset,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-priority,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label,
-:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item,
-:root[data-theme="dark"][data-seite="body"] .ypsi-protocol-conditions,
-:root[data-theme="dark"][data-seite="body"] .braverman-intro,
-:root[data-theme="dark"][data-seite="body"] .braverman-safety button,
-:root[data-theme="dark"][data-seite="body"] .braverman-result-focus,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores span,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy,
-:root[data-theme="dark"][data-seite="profile"],
-:root[data-theme="dark"][data-seite="profile"] body,
-:root[data-theme="dark"][data-seite="profile"] :is(#app,#view),
-:root[data-theme="dark"][data-seite="profile"] .app-dex-dock::after{
-  background:var(--app-card)!important;
-}
-:root[data-theme="dark"][data-seite="auth"] .auth-marquee,
-:root[data-theme="dark"][data-seite="auth"] .auth-shell [data-auth-form],
-:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-button,.food-dex-action-button),
-:root[data-theme="dark"] :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button),
-:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover),
-:root[data-theme="dark"] :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover),
-:root[data-theme="dark"] /* Tatsächliche COIN-DEX-Übertragung statt bloßer Stilzitate. */ :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero,
-:root[data-theme="dark"][data-seite="body"] .body-v2-hero,
-:root[data-theme="dark"][data-seite="body"] .body-reset-mini,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-hero,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach),
-:root[data-theme="dark"][data-seite="profile"] .sortier-tasten button,
-:root[data-theme="dark"][data-seite="profile"] .profile-ausloggen .btn,
-:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
-:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup,
-:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup .dex-detail-zutaten,
-:root[data-theme="dark"] /* Neutrale Kontextmenüs; nur echte Primäraktionen zeigen das Seitenpaar. */ :root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
-:root[data-theme="dark"][data-seite="training"] .dex-detail-popup,
-:root[data-theme="dark"] /* Kontextmenüs sind eine neutrale Systemebene. Überschrift,
-:root[data-theme="dark"] Menüzeilen und Icons bleiben schwarz; nur klar erkennbare Aktionsbuttons greifen das jeweilige Seitenpaar aus Hintergrund und Druckfarbe wieder auf. */ :root:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"] /* Neutrale Sheets; ausschließlich echte Primäraktionen verwenden Blueberry als Fläche und Creme als Schrift/Icon. */ :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-suche,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,
-:root[data-theme="dark"][data-seite="shopping"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info),
-:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section),
-:root[data-theme="dark"][data-seite="sleep"] .sleep-analysis-help,
-:root[data-theme="dark"] /* SCHLAF-Sheets bleiben neutrale Systemflächen. Nur echte Primäraktionen nehmen das Midnight-/Creme-Paar wieder auf. */ :root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"] /* Kontextmenüs bleiben neutral; ausschließlich echte Primäraktionen greifen Deep Blush und Gelb wieder auf. */ :root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-reward-actions button,
-:root[data-theme="dark"] /* Formulare bleiben eine neutrale weiße Systemebene. Nur die primäre Aktion verwendet Twilight Berry als Fläche und CAPCOIN-Gelb als Beschriftung. */ :root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-overview,.nutrition-card,.mahl-zeitblock ),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero,
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button),
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
-:root[data-theme="dark"][data-seite="essen"] .dex-detail-popup,
-:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button),
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-check,
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty),
-:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions>button,
-:root[data-theme="dark"][data-seite="body"] .braverman-nav>button,
-:root[data-theme="dark"][data-seite="body"] .braverman-result-actions>button,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt.profile-konto{
-  background:var(--app-card)!important;
-  border-color:var(--app-outline)!important;
-  color:var(--text)!important;
-}
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is(.mahl-leerzeile,.rem-row-titel b,.rem-row-titel small,.nutrition-entry b,.nutrition-entry small,.nutrition-entry strong),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value small,
-:root[data-theme="dark"][data-seite="body"] .body-v2-hero-value>small,
-:root[data-theme="dark"][data-seite="body"] :is(.body-v2-card>header,.body-v2-overview>summary) small,
-:root[data-theme="dark"][data-seite="body"] .body-chart-block>header>small,
-:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation>p,
-:root[data-theme="dark"][data-seite="body"] .body-inner-details>p,
-:root[data-theme="dark"][data-seite="body"] .body-weight-history time,
-:root[data-theme="dark"][data-seite="body"] .body-add-menu small,
-:root[data-theme="dark"][data-seite="body"] .guided-fold-grid small,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight-value small,
-:root[data-theme="dark"][data-seite="habits"] .routine-hero-value small,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head em,
-:root[data-theme="dark"] .coin-dex-page .coin-history,
-:root[data-theme="dark"] .coin-dex-page .coin-history :is(span,small,b,.plus,.minus),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero-value small, .nutrition-coin-hero-value strong, .nutrition-coin-hero-value b, .nutrition-coin-overview>summary b, .mahl-zeitblock>header h2, .rem-row-titel b, .nutrition-entry b, .nutrition-entry strong ),
-:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup .dex-detail-zutaten :is(h2,li,span,strong,small,p),
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head :is(b,em,.reminder-group-chevron,.material-svg,svg,svg *),
-:root[data-theme="dark"][data-seite="sleep"] :is( .sleep-checkin-overview>summary b, .sleep-checkin-overview>summary small, .sleep-checkin-overview>summary>.material-svg, .sleep-section>header h2, .sleep-section>header>small, .sleep-insights>header>small, .sleep-checkin-values b, .sleep-checkin-values small, .sleep-plan-comparison b, .sleep-plan-comparison small, .sleep-checkin-empty b, .sleep-checkin-empty span, .sleep-stats strong, .sleep-stats small, .sleep-chart-empty, .sleep-empty, .sleep-insights p, .sleep-history button, .sleep-history button>em ),
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is( .coin-verdienst>summary b, .coin-verdienst>summary small, .coin-verdienst>summary .material-svg, .coin-verdienst>summary svg, .coin-verdienst-hinweis, .coin-verdienst-titel b, .coin-verdienst-gruppe small, .coin-verdienst-gruppe strong, .coin-verdienst-frei b, .coin-verdienst-frei small, .coin-next b, .coin-next small, .coin-next>strong, .coin-reward-kopf b, .coin-reward-kopf small, .coin-reward-kopf>strong, .coin-reward p, .coin-empty b, .coin-empty span ),
-:root[data-theme="dark"][data-seite="profile"] :is( .profile-name, .profile-abschnitt .fld-l, .profile-untertitel, .sammlung-sichtbarkeit>.switchline, .interface-sound-setting, .interface-sound-setting :is(b,small) ),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is(.nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,.nutrition-coin-hero-value b,.nutrition-ring>span),
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-hero-value small,.routine-hero-value strong,.routine-hero-value b,.routine-progress-ring>span),
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-zeitblock>header h2,.routine-zeitblock>header small,.routine-copy b,.routine-zeitblock-leer),
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>header>em,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>p,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-secondary-relations>small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>p,
-:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li>:is(small,a),
-:root[data-theme="dark"][data-seite="body"] .body-falten-legende .body-legende-intro,
-:root[data-theme="dark"][data-seite="body"] .body-legende-disclaimer,
-:root[data-theme="dark"][data-seite="body"] .falten-item-head>small,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-status small,
-:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values) small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation>small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation>div>small,
-:root[data-theme="dark"][data-seite="body"] .skinfold-basis-field>small,
-:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-disclaimer,.falten-detail-quelle),
-:root[data-theme="dark"][data-seite="body"] .braverman-progress>small,
-:root[data-theme="dark"][data-seite="body"] .braverman-question>p,
-:root[data-theme="dark"][data-seite="body"] .braverman-result-focus>div>em,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores>small,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores em,
-:root[data-theme="dark"][data-seite="body"] .braverman-score-list small,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy>header em,
-:root[data-theme="dark"][data-seite="body"] .braverman-dose-list small,
-:root[data-theme="dark"][data-seite="profile"] :is(.profile-name,.profile-abschnitt .fld-l,.profile-untertitel,.sammlung-sichtbarkeit>.switchline,.interface-sound-setting,.interface-sound-setting :is(b,small)){
-  color:var(--muted)!important;
-}
-:root[data-theme="dark"] .coin-dex-page .coin-reward-actions .coin-redeem,
-:root[data-theme="dark"][data-seite="profile"] .role-tag,
-:root[data-theme="dark"][data-seite="profile"] .profile-datei-knopf,
-:root[data-theme="dark"] .neo-dex-page .dex-sammlungskopf button,
-:root[data-theme="dark"] /* Der App-Rahmen bleibt bewusst neutral. Die wechselnden Farbpaare leben innerhalb der Seite; Logo,
-:root[data-theme="dark"] Header und Dock bilden dadurch auf jeder Route dieselbe stabile CAPBOY-Bedienebene. */ :root:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-header,
-:root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-menu,
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero, .nutrition-coin-overview, .nutrition-card, .mahl-zeitblock ),
-:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button,
-:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
-:root[data-theme="dark"][data-seite="essen"] .dex-detail-popup,
-:root[data-theme="dark"][data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
-:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
-:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button,
-:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
-:root[data-theme="dark"][data-seite="supps"] .dex-detail-popup,
-:root[data-theme="dark"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
-:root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
-:root[data-theme="dark"][data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
-:root[data-theme="dark"][data-seite="shopping"] .app-dex-header,
-:root[data-theme="dark"][data-seite="shopping"] .app-dex-menu,
-:root[data-theme="dark"] /* Das mittlere Blush trägt neutrale dunkle App-Bedienung. Dadurch bleibt das Logo original und die gelbe Inhaltsdruckfarbe endet sauber am Seiteninhalt. */ :root[data-seite="stress"] .app-dex-header,
-:root[data-theme="dark"][data-seite="stress"] .app-dex-menu,
-:root[data-theme="dark"][data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet)>header,
-:root[data-theme="dark"][data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
-:root[data-theme="dark"][data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt>summary,
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-header,
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-menu,
-:root[data-theme="dark"][data-seite="supps"] .app-dex-header,
-:root[data-theme="dark"][data-seite="supps"] .app-dex-menu,
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-hero,
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-reward-actions button,
-:root[data-theme="dark"][data-seite="profile"] .app-dex-menu{
-  border-color:var(--app-outline)!important;
-  color:var(--text)!important;
-}
-:root[data-theme="dark"][data-seite="auth"] .auth-shell [data-auth-form] .input,
-:root[data-theme="dark"][data-seite="body"] .body-entry-form :is(input:not([type="checkbox"]):not([type="file"]),select,.input,.falten-summe),
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-tag-chip,
-:root[data-theme="dark"][data-seite="shopping"] :is(.einkauf-chip-btn,.einkauf-reset),
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .input,
-:root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="training"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="essen"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="supps"] .app-dex-header .nav-av,
-:root[data-theme="dark"] /* Kontextmenüs bleiben neutral; nur echte Primäraktionen verwenden das umgekehrte TRACKER-Paar. */ :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet),
-:root[data-theme="dark"][data-seite="habits"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="shopping"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="sleep"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="stress"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="coins"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="profile"] :is( .profile-datei, .themeseg, .sammlungs-sortierung, .themebtn, .sortier-tasten button, .profile-abschnitt .input, .profile-abschnitt .btn, .profile-ausloggen .btn ),
-:root[data-theme="dark"][data-seite="profile"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-header .nav-av,
-:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form select,
-:root[data-theme="dark"][data-seite="profile"] .app-dex-header{
-  background:var(--app-field)!important;
-  border-color:var(--app-outline)!important;
-  color:var(--text)!important;
-}
+:root[data-theme="dark"] .sleep-mini-switch input:checked+span::after,
+:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch-track,
+:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
+:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,
+:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,
 :root[data-theme="dark"][data-seite="body"] .body-v2-overview>summary,
 :root[data-theme="dark"][data-seite="body"] .body-v2-card>header,
 :root[data-theme="dark"][data-seite="body"] .body-skinfold-history .ist-unvollstaendig>summary,
@@ -12928,71 +12482,221 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview>summary,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-row-inhalt,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-suche,
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-row-inhalt,
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt,
 :root[data-theme="dark"] .coin-dex-page .coin-verdienst>summary,
 :root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"][data-seite="search"] .app-dex-header,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge),
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .input:disabled,
+:root[data-theme="dark"] .wissenssuche-feld,
+:root[data-theme="dark"] .wissenssuche-gruppe>div,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge),
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"],
+:root[data-theme="dark"][data-seite="profile"] .switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button:active,
+:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions,
+:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions.is-complete,
 :root[data-theme="dark"][data-seite="body"] .falten-detail-header,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation>summary i,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation>i,
 :root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>header,
-:root[data-theme="dark"][data-seite="profile"] .switchline-track::after{
+:root[data-theme="dark"][data-seite="body"] .braverman-safety button{
   background:var(--app-field)!important;
 }
-:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button,
-:root[data-theme="dark"] :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button,
-:root[data-theme="dark"][data-seite="body"] :is(.body-v2-card,.body-v2-overview),
-:root[data-theme="dark"][data-seite="sleep"] .sleep-insights p,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock,
-:root[data-theme="dark"][data-seite="profile"] .themebtn,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head,
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty),
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt.profile-konto,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-info-help,
-:root[data-theme="dark"] /* COMP · YPSI-Hautfaltenprioritäten und Braverman-Defizitprofil */ :root[data-seite="body"] :is(.ypsi-priority-empty,.ypsi-priority-block),
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-sheet,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-tags>span,
-:root[data-theme="dark"][data-seite="body"] .braverman-question>div>button{
-  background:var(--app-card)!important;
+:root[data-theme="dark"][data-seite="auth"] .auth-shell [data-auth-form] .input,
+:root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="training"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button,
+:root[data-theme="dark"][data-seite="essen"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
+:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button,
+:root[data-theme="dark"][data-seite="supps"] .app-dex-header .nav-av,
+:root[data-theme="dark"] /* Kontextmenüs bleiben neutral; nur echte Primäraktionen verwenden das umgekehrte TRACKER-Paar. */ :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
+:root[data-theme="dark"] /* Kontextmenüs sind eine neutrale Systemebene. Überschrift,
+:root[data-theme="dark"] Menüzeilen und Icons bleiben schwarz; nur klar erkennbare Aktionsbuttons greifen das jeweilige Seitenpaar aus Hintergrund und Druckfarbe wieder auf. */ :root:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="habits"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-suche,
+:root[data-theme="dark"][data-seite="shopping"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info),
+:root[data-theme="dark"][data-seite="sleep"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button,
+:root[data-theme="dark"] /* Das mittlere Blush trägt neutrale dunkle App-Bedienung. Dadurch bleibt das Logo original und die gelbe Inhaltsdruckfarbe endet sauber am Seiteninhalt. */ :root[data-seite="stress"] .app-dex-header,
+:root[data-theme="dark"][data-seite="stress"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-reward-actions button,
+:root[data-theme="dark"][data-seite="coins"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt>summary,
+:root[data-theme="dark"][data-seite="profile"] :is( .profile-datei, .themeseg, .sammlungs-sortierung, .themebtn, .sortier-tasten button, .profile-abschnitt .input, .profile-abschnitt .btn, .profile-ausloggen .btn ),
+:root[data-theme="dark"][data-seite="profile"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="reminders"] .app-dex-header,
+:root[data-theme="dark"][data-seite="reminders"] .app-dex-header .nav-av,
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button),
+:root[data-theme="dark"][data-seite="shopping"] .app-dex-header,
+:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.dex-sammlungskopf button,.neo-dex-filter button,.food-dex-filter button),
+:root[data-theme="dark"][data-seite="supps"] .app-dex-header,
+:root[data-theme="dark"][data-seite="profile"] .app-dex-header{
+  background:var(--app-field)!important;
+  border-color:var(--app-outline)!important;
   color:var(--text)!important;
 }
-:root[data-theme="dark"] /* COIN-DEX als Kartenreferenz: eine hervorgehobene Tagesbilanz mit hartem,
-:root[data-theme="dark"] rein senkrechtem Schatten; die wiederholten Mahlzeiten bleiben flacher. */ :root[data-seite="reminders"] .meal-log-dex-page .nutrition-card,
-:root[data-theme="dark"][data-seite="body"] .body-v2-overview,
-:root[data-theme="dark"][data-seite="body"] .body-analysis-help,
-:root[data-theme="dark"][data-seite="body"] .guided-fold-grid fieldset,
-:root[data-theme="dark"][data-seite="habits"] .routine-info-help,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-suche,
-:root[data-theme="dark"][data-seite="profile"] .avatar,
-:root[data-theme="dark"][data-seite="profile"] .profile-datei,
-:root[data-theme="dark"][data-seite="profile"] :is(.themeseg,.sammlungs-sortierung),
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
+:root[data-theme="dark"][data-seite="body"] .seitenkopf-kicker,
+:root[data-theme="dark"][data-seite="reminders"] .seitenkopf-kicker,
+:root[data-theme="dark"][data-seite="food-log"] .seitenkopf-kicker,
+:root[data-theme="dark"][data-seite="auth"] .auth-marquee,
+:root[data-theme="dark"][data-seite="auth"] .auth-shell [data-auth-form],
+:root[data-theme="dark"] .routine-delete,
+:root[data-theme="dark"] .kategorie-sheet .dex-entry-file,
+:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
+:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup,
+:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
+:root[data-theme="dark"][data-seite="essen"] .dex-detail-popup,
+:root[data-theme="dark"] /* Neutrale Kontextmenüs; nur echte Primäraktionen zeigen das Seitenpaar. */ :root[data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
+:root[data-theme="dark"][data-seite="training"] .dex-detail-popup,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-info-help,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock,
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-check,.routine-start,.routine-attach),
+:root[data-theme="dark"] /* Neutrale Sheets; ausschließlich echte Primäraktionen verwenden Blueberry als Fläche und Creme als Schrift/Icon. */ :root[data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="shopping"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-overview,.sleep-section),
+:root[data-theme="dark"][data-seite="sleep"] .sleep-analysis-help,
+:root[data-theme="dark"] /* SCHLAF-Sheets bleiben neutrale Systemflächen. Nur echte Primäraktionen nehmen das Midnight-/Creme-Paar wieder auf. */ :root[data-seite="sleep"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"] /* Kontextmenüs bleiben neutral; ausschließlich echte Primäraktionen greifen Deep Blush und Gelb wieder auf. */ :root[data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst,.coin-next,.coin-reward,.coin-empty),
+:root[data-theme="dark"] /* Formulare bleiben eine neutrale weiße Systemebene. Nur die primäre Aktion verwendet Twilight Berry als Fläche und CAPCOIN-Gelb als Beschriftung. */ :root[data-seite="coins"] :is(.special-dex-sheet,.kategorie-sheet),
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt.profile-konto,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-overview,.nutrition-card,.mahl-zeitblock ),
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-check{
+  background:var(--app-card)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] /* EINKAUF: Formular und Abteilungslisten auf das kompakte Mahlzeitenraster. */ .dex-audio-vorschau,
+:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button,
+:root[data-theme="dark"] :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button,
+:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-button,.food-dex-action-button),
+:root[data-theme="dark"] :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button),
+:root[data-theme="dark"][data-seite="body"] .body-entry-form :is(input:not([type="checkbox"]):not([type="file"]),select,.input,.falten-summe),
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-tag-chip,
+:root[data-theme="dark"][data-seite="shopping"] :is(.einkauf-chip-btn,.einkauf-reset),
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt>summary,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .input,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .input:disabled,
+:root[data-theme="dark"][data-seite="profile"] .sortier-tasten button,
+:root[data-theme="dark"] .app-dex-header .nav-av,
+:root[data-theme="dark"] /* Globale Suche,
+:root[data-theme="dark"] bewusst als neutrale Wissensansicht statt als elfter Dex. */ :root[data-seite="search"],
+:root[data-theme="dark"][data-seite="search"] body,
+:root[data-theme="dark"][data-seite="search"] .app-dex-header,
+:root[data-theme="dark"] .wissenssuche-seite,
+:root[data-theme="dark"] .wissenssuche-filter button,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-row-inhalt,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-verdienst>summary,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight :is(button,.sleep-analysis-info),
+:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>header>button,
+:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button,
+:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form select,
+:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions>button,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>summary i,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation>i,
+:root[data-theme="dark"][data-seite="body"] .braverman-question>div>button,
+:root[data-theme="dark"][data-seite="body"] .braverman-nav>button,
+:root[data-theme="dark"][data-seite="body"] .braverman-result-actions>button{
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] .routine-check,
+:root[data-theme="dark"] .food-dex-info-dialog,
+:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover),
+:root[data-theme="dark"] :is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover),
+:root[data-theme="dark"] /* Tatsächliche COIN-DEX-Übertragung statt bloßer Stilzitate. */ :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help,
+:root[data-theme="dark"][data-seite="body"] .body-log-dex-page,
+:root[data-theme="dark"][data-seite="body"] .body-v2-hero,
+:root[data-theme="dark"][data-seite="body"] :is(.body-v2-card,.body-v2-overview),
+:root[data-theme="dark"][data-seite="body"] .body-reset-mini,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-analysis-help,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview,
+:root[data-theme="dark"][data-seite="sleep"] .sleep-insights p,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-hero,
+:root[data-theme="dark"][data-seite="habits"] .routine-info-help,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-start,.routine-attach),
+:root[data-theme="dark"][data-seite="profile"] .themebtn,
+:root[data-theme="dark"][data-seite="profile"] .profile-ausloggen .btn,
+:root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup .dex-detail-zutaten,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head,
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-icon,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-info-help,
+:root[data-theme="dark"] /* COMP · YPSI-Hautfaltenprioritäten und Braverman-Defizitprofil */ :root[data-seite="body"] :is(.ypsi-priority-empty,.ypsi-priority-block),
+:root[data-theme="dark"][data-seite="body"] .ypsi-factor-list>span,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-sheet,
+:root[data-theme="dark"][data-seite="body"] .falten-detail-tags>span,
+:root[data-theme="dark"][data-seite="body"] .ypsi-relation-protocols>span,
+:root[data-theme="dark"][data-seite="body"] .braverman-safety,
+:root[data-theme="dark"][data-seite="body"] .braverman-warning{
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] .dex-entry-delete,
+:root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-tags input:checked+span,
+:root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-rating input:checked+span,
+:root[data-theme="dark"] .coin-dex-page .coin-reward-actions .coin-redeem,
+:root[data-theme="dark"] /* Der App-Rahmen bleibt bewusst neutral. Die wechselnden Farbpaare leben innerhalb der Seite; Logo,
+:root[data-theme="dark"] Header und Dock bilden dadurch auf jeder Route dieselbe stabile CAPBOY-Bedienebene. */ :root:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-header,
+:root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"]) .app-dex-menu,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero, .nutrition-coin-overview, .nutrition-card, .mahl-zeitblock ),
+:root[data-theme="dark"][data-seite="body"] :is(.body-v2-hero,.body-v2-overview,.body-v2-card),
+:root[data-theme="dark"][data-seite="body"] .dex-detail-popup,
+:root[data-theme="dark"][data-seite="body"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
+:root[data-theme="dark"][data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
+:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte,
+:root[data-theme="dark"][data-seite="supps"] .dex-detail-popup,
+:root[data-theme="dark"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
+:root[data-theme="dark"]:is([data-seite="reminders"],[data-seite="body"],[data-seite="food-log"],[data-seite="training"]) :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-hero,
+:root[data-theme="dark"][data-seite="habits"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
+:root[data-theme="dark"][data-seite="shopping"] .app-dex-header,
+:root[data-theme="dark"][data-seite="shopping"] .app-dex-menu,
+:root[data-theme="dark"][data-seite="stress"] .app-dex-menu,
+:root[data-theme="dark"][data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet)>header,
+:root[data-theme="dark"][data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet)>header :is(h1,h2,h3,button,.material-svg,svg,svg *),
+:root[data-theme="dark"][data-seite="stress"] :is(.special-dex-sheet,.kategorie-sheet) :is(.sheet-menue,.kategorie-sheet-menu)>button,
+:root[data-theme="dark"][data-seite="reminders"] .app-dex-menu,
+:root[data-theme="dark"][data-seite="supps"] .app-dex-menu,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-reward-actions button,
+:root[data-theme="dark"][data-seite="body"] .braverman-nav>[data-braverman-pause],
+:root[data-theme="dark"][data-seite="profile"] .app-dex-menu{
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .btn-danger,
+:root[data-theme="dark"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
+:root[data-theme="dark"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
+:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol :is(i,b),
+:root[data-theme="dark"][data-seite="shopping"] .app-dex-dock-inner::before,
+:root[data-theme="dark"][data-seite="stress"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span),
+:root[data-theme="dark"][data-seite="stress"] .app-dex-dock-inner::before,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-balance-card,
+:root[data-theme="dark"][data-seite="reminders"] .app-dex-dock-inner::before,
+:root[data-theme="dark"][data-seite="supps"] .app-dex-dock-inner::before,
 :root[data-theme="dark"][data-seite="profile"] .app-dex-dock-inner::before{
   background:var(--app-card)!important;
   border-color:var(--app-outline)!important;
 }
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt>summary,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-row-inhalt,
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-verdienst>summary,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>header>button{
-  background:var(--app-field)!important;
-  color:var(--text)!important;
-}
+:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
+:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau,
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"],
 :root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header{
   background:var(--app-field)!important;
   border-color:var(--app-outline)!important;
 }
 :root[data-theme="dark"][data-seite="food-log"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
+  background:var(--app-card)!important;
   border-color:var(--app-outline)!important;
   color:var(--muted)!important;
 }
@@ -13001,132 +12705,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--muted)!important;
 }
 
-/* --- Nachtrag: Token-gefärbte Schrift und unscoped Flächen ---------- */
-/* Viele Überschriften holen ihre Farbe über color:var(--dex-ink,…) statt
-   über einen Hex-Wert; im Dunkeln stünde sonst die Seitenfarbe auf Navy.
-   Dazu Flächen, die ohne Seiten-Scope hell gesetzt sind. */
-:root[data-theme="dark"] .dex-fixkopf .kategorie-kopftitel,
-:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page) :is(.unter-sammlungen-block>h2,.sammlung-alle>h2,.dex-eintrag-gruppe>h2),
-:root[data-theme="dark"] .nutrition-knowledge-card li>i,
-:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-primary,.food-dex-action-primary),
-:root[data-theme="dark"] .kategorie-sheet .dex-entry-file :is(.material-svg,svg,svg *),
-:root[data-theme="dark"][data-seite="body"] .body-log-dex-page,
-:root[data-theme="dark"][data-seite="body"] .body-analysis-info,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-section-title>.material-svg,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight button,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-tonight button :is(.material-svg,svg,svg *),
-:root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-tags input:checked+span,
-:root[data-theme="dark"][data-seite="sleep"] .special-dex-overlay .sleep-rating input:checked+span,
-:root[data-theme="dark"][data-seite="habits"] .routine-info-button,
-:root[data-theme="dark"] .coin-dex-page,
-:root[data-theme="dark"] .coin-dex-page .kategorie-kopftitel,
-:root[data-theme="dark"] .coin-dex-page :is(.coin-section-title h2,.coin-history-title),
-:root[data-theme="dark"] .app-dex-header,
-:root[data-theme="dark"] .app-dex-dock,
-:root[data-theme="dark"] .app-dex-tab,
-:root[data-theme="dark"] .app-dex-menu,
-:root[data-theme="dark"] .app-dex-search,
-:root[data-theme="dark"] .app-dex-header .coin-kopfstand strong,
-:root[data-theme="dark"] .neo-dex-page .dex-sammlungskopf,
-:root[data-theme="dark"] .neo-dex-page .dex-sammlungskopf button,
-:root[data-theme="dark"] /* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */ :root[data-seite="reminders"] .meal-log-dex-page,
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero, .nutrition-coin-overview, .nutrition-card, .mahl-zeitblock ),
-:root[data-theme="dark"] /* COMP: Cotton Cloud mit Pink fuer Daten,
-:root[data-theme="dark"] Konturen und Aktionen. */ :root[data-seite="body"] .body-log-dex-page,
-:root[data-theme="dark"][data-seite="body"] :is(.body-v2-hero,.body-v2-overview,.body-v2-card),
-:root[data-theme="dark"][data-seite="body"] .dex-detail-popup,
-:root[data-theme="dark"][data-seite="body"] .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button),
-:root[data-theme="dark"][data-seite="body"] .dex-detail-popup .dex-detail-inhalt h1,
-:root[data-theme="dark"][data-seite="body"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link),
-:root[data-theme="dark"] /* TRAINING: tiefes Grün mit dem aus der Vorlage entnommenen Creme #FCEFBB. Rasterkarten invertieren das Paar,
-:root[data-theme="dark"] damit auch längere Notizen und Vorschauen ruhig lesbar bleiben. */ :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page),
-:root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is( .dex-sammlungskopf, .unter-sammlungen-block>h2, .sammlung-alle>h2, .dex-eintrag-gruppe>h2, .sammlung-leer, .sammlung-leer strong, .sammlung-leer span ),
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button>i,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button>.material-svg,
-:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form>button,
-:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories h4>.material-svg,
-:root[data-theme="dark"][data-seite="body"] .ypsi-action-categories>article>ol>li::before,
-:root[data-theme="dark"][data-seite="body"] .ypsi-active-priority,
-:root[data-theme="dark"][data-seite="body"] .ypsi-primary-fold,
-:root[data-theme="dark"][data-seite="body"] .ypsi-current-step,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label:has(input:checked)>b,
-:root[data-theme="dark"][data-seite="body"] .ypsi-phase-group>h4,
-:root[data-theme="dark"][data-seite="body"] .braverman-nav>[data-braverman-pause],
-:root[data-theme="dark"][data-seite="body"] .braverman-dose-list strong{
-  color:var(--text)!important;
-}
-:root[data-theme="dark"] .emoji-eigen input,
-:root[data-theme="dark"] .emoji-eigen button,
-:root[data-theme="dark"] .sammlung-emoji-eigen input,
-:root[data-theme="dark"] .sleep-mini-switch input:checked+span::after,
-:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,
-:root[data-theme="dark"] .mahl-mini-switch-track,
-:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
-:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,
-:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"] .interface-sound-setting>input:checked~.switchline-track::after,
-:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"] .mess-einst .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"] .app-dex-header .nav-av,
-:root[data-theme="dark"] .wissenssuche-seite,
-:root[data-theme="dark"] .wissenssuche-feld,
-:root[data-theme="dark"] .wissenssuche-filter button,
-:root[data-theme="dark"] .wissenssuche-gruppe>div{
-  background:var(--app-field)!important;
-}
-:root[data-theme="dark"] .routine-timer-exercises li>span,
-:root[data-theme="dark"] .kategorie-sheet .dex-entry-file small,
-:root[data-theme="dark"] .coin-dex-page .coin-history,
-:root[data-theme="dark"] .coin-dex-page .coin-history :is(span,small,b,.plus,.minus),
-:root[data-theme="dark"] .special-dex-page :is(small,.body-explain,.routine-copy small,.sleep-chart-empty),
-:root[data-theme="dark"] .kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button small,
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page :is( .nutrition-coin-hero-value small, .nutrition-coin-hero-value strong, .nutrition-coin-hero-value b, .nutrition-coin-overview>summary b, .mahl-zeitblock>header h2, .rem-row-titel b, .nutrition-entry b, .nutrition-entry strong ),
-:root[data-theme="dark"][data-seite="body"] :is( .body-v2-hero-value>small, .body-v2-hero-value strong, .body-v2-hero-value b, .body-v2-overview>summary b, .body-v2-card>header b, .body-v2-overview>summary>.material-svg, .body-v2-card-body>.mini-title, .bodycomp-message, .body-latest-value>strong, .body-chart-block>header>b, .body-analysis-help b, .body-explain b, .body-chart-legend b, .body-goal-status b, .body-inner-details>summary ),
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block>header small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-top-fold>small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview>header small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button em,
-:root[data-theme="dark"][data-seite="body"] .ypsi-guided-plan>header>small,
-:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities small,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-header small,
-:root[data-theme="dark"][data-seite="body"] .braverman-question>small,
-:root[data-theme="dark"][data-seite="body"] .braverman-result-focus>small,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy>header small{
-  color:var(--muted)!important;
-}
-:root[data-theme="dark"] /* EINKAUF: Formular und Abteilungslisten auf das kompakte Mahlzeitenraster. */ .dex-audio-vorschau,
-:root[data-theme="dark"] .dex-detail-audio,
-:root[data-theme="dark"] .routine-check,
-:root[data-theme="dark"] .routine-delete,
-:root[data-theme="dark"] .sammlung-editor-farben button,
-:root[data-theme="dark"] .sammlung-editor-icons button,
-:root[data-theme="dark"] .food-dex-info-dialog,
-:root[data-theme="dark"] .nutrition-product-head>img,
-:root[data-theme="dark"] .nutrition-product-head>.material-svg,
-:root[data-theme="dark"] .dex-auswahl-marker{
-  background:var(--app-card)!important;
-}
-:root[data-theme="dark"] .kategorie-sheet .dex-entry-file{
-  background:var(--app-card)!important;
-  color:var(--text)!important;
-}
-
 /* ============================================================
-   DARKMODE · Token-Rücksetzung auf den Seiten-Wrappern
-
-   Der eigentliche Grund, warum einzelne Seiten im Dunkeln hell blieben:
-   Die Seiten-Wrapper definieren die Kern-Tokens LOKAL um, z. B.
-
-     :root[data-seite="habits"] .routine-dex-page{
-       --surface:#FFFCF5; --text:#4B125C; --ink:#4B125C; --muted:#715D75;
-     }
-
-   Innerhalb dieser Seite löst var(--text) damit zu Lila auf statt zu Weiß –
-   jede Regel, die korrekt auf Tokens setzt, bekam trotzdem die helle Palette.
-
-   Die --dm-* Konstanten unten werden von keiner Seite überschrieben und
-   dienen deshalb als sichere Quelle für die Rücksetzung.
+   DARKMODE · Hülle, Tokens und Ausnahmen (handgeschrieben)
    ============================================================ */
+
+/* --- Unschattierbare Dark-Konstanten ---------------------------------- */
+/* Die Seiten-Wrapper definieren --surface, --text, --ink und --muted lokal
+   um. Innerhalb einer Seite löst var(--text) deshalb zur Seitenfarbe auf
+   statt zu Weiß. Diese --dm-* werden von keiner Seite überschrieben. */
 :root[data-theme="dark"]{
   --dm-surface:#182234;
   --dm-surface2:#222E43;
@@ -13134,20 +12720,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --dm-ink:#94A0B4;
   --dm-muted:#B7C0CF;
   --dm-faint:#A1ACBD;
+  --cap-card:var(--dm-surface);
+  --cap-tint:var(--dm-surface2);
+  --cap-card-border:1.5px solid var(--dm-ink);
+  --cap-muted:var(--dm-muted);
+  --brand-outline:#0A1330;
 }
+
+/* --- Token-Rücksetzung auf den Seiten-Wrappern ------------------------ */
 :root[data-theme="dark"] :is(
-  .special-dex-page,
-  .body-log-dex-page,
-  .routine-dex-page,
-  .shopping-dex-page,
-  .shopping-dex-wrap,
-  .sleep-dex-page,
-  .sleep-log-dex-page,
-  .meal-log-dex-page,
-  .coin-dex-page,
-  .neo-dex-page,
-  .food-dex-page,
-  .training-dex-page
+  .special-dex-page,.body-log-dex-page,.routine-dex-page,.shopping-dex-page,
+  .shopping-dex-wrap,.sleep-dex-page,.sleep-log-dex-page,.meal-log-dex-page,
+  .coin-dex-page,.neo-dex-page,.food-dex-page,.training-dex-page,
+  .wissenssuche-seite
 ){
   --surface:var(--dm-surface);
   --surface2:var(--dm-surface2);
@@ -13159,7 +12744,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-card:var(--dm-surface);
   --app-field:var(--dm-surface2);
   --app-outline:var(--dm-ink);
-  /* Seitenspezifische Kartenflächen */
   --cap-card:var(--dm-surface);
   --cap-tint:var(--dm-surface2);
   --cap-muted:var(--dm-muted);
@@ -13170,16 +12754,98 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dm-text)!important;
 }
 
-/* Bildplatzhalter der Inhaltskarten: bis das Vorschaubild geladen ist, stand
-   hier die Seitenfarbe und blitzte hell auf. */
-:root[data-theme="dark"] .dex-inhaltskarte-vorschau{
-  background:var(--app-field)!important;
+/* --- Seitenfläche ----------------------------------------------------- */
+:root[data-theme="dark"],
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] #app,
+:root[data-theme="dark"] #view{
+  background:var(--bg)!important;
+}
+:root[data-theme="dark"] :is(
+  .special-dex-page,.body-log-dex-page,.coin-dex-page,.food-dex-page,
+  .meal-log-dex-page,.neo-dex-page,.routine-dex-page,.shopping-dex-page,
+  .sleep-dex-page,.sleep-log-dex-page,.training-dex-page,.wissenssuche-seite
+){
+  background:var(--bg)!important;
 }
 
-/* Die Seitenregeln für Inhaltskarten tragen die Form
-   :root[data-seite="…"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte…
-   und liegen damit über einer kurz geschriebenen Gegenregel. Gleiche Form,
-   spätere Position. */
+/* --- Header, Dock, Tabs ----------------------------------------------- */
+:root[data-theme="dark"] .app-dex-header{
+  background:var(--bg)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+  --dex-ink:var(--dm-text);
+}
+:root[data-theme="dark"] .app-dex-header .nav-av{
+  background:var(--app-field)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] .app-dex-dock{color:var(--text)!important;--dex-ink:var(--dm-text)}
+:root[data-theme="dark"] .app-dex-dock::after{background:var(--bg)!important}
+:root[data-theme="dark"] .app-dex-dock-inner::before{
+  background:color-mix(in srgb,var(--app-card) 88%,transparent)!important;
+  border-color:var(--app-outline)!important;
+}
+:root[data-theme="dark"] .app-dex-tab{color:var(--muted)!important}
+:root[data-theme="dark"] .app-dex-tab.aktiv{
+  background:var(--app-field)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+
+/* --- Ringe: die weiße Innenfläche ------------------------------------- */
+:root[data-theme="dark"] :is(
+  .body-v2-ring,.body-v2-ring::after,.routine-progress-ring::after,
+  .sleep-duration-ring,.sleep-duration-ring::after,.nutrition-ring::after
+){
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] :is(.body-v2-ring,.nutrition-ring,.sleep-duration-ring) :is(b,small,span){
+  color:var(--text)!important;
+}
+
+/* --- Chips: neutral dunkel, aktiv behält den Akzent ------------------- */
+:root[data-theme="dark"] :is(.neo-dex-filter,.food-dex-filter) button,
+:root[data-theme="dark"] .dex-sammlungskopf button{
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+:root[data-theme="dark"] :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
+  background:var(--dex-accent,var(--dex-ink,var(--app-field)))!important;
+  color:var(--dex-accent-ink,var(--text))!important;
+  border-color:var(--dex-accent,var(--dex-ink,var(--app-outline)))!important;
+}
+
+/* --- COMP: Regeln mit aufgeblähter :is()-Spezifität ------------------- */
+/* Diese beiden Listen führen sehr spezifische Einträge
+   (`.body-entry-form input:not(…):not(…)`, `.body-v2-overview>summary b`).
+   :is() erbt die Spezifität seines stärksten Arguments, die Regeln wiegen
+   dadurch (0,5,1) bzw. (0,3,2). Gleiche Form, spätere Position. */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero,.body-v2-overview,.body-v2-card,.body-analysis-help,
+  .body-reset-mini,.guided-fold-grid fieldset,
+  .body-entry-form input:not([type="checkbox"]):not([type="file"]),
+  .body-entry-form select,.body-entry-form .input,
+  .body-entry-form .falten-summe,.body-entry-form .btn-primary
+){
+  border-color:var(--app-outline)!important;
+}
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-hero-value>small,.body-v2-hero-value strong,.body-v2-hero-value b,
+  .body-v2-overview>summary b,.body-v2-card>header b,
+  .body-v2-overview>summary>.material-svg,.body-v2-card-body>.mini-title,
+  .bodycomp-message,.body-latest-value>strong,.body-chart-block>header>b,
+  .body-analysis-help b,.body-explain b,.body-chart-legend b,
+  .body-goal-status b,.body-inner-details>summary
+){
+  color:var(--text)!important;
+}
+
+/* --- Inhaltskarten: Seitenregeln tragen die Form
+   :root[data-seite="…"] :is(.neo-dex-page,.food-dex-page) .dex-… --------- */
 :root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   background:var(--app-field)!important;
   border-color:var(--app-outline)!important;
@@ -13190,4 +12856,54 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte small{
   color:var(--muted)!important;
+}
+
+/* --- Logo: auf jeder Route identisch ---------------------------------- */
+/* Die Silhouette hinter dem Schriftzug war je nach Seite mal weiß, mal
+   blass – die Seiten-Header setzen eigene Marken-Tokens. */
+:root[data-theme="dark"] .brand::before{
+  filter:brightness(0) invert(1)!important;
+  opacity:1!important;
+}
+:root[data-theme="dark"] .app-dex-header{
+  --sil-filter:brightness(0) invert(1);
+  --brand-outline:#0A1330;
+}
+
+/* --- Header-Werkzeuge: kein weißer Kasten ----------------------------- */
+:root[data-theme="dark"] .app-dex-search,
+:root[data-theme="dark"] .app-dex-search.aktiv{
+  background:var(--app-field)!important;
+  border-color:var(--app-outline)!important;
+  color:var(--text)!important;
+}
+
+/* --- Tapeten: überall gleich groß und gleich stark -------------------- */
+/* Im Retro-Look tragen alle Seiten dieselbe Deckkraft und eine vergrößerte
+   Kachel, damit nicht zu viele Symbole gleichzeitig zu sehen sind. Im
+   Dunkeln liefen Größe und Deckkraft je Seite auseinander, weil die Tapete
+   mit --dex-ink eingefärbt wird und jede Seite dort etwas anderes stehen
+   hat. Hier einmal vereinheitlicht. */
+:root[data-theme="dark"] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before,
+:root[data-theme="dark"] :is(
+  .special-dex-page,.body-log-dex-page,.routine-dex-page,.shopping-dex-page,
+  .sleep-dex-page,.sleep-log-dex-page,.meal-log-dex-page,.coin-dex-page,
+  .neo-dex-page,.food-dex-page,.training-dex-page
+)::before{
+  background:var(--dm-text)!important;
+  opacity:.05!important;
+  -webkit-mask-size:460px auto!important;
+  mask-size:460px auto!important;
+  -webkit-mask-repeat:repeat!important;
+  mask-repeat:repeat!important;
+}
+
+/* --- TRACKER: Hero-Zahlen tragen Weiß, nicht die Seitenfarbe ---------- */
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value strong,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value b{
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value small{
+  color:var(--dm-muted)!important;
 }
