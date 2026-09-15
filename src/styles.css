@@ -11763,7 +11763,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .braverman-intro>div{display:grid;gap:3px}
 :root[data-seite="body"] .braverman-intro b{color:#111!important;font:800 13px/1.2 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .braverman-intro p{margin:0;color:#5c6470;font:500 10.5px/1.4 var(--tech)}
-:root[data-seite="body"] .braverman-sheet{width:min(calc(100vw - 16px),520px)!important;max-width:520px!important}
+/* 100% statt 100vw: der Backdrop hat seitlich --dex-content-gutter Polsterung.
+   Mit 100vw wurde das Sheet breiter als sein Gitterfeld, wodurch die Spalte
+   ueber den Inhaltsbereich hinauswuchs und das Sheet sichtbar nach rechts
+   rutschte. */
+:root[data-seite="body"] .braverman-sheet{width:min(100%,520px)!important;max-width:520px!important}
 :root[data-seite="body"] .braverman-test-body{display:grid;gap:18px;padding:18px 16px 24px}
 :root[data-seite="body"] .braverman-progress{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
 :root[data-seite="body"] .braverman-progress>span{height:8px;overflow:hidden;border-radius:99px;background:#e3e3e3}
@@ -11802,7 +11806,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .neurotransmitter-other-scores span{display:grid;gap:3px;min-width:0;padding:9px;border-radius:9px;background:#f3f3f3}
 :root[data-seite="body"] .neurotransmitter-other-scores b{overflow:hidden;color:#111!important;font:750 9.5px/1.2 var(--ui);text-overflow:ellipsis;white-space:nowrap}
 :root[data-seite="body"] .neurotransmitter-other-scores em{color:#646b75;font:600 8px/1.2 var(--tech);font-style:normal;white-space:nowrap}
-:root[data-seite="body"] .neurotransmitter-open{min-height:48px!important;margin-top:2px!important;font-size:13px!important}
+:root[data-seite="body"] .neurotransmitter-open{min-height:48px!important;margin:16px 0 12px!important;font-size:13px!important}
 :root[data-seite="body"] .neurotransmitter-note{margin:0!important;color:#68707b!important;font:550 8.5px/1.35 var(--tech)!important;text-align:center}
 :root[data-seite="body"] .braverman-score-list{display:grid;gap:9px}
 :root[data-seite="body"] .braverman-score-list>div{display:grid;gap:5px}
