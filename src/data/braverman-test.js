@@ -2,27 +2,58 @@ export const BRAVERMAN_BEREICHE = Object.freeze({
   dopamin: {
     label: 'Dopamin',
     kurz: 'Antrieb, Energie und zielgerichtete Aufmerksamkeit',
+    defizitKurz: 'Antriebslosigkeit, niedrige Energie oder geringe Motivation',
     seminarLebensmittel: ['Rind', 'Sardinen', 'Pinienkerne', 'Bison', 'Büffel', 'Kaffee', 'Avocado', 'Eier'],
     seminarSupplemente: ['Koffein', 'L-Tyrosin', 'DL-Phenylalanin', 'Bacopa Monnieri'],
+    seminarAlltag: ['Ein passendes Frühstück einplanen.'],
+    seminarTraining: {
+      intensitaet: 'moderat bis hoch',
+      volumen: 'moderat bis hoch',
+      beispiele: ['5 × (1, 1, 1, 1, 1)', '3 × (3, 2, 1)', '10 × 3'],
+      sprint: '6 × 30 m oder 4 × 50 m',
+    },
+    bravermanLebensmittel: ['Geflügel', 'Hüttenkäse', 'Eier', 'Schweinefleisch', 'Ricotta', 'Sojaprodukte', 'Walnüsse', 'Weizenkeime', 'Granola', 'Hafer', 'Ente', 'Milch oder Joghurt'],
+    bravermanAlltag: ['Bauchatmung oder Wechselatmung üben.', 'Dreimal pro Woche Krafttraining einplanen.', 'Rauchen und vermeidbare Blei- oder Cadmiumexposition vermeiden.', 'Koffein nur morgens und bei Schlaflosigkeit oder Zittern reduzieren.'],
   },
   acetylcholin: {
     label: 'Acetylcholin',
     kurz: 'Gedächtnis, Verarbeitungsgeschwindigkeit und Kreativität',
+    defizitKurz: 'Vergesslichkeit oder verlangsamte Verarbeitung',
     seminarLebensmittel: ['Eigelb (Cholin)', 'Beeren', 'Nüsse', 'Butter', 'Geflügel', 'Eiscreme', 'Gesättigte Fette'],
     seminarSupplemente: ['Cholin (Lecithin)', 'Huperzine A', 'Acetyl-L-Carnitin', 'Alpha GPC'],
+    seminarTraining: {
+      intensitaet: 'moderat',
+      volumen: 'niedrig bis hoch',
+      beispiele: ['7, 5, 3, 7, 5, 3', '10 × 5', '10 × 10'],
+      sprint: '10 × 100 m',
+    },
   },
   gaba: {
     label: 'GABA',
     kurz: 'Ruhe, Belastbarkeit und gleichmäßiger Rhythmus',
+    defizitKurz: 'Nervosität, innere Unruhe oder sprunghafte Konzentration',
     seminarLebensmittel: [],
     seminarSupplemente: ['Taurin', 'Inositol', 'B-Vitamine', 'Glycin', 'Magnesium-L-Threonat', 'L-Theanin', 'Phenyl-GABA'],
     seminarHinweis: 'Die Seminarunterlagen halten ausdrücklich fest, dass gewöhnliche GABA-Supplements GABA nicht erhöhen.',
+    seminarTraining: {
+      intensitaet: 'niedrig bis moderat',
+      volumen: 'niedrig bis moderat',
+      beispiele: ['5, 3, 1', '5 × 5', '4 × 6–8'],
+      sprint: '',
+    },
   },
   serotonin: {
     label: 'Serotonin',
     kurz: 'Wohlbefinden, Schlafrhythmus und Regeneration',
+    defizitKurz: 'Niedergeschlagenheit, Grübeln oder gestörter Schlaf',
     seminarLebensmittel: ['Kohlenhydrate'],
     seminarSupplemente: ['Magnesium', 'Vitamin B6', 'Inositol', 'Liposomales Melatonin'],
+    seminarTraining: {
+      intensitaet: 'niedrig bis moderat',
+      volumen: 'hoch',
+      beispiele: ['5 × 6–8', '10 × 10', '10 × 20'],
+      sprint: '20 Minuten',
+    },
   },
 });
 

@@ -14,6 +14,7 @@ import { alterAmMessdatum, koerperfettAnteil, magermasse } from './ypsiFormel.js
 import {
   buildSkinfoldActionPlan,
   buildSkinfoldPlan,
+  buildNeurotransmitterCoachPlan,
   bravermanComplete,
   bravermanRecommendations,
   scoreBravermanAssessment,
@@ -44,9 +45,14 @@ const HAUTFALTEN_CONTEXT_FIELDS = Object.freeze([
   { group: 'Darm & Ernährung', id: 'mercuryContext', label: 'Ein Quecksilber-/Schwermetallkontext wurde fachlich eingeordnet.' },
   { group: 'Darm & Ernährung', id: 'mealsIrregular', label: 'Ich lasse häufig Mahlzeiten aus oder esse täglich zu stark wechselnden Zeiten.' },
   { group: 'Darm & Ernährung', id: 'postMealCrash', label: 'Nach Mahlzeiten treten häufig starke Müdigkeit, Heißhunger oder ein deutlicher Energieeinbruch auf.' },
+  { group: 'Darm & Ernährung', id: 'proteinFatIntakeLow', label: 'Ich erreiche mein Energie- oder Proteinziel häufig nicht oder esse sehr fettarm.' },
+  { group: 'Darm & Ernährung', id: 'micronutrientIntakeLow', label: 'Meine Lebensmittelauswahl ist wenig abwechslungsreich und enthält selten Gemüse, Obst oder typische Mikronährstoffquellen.' },
+  { group: 'Darm & Ernährung', id: 'carbIntakeHigh', label: 'Ich esse oder trinke häufig große Mengen Zucker oder stark raffinierte Kohlenhydrate.' },
   { group: 'Weitere Gegenprüfung', id: 'repeatedFoods', label: 'Ich esse sehr häufig dieselben Lebensmittel oder vermute Unverträglichkeiten.' },
   { group: 'Weitere Gegenprüfung', id: 'redDotsTriceps', label: 'Am Trizeps sind rote Punkte sichtbar.' },
   { group: 'Weitere Gegenprüfung', id: 'moldConcern', label: 'Im Wohn- oder Arbeitsumfeld besteht ein konkreter Feuchte- oder Schimmelverdacht.' },
+  { group: 'Weitere Gegenprüfung', id: 'environmentalExposure', label: 'Es besteht eine konkrete regelmäßige Exposition gegenüber Lösungsmitteln, Pestiziden, Rauch oder ähnlichen Stoffen.' },
+  { group: 'Weitere Gegenprüfung', id: 'zincStatusConcern', label: 'Eine niedrige Zinkzufuhr oder ein auffälliger Zinkstatus wurde anhand der Ernährung oder von Laborwerten eingeordnet.' },
 ]);
 
 const FALTEN_HILFE = {
@@ -404,6 +410,25 @@ function ypsiActionPlanMarkup(actionPlan, { showProtocols = true, phase = null }
 }
 
 function ypsiPriorityReasonMarkup(plan) {
+  const assessment = plan.factorAssessment;
+  const active = assessment?.activeFactor;
+  if (active) {
+    const statusLabel = active.status === 'bestaetigt'
+      ? 'WAHRSCHEINLICHSTER ZUSAMMENHANG'
+      : active.status === 'offen'
+        ? 'NOCH ZU KLÄREN'
+        : 'EINORDNUNG AUS DEN SEMINARUNTERLAGEN';
+    const reason = active.status === 'bestaetigt'
+      ? 'Deine Antworten oder die zugehörigen Gegenfalten stützen diesen Zusammenhang derzeit am stärksten.'
+      : active.status === 'offen'
+        ? `${active.unansweredQuestionIds.length} ${active.unansweredQuestionIds.length === 1 ? 'Antwort fehlt' : 'Antworten fehlen'}, bevor die App diesen Zusammenhang sicher von den anderen Möglichkeiten trennen kann.`
+        : 'Für diesen Verlaufsmarker ist keine einzelne Ursache aus den Faltenwerten ableitbar.';
+    const otherFactors = assessment.factors.filter((factor) => factor.id !== active.id);
+    return `<section class="ypsi-priority-reason"><small>${statusLabel}</small><div><b>${escapeHtml(active.faktor)}</b><p>${escapeHtml(reason)}</p></div>
+      ${assessment.progressNote ? `<p class="falten-detail-hinweis">${escapeHtml(assessment.progressNote)}</p>` : ''}
+      ${otherFactors.length ? `<aside class="ypsi-secondary-relations"><small>WEITERE ZUSAMMENHÄNGE IM BLICK</small><div class="ypsi-factor-list">${otherFactors.map((factor) => `<span>${escapeHtml(factor.faktor)}</span>`).join('')}</div></aside>` : ''}
+    </section>`;
+  }
   const relations = plan.topRelationships || [];
   const fallback = hautfaltenData.falten[plan.topFold.slug]?.interpretation?.kurzbeschreibung
     || 'Diese Falte weicht im aktuellen Vergleich am stärksten von ihrem Referenzwert ab.';
@@ -640,39 +665,55 @@ function bravermanQuestionMarkup(test) {
     </div>`;
 }
 
+function neurotransmitterStrategyMarkup(profile, { compact = false } = {}) {
+  if (!profile) return '';
+  const recommendations = profile.recommendations;
+  const foods = [...new Set([...recommendations.seminarFoods, ...recommendations.bravermanFoods])];
+  const foodSource = recommendations.bravermanFoods.length ? 'SEMINAR / BRAVERMAN' : 'SEMINARUNTERLAGEN';
+  const training = recommendations.seminarTraining;
+  return `<section class="neurotransmitter-strategy${compact ? ' is-compact' : ''}">
+    <header><span><small>${compact ? 'WEITERER AUFFÄLLIGER BEREICH' : 'DEIN NÄCHSTER SCHWERPUNKT'}</small><b>${escapeHtml(profile.area.label)}</b></span><em>${profile.score} von ${profile.total} · ${escapeHtml(profile.severity.label)}</em></header>
+    <p>${escapeHtml(profile.area.defizitKurz || profile.area.kurz)}</p>
+    ${foods.length ? `<div><h4>Ernährung <small>${foodSource}</small></h4><div class="falten-detail-tags">${foods.map((food) => `<span>${escapeHtml(food)}</span>`).join('')}</div></div>` : ''}
+    ${recommendations.seminarLifestyle.length || recommendations.bravermanLifestyle.length ? `<div><h4>Alltag <small>${recommendations.seminarLifestyle.length && recommendations.bravermanLifestyle.length ? 'SEMINAR / BRAVERMAN' : recommendations.seminarLifestyle.length ? 'SEMINARUNTERLAGEN' : 'BRAVERMAN'}</small></h4><ul>${[...recommendations.seminarLifestyle, ...recommendations.bravermanLifestyle].map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>` : ''}
+    ${training ? `<div><h4>Training <small>SEMINARUNTERLAGEN</small></h4><p>Intensität: ${escapeHtml(training.intensitaet)} · Volumen: ${escapeHtml(training.volumen)}</p><div class="falten-detail-tags">${training.beispiele.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}${training.sprint ? `<span>${escapeHtml(training.sprint)}</span>` : ''}</div></div>` : ''}
+    <div><h4>Supplement-Schwerpunkte <small>SEMINARUNTERLAGEN</small></h4><div class="falten-detail-tags">${recommendations.seminarSupplements.map((supplement) => `<span>${escapeHtml(supplement)}</span>`).join('')}</div></div>
+    ${recommendations.seminarNote ? `<p class="braverman-warning">${escapeHtml(recommendations.seminarNote)}</p>` : ''}
+  </section>`;
+}
+
 function bravermanResultMarkup(test, { sheet = false } = {}) {
   const result = scoreBravermanAssessment(test.answers);
+  const coachPlan = buildNeurotransmitterCoachPlan(test.answers);
+  const focusProfile = coachPlan.focus;
+  const hasRelevantProfile = coachPlan.relevant.length > 0;
   const scored = BRAVERMAN_REIHENFOLGE.map((key) => ({ key, score: result.scores[key], ...result.severity[key] }));
-  const focusRecommendations = bravermanRecommendations(result.focus, result.severity[result.focus].id);
+  const focusRecommendations = focusProfile?.recommendations || bravermanRecommendations(result.focus, result.severity[result.focus].id);
   const heading = sheet ? `<header class="falten-detail-header braverman-sheet-header"><div><small>NEUROTRANSMITTER-SELBSTTEST</small><h2>Dein Ergebnis</h2></div><button type="button" data-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>` : '';
   return `${heading}<div class="${sheet ? 'braverman-test-body ' : ''}braverman-result">
     ${sheet && test.safetyNotice ? `<aside class="braverman-safety"><b>Du musst damit nicht allein bleiben.</b><p>Wenn du akut daran denkst, dir etwas anzutun, rufe bitte sofort 112 oder wende dich an eine Krisenhilfe. Dieser Test kann keine Unterstützung durch einen Menschen ersetzen.</p><button type="button" data-dismiss-safety>Hinweis schließen</button></aside>` : ''}
-    <section class="braverman-result-focus"><small>STÄRKSTER AKTUELLER FOKUS</small><b>${escapeHtml(BRAVERMAN_BEREICHE[result.focus].label)}</b><span>${escapeHtml(BRAVERMAN_BEREICHE[result.focus].kurz)}</span></section>
+    <section class="braverman-result-focus"><small>${hasRelevantProfile ? 'AKTUELLER SCHWERPUNKT' : 'KEIN AUFFÄLLIGER SCHWERPUNKT'}</small><b>${hasRelevantProfile ? escapeHtml(focusProfile.area.label) : 'Alle vier Bereiche sind gering'}</b><span>${hasRelevantProfile ? escapeHtml(focusProfile.area.defizitKurz || focusProfile.area.kurz) : 'Aus dem Antwortmuster ergibt sich derzeit kein eigener Supplement-Schritt.'}</span></section>
     <div class="braverman-score-list">${scored.map((item) => {
       const total = BRAVERMAN_DEFIZIT_FRAGEN[item.key].length;
       return `<div data-tone="${item.tone}"><span><b>${escapeHtml(BRAVERMAN_BEREICHE[item.key].label)}</b><small>${item.score} von ${total} · ${item.label}</small></span><i><em style="width:${Math.round(item.score / total * 100)}%"></em></i></div>`;
     }).join('')}</div>
-    ${sheet ? `<section class="falten-detail-section braverman-seminar-strategies"><h3>Strategien aus den Seminarunterlagen</h3>
-        ${focusRecommendations.seminarFoods.length ? `<div><h4>Ernährung</h4><div class="falten-detail-tags">${focusRecommendations.seminarFoods.map((food) => `<span>${escapeHtml(food)}</span>`).join('')}</div></div>` : ''}
-        <div><h4>Supplement-Schwerpunkte</h4><div class="falten-detail-tags">${focusRecommendations.seminarSupplements.map((supplement) => `<span>${escapeHtml(supplement)}</span>`).join('')}</div></div>
-        ${focusRecommendations.seminarNote ? `<p class="braverman-warning">${escapeHtml(focusRecommendations.seminarNote)}</p>` : ''}
-      </section>
-      <section class="falten-detail-section"><h3>Dosierungstabelle der Braverman-Vorlage</h3><p class="falten-detail-hinweis">Diese historischen Dosierungen sind eine separate Quelle und keine automatische Einnahmeanweisung.</p><div class="braverman-dose-list">${focusRecommendations.supplements.map((supplement) => `<div><span><b>${escapeHtml(supplement.name)}</b><strong>${escapeHtml(supplement.dose)}</strong></span>${supplement.notiz ? `<small>${escapeHtml(supplement.notiz)}</small>` : ''}${supplement.safety ? `<p class="braverman-warning">${escapeHtml(supplement.safety)}</p>` : ''}</div>`).join('')}</div></section>
+    ${sheet ? `${coachPlan.hasMultipleRelevant ? '<p class="body-neutral-note">Setze zuerst nur den aktuellen Schwerpunkt um. Die weiteren auffälligen Bereiche bleiben sichtbar, sind aber keine Aufforderung, alle Supplements gleichzeitig einzunehmen.</p>' : ''}
+      ${hasRelevantProfile ? `${neurotransmitterStrategyMarkup(focusProfile)}
+      ${coachPlan.relevant.length > 1 ? `<details class="body-inner-details neurotransmitter-secondary"><summary><span>${coachPlan.relevant.length - 1} weitere auffällige ${coachPlan.relevant.length - 1 === 1 ? 'Bereich' : 'Bereiche'}</span>${materialIconMarkup('chevron_right')}</summary><div>${coachPlan.relevant.slice(1).map((profile) => neurotransmitterStrategyMarkup(profile, { compact: true })).join('')}</div></details>` : ''}
+      <details class="body-inner-details braverman-dose-details"><summary><span>Historische Braverman-Dosierung für ${escapeHtml(focusProfile.area.label)}</span>${materialIconMarkup('chevron_right')}</summary><div><p class="falten-detail-hinweis">Separate Quelle und keine automatische Einnahmeanweisung. Medikamente, Gesamtzufuhr und Kontraindikationen müssen vor einer Einnahme geprüft werden.</p><div class="braverman-dose-list">${focusRecommendations.supplements.map((supplement) => `<div><span><b>${escapeHtml(supplement.name)}</b><strong>${escapeHtml(supplement.dose)}</strong></span>${supplement.notiz ? `<small>${escapeHtml(supplement.notiz)}</small>` : ''}${supplement.safety ? `<p class="braverman-warning">${escapeHtml(supplement.safety)}</p>` : ''}</div>`).join('')}</div></div></details>` : '<p class="body-neutral-note">Behalte Schlaf, Energie und Stimmung im normalen Verlauf im Blick. Aus diesem Ergebnis folgt keine Einnahmeempfehlung.</p>'}
       <p class="falten-detail-disclaimer">Das Ergebnis beschreibt das Antwortmuster des Braverman-Modells und keine im Gehirn gemessenen Neurotransmitterwerte. Ernährung, Schlaf und Training stehen vor einer Supplement-Auswahl.</p>
       <div class="braverman-result-actions"><button class="btn btn-primary" type="button" data-close>Fertig</button><button type="button" data-braverman-reset>Test neu starten</button></div>` : ''}
   </div>`;
 }
 
 function bravermanOverviewMarkup(test) {
-  const result = scoreBravermanAssessment(test.answers);
-  const focus = result.focus;
-  const total = BRAVERMAN_DEFIZIT_FRAGEN[focus].length;
-  const others = BRAVERMAN_REIHENFOLGE
-    .filter((key) => key !== focus)
-    .sort((a, b) => result.scores[b] - result.scores[a]);
+  const coachPlan = buildNeurotransmitterCoachPlan(test.answers);
+  const focus = coachPlan.focus;
+  const hasRelevantProfile = coachPlan.relevant.length > 0;
+  const others = coachPlan.profiles.filter((profile) => profile.key !== focus.key);
   return `<div class="neurotransmitter-overview">
-    <section class="braverman-result-focus"><small>AKTUELLER SCHWERPUNKT</small><div><b>${escapeHtml(BRAVERMAN_BEREICHE[focus].label)}</b><em>${result.scores[focus]} von ${total} · ${escapeHtml(result.severity[focus].label)}</em></div><span>${escapeHtml(BRAVERMAN_BEREICHE[focus].kurz)}</span></section>
-    <section class="neurotransmitter-other-scores"><small>WEITERE BEREICHE</small><div>${others.map((key) => `<span><b>${escapeHtml(BRAVERMAN_BEREICHE[key].label)}</b><em>${result.scores[key]} · ${escapeHtml(result.severity[key].label)}</em></span>`).join('')}</div></section>
+    <section class="braverman-result-focus"><small>${hasRelevantProfile ? 'AKTUELLER SCHWERPUNKT' : 'KEIN AUFFÄLLIGER SCHWERPUNKT'}</small><div><b>${hasRelevantProfile ? escapeHtml(focus.area.label) : 'Alle Bereiche gering'}</b><em>${hasRelevantProfile ? `${focus.score} von ${focus.total} · ${escapeHtml(focus.severity.label)}` : 'keine Maßnahme'}</em></div><span>${hasRelevantProfile ? escapeHtml(focus.area.defizitKurz || focus.area.kurz) : 'Aus dem Antwortmuster ergibt sich derzeit kein eigener Schritt.'}</span></section>
+    <section class="neurotransmitter-other-scores"><small>WEITERE BEREICHE</small><div>${others.map((profile) => `<span><b>${escapeHtml(profile.area.label)}</b><em>${profile.score} · ${escapeHtml(profile.severity.label)}</em></span>`).join('')}</div></section>
   </div>`;
 }
 

@@ -1,0 +1,258 @@
+{
+  "version": "1.0",
+  "beschreibung": "Geordnete Coach-Prüfung der Faktoren aus Hautfalten Notizen S. 1–11. Der Quellenrang ist eine Prüfreihenfolge und kein diagnostischer Beweis.",
+  "falten": {
+    "kinn": {
+      "verlaufshinweis": "Kinn und Wange reagieren früh auf eine globale Fettzu- oder -abnahme.",
+      "faktoren": [
+        {
+          "id": "kinn-gewichtsdynamik",
+          "rang": null,
+          "faktor": "Globale Fettzu- oder -abnahme",
+          "strategie": {
+            "nutrition": ["Kalorien nur anpassen, wenn Kinn, Wange, Gewichtstrend und Falten-Summe dieselbe Entwicklung zeigen."],
+            "dailyLife": ["Die nächste Messung nach drei bis vier Wochen unter vergleichbaren Bedingungen durchführen."],
+            "sleep": [],
+            "supplements": []
+          },
+          "gegenfalten": ["wange"],
+          "fragen": [],
+          "pruefung": { "modus": "keine", "signale": [] },
+          "kapitel": [],
+          "quelle": "Hautfalten Notizen S. 1"
+        }
+      ]
+    },
+    "wange": {
+      "verlaufshinweis": "Wange und Kinn reagieren früh auf eine globale Fettzu- oder -abnahme.",
+      "faktoren": [
+        {
+          "id": "wange-gewichtsdynamik",
+          "rang": null,
+          "faktor": "Globale Fettzu- oder -abnahme",
+          "strategie": {
+            "nutrition": ["Kalorien nur anpassen, wenn Wange, Kinn, Gewichtstrend und Falten-Summe dieselbe Entwicklung zeigen."],
+            "dailyLife": ["Die nächste Messung nach drei bis vier Wochen unter vergleichbaren Bedingungen durchführen."],
+            "sleep": [],
+            "supplements": []
+          },
+          "gegenfalten": ["kinn"],
+          "fragen": [],
+          "pruefung": { "modus": "keine", "signale": [] },
+          "kapitel": [],
+          "quelle": "Hautfalten Notizen S. 1"
+        },
+        {
+          "id": "wange-umfeld-stress",
+          "rang": null,
+          "faktor": "Selten: belastendes Wohnumfeld oder dauerhaft hohe Alltagsanspannung",
+          "strategie": {
+            "nutrition": [],
+            "dailyLife": ["Bei bestätigtem Dauerstress täglich zehn Minuten Meditation oder ruhige Atemübung einplanen.", "Einen konkreten Feuchte- oder Schimmelverdacht qualifiziert vor Ort prüfen lassen; die Falte selbst stellt keine Belastung fest."],
+            "sleep": [],
+            "supplements": ["GABA-bezogene Seminaroptionen erst nach einem passenden Neurotransmitter- und Sicherheitscheck prüfen."]
+          },
+          "gegenfalten": [],
+          "fragen": ["stressHigh", "moldConcern"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "stressHigh" }, { "typ": "frage", "id": "moldConcern" }] },
+          "kapitel": [],
+          "quelle": "Hautfalten Notizen S. 1"
+        }
+      ]
+    },
+    "brust": {
+      "faktoren": [
+        {
+          "id": "brust-energie",
+          "rang": 1,
+          "faktor": "Wenig Energie oder möglicher DHEA-Kontext",
+          "strategie": { "nutrition": ["Ausreichend Protein, Energie und Nahrungsfette sicherstellen."], "dailyLife": ["Morgenenergie und Trainingsleistung zwei Wochen dokumentieren."], "sleep": [], "supplements": [] },
+          "gegenfalten": ["trizeps"],
+          "fragen": ["morningDriveLow"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "morningDriveLow" }, { "typ": "falte", "slug": "trizeps", "status": "erhoeht" }] },
+          "kapitel": ["Aromatase von Testosteron", "Energielevel steigern"],
+          "quelle": "Hautfalten Notizen S. 2"
+        },
+        {
+          "id": "brust-stress",
+          "rang": 2,
+          "faktor": "Stress",
+          "strategie": { "nutrition": [], "dailyLife": ["Einen konkreten vermeidbaren Stressor reduzieren und täglich eine kurze Entspannungsroutine durchführen."], "sleep": [], "supplements": [] },
+          "gegenfalten": ["bauch"],
+          "fragen": ["stressHigh"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "stressHigh" }, { "typ": "falte", "slug": "bauch", "status": "erhoeht" }] },
+          "kapitel": ["Cortisol", "Blutzucker A–H"],
+          "quelle": "Hautfalten Notizen S. 2"
+        },
+        {
+          "id": "brust-blutzucker",
+          "rang": 3,
+          "faktor": "Unpassende Nahrung oder schwankender Blutzucker",
+          "strategie": { "nutrition": ["Mahlzeiten regelmäßiger verteilen und jeweils eine Proteinquelle einplanen."], "dailyLife": ["Nach der größten Mahlzeit zehn bis fünfzehn Minuten gehen."], "sleep": [], "supplements": [] },
+          "gegenfalten": ["huefte"],
+          "fragen": ["mealsIrregular", "postMealCrash"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "mealsIrregular" }, { "typ": "frage", "id": "postMealCrash" }, { "typ": "falte", "slug": "huefte", "status": "erhoeht" }] },
+          "kapitel": ["Cortisol", "Blutzucker A–H"],
+          "quelle": "Hautfalten Notizen S. 2"
+        },
+        {
+          "id": "brust-entzuendung",
+          "rang": 4,
+          "faktor": "Entzündungskontext",
+          "strategie": { "nutrition": ["Lebensmittelauswahl und Verträglichkeit strukturiert dokumentieren statt mehrere Lebensmittelgruppen gleichzeitig zu streichen."], "dailyLife": [], "sleep": [], "supplements": [] },
+          "gegenfalten": ["ruecken"],
+          "fragen": ["digestiveSymptoms"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "digestiveSymptoms" }, { "typ": "falte", "slug": "ruecken", "status": "erhoeht" }] },
+          "kapitel": ["Entgiftung & Entzündungen"],
+          "quelle": "Hautfalten Notizen S. 2"
+        },
+        {
+          "id": "brust-zink",
+          "rang": 5,
+          "faktor": "Zinkbedarf, erst nach Energie-, Stress- und Entzündungskontext",
+          "strategie": { "nutrition": ["Regelmäßig zinkreiche Lebensmittel einbauen; einen Mangel nicht allein aus der Falte ableiten."], "dailyLife": [], "sleep": [], "supplements": ["Eine Zinkdosis nur anhand Ernährung, Gesamtzufuhr und gegebenenfalls Laborwerten festlegen."] },
+          "gegenfalten": [],
+          "fragen": ["zincStatusConcern"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "zincStatusConcern" }] },
+          "kapitel": ["Mikronährstoff: Zink"],
+          "quelle": "Hautfalten Notizen S. 2"
+        }
+      ]
+    },
+    "trizeps": {
+      "verlaufshinweis": "Die Unterlagen bezeichnen den Trizeps als Leitfalte.",
+      "faktoren": [
+        {
+          "id": "trizeps-rohstoffe",
+          "rang": 1,
+          "faktor": "Fehlende Rohstoffe für den Testosteronkontext",
+          "strategie": { "nutrition": ["Magnesium-, Vitamin-B6- und Zinkquellen sowie ausreichend Nahrungsfett und Cholesterin prüfen."], "dailyLife": [], "sleep": [], "supplements": ["Ergänzungen nur nach Prüfung von Ernährung, Gesamtzufuhr und Kontraindikationen auswählen."] },
+          "gegenfalten": [],
+          "fragen": ["proteinFatIntakeLow", "micronutrientIntakeLow"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "proteinFatIntakeLow" }, { "typ": "frage", "id": "micronutrientIntakeLow" }] },
+          "kapitel": ["Cortisol", "Blutzucker A–H"],
+          "quelle": "Hautfalten Notizen S. 3"
+        },
+        {
+          "id": "trizeps-dhea",
+          "rang": 2,
+          "faktor": "Fehlende Umstände für DHEA durch Belastung",
+          "strategie": { "nutrition": [], "dailyLife": ["Stressbelastung konkret erfassen und einen vermeidbaren Stressor reduzieren."], "sleep": [], "supplements": [] },
+          "gegenfalten": ["bauch"],
+          "fragen": ["stressHigh", "morningDriveLow"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "stressHigh" }, { "typ": "frage", "id": "morningDriveLow" }, { "typ": "falte", "slug": "bauch", "status": "erhoeht" }] },
+          "kapitel": ["Energielevel steigern A–D"],
+          "quelle": "Hautfalten Notizen S. 3"
+        },
+        {
+          "id": "trizeps-schlaf",
+          "rang": 3,
+          "faktor": "Schlechter Schlaf",
+          "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Ein- und Durchschlafen getrennt erfassen und eine feste Aufstehzeit etablieren."], "supplements": [] },
+          "gegenfalten": ["wade"],
+          "fragen": ["sleepOnset", "sleepMaintenance"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }, { "typ": "falte", "slug": "wade", "status": "erhoeht" }] },
+          "kapitel": ["Schlaf"],
+          "quelle": "Hautfalten Notizen S. 3"
+        },
+        {
+          "id": "trizeps-alkohol",
+          "rang": 4,
+          "faktor": "Alkoholkonsum",
+          "strategie": { "nutrition": [], "dailyLife": ["Alkoholkonsum reduzieren und den Verlauf dokumentieren."], "sleep": [], "supplements": [] },
+          "gegenfalten": [],
+          "fragen": ["alcoholNearBed"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "alcoholNearBed" }] },
+          "kapitel": ["Cortisol", "Blutzucker A–H"],
+          "quelle": "Hautfalten Notizen S. 3"
+        },
+        {
+          "id": "trizeps-rote-punkte",
+          "rang": 5,
+          "faktor": "Rote Punkte am Trizeps als zusätzlicher Leber-/Milzkontext",
+          "strategie": { "nutrition": ["Wie bei den Oberschenkelfalten Protein- und Mikronährstoffbasis prüfen."], "dailyLife": ["Quadrizeps, Beinbizeps und Knie als Gegenprüfung verwenden."], "sleep": [], "supplements": [] },
+          "gegenfalten": ["quadrizeps", "beinbizeps", "knie"],
+          "fragen": ["redDotsTriceps"],
+          "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "redDotsTriceps" }] },
+          "kapitel": ["Entgiftung & Entzündungen"],
+          "quelle": "Hautfalten Notizen S. 3"
+        }
+      ]
+    },
+    "ruecken": {
+      "verlaufshinweis": "Die genetisch geprägte Rückenfalte verändert sich laut Unterlagen besonders langsam.",
+      "faktoren": [
+        { "id": "ruecken-genetik", "rang": 1, "faktor": "Genetische Kohlenhydrattoleranz", "strategie": { "nutrition": ["Kohlenhydratmenge anhand von TRACKER, Hunger, Leistung und Verlauf festlegen, nicht anhand einer Einzelmessung."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": [], "pruefung": { "modus": "keine", "signale": [] }, "kapitel": [], "quelle": "Hautfalten Notizen S. 4" },
+        { "id": "ruecken-toxine", "rang": 2, "faktor": "Toxin- oder Entzündungskontext", "strategie": { "nutrition": ["Abwechslungsreiche, wenig einseitige Lebensmittelauswahl sicherstellen."], "dailyLife": ["Konkrete vermeidbare Expositionen reduzieren; keine Ausleitung aus der Falte ableiten."], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": ["environmentalExposure"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "environmentalExposure" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 4" },
+        { "id": "ruecken-stress", "rang": 3, "faktor": "Stress", "strategie": { "nutrition": [], "dailyLife": ["Stressbelastung konkret erfassen und täglich eine kurze Entspannungsroutine durchführen."], "sleep": [], "supplements": [] }, "gegenfalten": ["bauch"], "fragen": ["stressHigh"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "stressHigh" }, { "typ": "falte", "slug": "bauch", "status": "erhoeht" }] }, "kapitel": ["Cortisol", "Blutzucker A–H"], "quelle": "Hautfalten Notizen S. 4" },
+        { "id": "ruecken-schlaf", "rang": 4, "faktor": "Schlafdefizit", "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Ein- und Durchschlafprobleme getrennt bearbeiten und den Schlafverlauf dokumentieren."], "supplements": [] }, "gegenfalten": ["wade"], "fragen": ["sleepOnset", "sleepMaintenance"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }, { "typ": "falte", "slug": "wade", "status": "erhoeht" }] }, "kapitel": ["Schlaf"], "quelle": "Hautfalten Notizen S. 4" },
+        { "id": "ruecken-zucker", "rang": 5, "faktor": "Übermäßiger Zucker- oder Kohlenhydratkonsum", "strategie": { "nutrition": ["Zucker- und Kohlenhydratmenge zunächst dokumentieren und nur bei gemeinsam passendem Verlauf reduzieren."], "dailyLife": ["Nach Hauptmahlzeiten zehn bis fünfzehn Minuten gehen."], "sleep": [], "supplements": [] }, "gegenfalten": ["huefte"], "fragen": ["carbIntakeHigh", "postMealCrash"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "carbIntakeHigh" }, { "typ": "frage", "id": "postMealCrash" }, { "typ": "falte", "slug": "huefte", "status": "erhoeht" }] }, "kapitel": ["Insulinresistenz vermeiden"], "quelle": "Hautfalten Notizen S. 4" },
+        { "id": "ruecken-mikros", "rang": 6, "faktor": "Mikronährstoffdefizite", "strategie": { "nutrition": ["Gemüse-, Obst-, Protein- und Mineralstoffquellen abwechslungsreich einplanen."], "dailyLife": [], "sleep": [], "supplements": ["Eine Ergänzung nur anhand Ernährung, Gesamtzufuhr und gegebenenfalls Laborwerten auswählen."] }, "gegenfalten": [], "fragen": ["micronutrientIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "micronutrientIntakeLow" }] }, "kapitel": [], "quelle": "Hautfalten Notizen S. 4" }
+      ]
+    },
+    "rippe": {
+      "faktoren": [
+        { "id": "rippe-stress-energie", "rang": 1, "faktor": "Stress und wenig Energie", "strategie": { "nutrition": ["Regelmäßige proteinreiche Mahlzeiten sicherstellen."], "dailyLife": ["Stress und Morgenenergie dokumentieren und einen vermeidbaren Stressor reduzieren."], "sleep": [], "supplements": [] }, "gegenfalten": ["bauch", "trizeps"], "fragen": ["stressHigh", "morningDriveLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "stressHigh" }, { "typ": "frage", "id": "morningDriveLow" }, { "typ": "falte", "slug": "bauch", "status": "erhoeht" }, { "typ": "falte", "slug": "trizeps", "status": "erhoeht" }] }, "kapitel": ["Cortisol & Blutzucker A–H", "Stoffwechsel erhöhen", "Energielevel steigern A–D"], "quelle": "Hautfalten Notizen S. 5" },
+        { "id": "rippe-toxine", "rang": 2, "faktor": "Toxine, insbesondere Schwermetallkontext", "strategie": { "nutrition": [], "dailyLife": ["Nur bestätigte Expositionen fachlich einordnen und vermeidbare Quellen reduzieren; keine Ausleitung aus der Falte ableiten."], "sleep": [], "supplements": [] }, "gegenfalten": ["quadrizeps", "beinbizeps"], "fragen": ["environmentalExposure", "mercuryContext"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "environmentalExposure" }, { "typ": "frage", "id": "mercuryContext" }, { "typ": "falte", "slug": "quadrizeps", "status": "erhoeht" }, { "typ": "falte", "slug": "beinbizeps", "status": "erhoeht" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 5" },
+        { "id": "rippe-schlaf", "rang": 3, "faktor": "Schlaf", "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Ein- und Durchschlafen getrennt erfassen und die Waden- und Beinfalten als Gegenprüfung verwenden."], "supplements": [] }, "gegenfalten": ["wade", "quadrizeps", "beinbizeps"], "fragen": ["sleepOnset", "sleepMaintenance"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }, { "typ": "falte", "slug": "wade", "status": "erhoeht" }] }, "kapitel": ["Schlaf"], "quelle": "Hautfalten Notizen S. 5" },
+        { "id": "rippe-zucker", "rang": 4, "faktor": "Hoher Zuckerkonsum", "strategie": { "nutrition": ["Zuckerkonsum dokumentieren und bei passender Hüft- und Verlaufslage reduzieren."], "dailyLife": ["Nach Hauptmahlzeiten zehn bis fünfzehn Minuten gehen."], "sleep": [], "supplements": [] }, "gegenfalten": ["huefte"], "fragen": ["carbIntakeHigh", "postMealCrash"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "carbIntakeHigh" }, { "typ": "frage", "id": "postMealCrash" }, { "typ": "falte", "slug": "huefte", "status": "erhoeht" }] }, "kapitel": [], "quelle": "Hautfalten Notizen S. 5" },
+        { "id": "rippe-unvertraeglichkeit", "rang": 5, "faktor": "Lebensmittelunverträglichkeiten oder häufig wiederholte Lebensmittel", "strategie": { "nutrition": ["Vierzehn Tage Mahlzeiten und Symptome dokumentieren und immer nur einen Verdachtsfaktor verändern."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": ["repeatedFoods", "digestiveSymptoms"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "repeatedFoods" }, { "typ": "frage", "id": "digestiveSymptoms" }] }, "kapitel": ["Schilddrüse"], "quelle": "Hautfalten Notizen S. 5" }
+      ]
+    },
+    "huefte": {
+      "faktoren": [
+        { "id": "huefte-blutzucker", "rang": 1, "faktor": "Schwankender Blutzucker", "strategie": { "nutrition": ["Mahlzeiten, Hunger, Heißhunger und Energieeinbrüche zwei Wochen dokumentieren."], "dailyLife": ["Nach mindestens einer Hauptmahlzeit zehn bis fünfzehn Minuten gehen."], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": ["postMealCrash"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "postMealCrash" }] }, "kapitel": ["Cortisol & Blutzucker A–H"], "quelle": "Hautfalten Notizen S. 6" },
+        { "id": "huefte-unterzucker", "rang": 2, "faktor": "Blutzuckerschwankungen, Unterzucker oder erhöhte Insulinwerte", "strategie": { "nutrition": ["Regelmäßige Hauptmahlzeiten mit Protein einplanen und den Tag mit einem proteinreichen Frühstück beginnen."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": ["mealsIrregular", "postMealCrash"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "mealsIrregular" }, { "typ": "frage", "id": "postMealCrash" }] }, "kapitel": ["Insulin & Körperfett", "Glukoneogenese"], "quelle": "Hautfalten Notizen S. 6" },
+        { "id": "huefte-kohlenhydrate", "rang": 4, "faktor": "Zu viele Kohlenhydrate", "strategie": { "nutrition": ["Kohlenhydratmenge an Training, Hunger, Energie, Kalorienziel und Verlauf anpassen."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": ["ruecken"], "fragen": ["carbIntakeHigh"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "carbIntakeHigh" }] }, "kapitel": ["Kohlenhydrat-Richtlinien"], "quelle": "Hautfalten Notizen S. 6" },
+        { "id": "huefte-cgm", "rang": 5, "faktor": "Bei weiter unklarem Verlauf: optionale Glukosemessung", "strategie": { "nutrition": ["Eine zeitlich begrenzte CGM-Messung nur als zusätzliche Verlaufshilfe und nicht als Diagnose verwenden."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": [], "pruefung": { "modus": "keine", "signale": [] }, "kapitel": ["CGM-Messungen"], "quelle": "Hautfalten Notizen S. 6" }
+      ]
+    },
+    "bauch": {
+      "faktoren": [
+        { "id": "bauch-cortisol", "rang": 1, "faktor": "Hohe Stress- und Cortisolbelastung", "strategie": { "nutrition": ["Mahlzeiten regelmäßig halten, damit Stress und Blutzucker nicht gleichzeitig schwanken."], "dailyLife": ["Einen konkreten Stressor reduzieren und täglich zehn Minuten Meditation oder ruhige Atmung durchführen."], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": ["stressHigh", "troubleWindingDown"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "stressHigh" }, { "typ": "frage", "id": "troubleWindingDown" }] }, "kapitel": ["Cortisol & Blutzucker A–H"], "quelle": "Hautfalten Notizen S. 7" },
+        { "id": "bauch-unterzucker", "rang": 2, "faktor": "Unterzucker oder zu wenig Nahrung und Protein", "strategie": { "nutrition": ["Regelmäßige Protein- und Fettmahlzeiten einplanen und sehr lange Essenspausen vermeiden."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": ["huefte"], "fragen": ["mealsIrregular", "postMealCrash", "proteinFatIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "mealsIrregular" }, { "typ": "frage", "id": "postMealCrash" }, { "typ": "frage", "id": "proteinFatIntakeLow" }, { "typ": "falte", "slug": "huefte", "status": "erhoeht" }] }, "kapitel": ["Glukoneogenese"], "quelle": "Hautfalten Notizen S. 7" },
+        { "id": "bauch-mikros", "rang": 3, "faktor": "Mikronährstoffdefizite", "strategie": { "nutrition": ["Eine abwechslungsreiche Lebensmittelauswahl und übliche Mikronährstoffquellen sicherstellen."], "dailyLife": [], "sleep": [], "supplements": ["MultiKomplex ist die Seminarstrategie; Gesamtzufuhr und Verträglichkeit vor Anwendung prüfen."] }, "gegenfalten": [], "fragen": ["micronutrientIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "micronutrientIntakeLow" }] }, "kapitel": [], "quelle": "Hautfalten Notizen S. 7" },
+        { "id": "bauch-energie", "rang": 4, "faktor": "Niedrige Energie im DHEA-/Testosteronkontext", "strategie": { "nutrition": ["Energie- und Proteinversorgung sowie Nahrungsfette prüfen."], "dailyLife": ["Morgenenergie und Trainingsleistung dokumentieren."], "sleep": [], "supplements": [] }, "gegenfalten": ["trizeps"], "fragen": ["morningDriveLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "morningDriveLow" }, { "typ": "falte", "slug": "trizeps", "status": "erhoeht" }] }, "kapitel": ["Energielevel steigern A–D"], "quelle": "Hautfalten Notizen S. 7" },
+        { "id": "bauch-schlaf", "rang": 5, "faktor": "Schlaf- oder Tiefschlafdefizit", "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Ein- und Durchschlafprobleme getrennt erfassen und eine feste Aufstehzeit etablieren."], "supplements": [] }, "gegenfalten": ["wade", "quadrizeps", "beinbizeps"], "fragen": ["sleepOnset", "sleepMaintenance"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }, { "typ": "falte", "slug": "wade", "status": "erhoeht" }] }, "kapitel": ["Schlaf"], "quelle": "Hautfalten Notizen S. 7" },
+        { "id": "bauch-darm", "rang": 6, "faktor": "Darmkontext, erst nach Stress und Energie", "strategie": { "nutrition": ["Vierzehn Tage Mahlzeiten, Getreide, Milch, Fruchtzucker und Beschwerden dokumentieren; keine pauschale Ausschlussdiät beginnen."], "dailyLife": [], "sleep": [], "supplements": [] }, "gegenfalten": ["trizeps"], "fragen": ["wakesFit", "digestiveSymptoms"], "pruefung": { "modus": "alle", "signale": [{ "typ": "frage", "id": "wakesFit" }, { "typ": "frage", "id": "digestiveSymptoms" }, { "typ": "falte", "slug": "trizeps", "status": "nicht_erhoeht" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 7"
+        }
+      ]
+    },
+    "knie": {
+      "faktoren": [
+        { "id": "knie-mikros", "rang": 1, "faktor": "Mikronährstoff- und Antioxidanzienversorgung", "strategie": { "nutrition": ["Täglich vielfältige Gemüse-, Obst- und Proteinquellen einplanen."], "dailyLife": [], "sleep": [], "supplements": ["MultiKomplex und Magnesium sind die Seminarstrategie; Gesamtzufuhr und Kontraindikationen prüfen."] }, "gegenfalten": [], "fragen": ["micronutrientIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "micronutrientIntakeLow" }] }, "kapitel": [], "quelle": "Hautfalten Notizen S. 8" },
+        { "id": "knie-toxine", "rang": 2, "faktor": "Toxinkontext", "strategie": { "nutrition": [], "dailyLife": ["Nur konkrete, vermeidbare Expositionen reduzieren; keine medizinische Ausleitung aus der Falte ableiten."], "sleep": [], "supplements": [] }, "gegenfalten": ["quadrizeps", "beinbizeps"], "fragen": ["environmentalExposure", "mercuryContext"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "environmentalExposure" }, { "typ": "frage", "id": "mercuryContext" }, { "typ": "falte", "slug": "quadrizeps", "status": "erhoeht" }, { "typ": "falte", "slug": "beinbizeps", "status": "erhoeht" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 8" }
+      ]
+    },
+    "wade": {
+      "verlaufshinweis": "Durchschlafen ist laut Unterlagen nicht mit guter Schlafqualität gleichzusetzen.",
+      "faktoren": [
+        { "id": "wade-tiefschlaf", "rang": 1, "faktor": "Tiefschlaf, Melatonin-/Wachstumshormon- und abendlicher Cortisolkontext", "strategie": { "nutrition": [], "dailyLife": ["Abendliche Anspannung und Morgenenergie dokumentieren."], "sleep": ["Ein- und Durchschlafprobleme getrennt bearbeiten und eine feste Aufstehzeit einhalten."], "supplements": ["Serotonin-, Melatonin- oder Cortisoloptionen erst anhand des konkreten Schlafmusters und des Neurotransmitterprofils auswählen."] }, "gegenfalten": [], "fragen": ["troubleWindingDown", "sleepOnset", "sleepMaintenance"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "troubleWindingDown" }, { "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }] }, "kapitel": ["Schlaf", "Cortisol"], "quelle": "Hautfalten Notizen S. 8–9" },
+        { "id": "wade-magnesium", "rang": null, "faktor": "Magnesiumbedarf", "strategie": { "nutrition": ["Magnesiumreiche Lebensmittel regelmäßig einplanen."], "dailyLife": [], "sleep": [], "supplements": ["Magnesiumbedarf und -form individuell prüfen oder rotieren."] }, "gegenfalten": [], "fragen": ["micronutrientIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "micronutrientIntakeLow" }] }, "kapitel": [], "quelle": "Hautfalten Notizen S. 8" },
+        { "id": "wade-organuhr", "rang": 2, "faktor": "Nächtliches Aufwachen im Organuhr-Kontext", "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Uhrzeit und Dauer des Aufwachens dokumentieren; die Organzuordnung ist eine Seminarhypothese und keine Diagnose."], "supplements": [] }, "gegenfalten": [], "fragen": ["wakes3to7"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "wakes3to7" }] }, "kapitel": ["Organuhr"], "quelle": "Hautfalten Notizen S. 8–9" }
+      ]
+    },
+    "quadrizeps": {
+      "verlaufshinweis": "Beinfalten reagieren laut Unterlagen insgesamt besonders langsam.",
+      "faktoren": [
+        { "id": "quadrizeps-darm", "rang": 1, "faktor": "Verdauung und Darmfunktion", "strategie": { "nutrition": ["Vierzehn Tage Mahlzeiten und Verdauungsbeschwerden dokumentieren; keine pauschale Darmsanierung allein aus der Falte beginnen."], "dailyLife": ["Bauch und Stresskontext gegenprüfen."], "sleep": [], "supplements": [] }, "gegenfalten": ["bauch"], "fragen": ["digestiveSymptoms", "leakyGut", "stressHigh"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "digestiveSymptoms" }, { "typ": "frage", "id": "leakyGut" }, { "typ": "falte", "slug": "bauch", "status": "erhoeht" }] }, "kapitel": ["Alles zu Darm"], "quelle": "Hautfalten Notizen S. 10–11" },
+        { "id": "quadrizeps-leber", "rang": 2, "faktor": "Umweltgifte oder Schwermetallkontext und Leber-Phase 2", "strategie": { "nutrition": ["Den Tag mit einem hochwertigen proteinreichen Frühstück beginnen."], "dailyLife": ["Konkrete vermeidbare Expositionen reduzieren."], "sleep": [], "supplements": [] }, "gegenfalten": ["knie"], "fragen": ["environmentalExposure", "mercuryContext", "proteinFatIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "environmentalExposure" }, { "typ": "frage", "id": "mercuryContext" }, { "typ": "frage", "id": "proteinFatIntakeLow" }, { "typ": "falte", "slug": "knie", "status": "erhoeht" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 10–11" },
+        { "id": "quadrizeps-xenoestrogene", "rang": 3, "faktor": "Xenoöstrogen- und Entzündungskontext", "strategie": { "nutrition": [], "dailyLife": ["Kosmetika, Hygieneprodukte und andere konkrete Expositionen prüfen und vermeidbare Quellen schrittweise reduzieren."], "sleep": [], "supplements": [] }, "gegenfalten": [], "fragen": ["environmentalExposure"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "environmentalExposure" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 10–11" }
+      ]
+    },
+    "beinbizeps": {
+      "verlaufshinweis": "Beinfalten reagieren laut Unterlagen insgesamt besonders langsam; das Verhältnis zum Quadrizeps ist entscheidend.",
+      "faktoren": [
+        { "id": "beinbizeps-b-vitamine", "rang": 1, "faktor": "Vitamin-B-Bedarf", "strategie": { "nutrition": ["Proteinreiche Lebensmittel und übliche B-Vitaminquellen regelmäßig einplanen."], "dailyLife": ["Das Verhältnis von Beinbizeps zu Quadrizeps im Verlauf beobachten."], "sleep": [], "supplements": ["B-Vitamine nur unter Berücksichtigung von Ernährung, Gesamtzufuhr und Verträglichkeit ergänzen."] }, "gegenfalten": ["quadrizeps"], "fragen": ["micronutrientIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "micronutrientIntakeLow" }, { "typ": "falte_vergleich", "links": "beinbizeps", "operator": ">", "rechts": "quadrizeps" }] }, "kapitel": ["B-Vitamine"], "quelle": "Hautfalten Notizen S. 10–11" },
+        { "id": "beinbizeps-leber", "rang": 2, "faktor": "Umweltgifte oder Schwermetallkontext und Leber-Phase 2", "strategie": { "nutrition": ["Den Tag mit einem hochwertigen proteinreichen Frühstück beginnen."], "dailyLife": ["Knie als Gegenprüfung für Leber-Phase 1 und konkrete Expositionen heranziehen."], "sleep": [], "supplements": [] }, "gegenfalten": ["knie"], "fragen": ["environmentalExposure", "mercuryContext", "proteinFatIntakeLow"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "environmentalExposure" }, { "typ": "frage", "id": "mercuryContext" }, { "typ": "falte", "slug": "knie", "status": "erhoeht" }] }, "kapitel": ["Entgiftung & Entzündungen"], "quelle": "Hautfalten Notizen S. 10–11" },
+        { "id": "beinbizeps-tiefschlaf", "rang": 3, "faktor": "Tiefschlaf, Melatonin-/Wachstumshormon- und abendlicher Cortisolkontext", "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Ein- und Durchschlafprobleme getrennt erfassen und die Wade als Gegenprüfung verwenden."], "supplements": [] }, "gegenfalten": ["wade"], "fragen": ["sleepOnset", "sleepMaintenance"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }, { "typ": "falte", "slug": "wade", "status": "erhoeht" }] }, "kapitel": ["Schlaf", "Cortisol"], "quelle": "Hautfalten Notizen S. 10–11" }
+      ]
+    },
+    "bizeps": {
+      "faktoren": [
+        { "id": "bizeps-energie", "rang": 1, "faktor": "Niedrige Energie im DHEA-/Testosteronkontext", "strategie": { "nutrition": ["Ausreichend Protein, Energie und Nahrungsfette sicherstellen."], "dailyLife": ["Morgenenergie, Stress und Trainingsleistung zwei Wochen dokumentieren."], "sleep": [], "supplements": [] }, "gegenfalten": ["trizeps"], "fragen": ["morningDriveLow", "stressHigh"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "morningDriveLow" }, { "typ": "frage", "id": "stressHigh" }, { "typ": "falte", "slug": "trizeps", "status": "erhoeht" }] }, "kapitel": ["Energielevel steigern A–D"], "quelle": "Hautfalten Notizen S. 11" },
+        { "id": "bizeps-schlaf", "rang": 2, "faktor": "Schlafdefizit und abendlicher Cortisolkontext", "strategie": { "nutrition": [], "dailyLife": [], "sleep": ["Ein- und Durchschlafprobleme getrennt erfassen und Wade sowie Beinfalten als Gegenprüfung verwenden."], "supplements": [] }, "gegenfalten": ["wade", "quadrizeps", "beinbizeps"], "fragen": ["sleepOnset", "sleepMaintenance"], "pruefung": { "modus": "beliebig", "signale": [{ "typ": "frage", "id": "sleepOnset" }, { "typ": "frage", "id": "sleepMaintenance" }, { "typ": "falte", "slug": "wade", "status": "erhoeht" }, { "typ": "falte", "slug": "quadrizeps", "status": "erhoeht" }, { "typ": "falte", "slug": "beinbizeps", "status": "erhoeht" }] }, "kapitel": ["Schlaf", "Cortisol"], "quelle": "Hautfalten Notizen S. 11" }
+      ]
+    }
+  }
+}

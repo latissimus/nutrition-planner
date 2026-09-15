@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   assessSkinfoldPriorities,
+  assessSkinfoldFactors,
   buildSkinfoldPlan,
   buildSkinfoldActionPlan,
   buildSkinfoldRelationships,
+  buildNeurotransmitterCoachPlan,
   bravermanComplete,
   bravermanRecommendations,
   bravermanSeverity,
@@ -15,6 +17,7 @@ import { BRAVERMAN_DEFIZIT_FRAGEN } from './data/braverman-test.js';
 import hautfaltenData from './data/hautfalten.json';
 import supplementKatalog from './data/supplements-katalog.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
+import hautfaltenFaktoren from './data/hautfalten-faktoren.json';
 
 const folds = {
   kinn: 4, wange: 4, brust: 3, ruecken: 8, rippe: 5, huefte: 9,
@@ -220,12 +223,12 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     const actions = buildSkinfoldActionPlan(plan, {});
     expect(plan.topFold.slug).toBe('beinbizeps');
     expect(actions.unansweredQuestionIds).toEqual(expect.arrayContaining([
+      'micronutrientIntakeLow',
+      'environmentalExposure',
+      'mercuryContext',
+      'proteinFatIntakeLow',
       'sleepOnset',
       'sleepMaintenance',
-      'wakes3to7',
-      'digestiveSymptoms',
-      'leakyGut',
-      'mercuryContext',
     ]));
   });
 
@@ -233,7 +236,7 @@ describe('YPSI-Hautfaltenprioritäten', () => {
     const requiredByFold = {
       wange: ['stressHigh', 'moldConcern'],
       rippe: ['stressHigh', 'morningDriveLow', 'sleepOnset', 'sleepMaintenance', 'digestiveSymptoms', 'repeatedFoods', 'mercuryContext'],
-      ruecken: ['stressHigh', 'sleepOnset', 'sleepMaintenance', 'mercuryContext', 'mealsIrregular'],
+      ruecken: ['environmentalExposure', 'stressHigh', 'sleepOnset', 'sleepMaintenance', 'carbIntakeHigh', 'postMealCrash', 'micronutrientIntakeLow'],
       bizeps: ['stressHigh', 'morningDriveLow', 'sleepOnset', 'sleepMaintenance'],
     };
     Object.entries(requiredByFold).forEach(([slug, expectedQuestions]) => {
@@ -266,6 +269,50 @@ describe('YPSI-Hautfaltenprioritäten', () => {
 });
 
 describe('YPSI-Datenkonsistenz', () => {
+  it('enthält für alle 13 Falten eine geordnete Faktor-Struktur mit direkt zugeordneten Strategien', () => {
+    expect(Object.keys(hautfaltenFaktoren.falten)).toEqual(expect.arrayContaining(Object.keys(hautfaltenData.falten)));
+    expect(Object.keys(hautfaltenFaktoren.falten)).toHaveLength(13);
+    Object.entries(hautfaltenFaktoren.falten).forEach(([slug, fold]) => {
+      expect(fold.faktoren.length, slug).toBeGreaterThan(0);
+      fold.faktoren.forEach((factor) => {
+        expect(factor.id, slug).toBeTruthy();
+        expect(factor.faktor, factor.id).toBeTruthy();
+        expect(factor.quelle, factor.id).toContain('Hautfalten Notizen');
+        expect(Object.keys(factor.strategie), factor.id).toEqual(['nutrition', 'dailyLife', 'sleep', 'supplements']);
+        expect(factor.pruefung?.modus, factor.id).toMatch(/^(keine|beliebig|alle)$/);
+      });
+    });
+    expect(hautfaltenFaktoren.falten.huefte.faktoren.map((factor) => factor.rang)).toEqual([1, 2, 4, 5]);
+  });
+
+  it('verknüpft Bauchfaktoren mit Antworten und Gegenfalten statt nur mit freiem Text', () => {
+    const stress = assessSkinfoldFactors(folds, 'male', 'bauch', { stressHigh: true });
+    expect(stress.activeFactor).toMatchObject({ id: 'bauch-cortisol', status: 'bestaetigt' });
+
+    const gut = assessSkinfoldFactors(folds, 'male', 'bauch', {
+      stressHigh: false,
+      troubleWindingDown: false,
+      mealsIrregular: false,
+      postMealCrash: false,
+      proteinFatIntakeLow: false,
+      micronutrientIntakeLow: false,
+      morningDriveLow: false,
+      sleepOnset: false,
+      sleepMaintenance: false,
+      wakesFit: true,
+      digestiveSymptoms: true,
+    });
+    expect(gut.factors.find((factor) => factor.id === 'bauch-darm')).toMatchObject({ status: 'bestaetigt' });
+  });
+
+  it('liefert für jede mögliche Rang-1-Falte eine Faktorprüfung', () => {
+    Object.keys(hautfaltenFaktoren.falten).forEach((slug) => {
+      const result = assessSkinfoldFactors({ ...folds, [slug]: 100 }, 'male', slug, {});
+      expect(result?.activeFactor?.id, slug).toBeTruthy();
+      expect(result.factors.every((factor) => Array.isArray(factor.unansweredQuestionIds)), slug).toBe(true);
+    });
+  });
+
   it('verweist jede Falte nur auf vorhandene Protokolle', () => {
     const protocolIds = new Set(Object.keys(ypsiProtokolle.protokolle));
     Object.values(hautfaltenData.falten).forEach((fold) => {
@@ -360,5 +407,29 @@ describe('Braverman-Defizitprofil', () => {
     const serotonin = bravermanRecommendations('serotonin', 'moderate');
     expect(serotonin.seminarFoods).toContain('Kohlenhydrate');
     expect(serotonin.seminarSupplements).toContain('Liposomales Melatonin');
+  });
+
+  it('enthält die Trainingsvorgaben des Seminars für alle vier Bereiche', () => {
+    expect(bravermanRecommendations('dopamin', 'moderate').seminarTraining).toMatchObject({ intensitaet: 'moderat bis hoch', sprint: '6 × 30 m oder 4 × 50 m' });
+    expect(bravermanRecommendations('acetylcholin', 'moderate').seminarTraining.beispiele).toContain('10 × 10');
+    expect(bravermanRecommendations('gaba', 'moderate').seminarTraining).toMatchObject({ volumen: 'niedrig bis moderat', sprint: '' });
+    expect(bravermanRecommendations('serotonin', 'moderate').seminarTraining).toMatchObject({ volumen: 'hoch', sprint: '20 Minuten' });
+  });
+
+  it('zeigt mehrere auffällige Defizitskalen, priorisiert aber nur einen nächsten Schwerpunkt', () => {
+    const answers = Object.fromEntries(Object.entries(BRAVERMAN_DEFIZIT_FRAGEN).map(([key, questions]) => [
+      key,
+      questions.map((_, index) => (
+        (key === 'dopamin' && index < 10)
+        || (key === 'gaba' && index < 18)
+        || (key === 'serotonin' && index < 8)
+      )),
+    ]));
+    const plan = buildNeurotransmitterCoachPlan(answers);
+    expect(plan.complete).toBe(true);
+    expect(plan.focus.key).toBe('gaba');
+    expect(plan.hasMultipleRelevant).toBe(true);
+    expect(plan.relevant.map((profile) => profile.key)).toEqual(expect.arrayContaining(['dopamin', 'gaba', 'serotonin']));
+    expect(plan.focus.recommendations.seminarTraining).toBeTruthy();
   });
 });

@@ -3,6 +3,7 @@ import { faltenRang } from './ypsiFormel.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import supplementKatalog from './data/supplements-katalog.json';
+import hautfaltenFaktoren from './data/hautfalten-faktoren.json';
 import { BRAVERMAN_BEREICHE, BRAVERMAN_DEFIZIT_FRAGEN, BRAVERMAN_REIHENFOLGE } from './data/braverman-test.js';
 
 const PROTOKOLL_GRUPPEN = Object.freeze([
@@ -127,6 +128,85 @@ function foldAssessment(folds = {}, calculationBasis = 'male') {
 
 export function rankSkinfolds(folds = {}, calculationBasis = 'male') {
   return foldAssessment(folds, calculationBasis)?.ranked || [];
+}
+
+function factorSignalResult(signal, bySlug, context) {
+  if (signal.typ === 'frage') {
+    if (!answered(context?.[signal.id])) return null;
+    return context[signal.id] === (signal.wert ?? true);
+  }
+  if (signal.typ === 'falte') {
+    const fold = bySlug[signal.slug];
+    if (!fold) return null;
+    return signal.status === 'nicht_erhoeht' ? !isElevated(fold) : isElevated(fold);
+  }
+  if (signal.typ === 'falte_vergleich') {
+    const left = bySlug[signal.links]?.value;
+    const right = bySlug[signal.rechts]?.value;
+    if (!Number.isFinite(left) || !Number.isFinite(right)) return null;
+    if (signal.operator === '>') return left > right;
+    if (signal.operator === '<') return left < right;
+    return left === right;
+  }
+  return null;
+}
+
+/**
+ * Prüft die in den Seminarunterlagen je Falte geordneten Faktoren. Der Rang
+ * ist eine Coach-Prüfreihenfolge, kein medizinischer Befund. Erst explizite
+ * Antworten und die dokumentierten Gegenfalten können einen Faktor stützen.
+ */
+export function assessSkinfoldFactors(folds = {}, calculationBasis = 'male', topSlug = null, context = {}) {
+  const assessment = foldAssessment(folds, calculationBasis);
+  const slug = topSlug || assessment?.ranked?.[0]?.slug;
+  const source = hautfaltenFaktoren.falten?.[slug];
+  if (!assessment || !source) return null;
+  const factors = (source.faktoren || []).map((factor, sourceIndex) => {
+    const signals = (factor.pruefung?.signale || []).map((signal) => ({
+      ...signal,
+      result: factorSignalResult(signal, assessment.bySlug, context),
+    }));
+    const mode = factor.pruefung?.modus || 'keine';
+    const results = signals.map((signal) => signal.result);
+    let status = 'basis';
+    if (mode === 'alle') {
+      status = results.some((result) => result === false)
+        ? 'weniger_wahrscheinlich'
+        : results.every((result) => result === true)
+          ? 'bestaetigt'
+          : 'offen';
+    } else if (mode !== 'keine') {
+      status = results.some((result) => result === true)
+        ? 'bestaetigt'
+        : results.some((result) => result == null)
+          ? 'offen'
+          : 'weniger_wahrscheinlich';
+    }
+    return {
+      ...factor,
+      sourceIndex,
+      status,
+      signals,
+      unansweredQuestionIds: signals
+        .filter((signal) => signal.typ === 'frage' && signal.result == null)
+        .map((signal) => signal.id),
+      matchedCounterfolds: signals
+        .filter((signal) => signal.typ !== 'frage' && signal.result === true)
+        .flatMap((signal) => signal.typ === 'falte_vergleich' ? [signal.links, signal.rechts] : [signal.slug]),
+    };
+  });
+  const activeFactor = factors.find((factor) => factor.status === 'bestaetigt')
+    || factors.find((factor) => factor.status === 'offen')
+    || factors.find((factor) => factor.status === 'basis')
+    || factors[0]
+    || null;
+  return {
+    slug,
+    label: assessment.bySlug[slug]?.label || slug,
+    progressNote: source.verlaufshinweis || '',
+    factors,
+    activeFactor,
+  };
 }
 
 export function assessSkinfoldPriorities(folds = {}, calculationBasis = 'male') {
@@ -655,6 +735,7 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
   const topRelationships = relationships
     .filter((relation) => relation.focusSlugs.includes(topFold.slug))
     .sort((a, b) => Number(primaryRelationForFold(b, topFold.slug)) - Number(primaryRelationForFold(a, topFold.slug)));
+  const factorAssessment = assessSkinfoldFactors(current.falten, calculationBasis, topFold.slug, context);
   const enriched = priorities.map((priority) => {
     const previousOccurrences = occurrences[priority.id] || 0;
     const isActive = priority.id === activeProtocolGroup?.id;
@@ -693,6 +774,7 @@ export function buildSkinfoldPlan(history = [], calculationBasis = 'male', conte
     rankedFolds,
     relationships,
     topRelationships,
+    factorAssessment,
     occurrences,
   };
 }
@@ -727,11 +809,16 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
   add('nutrition', 'Lass dein Kalorienziel zunächst unverändert und beurteile es weiter über TRACKER, Gewichtstrend und Falten-Summe – nicht über eine einzelne Falte.', 'app');
   add('dailyLife', 'Setze für die nächsten drei bis vier Wochen nur diesen Schwerpunkt um, dokumentiere kurz die Umsetzung und miss dann unter ähnlichen Bedingungen erneut.', 'app');
 
-  if (['bauch-brust-trizeps', 'huefte'].includes(groupId) || (actionableTop && ['bauch', 'brust', 'trizeps', 'huefte', 'ruecken', 'rippe'].includes(top.slug))) {
-    requireAnswers('mealsIrregular', 'postMealCrash');
+  const factorAssessment = plan.factorAssessment;
+  const activeFactor = factorAssessment?.activeFactor || null;
+  factorAssessment?.factors?.forEach((factor) => requireAnswers(...(factor.fragen || [])));
+  if (activeFactor && ['bestaetigt', 'basis'].includes(activeFactor.status)) {
+    Object.entries(activeFactor.strategie || {}).forEach(([category, actions]) => {
+      (actions || []).forEach((text) => add(category, text, 'seminar'));
+    });
   }
+
   if (groupId === 'bauch-brust-trizeps' || (actionableTop && ['bauch', 'brust', 'trizeps'].includes(top.slug))) {
-    requireAnswers('stressHigh', 'wakesFit', 'morningDriveLow', 'troubleWindingDown', 'sleepOnset', 'sleepMaintenance', 'digestiveSymptoms');
     add('nutrition', 'Plane drei verlässliche Mahlzeiten mit einer klaren Proteinquelle; prüfe anhand von Hunger und Energie, ob sehr lange Essenspausen oder zu knappe Mahlzeiten dein Problem verstärken.', 'seminar');
     if (elevated('huefte') || yes(context.mealsIrregular) || yes(context.postMealCrash)) {
       add('nutrition', 'Verteile die Mahlzeiten für zwei Wochen regelmäßiger und gehe direkt nach der größten Mahlzeit etwa 10 bis 15 Minuten zügig spazieren.', 'evidence', 'postMealMovement');
@@ -755,27 +842,18 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
   }
 
   if (groupId === 'huefte' || (actionableTop && top.slug === 'huefte')) {
-    requireAnswers('mealsIrregular', 'postMealCrash');
     add('nutrition', 'Iss für zwei Wochen zu ähnlichen Zeiten und kombiniere jede Hauptmahlzeit mit Protein und ballaststoffreichen Lebensmitteln.', 'seminar');
     add('nutrition', 'Gehe direkt nach mindestens einer Hauptmahlzeit etwa 10 bis 15 Minuten zügig spazieren.', 'evidence', 'postMealMovement');
     add('dailyLife', 'Unterbrich längere Sitzphasen regelmäßig und sammle über die Woche mindestens 150 Minuten moderate Bewegung; Krafttraining zählt zusätzlich.', 'evidence', 'movement');
   }
 
-  if (groupId === 'wade' || groupId === 'quad-beinbizeps' || (actionableTop && ['wade', 'quadrizeps', 'beinbizeps', 'knie', 'bizeps', 'rippe'].includes(top.slug))) {
-    requireAnswers('sleepOnset', 'sleepMaintenance', 'wakes3to7', 'caffeineLate', 'alcoholNearBed', 'snoringBreathing');
-  }
   if (groupId === 'quad-beinbizeps' || groupId === 'knie' || (actionableTop && ['quadrizeps', 'beinbizeps', 'knie'].includes(top.slug))) {
-    requireAnswers('digestiveSymptoms', 'leakyGut', 'mercuryContext', 'alcoholNearBed');
     add('nutrition', 'Sichere täglich ausreichendes Protein und eine abwechslungsreiche Lebensmittelauswahl; starte keine pauschale „Entgiftungsdiät“ allein aufgrund der Faltenwerte.', 'seminar');
     add('nutrition', 'Beginne den Tag für zwei Wochen mit einem proteinreichen Frühstück und dokumentiere Hunger, Energie und Verdauung; diese Empfehlung stammt aus dem Leber-Phase-2-Kontext der Beinfalten.', 'seminar');
     add('dailyLife', 'Bewege dich täglich und reduziere vermeidbaren Alkoholkonsum sowie unnötige Expositionen schrittweise, ohne daraus eine medizinische „Entgiftung“ abzuleiten.', 'seminar');
     add('dailyLife', 'Sammle über die Woche mindestens 150 Minuten moderate Bewegung und ergänze an mindestens zwei Tagen Krafttraining.', 'evidence', 'movement');
   }
-  if (actionableTop && top.slug === 'trizeps') requireAnswers('redDotsTriceps', 'alcoholNearBed');
-  if (actionableTop && top.slug === 'rippe') requireAnswers('repeatedFoods', 'digestiveSymptoms', 'stressHigh', 'morningDriveLow', 'mercuryContext');
-
   if (actionableTop && top.slug === 'ruecken') {
-    requireAnswers('stressHigh', 'sleepOnset', 'sleepMaintenance', 'mercuryContext');
     add('nutrition', 'Halte deine Kohlenhydratmenge zunächst zwei Wochen möglichst konstant und notiere zu den Hauptmahlzeiten grob Portion, Hunger, Energie und Trainingsleistung.', 'seminar');
     add('nutrition', 'Reduziere Kohlenhydrate nicht allein wegen der Rückenfalte. Ändere die Menge erst, wenn TRACKER, Gewichtsverlauf, Hunger und Leistung gemeinsam dafür sprechen.', 'app');
     add('nutrition', 'Sichere eine abwechslungsreiche Lebensmittelauswahl mit Gemüse, Protein und üblichen Mikronährstoffquellen; leite aus der Rückenfalte keine pauschale „Entgiftung“ oder Supplement-Dosis ab.', 'seminar');
@@ -795,7 +873,6 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
     }
   }
   if (actionableTop && top.slug === 'bizeps') {
-    requireAnswers('stressHigh', 'morningDriveLow');
     add('nutrition', 'Prüfe für zwei Wochen, ob Kalorienziel, Protein und Nahrungsfette tatsächlich erreicht werden; leite aus der Bizepsfalte allein keinen Hormonmangel ab.', 'seminar');
     if (yes(context.morningDriveLow) || yes(context.stressHigh)) add('dailyLife', 'Dokumentiere zwei Wochen Morgenenergie, Stress und Trainingsleistung. Trizeps und Schlafverlauf entscheiden mit, ob der Energie-/Erholungskontext plausibel ist.', 'seminar');
   }
@@ -803,7 +880,6 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
     add('dailyLife', 'Bewerte Kinn und Wange nur als gemeinsames Verlaufspaar. Ändere erst etwas, wenn auch Gewichtstrend oder Falten-Summe dieselbe Richtung bestätigen.', 'seminar');
   }
   if (actionableTop && top.slug === 'wange') {
-    requireAnswers('stressHigh', 'moldConcern');
     if (yes(context.stressHigh)) add('dailyLife', 'Mache täglich zehn Minuten eine geführte Achtsamkeitsmeditation oder ruhige Atemübung und notiere deine Anspannung davor und danach.', 'evidence', 'mindfulness');
     if (yes(context.moldConcern)) add('dailyLife', 'Lass einen konkreten Feuchte-/Schimmelverdacht im Wohn- oder Arbeitsumfeld qualifiziert vor Ort prüfen; die Wangenfalte selbst kann keine Belastung feststellen.', 'app');
   }
@@ -867,14 +943,21 @@ export function buildSkinfoldActionPlan(plan, context = {}) {
       ? `${top.label}: Gegenprüfungen bearbeiten, kein Supplement-Protokoll starten`
       : `${top.label}: Verlauf beobachten, kein Fettabbau-Protokoll starten`;
   return {
-    focusTitle,
-    summary: active
-      ? `${top.label} ist deine aktuelle Priorität. Die Empfehlungen berücksichtigen die zugehörigen Faltenwerte und deine beantworteten Kontextfragen.`
-      : `${top.label} ist deine aktuelle Priorität. Aus dieser Messung ergibt sich kein eigener Supplement-Schritt.`,
+    focusTitle: activeFactor
+      ? `${top.label}${active ? ` · Phase ${active.suggestedPhase === 4 ? '4+' : active.suggestedPhase}` : ''}: ${activeFactor.faktor}`
+      : focusTitle,
+    summary: activeFactor?.status === 'bestaetigt'
+      ? `${top.label} ist deine aktuelle Priorität. Deine Antworten und Gegenfalten stützen am ehesten den Zusammenhang „${activeFactor.faktor}“.`
+      : activeFactor?.status === 'offen'
+        ? `${top.label} ist deine aktuelle Priorität. Für „${activeFactor.faktor}“ fehlen noch Antworten; bis dahin bleibt der Zusammenhang offen.`
+        : active
+          ? `${top.label} ist deine aktuelle Priorität. Die Empfehlungen berücksichtigen die zugehörigen Faltenwerte und deine beantworteten Kontextfragen.`
+          : `${top.label} ist deine aktuelle Priorität. Aus dieser Messung ergibt sich kein eigener Supplement-Schritt.`,
     requiredQuestionIds: required,
     unansweredQuestionIds,
     categories,
     protocols,
+    factorAssessment,
   };
 }
 
@@ -930,12 +1013,52 @@ export function bravermanRecommendations(type, severityId) {
     seminarFoods: area?.seminarLebensmittel || [],
     seminarSupplements: area?.seminarSupplemente || [],
     seminarNote: area?.seminarHinweis || '',
+    seminarLifestyle: area?.seminarAlltag || [],
+    seminarTraining: area?.seminarTraining || null,
+    bravermanFoods: area?.bravermanLebensmittel || [],
+    bravermanLifestyle: area?.bravermanAlltag || [],
     supplements: table.map((item) => ({
       ...item,
       name: supplementName(item.slug),
       dose: item[severityId] || '',
       safety: supplementSafety(item.slug),
     })),
+  };
+}
+
+/**
+ * Macht aus den vier getrennten Defizitskalen einen umsetzbaren Überblick.
+ * Die Quelle verlangt keine Konkurrenz der Skalen; der einzelne Schwerpunkt
+ * ist deshalb eine transparente App-Entscheidung nach Schwere und relativem
+ * Anteil. Weitere auffällige Bereiche bleiben sichtbar.
+ */
+export function buildNeurotransmitterCoachPlan(answers = {}) {
+  const result = scoreBravermanAssessment(answers);
+  const severityRank = { minor: 0, moderate: 1, major: 2 };
+  const profiles = BRAVERMAN_REIHENFOLGE.map((key) => {
+    const total = BRAVERMAN_DEFIZIT_FRAGEN[key].length;
+    const severity = result.severity[key];
+    return {
+      key,
+      area: BRAVERMAN_BEREICHE[key],
+      score: result.scores[key],
+      total,
+      ratio: total ? result.scores[key] / total : 0,
+      severity,
+      recommendations: bravermanRecommendations(key, severity.id),
+    };
+  }).sort((a, b) => (
+    severityRank[b.severity.id] - severityRank[a.severity.id]
+    || b.ratio - a.ratio
+    || BRAVERMAN_REIHENFOLGE.indexOf(a.key) - BRAVERMAN_REIHENFOLGE.indexOf(b.key)
+  ));
+  const relevant = profiles.filter((profile) => profile.severity.id !== 'minor');
+  return {
+    complete: bravermanComplete(answers),
+    focus: relevant[0] || profiles[0] || null,
+    relevant,
+    profiles,
+    hasMultipleRelevant: relevant.length > 1,
   };
 }
 
