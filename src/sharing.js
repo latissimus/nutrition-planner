@@ -27,14 +27,36 @@ export async function resolveSharedSpace(userId, scope, signal) {
   return chooseSharedSpace(userId, data || []);
 }
 
-export async function openShareSheet(scope) {
+/* Beschriftung für den Menüeintrag: sie soll auf einen Blick sagen, ob der
+   Bereich gerade geteilt ist – und in welche Richtung. Reine Funktion,
+   damit die Fälle ohne DOM und ohne Datenbank prüfbar bleiben. */
+export function shareStateLabel(state) {
+  if (!state || state.fehler) return 'Freigaben konnten nicht geladen werden';
+  if (state.empfangen) return 'Wird für dich freigegeben';
+  const anzahl = state.eigene?.length || 0;
+  if (!anzahl) return 'Noch mit niemandem geteilt';
+  if (anzahl === 1) return `Freigegeben für ${state.eigene[0].partner_email}`;
+  return `Freigegeben für ${anzahl} Personen`;
+}
+
+/* Beide Richtungen auf einmal: eigene Freigaben kommen aus der Datenbank,
+   "empfangen" weiss nur der Aufrufer (resolveSharedSpace). */
+export async function loadShareState(scope, { empfangen = false } = {}) {
+  const { data, error } = await supabase.rpc('list_owned_space_shares', { space_scope: scope });
+  if (error) return { fehler: true, eigene: [], empfangen };
+  return { fehler: false, eigene: data || [], empfangen };
+}
+
+export async function openShareSheet(scope, { empfangen = false } = {}) {
   const label = scope === 'shopping' ? 'Einkauf' : 'Rezepte';
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop teilen-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet teilen-sheet" role="dialog" aria-modal="true" aria-label="${label} teilen">
     <header><h2>${label} teilen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
-    <p class="profile-hinweis">Die Person benötigt ein eigenes CAPBOY-Konto. Beide Profile können diesen Bereich anschließend gemeinsam bearbeiten.</p>
-    <form data-share-form><label class="dex-entry-field"><span>E-Mail des Partners</span><input class="input" type="email" autocomplete="email" required placeholder="name@beispiel.de"></label><button class="btn btn-primary btn-block" type="submit">Freigeben</button></form>
+    ${empfangen
+    ? `<p class="profile-hinweis">Dieser Bereich gehört einem anderen Profil und wurde für dich freigegeben. Ihr bearbeitet ihn gemeinsam; verwalten kann die Freigabe nur das Profil, dem der Bereich gehört.</p>`
+    : `<p class="profile-hinweis">Die Person benötigt ein eigenes CAPBOY-Konto. Beide Profile können diesen Bereich anschließend gemeinsam bearbeiten.</p>
+    <form data-share-form><label class="dex-entry-field"><span>E-Mail des Partners</span><input class="input" type="email" autocomplete="email" required placeholder="name@beispiel.de"></label><button class="btn btn-primary btn-block" type="submit">Freigeben</button></form>`}
     <h3>Freigegeben für</h3><div class="teilen-liste" data-share-list><span>Wird geladen …</span></div>
   </section>`;
   const close = () => backdrop.remove();
@@ -45,7 +67,9 @@ export async function openShareSheet(scope) {
     if (error) { list.innerHTML = '<span>Freigaben konnten nicht geladen werden.</span>'; return; }
     list.innerHTML = data?.length ? data.map((share) => `<div><span>${escapeHtml(share.partner_email)}</span><button type="button" data-remove-share="${share.id}" aria-label="Freigabe entfernen">${materialIconMarkup('delete_forever')}</button></div>`).join('') : '<span>Noch mit niemandem geteilt.</span>';
   };
-  backdrop.querySelector('[data-share-form]').onsubmit = async (event) => {
+  /* Als Empfänger gibt es kein Formular – dort ist nur die Liste sinnvoll. */
+  const form = backdrop.querySelector('[data-share-form]');
+  if (form) form.onsubmit = async (event) => {
     event.preventDefault();
     const button = event.currentTarget.querySelector('button');
     button.disabled = true;

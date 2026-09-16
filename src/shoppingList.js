@@ -1,7 +1,9 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
-import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
+import {
+  categoryColor, colorIsDark, fuelleFreigabeZustand, materialIconMarkup,
+} from './categoryIcons.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { resolveSharedSpace } from './sharing.js';
@@ -915,7 +917,7 @@ export async function mountShoppingList(container, { session, signal }) {
   return {
     isShared: space.isShared,
     ownerId: userId,
-    openAddMenu() {
+    openAddMenu(menuOptions = {}) {
       const sections = [...new Set([...KNOWN_SECTIONS, ...items.map((item) => item.section)])];
       const backdrop = document.createElement('div');
       backdrop.className = 'kategorie-sheet-backdrop einkauf-add-backdrop';
@@ -928,9 +930,15 @@ export async function mountShoppingList(container, { session, signal }) {
           <label class="dex-entry-field"><span>Abteilung</span><select class="input" data-new-section>${sections.map((section) => `<option value="${escapeHtml(section)}"${section === 'Sonstiges' ? ' selected' : ''}>${escapeHtml(section)}</option>`).join('')}</select></label>
           <button class="btn btn-primary btn-block" type="submit">Lebensmittel hinzufügen</button>
         </form>
+        ${menuOptions.onShare ? `<div class="sheet-menue einkauf-add-menue">
+          <button type="button" data-share-open>${materialIconMarkup('upload_file', 'sheet-list-icon')}<span><b>Mit Partner teilen</b><small data-share-state>Freigaben werden geladen …</small></span></button>
+        </div>` : ''}
       </section>`;
       const close = () => backdrop.remove();
-      backdrop.onclick = (event) => { if (event.target === backdrop || event.target.closest('[data-sheet-close]')) close(); };
+      backdrop.onclick = (event) => {
+        if (event.target === backdrop || event.target.closest('[data-sheet-close]')) return close();
+        if (event.target.closest('[data-share-open]')) { close(); menuOptions.onShare?.(); }
+      };
       mountTagPicker(backdrop, backdrop.querySelector('[data-new-tags]'));
       backdrop.querySelector('[data-add-overlay-form]').onsubmit = async (event) => {
         event.preventDefault();
@@ -949,6 +957,7 @@ export async function mountShoppingList(container, { session, signal }) {
         finally { submit.disabled = false; }
       };
       document.body.append(backdrop);
+      fuelleFreigabeZustand(backdrop, menuOptions);
       requestAnimationFrame(() => {
         backdrop.classList.add('offen');
         backdrop.querySelector('[data-new-name]')?.focus({ preventScroll: true });

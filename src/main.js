@@ -86,6 +86,13 @@ const startDexSelection = async (...args) => (await selectionModule()).startDexS
 const openShareSheet = async (...args) => (await sharingModule()).openShareSheet(...args);
 const resolveSharedSpace = async (...args) => (await sharingModule()).resolveSharedSpace(...args);
 
+/* Zustandszeile unter "Mit Partner teilen". Wird erst beim Öffnen des Menüs
+   abgefragt, damit der Seitenaufbau keine zusätzliche Anfrage trägt. */
+const shareLabelLader = (scope, empfangen) => async () => {
+  const modul = await sharingModule();
+  return modul.shareStateLabel(await modul.loadShareState(scope, { empfangen }));
+};
+
 applyTheme(getTheme());
 registriereServiceWorker().catch(() => {});
 
@@ -1473,8 +1480,16 @@ async function renderRoute() {
       pageLookScope: route, pageLookPattern: 'drops',
       // Kein Link/Notiz/Bild-Menue: Der Plus-Knopf springt direkt ins
       // eigene "Neuer Artikel"-Feld der Einkaufsliste.
-      onPlus: () => shoppingActions?.openAddMenu?.(),
-      onShare: shoppingActions?.isShared ? null : () => openShareSheet('shopping'),
+      // Das Teilen hing bisher am Werkzeug-Knopf der alten Kategoriekopfzeile.
+      // Die ist ausgeblendet, seit das Dock-Menü übernommen hat – der Eintrag
+      // war dadurch nicht mehr erreichbar. Er wandert deshalb in das Menü,
+      // das der MENÜ-Knopf tatsächlich öffnet.
+      onPlus: () => shoppingActions?.openAddMenu?.({
+        onShare: () => openShareSheet('shopping', { empfangen: Boolean(shoppingActions?.isShared) }),
+        loadShareLabel: shareLabelLader('shopping', Boolean(shoppingActions?.isShared)),
+      }),
+      onShare: () => openShareSheet('shopping', { empfangen: Boolean(shoppingActions?.isShared) }),
+      loadShareLabel: shareLabelLader('shopping', Boolean(shoppingActions?.isShared)),
     });
     installNeoDexChrome(view, {
       title: 'EINKAUF',
@@ -1508,7 +1523,10 @@ async function renderRoute() {
       onAddOwnRecipe: () => openEntry('note', 'recipe'),
       onCreateSub: () => openCollectionEditor({ userId: foodOwnerId, rootKey: 'food-log', onSaved: refresh }),
       onSelect: () => startDexSelection(view, { userId: foodOwnerId, rootKey: 'food-log', onChanged: refresh }),
-      onShare: foodSpace.isShared ? null : () => openShareSheet('food-log'),
+      // Auch als Empfänger sichtbar: dann zeigt das Sheet, wem der Bereich
+      // gehört, statt den Eintrag ganz wegzulassen.
+      onShare: () => openShareSheet('food-log', { empfangen: foodSpace.isShared }),
+      loadShareLabel: shareLabelLader('food-log', foodSpace.isShared),
     });
     // REZEPTE bekommt einen kompakten Vozzy-inspirierten Header: die
     // wichtigsten Aktionen liegen in einem kleinen Floating-Menü, damit das

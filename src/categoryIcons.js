@@ -442,6 +442,21 @@ function closeSheet(backdrop) {
   backdrop.remove();
 }
 
+/* Trägt die Freigabe-Beschriftung in ein bereits offenes Sheet nach.
+   Dieses Modul kennt die Datenbank nicht: der Aufrufer reicht über
+   options.loadShareLabel eine Funktion herein, die den Text liefert. Das
+   Nachreichen hält das Öffnen des Menüs frei von einer Netzanfrage. */
+export async function fuelleFreigabeZustand(root, options = {}) {
+  const ziel = root?.querySelector('[data-share-state]');
+  if (!ziel || typeof options.loadShareLabel !== 'function') return;
+  try {
+    const text = await options.loadShareLabel();
+    if (ziel.isConnected && text) ziel.textContent = text;
+  } catch (error) {
+    if (ziel.isConnected) ziel.textContent = 'Freigaben konnten nicht geladen werden';
+  }
+}
+
 function notifyAppearanceChanged(route) {
   window.dispatchEvent(new CustomEvent('muscledex:appearance-changed', {
     detail: { route },
@@ -600,7 +615,11 @@ function eintragTypWaehlen(container, route, options = {}) {
         ${options.onAddNote ? `<button data-entry-type="note">${materialIcon('note_add', 'sheet-list-icon')}<span>Notiz</span></button>` : ''}`
         : standardEntries}
       ${options.onCreateSub ? `<button data-entry-type="sub">${materialIcon('create_new_folder', 'sheet-list-icon')}<span>Unterordner erstellen</span></button>` : ''}
+      ${options.onShare ? `<button data-entry-type="share">${materialIcon('upload_file', 'sheet-list-icon')}<span><b>Mit Partner teilen</b><small data-share-state>Freigaben werden geladen …</small></span></button>` : ''}
     </div>`);
+  /* Der Zustand kommt aus der Datenbank und darf das Öffnen nicht aufhalten:
+     die Zeile steht sofort, die Beschriftung wird nachgereicht. */
+  fuelleFreigabeZustand(backdrop, options);
   backdrop.querySelector('.eintrag-typ-menue').onclick = (event) => {
     const type = event.target.closest('[data-entry-type]')?.dataset.entryType;
     if (!type) return;
@@ -610,6 +629,7 @@ function eintragTypWaehlen(container, route, options = {}) {
     if (type === 'audio') return options.onAddAudio?.();
     if (type === 'routine') return options.onAddRoutine?.();
     if (type === 'sub') return options.onCreateSub?.();
+    if (type === 'share') return options.onShare?.();
     if (type === 'note') {
       if (options.onAddNote) return options.onAddNote();
       return toast('Notizen sind für diese Seite vorbereitet.');

@@ -13582,3 +13582,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:var(--dm-text)!important;
   color:var(--dm-text)!important;
 }
+
+/* --- Einkauf: "Mit Partner teilen" unter dem Hinzufügen-Formular ------- */
+/* Das Menü des MENÜ-Knopfes ist hier ein Formular. Die Teilen-Zeile setzt
+   sich deshalb durch eine Trennlinie davon ab, statt wie ein weiteres
+   Eingabefeld zu wirken. */
+.einkauf-add-sheet .einkauf-add-menue{
+  margin-top:14px;
+  padding-top:2px;
+  border-top:1.5px solid var(--app-divider,var(--ink));
+}
