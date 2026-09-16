@@ -12907,3 +12907,28 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero-value small{
   color:var(--dm-muted)!important;
 }
+
+/* --- Live-Audit: zwei verbliebene Stellen ----------------------------- */
+/* MIND: die Seite definiert --stress-card-ink als eigenes Textfarb-Token
+   auf :root[data-seite="stress"]. Es stand nicht in der Rücksetzliste, weil
+   es keiner der Kern-Tokens ist – die Texte blieben dadurch dunkelrot. */
+:root[data-theme="dark"][data-seite="stress"],
+:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page){
+  --stress-card-ink:var(--dm-text);
+  --stress-card:var(--dm-surface);
+}
+
+/* COMP: der Prioritätsblock setzt color:#111 in einer :is()-Liste, die der
+   Generator als Gruppe zusammengefasst hat – die Deklaration kam dadurch
+   nicht bis zum Block selbst durch. */
+:root[data-theme="dark"][data-seite="body"] :is(.ypsi-priority-empty,.ypsi-priority-block){
+  background:var(--app-card)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+:root[data-theme="dark"][data-seite="body"] :is(.ypsi-priority-empty,.ypsi-priority-block) :is(b,strong,span,header,div,p,li){
+  color:var(--text)!important;
+}
+:root[data-theme="dark"][data-seite="body"] :is(.ypsi-priority-empty,.ypsi-priority-block) small{
+  color:var(--muted)!important;
+}
