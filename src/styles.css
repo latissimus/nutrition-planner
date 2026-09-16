@@ -12932,3 +12932,135 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="body"] :is(.ypsi-priority-empty,.ypsi-priority-block) small{
   color:var(--muted)!important;
 }
+
+/* ============================================================
+   DARKMODE · Live-Audit: farbige Restflächen
+   Gefunden durch eine Sättigungsmessung in der laufenden App. Die vorherige
+   Prüfung suchte nur nach HELLEN Flächen – farbige, aber dunkle Elemente
+   (Tags, Icon-Kacheln, Schalter) sind ihr dadurch entgangen.
+   ============================================================ */
+
+/* --- Tags, Icon-Kacheln und Schalter auf allen Seiten ----------------- */
+:root[data-theme="dark"] :is(
+  .rem-row-emoji,
+  .nutrition-entry-icon,
+  .mahl-mini-switch-track,
+  .rem-switch-thumb,
+  .som-info-knopf,
+  .einkauf-gruppe-icon,
+  .dex-tag,
+  .dex-schlagwort,
+  .kategorie-tag
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* Die Schlagwort-Chips der Wissensseiten liegen als <i> in den Karten. */
+:root[data-theme="dark"] :is(.neo-dex-page,.food-dex-page,.special-dex-page) i{
+  background-color:var(--app-field)!important;
+  color:var(--text)!important;
+}
+
+/* --- SCHLAF: der Hero trug ein eigenes Nachtblau --------------------- */
+:root[data-theme="dark"] :is(.sleep-tonight,.special-dex-hero){
+  background:var(--app-card)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* --- EINKAUF: markierte Lebensmittel waren unsichtbar ---------------- */
+/* Gefüllte weiße Box mit dunkelgrauem Haken – so ist der Zustand auch auf
+   dunklem Grund sofort erkennbar. */
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"]{
+  border-color:var(--app-outline)!important;
+  background:transparent!important;
+}
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"]:checked{
+  border-color:#FFFFFF!important;
+  background-color:#FFFFFF!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4L19 6' fill='none' stroke='%23343A46' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
+}
+
+/* --- Verlaufslinien in COMP und SCHLAF ------------------------------- */
+/* Die Trendlinie trug die Seitenfarbe und verschwand auf Navy fast. */
+:root[data-theme="dark"] .k-linie.trend{
+  stroke:#FFFFFF!important;
+}
+:root[data-theme="dark"] .k-linie.roh{
+  stroke:var(--dm-muted)!important;
+  opacity:.7!important;
+}
+:root[data-theme="dark"] .k-punkt,
+:root[data-theme="dark"] .kurve circle{
+  fill:#FFFFFF!important;
+  stroke:var(--dm-surface)!important;
+}
+
+/* Die Seitenregeln für Info-Knöpfe und Schalter tragen die Form
+   :root[data-seite="…"] .<seiten-wrapper> .<element> und wiegen damit (0,4,0).
+   Gleiche Form, spätere Position. */
+:root[data-theme="dark"] :is(
+  .meal-log-dex-page,.routine-dex-page,.sleep-dex-page,.sleep-log-dex-page,
+  .shopping-dex-page,.shopping-dex-wrap,.coin-dex-page,.body-log-dex-page,
+  .neo-dex-page,.food-dex-page,.training-dex-page,.special-dex-page
+) :is(
+  .som-info-knopf,.nutrition-calibration-info,.rem-switch-thumb,
+  .mahl-mini-switch-track,.rem-row-emoji,.nutrition-entry-icon
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* --- Letzter Durchgang: Info-Knöpfe und Tag-Badges ------------------- */
+/* Die Klasse wird doppelt notiert, um die (0,4,0) der Seitenregeln legitim
+   zu überbieten, ohne eine weitere !important-Kette aufzubauen. */
+:root[data-theme="dark"][data-seite] :is(
+  .som-info-knopf.som-info-knopf,
+  .body-analysis-info.body-analysis-info,
+  .nutrition-calibration-info.nutrition-calibration-info
+){
+  background:var(--app-field)!important;
+  color:var(--text)!important;
+  border-color:var(--app-outline)!important;
+}
+
+/* Tag-Badges: Wochentage in ROUTINEN, Marken in CAPCOINS, Schlagworte in
+   den Wissensseiten. Sie lagen als <i> oder <small> mit eigener Fläche vor. */
+:root[data-theme="dark"] :is(
+  .routine-dex-page,.coin-dex-page,.neo-dex-page,.food-dex-page
+) :is(i,small):not(.material-svg){
+  background-color:var(--app-field)!important;
+  color:var(--text)!important;
+}
+:root[data-theme="dark"] .routine-dex-page .routine-tag,
+:root[data-theme="dark"] .routine-dex-page small{
+  background-color:var(--app-field)!important;
+  color:var(--text)!important;
+}
+
+/* --- Verlaufskurven in COMP und SCHLAF ------------------------------- */
+/* Die Linien tragen ihre Farbe als SVG-Präsentationsattribut und haben
+   keine Klasse. CSS schlägt das Attribut, deshalb reicht ein Zugriff über
+   den Seiten-Wrapper. */
+:root[data-theme="dark"] :is(
+  .sleep-log-dex-page,.sleep-dex-page,.body-log-dex-page,.special-dex-page,
+  .meal-log-dex-page
+) svg :is(polyline,path.k-linie,.k-linie){
+  stroke:#FFFFFF!important;
+}
+:root[data-theme="dark"] :is(
+  .sleep-log-dex-page,.sleep-dex-page,.body-log-dex-page,.special-dex-page,
+  .meal-log-dex-page
+) svg circle{
+  fill:#FFFFFF!important;
+  stroke:var(--dm-surface)!important;
+}
+
+/* Unmarkierte Box bleibt leer: die Seitenregel setzt background-color,
+   nicht background – deshalb hier dieselbe Eigenschaft. */
+:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"]:not(:checked){
+  background-color:transparent!important;
+  border-color:var(--app-outline)!important;
+}
