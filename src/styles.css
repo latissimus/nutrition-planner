@@ -13064,3 +13064,521 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:transparent!important;
   border-color:var(--app-outline)!important;
 }
+
+/* ============================================================
+   DARKMODE · Overlays, Ringe, Schalter (Nachtrag)
+   ============================================================ */
+
+/* --- Token-Rücksetzung auf den Overlay-Wurzeln ------------------------ */
+/* Sämtliche Overlays hängen per document.body.append() AUSSERHALB der
+   Seiten-Wrapper. Die Rücksetzung weiter oben sitzt auf ".special-dex-page"
+   und Geschwistern und greift dort deshalb nicht: im Overlay löst
+   var(--surface) auf den Retro-Wert auf – weiße Fläche, schwarze Schrift.
+   Dieselbe Rücksetzung gehört daher auch auf die Overlay-Wurzeln. */
+:root[data-theme="dark"] :is(
+  .kategorie-sheet-backdrop,.dex-detail-overlay,.food-dex-info-dialog-overlay,
+  .rem-period-overlay,.slot-info-overlay,.dex-auswahlleiste,.dex-bild-vollbild,
+  .neo-dex-action-popover,.food-dex-action-popover,.neo-dex-retro-menu,
+  .food-dex-retro-menu,.body-add-menu,.eintrag-typ-menue,.rem-row-sheet,
+  .app-toast,.push-onboarding,.gesten-hinweis,.tapeten-langvorschau,
+  .teilen-sheet,.kategorie-sheet,.sammlung-editor
+){
+  --surface:var(--dm-surface);
+  --surface2:var(--dm-surface2);
+  --text:var(--dm-text);
+  --ink:var(--dm-ink);
+  --line:var(--dm-ink);
+  --muted:var(--dm-muted);
+  --faint:var(--dm-faint);
+  --app-card:var(--dm-surface);
+  --app-field:var(--dm-surface2);
+  --app-outline:var(--dm-ink);
+  --app-divider:var(--dm-ink);
+  --app-hard-shadow:#43516E;
+  --cap-card:var(--dm-surface);
+  --cap-tint:var(--dm-surface2);
+  --cap-muted:var(--dm-muted);
+  --supps-card:var(--dm-surface);
+  --stress-card:var(--dm-surface);
+  --tracker-card:var(--dm-surface);
+  --special-dex-card-bg:var(--dm-surface);
+}
+
+/* --- Sheetfläche und Menüs ------------------------------------------- */
+:root[data-theme="dark"] :is(
+  .kategorie-sheet,.sheet-menue,.kategorie-sheet-menu,.rem-period-menu,
+  .neo-dex-action-popover,.food-dex-action-popover,.neo-dex-retro-menu,
+  .food-dex-retro-menu,.body-add-menu,.eintrag-typ-menue,.rem-row-sheet,
+  .food-dex-info-dialog,.sammlung-editor,.teilen-sheet,.dex-auswahlleiste
+){
+  background:var(--dm-surface)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+
+/* Schrift im Overlay. Ohne die Aufzählung bleiben einzeln gefärbte
+   Überschriften und Absätze auf ihrem Retro-Schwarz stehen. */
+:root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(
+  h1,h2,h3,h4,h5,h6,p,label,li,b,strong,summary,legend,td,th,dt,dd,figcaption
+){
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(
+  small,.sheet-hinweis,.rem-overlay-hinweis,.muted
+){
+  color:var(--dm-muted)!important;
+}
+
+/* --- Kopfzeile des Sheets --------------------------------------------- */
+/* Die Basisregel setzt color:#000 und fill:#000 fest – auf der dunklen
+   Fläche verschwinden Schließkreuz und Drei-Punkte-Knopf dadurch ganz. */
+:root[data-theme="dark"] .kategorie-sheet>header button{
+  background:var(--dm-surface2)!important;
+  border-radius:50%!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"] .kategorie-sheet>header button :is(.material-svg,svg,svg *){
+  fill:var(--dm-text)!important;
+  color:var(--dm-text)!important;
+}
+
+/* --- Drei-Punkte- und Schließknopf der Eintrag-Detailseite ------------ */
+:root[data-theme="dark"] :is(.neo-dex-action-button,.food-dex-action-button){
+  background:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"] :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *){
+  fill:var(--dm-text)!important;
+  color:var(--dm-text)!important;
+}
+
+/* --- Eingabefelder im Overlay ----------------------------------------- */
+:root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),textarea,select,.input
+){
+  background:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(input,textarea)::placeholder{
+  color:var(--dm-faint)!important;
+}
+
+/* --- Fortschrittsringe ------------------------------------------------ */
+/* Die Füllung zog --ordner, also die Seitenfarbe – dunkelbraun auf
+   dunkler Karte. Füllung weiß, Restbogen als heller Grauton, damit der
+   Ring überhaupt als Ring lesbar ist. */
+:root[data-theme="dark"] .nutrition-ring.nutrition-ring{
+  background:conic-gradient(#FFFFFF var(--nutrition-progress),rgba(255,255,255,.22) 0)!important;
+}
+:root[data-theme="dark"] .body-v2-ring.body-v2-ring{
+  background:conic-gradient(#FFFFFF var(--body-progress),rgba(255,255,255,.22) 0)!important;
+}
+:root[data-theme="dark"] .sleep-duration-ring.sleep-duration-ring{
+  background:conic-gradient(#FFFFFF var(--sleep-progress),rgba(255,255,255,.22) 0)!important;
+}
+:root[data-theme="dark"] .routine-progress-ring.routine-progress-ring{
+  background:conic-gradient(#FFFFFF var(--routine-progress),rgba(255,255,255,.22) 0)!important;
+}
+
+/* --- Schalter --------------------------------------------------------- */
+/* Bahn weiß mit hellgrauem Rand, Knopf weiß mit demselben Rand. Der
+   Zustand liegt damit allein in der Position des Knopfes. */
+:root[data-theme="dark"] :is(
+  .rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,
+  .mahl-mini-switch-track,.switchline-track
+){
+  background:#FFFFFF!important;
+  box-shadow:inset 0 0 0 1.5px #C9CFDA!important;
+}
+:root[data-theme="dark"] :is(
+  .rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,
+  .mahl-mini-switch-track,.switchline-track
+)::after{
+  background:#FFFFFF!important;
+  box-shadow:0 0 0 1.5px #C9CFDA!important;
+}
+
+/* --- Seitenfarbe aus Flächen entfernen ------------------------------- */
+/* 44 Regeln mischen die Seitenfarbe per color-mix() in Karten, Header und
+   Felder. Im Rechner löst das zu color(srgb …) auf – ein Wert, den keine
+   der bisherigen Prüfungen gelesen hat. Genau diese Stellen trugen den
+   braunen bzw. farbigen Stich. Aktive Chips bleiben ausgenommen. */
+:root[data-theme="dark"] .meditation-editor-settings{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .mobility-editor-settings{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .custom-timer-settings{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .coin-balance-card{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .coin-next{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .coin-verdienst>summary{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .coin-section-title button{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .nutrition-period-inline{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"] .mahl-slot-zeit input{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .mahl-zeitblock .rem-row-zeit{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .sleep-section-title>.material-svg{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .mahl-slot-titel>.reminder-svg{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .mahl-slot-info:hover{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .mahl-slot-info.hat-info{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"] .nutrition-period-inline{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"] .nutrition-knowledge-card{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-card{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-card{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-overview>summary{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-overview-macros>span{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-overview-target{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock>header{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-v2-hero{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-v2-overview{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-v2-overview>summary,
+:root[data-theme="dark"][data-seite="body"] .body-v2-card>header{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-v2-overview .body-v2-card-body{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-chart-empty{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-goal-status{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-skinfold-history .ist-unvollstaendig>summary{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .body-reset-mini{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="body"] .guided-fold-grid fieldset{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview>summary{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values>span{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="sleep"] .sleep-stats>div{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="sleep"] .sleep-insights p{
+  background-color:var(--dm-surface)!important;
+}
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-hero{
+  background-color:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header{
+  background-color:var(--dm-surface2)!important;
+}
+
+/* --- Verlaufskurven ---------------------------------------------------- */
+/* Die Linien sind schlichte <path> ohne Klasse; die frühere Regel traf nur
+   .k-linie und <polyline> und ging an COMP deshalb vorbei. */
+:root[data-theme="dark"] :is(.body-chart-block,.sleep-chart,.kurve) svg :is(path,polyline,.k-linie){
+  stroke:#FFFFFF!important;
+}
+:root[data-theme="dark"] :is(.body-chart-block,.sleep-chart,.kurve) svg :is(circle,.k-pt){
+  fill:#FFFFFF!important;
+  stroke:var(--dm-surface)!important;
+}
+:root[data-theme="dark"] :is(.body-chart-block,.sleep-chart,.kurve) svg text{
+  fill:var(--dm-muted)!important;
+}
+:root[data-theme="dark"] :is(.body-chart-block,.sleep-chart,.kurve) svg :is(.k-raster,.k-achse){
+  stroke:var(--dm-ink)!important;
+}
+
+/* --- Filterchips der Grid-Seiten -------------------------------------- */
+/* Am Telefon trugen sie Seitenfarbe auf Fläche und Schrift (dunkelviolett
+   mit Gelb). Grau mit weißer Schrift; der aktive Chip bleibt als weiß
+   gefüllte Marke unterscheidbar – dieselbe Logik wie die Einkaufs-Checkbox. */
+:root[data-theme="dark"] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
+)>button{
+  background-color:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
+)>button.aktiv{
+  background:#FFFFFF!important;
+  border-color:#FFFFFF!important;
+  color:#343A46!important;
+}
+
+/* --- Tags an Einträgen und im Einkauf --------------------------------- */
+:root[data-theme="dark"] :is(
+  .dex-detail-tags span,.einkauf-tag,.einkauf-tag-chip,.einkauf-row-tags span,
+  .sleep-tags span,.falten-detail-tags span,.dex-eintrag-tag,.tuck-tag
+){
+  background-color:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+
+/* --- Nachschärfung: Seitenregeln überstimmen --------------------------- */
+/* Die Seiten setzen ihre Chips und Kurven über ":root[data-seite=…] …" mit
+   !important. Dieselbe Form plus [data-theme] liegt eine Stufe darüber;
+   [class*="dex-page"] trifft dabei jeden Seiten-Wrapper, ohne sie alle
+   einzeln aufzuzählen. */
+:root[data-theme="dark"][data-seite] [class*="dex-page"] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter
+) button{
+  background-color:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] [class*="dex-page"] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter
+) button.aktiv{
+  background:#FFFFFF!important;
+  border-color:#FFFFFF!important;
+  color:#343A46!important;
+}
+
+:root[data-theme="dark"][data-seite] :is(.body-chart-block,.sleep-chart,.kurve) :is(
+  path,polyline,.k-linie,.k-linie.roh,.k-linie.glatt
+){
+  stroke:#FFFFFF!important;
+}
+:root[data-theme="dark"][data-seite] :is(.body-chart-block,.sleep-chart,.kurve) :is(
+  circle,.k-pt,.k-pt.roh,.k-pt.glatt
+){
+  fill:#FFFFFF!important;
+  stroke:var(--dm-surface)!important;
+}
+
+/* Seitenüberschrift der Sammlungen (MIND trug die Seitenfarbe). */
+:root[data-theme="dark"] .dex-sammlungskopf :is(h1,h2){
+  color:var(--dm-text)!important;
+}
+
+/* --- Schalter: Bahn und Knopf weiß ------------------------------------ */
+/* Gespiegelt aus den Regeln, die Bahn oder Knopf einfärben. Ohne die
+   Spiegelung gewinnen seitenspezifische Selektoren wie
+   ":root[data-seite='body'] .body-reminder-settings …" mit !important. */
+:root[data-theme="dark"] .rem-switch-thumb,
+:root[data-theme="dark"] .rem-switch-thumb::after,
+:root[data-theme="dark"] .rem-switch input:checked ~ .rem-switch-thumb,
+:root[data-theme="dark"] .sleep-mini-switch span,
+:root[data-theme="dark"] .sleep-mini-switch span::after,
+:root[data-theme="dark"] .sleep-setting-switch .sleep-switch-track,
+:root[data-theme="dark"] .sleep-setting-switch .sleep-switch-track::after,
+:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track,
+:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch-track,
+:root[data-theme="dark"] .mahl-mini-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track,
+:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
+:root[data-theme="dark"] .switchline-track,
+:root[data-theme="dark"] .switchline-track::after,
+:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb,
+:root[data-theme="dark"] .switchline input:checked~.switchline-track,
+:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,
+:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .interface-sound-setting .switchline-track,
+:root[data-theme="dark"] .interface-sound-setting .switchline-track::after,
+:root[data-theme="dark"] .interface-sound-setting>input:checked~.switchline-track,
+:root[data-theme="dark"] .interface-sound-setting>input:checked~.switchline-track::after,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline-track,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline-track::after,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline input:checked~.switchline-track,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .mess-einst .switchline-track,
+:root[data-theme="dark"] .mess-einst .switchline-track::after,
+:root[data-theme="dark"] .mess-einst .switchline input:checked~.switchline-track,
+:root[data-theme="dark"] .mess-einst .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline-track,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="profile"] .switchline-track::after,
+:root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track,
+:root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+  background:#FFFFFF!important;
+  box-shadow:inset 0 0 0 1.5px #C9CFDA!important;
+}
+:root[data-theme="dark"] .rem-switch-thumb::after,
+:root[data-theme="dark"] .rem-switch-thumb::after,
+:root[data-theme="dark"] .rem-switch input:checked ~ .rem-switch-thumb::after,
+:root[data-theme="dark"] .sleep-mini-switch span::after,
+:root[data-theme="dark"] .sleep-mini-switch span::after,
+:root[data-theme="dark"] .sleep-setting-switch .sleep-switch-track::after,
+:root[data-theme="dark"] .sleep-setting-switch .sleep-switch-track::after,
+:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,
+:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
+:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
+:root[data-theme="dark"] .switchline-track::after,
+:root[data-theme="dark"] .switchline-track::after,
+:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,
+:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,
+:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .interface-sound-setting .switchline-track::after,
+:root[data-theme="dark"] .interface-sound-setting .switchline-track::after,
+:root[data-theme="dark"] .interface-sound-setting>input:checked~.switchline-track::after,
+:root[data-theme="dark"] .interface-sound-setting>input:checked~.switchline-track::after,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline-track::after,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline-track::after,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .sammlung-sichtbarkeit .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .mess-einst .switchline-track::after,
+:root[data-theme="dark"] .mess-einst .switchline-track::after,
+:root[data-theme="dark"] .mess-einst .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"] .mess-einst .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="profile"] .switchline-track::after,
+:root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
+:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
+  background:#FFFFFF!important;
+  box-shadow:0 0 0 1.5px #C9CFDA!important;
+}
+
+/* --- Eintragsfarbe aus Flächen entfernen ------------------------------ */
+/* --eintrag-farbe wird inline auf die Detailkarte gesetzt und färbt von
+   dort Herkunftsleiste, Vorschauflächen und Tags. Knöpfe und Links sind
+   ausgenommen: die behalten ihre Farbe. */
+:root[data-theme="dark"] .dex-inhaltskarte-streifen,
+:root[data-theme="dark"] .dex-inhaltskarte-vorschau,
+:root[data-theme="dark"] .dex-audio-vorschau,
+:root[data-theme="dark"] .dex-detail-audio,
+:root[data-theme="dark"] .dex-notiz-vorschau,
+:root[data-theme="dark"] .dex-notiz-vorschau i,
+:root[data-theme="dark"] .dex-detail-foodmeta span,
+:root[data-theme="dark"] .dex-detail-popup .dex-detail-foodmeta span,
+:root[data-theme="dark"] .dex-detail-popup .dex-detail-tags span,
+:root[data-theme="dark"] .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft{
+  background-color:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+
+/* Restliche Schrift im Overlay. Knöpfe bleiben ausgenommen – sie tragen
+   ihre eigene Farbkombination. */
+:root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(i,span,em,time,output,a):not(.btn):not(.btn-primary):not(.btn *):not(.dex-detail-link){
+  color:var(--dm-text);
+}
+
+/* --- Fortschrittsringe, endgültig ------------------------------------- */
+/* Die maschinell erzeugte Dark-Schicht weiter oben setzt für die Seiten-
+   wrapper "background:var(--app-card)!important" – das löscht den
+   conic-gradient und macht aus dem Ring eine flache Scheibe. Diese Regeln
+   liegen mit [data-seite] plus Wrapper-Treffer eine Stufe darüber. */
+:root[data-theme="dark"][data-seite] [class*="dex-page"] .routine-progress-ring.routine-progress-ring,
+:root[data-theme="dark"][data-seite] .routine-progress-ring.routine-progress-ring.routine-progress-ring{
+  background:conic-gradient(#FFFFFF var(--routine-progress),rgba(255,255,255,.22) 0)!important;
+}
+:root[data-theme="dark"][data-seite] [class*="dex-page"] .nutrition-ring.nutrition-ring,
+:root[data-theme="dark"][data-seite] .nutrition-ring.nutrition-ring.nutrition-ring{
+  background:conic-gradient(#FFFFFF var(--nutrition-progress),rgba(255,255,255,.22) 0)!important;
+}
+:root[data-theme="dark"][data-seite] [class*="dex-page"] .body-v2-ring.body-v2-ring,
+:root[data-theme="dark"][data-seite] .body-v2-ring.body-v2-ring.body-v2-ring{
+  background:conic-gradient(#FFFFFF var(--body-progress),rgba(255,255,255,.22) 0)!important;
+}
+:root[data-theme="dark"][data-seite] [class*="dex-page"] .sleep-duration-ring.sleep-duration-ring,
+:root[data-theme="dark"][data-seite] .sleep-duration-ring.sleep-duration-ring.sleep-duration-ring{
+  background:conic-gradient(#FFFFFF var(--sleep-progress),rgba(255,255,255,.22) 0)!important;
+}
+/* Innenscheibe bleibt die Kartenfarbe, damit aus der Scheibe ein Ring wird. */
+:root[data-theme="dark"] :is(.routine-progress-ring,.nutrition-ring,.body-v2-ring,.sleep-duration-ring)::after{
+  background-color:var(--dm-surface)!important;
+}
+
+/* --- Profil: Chevrons ------------------------------------------------- */
+/* Der Pfeil ist ein data-URI-SVG mit fest eingebautem stroke='%230A1330'.
+   Auf der dunklen Karte verschwindet er; hier dieselbe Grafik in Weiß. */
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt>summary::after{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")!important;
+}
+
+/* --- MENÜ: Schlagschatten des Retro-Fensters -------------------------- */
+:root[data-theme="dark"] .menue-computer-schatten{
+  fill:#FFFFFF!important;
+}
+
+/* Hervorhebungen im Overlay tragen sonst die Seitenfarbe als Fläche. */
+:root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(em,mark){
+  background:var(--dm-surface2)!important;
+  color:var(--dm-text)!important;
+}
+
+/* --- Symbole in den Tracker-Zeilen ------------------------------------ */
+/* ".rem-row-emoji svg{fill:#000}" lässt die Supplement-Symbole auf der
+   grauen Kachel praktisch verschwinden. */
+:root[data-theme="dark"] .rem-row-emoji :is(.reminder-svg,svg,svg *){
+  fill:var(--dm-text)!important;
+  color:var(--dm-text)!important;
+}
