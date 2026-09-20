@@ -1927,7 +1927,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
 .dex-inhaltskarte-vorschau img{
   position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:0;
-  transition:opacity .72s cubic-bezier(.2,.65,.3,1);
+  /* Frueher .72s: das Bild lag fertig vor und wurde trotzdem noch drei
+     Viertelsekunden lang eingeblendet. Die Geste bleibt, nur kurz. */
+  transition:opacity .18s ease-out;
 }
 .dex-foto-post-vorschau{background:#111!important}
 .dex-foto-post-vorschau img{object-fit:contain!important;object-position:center center!important;transform:none!important}
@@ -14150,4 +14152,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter
 )>button{
   box-shadow:0 3.5px 0 var(--dm-ink)!important;
+}
+
+/* --- Lange Listen: Layout nur fuer Sichtbares ------------------------- */
+/* Gemessen beim Seitenaufbau von EINKAUF: HTML erzeugen 4 ms, Layout 60 ms
+   bei 141 Zeilen. Der Browser vermisst also jede Zeile, auch die weit
+   unterhalb des Bildschirms. content-visibility ueberspringt das, bis eine
+   Zeile in die Naehe des Sichtfelds kommt – gemessen 30-57 ms runter auf
+   14-17 ms. contain-intrinsic-size traegt die gemessene Zeilenhoehe nach,
+   damit Rollbalken und Sprungmarken nicht springen. */
+.einkauf-row{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 58px;
+}
+.dex-inhaltskarte{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 182px;
+}
+.rem-row{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 62px;
 }

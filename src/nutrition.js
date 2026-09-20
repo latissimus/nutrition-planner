@@ -600,19 +600,31 @@ export function pickFoodIngredient(onPick) {
 // Rezept- und Log-Bilder liegen im privaten dex-entries-Bucket und werden für
 // die Anzeige kurzlebig signiert (1 h). Liefert eine Map path → signierte URL.
 const DEX_BUCKET = 'dex-entries';
-async function signImagePaths(paths) {
+/* Auch hier standen Originaldateien hinter winzigen Kacheln: das Bild einer
+   Mahlzeit ist 38x38 CSS-Pixel gross. Die Masse stecken im signierten Token,
+   weshalb createSignedUrls (Stapel) nicht verkleinern kann und jeder Pfad
+   einzeln signiert wird – parallel, mit Rueckfall auf das Original. */
+const MAHLZEIT_MASSE = { width: 160, height: 160, resize: 'cover', quality: 70 };
+const REZEPT_MASSE = { width: 360, height: 240, resize: 'cover', quality: 70 };
+
+async function signImagePaths(paths, transform = MAHLZEIT_MASSE) {
   const unique = [...new Set((paths || []).filter(Boolean))];
   if (!unique.length) return new Map();
   try {
-    const { data, error } = await supabase.storage.from(DEX_BUCKET).createSignedUrls(unique, 60 * 60);
-    if (error) return new Map();
-    return new Map((data || []).filter((entry) => entry.signedUrl).map((entry) => [entry.path, entry.signedUrl]));
+    const eintraege = await Promise.all(unique.map(async (pfad) => {
+      const klein = await supabase.storage.from(DEX_BUCKET)
+        .createSignedUrl(pfad, 60 * 60, { transform });
+      if (klein.data?.signedUrl) return [pfad, klein.data.signedUrl];
+      const gross = await supabase.storage.from(DEX_BUCKET).createSignedUrl(pfad, 60 * 60);
+      return [pfad, gross.data?.signedUrl || ''];
+    }));
+    return new Map(eintraege.filter(([, url]) => url));
   } catch { return new Map(); }
 }
 
 // Rezeptbilder für die Auswahl-Liste signieren → recipe._imageUrl.
 async function signRecipeImages(recipes) {
-  const map = await signImagePaths(recipes.map((recipe) => recipe.image_path));
+  const map = await signImagePaths(recipes.map((recipe) => recipe.image_path), REZEPT_MASSE);
   recipes.forEach((recipe) => { if (recipe.image_path && map.has(recipe.image_path)) recipe._imageUrl = map.get(recipe.image_path); });
 }
 

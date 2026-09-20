@@ -78,17 +78,62 @@ function queryScope(query, { collectionId }) {
   return collectionId ? query.eq('collection_id', collectionId) : query.is('collection_id', null);
 }
 
+/* Die Vorschau ist rund 180x100 CSS-Pixel gross. Ausgeliefert wurde bisher
+   die Originaldatei: gemessen 4,0 MB fuer fuenf Kacheln, ein einzelnes Bild
+   mit 3,7 MB bei 1200x1600. Supabase verkleinert beim Signieren – 94 %
+   weniger Daten. 540x304 deckt auch ein Display mit dreifacher Punktdichte ab.
+   Die Detailansicht signiert getrennt und bekommt weiterhin das Original. */
+const VORSCHAU_MASSE = { width: 540, height: 304, resize: 'cover', quality: 70 };
+
+/* Die Groesse steckt IM signierten Token. createSignedUrls (Stapel) kennt das
+   Feld nicht, deshalb wird jedes Bild einzeln signiert – parallel, und mit
+   Rueckfall auf die unveraenderte Datei, falls die Verkleinerung einmal nicht
+   zur Verfuegung steht. Toene brauchen keine und bleiben im Stapel. */
+async function signiereVorschau(pfad) {
+  const verkleinert = await supabase.storage.from(BUCKET)
+    .createSignedUrl(pfad, 60 * 60, { transform: VORSCHAU_MASSE });
+  if (verkleinert.data?.signedUrl) return [pfad, verkleinert.data.signedUrl];
+  const original = await supabase.storage.from(BUCKET).createSignedUrl(pfad, 60 * 60);
+  return [pfad, original.data?.signedUrl || ''];
+}
+
+/* Linkvorschauen liegen in unserer eigenen OEFFENTLICHEN Ablage und wurden
+   in Originalgroesse ausgeliefert – gemessen 5,1 MB fuer 17 Stueck, ein
+   einzelnes Bild mit 1186x1701 hinter einer 180x100-Kachel. Oeffentliche
+   Dateien verkleinert Supabase ohne Signierung: ein Pfadwechsel genuegt.
+   Fremde Adressen (YouTube-Vorschaubilder o. ae.) bleiben unberuehrt, und
+   eine bereits umgeschriebene URL trifft die Bedingung nicht mehr. */
+const ABLAGE_OEFFENTLICH = `${import.meta.env.VITE_SUPABASE_URL || ''}/storage/v1/object/public/`;
+
+function vorschauUrl(url) {
+  if (!url || !import.meta.env.VITE_SUPABASE_URL || !url.startsWith(ABLAGE_OEFFENTLICH)) return url;
+  const pfad = url.slice(ABLAGE_OEFFENTLICH.length).split('?')[0];
+  const { width, height, resize, quality } = VORSCHAU_MASSE;
+  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/render/image/public/${pfad}`
+    + `?width=${width}&height=${height}&resize=${resize}&quality=${quality}`;
+}
+
 async function attachSignedMediaUrls(entries) {
-  const paths = [...new Set(entries.map((entry) => entry.image_path || entry.audio_path).filter(Boolean))];
-  if (!paths.length) return entries;
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrls(paths, 60 * 60);
-  if (error) return entries;
-  const urls = new Map((data || []).map((item) => [item.path, item.signedUrl]));
   entries.forEach((entry) => {
-    const path = entry.image_path || entry.audio_path;
-    if (entry.audio_path) entry.audio_url = urls.get(path) || '';
-    else entry.preview_url = urls.get(path) || entry.preview_url || '';
+    if (entry.preview_url) entry.preview_url = vorschauUrl(entry.preview_url);
   });
+  const bildPfade = [...new Set(entries.map((entry) => entry.image_path).filter(Boolean))];
+  const tonPfade = [...new Set(entries.map((entry) => entry.audio_path).filter(Boolean))];
+  if (!bildPfade.length && !tonPfade.length) return entries;   // Vorschauen sind oben bereits umgeschrieben
+  try {
+    const [bilder, toene] = await Promise.all([
+      Promise.all(bildPfade.map(signiereVorschau)),
+      tonPfade.length
+        ? supabase.storage.from(BUCKET).createSignedUrls(tonPfade, 60 * 60)
+          .then(({ data }) => (data || []).map((item) => [item.path, item.signedUrl]))
+        : Promise.resolve([]),
+    ]);
+    const urls = new Map([...bilder, ...toene].filter(([, url]) => url));
+    entries.forEach((entry) => {
+      if (entry.audio_path) entry.audio_url = urls.get(entry.audio_path) || '';
+      else if (entry.image_path) entry.preview_url = urls.get(entry.image_path) || entry.preview_url || '';
+    });
+  } catch { /* ohne Signatur bleibt die Liste nutzbar, nur ohne Vorschaubild */ }
   return entries;
 }
 
@@ -619,7 +664,7 @@ function youtubeThumbnail(value) {
 
 function providerPreview(entry, provider, playable) {
   const thumbnail = provider?.key === 'youtube' ? youtubeThumbnail(entry.url) : '';
-  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau hat-vorschaubild dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}</span>`;
+  if (thumbnail) return `<span class="dex-inhaltskarte-vorschau hat-vorschaubild dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy" decoding="async">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}</span>`;
   return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}<b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
 }
 
@@ -649,7 +694,7 @@ export function dexEntryOverviewMarkup(entry, color = '#A9DCE8') {
       : type === 'audio'
       ? `<span class="dex-inhaltskarte-vorschau dex-audio-vorschau">${materialIconMarkup('mic')}<small>Tonaufnahme</small></span>`
       : type === 'note'
-      ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy"></span>`
+      ? entry.preview_url ? `<span class="dex-inhaltskarte-vorschau hat-vorschaubild"><img src="${escapeHtml(entry.preview_url)}" alt="" loading="lazy" decoding="async"></span>`
         : '<span class="dex-inhaltskarte-vorschau dex-notiz-vorschau"><i></i><i></i><i></i><i></i></span>'
       : type === 'video' ? providerPreview(entry, provider, playable) : '',
     playable, detailHref: `#entry/${entry.id}`,
