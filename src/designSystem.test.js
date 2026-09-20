@@ -337,7 +337,28 @@ describe('CAPBOY Design-System', () => {
   it('rastet das horizontale App-Menü auf vollständigen Tabs ein', () => {
     expect(css).toContain('scroll-snap-type:x mandatory;');
     expect(css).toContain('scroll-snap-align:start;');
-    expect(main).toContain("tabLeiste.scrollTo({ left: eingerastet");
+    // Es wird weiterhin auf einen Reiteranfang eingerastet …
+    expect(main).toContain('const eingerastet = rasterpunkte.reduce');
+    // … das Ergebnis aber so begrenzt, dass der aktive Reiter im Bild bleibt.
+    // Ohne diese Grenze rutschten EINKAUF und MIND aus dem Fenster – seit sie
+    // selbst das Menü öffnen, müssen sie sichtbar sein.
+    expect(main).toContain('const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze)');
+    expect(main).toContain('tabLeiste.scrollTo({ left: sicher');
     expect(main).not.toContain("aktiv.scrollIntoView({ behavior: 'smooth'");
+  });
+
+  /* Der MENÜ-Knopf rechts im Dock ist entfallen; seine Aufgabe übernimmt ein
+     zweiter Tipp auf den Reiter der offenen Seite. Beides gehört zusammen:
+     ohne den Knopf UND ohne diesen Tipp gäbe es keinen Weg mehr, etwas
+     anzulegen. */
+  it('ersetzt den MENÜ-Knopf durch den Reiter der offenen Seite', () => {
+    expect(main).not.toContain('class="app-dex-menu"');
+    // Die Leiste bekommt die volle Breite: keine zweite Spalte mehr.
+    expect(css).toContain('grid-template-columns:minmax(0,1fr);');
+    // Der Hinweis am offenen Reiter braucht Elternteil UND Klasse, sonst
+    // gewinnt ".app-dex-tab>span" mit seinen 29x29 px.
+    expect(css).toContain('.app-dex-tab>.app-dex-tab-punkte');
+    expect(main).toContain('app-dex-tab-punkte');
+    expect(main).toContain("view.querySelector('.kategorie-plus')?.click()");
   });
 });

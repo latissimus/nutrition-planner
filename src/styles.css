@@ -8211,7 +8211,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-inline:auto;
   padding:5px;
   display:grid;
-  grid-template-columns:minmax(0,1fr) 68px;
+  /* Zweite Spalte entfernt: der MENÜ-Knopf ist weg, die Reiterleiste
+     bekommt die volle Breite (353 statt 286 px bei 375 px Gerätebreite). */
+  grid-template-columns:minmax(0,1fr);
   gap:6px;
   border-radius:16px;
 }
@@ -8719,7 +8721,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Globales Milchglas-Menue: feste Menue-Spalte, unverrueckbare Trennlinie
    und identische Tab-Typografie auf jeder Seite. */
 .app-dex-dock-inner{
-  grid-template-columns:minmax(0,1fr) 62px;
+  grid-template-columns:minmax(0,1fr);
   gap:5px;
   padding:4px;
 }
@@ -14470,3 +14472,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   content-visibility:auto;
   contain-intrinsic-size:auto 483px;
 }
+
+/* --- Drei Punkte am Reiter der offenen Seite -------------------------- */
+/* Ersetzt den entfernten MENÜ-Knopf als Hinweis: Hier steckt noch etwas
+   dahinter. Sitzt nur auf dem Reiter, auf dem man ohnehin steht, kostet
+   deshalb keine Breite.
+   Der Selektor nennt bewusst Elternteil UND Klasse: ".app-dex-tab>span"
+   setzt allen direkten Kindern 29x29 px und display:grid – eine Regel mit
+   nur der Klasse verliert dagegen. */
+.app-dex-tab{position:relative}
+.app-dex-tab>.app-dex-tab-punkte{
+  position:absolute;
+  top:1px;
+  left:50%;
+  display:block;
+  width:14px;
+  height:3px;
+  min-width:0;
+  transform:translateX(-50%);
+  pointer-events:none;
+  background:
+    radial-gradient(circle, currentColor 46%, transparent 52%) 0 50%/3px 3px no-repeat,
+    radial-gradient(circle, currentColor 46%, transparent 52%) 50% 50%/3px 3px no-repeat,
+    radial-gradient(circle, currentColor 46%, transparent 52%) 100% 50%/3px 3px no-repeat;
+  opacity:.6;
+}
+/* Kurze Rückmeldung beim Antippen – wie zuvor beim MENÜ-Knopf. */
+.app-dex-tab.ist-gedrueckt{transform:translateY(1.5px)}
+.app-dex-tab.ist-gedrueckt>.app-dex-tab-punkte{opacity:1}

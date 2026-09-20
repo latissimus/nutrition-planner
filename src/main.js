@@ -41,7 +41,7 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
-import { entryButtonMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup } from './menuIcons.js';
+import { hasMenuIcon, menuIconMarkup, searchIconMarkup } from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -682,20 +682,26 @@ function appDockTitel(route) {
     || (route === 'coins' ? 'CAPCOINS' : 'Seite');
 }
 
-function appDockEintraegeMarkup(aktiveDockRoute) {
+/* aufSeite: Stehen wir tatsächlich auf der markierten Seite? Nur dann trägt
+   ihr Reiter die drei Punkte und öffnet beim Tippen das Menü. */
+function appDockEintraegeMarkup(aktiveDockRoute, aufSeite = true) {
+  const punkte = '<span class="app-dex-tab-punkte" aria-hidden="true"></span>';
+  const istOffen = (route) => aktiveDockRoute === route && aufSeite;
   const standard = sichtbareSammlungen().map(([route, titel]) => `
-    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
+    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}" href="#${route}"
        data-sammlung="${route}" style="--app-dex-tab-color:${escapeHtml(pageLook(route, categoryColor(route), 'drops').color)}"
-       aria-label="${escapeHtml(titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
+       aria-label="${escapeHtml(istOffen(route) ? `Menü für ${titel} öffnen` : titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
+      ${istOffen(route) ? punkte : ''}
       <span aria-hidden="true">${hasMenuIcon(route) ? menuIconMarkup(route, 'app-dex-tab-icon') : categoryIconMarkup(route, 'app-dex-tab-icon')}</span>
       <small>${escapeHtml(titel)}</small>
     </a>`).join('');
   const eigene = appDockEigene.map((item) => {
     const route = `collection/${item.id}`;
     return `
-      <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}" href="#${route}"
+      <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}" href="#${route}"
          data-collection-id="${item.id}" style="--app-dex-tab-color:${escapeHtml(item.color || '#FF69AE')}"
-         aria-label="${escapeHtml(item.name)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
+         aria-label="${escapeHtml(istOffen(route) ? `Menü für ${item.name} öffnen` : item.name)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
+        ${istOffen(route) ? punkte : ''}
         <span aria-hidden="true">${collectionIconMarkup(item.icon_key)}</span>
         <small>${escapeHtml(item.name)}</small>
       </a>`;
@@ -767,14 +773,14 @@ function appDexShellZeichnen(route, view) {
     app.append(dock);
   }
   dock.setAttribute('aria-label', 'Seite wechseln und Eintrag hinzufügen');
+  /* Der frühere MENÜ-Knopf rechts ist entfallen. Er hat die Leiste optisch
+     abgeschnitten und ihr 68 px genommen (sichtbar 286 statt 353 px bei
+     375 px Gerätebreite). Seine Aufgabe übernimmt ein zweiter Tipp auf den
+     Reiter der Seite, auf der man ohnehin steht – dieser trägt dafür drei
+     Punkte als Hinweis. */
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
-      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute)}</div>
-      <button class="app-dex-menu" type="button" aria-label="${istNebenansicht
-        ? `Zurück zu ${escapeHtml(appDockTitel(aktiveDockRoute))}`
-        : `Menü für ${escapeHtml(appDockTitel(aktiveDockRoute))} öffnen`}">
-        ${entryButtonMarkup()}
-      </button>
+      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
     </div>`;
   appSyncStatusAktualisieren();
 
@@ -803,36 +809,30 @@ function appDexShellZeichnen(route, view) {
     const eingerastet = rasterpunkte.reduce((naechster, punkt) => (
       Math.abs(punkt - gewuenscht) < Math.abs(naechster - gewuenscht) ? punkt : naechster
     ), 0);
-    tabLeiste.scrollTo({ left: eingerastet, behavior: istAusserhalb ? 'smooth' : 'auto' });
+    /* Das Einrasten auf den naechsten Reiteranfang konnte den aktiven Reiter
+       aus dem Fenster schieben – gemessen bei EINKAUF und MIND. Seit der
+       Reiter selbst das Menue oeffnet, muss er sichtbar sein. Deshalb wird
+       das eingerastete Ziel in den Bereich gezwungen, in dem er ganz im Bild
+       liegt: scrollLeft zwischen (rechts - Fensterbreite) und links. */
+    const untergrenze = Math.max(0, Math.min(rechts - tabLeiste.clientWidth, maximal));
+    const obergrenze = Math.max(untergrenze, Math.min(links, maximal));
+    const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze);
+    tabLeiste.scrollTo({ left: sicher, behavior: istAusserhalb ? 'smooth' : 'auto' });
   });
 
-  dock.querySelector('.app-dex-menu').onclick = () => {
-    if (istNebenansicht) {
-      location.hash = aktiveDockRoute;
-      return;
-    }
-    /* Frühere Zwischenstation über die floating Add-Buttons ist weg –
-       der Menü-Knopf löst die Add-Aktion direkt am (unsichtbaren)
-       Kategoriekopf des jeweiligen Dex aus. */
+  /* Tippen auf den Reiter der GERADE offenen Seite öffnet deren Menü statt
+     erneut dorthin zu navigieren. Auf einer Nebenansicht (Profil, Suche,
+     CAPCOINS, Eintragsseite) steht man nicht auf dieser Seite – dort bleibt
+     der Reiter ein normaler Verweis und bringt einen zurück. */
+  tabLeiste.addEventListener('click', (event) => {
+    const reiter = event.target.closest?.('.app-dex-tab');
+    if (!reiter || istNebenansicht) return;
+    if (reiter.getAttribute('href')?.replace(/^#/, '') !== aktiveDockRoute) return;
+    event.preventDefault();
+    reiter.classList.add('ist-gedrueckt');
+    window.setTimeout(() => reiter.classList.remove('ist-gedrueckt'), 220);
     view.querySelector('.kategorie-plus')?.click();
-  };
-  const menueKnopf = dock.querySelector('.app-dex-menu');
-  let menueDruckStart = 0;
-  let menueDruckTimer = 0;
-  const menueDruecken = () => {
-    clearTimeout(menueDruckTimer);
-    menueDruckStart = performance.now();
-    menueKnopf.classList.add('ist-gedrueckt');
-    menueDruckTimer = window.setTimeout(() => menueKnopf.classList.remove('ist-gedrueckt'), 900);
-  };
-  const menueLoslassen = () => {
-    clearTimeout(menueDruckTimer);
-    const rest = Math.max(0, 150 - (performance.now() - menueDruckStart));
-    menueDruckTimer = window.setTimeout(() => menueKnopf.classList.remove('ist-gedrueckt'), rest);
-  };
-  menueKnopf.addEventListener('pointerdown', menueDruecken, { passive: true });
-  menueKnopf.addEventListener('pointerup', menueLoslassen, { passive: true });
-  menueKnopf.addEventListener('pointercancel', menueLoslassen, { passive: true });
+  });
 }
 
 async function appDexShellDatenLaden(route, view, signal) {
@@ -1842,12 +1842,12 @@ async function renderRoute() {
   view.hidden = false;
   view.classList.remove('warten-auf-daten');
   appDexShellAktualisieren(route, view, signal);
-  const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-menu')
+  const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-tab.ist-offen')
     || view.querySelector('.kategorie-plus');
   if (dexAddButton) showGestureHintOnce({
     key: 'dex-hinzufuegen',
     title: 'Hier kommt Neues hinein',
-    text: 'Der Menübutton passt sich jeder Seite an und zeigt die passenden Einträge.',
+    text: 'Tippe nochmal auf den Reiter der offenen Seite – die drei Punkte zeigen, wo das Menü sitzt.',
     gesture: 'add',
     target: dexAddButton,
     replace: true,
