@@ -295,7 +295,16 @@ document.addEventListener('visibilitychange', () => {
   // Gegenstueck; das darf den Cache nicht kosten.)
   const abwesend = imHintergrundSeit ? Date.now() - imHintergrundSeit : 0;
   imHintergrundSeit = 0;
-  if (abwesend > CACHE_HALTBARKEIT_MS) { datenspeicher.leeren(); ansichtsCache.clear(); }
+  if (abwesend <= CACHE_HALTBARKEIT_MS) return;
+  /* Nach längerer Abwesenheit fallen nur die fertig GEZEICHNETEN Ansichten:
+     die zeigen einen alten Stand und können sich nicht selbst auffrischen.
+     Die Daten bleiben liegen – sie sind älter als eine Minute und werden
+     deshalb sofort geliefert und im Hintergrund erneuert.
+     Früher wurde hier auch der Datenspeicher geleert. Weil der Vorlauf nur
+     einmal je Sitzung lief, füllte ihn danach niemand wieder: die App fiel
+     dauerhaft auf Netzgeschwindigkeit zurück, bis man sie ganz neu startete. */
+  ansichtsCache.clear();
+  dexDatenErneutVorladen();
 });
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
@@ -1923,6 +1932,15 @@ function dexModuleVorladen() {
    In Wellen, damit die Vorbereitung nicht mit der gerade sichtbaren Seite
    um die sechs gleichzeitigen Verbindungen des Browsers streitet. */
 let dexDatenVorgeladen = false;
+
+/* Den Vorlauf erneut zulassen. Für bereits frische Einträge kostet das
+   nichts – hole() liefert sie unverändert zurück; ältere werden dabei still
+   erneuert. */
+function dexDatenErneutVorladen() {
+  dexDatenVorgeladen = false;
+  dexDatenVorladen();
+}
+
 function dexDatenVorladen() {
   if (dexDatenVorgeladen || !session?.user?.id) return;
   dexDatenVorgeladen = true;
