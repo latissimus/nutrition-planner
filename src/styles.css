@@ -14257,8 +14257,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    unter dem Kopf, statt einen zweiten Dialog über die Seite zu legen. */
 .neo-dex-page .grid-collection-info-help{
   box-sizing:border-box!important;
-  width:100%!important;
-  margin:0 0 18px!important;
+  width:min(calc(100vw - var(--cap-reference-inline) - var(--cap-reference-inline)),var(--cap-content-max))!important;
+  max-width:var(--cap-content-max)!important;
+  margin:0 auto 18px!important;
   padding:16px!important;
   border:1.5px solid var(--ink)!important;
   border-radius:14px!important;
