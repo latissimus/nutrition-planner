@@ -1925,33 +1925,32 @@ function dexDatenVorladen() {
   const userId = session.user.id;
   const still = (p) => Promise.resolve(p).catch(() => {});
   const welle = (aufgaben) => Promise.all(aufgaben.map(still));
+  /* In zwei Wellen statt dreizehn Einzelschritten. Der erste Bildschirm ist
+     zu diesem Zeitpunkt fertig, es gibt also niemanden mehr, mit dem die
+     Vorbereitung um Verbindungen streiten muesste – und je kuerzer sie
+     dauert, desto kleiner das Zeitfenster, in dem ein Tippen doch noch aufs
+     Netz wartet. */
   const start = async () => {
-    // Rasterseiten zuerst: Ordner und erste Eintragsseite.
-    for (const route of ['food-log', 'essen', 'supps', 'training', 'stress']) {
-      if (!session?.user?.id) return;
-      await welle([
+    if (!session?.user?.id) return;
+    const rasterseiten = ['food-log', 'essen', 'supps', 'training', 'stress'];
+    await welle([
+      ...rasterseiten.flatMap((route) => [
         loadCollections(userId, { rootKey: route }),
         loadDexEntryPage(userId, { rootKey: route }),
-      ]);
-    }
-    // COMP und ROUTINEN zeigen zusaetzlich eine Eintragsliste.
-    await welle([
+      ]),
+      // COMP und ROUTINEN zeigen zusaetzlich eine Eintragsliste.
       loadDexEntryPage(userId, { rootKey: 'body' }),
       loadDexEntryPage(userId, { rootKey: 'habits', routineId: null }),
-    ]);
-    // Freigaben: eine Abfrage je Bereich, danach fuer die Sitzung gemerkt.
-    await welle([
+      // Freigaben: eine Abfrage je Bereich, danach fuer die Sitzung gemerkt.
       resolveSharedSpace(userId, 'food-log'),
       resolveSharedSpace(userId, 'shopping'),
     ]);
-    // Danach die Seiten mit eigenem Datenmodell. TRACKER haengt an
-    // nutrition.js, nicht an reminders.js – deshalb steht es hier eigens.
-    const module = [shoppingModule, sleepModule, routinesModule,
-      nutritionModule, remindersModule, bodyMetricsModule];
-    for (const laden of module) {
-      if (!session?.user?.id) return;
-      await still(laden().then((m) => m.vorladen?.(userId)));
-    }
+    if (!session?.user?.id) return;
+    // Seiten mit eigenem Datenmodell. TRACKER haengt an nutrition.js, nicht
+    // an reminders.js – deshalb steht es hier eigens.
+    await welle([shoppingModule, sleepModule, routinesModule,
+      nutritionModule, remindersModule, bodyMetricsModule]
+      .map((laden) => laden().then((m) => m.vorladen?.(userId))));
   };
   if (typeof window.requestIdleCallback === 'function') {
     window.requestIdleCallback(() => { start(); }, { timeout: 4000 });

@@ -14450,3 +14450,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   content-visibility:auto;
   contain-intrinsic-size:auto 62px;
 }
+/* COMP hat die meiste Layoutarbeit: 694 Knoten, davon der groesste Teil in
+   sechs Karten weit unterhalb des Bildschirms. Gemessen 17 ms Layout ohne,
+   3 ms mit dieser Regel. Die Diagramme darin zeichnen ueber eine feste
+   viewBox und messen ihren Container nicht aus – sie vertragen das. */
+.body-v2-card{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 520px;
+}
+.falten-legende-item{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 58px;
+}
+/* Die Abteilungsbloecke von EINKAUF und TRACKER. Die Zeilen darin tragen
+   bereits content-visibility, der umgebende Block wurde aber weiter
+   vollstaendig vermessen: 13 ms Layout ohne, 4 ms mit. Gegenprobe mit einem
+   Selektor, der nichts trifft: unveraendert 12 ms. */
+.reminder-group{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 483px;
+}

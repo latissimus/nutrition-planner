@@ -24,9 +24,17 @@ const unterwegs = new Map(); // schluessel -> Promise
 const stand = new Map(); // schluessel -> Zahl
 const standVon = (key) => stand.get(key) || 0;
 
-/* Sicherheitsnetz gegen ewig alte Daten. Im Normalfall greift nicht das
-   Alter, sondern das gezielte Verwerfen nach einer Änderung. */
-export const HOECHSTALTER_MS = 5 * 60 * 1000;
+/* Zwei Schwellen statt einer:
+   - Bis FRISCHE_MS gilt ein Wert als frisch und wird unverändert geliefert.
+   - Danach wird er WEITER SOFORT geliefert, im Hintergrund aber nachgezogen.
+     So gibt es nie eine Wartezeit, nur gelegentlich einen Stand von vorhin.
+   - Erst ab HOECHSTALTER_MS wird wirklich gewartet.
+   Ein früheres Höchstalter von 5 Minuten hat sich als zu streng erwiesen: Wer
+   die App länger offen hatte, wartete beim nächsten Seitenwechsel wieder auf
+   das Netz, obwohl sich nichts geändert hatte. Eigene Änderungen verwerfen
+   ohnehin gezielt – das Alter ist nur das Netz darunter. */
+export const FRISCHE_MS = 60 * 1000;
+export const HOECHSTALTER_MS = 60 * 60 * 1000;
 
 export function schluessel(bereich, ...teile) {
   return [bereich, ...teile.map((teil) => (teil == null ? '' : String(teil)))].join(':');
@@ -40,10 +48,18 @@ export function schluessel(bereich, ...teile) {
  * für den nächsten Aufruf behalten. Die Aufrufer prüfen `signal.aborted`
  * weiterhin selbst, bevor sie zeichnen.
  */
-export function hole(key, laden, { hoechstalter = HOECHSTALTER_MS, frisch = false } = {}) {
+export function hole(key, laden, {
+  hoechstalter = HOECHSTALTER_MS, frischeAb = FRISCHE_MS, frisch = false,
+} = {}) {
   if (!frisch) {
     const da = gehalten.get(key);
-    if (da && Date.now() - da.zeit < hoechstalter) return Promise.resolve(da.wert);
+    if (da && Date.now() - da.zeit < hoechstalter) {
+      // Älter als frisch, aber noch brauchbar: ausliefern und still nachziehen.
+      if (Date.now() - da.zeit > frischeAb && !unterwegs.has(key)) {
+        hole(key, laden, { frisch: true }).catch(() => {});
+      }
+      return Promise.resolve(da.wert);
+    }
     const laeuft = unterwegs.get(key);
     if (laeuft) return laeuft;
   }

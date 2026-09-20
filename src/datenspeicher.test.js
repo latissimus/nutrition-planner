@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  HOECHSTALTER_MS, groesse, hole, istGehalten, leeren, schluessel, verwerfen,
+  FRISCHE_MS, HOECHSTALTER_MS, groesse, hole, istGehalten, leeren, schluessel, verwerfen,
 } from './datenspeicher.js';
 
 beforeEach(() => leeren());
@@ -115,5 +115,55 @@ describe('verwerfen', () => {
     // Nach dem Verwerfen darf das spaete Ergebnis nicht als frisch gelten.
     const laden = vi.fn().mockResolvedValue(['neu']);
     expect(await hole('shopping:artikel', laden)).toEqual(['neu']);
+  });
+});
+
+/* Das eigentliche Versprechen: nie warten. Ein gealterter Wert wird sofort
+   geliefert und im Hintergrund erneuert – erst ab dem Höchstalter wird
+   tatsächlich gewartet. */
+describe('Nachziehen im Hintergrund', () => {
+  it('liefert einen gealterten Wert sofort und erneuert ihn still', async () => {
+    const laden = vi.fn().mockResolvedValueOnce(['alt']).mockResolvedValueOnce(['neu']);
+    vi.useFakeTimers();
+    try {
+      await hole('essen:x', laden);
+      vi.setSystemTime(Date.now() + FRISCHE_MS + 5000);
+      // Sofort und ohne Warten: noch der alte Stand.
+      expect(await hole('essen:x', laden)).toEqual(['alt']);
+      expect(laden).toHaveBeenCalledTimes(2);      // Nachladen wurde angestoßen
+      vi.useRealTimers();
+      await new Promise((r) => setTimeout(r, 0));
+      // Der nächste Aufruf bekommt den erneuerten Stand.
+      expect(await hole('essen:x', laden)).toEqual(['neu']);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('stößt kein zweites Nachladen an, solange eines läuft', async () => {
+    const laden = vi.fn().mockResolvedValue(['a']);
+    vi.useFakeTimers();
+    try {
+      await hole('essen:x', laden);
+      vi.setSystemTime(Date.now() + FRISCHE_MS + 5000);
+      await hole('essen:x', laden);
+      await hole('essen:x', laden);
+      await hole('essen:x', laden);
+      expect(laden).toHaveBeenCalledTimes(2);      // einmal zuerst, einmal nachgezogen
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('wartet erst jenseits des Höchstalters', async () => {
+    const laden = vi.fn().mockResolvedValueOnce(['alt']).mockResolvedValueOnce(['neu']);
+    vi.useFakeTimers();
+    try {
+      await hole('essen:x', laden);
+      vi.setSystemTime(Date.now() + HOECHSTALTER_MS + 1000);
+      expect(await hole('essen:x', laden)).toEqual(['neu']);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
