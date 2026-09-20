@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createRealtimeRefresh } from './realtime.js';
+import { createRealtimeRefresh, passtZumBereich } from './realtime.js';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -40,5 +40,34 @@ describe('createRealtimeRefresh', () => {
     scheduler.request(); scheduler.stop();
     await vi.runAllTimersAsync();
     expect(refresh).not.toHaveBeenCalled();
+  });
+});
+
+/* Frueher loeste JEDE Speicherung in JEDER offenen Ansicht ein Nachladen aus:
+   ein abgehakter Einkaufsartikel liess die sichtbare TRAINING-Seite ihre
+   Ordner und Eintraege neu holen. Seit die Ereignisse ihren Bereich nennen,
+   filtert der Abonnent - aber nur, wenn BEIDE Seiten einen Bereich angeben. */
+describe('passtZumBereich', () => {
+  it('laesst den eigenen Bereich durch', () => {
+    expect(passtZumBereich('shopping', 'shopping')).toBe(true);
+    expect(passtZumBereich('habits', ['habits', 'coins'])).toBe(true);
+  });
+
+  it('blockt fremde Bereiche', () => {
+    expect(passtZumBereich('training', 'shopping')).toBe(false);
+    expect(passtZumBereich('training', ['habits', 'coins'])).toBe(false);
+  });
+
+  it('laedt nach, wenn eine der beiden Angaben fehlt', () => {
+    // Sicherheitsnetz: lieber einmal zu viel laden als veraltet anzeigen.
+    expect(passtZumBereich(undefined, 'shopping')).toBe(true);
+    expect(passtZumBereich('training', undefined)).toBe(true);
+    expect(passtZumBereich('training', null)).toBe(true);
+    expect(passtZumBereich(undefined, undefined)).toBe(true);
+  });
+
+  it('behandelt eine leere Liste als allgemein', () => {
+    expect(passtZumBereich('training', [])).toBe(true);
+    expect(passtZumBereich('training', [null])).toBe(true);
   });
 });

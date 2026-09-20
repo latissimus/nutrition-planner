@@ -74,9 +74,20 @@ export function createRealtimeRefresh(onRefresh, { delay = 90, onError } = {}) {
 
 const REFRESH_EVENTS = ['muscledex:counts-changed', 'muscledex:coins-changed'];
 
-function attachRefresh(request, signal) {
+/* Ein Ereignis nennt seinen Bereich, ein Abonnent den seinen. Nur wenn BEIDE
+   gesetzt sind und nicht zusammenpassen, wird nicht nachgeladen. Fehlt eine
+   der beiden Angaben, gilt das Ereignis als allgemein und loest aus – eine
+   uebersehene Stelle zeigt damit nie veraltete Daten, sie laedt nur oefter
+   als noetig. */
+export function passtZumBereich(bereich, quelle) {
+  if (!bereich || quelle == null) return true;
+  const betroffen = [].concat(quelle).filter(Boolean);
+  return !betroffen.length || betroffen.includes(bereich);
+}
+
+function attachRefresh(request, signal, bereich) {
   if (typeof window === 'undefined') return () => {};
-  const listener = () => request();
+  const listener = (event) => { if (passtZumBereich(bereich, event?.detail?.bereich)) request(); };
   const visibility = () => { if (document.visibilityState === 'visible') request(); };
   REFRESH_EVENTS.forEach((event) => window.addEventListener(event, listener));
   document.addEventListener('visibilitychange', visibility);
@@ -88,10 +99,10 @@ function attachRefresh(request, signal) {
   return detach;
 }
 
-export function subscribeToTableChanges({ table, signal, onChange, onError }) {
+export function subscribeToTableChanges({ table, signal, onChange, onError, bereich }) {
   if (!table || typeof onChange !== 'function' || signal?.aborted) return () => {};
   const refresh = createRealtimeRefresh(onChange, { onError });
-  const detach = attachRefresh(refresh.request, signal);
+  const detach = attachRefresh(refresh.request, signal, bereich);
   let closed = false;
   return () => {
     if (closed) return;
@@ -101,10 +112,10 @@ export function subscribeToTableChanges({ table, signal, onChange, onError }) {
   };
 }
 
-export function subscribeToTablesChanges({ tables = [], signal, onChange, onError, delay = 90 }) {
+export function subscribeToTablesChanges({ tables = [], signal, onChange, onError, delay = 90, bereich }) {
   if (!tables.length || typeof onChange !== 'function' || signal?.aborted) return () => {};
   const refresh = createRealtimeRefresh(onChange, { delay, onError });
-  const detach = attachRefresh(refresh.request, signal);
+  const detach = attachRefresh(refresh.request, signal, bereich);
   let closed = false;
   return () => {
     if (closed) return;

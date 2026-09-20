@@ -842,7 +842,7 @@ export async function mountShoppingList(container, { session, signal }) {
     item.id, item.section, item.name, item.note, item.tags, item.checked, item.position,
   ]));
   subscribeToTableChanges({
-    table: 'shopping_items', signal,
+    table: 'shopping_items', signal, bereich: 'shopping',
     onChange: async () => {
       const aktuell = await loadItems(userId, signal);
       if (signal?.aborted || itemStand(aktuell) === itemStand(items)) return;

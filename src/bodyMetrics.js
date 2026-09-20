@@ -78,10 +78,10 @@ async function queryState(userId, signal) {
     // verloren. Fuer Berechnung und Kurve werden sie danach chronologisch
     // sortiert.
     abort(supabase.from('weights').select('*').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(180)),
-    abort(supabase.from('waist_measurements').select('*').eq('user_id', userId).order('gemessen_am').limit(60)),
-    abort(supabase.from('logman_performance').select('*').eq('user_id', userId).order('performed_on').limit(500)),
-    abort(supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(60)),
-    abort(supabase.from('bodycomp_checkins').select('*').eq('user_id', userId).order('checkin_date').limit(60)),
+    abort(supabase.from('waist_measurements').select('*').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(60)),
+    abort(supabase.from('logman_performance').select('*').eq('user_id', userId).order('performed_on', { ascending: false }).limit(500)),
+    abort(supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date', { ascending: false }).limit(60)),
+    abort(supabase.from('bodycomp_checkins').select('*').eq('user_id', userId).order('checkin_date', { ascending: false }).limit(60)),
     abort(supabase.from('nutrition_settings').select('goal,bodycomp_thresholds,calculation_basis,height_cm,birth_date').eq('user_id', userId).maybeSingle()),
   ]);
   const error = results.find((result) => result.error)?.error;
@@ -100,8 +100,10 @@ async function queryState(userId, signal) {
       }))
       .sort((a, b) => a.gemessen_am.localeCompare(b.gemessen_am)),
     weights,
-    waists: results[2].data || [], performance: results[3].data || [],
-    sleep: results[4].data || [], checkins: results[5].data || [], settings,
+    // Wie oben bei Gewicht und Hautfalten: absteigend geholt, damit das Limit
+    // die aeltesten Werte abschneidet, und hier wieder chronologisch gedreht.
+    waists: (results[2].data || []).reverse(), performance: (results[3].data || []).reverse(),
+    sleep: (results[4].data || []).reverse(), checkins: (results[5].data || []).reverse(), settings,
   };
 }
 
@@ -1223,6 +1225,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   }
   subscribeToTablesChanges({
     tables: ['weights', 'skinfolds', 'waist_measurements', 'bodycomp_checkins', 'logman_performance', 'nutrition_settings'],
+    bereich: 'body',
     signal,
     onChange: () => {
       if (document.querySelector('[data-body-entry-overlay]')) {

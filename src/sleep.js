@@ -363,6 +363,7 @@ export async function mountSleepDex(container, { userId, signal }) {
   render(container, userId, state, refresh);
   subscribeToTablesChanges({
     tables: ['sleep_logs', 'sleep_schedules', 'sleep_settings'],
+    bereich: 'sleep',
     signal, onChange: refresh, onError: () => {},
   });
   return {

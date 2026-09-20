@@ -80,11 +80,11 @@ async function loadNutritionCalibration(userId, date, signal) {
     .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
   let dayStatusQuery = supabase.from('nutrition_day_status').select('*').eq('user_id', userId)
     .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
-  let skinfoldQuery = supabase.from('skinfolds').select('gemessen_am,falten,standardisiert').eq('user_id', userId).order('gemessen_am').limit(12);
-  let waistQuery = supabase.from('waist_measurements').select('gemessen_am,cm,standardisiert').eq('user_id', userId).order('gemessen_am').limit(12);
-  let performanceQuery = supabase.from('logman_performance').select('performed_on,exercise,category,estimated_1rm').eq('user_id', userId).order('performed_on').limit(300);
-  let sleepQuery = supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date').limit(42);
-  let checkinQuery = supabase.from('bodycomp_checkins').select('checkin_date,recovery').eq('user_id', userId).order('checkin_date').limit(42);
+  let skinfoldQuery = supabase.from('skinfolds').select('gemessen_am,falten,standardisiert').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(12);
+  let waistQuery = supabase.from('waist_measurements').select('gemessen_am,cm,standardisiert').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(12);
+  let performanceQuery = supabase.from('logman_performance').select('performed_on,exercise,category,estimated_1rm').eq('user_id', userId).order('performed_on', { ascending: false }).limit(300);
+  let sleepQuery = supabase.from('sleep_logs').select('sleep_date,quality,energy').eq('user_id', userId).order('sleep_date', { ascending: false }).limit(42);
+  let checkinQuery = supabase.from('bodycomp_checkins').select('checkin_date,recovery').eq('user_id', userId).order('checkin_date', { ascending: false }).limit(42);
   if (signal) {
     weightQuery = weightQuery.abortSignal(signal);
     historyQuery = historyQuery.abortSignal(signal); dayStatusQuery = dayStatusQuery.abortSignal(signal);
@@ -110,8 +110,13 @@ async function loadNutritionCalibration(userId, date, signal) {
   return {
     weights, historyDays,
     dayStatus: statusByDate.get(date) || { complete: false, excluded: false, exclude_reason: '' },
-    skinfolds: skinfolds.data || [], waists: waists.data || [], performance: performance.data || [],
-    sleep: sleep.data || [], bodyCheckins: checkins.data || [],
+    /* Alle fuenf Reihen werden absteigend geholt, damit das Limit die
+       AELTESTEN Werte abschneidet statt der aktuellen, und hier wieder
+       chronologisch gedreht. Zuvor haette z. B. die Schlafreihe ab dem
+       43. Eintrag nie wieder einen neuen Wert enthalten. */
+    skinfolds: (skinfolds.data || []).reverse(), waists: (waists.data || []).reverse(),
+    performance: (performance.data || []).reverse(),
+    sleep: (sleep.data || []).reverse(), bodyCheckins: (checkins.data || []).reverse(),
   };
 }
 
@@ -1034,6 +1039,7 @@ export async function mountNutrition(container, { userId, signal }) {
     console.warn('Kalorien-Kalibrierung konnte nicht geladen werden', error);
   }
   subscribeToTablesChanges({
+    bereich: 'reminders',
     tables: [
       'nutrition_log_entries', 'nutrition_settings', 'nutrition_products', 'nutrition_day_status',
       'weights', 'skinfolds', 'waist_measurements', 'logman_performance', 'bodycomp_checkins',

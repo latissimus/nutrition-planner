@@ -928,6 +928,7 @@ function gemerkteAnsichtZeigen(route) {
   // führen atomar zu einem normalen Neuaufbau derselben Route.
   subscribeToTableChanges({
     table: 'aktive-cache-ansicht',
+    bereich: route,
     signal: routeAbortController.signal,
     onChange: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
     onError: () => {},
@@ -1304,7 +1305,7 @@ async function mountCustomCollection(container, item, signal) {
       updateGridCollectionMasthead(container, total ?? entries.length, children.length);
     },
   });
-  subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
+  subscribeToTableChanges({ table: 'collections', signal, bereich: item.root_key, onChange: refresh, onError: () => {} });
 }
 
 async function profilLaden() {
@@ -1603,7 +1604,7 @@ async function renderRoute() {
         updateGridCollectionMasthead(view, total ?? entries.length, children.length);
       },
     });
-    subscribeToTableChanges({ table: 'collections', signal, onChange: refresh, onError: () => {} });
+    subscribeToTableChanges({ table: 'collections', signal, bereich: 'food-log', onChange: refresh, onError: () => {} });
   } else if (['essen', 'training', 'supps'].includes(route)) {
     const pageConfig = {
       essen: { title: 'ESSEN', pattern: 'wallpaper-essen' },

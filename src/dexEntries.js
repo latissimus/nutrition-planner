@@ -863,7 +863,7 @@ export async function renderDexEntries(container, {
     paint();
     let aktuellerStand = stand();
     subscribeToTableChanges({
-      table: 'dex_entries', signal,
+      table: 'dex_entries', signal, bereich: rootKey,
       onChange: async () => {
         const page = await loadDexEntryPage(userId, { rootKey, collectionId, routineId, signal });
         if (signal?.aborted) return;
