@@ -1077,13 +1077,22 @@ function gridCollectionMastheadMarkup(title, folders = 0) {
       <h1>${escapeHtml(title)}</h1>
       <small data-grid-collection-meta>${gridCollectionMetaText(0, folders)}</small>
     </div>
-    <button class="som-info-knopf" type="button" data-grid-collection-info aria-label="Info zur Sammlung">i</button>
-  </section>`;
+    <button class="som-info-knopf" type="button" data-grid-collection-info aria-expanded="false" aria-controls="grid-collection-info-help" aria-label="Info zur Sammlung">i</button>
+  </section>
+  <div class="som-kurzhilfe nutrition-calibration-help grid-collection-info-help" id="grid-collection-info-help" data-grid-collection-info-help hidden></div>`;
 }
 
 function mountGridCollectionMasthead(root, { infoKind, title }) {
-  root.querySelector('[data-grid-collection-info]')?.addEventListener('click', () => {
-    openNeoDexInfoDialog(infoKind, title);
+  const button = root.querySelector('[data-grid-collection-info]');
+  const help = root.querySelector('[data-grid-collection-info-help]');
+  button?.addEventListener('click', () => {
+    const open = help.hidden;
+    if (open && !help.dataset.infoReady) {
+      openNeoDexInfoDialog(infoKind, title, { inlineTarget: help });
+      help.dataset.infoReady = 'true';
+    }
+    help.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
   });
 }
 
@@ -1092,7 +1101,7 @@ function updateGridCollectionMasthead(root, entries, folders) {
   if (meta) meta.textContent = gridCollectionMetaText(entries, folders);
 }
 
-function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
+function openNeoDexInfoDialog(kind = 'food', customTitle = '', { inlineTarget = null } = {}) {
   const training = kind === 'training';
   const supps = kind === 'supps';
   const essen = kind === 'essen';
@@ -1146,6 +1155,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '') {
     : `<p>In <b>REZEPTE</b> sammelst du <b>eigene Rezepte</b>, <b>Rezeptideen</b>, Links, Bilder und Videos an einem Ort.</p>
       <p>Mit <b>Tags</b> wie <b>Cheat-Meals</b>, <b>Low Carb</b> oder <b>High Carb</b> sortierst du schnell, was immer geht — besonders für ideenlose Tage.</p>
       <p>Unterordner helfen dir, größere Bereiche sauber zu trennen, ohne den schnellen Zugriff zu verlieren.</p>`;
+  if (inlineTarget) {
+    inlineTarget.innerHTML = copy;
+    return;
+  }
   const existing = document.querySelector('[data-food-info-dialog]');
   if (existing) existing.remove();
   const overlay = document.createElement('div');
