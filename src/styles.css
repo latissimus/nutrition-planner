@@ -3598,17 +3598,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --surface:#182234;
-  --surface2:#222E43;
-  --ink:#94A0B4;
-  --line:#94A0B4;
-  --text:#F4F6FA;
-  --muted:#B7C0CF;
-  --faint:#A1ACBD;
+  /* Exakt dieselbe neutrale Staffelung wie in LOGMAN. Der spaetere
+     Konsistenzpass darf die gemeinsamen Dark-Tokens nicht erneut aufhellen. */
+  --surface:#191C24;
+  --surface2:#232733;
+  --ink:#697486;
+  --line:#697486;
+  --text:#EDF0F6;
+  --muted:#98A2B3;
+  --faint:#8490A3;
   --app-card:var(--surface);
   --app-field:var(--surface2);
   --app-outline:var(--ink);
-  --app-divider:rgba(244,246,250,.2);
+  --app-divider:rgba(105,116,134,.38);
   /* Auf Navy braucht der harte Retro-Versatz einen helleren Eigenwert.
      Stahlblau trennt ihn sichtbar vom Grund, ohne wie ein Glow zu wirken. */
   --app-hard-shadow:#43516E;
@@ -12714,12 +12716,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    um. Innerhalb einer Seite löst var(--text) deshalb zur Seitenfarbe auf
    statt zu Weiß. Diese --dm-* werden von keiner Seite überschrieben. */
 :root[data-theme="dark"]{
-  --dm-surface:#182234;
-  --dm-surface2:#222E43;
-  --dm-text:#F4F6FA;
-  --dm-ink:#94A0B4;
-  --dm-muted:#B7C0CF;
-  --dm-faint:#A1ACBD;
+  /* Unveraenderliche LOGMAN-Referenzwerte. Seitenfarben duerfen im Darkmode
+     nur noch Buttons und echte Akzente tragen, nicht Flaechen oder Konturen. */
+  --dm-surface:#191C24;
+  --dm-surface2:#232733;
+  --dm-text:#EDF0F6;
+  --dm-ink:#697486;
+  --dm-muted:#98A2B3;
+  --dm-faint:#8490A3;
   --cap-card:var(--dm-surface);
   --cap-tint:var(--dm-surface2);
   --cap-card-border:1.5px solid var(--dm-ink);
@@ -12790,8 +12794,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .app-dex-tab{color:var(--muted)!important}
 :root[data-theme="dark"] .app-dex-tab.aktiv{
   background:var(--app-field)!important;
-  border-color:var(--app-outline)!important;
   color:var(--text)!important;
+  /* Der aktive Menuepunkt ist wie gewuenscht eindeutig weiss umrandet; die
+     Flaeche bleibt nur eine Stufe heller als das restliche Menueband. */
+  box-shadow:inset 0 0 0 1.5px #FFFFFF!important;
 }
 
 /* --- Ringe: die weiße Innenfläche ------------------------------------- */
@@ -13591,4 +13597,73 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-top:14px;
   padding-top:2px;
   border-top:1.5px solid var(--app-divider,var(--ink));
+}
+
+/* --- Letzte Konturangleichung an LOGMAN ------------------------------ */
+/* COMP besitzt viele inhaltliche Trenner, die im Retro-Theme bewusst aus
+   verschiedenen Hellgraus bestehen. Im Darkmode sind auch diese Linien Teil
+   derselben ruhigen Konturhierarchie wie Karten und Eingabefelder. */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .body-v2-card-body,.body-chart-block,.body-inner-details,
+  .body-weight-history>ol,.body-weight-history li,
+  .ypsi-secondary-relations,.ypsi-relations-overview,.ypsi-priority-list,
+  .ypsi-basis-form,.ypsi-action-categories>article,
+  .ypsi-observed-priorities,.ypsi-background,
+  .ypsi-observed-groups .ypsi-priority-list,.falten-legende-liste,
+  .falten-detail-header,.falten-detail-section,
+  .ypsi-relation-protocols>span,.skinfold-context-form fieldset,
+  .skinfold-context-question,.falten-protokoll-item,
+  .ypsi-protocol-conditions,.falten-protokoll-item>ul>li,
+  .falten-protokoll-notiz,.braverman-result>.falten-detail-section,
+  .neurotransmitter-strategy,.braverman-dose-list,
+  .braverman-dose-list>div
+){
+  border-color:var(--dm-ink)!important;
+}
+:root[data-theme="dark"] :is(
+  .routine-anhaenge,.sleep-checkin-overview-body,.sleep-month,
+  .avatar
+){
+  border-color:var(--dm-ink)!important;
+}
+
+/* Die Rollenmarke ist Status, kein Knopf. Sie bleibt deshalb wie die
+   umliegende Karte neutral statt den Navy-Akzent des Retro-Themes zu tragen. */
+:root[data-theme="dark"] .role-tag{
+  background:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+
+/* COMP-Statusmarken bleiben strukturell hervorgehoben, aber nicht mehr rot,
+   pink oder gruen. Farbe ist im Darkmode Bedienelementen vorbehalten. */
+:root[data-theme="dark"][data-seite="body"] :is(
+  .ypsi-top-fold,.is-primary,.ypsi-priority-reason,
+  .ypsi-open-questions.is-complete
+){
+  box-shadow:inset 3px 0 0 var(--dm-ink)!important;
+}
+
+/* LOGMAN-Karten tragen nur ihre Kontur. Die zwei uebrig gebliebenen harten
+   Retro-Schatten im Profil wuerden die gemeinsame Kartenfarbe verfälschen. */
+:root[data-theme="dark"][data-seite="profile"] :is(
+  .profile-abschnitt.profile-konto,.themeseg
+){
+  box-shadow:none!important;
+}
+
+/* Einige Wissenssammlungen geben dem gesamten Kopf noch ihre warme
+   Retro-Schriftfarbe mit. Im Darkmode gilt auch dort Weiß/Hellgrau. */
+:root[data-theme="dark"] .dex-sammlungskopf,
+:root[data-theme="dark"] .dex-sammlungskopf :is(span,small,b,strong,h1,h2){
+  color:var(--dm-text)!important;
+}
+
+/* Die Messhistorie baut ihre Zeilen aus klassenlosen div-Knoten auf. Auch
+   deren feine Trenner sowie die Erinnerungsbox folgen der LOGMAN-Kontur. */
+:root[data-theme="dark"][data-seite="body"] .body-skinfold-history :is(
+  dl,ol,li,details,div
+),
+:root[data-theme="dark"][data-seite="body"] .mess-einst{
+  border-color:var(--dm-ink)!important;
 }
