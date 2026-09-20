@@ -8232,7 +8232,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   min-width:0;
   display:flex;
   align-items:stretch;
-  gap:3px;
+  gap:6px;
   overflow-x:auto;
   overflow-y:hidden;
   overscroll-behavior-x:contain;
@@ -8738,7 +8738,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-backdrop-filter:blur(13px) saturate(1.08);
   backdrop-filter:blur(13px) saturate(1.08);
 }
-.app-dex-tabs{gap:2px}
+.app-dex-tabs{gap:5px}
 .app-dex-tab{
   width:54px;
   min-width:54px;
@@ -14493,16 +14493,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   top:3px;
   left:50%;
   display:block;
-  width:14px;
-  height:3px;
+  width:18px;
+  height:4px;
   min-width:0;
   transform:translateX(-50%);
   pointer-events:none;
+  /* currentColor, nicht Weiß: der aktive Reiter liegt je nach Seite auf
+     Creme, Hellblau oder Dunkelgrün. currentColor folgt der Schriftfarbe
+     des Reiters und bleibt dadurch überall lesbar – auf dunklem Grund ist
+     das ohnehin Weiß. */
   background:
-    radial-gradient(circle, currentColor 46%, transparent 52%) 0 50%/3px 3px no-repeat,
-    radial-gradient(circle, currentColor 46%, transparent 52%) 50% 50%/3px 3px no-repeat,
-    radial-gradient(circle, currentColor 46%, transparent 52%) 100% 50%/3px 3px no-repeat;
-  opacity:.6;
+    radial-gradient(circle, currentColor 48%, transparent 54%) 0 50%/4px 4px no-repeat,
+    radial-gradient(circle, currentColor 48%, transparent 54%) 50% 50%/4px 4px no-repeat,
+    radial-gradient(circle, currentColor 48%, transparent 54%) 100% 50%/4px 4px no-repeat;
+  opacity:.85;
 }
 /* Kurze Rückmeldung beim Antippen – wie zuvor beim MENÜ-Knopf. */
 .app-dex-tab.ist-gedrueckt{transform:translateY(1.5px)}

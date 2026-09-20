@@ -685,7 +685,11 @@ function appDockTitel(route) {
 /* aufSeite: Stehen wir tatsächlich auf der markierten Seite? Nur dann trägt
    ihr Reiter die drei Punkte und öffnet beim Tippen das Menü. */
 function appDockEintraegeMarkup(aktiveDockRoute, aufSeite = true) {
-  const punkte = '<span class="app-dex-tab-punkte" aria-hidden="true"></span>';
+  /* Bewusst ein <i> und kein <span>: ".app-dex-tab.aktiv>span" legt allen
+     direkten span-Kindern einen drop-shadow auf (und ".app-dex-tab>span"
+     dazu 29x29 px). Beides ist für das Symbol gedacht, nicht für den
+     Hinweis – mit einem anderen Element greifen die Regeln erst gar nicht. */
+  const punkte = '<i class="app-dex-tab-punkte" aria-hidden="true"></i>';
   const istOffen = (route) => aktiveDockRoute === route && aufSeite;
   const standard = sichtbareSammlungen().map(([route, titel]) => `
     <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}" href="#${route}"
