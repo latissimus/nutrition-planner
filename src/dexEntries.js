@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
 import { toast } from './toast.js';
@@ -158,15 +159,27 @@ export async function loadDexEntries(userId, { rootKey, collectionId = null, rou
   return attachSignedMediaUrls(entries);
 }
 
-export async function loadDexEntryPage(userId, {
-  rootKey, collectionId = null, routineId, signal, offset = 0, limit = DEX_PAGE_SIZE,
-} = {}) {
+async function ladeSeite(userId, { rootKey, collectionId, routineId, offset, limit }) {
   const { data, error, count } = await dexEntriesQuery({
-    userId, rootKey, collectionId, routineId, signal, offset, limit, count: true,
+    userId, rootKey, collectionId, routineId, offset, limit, count: true,
   });
   if (error) throw error;
   const entries = await attachSignedMediaUrls(data || []);
   return { entries, total: count ?? entries.length };
+}
+
+/* Die erste Seite einer Liste wird im Sitzungsspeicher gehalten – sie ist
+   das, was bei jedem Seitenwechsel gebraucht wird. Weitere Seiten
+   ("Mehr laden") holt der Nutzer bewusst und bekommen sie frisch. */
+export async function loadDexEntryPage(userId, {
+  rootKey, collectionId = null, routineId, offset = 0, limit = DEX_PAGE_SIZE,
+} = {}) {
+  const argumente = { rootKey, collectionId, routineId, offset, limit };
+  if (offset) return ladeSeite(userId, argumente);
+  return hole(
+    schluessel(rootKey, 'eintraege', collectionId, routineId, limit),
+    () => ladeSeite(userId, argumente),
+  );
 }
 
 export async function loadAllDexEntries(userId, signal) {

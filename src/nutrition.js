@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { materialIconMarkup, pageLook } from './categoryIcons.js';
 import { subscribeToTablesChanges } from './realtime.js';
@@ -45,7 +46,15 @@ export function calculateEnergyNeed(input) { return initialEnergyEstimate(input)
 
 function total(entries, field) { return entries.reduce((sum, item) => sum + number(item[field]), 0); }
 
-async function loadNutritionCore(userId, date, signal) {
+/* Die Tagesansicht baut sich stufenweise auf: erst der Kern, dann die
+   Kalibrierung. Beide werden deshalb EINZELN gehalten – eine Huelle um den
+   Gesamtaufruf wuerde den Mount-Pfad nicht erreichen. */
+async function loadNutritionCore(userId, date) {
+  return hole(schluessel('reminders', 'ernaehrung-kern', date), () => ladeKern(userId, date));
+}
+
+async function ladeKern(userId, date) {
+  const signal = null;
   let settingsQuery = supabase.from('nutrition_settings').select('*').eq('user_id', userId).maybeSingle();
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
   let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false });
@@ -72,7 +81,12 @@ async function loadNutritionCore(userId, date, signal) {
   };
 }
 
-async function loadNutritionCalibration(userId, date, signal) {
+async function loadNutritionCalibration(userId, date) {
+  return hole(schluessel('reminders', 'ernaehrung-kalibrierung', date), () => ladeKalibrierung(userId, date));
+}
+
+async function ladeKalibrierung(userId, date) {
+  const signal = null;
   // Absteigend holen, damit das Limit die AELTESTEN Werte abschneidet und nicht
   // die aktuellen. Fuer Kurve und Rechnung wird die Reihe danach gedreht.
   let weightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(90);
@@ -120,10 +134,11 @@ async function loadNutritionCalibration(userId, date, signal) {
   };
 }
 
-async function loadNutrition(userId, date, signal) {
+/* Der Tageszustand haengt am Datum – deshalb steht es im Schluessel. */
+async function loadNutrition(userId, date) {
   const [core, calibration] = await Promise.all([
-    loadNutritionCore(userId, date, signal),
-    loadNutritionCalibration(userId, date, signal),
+    loadNutritionCore(userId, date),
+    loadNutritionCalibration(userId, date),
   ]);
   const juengste = calibration.weights[calibration.weights.length - 1];
   return { ...core, ...calibration, latestWeight: number(juengste?.kg) };
@@ -843,7 +858,7 @@ export async function mountNutrition(container, { userId, signal }) {
   let refreshPending = false;
   const runRefresh = async () => {
     const version = ++refreshVersion;
-    const nextState = await loadNutrition(userId, date, signal);
+    const nextState = await loadNutrition(userId, date);
     if (signal?.aborted || version !== refreshVersion) return;
     state = nextState;
     render();
@@ -1019,7 +1034,7 @@ export async function mountNutrition(container, { userId, signal }) {
   container.innerHTML = '<section class="nutrition-card"><p class="nutrition-empty">Kalorien werden geladen …</p></section>';
   const initialVersion = ++refreshVersion;
   try {
-    const core = await loadNutritionCore(userId, date, signal);
+    const core = await loadNutritionCore(userId, date);
     if (!signal?.aborted && initialVersion === refreshVersion) {
       state = { ...state, ...core };
       render();
@@ -1028,7 +1043,7 @@ export async function mountNutrition(container, { userId, signal }) {
     container.innerHTML = `<section class="nutrition-card"><p class="nutrition-empty">Kalorien-Log konnte nicht geladen werden.<br><small>${escapeHtml(error.message)}</small></p></section>`;
   }
   try {
-    const calibration = await loadNutritionCalibration(userId, date, signal);
+    const calibration = await loadNutritionCalibration(userId, date);
     if (!signal?.aborted && initialVersion === refreshVersion) {
       state = { ...state, ...calibration };
       render();
@@ -1063,3 +1078,5 @@ export async function mountNutrition(container, { userId, signal }) {
     openAction: (action) => openNutritionAction(action, { date, userId, ownProducts: state.ownProducts, onSave: saveEntry, onDeleteOwnProduct: deleteOwnProduct }),
   };
 }
+
+export const vorladen = (userId) => loadNutrition(userId, localDateKey()).catch(() => {});

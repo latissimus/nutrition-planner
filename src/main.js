@@ -1,4 +1,5 @@
 import './styles.css';
+import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
 // Figtree (SIL Open Font License). Ausgewaehlt im direkten Vergleich mit einem
 // vergroesserten Ausschnitt aus Inspirationen/IMG_5112: Tuckiis Schrift hat ein
@@ -47,6 +48,7 @@ import { entryButtonMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup } from
 const profileModule = () => import('./profile.js');
 const bodyMetricsModule = () => import('./bodyMetrics.js');
 const remindersModule = () => import('./reminders.js');
+const nutritionModule = () => import('./nutrition.js');
 const shoppingModule = () => import('./shoppingList.js');
 const routinesModule = () => import('./routines.js');
 const sleepModule = () => import('./sleep.js');
@@ -270,7 +272,12 @@ function ansichtenVerwerfen(bereich) {
 }
 
 ['muscledex:counts-changed', 'muscledex:coins-changed']
-  .forEach((event) => window.addEventListener(event, (e) => ansichtenVerwerfen(e.detail?.bereich)));
+  .forEach((event) => window.addEventListener(event, (e) => {
+    // Erst die Daten, dann die daraus gebauten Ansichten – in dieser
+    // Reihenfolge, damit ein sofort folgender Neuaufbau frisch laedt.
+    datenspeicher.verwerfen(e.detail?.bereich);
+    ansichtenVerwerfen(e.detail?.bereich);
+  }));
 // Farb- und Icon-Wechsel wirken seitenuebergreifend – hier faellt weiterhin alles.
 window.addEventListener('muscledex:appearance-changed', () => ansichtsCache.clear());
 /* Frueher wurde bei jeder Rueckkehr in den Vordergrund der komplette Cache
@@ -288,7 +295,7 @@ document.addEventListener('visibilitychange', () => {
   // Gegenstueck; das darf den Cache nicht kosten.)
   const abwesend = imHintergrundSeit ? Date.now() - imHintergrundSeit : 0;
   imHintergrundSeit = 0;
-  if (abwesend > CACHE_HALTBARKEIT_MS) ansichtsCache.clear();
+  if (abwesend > CACHE_HALTBARKEIT_MS) { datenspeicher.leeren(); ansichtsCache.clear(); }
 });
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
@@ -303,6 +310,8 @@ const navRichtung = (ziel) => routeStack.navigate(ziel);
 function navigationZuruecksetzen(route = 'home') {
   routeAbortController?.abort();
   routeAbortController = null;
+  datenspeicher.leeren();
+  dexDatenVorgeladen = false;
   ansichtsCache.clear();
   routeStack.reset(route);
   aktiveRoute = route;
@@ -988,6 +997,14 @@ function dexEintraegeVorab(userId, rootKey, signal) {
 
 async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   if (!roots.length) return new Map();
+  return datenspeicher.hole(
+    datenspeicher.schluessel(rootKey, 'statistik', roots.map((r) => r.id).join(',')),
+    () => zaehleSammlungen(userId, rootKey, roots),
+  );
+}
+
+async function zaehleSammlungen(userId, rootKey, roots) {
+  const signal = null;
   let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
   let entriesQuery = supabase.from('dex_entries').select('collection_id').eq('user_id', userId).eq('root_key', rootKey);
   if (signal) { collectionsQuery = collectionsQuery.abortSignal(signal); entriesQuery = entriesQuery.abortSignal(signal); }
@@ -1895,6 +1912,54 @@ function dexModuleVorladen() {
   }
 }
 
+/* Nach dem ersten Bildschirm die Daten der uebrigen Seiten still nachholen.
+   Der gesamte Bestand eines Kontos ist klein – gemessen 516 Zeilen und
+   245 KB – und liegt danach im Sitzungsspeicher. Der ERSTE Besuch jeder
+   Seite kostet dann keine Abfrage mehr, sondern nur noch das Zeichnen.
+   In Wellen, damit die Vorbereitung nicht mit der gerade sichtbaren Seite
+   um die sechs gleichzeitigen Verbindungen des Browsers streitet. */
+let dexDatenVorgeladen = false;
+function dexDatenVorladen() {
+  if (dexDatenVorgeladen || !session?.user?.id) return;
+  dexDatenVorgeladen = true;
+  const userId = session.user.id;
+  const still = (p) => Promise.resolve(p).catch(() => {});
+  const welle = (aufgaben) => Promise.all(aufgaben.map(still));
+  const start = async () => {
+    // Rasterseiten zuerst: Ordner und erste Eintragsseite.
+    for (const route of ['food-log', 'essen', 'supps', 'training', 'stress']) {
+      if (!session?.user?.id) return;
+      await welle([
+        loadCollections(userId, { rootKey: route }),
+        loadDexEntryPage(userId, { rootKey: route }),
+      ]);
+    }
+    // COMP und ROUTINEN zeigen zusaetzlich eine Eintragsliste.
+    await welle([
+      loadDexEntryPage(userId, { rootKey: 'body' }),
+      loadDexEntryPage(userId, { rootKey: 'habits', routineId: null }),
+    ]);
+    // Freigaben: eine Abfrage je Bereich, danach fuer die Sitzung gemerkt.
+    await welle([
+      resolveSharedSpace(userId, 'food-log'),
+      resolveSharedSpace(userId, 'shopping'),
+    ]);
+    // Danach die Seiten mit eigenem Datenmodell. TRACKER haengt an
+    // nutrition.js, nicht an reminders.js – deshalb steht es hier eigens.
+    const module = [shoppingModule, sleepModule, routinesModule,
+      nutritionModule, remindersModule, bodyMetricsModule];
+    for (const laden of module) {
+      if (!session?.user?.id) return;
+      await still(laden().then((m) => m.vorladen?.(userId)));
+    }
+  };
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(() => { start(); }, { timeout: 4000 });
+  } else {
+    setTimeout(start, 1200);
+  }
+}
+
 let renderLaeuft = false;
 let renderAngefordert = false;
 async function render() {
@@ -1909,7 +1974,7 @@ async function render() {
       renderAngefordert = false;
       await renderRoute();
     }
-    if (session) dexModuleVorladen();
+    if (session) { dexModuleVorladen(); dexDatenVorladen(); }
   } catch (error) {
     if (isAbortError(error)) return;
     console.error('Seite konnte nicht geladen werden:', error);

@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import {
   availableCategoryIcons, categoryColor, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
@@ -38,7 +39,7 @@ const unterdexFolderSvg = prepareFolderSvg(unterdexSvgRaw, 'dex-ordner-form dex-
   'dex-ordner-front',
 ]);
 
-export async function loadCollections(userId, { rootKey, parentId = null, signal } = {}) {
+async function ladeSammlungen(userId, rootKey, parentId) {
   let query = supabase.from('collections')
     .select('id,user_id,parent_id,root_key,name,color,icon_key,position,created_at')
     .eq('user_id', userId)
@@ -46,10 +47,20 @@ export async function loadCollections(userId, { rootKey, parentId = null, signal
     .order('position', { ascending: true })
     .order('created_at', { ascending: true });
   query = parentId ? query.eq('parent_id', parentId) : query.is('parent_id', null);
-  if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];
+}
+
+/* Aus dem Sitzungsspeicher, sonst einmal vom Server. Das signal wird bewusst
+   nicht mehr an die Abfrage gereicht: ein Seitenwechsel soll das Laden nicht
+   abbrechen, sondern sein Ergebnis fuer den naechsten Aufruf behalten. Die
+   Aufrufer pruefen signal.aborted weiterhin selbst, bevor sie zeichnen. */
+export async function loadCollections(userId, { rootKey, parentId = null } = {}) {
+  return hole(
+    schluessel(rootKey, 'sammlungen', parentId),
+    () => ladeSammlungen(userId, rootKey, parentId),
+  );
 }
 
 export async function getCollection(userId, id, signal) {

@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { chooseReminderIcon, reminderIconMarkup } from './reminders.js';
 import { dexEntryOverviewMarkup, loadDexEntries, openDexEntryEditor, vorschaubilderEinblenden } from './dexEntries.js';
@@ -55,6 +56,11 @@ function mobilityExerciseRowMarkup(item = { name: '', prescription: '' }) {
 }
 
 async function load(userId, signal) {
+  return hole(schluessel('habits', 'routinen'), () => ladeRoutinen(userId));
+}
+
+async function ladeRoutinen(userId) {
+  const signal = null;
   const date = today();
   let routinesQuery = supabase.from('routines').select('*').eq('user_id', userId).order('position');
   let completionsQuery = supabase.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', shiftedDate(date, -29)).lte('completed_on', date);
@@ -524,3 +530,5 @@ export async function mountRoutines(container, { session, signal }) {
     openRoutineEditor: () => chooseRoutineTemplate(userId, refresh),
   };
 }
+
+export const vorladen = (userId) => load(userId).catch(() => {});

@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
 import { availableCategoryIcons, materialIconMarkup, categoryColor, pageLook } from './categoryIcons.js';
@@ -203,29 +204,36 @@ function notificationText(reminder) {
 }
 
 async function loadReminders(userId, signal, { includeDeleted = false } = {}) {
-  let query = supabase
+  const alle = await hole(schluessel('reminders', 'liste'), () => ladeErinnerungen(userId));
+  return includeDeleted ? alle : alle.filter((reminder) => !reminder.metadata?.deleted);
+}
+
+/* Immer die vollstaendige Liste holen und erst danach filtern: so genuegt
+   ein Speicherplatz fuer beide Aufrufarten. */
+async function ladeErinnerungen(userId) {
+  const query = supabase
     .from('reminders')
     .select('id, type, label, time, weekdays, active, metadata, route')
     .eq('user_id', userId)
     .order('type')
     .order('time');
-  if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
-  return includeDeleted ? (data ?? []) : (data ?? []).filter((reminder) => !reminder.metadata?.deleted);
+  return data ?? [];
 }
 
 async function loadCompletionsToday(userId, signal) {
   const today = dateKey(new Date());
-  let query = supabase
-    .from('reminder_completions')
-    .select('id, reminder_id, date, completed_at, snoozed_until')
-    .eq('user_id', userId)
-    .eq('date', today);
-  if (signal) query = query.abortSignal(signal);
-  const { data, error } = await query;
-  if (error) throw error;
-  return data ?? [];
+  return hole(schluessel('reminders', 'erledigt', today), async () => {
+    const query = supabase
+      .from('reminder_completions')
+      .select('id, reminder_id, date, completed_at, snoozed_until')
+      .eq('user_id', userId)
+      .eq('date', today);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data ?? [];
+  });
 }
 
 async function upsertCompletion(userId, reminderId, patch) {
@@ -1336,3 +1344,9 @@ export async function mountReminders(container, { session, signal }) {
     },
   };
 }
+
+/* Waermt den Sitzungsspeicher im Leerlauf - siehe dexDatenVorladen. */
+export const vorladen = (userId) => Promise.all([
+  loadReminders(userId),
+  loadCompletionsToday(userId),
+]).catch(() => {});

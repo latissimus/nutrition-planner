@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { curveSvg } from './curve.js';
 import { FALTEN, datumKurz, heute, summe, zahl } from './measurements.js';
@@ -70,6 +71,11 @@ const day = (value) => Math.floor(new Date(`${value}T12:00:00`).getTime() / 86_4
 const vollstaendigeFalten = (falten = {}) => FALTEN.every(([key]) => zahl(falten?.[key]) != null);
 
 async function queryState(userId, signal) {
+  return hole(schluessel('body', 'messwerte'), () => ladeMesswerte(userId));
+}
+
+async function ladeMesswerte(userId) {
+  const signal = null;
   const abort = (query) => signal ? query.abortSignal(signal) : query;
   const results = await Promise.all([
     abort(supabase.from('skinfolds').select('*').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(60)),
@@ -1240,3 +1246,5 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     openAddMenu,
   };
 }
+
+export const vorladen = (userId) => queryState(userId).catch(() => {});

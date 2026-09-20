@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { openSleepSoundTimer } from './meditationTimer.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
@@ -118,6 +119,11 @@ async function ensureSleepData(userId, signal) {
 }
 
 async function loadState(userId, signal) {
+  return hole(schluessel('sleep', 'zustand'), () => ladeSchlafzustand(userId));
+}
+
+async function ladeSchlafzustand(userId) {
+  const signal = null;
   let logsQuery = supabase.from('sleep_logs').select('*').eq('user_id', userId).order('sleep_date', { ascending: false }).limit(90);
   if (signal) logsQuery = logsQuery.abortSignal(signal);
   const [sleep, { data: logs, error: logsError }] = await Promise.all([
@@ -371,3 +377,6 @@ export async function mountSleepDex(container, { userId, signal }) {
     openAddMenu: () => actionsMenu({ userId, state, onSaved: refresh }),
   };
 }
+
+/* Waermt den Sitzungsspeicher im Leerlauf – siehe dexDatenVorladen. */
+export const vorladen = (userId) => loadState(userId).catch(() => {});

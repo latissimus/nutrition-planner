@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { hole, schluessel } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { iconMarkup } from './icons.js';
 import {
@@ -226,11 +227,15 @@ function sectionIconMarkup(section) {
 
 const SELECT_COLUMNS = 'id,user_id,section,name,note,tags,checked,position';
 
+/* Aus dem Sitzungsspeicher, sonst einmal vom Server. */
 async function loadItems(userId, signal) {
-  let query = supabase.from('shopping_items').select(SELECT_COLUMNS)
+  return hole(schluessel('shopping', 'artikel'), () => ladeArtikel(userId));
+}
+
+async function ladeArtikel(userId) {
+  const query = supabase.from('shopping_items').select(SELECT_COLUMNS)
     .eq('user_id', userId)
     .order('position', { ascending: true });
-  if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
   return data ?? [];
@@ -974,3 +979,5 @@ function befuelleAbteilungen(container, items) {
   select.innerHTML = bekannt.map((section) => `<option value="${escapeHtml(section)}">${escapeHtml(section)}</option>`).join('');
   select.value = bekannt.includes(vorherigeWahl) ? vorherigeWahl : 'Sonstiges';
 }
+
+export const vorladen = (userId) => loadItems(userId).catch(() => {});
