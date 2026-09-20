@@ -17,12 +17,19 @@
  */
 
 // Lokale Ereignisse: jeder Save streut sie, jeder Refresh hört mit.
-export function notifyHomeCountsChanged() {
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:counts-changed'));
+//
+// bereich sagt, WELCHE Seite die Änderung betrifft – ein Routenname oder eine
+// Liste davon. main.js verwirft daraufhin nur die gemerkten Ansichten dieser
+// Seiten statt aller. Ohne Angabe bleibt es beim vollständigen Verwerfen,
+// damit eine übersehene Aufrufstelle nie veraltete Daten stehen lässt.
+export function notifyHomeCountsChanged(bereich) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('muscledex:counts-changed', { detail: { bereich } }));
 }
 
-export function notifyCoinBalanceChanged() {
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event('muscledex:coins-changed'));
+export function notifyCoinBalanceChanged(bereich) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('muscledex:coins-changed', { detail: { bereich } }));
 }
 
 /* Mehrere schnelle Anfragen (z. B. ein Rezeptimport) werden zu genau

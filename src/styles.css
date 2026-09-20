@@ -341,8 +341,11 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
   opacity:0;
   --sil-filter:brightness(0) invert(1);
 }
+/* Frueher 2s: die Blende allein kostete zwei Sekunden, bevor ueberhaupt
+   etwas zu sehen war (gemessener First Contentful Paint 2,6-3,6 s). Dieselbe
+   Geste in 600 ms – sichtbar ist das Logo damit nach rund 180 ms. */
 .app-logo-font-ready .app-start-splash .brand{
-  animation:splash-in 2s cubic-bezier(.16,.84,.32,1) both;
+  animation:splash-in .6s cubic-bezier(.16,.84,.32,1) both;
 }
 @media (prefers-reduced-motion:reduce){
   .app-logo-font-ready .app-start-splash .brand{animation:none;opacity:1}

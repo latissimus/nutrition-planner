@@ -236,7 +236,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
     if (!confirm(`„${entry.title}“ wirklich löschen?`)) return;
     const { error } = await supabase.from('dex_entries').delete().eq('id', entry.id).eq('user_id', entry.user_id);
     if (error) { toast(error.message || 'Löschen fehlgeschlagen'); return; }
-    notifyHomeCountsChanged();
+    notifyHomeCountsChanged(entry.root_key);
     if (entry.image_path || entry.audio_path) await supabase.storage.from(BUCKET).remove([entry.image_path || entry.audio_path]);
     close(); toast('Eintrag gelöscht');
     if (onDeleted) onDeleted();

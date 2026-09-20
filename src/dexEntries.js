@@ -524,7 +524,7 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         ingredients: foodMode ? recipeIngredients.getItems().map(ingredientLine) : [],
       }).select().single();
       if (error) throw error;
-      notifyHomeCountsChanged();
+      notifyHomeCountsChanged(rootKey);
       close();
       toast(type === 'image' ? 'Bild auf der Seite gespeichert' : type === 'audio' ? 'Tonaufnahme auf der Seite gespeichert' : type === 'routine' ? 'Routine auf der Seite gespeichert' : type === 'note' ? `${entryLabel || 'Notiz'} auf der Seite gespeichert` : 'Link auf der Seite gespeichert');
       await onSaved?.(data);

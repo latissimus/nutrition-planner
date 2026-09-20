@@ -174,7 +174,12 @@ if (routineActionFromUrl) {
 }
 
 const app = document.querySelector('#app');
-const APP_START_SPLASH_MS = 2000;
+/* Frueher 2000: eine feste Untergrenze, die jeden Kaltstart auf mindestens
+   zwei Sekunden streckte, obwohl die Daten nach ~700 ms bereitstehen. Der
+   Splash bleibt, zeigt sich aber nur noch so lange, wie wirklich geladen
+   wird. Die kurze Schranke verhindert weiterhin ein Aufblitzen, wenn alles
+   aus dem Cache kommt. */
+const APP_START_SPLASH_MS = 300;
 const appStartSplashBeginn = performance.now();
 const appLogoSchriftBereit = document.fonts
   ? document.fonts.load('italic 700 54px "Work Sans"', 'CAPBOY').catch(() => [])
@@ -248,8 +253,26 @@ const ansichtsCache = createLruCache({ limit: 8, onEvict: disposeViewEntry });
 // Datenänderungen machen abgelegte Ansichten ungültig. Die aktive Ansicht ist
 // nicht im Cache und aktualisiert sich über ihren eigenen Listener. Nach einer
 // Rückkehr aus dem Hintergrund werden ebenfalls keine alten Daten gezeigt.
-['muscledex:counts-changed', 'muscledex:coins-changed', 'muscledex:appearance-changed']
-  .forEach((event) => window.addEventListener(event, () => ansichtsCache.clear()));
+/* Frueher warf JEDE Speicherung alle acht gemerkten Seiten weg: ein
+   abgehakter Einkaufsartikel kostete auch den schnellen Rueckweg zu REZEPTE.
+   Jetzt faellt nur der betroffene Bereich. Ohne Angabe wird weiterhin alles
+   verworfen – so bleibt eine uebersehene Aufrufstelle auf der sicheren Seite. */
+function ansichtenVerwerfen(bereich) {
+  const liste = bereich == null ? null : [].concat(bereich).filter(Boolean);
+  if (!liste || !liste.length) { ansichtsCache.clear(); return; }
+  const betroffen = new Set(liste);
+  ansichtsCache.keys().forEach((route) => {
+    // Unterseiten zeigen dieselben Eintraege wie ihr Dex und fallen mit.
+    if (betroffen.has(route) || route.startsWith('collection/') || route.startsWith('entry/')) {
+      ansichtsCache.delete(route);
+    }
+  });
+}
+
+['muscledex:counts-changed', 'muscledex:coins-changed']
+  .forEach((event) => window.addEventListener(event, (e) => ansichtenVerwerfen(e.detail?.bereich)));
+// Farb- und Icon-Wechsel wirken seitenuebergreifend – hier faellt weiterhin alles.
+window.addEventListener('muscledex:appearance-changed', () => ansichtsCache.clear());
 /* Frueher wurde bei jeder Rueckkehr in den Vordergrund der komplette Cache
    verworfen. Am Handy passiert das staendig (Nachricht lesen, Kamera, Anruf),
    und der Rueckweg kostete danach wieder ~200 ms statt ~25 ms.

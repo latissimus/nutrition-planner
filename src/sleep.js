@@ -184,7 +184,7 @@ function planEditor({ userId, state, onSaved }) {
       if (submit) submit.disabled = false;
       return;
     }
-    closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlafplan gespeichert'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged('sleep'); toast('Schlafplan gespeichert'); await onSaved?.();
   };
 }
 
@@ -239,14 +239,14 @@ function checkinEditor({ userId, state, existing = null, onSaved }) {
       if (submit) submit.disabled = false;
       return;
     }
-    closeOverlay(backdrop); notifyHomeCountsChanged(); notifyCoinBalanceChanged(); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 CAPCOINS'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged('sleep'); notifyCoinBalanceChanged('coins'); toast(existing ? 'Check-in aktualisiert' : 'Check-in gespeichert · +3 CAPCOINS'); await onSaved?.();
     playInterfaceSound('bonus', { retrigger: 'restart' });
   };
   backdrop.querySelector('[data-sleep-delete]')?.addEventListener('click', async () => {
     if (!confirm('Diesen Schlaf-Eintrag wirklich löschen?')) return;
     const { error } = await supabase.from('sleep_logs').delete().eq('id', existing.id).eq('user_id', userId);
     if (error) return toast('Eintrag konnte nicht gelöscht werden.');
-    closeOverlay(backdrop); notifyHomeCountsChanged(); toast('Schlaf-Eintrag gelöscht'); await onSaved?.();
+    closeOverlay(backdrop); notifyHomeCountsChanged('sleep'); toast('Schlaf-Eintrag gelöscht'); await onSaved?.();
   });
 }
 

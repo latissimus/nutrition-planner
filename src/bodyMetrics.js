@@ -884,8 +884,8 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         const isNew = !state.weights.some((row) => row.gemessen_am === date);
         const { error } = await supabase.from('weights').upsert({ user_id: userId, gemessen_am: date, kg }, { onConflict: 'user_id,gemessen_am' });
         if (error) return toast('Gewicht konnte nicht gespeichert werden');
-        notifyHomeCountsChanged();
-        if (isNew) notifyCoinBalanceChanged();
+        notifyHomeCountsChanged('body');
+        if (isNew) notifyCoinBalanceChanged(['body', 'coins']);
         toast(isNew ? 'Gewicht gespeichert · +1 CAPCOIN' : 'Gewicht aktualisiert');
         await closeAndRender();
       });
@@ -901,7 +901,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         const isNew = !state.waists.some((row) => row.gemessen_am === date);
         const { error } = await supabase.from('waist_measurements').upsert({ user_id: userId, gemessen_am: date, cm, standardisiert: waistForm.querySelector('[data-waist-standard]').checked }, { onConflict: 'user_id,gemessen_am' });
         if (error) return toast('Taillenumfang konnte nicht gespeichert werden');
-        if (isNew) notifyCoinBalanceChanged();
+        if (isNew) notifyCoinBalanceChanged(['body', 'coins']);
         toast(isNew ? 'Taillenumfang gespeichert · +1 CAPCOIN' : 'Taillenumfang aktualisiert');
         await closeAndRender();
       });
@@ -973,8 +973,8 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
           const { error } = await supabase.from('skinfolds').upsert(record, { onConflict: 'user_id,gemessen_am' });
           if (error) return toast(`Messung konnte nicht gespeichert werden: ${error.message}`);
           state.settings.calculation_basis = calculation_basis;
-          notifyHomeCountsChanged();
-          if (isNew) notifyCoinBalanceChanged();
+          notifyHomeCountsChanged('body');
+          if (isNew) notifyCoinBalanceChanged(['body', 'coins']);
           const status = complete === FALTEN.length ? 'Hautfaltenmessung' : `Unvollständige Messung (${complete}/${FALTEN.length})`;
           toast(isNew ? `${status} gespeichert · +1 CAPCOIN` : `${status} aktualisiert`);
           await closeAndRender();
@@ -1209,7 +1209,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         if (!config || !confirm(`Wirklich ${config.label} löschen?`)) return;
         const { error } = await supabase.from(config.table).delete().eq('user_id', userId);
         if (error) return toast('Daten konnten nicht gelöscht werden');
-        notifyHomeCountsChanged();
+        notifyHomeCountsChanged('body');
         toast(config.toast);
         await render();
       };

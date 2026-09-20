@@ -17,6 +17,6 @@ export async function setRoutineCompletion({ routineId, date = localDate(), comp
     target_snoozed_until: snoozedUntil,
   });
   if (error) throw error;
-  notifyCoinBalanceChanged();
+  notifyCoinBalanceChanged(['habits', 'coins']);
   return Number(data || 0);
 }

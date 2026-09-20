@@ -329,7 +329,7 @@ export function sichtbareItems(items, { nurAusgewaehlt = false, activeTag = '', 
 async function toggleItem(userId, id, checked) {
   const { error } = await supabase.from('shopping_items').update({ checked }).eq('id', id);
   if (error) throw error;
-  notifyHomeCountsChanged();
+  notifyHomeCountsChanged('shopping');
 }
 
 async function resetChecked(userId) {
@@ -353,21 +353,21 @@ async function addItem(userId, name, section, tagsInput) {
     if (error.code === '23505') { toast(`„${cleanName}“ steht schon auf der Liste.`); return null; }
     throw error;
   }
-  notifyHomeCountsChanged();
+  notifyHomeCountsChanged('shopping');
   return data;
 }
 
 async function deleteItem(userId, id) {
   const { error } = await supabase.from('shopping_items').delete().eq('id', id);
   if (error) throw error;
-  notifyHomeCountsChanged();
+  notifyHomeCountsChanged('shopping');
 }
 
 async function updateItem(userId, id, patch) {
   const { data, error } = await supabase.from('shopping_items').update(patch)
     .eq('id', id).select(SELECT_COLUMNS).single();
   if (error) throw error;
-  notifyHomeCountsChanged();
+  notifyHomeCountsChanged('shopping');
   return data;
 }
 

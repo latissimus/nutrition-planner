@@ -296,7 +296,7 @@ async function saveReminder(userId, reminder) {
     }
   }
   if (error) throw error;
-  notifyHomeCountsChanged();
+  notifyHomeCountsChanged('reminders');
   return data;
 }
 
@@ -308,7 +308,7 @@ async function deleteReminder(userId, reminderId) {
     .update({ active: false, metadata: { ...(existing?.metadata || {}), deleted: true } })
     .eq('id', reminderId).eq('user_id', userId);
   if (error) throw error;
-  notifyHomeCountsChanged();
+  notifyHomeCountsChanged('reminders');
 }
 
 async function ensureDefaults(userId, signal) {

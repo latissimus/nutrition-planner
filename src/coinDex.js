@@ -178,7 +178,7 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
         : (redeemError.message || 'Einlösen fehlgeschlagen.');
       return toast(message);
     }
-    notifyCoinBalanceChanged();
+    notifyCoinBalanceChanged('coins');
     toast('Belohnung eingelöst'); refresh();
   };
   return {
