@@ -13667,3 +13667,114 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="body"] .mess-einst{
   border-color:var(--dm-ink)!important;
 }
+
+/* ============================================================
+   DARKMODE · visuelle Endkontrolle
+   ============================================================ */
+
+/* Jede Route beginnt auf exakt derselben LOGMAN-Grundfläche. Frühere
+   Seitenthemes setzen teils :root/body oder den Seiten-Wrapper selbst auf
+   eine Kartenfarbe; die zusätzliche [data-seite]-Spezifität neutralisiert
+   diese Regeln zuverlässig. */
+:root[data-theme="dark"][data-seite],
+:root[data-theme="dark"][data-seite] body,
+:root[data-theme="dark"][data-seite] #app,
+:root[data-theme="dark"][data-seite] #view,
+:root[data-theme="dark"][data-seite] :is(
+  .special-dex-page,.body-log-dex-page,.coin-dex-page,.food-dex-page,
+  .meal-log-dex-page,.neo-dex-page,.routine-dex-page,.shopping-dex-page,
+  .shopping-dex-wrap,.sleep-dex-page,.sleep-log-dex-page,
+  .training-dex-page,.wissenssuche-seite
+){
+  background-color:var(--bg)!important;
+}
+
+/* Die Seiten-Tapeten verändern die wahrgenommene Grundfarbe. Im Darkmode
+   bleibt die Fläche deshalb ruhig und einheitlich wie bei LOGMAN. */
+:root[data-theme="dark"][data-seite] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before,
+:root[data-theme="dark"][data-seite] :is(
+  .special-dex-page,.body-log-dex-page,.routine-dex-page,.shopping-dex-page,
+  .sleep-dex-page,.sleep-log-dex-page,.meal-log-dex-page,.coin-dex-page,
+  .neo-dex-page,.food-dex-page,.training-dex-page
+)::before{
+  background:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  opacity:0!important;
+}
+
+/* Suche ist ein Header-Symbol, keine Karte. */
+:root[data-theme="dark"][data-seite] .app-dex-search,
+:root[data-theme="dark"][data-seite] .app-dex-search.aktiv{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  color:var(--dm-text)!important;
+}
+
+/* Kleine Beschriftungen sind Text und dürfen keine eigenen Balken bilden.
+   Die vorherigen generischen i/small-Regeln waren für Tags gedacht, trafen
+   aber auch COMP-Unterzeilen und Statusmeldungen. */
+:root[data-theme="dark"][data-seite] :is(
+  .special-dex-page,.body-log-dex-page,.coin-dex-page,.food-dex-page,
+  .meal-log-dex-page,.neo-dex-page,.routine-dex-page,.shopping-dex-page,
+  .sleep-dex-page,.sleep-log-dex-page,.training-dex-page,.wissenssuche-seite
+) :is(small,i):not(.material-svg):not(.dex-tag):not(.dex-schlagwort):not(.kategorie-tag):not(.dex-eintrag-tag):not(.tuck-tag){
+  background-color:transparent!important;
+}
+
+/* Chips bleiben neutrale, klar umrandete LOGMAN-Flächen. Auch Seitenregeln
+   mit eigenen Textfarben werden durch die gleich hohe Routen-Spezifität
+   überschrieben. */
+:root[data-theme="dark"][data-seite] :is(
+  .dex-detail-tags span,.einkauf-tag,.einkauf-tag-chip,.einkauf-row-tags span,
+  .sleep-tags span,.falten-detail-tags span,.dex-eintrag-tag,.tuck-tag,
+  .routine-tag,.dex-tag,.dex-schlagwort,.kategorie-tag
+){
+  background-color:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+  -webkit-text-fill-color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
+)>button{
+  background:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+  -webkit-text-fill-color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
+)>button.aktiv{
+  background:#FFFFFF!important;
+  border-color:#FFFFFF!important;
+  color:#343A46!important;
+  -webkit-text-fill-color:#343A46!important;
+}
+
+/* CAPCOINS ist im hellen Theme bewusst gelb. Im Darkmode gelten auch hier
+   weiße bzw. hellgraue Schriften; nur echte Aktionsbuttons dürfen Akzent
+   tragen. */
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-balance-card :is(small,strong,b),
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-section-title h2,.coin-history-title),
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-history,
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-history :is(span,b,.plus,.minus){
+  color:var(--dm-text)!important;
+  -webkit-text-fill-color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-history small{
+  color:var(--dm-muted)!important;
+  -webkit-text-fill-color:var(--dm-muted)!important;
+}
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-balance-symbol,.coin-reward-symbol){
+  filter:grayscale(1) brightness(1.55)!important;
+}
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress{
+  background:var(--dm-surface2)!important;
+}
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress i{
+  background:#FFFFFF!important;
+}
