@@ -142,15 +142,26 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
   mountChrome(container, 'coins', 'CAPCOINS', {
     color, meta: 'Belohnungen', pageLookPattern: 'wallpaper-game', hideAppearanceIcon: true, onPlus: openRewardEditor,
   });
+  let balanceQuery = supabase.rpc('muscle_coin_balance');
   let ledgerQuery = supabase.from('muscle_coin_ledger').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30);
   let rewardsQuery = supabase.from('muscle_rewards').select('*').eq('user_id', userId).eq('active', true).order('cost');
-  if (signal) { ledgerQuery = ledgerQuery.abortSignal(signal); rewardsQuery = rewardsQuery.abortSignal(signal); }
-  const [{ data: ledger, error }, { data: rewards, error: rewardsError }] = await Promise.all([ledgerQuery, rewardsQuery]);
-  if (error || rewardsError) {
+  if (signal) {
+    balanceQuery = balanceQuery.abortSignal(signal);
+    ledgerQuery = ledgerQuery.abortSignal(signal);
+    rewardsQuery = rewardsQuery.abortSignal(signal);
+  }
+  const [
+    { data: balanceData, error: balanceError },
+    { data: ledger, error },
+    { data: rewards, error: rewardsError },
+  ] = await Promise.all([balanceQuery, ledgerQuery, rewardsQuery]);
+  if (balanceError || error || rewardsError) {
     container.querySelector('.coin-dex-inhalt').innerHTML = '<div class="tuck-leer"><b>CAPCOINS noch nicht bereit</b><span>Bitte zuerst das neue Datenbank-Update einspielen.</span></div>';
     return { meta: 'Belohnungen', openAddMenu: openRewardEditor };
   }
-  const balance = (ledger || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  // Der Header verwendet dieselbe RPC. Die begrenzte Ledger-Abfrage ist nur
+  // für „Zuletzt“ gedacht und darf den Kontostand nicht abschneiden.
+  const balance = Number(balanceData || 0);
   const next = nextReward(rewards || [], balance);
   const progress = next ? Math.min(100, Math.round((balance / next.cost) * 100)) : 0;
   container.querySelector('.coin-dex-inhalt').innerHTML = `
