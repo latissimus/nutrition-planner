@@ -335,8 +335,15 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('rastet das horizontale App-Menü auf vollständigen Tabs ein', () => {
-    expect(css).toContain('scroll-snap-type:x mandatory;');
-    expect(css).toContain('scroll-snap-align:start;');
+    /* Das zwingende Einrasten ist bewusst entfallen: zusammen mit
+       "scroll-snap-stop:always" hielt jeder Wisch beim naechsten Reiter an,
+       was sich zaeh anfuehlte. Die Leiste laeuft jetzt frei aus; ins Bild
+       geholt wird der aktive Reiter weiterhin per Skript. */
+    expect(css).not.toContain('scroll-snap-type:x mandatory;');
+    expect(css).not.toContain('scroll-snap-stop:always;');
+    // Ohne Luft im Scrollbereich schneidet overflow-y:hidden die drei Punkte
+    // und den Druckeffekt ab.
+    expect(css).toContain('padding-block:4px;');
     // Es wird weiterhin auf einen Reiteranfang eingerastet …
     expect(main).toContain('const eingerastet = rasterpunkte.reduce');
     // … das Ergebnis aber so begrenzt, dass der aktive Reiter im Bild bleibt.

@@ -8236,15 +8236,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow-x:auto;
   overflow-y:hidden;
   overscroll-behavior-x:contain;
-  scroll-snap-type:x mandatory;
+  /* Frueher "scroll-snap-type:x mandatory" zusammen mit
+     "scroll-snap-stop:always" am Reiter: jeder Wisch musste beim naechsten
+     Reiter anhalten, egal wie kraeftig er war. Das fuehlte sich zaeh an.
+     Ohne Einrasten laeuft die Leiste frei aus; das Federn am Rand bleibt,
+     denn "contain" verhindert nur das Weiterreichen an die Seite, nicht den
+     Gummibandeffekt. Die aktive Seite wird beim Wechsel weiterhin per
+     Skript ins Bild gezogen. */
   touch-action:pan-x;
+  /* Luft nach oben und unten: overflow-y:hidden schnitt sonst die drei
+     Punkte (1 px unter der Kante) und den Druckeffekt (1,5 px darunter) ab. */
+  padding-block:4px;
 }
 .app-dex-tab{
   box-sizing:border-box;
   width:56px;
   min-width:56px;
-  height:55px;
-  padding:5px 2px 4px;
+  height:58px;
+  padding:8px 2px 4px;
   display:grid;
   grid-template-rows:32px 12px;
   place-items:center;
@@ -8255,8 +8264,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dex-ink,#0A1330);
   box-shadow:none;
   text-decoration:none;
-  scroll-snap-align:start;
-  scroll-snap-stop:always;
 }
 .app-dex-tab>span{
   width:32px;
@@ -8735,9 +8742,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-tab{
   width:54px;
   min-width:54px;
-  height:53px;
+  height:56px;
   grid-template-rows:30px 11px;
-  padding:5px 2px 3px;
+  padding:8px 2px 3px;
   border-radius:10px;
 }
 .app-dex-tab>span{width:29px;height:29px;font-size:23px}
@@ -14483,7 +14490,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-tab{position:relative}
 .app-dex-tab>.app-dex-tab-punkte{
   position:absolute;
-  top:1px;
+  top:3px;
   left:50%;
   display:block;
   width:14px;
