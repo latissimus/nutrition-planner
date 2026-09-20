@@ -105,13 +105,15 @@ async function signiereVorschau(pfad) {
    eine bereits umgeschriebene URL trifft die Bedingung nicht mehr. */
 const ABLAGE_OEFFENTLICH = `${import.meta.env.VITE_SUPABASE_URL || ''}/storage/v1/object/public/`;
 
-function vorschauUrl(url) {
+export function oeffentlichVerkleinert(url, masse = VORSCHAU_MASSE) {
   if (!url || !import.meta.env.VITE_SUPABASE_URL || !url.startsWith(ABLAGE_OEFFENTLICH)) return url;
   const pfad = url.slice(ABLAGE_OEFFENTLICH.length).split('?')[0];
-  const { width, height, resize, quality } = VORSCHAU_MASSE;
+  const { width, height, resize, quality } = masse;
   return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/render/image/public/${pfad}`
     + `?width=${width}&height=${height}&resize=${resize}&quality=${quality}`;
 }
+
+const vorschauUrl = (url) => oeffentlichVerkleinert(url);
 
 async function attachSignedMediaUrls(entries) {
   entries.forEach((entry) => {

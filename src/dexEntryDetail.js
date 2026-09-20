@@ -1,6 +1,9 @@
 import { supabase } from './supabase.js';
 import { applyPageLook, categoryColor, colorIsDark, materialIconMarkup, pageLook } from './categoryIcons.js';
-import { sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine } from './dexEntries.js';
+import {
+  sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine,
+  oeffentlichVerkleinert,
+} from './dexEntries.js';
 import { noteEditorMarkup, mountNoteEditors, readNote, renderNoteHtml, noteToText } from './richText.js';
 import { toast } from './toast.js';
 import { optimizeImageFile, uploadExtension } from './imageProcessing.js';
@@ -10,6 +13,9 @@ import { notifyHomeCountsChanged } from './realtime.js';
 import { foodDexActionsMarkup } from './foodDexActions.js';
 
 const BUCKET = 'dex-entries';
+/* Anzeigegroesse der Detailkarte ist rund 343x260; das deckt dreifache
+   Punktdichte ab und bleibt beim Hineinzoomen ueber das Vollbild scharf. */
+const DETAIL_MASSE = { width: 1040, height: 790, resize: 'contain', quality: 78 };
 const ENTRY_COLUMNS = 'id,user_id,collection_id,root_key,entry_type,title,note,url,image_path,audio_path,preview_url,provider,tags,favorite,food_kind,carb_class,training_class,prep_minutes,ingredients,ingredient_items,created_at,updated_at';
 const TRAINING_CLASSES = [
   ['unset', 'Nicht festgelegt'], ['exercise', 'Übungen'], ['recovery', 'Regeneration'],
@@ -101,10 +107,24 @@ async function loadEntry(userId, id, signal) {
     if (collection?.color) data.color = collection.color;
     if (collection?.name) data.dex_name = collection.name;
   }
-  if (data.image_path || data.audio_path) {
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(data.image_path || data.audio_path, 60 * 60);
-    if (data.audio_path) data.audio_url = signed?.signedUrl || '';
-    else data.preview_url = signed?.signedUrl || '';
+  if (data.audio_path) {
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(data.audio_path, 60 * 60);
+    data.audio_url = signed?.signedUrl || '';
+  } else if (data.image_path) {
+    /* Die Karte zeigt das Bild mit rund 343x260 CSS-Pixeln, geladen wurde
+       bisher das Original – gemessen 1200x1600 mit 3,7 MB. Fuer die Karte
+       genuegt eine auf dreifache Punktdichte gerechnete Fassung; das Original
+       bleibt fuer das Vollbild, damit Hineinzoomen scharf bleibt. Beide
+       Signaturen laufen parallel, kosten also keine zusaetzliche Wartezeit. */
+    const [klein, gross] = await Promise.all([
+      supabase.storage.from(BUCKET).createSignedUrl(data.image_path, 60 * 60, { transform: DETAIL_MASSE }),
+      supabase.storage.from(BUCKET).createSignedUrl(data.image_path, 60 * 60),
+    ]);
+    data.vollbild_url = gross.data?.signedUrl || '';
+    data.preview_url = klein.data?.signedUrl || data.vollbild_url;
+  } else if (data.preview_url) {
+    // Linkvorschauen liegen in der eigenen oeffentlichen Ablage.
+    data.preview_url = oeffentlichVerkleinert(data.preview_url, DETAIL_MASSE);
   }
   return data;
 }
@@ -488,5 +508,5 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   }
   container.querySelector('[data-entry-edit]').onclick = () => editEntry(entry, () => mountDexEntryDetail(container, { userId, id, signal }));
   container.querySelector('[data-entry-share]').onclick = () => shareEntry(entry);
-  container.querySelector('[data-fullscreen]')?.addEventListener('click', () => fullscreenImage(entry.preview_url, entry.title));
+  container.querySelector('[data-fullscreen]')?.addEventListener('click', () => fullscreenImage(entry.vollbild_url || entry.preview_url, entry.title));
 }
