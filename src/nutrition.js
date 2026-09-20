@@ -49,16 +49,17 @@ async function loadNutritionCore(userId, date, signal) {
   let settingsQuery = supabase.from('nutrition_settings').select('*').eq('user_id', userId).maybeSingle();
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
   let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false });
-  let latestWeightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(1);
   if (signal) {
     settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
     ownQuery = ownQuery.abortSignal(signal);
-    latestWeightQuery = latestWeightQuery.abortSignal(signal);
   }
-  const [settings, entries, own, latestWeight] = await Promise.all([
-    settingsQuery, logQuery, ownQuery, latestWeightQuery,
+  /* Das aktuelle Gewicht wurde hier frueher ein zweites Mal geholt – dieselbe
+     Tabelle, dieselben Spalten, nur andere Sortierung. Es steckt bereits in
+     der Reihe aus loadNutritionCalibration und wird dort entnommen. */
+  const [settings, entries, own] = await Promise.all([
+    settingsQuery, logQuery, ownQuery,
   ]);
-  const error = settings.error || entries.error || own.error || latestWeight.error;
+  const error = settings.error || entries.error || own.error;
   if (error) throw error;
   const entryList = entries.data || [];
   const signed = await signImagePaths(entryList.map((entry) => entry.product_snapshot?.image_path));
@@ -68,12 +69,13 @@ async function loadNutritionCore(userId, date, signal) {
   });
   return {
     settings: settings.data || {}, entries: entryList, ownProducts: own.data || [],
-    latestWeight: number(latestWeight.data?.[0]?.kg),
   };
 }
 
 async function loadNutritionCalibration(userId, date, signal) {
-  let weightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: true }).limit(90);
+  // Absteigend holen, damit das Limit die AELTESTEN Werte abschneidet und nicht
+  // die aktuellen. Fuer Kurve und Rechnung wird die Reihe danach gedreht.
+  let weightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(90);
   let historyQuery = supabase.from('nutrition_log_entries').select('log_date,energy_kcal').eq('user_id', userId)
     .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
   let dayStatusQuery = supabase.from('nutrition_day_status').select('*').eq('user_id', userId)
@@ -104,7 +106,7 @@ async function loadNutritionCalibration(userId, date, signal) {
     const status = statusByDate.get(cursor) || {};
     historyDays.push({ date: cursor, kcal: kcalByDate.get(cursor) || 0, complete: status.complete === true, excluded: status.excluded, exclude_reason: status.exclude_reason || '' });
   }
-  const weights = (weight.data || []).map((item) => ({ date: item.gemessen_am, kg: number(item.kg) }));
+  const weights = (weight.data || []).map((item) => ({ date: item.gemessen_am, kg: number(item.kg) })).reverse();
   return {
     weights, historyDays,
     dayStatus: statusByDate.get(date) || { complete: false, excluded: false, exclude_reason: '' },
@@ -118,7 +120,8 @@ async function loadNutrition(userId, date, signal) {
     loadNutritionCore(userId, date, signal),
     loadNutritionCalibration(userId, date, signal),
   ]);
-  return { ...core, ...calibration };
+  const juengste = calibration.weights[calibration.weights.length - 1];
+  return { ...core, ...calibration, latestWeight: number(juengste?.kg) };
 }
 
 function recoveryDirection(state) {

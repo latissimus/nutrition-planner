@@ -21,7 +21,7 @@ import {
   coinDexIsVisible, customCollectionIsVisible, orderCustomCollections, visibleCollectionRoutes,
 } from './collectionPreferences.js';
 import { coinHeaderMarkup, loadCoinSummary, mountCoinDex } from './coinDex.js';
-import { openDexEntryEditor, renderDexEntries } from './dexEntries.js';
+import { loadDexEntryPage, openDexEntryEditor, renderDexEntries } from './dexEntries.js';
 import { registriereServiceWorker } from './pwa.js';
 import { iconMarkup } from './icons.js';
 import { toast } from './toast.js';
@@ -250,8 +250,22 @@ const ansichtsCache = createLruCache({ limit: 8, onEvict: disposeViewEntry });
 // Rückkehr aus dem Hintergrund werden ebenfalls keine alten Daten gezeigt.
 ['muscledex:counts-changed', 'muscledex:coins-changed', 'muscledex:appearance-changed']
   .forEach((event) => window.addEventListener(event, () => ansichtsCache.clear()));
+/* Frueher wurde bei jeder Rueckkehr in den Vordergrund der komplette Cache
+   verworfen. Am Handy passiert das staendig (Nachricht lesen, Kamera, Anruf),
+   und der Rueckweg kostete danach wieder ~200 ms statt ~25 ms.
+   Kurzes Wegtippen ist aber kein Datenwechsel. Erst nach laengerer
+   Abwesenheit kann ein zweites Geraet oder ein Freigabe-Partner etwas
+   geaendert haben – dann wird weiterhin alles verworfen. */
+const CACHE_HALTBARKEIT_MS = 5 * 60 * 1000;
+let imHintergrundSeit = 0;
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') ansichtsCache.clear();
+  if (document.visibilityState !== 'visible') { imHintergrundSeit = Date.now(); return; }
+  // Ohne vorangegangenes "versteckt" gab es keine Abwesenheit – dann gibt es
+  // auch nichts zu verwerfen. (Manche Browser melden "sichtbar" auch ohne
+  // Gegenstueck; das darf den Cache nicht kosten.)
+  const abwesend = imHintergrundSeit ? Date.now() - imHintergrundSeit : 0;
+  imHintergrundSeit = 0;
+  if (abwesend > CACHE_HALTBARKEIT_MS) ansichtsCache.clear();
 });
 
 // Eigener Navigations-Stack, um vorwaerts (tiefer rein) von rueckwaerts
@@ -937,6 +951,17 @@ function unterordnerEinstellungenOeffner({ userId, refresh, itemsById }) {
   };
 }
 
+/* Die Eintraege einer Rasterseite haengen nicht an ihren Ordnern: gebraucht
+   wird von dort nur, OB es Unterordner gibt. Die Abfrage darf deshalb sofort
+   losfahren, statt auf loadCollections zu warten – das spart je Seitenwechsel
+   eine volle Rundreise. Das .catch() verhindert nur die Warnung ueber eine
+   unbehandelte Ablehnung; der Fehler selbst kommt beim Abholen wieder hoch. */
+function dexEintraegeVorab(userId, rootKey, signal) {
+  const p = loadDexEntryPage(userId, { rootKey, signal });
+  p.catch(() => {});
+  return p;
+}
+
 async function dexSammlungsStatistik(userId, rootKey, roots, signal) {
   if (!roots.length) return new Map();
   let collectionsQuery = supabase.from('collections').select('id,parent_id').eq('user_id', userId).eq('root_key', rootKey);
@@ -1500,6 +1525,7 @@ async function renderRoute() {
     setSeite('food-log');
     const foodSpace = await resolveSharedSpace(session.user.id, 'food-log', signal);
     const foodOwnerId = foodSpace.ownerId;
+    const foodEintraege = dexEintraegeVorab(foodOwnerId, 'food-log', signal);
     const children = await loadCollections(foodOwnerId, { rootKey: 'food-log', signal });
     const childStats = await dexSammlungsStatistik(foodOwnerId, 'food-log', children, signal);
     if (signal?.aborted) return;
@@ -1544,6 +1570,7 @@ async function renderRoute() {
     }));
     await renderDexEntries(view, {
       userId: foodOwnerId, rootKey: 'food-log', color: categoryColor('food-log'), signal, hasChildren: children.length > 0,
+      vorabSeite: foodEintraege,
       onChanged: (entries, total) => {
         if (!Array.isArray(entries)) return;
         const meta = view.querySelector('.kategorie-kopftitel small');
@@ -1567,6 +1594,7 @@ async function renderRoute() {
     // still pending. Paint the fixed Wissensseite immediately so the
     // shared template fallback (#F0C987) can never flash in that gap.
     applyPageLook(route, routeColor, pattern);
+    const rasterEintraege = dexEintraegeVorab(session.user.id, route, signal);
     const children = await loadCollections(session.user.id, { rootKey: route, signal });
     const childStats = await dexSammlungsStatistik(session.user.id, route, children, signal);
     if (signal?.aborted) return;
@@ -1600,6 +1628,7 @@ async function renderRoute() {
     }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: route, color: routeColor, signal, hasChildren: children.length > 0,
+      vorabSeite: rasterEintraege,
       onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;
@@ -1682,6 +1711,7 @@ async function renderRoute() {
     // Fixierte Farbe und Tapete zuerst setzen, damit waehrend des Ladens
     // (siehe TRAINING-Muster) niemals der neutrale Sammlungs-Look aufblitzt.
     applyPageLook('stress', categoryColor('stress'), 'wallpaper-wolke');
+    const stressEintraege = dexEintraegeVorab(session.user.id, 'stress', signal);
     const children = await loadCollections(session.user.id, { rootKey: 'stress', signal });
     const childStats = await dexSammlungsStatistik(session.user.id, 'stress', children, signal);
     if (signal?.aborted) return;
@@ -1714,6 +1744,7 @@ async function renderRoute() {
     }));
     await renderDexEntries(view, {
       userId: session.user.id, rootKey: 'stress', color: categoryColor('stress'), signal, hasChildren: children.length > 0,
+      vorabSeite: stressEintraege,
       onChanged: (entries, total) => {
         const meta = view.querySelector('.kategorie-kopftitel small');
         if (meta && Array.isArray(entries)) meta.textContent = `${total ?? entries.length} Einträge · ${children.length} Unterordner`;

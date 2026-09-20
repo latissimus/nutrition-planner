@@ -741,11 +741,15 @@ function entriesMarkup(entries, color, emptyText = 'Lege hier ein Cheat-Meal, ei
 export async function renderDexEntries(container, {
   userId, rootKey, collectionId = null, routineId, color, signal, onChanged,
   foodFilters = rootKey === 'food-log', classFilters = Boolean(entryClassConfig(rootKey)), hasChildren = false, hideEmpty = false,
+  vorabSeite = null,
 } = {}) {
   const slot = container.querySelector('[data-dex-entries]');
   if (!slot) return [];
   try {
-    const firstPage = await loadDexEntryPage(userId, { rootKey, collectionId, routineId, signal });
+    /* vorabSeite: Die Eintraege haengen inhaltlich nicht an den Ordnern.
+       Die Seite kann ihre Abfrage deshalb schon starten, waehrend die
+       Ordner noch unterwegs sind – hier wird nur noch abgeholt. */
+    const firstPage = await (vorabSeite || loadDexEntryPage(userId, { rootKey, collectionId, routineId, signal }));
     const entries = [...firstPage.entries];
     let total = firstPage.total;
     if (signal?.aborted) return [];

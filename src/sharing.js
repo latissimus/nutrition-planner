@@ -15,7 +15,17 @@ export function chooseSharedSpace(userId, shares = []) {
   };
 }
 
+/* Freigaben aendern sich fast nie, werden aber vor JEDEM Aufbau von REZEPTE
+   und EINKAUF abgefragt – und zwar als erste Abfrage, die alles andere
+   aufhaelt. Einmal je Sitzung genuegt; nach jeder Aenderung im Teilen-Sheet
+   wird der Merker verworfen. */
+const raumMerker = new Map();
+
+export function freigabenMerkerLeeren() { raumMerker.clear(); }
+
 export async function resolveSharedSpace(userId, scope, signal) {
+  const schluessel = `${userId}|${scope}`;
+  if (raumMerker.has(schluessel)) return raumMerker.get(schluessel);
   let query = supabase.from('shared_spaces')
     .select('id,owner_id,partner_id,created_at')
     .eq('scope', scope)
@@ -24,7 +34,9 @@ export async function resolveSharedSpace(userId, scope, signal) {
   if (signal) query = query.abortSignal(signal);
   const { data, error } = await query;
   if (error) throw error;
-  return chooseSharedSpace(userId, data || []);
+  const ergebnis = chooseSharedSpace(userId, data || []);
+  raumMerker.set(schluessel, ergebnis);
+  return ergebnis;
 }
 
 /* Beschriftung für den Menüeintrag: sie soll auf einen Blick sagen, ob der
@@ -77,13 +89,14 @@ export async function openShareSheet(scope, { empfangen = false } = {}) {
     const { error } = await supabase.rpc('share_space_with_email', { space_scope: scope, partner_email: email });
     button.disabled = false;
     if (error) return toast(error.message || 'Freigabe nicht möglich.');
-    event.currentTarget.reset(); toast(`${label} freigegeben`); await load();
+    event.currentTarget.reset(); freigabenMerkerLeeren(); toast(`${label} freigegeben`); await load();
   };
   list.onclick = async (event) => {
     const button = event.target.closest('[data-remove-share]');
     if (!button) return;
     const { error } = await supabase.from('shared_spaces').delete().eq('id', button.dataset.removeShare);
     if (error) return toast('Freigabe konnte nicht entfernt werden.');
+    freigabenMerkerLeeren();
     toast('Freigabe entfernt'); await load();
   };
   document.body.append(backdrop);
