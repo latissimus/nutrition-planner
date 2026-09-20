@@ -17,10 +17,10 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('.app-dex-tab[data-sammlung="stress"] .app-dex-tab-icon{transform:scale(1.09)}');
   });
 
-  it('verwendet das CAPCOIN-Violett auf Splash und Anmeldung', () => {
-    expect(indexHtml).toContain('<meta name="theme-color" content="#432C5E">');
-    expect(indexHtml).toContain('background:#432C5E!important');
-    expect(manifest).toContain('"background_color": "#432C5E"');
+  it('verwendet LOGMAN-Navy auf Splash und CAPCOIN-Violett auf der Anmeldung', () => {
+    expect(indexHtml).toContain('<meta name="theme-color" content="#101A2B">');
+    expect(indexHtml).toContain('background:#101A2B!important');
+    expect(manifest).toContain('"background_color": "#101A2B"');
     expect(css).toContain(':root[data-seite="auth"] .auth-marquee{');
     expect(css).toContain('background:#fff!important;\n  color:#111!important;');
     expect(css).toContain(':root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]){');
@@ -119,14 +119,14 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("actions.title || 'Seite bearbeiten'");
   });
 
-  it('verwendet CAPCOIN-Violett und eine weisse Silhouette im Splash', () => {
+  it('verwendet LOGMAN-Navy und eine weisse Silhouette im Splash', () => {
     const splashStart = css.indexOf('.app-start-splash{');
     const splashEnd = css.indexOf('.app-logo-font-ready', splashStart);
     const splashCss = css.slice(splashStart, splashEnd);
-    expect(indexHtml).toContain('name="theme-color" content="#432C5E"');
-    expect(indexHtml).toContain('background:#432C5E!important');
-    expect(manifest).toContain('"background_color": "#432C5E"');
-    expect(splashCss).toContain('background:#432C5E');
+    expect(indexHtml).toContain('name="theme-color" content="#101A2B"');
+    expect(indexHtml).toContain('background:#101A2B!important');
+    expect(manifest).toContain('"background_color": "#101A2B"');
+    expect(splashCss).toContain('background:#101A2B');
     expect(splashCss).toContain('.app-start-splash .brand{');
     expect(splashCss).toContain('--sil-filter:brightness(0) invert(1)');
   });
