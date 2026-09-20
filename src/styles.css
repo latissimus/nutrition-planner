@@ -333,7 +333,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
    aufgebaut werden, und verschwindet erst beim atomaren Seitenwechsel. */
 .app-start-splash{
   position:fixed;z-index:2000;inset:0;display:flex;align-items:center;
-  justify-content:center;background:#101A2B;
+  justify-content:center;background:#432C5E;
   padding:20px 20px calc(20px + env(safe-area-inset-bottom));
 }
 .app-start-splash .brand{
@@ -341,6 +341,7 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
   opacity:0;
   --sil-filter:brightness(0) invert(1);
 }
+:root[data-theme="dark"] .app-start-splash{background:#101A2B}
 /* Frueher 2s: die Blende allein kostete zwei Sekunden, bevor ueberhaupt
    etwas zu sehen war (gemessener First Contentful Paint 2,6-3,6 s). Dieselbe
    Geste in 600 ms – sichtbar ist das Logo damit nach rund 180 ms. */
@@ -13964,20 +13965,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Kopfzeile: Suche wird reinweiß, CAPCOIN und Profilbild werden entsättigt.
    Der harte Schatten ist bei allen Header-Symbolen dasselbe helle Grau wie
    die LOGMAN-Kontur. */
-:root[data-theme="dark"][data-seite] .app-dex-search .app-dex-search-icon{
-  color:#FFFFFF!important;
-  filter:brightness(0) invert(1) drop-shadow(2.5px 2.5px 0 var(--dm-ink))!important;
-}
-:root[data-theme="dark"][data-seite] .app-dex-search .app-dex-search-icon :is(svg,svg *){
-  color:#FFFFFF!important;
-  fill:#FFFFFF!important;
-}
 :root[data-theme="dark"][data-seite] .app-dex-header .coin-kopf-symbol{
-  filter:grayscale(1) brightness(1.35) contrast(.82) drop-shadow(2.5px 2.5px 0 var(--dm-ink))!important;
+  filter:grayscale(1) brightness(1.35) contrast(.82)!important;
+}
+:root[data-theme="dark"][data-seite] .app-dex-header .coin-kopfstand.aktiv .coin-kopf-symbol{
+  filter:grayscale(1) brightness(1.35) contrast(.82) drop-shadow(2.5px 2.5px 0 #FFFFFF)!important;
 }
 :root[data-theme="dark"][data-seite] .app-dex-header .nav-av{
   border-color:var(--dm-ink)!important;
-  box-shadow:2.5px 2.5px 0 var(--dm-ink)!important;
+  box-shadow:none!important;
 }
 :root[data-theme="dark"][data-seite] .app-dex-header .nav-av img{
   filter:grayscale(1)!important;
@@ -13991,8 +13987,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Die gelieferten Menübilder behalten ihre Farben, ihr äußerer Schatten ist
    aber nie mehr schwarz oder seitenabhängig. Der MENÜ-Computer bleibt als
    einzige farbige Aktionsschaltfläche vollständig unangetastet. */
-:root[data-theme="dark"][data-seite] .app-dex-tab>span{
-  filter:drop-shadow(2.5px 2.5px 0 var(--dm-ink))!important;
+:root[data-theme="dark"][data-seite] .app-dex-tab>span,
+:root[data-theme="dark"][data-seite] .app-dex-search .app-dex-search-icon{
+  filter:none!important;
+}
+:root[data-theme="dark"][data-seite] .app-dex-tab.aktiv>span,
+:root[data-theme="dark"][data-seite] .app-dex-search.aktiv .app-dex-search-icon{
+  filter:drop-shadow(2.5px 2.5px 0 #FFFFFF)!important;
 }
 
 /* Alle normalen Buttons: dunkles Grau, weiße Schrift, graue Kontur. #app
@@ -14098,6 +14099,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dm-text)!important;
   -webkit-text-fill-color:var(--dm-text)!important;
 }
+:root[data-theme="dark"][data-seite] body .food-dex-info-dialog .food-dex-info-dialog-close,
+:root[data-theme="dark"][data-seite="reminders"] body :is(
+  .rem-period-overlay,.slot-info-overlay,.nutrition-calculator-overlay
+) :is([data-reminder-overlay-close],[data-nutrition-close],[data-close]){
+  background:transparent!important;
+  background-color:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+/* Die generische Buttonregel enthält doppelte Sheet-Klassen. Diese reale
+   Overlay-Kette ist absichtlich noch spezifischer, damit der transparente
+   Schließknopf nicht wieder zur grauen Schaltfläche wird. */
+:root:root[data-theme="dark"][data-seite] body .food-dex-info-dialog.food-dex-info-dialog .food-dex-info-dialog-close.food-dex-info-dialog-close,
+:root:root[data-theme="dark"][data-seite="reminders"] body :is(
+  .rem-period-overlay.rem-period-overlay,
+  .slot-info-overlay.slot-info-overlay,
+  .nutrition-calculator-overlay.nutrition-calculator-overlay
+) .kategorie-sheet.kategorie-sheet>header>:is(
+  [data-reminder-overlay-close],[data-nutrition-close],[data-close]
+){
+  background:transparent!important;
+  background-color:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
 :root[data-theme="dark"][data-seite] body :is(
   .kategorie-sheet.kategorie-sheet,
   .special-dex-sheet.special-dex-sheet
@@ -14119,6 +14145,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:var(--dm-text)!important;
   -webkit-text-fill-color:initial!important;
   opacity:1!important;
+}
+
+/* Supplement-Symbole im TRACKER stehen ohne Kachel direkt auf der Karte. */
+:root[data-theme="dark"][data-seite="reminders"] #app .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-emoji{
+  background:transparent!important;
+  background-color:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  color:#FFFFFF!important;
+}
+:root[data-theme="dark"][data-seite="reminders"] #app .meal-log-dex-page .mahl-zeitblock .rem-row[data-type="supplement"] .rem-row-emoji :is(
+  .reminder-svg,svg,svg *
+){
+  color:#FFFFFF!important;
+  fill:#FFFFFF!important;
+  filter:none!important;
 }
 :root[data-theme="dark"][data-seite] .dex-detail-overlay.dex-detail-overlay .dex-detail-popup.dex-detail-popup :is(
   .dex-detail-foodmeta>span,.dex-detail-tags span,.dex-detail-link.dex-detail-link,
