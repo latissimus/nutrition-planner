@@ -13778,3 +13778,189 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress i{
   background:#FFFFFF!important;
 }
+
+/* ============================================================
+   DARKMODE · mobile Screenshot-Abgleich mit LOGMAN
+   ============================================================ */
+
+/* Feste App-Schale: Der Header ist auf jeder Route Navy. TRACKER, ROUTINEN,
+   EINKAUF, SUPPS und PROFIL hatten über seitenspezifische Selektoren noch
+   --surface2 geerbt. */
+:root[data-theme="dark"][data-seite] .app-dex-header{
+  background:var(--bg)!important;
+  border-bottom-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+
+/* Exakt die LOGMAN-Leiste: halbtransparente #1E212A-Fläche, 6.65 px Blur,
+   1.25 Sättigung und LOGMAN-Kontur. Keine zusätzliche graue Deckfläche. */
+:root[data-theme="dark"][data-seite] .app-dex-dock::before{
+  background:linear-gradient(180deg,var(--bg) 0,color-mix(in srgb,var(--bg) 70%,transparent) 45%,transparent 100%)!important;
+}
+:root[data-theme="dark"][data-seite] .app-dex-dock::after{
+  background:var(--bg)!important;
+}
+:root[data-theme="dark"][data-seite] .app-dex-dock-inner::before{
+  background:rgba(30,33,42,.27)!important;
+  border:2px solid var(--dm-ink)!important;
+  -webkit-backdrop-filter:blur(6.65px) saturate(1.25)!important;
+  backdrop-filter:blur(6.65px) saturate(1.25)!important;
+}
+:root[data-theme="dark"][data-seite] .app-dex-tab{
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] .app-dex-tab small{
+  color:inherit!important;
+  opacity:.72;
+}
+:root[data-theme="dark"][data-seite] .app-dex-tab.aktiv{
+  background:rgba(255,255,255,.07)!important;
+  box-shadow:inset 0 0 0 1.5px #FFFFFF!important;
+}
+
+/* LOGMAN nutzt für Karten genau --surface. Heros, Kartenköpfe und
+   aufklappbare Zusammenfassungen bilden deshalb keine dritte Graustufe. */
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-coin-hero,.nutrition-coin-overview,.nutrition-card,.mahl-zeitblock,
+  .routine-hero,.routine-zeitblock,.routine-row-inhalt,
+  .body-v2-hero,.body-v2-overview,.body-v2-card,.body-v2-card-body,
+  .sleep-tonight,.sleep-checkin-overview,.sleep-section,
+  .coin-balance-card,.coin-verdienst,.coin-next,.coin-reward,.coin-empty,
+  .dex-inhaltskarte,.dex-detail-popup
+){
+  background-color:var(--dm-surface)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-coin-overview>summary,.mahl-zeitblock>header,
+  .routine-zeitblock>header,
+  .body-v2-overview>summary,.body-v2-card>header,
+  .sleep-checkin-overview>summary,.sleep-section>header,
+  .coin-verdienst>summary
+){
+  background-color:var(--dm-surface)!important;
+  border-color:var(--dm-ink)!important;
+  color:var(--dm-text)!important;
+}
+
+/* --surface2 bleibt ausschließlich der untergeordneten Informationsebene
+   vorbehalten: Messwerte, Metadaten, Eingaben und Bildplatzhalter. */
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-overview-macros>span,.nutrition-overview-target,
+  .body-metric-grid>span,.bodycomp-sources>span,.body-latest-value,
+  .sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,
+  .dex-inhaltskarte-vorschau,.dex-detail-herkunft,.dex-detail-foodmeta span,
+  .dex-detail-tags span
+){
+  background-color:var(--dm-surface2)!important;
+  border-color:var(--dm-ink)!important;
+}
+
+/* Primärtexte sind weiß. Nur echte Zusatzinformationen bleiben im
+   LOGMAN-Muted-Grau. */
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-coin-hero,.routine-hero,.body-v2-hero,.sleep-tonight
+) :is(small,strong,b,span),
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-coin-overview,.mahl-zeitblock,.routine-zeitblock,
+  .body-v2-overview,.body-v2-card,.sleep-checkin-overview,.sleep-section,
+  .dex-inhaltskarte,.dex-detail-popup
+) :is(h1,h2,h3,strong),
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-coin-overview>summary,.mahl-zeitblock>header,
+  .routine-zeitblock>header,.body-v2-overview>summary,.body-v2-card>header,
+  .sleep-checkin-overview>summary,.sleep-section>header
+) b,
+:root[data-theme="dark"][data-seite="reminders"] :is(.rem-row-titel,.nutrition-entry) b,
+:root[data-theme="dark"][data-seite="reminders"] .nutrition-entry strong,
+:root[data-theme="dark"][data-seite="habits"] .routine-copy b,
+:root[data-theme="dark"][data-seite] .dex-inhaltskarte :is(.dex-inhaltskarte-text,b,strong){
+  color:var(--dm-text)!important;
+  -webkit-text-fill-color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] :is(
+  .nutrition-coin-overview,.mahl-zeitblock,.routine-zeitblock,
+  .body-v2-overview,.body-v2-card,.sleep-checkin-overview,.sleep-section,
+  .dex-inhaltskarte,.dex-detail-popup
+) :is(small,time,.muted),
+:root[data-theme="dark"][data-seite="reminders"] :is(.rem-row-titel,.nutrition-entry) small,
+:root[data-theme="dark"][data-seite="habits"] .routine-copy small{
+  color:var(--dm-muted)!important;
+  -webkit-text-fill-color:var(--dm-muted)!important;
+}
+
+/* Eintragsdetail: Mehr und Schließen liegen wie im hellen Layout direkt auf
+   der Karte. Die Punkte erhalten ihre eigene Füllung zurück. */
+:root[data-theme="dark"][data-seite] .dex-detail-popup>.dex-detail-card-actions :is(
+  .neo-dex-action-button,.food-dex-action-button
+){
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite] .dex-detail-popup>.dex-detail-card-actions :is(
+  .neo-dex-more-dots,.food-dex-more-dots
+) i{
+  display:block!important;
+  width:4px!important;
+  height:4px!important;
+  border-radius:50%!important;
+  background:var(--dm-text)!important;
+  opacity:1!important;
+}
+/* Die ältere generische i-Regel enthält mehrere :not()-Klassen und ist
+   unerwartet spezifisch. Der vollständige Aktionspfad stellt die drei Punkte
+   auch nach dieser Regel sicher. */
+:root[data-theme="dark"][data-seite] .dex-detail-overlay.dex-detail-overlay .dex-detail-popup.dex-detail-popup .dex-detail-card-actions .neo-dex-floating-actions .neo-dex-retro-menu .neo-dex-more-dots>i{
+  background-color:var(--dm-text)!important;
+}
+
+/* Harte Retro-Schatten verwenden im Darkmode dieselbe helle LOGMAN-Kontur
+   statt Schwarz oder eines seitenabhängigen Farbtons. */
+:root[data-theme="dark"] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
+)>button,
+:root[data-theme="dark"] :is(.dex-detail-foodmeta span,.dex-detail-tags span,.einkauf-tag-chip),
+:root[data-theme="dark"] .dex-detail-link,
+:root[data-theme="dark"] .wissenssuche-feld,
+:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt .btn,
+:root[data-theme="dark"][data-seite="profile"] .profile-ausloggen .btn,
+:root[data-theme="dark"][data-seite="body"] :is(.btn-primary,.ypsi-relations-overview>header>button,.ypsi-basis-form>button,.ypsi-open-questions>button,.ypsi-active-priority,.braverman-question>div>button){
+  box-shadow:0 3.5px 0 var(--dm-ink)!important;
+}
+:root[data-theme="dark"][data-seite] .dex-detail-overlay.dex-detail-overlay .dex-detail-popup.dex-detail-popup :is(
+  .dex-detail-foodmeta>span,.dex-detail-tags span,.dex-detail-link.dex-detail-link,
+  .neo-dex-action-popover,.food-dex-action-popover
+){
+  box-shadow:0 3.5px 0 var(--dm-ink)!important;
+}
+
+/* Primärwerte, die einzelne Seitenthemes noch explizit auf Muted setzen. */
+:root[data-theme="dark"][data-seite="sleep"] .sleep-section :is(h2,strong),
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(
+  .coin-verdienst strong,.coin-next>strong,.coin-reward-kopf>strong
+){
+  color:var(--dm-text)!important;
+  -webkit-text-fill-color:var(--dm-text)!important;
+}
+:root[data-theme="dark"][data-seite="sleep"] .sleep-log-dex-page.sleep-log-dex-page .sleep-section.sleep-section :is(h2,strong),
+:root[data-theme="dark"][data-seite="coins"] .coin-dex-page.coin-dex-page :is(
+  .coin-verdienst.coin-verdienst strong,
+  .coin-next.coin-next>strong,
+  .coin-reward.coin-reward .coin-reward-kopf>strong
+){
+  color:var(--dm-text)!important;
+  -webkit-text-fill-color:var(--dm-text)!important;
+}
+
+/* ESSEN und SUPPS vergeben den Filtern ihre Schatten mit einer zusätzlichen
+   Routen- und Wrapper-Spezifität. Dieselbe Form stellt LOGMAN-Grau sicher. */
+:root[data-theme="dark"][data-seite] [class*="dex-page"] :is(
+  .neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,
+  .supps-dex-filter,.stress-dex-filter
+)>button{
+  box-shadow:0 3.5px 0 var(--dm-ink)!important;
+}
