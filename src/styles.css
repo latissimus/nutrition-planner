@@ -1212,7 +1212,7 @@ label.fld-l,.falte span{font-family:var(--ui);color:var(--app-secondary)}
 
 /* Anmeldung und Recovery greifen das CAPCOIN-Violett auf. Formularflächen
    bleiben weiß und lesbar; das Laufband fährt als klare weiße Ebene ab. */
-:root[data-seite="auth"],:root[data-seite="auth"] body,:root[data-seite="auth"] #app{
+:root[data-seite="auth"],:root[data-seite="auth"] body,:root[data-seite="auth"] #view{
   background:#432C5E!important;
 }
 :root[data-seite="auth"] .auth-marquee{
@@ -11897,7 +11897,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* AUTH · exakt derselbe Hintergrund wie CAPCOINS, unabhängig vom Systemmodus */
 :root[data-seite="auth"],
 :root[data-seite="auth"] body,
-:root[data-seite="auth"] #app,
+:root[data-seite="auth"] #view,
 :root[data-seite="auth"] .auth-shell{
   background-color:#432C5E!important;
   background-image:none!important;
@@ -12776,7 +12776,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* --- Seitenfläche ----------------------------------------------------- */
 :root[data-theme="dark"],
 :root[data-theme="dark"] body,
-:root[data-theme="dark"] #app,
+:root[data-theme="dark"] #view,
 :root[data-theme="dark"] #view{
   background:var(--bg)!important;
 }
@@ -13704,9 +13704,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:var(--bg)!important;
 }
 
-/* Die Seiten-Tapeten verändern die wahrgenommene Grundfarbe. Im Darkmode
-   bleibt die Fläche deshalb ruhig und einheitlich wie bei LOGMAN. */
-:root[data-theme="dark"][data-seite] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before,
+/* Die gezeichneten Seiten-Tapeten (Pizza, Hantel...) veraendern die
+   wahrgenommene Grundfarbe und bleiben im Darkmode aus. An ihrer Stelle
+   liegt das Raster aus dem LOGMAN – es haengt an #app, siehe den Block
+   "Darkmode-Tapeten nach LOGMAN-Vorbild" am Dateiende. */
+:root[data-theme="dark"][data-seite] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before{
+  background:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  opacity:0!important;
+}
 :root[data-theme="dark"][data-seite] :is(
   .special-dex-page,.body-log-dex-page,.routine-dex-page,.shopping-dex-page,
   .sleep-dex-page,.sleep-log-dex-page,.meal-log-dex-page,.coin-dex-page,
@@ -14511,3 +14518,65 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Kurze Rückmeldung beim Antippen – wie zuvor beim MENÜ-Knopf. */
 .app-dex-tab.ist-gedrueckt{transform:translateY(1.5px)}
 .app-dex-tab.ist-gedrueckt>.app-dex-tab-punkte{opacity:1}
+
+/* ---------- Darkmode-Tapeten nach LOGMAN-Vorbild ---------------------- */
+/* Im Retromodus traegt jede Seite ihre gezeichnete Tapete (Pizza, Hantel...).
+   Im Darkmode war die Flaeche dagegen leer. Dort liegen jetzt dieselben
+   ruhigen Raster wie im LOGMAN: die kleinen Dreiecke und die organischen
+   Tropfen, dazu als drittes Quadrate im Mass der Dreiecke, damit sich nicht
+   ueberall dasselbe wiederholt.
+
+   Angebracht an #view: im Darkmode traegt es eine DECKENDE Grundfarbe
+   (gemessen rgb(16,26,43)) und verdeckt damit alles, was auf #app liegt.
+   Eine frueher gesetzte Regel ":root[data-seite] #view{background-image:none}"
+   wird durch die hoehere Gewichtung hier ueberstimmt.
+
+   Die Deckkraft steckt in der SVG selbst (fill-opacity), wie im LOGMAN. */
+:root[data-theme="dark"]{
+  --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.028'/%3E%3C/svg%3E");
+}
+
+/* Dreiecke */
+:root[data-theme="dark"][data-seite="reminders"] #view,
+:root[data-theme="dark"][data-seite="body"] #view,
+:root[data-theme="dark"][data-seite="supps"] #view,
+:root[data-theme="dark"][data-seite="profile"] #view,
+:root[data-theme="dark"][data-seite="coins"] #view,
+:root[data-theme="dark"][data-seite="search"] #view{
+  background-image:var(--muster-dreieck-dunkel)!important;
+  background-repeat:repeat!important;
+  background-attachment:fixed!important;
+}
+
+/* Tropfen. LOGMAN kachelt sie mit 112 px, dort ist die Flaeche aber offener.
+   In CAPBOY reichen die Karten fast bis an den Rand, sodass bei 112 px kaum
+   ein Motiv in den schmalen Streifen daneben faellt. 64 px behaelt ihren
+   Charakter und laesst sie dort ueberhaupt erscheinen. */
+:root[data-theme="dark"][data-seite="sleep"] #view,
+:root[data-theme="dark"][data-seite="shopping"] #view,
+:root[data-theme="dark"][data-seite="essen"] #view,
+:root[data-theme="dark"][data-seite="stress"] #view{
+  background-image:var(--muster-tropfen-dunkel)!important;
+  background-size:64px!important;
+  background-repeat:repeat!important;
+  background-attachment:fixed!important;
+}
+
+/* Quadrate */
+:root[data-theme="dark"][data-seite="habits"] #view,
+:root[data-theme="dark"][data-seite="food-log"] #view,
+:root[data-theme="dark"][data-seite="training"] #view{
+  background-image:var(--muster-quadrat-dunkel)!important;
+  background-repeat:repeat!important;
+  background-attachment:fixed!important;
+}
+
+/* SCHLAF und EINKAUF legen eine eigene Flaeche ueber #view – in exakt
+   derselben Farbe. Sie verdeckte dort das Muster, ohne optisch etwas
+   beizutragen. Transparent gesetzt sieht die Seite unveraendert aus und das
+   Raster kommt durch. Geprueft mit elementFromPoint: nur diese beiden von
+   zehn Seiten waren betroffen. */
+:root[data-theme="dark"][data-seite="sleep"] #view>.wrap,
+:root[data-theme="dark"][data-seite="shopping"] #view>.wrap{
+  background-color:transparent!important;
+}
