@@ -2196,6 +2196,10 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-zutat-remove{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--muted)}
 .dex-zutat-remove svg{width:18px;height:18px;fill:currentColor}
 .dex-zutat-add{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;margin-top:2px}
+.dex-zutat-aktionen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:2px}
+.dex-zutat-aktionen .dex-zutat-add{width:100%;margin-top:0;padding-inline:10px}
+.dex-zutat-aktionen .dex-zutat-add span{min-width:0}
+@media(max-width:430px){.dex-zutat-aktionen{grid-template-columns:1fr}}
 :root[data-seite="body"] .gew-eingabe{gap:9px;margin-top:14px}
 
 /* Einheitliche Felder und Hauptaktionen in allen drei System-DEX. */
@@ -14447,6 +14451,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:transparent!important;
   border-color:transparent!important;
   box-shadow:none!important;
+}
+
+/* Instagram liefert häufig hochformatige Reel-Cover. In der Detailkarte ist
+   das jedoch eine Vorschau, kein Vollbild: festes Querformat, genügend Abstand
+   unter Mehr/Schließen und eine begrenzte Höhe verhindern Überlagerungen. */
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>a.dex-detail-instagram-vorschau{
+  display:block!important;
+  aspect-ratio:16/9!important;
+  height:auto!important;
+  max-height:220px!important;
+  margin-top:64px!important;
+}
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup>a.dex-detail-instagram-vorschau img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
 }
 
 /* --- Lange Listen: Layout nur fuer Sichtbares ------------------------- */

@@ -758,12 +758,12 @@ async function recipeEditor({ userId, date, onSave }) {
   };
 }
 
-async function barcodeResult(barcode, { date, onSave }, closeCurrent) {
+async function barcodeResult(barcode, { date, onSave, ingredient = false }, closeCurrent) {
   toast('Produkt wird gesucht …');
   try {
     const product = (await productLookup('barcode', barcode)).product;
     if (!product) return toast('Barcode nicht gefunden. Du kannst das Produkt manuell eintragen.');
-    closeCurrent?.(); amountEditor({ product, date, onSave });
+    closeCurrent?.(); amountEditor({ product, date, onSave, ingredient });
   } catch { toast('Produktdaten konnten nicht geladen werden.'); }
 }
 
@@ -824,6 +824,18 @@ function scannerEditor(context) {
   }).catch((error) => {
     backdrop.querySelector('[data-scanner-status]')?.replaceChildren(document.createTextNode('Kamera nicht verfügbar'));
     toast(error?.name === 'NotAllowedError' ? 'Kamerazugriff wurde nicht erlaubt.' : 'Kamera nicht verfügbar. Barcode bitte manuell eingeben.');
+  });
+}
+
+// Derselbe Kamera-Scanner wie im TRACKER, aber mit dem Zutaten-Mengenlimit
+// und einer Rückgabe an den gerade geöffneten Rezepteditor.
+export function scanFoodIngredient(onPick) {
+  scannerEditor({
+    ingredient: true,
+    onSave: async (payload) => {
+      onPick(payload.product, payload.amount, payload.portion);
+      return true;
+    },
   });
 }
 

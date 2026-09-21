@@ -9,7 +9,7 @@ import { dexStoragePath } from './storagePaths.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
-import { pickFoodIngredient } from './nutrition.js';
+import { pickFoodIngredient, scanFoodIngredient } from './nutrition.js';
 import { noteEditorMarkup, mountNoteEditors, readNote, readNoteText, noteToText } from './richText.js';
 
 const BUCKET = 'dex-entries';
@@ -270,7 +270,10 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       </div>` : ''}
       ${foodMode && foodKind !== 'cheat_meal' ? `<div class="dex-entry-field dex-zutaten"><span>Zutaten <small>aus der Lebensmittel-Datenbank</small></span>
         <div class="dex-zutaten-liste" data-zutaten-liste></div>
-        <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('add')}<span>Zutat hinzufügen</span></button>
+        <div class="dex-zutat-aktionen">
+          <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('search')}<span>Zutat suchen</span></button>
+          <button type="button" class="btn dex-zutat-add" data-zutat-scan>${materialIconMarkup('photo_camera')}<span>Barcode scannen</span></button>
+        </div>
       </div>` : ''}
       ${classConfig ? `<label class="dex-entry-field" for="dex-entry-training-class"><span>${classConfig.fieldLabel}</span>
         <select id="dex-entry-training-class" class="input">
@@ -301,6 +304,7 @@ const stripPortionLabel = (label) => String(label || '').replace(/^\s*1\s+/, '')
 export function mountIngredientEditor(root, initial = []) {
   const list = root.querySelector('[data-zutaten-liste]');
   const addBtn = root.querySelector('[data-zutat-add]');
+  const scanBtn = root.querySelector('[data-zutat-scan]');
   if (!list || !addBtn) return { getItems: () => [] };
   const normPortions = (list) => (Array.isArray(list) ? list : [])
     .map(([label, grams]) => [String(label || ''), Number(grams) || 0])
@@ -337,7 +341,7 @@ export function mountIngredientEditor(root, initial = []) {
         <span class="dex-zutat-name">${escapeHtml(item.name)}</span>
         <button type="button" class="dex-zutat-remove" data-zutat-remove aria-label="Zutat entfernen">${materialIconMarkup('close')}</button>
         <div class="dex-zutat-controls">${controls(item)}</div>
-      </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Über „Zutat hinzufügen" ein Lebensmittel aus der Datenbank wählen.</p>';
+      </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Suche ein Lebensmittel oder scanne den Barcode.</p>';
   };
   // Menge (Anzahl bzw. Gramm) ändern – ohne Neurender, damit der Fokus bleibt.
   list.addEventListener('input', (event) => {
@@ -373,10 +377,9 @@ export function mountIngredientEditor(root, initial = []) {
     const index = Number(remove.closest('[data-zutat-index]')?.dataset.zutatIndex);
     if (index >= 0) { items.splice(index, 1); render(); }
   });
-  addBtn.addEventListener('click', () => {
-    // Auswahl über denselben Mengen-Dialog wie im Meal-Log; `portion` trägt die
-    // dort gewählte Einheit + Anzahl (z. B. 6 × Stück (Größe M)).
-    pickFoodIngredient((product, grams, portion) => {
+  // Suche und Scanner enden im selben Mengen-Dialog wie der Meal-Log;
+  // `portion` trägt die dort gewählte Einheit + Anzahl.
+  const addIngredient = (product, grams, portion) => {
       const portions = normPortions(product.portions);
       const total = Math.round(Number(grams)) || Math.round(Number(product.serving_g)) || portions[0]?.[1] || 100;
       items.push({
@@ -391,8 +394,9 @@ export function mountIngredientEditor(root, initial = []) {
         grams: total,
       });
       render();
-    });
-  });
+  };
+  addBtn.addEventListener('click', () => pickFoodIngredient(addIngredient));
+  scanBtn?.addEventListener('click', () => scanFoodIngredient(addIngredient));
   render();
   return {
     getItems: () => items.filter((it) => it.name && it.grams > 0).map((it) => ({
