@@ -1174,7 +1174,7 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '', { inlineTarget = 
     : habits
     ? `<p>Auf der Seite <b>ROUTINEN</b> planst du wiederkehrende Abläufe und hältst ihre Erledigung fest.</p><p>Die Übersicht zeigt dir, was heute ansteht und wie konstant du deine Routinen umsetzt.</p>`
     : stress
-    ? `<p>Auf der Seite <b>MIND</b> sammelst du <b>Motivation</b>, mentale Stärke und Strategien für den Umgang mit Stress.</p><p>Mit <b>Tags</b> und <b>Unterordnern</b> ordnest du Impulse, Belastungen, Auslöser und Entspannung so, dass du hilfreiche Muster schnell wiederfindest.</p>`
+    ? `<p>Auf der Seite <b>MIND</b> sammelst du <b>Motivation</b>, mentale Stärke und Strategien für den Umgang mit Stress.</p><p>Mit <b>eigenen Tags</b> und <b>Unterordnern</b> ordnest du deine Inhalte so, dass du hilfreiche Muster schnell wiederfindest.</p>`
     : coins
     ? `<p>Auf der Seite <b>CAPCOINS</b> sammelst du CAPCOINS für erledigte Routinen, Check-ins und Messungen.</p>
       <p>Du legst eigene Belohnungen und deren Preis fest. Sobald dein Kontostand reicht, kannst du eine Belohnung einlösen.</p>

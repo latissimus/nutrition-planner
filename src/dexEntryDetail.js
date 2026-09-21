@@ -30,9 +30,9 @@ const ESSEN_CLASSES = [
   ['meals', 'Mahlzeiten'], ['behavior', 'Verhalten'], ['studies', 'Studien'],
 ];
 const STRESS_CLASSES = [
-  ['unset', 'Nicht festgelegt'], ['impulses', 'Impulse'], ['strains', 'Belastungen'],
-  ['triggers', 'Auslöser'], ['relaxation', 'Entspannung'],
+  ['unset', 'Nicht festgelegt'], ['relaxation', 'Entspannung'],
 ];
+const LEGACY_STRESS_CLASSES = new Set(['impulses', 'strains', 'triggers']);
 
 function entryClassConfig(rootKey) {
   if (rootKey === 'training') return {
@@ -148,7 +148,8 @@ function backHref(entry) {
 export function editEntry(entry, onSaved, { onDeleted } = {}) {
   const ownRecipe = entry.root_key === 'food-log' && entry.entry_type === 'note' && entry.food_kind === 'recipe';
   const classConfig = entryClassConfig(entry.root_key);
-  const fixedEntryClass = classConfig?.definitions.some(([key]) => key === entry.training_class);
+  const legacyEntryClass = entry.root_key === 'stress' && LEGACY_STRESS_CLASSES.has(entry.training_class);
+  const fixedEntryClass = classConfig?.definitions.some(([key]) => key === entry.training_class) || legacyEntryClass;
   const backdrop = document.createElement('div');
   backdrop.className = 'kategorie-sheet-backdrop';
   backdrop.innerHTML = `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="Eintrag bearbeiten">
@@ -176,7 +177,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
         <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('add')}<span>Zutat hinzufügen</span></button>
       </div>` : ''}
       ${classConfig ? `<label class="dex-entry-field" for="edit-entry-training-class"><span>${classConfig.fieldLabel}</span><select id="edit-entry-training-class" class="input">
-        ${classConfig.definitions.map(([key, label]) => `<option value="${key}"${(entry.training_class || 'unset') === key ? ' selected' : ''}>${label}</option>`).join('')}
+        ${classConfig.definitions.map(([key, label]) => `<option value="${key}"${(legacyEntryClass ? 'unset' : (entry.training_class || 'unset')) === key ? ' selected' : ''}>${label}</option>`).join('')}
         <option value="custom"${entry.training_class && !fixedEntryClass ? ' selected' : ''}>${classConfig.customOptionLabel}</option>
       </select></label>
       <label class="dex-entry-field" for="edit-entry-training-class-custom" data-edit-training-class-custom${fixedEntryClass || !entry.training_class ? ' hidden' : ''}><span>${classConfig.customFieldLabel}</span>
@@ -364,6 +365,8 @@ function detailMarkup(entry, look) {
     ? `<div class="dex-detail-audio">${materialIconMarkup('mic')}<audio controls preload="metadata" src="${escapeHtml(entry.audio_url)}"></audio></div>`
     : entry.image_path && entry.preview_url
     ? `<button class="dex-detail-bild" type="button" data-fullscreen><img src="${escapeHtml(entry.preview_url)}" alt="${escapeHtml(entry.title)}"></button>`
+    : provider?.key === 'instagram' && entry.preview_url
+    ? `<a class="dex-detail-linkvorschau dex-detail-instagram-vorschau" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram-Beitrag öffnen"><img src="${escapeHtml(entry.preview_url)}" alt=""></a>`
     : embed ? `<div class="dex-detail-video${provider?.key === 'instagram' ? ' dex-detail-video-instagram' : ''}"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" scrolling="no" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
       : entry.preview_url ? `<div class="dex-detail-linkvorschau"><img src="${escapeHtml(entry.preview_url)}" alt=""></div>`
         : provider ? `<div class="dex-detail-provider"><strong>${escapeHtml(entry.provider || provider.name)}</strong><span>Vorschau dieses Videos</span></div>` : '';

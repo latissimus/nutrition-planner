@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { hole, schluessel } from './datenspeicher.js';
+import { hole, schluessel, verwerfen } from './datenspeicher.js';
 import {
   availableCategoryIcons, categoryColor, dexEditorColors, materialIconMarkup,
 } from './categoryIcons.js';
@@ -140,13 +140,15 @@ export async function saveCollection(userId, values, existing = null) {
       .eq('id', existing.id).select().single()
     : await query.insert(payload).select().single();
   if (error) throw error;
+  verwerfen(payload.root_key);
   return data;
 }
 
 export async function deleteCollection(userId, item) {
   const { error } = await supabase.from('collections').delete()
-    .eq('id', item.id);
+    .eq('id', item.id).eq('user_id', userId);
   if (error) throw error;
+  verwerfen(item.root_key);
 }
 
 function closeEditor(backdrop) {

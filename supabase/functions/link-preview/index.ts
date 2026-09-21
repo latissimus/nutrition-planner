@@ -32,6 +32,15 @@ function embeddedJsonString(html: string, key: string) {
   try { return JSON.parse(`"${match[1]}"`); } catch { return ''; }
 }
 
+function decodeHtmlEntities(value: unknown) {
+  return String(value || '')
+    .replace(/&#(\d+);/g, (_match, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([\da-f]+);/gi, (_match, code) => String.fromCodePoint(Number.parseInt(code, 16)))
+    .replace(/&(amp|quot|apos|lt|gt|nbsp);/gi, (_match, entity) => ({
+      amp: '&', quot: '"', apos: "'", lt: '<', gt: '>', nbsp: ' ',
+    }[String(entity).toLowerCase()] || _match));
+}
+
 function structuredMetadata(html: string, fallbackProvider = '') {
   const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   for (const script of scripts) {
@@ -123,8 +132,11 @@ async function instagramMetadata(url: URL) {
   const canonical = new URL(`https://www.instagram.com/${type}/${match[2]}/`);
   let api: Record<string, unknown> = {};
   try {
-    api = await oembed(`https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(canonical.href)}&omitscript=true`);
-  } catch { /* Instagram kann den anonymen oEmbed-Endpunkt sperren. */ }
+    /* Metas offizieller oEmbed-Endpunkt ist seit Juni 2026 fuer oeffentliche
+       Beitraege ohne Token nutzbar. thumbnail_url liefert er nicht mehr;
+       das Vorschaubild wird deshalb weiterhin aus der Embed-Seite gelesen. */
+    api = await oembed(`https://graph.facebook.com/v26.0/instagram_oembed?url=${encodeURIComponent(canonical.href)}&omitscript=true`);
+  } catch { /* Die Embed-Seite bleibt der Fallback. */ }
   let html = '';
   let embed: Record<string, unknown> = {};
   try {
@@ -154,9 +166,9 @@ async function instagramMetadata(url: URL) {
     ...page,
     ...embed,
     ...api,
-    title: String(api.title || embed.title || page.title || '').trim(),
-    description: String(api.description || api.title || embed.description || page.description || fallbackDescription || '').trim(),
-    thumbnail_url: String(api.thumbnail_url || embed.thumbnail_url || page.thumbnail_url || fallbackImage || '').trim(),
+    title: decodeHtmlEntities(api.title || embed.title || page.title || '').trim(),
+    description: decodeHtmlEntities(api.description || api.title || embed.description || page.description || fallbackDescription || '').trim(),
+    thumbnail_url: decodeHtmlEntities(api.thumbnail_url || embed.thumbnail_url || page.thumbnail_url || fallbackImage || '').trim(),
     provider_name: 'Instagram',
   };
 }
@@ -268,13 +280,13 @@ Deno.serve(async (request) => {
     else if (url.hostname.includes('instagram.com')) data = await instagramMetadata(url);
     else if (url.hostname.includes('vimeo.com')) data = await oembed(`https://vimeo.com/api/oembed.json?url=${encoded}`);
     else data = await pageMetadata(url);
-    const rawPreview = String(data.thumbnail_url || '');
+    const rawPreview = decodeHtmlEntities(data.thumbnail_url || '');
     let previewUrl = '';
     try { previewUrl = rawPreview ? new URL(rawPreview, url).href : ''; } catch { previewUrl = ''; }
     const stablePreview = await stablePreviewUrl(previewUrl);
     return json({
-      title: String(data.title || '').slice(0, 100),
-      description: String(data.description || data.author_name || '').slice(0, 500),
+      title: decodeHtmlEntities(data.title || '').slice(0, 100),
+      description: decodeHtmlEntities(data.description || data.author_name || '').slice(0, 500),
       previewUrl: stablePreview.slice(0, 2000),
       provider: String(data.provider_name || url.hostname.replace(/^www\./, '')).slice(0, 80),
       resolvedUrl: url.href.slice(0, 2000),

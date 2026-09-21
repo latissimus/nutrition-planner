@@ -137,14 +137,18 @@ describe('Vorschaubilder', () => {
 });
 
 describe('MIND-Themenleiste', () => {
-  it('zeigt die festen Themen oberhalb des Eintragsrasters', () => {
-    const markup = entryClassFiltersMarkup([], 'stress');
+  it('zeigt nur die weiterhin festen Themen oberhalb des Eintragsrasters', () => {
+    const markup = entryClassFiltersMarkup([
+      { training_class: 'impulses' },
+      { training_class: 'strains' },
+      { training_class: 'triggers' },
+    ], 'stress');
     expect(markup).toContain('aria-label="MIND filtern"');
     expect(markup).toContain('>Alle</button>');
-    expect(markup).toContain('>Impulse</button>');
-    expect(markup).toContain('>Belastungen</button>');
-    expect(markup).toContain('>Auslöser</button>');
     expect(markup).toContain('>Entspannung</button>');
+    expect(markup).not.toContain('>Impulse</button>');
+    expect(markup).not.toContain('>Belastungen</button>');
+    expect(markup).not.toContain('>Auslöser</button>');
   });
 
   it('ergänzt frei vergebene Tags als filterbare Chips', () => {
@@ -156,5 +160,17 @@ describe('MIND-Themenleiste', () => {
     expect(markup).toContain('data-entry-class-filter="tag:selbstwert"');
     expect(markup).toContain('>Selbstwert</button>');
     expect(filterEntriesByClass(entries, 'tag:selbstwert')).toEqual([entries[0]]);
+  });
+});
+
+describe('Instagram-Vorschau', () => {
+  it('verwendet das gespeicherte Vorschaubild auch für Reels', () => {
+    const markup = dexEntryOverviewMarkup({
+      id: 'instagram-1', entry_type: 'link', title: 'Reel',
+      url: 'https://www.instagram.com/reel/ABC123/',
+      preview_url: 'https://example.com/instagram.jpg', provider: 'Instagram',
+    });
+    expect(markup).toContain('https://example.com/instagram.jpg');
+    expect(markup).toContain('dex-video-vorschau');
   });
 });

@@ -38,9 +38,16 @@ const entryClassDefinitions = {
     ['meals', 'Mahlzeiten'], ['behavior', 'Verhalten'], ['studies', 'Studien'],
   ],
   stress: [
-    ['all', 'Alle'], ['impulses', 'Impulse'], ['strains', 'Belastungen'],
-    ['triggers', 'Auslöser'], ['relaxation', 'Entspannung'],
+    ['all', 'Alle'], ['relaxation', 'Entspannung'],
   ],
+};
+
+/* Diese drei früheren MIND-Themen werden nicht mehr angeboten. Alte
+   Einträge dürfen sie auch nicht versehentlich als "eigene Themen" wieder
+   in die Filterleiste bringen. Die Einträge selbst bleiben unter "Alle"
+   erhalten und können beim nächsten Bearbeiten neu einsortiert werden. */
+const hiddenLegacyEntryClasses = {
+  stress: new Set(['impulses', 'strains', 'triggers']),
 };
 
 function entryClassConfig(rootKey) {
@@ -111,8 +118,13 @@ async function signiereVorschau(pfad) {
 const ABLAGE_OEFFENTLICH = `${import.meta.env.VITE_SUPABASE_URL || ''}/storage/v1/object/public/`;
 
 export function oeffentlichVerkleinert(url, masse = VORSCHAU_MASSE) {
-  if (!url || !import.meta.env.VITE_SUPABASE_URL || !url.startsWith(ABLAGE_OEFFENTLICH)) return url;
-  const pfad = url.slice(ABLAGE_OEFFENTLICH.length).split('?')[0];
+  if (!url) return url;
+  /* Instagram schreibt Query-Trenner in seinen Embed-Metadaten als &amp;.
+     Aeltere gespeicherte Vorschauen werden dadurch sofort wieder nutzbar;
+     neue werden bereits in der Edge Function bereinigt und lokal gespiegelt. */
+  const normalizedUrl = String(url).replaceAll('&amp;', '&').replaceAll('&#38;', '&').replaceAll('&#x26;', '&');
+  if (!import.meta.env.VITE_SUPABASE_URL || !normalizedUrl.startsWith(ABLAGE_OEFFENTLICH)) return normalizedUrl;
+  const pfad = normalizedUrl.slice(ABLAGE_OEFFENTLICH.length).split('?')[0];
   const { width, height, resize, quality } = masse;
   return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/render/image/public/${pfad}`
     + `?width=${width}&height=${height}&resize=${resize}&quality=${quality}`;
@@ -211,7 +223,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
   const tagsPlaceholder = rootKey === 'supps'
     ? 'z. B. Kreatin, Dosierung, Studie'
     : rootKey === 'essen' ? 'z. B. Protein, Sättigung, Studie'
-      : rootKey === 'stress' ? 'z. B. Fokus, Auslöser, Entspannung' : 'z. B. Protein, Low Carb, Schnell';
+      : rootKey === 'stress' ? 'z. B. Fokus, Selbstwert, Entspannung' : 'z. B. Protein, Low Carb, Schnell';
   const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -684,7 +696,7 @@ function youtubeThumbnail(value) {
 }
 
 function providerPreview(entry, provider, playable) {
-  const thumbnail = provider?.key === 'youtube' ? youtubeThumbnail(entry.url) : '';
+  const thumbnail = entry.preview_url || (provider?.key === 'youtube' ? youtubeThumbnail(entry.url) : '');
   if (thumbnail) return `<span class="dex-inhaltskarte-vorschau hat-vorschaubild dex-video-vorschau"><img src="${thumbnail}" alt="" loading="lazy" decoding="async">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}</span>`;
   return `<span class="dex-inhaltskarte-vorschau dex-provider-vorschau dex-provider-${provider?.key || 'link'}">${playable ? `<i>${materialIconMarkup('play_arrow')}</i>` : ''}<b>${escapeHtml(provider?.name || sourceFromUrl(entry.url))}</b></span>`;
 }
@@ -757,10 +769,11 @@ export function entryClassFiltersMarkup(entries, rootKey, active = 'all') {
   const config = entryClassConfig(rootKey);
   if (!config) return '';
   const fixed = new Set(config.definitions.map(([key]) => key));
+  const hiddenLegacy = hiddenLegacyEntryClasses[rootKey] || new Set();
   const custom = [];
   entries.forEach((entry) => {
     const value = String(entry.training_class || '').trim();
-    if (!value || value === 'unset' || fixed.has(value)) return;
+    if (!value || value === 'unset' || fixed.has(value) || hiddenLegacy.has(value)) return;
     if (!custom.some((item) => item.toLocaleLowerCase('de') === value.toLocaleLowerCase('de'))) custom.push(value);
   });
   const topicDefinitions = [...config.definitions, ...custom.sort((a, b) => a.localeCompare(b, 'de')).map((label) => [label, label])];
