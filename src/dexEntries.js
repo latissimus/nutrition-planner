@@ -763,13 +763,32 @@ export function entryClassFiltersMarkup(entries, rootKey, active = 'all') {
     if (!value || value === 'unset' || fixed.has(value)) return;
     if (!custom.some((item) => item.toLocaleLowerCase('de') === value.toLocaleLowerCase('de'))) custom.push(value);
   });
-  const definitions = [...config.definitions, ...custom.sort((a, b) => a.localeCompare(b, 'de')).map((label) => [label, label])];
+  const topicDefinitions = [...config.definitions, ...custom.sort((a, b) => a.localeCompare(b, 'de')).map((label) => [label, label])];
+  const occupiedLabels = new Set(topicDefinitions.map(([, label]) => String(label).normalize('NFC').toLocaleLowerCase('de')));
+  const ownTags = rootKey === 'stress' ? entries.reduce((tags, entry) => {
+    (Array.isArray(entry.tags) ? entry.tags : []).forEach((rawTag) => {
+      const tag = String(rawTag || '').trim();
+      const normalized = tag.normalize('NFC').toLocaleLowerCase('de');
+      if (!tag || occupiedLabels.has(normalized) || tags.has(normalized)) return;
+      tags.set(normalized, tag);
+    });
+    return tags;
+  }, new Map()) : new Map();
+  const tagDefinitions = [...ownTags.entries()]
+    .sort(([, a], [, b]) => a.localeCompare(b, 'de'))
+    .map(([normalized, label]) => [`tag:${normalized}`, label]);
+  const definitions = [...topicDefinitions, ...tagDefinitions];
   return `<nav class="neo-dex-filter food-dex-filter entry-class-filter ${rootKey}-dex-filter" aria-label="${config.filterLabel}">${definitions.map(([key, label]) =>
     `<button type="button" data-entry-class-filter="${escapeHtml(key)}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${escapeHtml(label)}</button>`).join('')}</nav>`;
 }
 
-function filterEntriesByClass(entries, filter) {
+export function filterEntriesByClass(entries, filter) {
   if (filter === 'all') return entries;
+  if (filter.startsWith('tag:')) {
+    const selectedTag = filter.slice(4).normalize('NFC').toLocaleLowerCase('de');
+    return entries.filter((entry) => (Array.isArray(entry.tags) ? entry.tags : [])
+      .some((tag) => String(tag || '').trim().normalize('NFC').toLocaleLowerCase('de') === selectedTag));
+  }
   return entries.filter((entry) => String(entry.training_class || '').toLocaleLowerCase('de') === filter.toLocaleLowerCase('de'));
 }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  dexEntryOverviewMarkup, entryClassFiltersMarkup, isTikTokPhotoPost,
+  dexEntryOverviewMarkup, entryClassFiltersMarkup, filterEntriesByClass, isTikTokPhotoPost,
   normalizeDexUrl, videoEmbedUrl, videoProvider,
 } from './dexEntries.js';
 import { categoryColor, colorIsDark, pageLook } from './categoryIcons.js';
@@ -145,5 +145,16 @@ describe('MIND-Themenleiste', () => {
     expect(markup).toContain('>Belastungen</button>');
     expect(markup).toContain('>Auslöser</button>');
     expect(markup).toContain('>Entspannung</button>');
+  });
+
+  it('ergänzt frei vergebene Tags als filterbare Chips', () => {
+    const entries = [
+      { id: 'eins', training_class: 'impulses', tags: ['Selbstwert', 'Fokus'] },
+      { id: 'zwei', training_class: 'relaxation', tags: ['Atmung'] },
+    ];
+    const markup = entryClassFiltersMarkup(entries, 'stress');
+    expect(markup).toContain('data-entry-class-filter="tag:selbstwert"');
+    expect(markup).toContain('>Selbstwert</button>');
+    expect(filterEntriesByClass(entries, 'tag:selbstwert')).toEqual([entries[0]]);
   });
 });
