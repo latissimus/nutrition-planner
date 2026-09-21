@@ -29,6 +29,10 @@ const ESSEN_CLASSES = [
   ['unset', 'Nicht festgelegt'], ['nutrition', 'Ernährung'], ['foods', 'Lebensmittel'],
   ['meals', 'Mahlzeiten'], ['behavior', 'Verhalten'], ['studies', 'Studien'],
 ];
+const STRESS_CLASSES = [
+  ['unset', 'Nicht festgelegt'], ['impulses', 'Impulse'], ['strains', 'Belastungen'],
+  ['triggers', 'Auslöser'], ['relaxation', 'Entspannung'],
+];
 
 function entryClassConfig(rootKey) {
   if (rootKey === 'training') return {
@@ -53,6 +57,14 @@ function entryClassConfig(rootKey) {
     customOptionLabel: 'Eigenes Thema …',
     customFieldLabel: 'Eigenes Thema',
     customPlaceholder: 'z. B. Evidenz',
+    customError: 'Bitte ein eigenes Thema benennen.',
+  };
+  if (rootKey === 'stress') return {
+    definitions: STRESS_CLASSES,
+    fieldLabel: 'Thema',
+    customOptionLabel: 'Eigenes Thema …',
+    customFieldLabel: 'Eigenes Thema',
+    customPlaceholder: 'z. B. Resilienz',
     customError: 'Bitte ein eigenes Thema benennen.',
   };
   return null;

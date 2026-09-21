@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { dexEntryOverviewMarkup, isTikTokPhotoPost, normalizeDexUrl, videoEmbedUrl, videoProvider } from './dexEntries.js';
+import {
+  dexEntryOverviewMarkup, entryClassFiltersMarkup, isTikTokPhotoPost,
+  normalizeDexUrl, videoEmbedUrl, videoProvider,
+} from './dexEntries.js';
 import { categoryColor, colorIsDark, pageLook } from './categoryIcons.js';
 
 describe('normalizeDexUrl', () => {
@@ -130,5 +133,17 @@ describe('Vorschaubilder', () => {
     });
     expect(markup).not.toContain('dex-foto-post-vorschau');
     expect(markup).toContain('dex-artikel-vorschau');
+  });
+});
+
+describe('MIND-Themenleiste', () => {
+  it('zeigt die festen Themen oberhalb des Eintragsrasters', () => {
+    const markup = entryClassFiltersMarkup([], 'stress');
+    expect(markup).toContain('aria-label="MIND filtern"');
+    expect(markup).toContain('>Alle</button>');
+    expect(markup).toContain('>Impulse</button>');
+    expect(markup).toContain('>Belastungen</button>');
+    expect(markup).toContain('>Auslöser</button>');
+    expect(markup).toContain('>Entspannung</button>');
   });
 });

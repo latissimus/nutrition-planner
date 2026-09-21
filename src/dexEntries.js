@@ -37,13 +37,17 @@ const entryClassDefinitions = {
     ['all', 'Alle'], ['nutrition', 'Ernährung'], ['foods', 'Lebensmittel'],
     ['meals', 'Mahlzeiten'], ['behavior', 'Verhalten'], ['studies', 'Studien'],
   ],
+  stress: [
+    ['all', 'Alle'], ['impulses', 'Impulse'], ['strains', 'Belastungen'],
+    ['triggers', 'Auslöser'], ['relaxation', 'Entspannung'],
+  ],
 };
 
 function entryClassConfig(rootKey) {
   const definitions = entryClassDefinitions[rootKey];
   if (!definitions) return null;
   const training = rootKey === 'training';
-  const pageName = { training: 'Training', supps: 'SUPPS', essen: 'ESSEN' }[rootKey];
+  const pageName = { training: 'Training', supps: 'SUPPS', essen: 'ESSEN', stress: 'MIND' }[rootKey];
   return {
     definitions,
     fieldLabel: training ? 'Training-Klasse' : 'Thema',
@@ -202,10 +206,12 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
   const classConfig = entryClassConfig(rootKey);
   const titlePlaceholder = rootKey === 'supps'
     ? 'z. B. Kreatin: Einnahme und Wirkung'
-    : rootKey === 'essen' ? 'z. B. Warum Protein beim Frühstück hilft' : 'z. B. Schnelles Protein-Frühstück';
+    : rootKey === 'essen' ? 'z. B. Warum Protein beim Frühstück hilft'
+      : rootKey === 'stress' ? 'z. B. Was mir in Drucksituationen hilft' : 'z. B. Schnelles Protein-Frühstück';
   const tagsPlaceholder = rootKey === 'supps'
     ? 'z. B. Kreatin, Dosierung, Studie'
-    : rootKey === 'essen' ? 'z. B. Protein, Sättigung, Studie' : 'z. B. Protein, Low Carb, Schnell';
+    : rootKey === 'essen' ? 'z. B. Protein, Sättigung, Studie'
+      : rootKey === 'stress' ? 'z. B. Fokus, Auslöser, Entspannung' : 'z. B. Protein, Low Carb, Schnell';
   const label = entryLabel || (cheatMeal ? 'Cheat-Meal' : foodMode && note ? 'Eigenes Rezept' : foodMode && image ? 'Rezeptbild' : foodMode ? 'Rezeptlink' : routine ? 'Routine' : audio ? 'Tonaufnahme' : image ? 'Bild' : note ? 'Notiz' : 'Link');
   return `<section class="kategorie-sheet dex-entry-editor" role="dialog" aria-modal="true" aria-label="${label} hinzufügen">
     <header><h2>${label} hinzufügen</h2><button type="button" data-sheet-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
@@ -573,9 +579,9 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
         food_kind: foodMode ? (foodKind || 'recipe') : null,
         carb_class: foodMode ? form.querySelector('#dex-entry-carb').value : null,
-        // Das bestehende Datenbankfeld speichert die Klassifikation beider
-        // Wissensseiten. So bleibt die Remote-Struktur kompatibel, während
-        // TRAINING und SUPPS jeweils ihre eigenen sichtbaren Themen haben.
+        // Das bestehende Datenbankfeld speichert die einwertige Klassifikation
+        // der Wissensseiten. So bleibt die Remote-Struktur kompatibel, während
+        // jede Seite ihre eigenen sichtbaren Themen haben kann.
         training_class: selectedEntryClass,
         prep_minutes: foodMode && form.querySelector('#dex-entry-prep').value
           ? Number(form.querySelector('#dex-entry-prep').value) : null,
@@ -747,7 +753,7 @@ function foodFiltersMarkup(active = 'all') {
     `<button type="button" data-food-filter="${key}" class="${key === active ? 'aktiv' : ''}" aria-pressed="${key === active}">${label}</button>`).join('')}</nav>`;
 }
 
-function entryClassFiltersMarkup(entries, rootKey, active = 'all') {
+export function entryClassFiltersMarkup(entries, rootKey, active = 'all') {
   const config = entryClassConfig(rootKey);
   if (!config) return '';
   const fixed = new Set(config.definitions.map(([key]) => key));
