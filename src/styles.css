@@ -14611,6 +14611,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-sammlungskopf-zurueck{
   display:grid;
   place-items:center;
+  /* Der Kopf verteilt seine drei Teile mit space-between – der Pfeil landete
+     dadurch frei in der Mitte. margin-left:auto schiebt ihn ans rechte Ende,
+     der negative Rand rueckt ihn dicht an den Info-Knopf (16px Abstand des
+     Kopfes minus 6px). Der Abstand zum Titel bleibt unveraendert. */
+  margin-left:auto;
+  margin-right:-6px;
   text-decoration:none;
 }
 /* Nur der Container wird gespiegelt. Spiegelt man zusaetzlich das SVG,

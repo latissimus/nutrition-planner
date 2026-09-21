@@ -318,8 +318,8 @@ const geladeneProduktbilder = new Set();
 /* Laedt die Produktbilder abseits der Darstellung und tauscht sie erst dann
    gegen das Symbol – statt einen <img>-Kasten leer stehen zu lassen,
    solange die fremde Quelle nicht antwortet. Kommt nichts, bleibt das Symbol. */
-function produktbilderNachziehen(wurzel) {
-  wurzel?.querySelectorAll?.('.nutrition-entry-icon[data-bild]').forEach((halter) => {
+function produktbilderNachziehen(wurzel, auswahl = '.nutrition-entry-icon[data-bild]', bildKlasse = 'nutrition-entry-bild') {
+  wurzel?.querySelectorAll?.(auswahl).forEach((halter) => {
     const url = halter.dataset.bild;
     delete halter.dataset.bild;             // je Darstellung nur ein Versuch
     const probe = new Image();
@@ -328,7 +328,7 @@ function produktbilderNachziehen(wurzel) {
       geladeneProduktbilder.add(url);
       if (!halter.isConnected) return;
       const bild = document.createElement('img');
-      bild.className = 'nutrition-entry-bild';
+      bild.className = bildKlasse;
       bild.alt = '';
       bild.decoding = 'async';
       bild.src = url;                        // aus dem Zwischenspeicher: sofort da
@@ -614,11 +614,19 @@ function foodSearchOverlay({ title = 'Lebensmittel suchen', onPick }) {
         gesehen.add(key);
         return true;
       }).slice(0, 20);
-      results.innerHTML = products.length ? products.map((product, index) => `<button type="button" data-product-index="${index}">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${index < 2 ? ' fetchpriority="high"' : ''}>` : `<span class="nutrition-food-platzhalter">${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigenes Lebensmittel“.</p>';
-      results.querySelectorAll('img').forEach((image) => {
-        const reveal = () => image.classList.add('ist-geladen');
-        if (image.complete) reveal(); else image.addEventListener('load', reveal, { once: true });
-      });
+      /* Wie im Tagesprotokoll: Bis ein Produktbild wirklich geladen ist, steht
+         das Symbol an seiner Stelle. Vorher stand hier ein <img>, das bei
+         ausbleibender Antwort als blasser grauer Kasten liegen blieb – bei
+         20 Treffern also 20 leere Kaesten. */
+      results.innerHTML = products.length ? products.map((product, index) => {
+        const bild = product.image_url;
+        const schonGeladen = Boolean(bild) && geladeneProduktbilder.has(bild);
+        const vorschau = schonGeladen
+          ? `<img class="ist-geladen" src="${escapeHtml(bild)}" alt="" decoding="async">`
+          : `<span class="nutrition-food-platzhalter"${bild ? ` data-bild="${escapeHtml(bild)}"` : ''}>${materialIconMarkup('Lebensmittel', 'nutrition-food-icon')}</span>`;
+        return `<button type="button" data-product-index="${index}">${vorschau}<div><b>${escapeHtml(product.name)}</b><small>${escapeHtml(product.brand || '')}</small></div><strong>${decimal(product.kcal_100g)} kcal</strong></button>`;
+      }).join('') : '<p>Kein passendes Produkt gefunden. Nutze „Eigenes Lebensmittel“.</p>';
+      produktbilderNachziehen(results, '[data-bild]', 'ist-geladen');
     } catch { results.innerHTML = '<p>Produktsuche gerade nicht erreichbar.</p>'; }
     finally { streamingSound?.stop?.(); }
   };
