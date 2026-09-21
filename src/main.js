@@ -1100,19 +1100,29 @@ function gridCollectionMetaText(entries = 0, folders = 0) {
   return `${entries} ${entryLabel} · ${folders} ${folderLabel}`;
 }
 
-function gridCollectionMastheadMarkup(title, folders = 0) {
+/* mitMenue: Seiten, die im Menüband KEINEN eigenen Reiter haben – das sind
+   die Unterordner. Auf allen anderen öffnet der zweite Tipp auf den eigenen
+   Reiter das Menü; hier gäbe es sonst gar keinen Weg dorthin, weil ein Tipp
+   auf einen fremden Reiter wegnavigiert. */
+function gridCollectionMastheadMarkup(title, folders = 0, mitMenue = false) {
   return `<section class="dex-sammlungskopf" data-grid-collection-header>
     <div class="dex-sammlungskopf-text">
       <span>Wissenssammlung</span>
       <h1>${escapeHtml(title)}</h1>
       <small data-grid-collection-meta>${gridCollectionMetaText(0, folders)}</small>
     </div>
+    ${mitMenue ? `<button class="som-info-knopf dex-sammlungskopf-menue" type="button" data-grid-collection-menu aria-label="Menü für ${escapeHtml(title)} öffnen"><span class="app-dex-tab-punkte" aria-hidden="true"></span></button>` : ''}
     <button class="som-info-knopf" type="button" data-grid-collection-info aria-expanded="false" aria-controls="grid-collection-info-help" aria-label="Info zur Sammlung">i</button>
   </section>
   <div class="som-kurzhilfe nutrition-calibration-help grid-collection-info-help" id="grid-collection-info-help" data-grid-collection-info-help hidden></div>`;
 }
 
 function mountGridCollectionMasthead(root, { infoKind, title }) {
+  /* Derselbe Aufruf wie beim Reiter: der (unsichtbare) Kategoriekopf traegt
+     die Menue-Aktion der Seite. */
+  root.querySelector('[data-grid-collection-menu]')?.addEventListener('click', () => {
+    root.querySelector('.kategorie-plus')?.click();
+  });
   const button = root.querySelector('[data-grid-collection-info]');
   const help = root.querySelector('[data-grid-collection-info-help]');
   button?.addEventListener('click', () => {
@@ -1265,7 +1275,7 @@ async function mountCustomCollection(container, item, signal) {
     container.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(inheritedColor));
   }
   const collectionTitleMarkup = gridDexSkin
-    ? gridCollectionMastheadMarkup(item.name, children.length)
+    ? gridCollectionMastheadMarkup(item.name, children.length, true)
     : neoDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     ${collectionTitleMarkup}
@@ -1438,7 +1448,23 @@ async function renderRoute() {
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
   const vorherigeSeite = document.documentElement.dataset.seite || '';
-  if (richtung === 'gleich') vorherigerController?.abort();
+  /* Ein Neuaufbau DERSELBEN Route ist immer ein Auffrischen nach einer
+     Eingabe: die Speicherpfade rufen dafür refresh(), das ein hashchange auf
+     denselben Hash streut. Ohne diese Zeile bediente der Sitzungsspeicher den
+     Neuaufbau aus seinem alten Stand – neu angelegte Mahlzeiten oder
+     Unterordner erschienen dann erst nach einem Neustart der App. */
+  if (richtung === 'gleich') {
+    if (route.startsWith('collection/')) {
+      /* Der Bereich eines Unterordners steckt in seinem rootKey, der hier
+         noch nicht bekannt ist. Deshalb alles verwerfen – und den Vorlauf
+         wieder zulassen, sonst bliebe der Speicher danach leer. */
+      datenspeicher.leeren();
+      dexDatenErneutVorladen();
+    } else {
+      datenspeicher.verwerfen(route);
+    }
+    vorherigerController?.abort();
+  }
   routeAbortController = new AbortController();
   const { signal } = routeAbortController;
   // Wie beim LOGMAN werden Seiten ohne Slide, Fade oder Gegenbewegung

@@ -2,7 +2,7 @@ import { supabase } from './supabase.js';
 import { hole, schluessel } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { materialIconMarkup, pageLook } from './categoryIcons.js';
-import { subscribeToTablesChanges } from './realtime.js';
+import { notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
 import { blsSuche, preloadBls } from './blsFoods.js';
@@ -49,8 +49,8 @@ function total(entries, field) { return entries.reduce((sum, item) => sum + numb
 /* Die Tagesansicht baut sich stufenweise auf: erst der Kern, dann die
    Kalibrierung. Beide werden deshalb EINZELN gehalten – eine Huelle um den
    Gesamtaufruf wuerde den Mount-Pfad nicht erreichen. */
-async function loadNutritionCore(userId, date) {
-  return hole(schluessel('reminders', 'ernaehrung-kern', date), () => ladeKern(userId, date));
+async function loadNutritionCore(userId, date, frisch = false) {
+  return hole(schluessel('reminders', 'ernaehrung-kern', date), () => ladeKern(userId, date), { frisch });
 }
 
 async function ladeKern(userId, date) {
@@ -81,8 +81,8 @@ async function ladeKern(userId, date) {
   };
 }
 
-async function loadNutritionCalibration(userId, date) {
-  return hole(schluessel('reminders', 'ernaehrung-kalibrierung', date), () => ladeKalibrierung(userId, date));
+async function loadNutritionCalibration(userId, date, frisch = false) {
+  return hole(schluessel('reminders', 'ernaehrung-kalibrierung', date), () => ladeKalibrierung(userId, date), { frisch });
 }
 
 async function ladeKalibrierung(userId, date) {
@@ -135,10 +135,10 @@ async function ladeKalibrierung(userId, date) {
 }
 
 /* Der Tageszustand haengt am Datum – deshalb steht es im Schluessel. */
-async function loadNutrition(userId, date) {
+async function loadNutrition(userId, date, frisch = false) {
   const [core, calibration] = await Promise.all([
-    loadNutritionCore(userId, date),
-    loadNutritionCalibration(userId, date),
+    loadNutritionCore(userId, date, frisch),
+    loadNutritionCalibration(userId, date, frisch),
   ]);
   const juengste = calibration.weights[calibration.weights.length - 1];
   return { ...core, ...calibration, latestWeight: number(juengste?.kg) };
@@ -858,7 +858,11 @@ export async function mountNutrition(container, { userId, signal }) {
   let refreshPending = false;
   const runRefresh = async () => {
     const version = ++refreshVersion;
-    const nextState = await loadNutrition(userId, date);
+    /* Bewusst am Sitzungsspeicher vorbei: runRefresh laeuft nur nach einer
+       Eingabe oder einem Tageswechsel. Ohne das lieferte der Speicher den
+       Stand von vor dem Eintrag – neu Gegessenes erschien erst nach einem
+       Neustart der App. */
+    const nextState = await loadNutrition(userId, date, true);
     if (signal?.aborted || version !== refreshVersion) return;
     state = nextState;
     render();
@@ -922,6 +926,9 @@ export async function mountNutrition(container, { userId, signal }) {
       if (error) throw error;
       playInterfaceSound('bonus', { retrigger: 'restart' });
       toast(payload.id ? 'Mahlzeit aktualisiert' : 'Kalorien eingetragen');
+      /* Verwirft auch die gemerkte Ansicht dieser Seite: ohne das zeigte der
+         Rueckweg aus einer anderen Seite den Stand vor dem Eintrag. */
+      notifyHomeCountsChanged('reminders');
       await refresh(); return true;
     } catch (error) { toast(error.message || 'Eintrag konnte nicht gespeichert werden'); return false; }
   };

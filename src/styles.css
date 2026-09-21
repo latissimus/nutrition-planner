@@ -14580,3 +14580,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="shopping"] #view>.wrap{
   background-color:transparent!important;
 }
+
+/* Menü-Knopf im Kopf einer Unterordner-Seite. Dieselben drei Punkte wie am
+   Reiter, hier aber mittig im runden Knopf statt oben angeheftet – die
+   Reiter-Regel greift über ".app-dex-tab>" und trifft ihn nicht. */
+.dex-sammlungskopf-menue{
+  display:grid;
+  place-items:center;
+}
+.dex-sammlungskopf-menue>.app-dex-tab-punkte{
+  position:static;
+  display:block;
+  width:18px;
+  height:4px;
+  transform:none;
+  pointer-events:none;
+  background:
+    radial-gradient(circle, currentColor 48%, transparent 54%) 0 50%/4px 4px no-repeat,
+    radial-gradient(circle, currentColor 48%, transparent 54%) 50% 50%/4px 4px no-repeat,
+    radial-gradient(circle, currentColor 48%, transparent 54%) 100% 50%/4px 4px no-repeat;
+  opacity:.85;
+}
