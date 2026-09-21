@@ -809,6 +809,12 @@ export async function mountShoppingList(container, { session, signal }) {
     const tagsSlot = container.querySelector('[data-einkauf-tags-slot]');
     if (tagsSlot) tagsSlot.innerHTML = tagLeiste(items, filter.activeTag);
 
+    zaehlerAktualisieren();
+  }
+
+  /* Statuszeile, Zuruecksetzen-Knopf und der Filterknopf haengen nur an der
+     Anzahl der Haken – sie werden von beiden Wegen gebraucht. */
+  function zaehlerAktualisieren() {
     const checkedCount = items.filter((item) => item.checked).length;
     const status = container.querySelector('[data-einkauf-status]');
     if (status) status.textContent = `${checkedCount} ausgewählt`;
@@ -823,6 +829,28 @@ export async function mountShoppingList(container, { session, signal }) {
       nurButton.setAttribute('aria-pressed', String(filter.nurAusgewaehlt));
       nurButton.textContent = filter.nurAusgewaehlt ? 'Alle anzeigen' : 'Nur Ausgewählte';
     }
+  }
+
+  /* Beim Abhaken genuegt die eine Zeile. Ein voller redraw() ersetzt alle
+     Abteilungen mit saemtlichen Zeilen auf einmal und haengt jede Geste neu
+     ein – das sah man als kurzes Flackern. Liefert false, wenn die Zeile
+     nicht gefunden wurde; dann faellt der Aufrufer auf redraw() zurueck. */
+  function zeileAktualisieren(id) {
+    const row = container.querySelector(`.einkauf-row[data-item-id="${id}"]`);
+    const item = items.find((eintrag) => eintrag.id === id);
+    if (!row || !item) return false;
+    row.classList.toggle('ist-ausgewaehlt', Boolean(item.checked));
+    const gruppe = row.closest('.einkauf-gruppe');
+    const zaehler = gruppe?.querySelector('.reminder-group-head em');
+    if (gruppe && zaehler) {
+      // Dieselbe Grundlage wie beim Aufbau: gezaehlt wird, was sichtbar ist.
+      const sichtbar = sichtbareItems(
+        items.filter((eintrag) => eintrag.section === gruppe.dataset.section), filter,
+      );
+      zaehler.textContent = `${sichtbar.filter((eintrag) => eintrag.checked).length}/${sichtbar.length}`;
+    }
+    zaehlerAktualisieren();
+    return true;
   }
 
   try {
@@ -871,7 +899,9 @@ export async function mountShoppingList(container, { session, signal }) {
     try {
       await toggleItem(userId, id, item.checked);
       playInterfaceSound(item.checked ? 'check' : 'uncheck');
-      redraw();
+      // Bei aktivem "Nur Ausgewaehlte" aendert der Haken die Sichtbarkeit –
+      // dann muss die Liste wirklich neu gebaut werden.
+      if (filter.nurAusgewaehlt || !zeileAktualisieren(id)) redraw();
     } catch (error) {
       item.checked = zuvor;
       redraw();

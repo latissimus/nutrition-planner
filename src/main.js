@@ -793,7 +793,7 @@ function appDexShellZeichnen(route, view) {
      Punkte als Hinweis. */
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
-      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
+      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute, route === aktiveDockRoute)}</div>
     </div>`;
   appSyncStatusAktualisieren();
 
@@ -839,7 +839,10 @@ function appDexShellZeichnen(route, view) {
      der Reiter ein normaler Verweis und bringt einen zurück. */
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
-    if (!reiter || istNebenansicht) return;
+    /* Nur wenn man wirklich auf der Seite dieses Reiters steht. Auf einer
+       Nebenansicht oder in einem Unterordner bleibt er ein Verweis und
+       bringt einen dorthin zurück. */
+    if (!reiter || route !== aktiveDockRoute) return;
     if (reiter.getAttribute('href')?.replace(/^#/, '') !== aktiveDockRoute) return;
     event.preventDefault();
     reiter.classList.add('ist-gedrueckt');
@@ -1250,7 +1253,14 @@ async function mountCustomCollection(container, item, signal) {
     if (!parent || signal?.aborted) break;
     lookRoot = parent;
   }
-  container.dataset.appDockRoute = `collection/${lookRoot.id}`;
+  /* Unterordner eines System-Dex (TRAINING, ESSEN ...) haben keinen eigenen
+     Reiter. Ohne Zuordnung blieb im Menüband gar nichts markiert und man sah
+     nicht mehr, wo man ist. Sie zeigen deshalb auf den Reiter ihres Dex –
+     der bleibt hervorgehoben UND führt beim Tippen dorthin zurück. Eigene
+     Sammlungen behalten ihren eigenen Reiter. */
+  container.dataset.appDockRoute = item.root_key === 'home'
+    ? `collection/${lookRoot.id}`
+    : item.root_key;
   container.dataset.appDockSubdex = item.id === lookRoot.id ? 'false' : 'true';
   const inheritsSystemDexLook = item.root_key !== 'home';
   const inheritedLookScope = inheritsSystemDexLook ? item.root_key : `collection-${lookRoot.id}`;
