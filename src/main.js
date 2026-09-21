@@ -793,7 +793,7 @@ function appDexShellZeichnen(route, view) {
      Punkte als Hinweis. */
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
-      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute, route === aktiveDockRoute)}</div>
+      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
     </div>`;
   appSyncStatusAktualisieren();
 
@@ -839,10 +839,10 @@ function appDexShellZeichnen(route, view) {
      der Reiter ein normaler Verweis und bringt einen zurück. */
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
-    /* Nur wenn man wirklich auf der Seite dieses Reiters steht. Auf einer
-       Nebenansicht oder in einem Unterordner bleibt er ein Verweis und
-       bringt einen dorthin zurück. */
-    if (!reiter || route !== aktiveDockRoute) return;
+    /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
+       Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
+       der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
+    if (!reiter || istNebenansicht) return;
     if (reiter.getAttribute('href')?.replace(/^#/, '') !== aktiveDockRoute) return;
     event.preventDefault();
     reiter.classList.add('ist-gedrueckt');
@@ -1103,29 +1103,23 @@ function gridCollectionMetaText(entries = 0, folders = 0) {
   return `${entries} ${entryLabel} · ${folders} ${folderLabel}`;
 }
 
-/* mitMenue: Seiten, die im Menüband KEINEN eigenen Reiter haben – das sind
-   die Unterordner. Auf allen anderen öffnet der zweite Tipp auf den eigenen
-   Reiter das Menü; hier gäbe es sonst gar keinen Weg dorthin, weil ein Tipp
-   auf einen fremden Reiter wegnavigiert. */
-function gridCollectionMastheadMarkup(title, folders = 0, mitMenue = false) {
+/* zurueckHref: Unterordner bekommen neben dem Info-Knopf einen kleinen Pfeil
+   zurück zur übergeordneten Seite. Nötig, seit der Reiter im Menüband dort
+   das Kontextmenü öffnet statt zu navigieren. */
+function gridCollectionMastheadMarkup(title, folders = 0, zurueckHref = '') {
   return `<section class="dex-sammlungskopf" data-grid-collection-header>
     <div class="dex-sammlungskopf-text">
       <span>Wissenssammlung</span>
       <h1>${escapeHtml(title)}</h1>
       <small data-grid-collection-meta>${gridCollectionMetaText(0, folders)}</small>
     </div>
-    ${mitMenue ? `<button class="som-info-knopf dex-sammlungskopf-menue" type="button" data-grid-collection-menu aria-label="Menü für ${escapeHtml(title)} öffnen"><span class="app-dex-tab-punkte" aria-hidden="true"></span></button>` : ''}
+    ${zurueckHref ? `<a class="som-info-knopf dex-sammlungskopf-zurueck" href="${escapeHtml(zurueckHref)}" aria-label="Zurück zur übergeordneten Seite">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>` : ''}
     <button class="som-info-knopf" type="button" data-grid-collection-info aria-expanded="false" aria-controls="grid-collection-info-help" aria-label="Info zur Sammlung">i</button>
   </section>
   <div class="som-kurzhilfe nutrition-calibration-help grid-collection-info-help" id="grid-collection-info-help" data-grid-collection-info-help hidden></div>`;
 }
 
 function mountGridCollectionMasthead(root, { infoKind, title }) {
-  /* Derselbe Aufruf wie beim Reiter: der (unsichtbare) Kategoriekopf traegt
-     die Menue-Aktion der Seite. */
-  root.querySelector('[data-grid-collection-menu]')?.addEventListener('click', () => {
-    root.querySelector('.kategorie-plus')?.click();
-  });
   const button = root.querySelector('[data-grid-collection-info]');
   const help = root.querySelector('[data-grid-collection-info-help]');
   button?.addEventListener('click', () => {
@@ -1284,8 +1278,10 @@ async function mountCustomCollection(container, item, signal) {
     container.classList.add('neo-dex-page', 'food-dex-page');
     container.classList.toggle('food-dex-dunkler-hintergrund', istDunkleOrdnerfarbe(inheritedColor));
   }
+  // Muss vor dem Kopfzeilen-Markup stehen: der Zurueck-Pfeil braucht ihn.
+  const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const collectionTitleMarkup = gridDexSkin
-    ? gridCollectionMastheadMarkup(item.name, children.length, true)
+    ? gridCollectionMastheadMarkup(item.name, children.length, backHref)
     : neoDexSkin ? '' : `<div class="seitenkopf"><h1>${escapeHtml(item.name)}</h1></div>`;
   container.innerHTML = `<div class="wrap pad-bottom sammlung-seite">
     ${collectionTitleMarkup}
@@ -1298,7 +1294,6 @@ async function mountCustomCollection(container, item, signal) {
       title: item.name,
     });
   }
-  const backHref = item.parent_id ? `#collection/${item.parent_id}` : (item.root_key === 'home' ? '#home' : `#${item.root_key}`);
   const refresh = () => window.dispatchEvent(new HashChangeEvent('hashchange'));
   const openEntry = (type, foodKind = null) => openDexEntryEditor({
     type, foodKind, userId: item.user_id || session.user.id, rootKey: item.root_key, collectionId: item.id, onSaved: refresh,

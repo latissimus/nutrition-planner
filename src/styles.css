@@ -8954,7 +8954,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:.015em;
   opacity:.72;
 }
-.neo-dex-page .dex-sammlungskopf button{
+.neo-dex-page .dex-sammlungskopf button,
+.neo-dex-page .dex-sammlungskopf .dex-sammlungskopf-zurueck{
   display:grid;
   flex:0 0 34px;
   place-items:center;
@@ -8973,7 +8974,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-appearance:none;
   appearance:none;
 }
-.neo-dex-page .dex-sammlungskopf button:active{
+.neo-dex-page .dex-sammlungskopf button:active,
+.neo-dex-page .dex-sammlungskopf .dex-sammlungskopf-zurueck:active{
   transform:scale(.94);
 }
 .neo-dex-page .dex-sammlungskopf + .unter-sammlungen-block{
@@ -14581,23 +14583,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:transparent!important;
 }
 
-/* Menü-Knopf im Kopf einer Unterordner-Seite. Dieselben drei Punkte wie am
-   Reiter, hier aber mittig im runden Knopf statt oben angeheftet – die
-   Reiter-Regel greift über ".app-dex-tab>" und trifft ihn nicht. */
-.dex-sammlungskopf-menue{
+/* Zurück-Pfeil im Kopf einer Unterordner-Seite, direkt neben dem Info-Knopf.
+   Nötig, seit der Reiter im Menüband dort das Kontextmenü öffnet statt zur
+   übergeordneten Seite zu führen. Er übernimmt die Form des Info-Knopfes;
+   das Chevron wird gespiegelt, damit es nach links zeigt. */
+.dex-sammlungskopf-zurueck{
   display:grid;
   place-items:center;
+  text-decoration:none;
 }
-.dex-sammlungskopf-menue>.app-dex-tab-punkte{
-  position:static;
+/* Nur der Container wird gespiegelt. Spiegelt man zusaetzlich das SVG,
+   heben sich beide auf und der Pfeil zeigt wieder nach rechts. */
+.dex-sammlungskopf-zurueck .dex-sammlungskopf-pfeil{
   display:block;
-  width:18px;
-  height:4px;
-  transform:none;
-  pointer-events:none;
-  background:
-    radial-gradient(circle, currentColor 48%, transparent 54%) 0 50%/4px 4px no-repeat,
-    radial-gradient(circle, currentColor 48%, transparent 54%) 50% 50%/4px 4px no-repeat,
-    radial-gradient(circle, currentColor 48%, transparent 54%) 100% 50%/4px 4px no-repeat;
-  opacity:.85;
+  transform:scaleX(-1);
+}
+.dex-sammlungskopf-zurueck .dex-sammlungskopf-pfeil svg{
+  display:block;
+  width:20px;
+  height:20px;
+  fill:currentColor;
 }

@@ -311,6 +311,33 @@ function calculationResultMarkup(result, customTarget = 0) {
   return result ? `<span><small>GESCHÄTZTER RUHEENERGIEVERBRAUCH</small><b>${decimal(result.resting)} kcal</b></span><span><small>GESCHÄTZTER ERHALTUNGSBEDARF</small><b>${decimal(result.maintenance)} kcal</b><i>plausibel etwa ${decimal(result.maintenanceRange[0])}–${decimal(result.maintenanceRange[1])}</i></span><span><small>AKTUELLES KALORIENZIEL</small><b>${decimal(customTarget || result.target)} kcal</b></span><p>${result.method} · Startschätzung, keine Messung</p>` : '<p>Geburtsdatum, Größe und Gewicht vervollständigen.</p>';
 }
 
+/* Einmal geladene Bild-Adressen: Bei jedem erneuten Zeichnen soll ein
+   bereits sichtbares Bild nicht wieder zum Symbol zurueckspringen. */
+const geladeneProduktbilder = new Set();
+
+/* Laedt die Produktbilder abseits der Darstellung und tauscht sie erst dann
+   gegen das Symbol – statt einen <img>-Kasten leer stehen zu lassen,
+   solange die fremde Quelle nicht antwortet. Kommt nichts, bleibt das Symbol. */
+function produktbilderNachziehen(wurzel) {
+  wurzel?.querySelectorAll?.('.nutrition-entry-icon[data-bild]').forEach((halter) => {
+    const url = halter.dataset.bild;
+    delete halter.dataset.bild;             // je Darstellung nur ein Versuch
+    const probe = new Image();
+    probe.decoding = 'async';
+    probe.addEventListener('load', () => {
+      geladeneProduktbilder.add(url);
+      if (!halter.isConnected) return;
+      const bild = document.createElement('img');
+      bild.className = 'nutrition-entry-bild';
+      bild.alt = '';
+      bild.decoding = 'async';
+      bild.src = url;                        // aus dem Zwischenspeicher: sofort da
+      halter.replaceChildren(bild);
+    });
+    probe.src = url;
+  });
+}
+
 function periodEntriesMarkup(entries, period) {
   if (!entries.length) return '';
   return `<section class="nutrition-period-inline"><div>${entries.map((item) => {
@@ -319,12 +346,19 @@ function periodEntriesMarkup(entries, period) {
     // Rezepte ohne eigenes Bild bekommen das Rezept-Icon (menu_book) wie im Menü.
     const bild = item.product_snapshot?.image_url;
     const platzhalter = item.product_snapshot?.source === 'recipe' ? 'menu_book' : 'Lebensmittel';
-    const vorschau = bild
-      ? `<img class="nutrition-entry-bild" src="${escapeHtml(bild)}" alt="" loading="lazy" decoding="async">`
+    /* Die Produktbilder liegen bei images.openfoodfacts.org, nicht bei uns –
+       gemessen brauchte eines von zwei Bildern ueber acht Sekunden und kam
+       dann gar nicht. Deshalb steht zuerst immer das Symbol da; das Bild
+       tritt erst an seine Stelle, wenn es wirklich geladen ist (siehe
+       produktbilderNachziehen). Ein leerer Kasten entsteht so nie. */
+    const schonGeladen = Boolean(bild) && geladeneProduktbilder.has(bild);
+    const vorschau = schonGeladen
+      ? `<img class="nutrition-entry-bild" src="${escapeHtml(bild)}" alt="" decoding="async">`
       : materialIconMarkup(platzhalter, 'nutrition-food-icon');
+    const nachzuziehen = bild && !schonGeladen ? ` data-bild="${escapeHtml(bild)}"` : '';
     return `<div class="rem-row nutrition-entry" data-nutrition-entry="${item.id}">
       <div class="rem-row-head nutrition-entry-head">
-        <span class="rem-row-emoji nutrition-entry-icon" aria-hidden="true">${vorschau}</span>
+        <span class="rem-row-emoji nutrition-entry-icon" aria-hidden="true"${nachzuziehen}>${vorschau}</span>
         <span class="rem-row-titel"><b>${escapeHtml(item.name)}</b><small>${decimal(item.amount, 1)} g · ${decimal(item.protein_g, 1)} P · ${decimal(item.carbs_g, 1)} K · ${decimal(item.fat_g, 1)} F</small></span>
         <strong>${decimal(item.energy_kcal)} kcal</strong>
       </div>
@@ -851,6 +885,7 @@ export async function mountNutrition(container, { userId, signal }) {
       const empty = block?.querySelector('[data-reminder-empty]');
       if (empty) empty.hidden = entries.length > 0;
     });
+    produktbilderNachziehen(root);
   };
   const render = () => { container.innerHTML = summaryMarkup(state, date); bind(); renderIntegrated(); };
   let refreshVersion = 0;
