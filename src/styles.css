@@ -14562,13 +14562,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    dadurch deutlich heller. Dreiecke .03, Quadrate .027, Tropfen .02 gleichen
    das aus. */
 :root[data-theme="dark"]{
+  /* Probe: Kapsel fuer SUPPS, als Pixelmotiv gezeichnet (nur ganze Pixel,
+     rechte Winkel, keine Rundungen). Die Deckkraft folgt der Flaechendeckung:
+     Motiv 18x12 in einer 44er Kachel sind 9,3 %, die Dreiecke decken 4,35 %
+     bei .03 - gleiche Gesamthelligkeit ergibt rund .014. */
+  --muster-kapsel-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.014'%3E%3Crect x='16' y='16' width='12' height='3'/%3E%3Crect x='13' y='19' width='18' height='6'/%3E%3Crect x='16' y='25' width='12' height='3'/%3E%3C/g%3E%3C/svg%3E");
   --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.027'/%3E%3C/svg%3E");
 }
 
 /* Dreiecke */
 :root[data-theme="dark"][data-seite="reminders"] #view,
 :root[data-theme="dark"][data-seite="body"] #view,
-:root[data-theme="dark"][data-seite="supps"] #view,
 :root[data-theme="dark"][data-seite="profile"] #view,
 :root[data-theme="dark"][data-seite="coins"] #view,
 :root[data-theme="dark"][data-seite="search"] #view{
@@ -14587,6 +14591,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="stress"] #view{
   background-image:var(--muster-tropfen-dunkel)!important;
   background-size:112px!important;
+  background-repeat:repeat!important;
+  background-attachment:fixed!important;
+}
+
+/* Kapsel - Probe auf SUPPS */
+:root[data-theme="dark"][data-seite="supps"] #view{
+  background-image:var(--muster-kapsel-dunkel)!important;
   background-repeat:repeat!important;
   background-attachment:fixed!important;
 }
