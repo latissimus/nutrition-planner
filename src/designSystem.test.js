@@ -90,6 +90,17 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('font:800 13px/1 var(--tech);');
   });
 
+  it('vereinheitlicht Darkmode-Unterordner, Suchtreffer und Raster-Infos', () => {
+    expect(designSystem).toContain('.dex-unterdex-fach .dex-ordner-form :is(');
+    expect(designSystem).toContain('.dex-ordner-rueckblatt,.dex-ordner-farbblatt,.dex-ordner-front');
+    expect(designSystem).toContain('fill:#fff!important;');
+    expect(designSystem).toContain('#view:is(.neo-dex-page,.food-dex-page) .dex-unterdex-fach .dex-ordner-inhalt :is(h2,b,span)');
+    expect(designSystem).toContain('-webkit-text-fill-color:#111!important;');
+    expect(designSystem).toContain('.nutrition-search-results>button{');
+    expect(designSystem).toContain('.grid-collection-info-help p{');
+    expect(designSystem).toContain('font:500 11.5px/1.45 var(--tech)!important;');
+  });
+
   it('haelt Header, Dock und Sheets global statt seitenspezifisch', () => {
     expect(designSystem).toContain('.app-dex-header-actions{gap:4px}');
     expect(designSystem).toContain('transform:translate(-2px,2px);');
