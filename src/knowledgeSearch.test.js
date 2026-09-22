@@ -9,6 +9,7 @@ describe('Wissenssuche', () => {
     expect(KNOWLEDGE_ROOTS).toEqual(['food-log', 'essen', 'training', 'supps', 'stress']);
     expect(source).not.toContain('>Schließen</a>');
     expect(source).not.toContain('Durchsuche REZEPTE');
+    expect(source).toContain("materialIconMarkup('search', 'wissenssuche-lupe')");
     expect(source).toContain('data-search-clear aria-label="Suche leeren" hidden><span aria-hidden="true"></span>');
   });
 

@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { loadAllDexEntries } from './dexEntries.js';
 import { noteToText } from './richText.js';
+import { materialIconMarkup } from './categoryIcons.js';
 
 export const KNOWLEDGE_ROOTS = ['food-log', 'essen', 'training', 'supps', 'stress'];
 
@@ -131,7 +132,7 @@ export async function mountKnowledgeSearch(view, { signal } = {}) {
         <h1>WISSEN DURCHSUCHEN</h1>
       </header>
       <label class="wissenssuche-feld" for="wissenssuche-input">
-        <span aria-hidden="true"></span>
+        ${materialIconMarkup('search', 'wissenssuche-lupe')}
         <input id="wissenssuche-input" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Titel, Notizen, Tags …">
         <button type="button" data-search-clear aria-label="Suche leeren" hidden><span aria-hidden="true"></span></button>
       </label>
