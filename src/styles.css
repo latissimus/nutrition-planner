@@ -244,7 +244,7 @@
      brightness(0) faerbt das PNG schwarz und laesst die Transparenz stehen,
      invert(1) macht daraus Weiss – so bleibt es bei einer Bilddatei. */
   --sil-filter:brightness(0) invert(1);
-  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.07'/%3E%3C/svg%3E");
+  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.053'/%3E%3C/svg%3E");
   --muster-tropfen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23EDF0F6' fill-opacity='.02' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -13805,8 +13805,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress{
   background:#697486!important;
 }
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress i{
-  background:#D9DEE7!important;
+:root:root[data-theme="dark"][data-seite="coins"] #view.coin-dex-page .coin-progress>i:not(.material-svg){
+  background:#FFFFFF!important;
+  background-color:#FFFFFF!important;
 }
 
 /* ============================================================
@@ -14564,7 +14565,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    dadurch deutlich heller. Dreiecke .03, Quadrate .027, Tropfen .02 gleichen
    das aus. */
 :root[data-theme="dark"]{
-  /* Zwei Staerken, jede in sich gleich eingestellt. Massgroesse ist
+  /* background-position:center bei allen Mustern. Ohne das beginnt die
+     Kachelung am linken Bildrand, und der Rest der Bildschirmbreite, der
+     keine ganze Kachel mehr ergibt, bleibt komplett rechts liegen - beim
+     Punktraster fehlte dort sichtbar die letzte Punktspalte. Zentriert
+     verteilt sich derselbe Rest gleichmaessig auf beide Seiten und faellt
+     nicht mehr auf (bei 521 px Breite und 16er Kachel je 2,7 px statt
+     5,4 px nur rechts).
+
+     Zwei Staerken, jede in sich gleich eingestellt. Massgroesse ist
      Helligkeitsabstand zum Grund MAL Flaechendeckung, gemessen ueber dem
      echten Seitengrund (16 von 255):
        Bildschirm-Texturen (Gitter, Dithering)  rund 1,6
@@ -14580,70 +14589,81 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      deshalb zuerst sehr niedrig - waren dann aber kaum zu sehen. Jetzt so
      eingestellt, dass die Textur wirklich traegt. */
   --muster-steuerkreuz-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' shape-rendering='crispEdges'%3E%3Cpath d='M17 12h6v5h5v6h-5v5h-6v-5h-5v-6h5z' fill='%23EDF0F6' fill-opacity='.037'/%3E%3C/svg%3E");
-  --muster-millimeter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%23EDF0F6' stroke-opacity='.11' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-millimeter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%23EDF0F6' stroke-opacity='.082' stroke-width='1' fill='none'/%3E%3C/svg%3E");
   --muster-punktraster-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%23EDF0F6' fill-opacity='.058'/%3E%3C/svg%3E");
   --muster-gitter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%23EDF0F6' stroke-opacity='.042' stroke-width='1' fill='none'/%3E%3C/svg%3E");
   --muster-dithering-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.13'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
-  --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.039'/%3E%3C/svg%3E");
+  --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.029'/%3E%3C/svg%3E");
 }
+
+/* Reihenfolge im Menuband, links nach rechts: TRACKER, ROUTINEN, COMP,
+   SCHLAF, REZEPTE, ESSEN, SUPPS, EINKAUF, TRAINING, MIND. Die Muster sind so
+   verteilt, dass beim Durchklicken nie zweimal hintereinander dasselbe kommt:
+   Steuerkreuz, Punkt, Millimeter, Gitter, Quadrat, Dithering, Gitter, Punkt,
+   Dreieck, Millimeter. */
 
 /* Steuerkreuz - TRACKER */
 :root[data-theme="dark"][data-seite="reminders"] #view{
   background-image:var(--muster-steuerkreuz-dunkel)!important;
   background-repeat:repeat!important;
+  background-position:center!important;
   background-attachment:fixed!important;
 }
 
-/* Millimeterraster - BODY, SCHLAF, STRESS */
+/* Punktraster - ROUTINEN, EINKAUF */
+:root[data-theme="dark"][data-seite="habits"] #view,
+:root[data-theme="dark"][data-seite="shopping"] #view{
+  background-image:var(--muster-punktraster-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Millimeterraster - COMP, MIND */
 :root[data-theme="dark"][data-seite="body"] #view,
-:root[data-theme="dark"][data-seite="sleep"] #view,
 :root[data-theme="dark"][data-seite="stress"] #view{
   background-image:var(--muster-millimeter-dunkel)!important;
   background-repeat:repeat!important;
+  background-position:center!important;
   background-attachment:fixed!important;
 }
 
-/* Punktraster - EINKAUF, ROUTINEN */
-:root[data-theme="dark"][data-seite="shopping"] #view,
-:root[data-theme="dark"][data-seite="habits"] #view{
-  background-image:var(--muster-punktraster-dunkel)!important;
-  background-repeat:repeat!important;
-  background-attachment:fixed!important;
-}
-
-/* Dreiecke - das Set-O-Meter-Motiv aus dem LOGMAN */
-:root[data-theme="dark"][data-seite="training"] #view{
-  background-image:var(--muster-dreieck-dunkel)!important;
-  background-repeat:repeat!important;
-  background-attachment:fixed!important;
-}
-
-
-/* Gameboy-Gitter - SUCHE, SUPPS, PROFIL. SUCHE ist die Seite mit der groessten freien
-   Flaeche: eine Textur aus 1-px-Linien lebt davon, dass man sie ueber eine
-   weite Strecke sieht. Auf den kartenschweren Seiten SUPPS und PROFIL
-   funktioniert sie trotzdem, weil sie auch in schmalen Streifen traegt -
-   ein einzelnes Motiv braeuchte dort Platz, den es nicht gibt. */
-:root[data-theme="dark"][data-seite="search"] #view,
+/* Gameboy-Gitter - SCHLAF, SUPPS, SUCHE. Eine Textur aus 1-px-Linien lebt
+   davon, dass man sie ueber eine weite Strecke sieht; sie traegt aber auch
+   in den schmalen Streifen zwischen Karten, wo ein Motiv keinen Platz mehr
+   haette. */
+:root[data-theme="dark"][data-seite="sleep"] #view,
 :root[data-theme="dark"][data-seite="supps"] #view,
-:root[data-theme="dark"][data-seite="profile"] #view{
+:root[data-theme="dark"][data-seite="search"] #view{
   background-image:var(--muster-gitter-dunkel)!important;
   background-repeat:repeat!important;
+  background-position:center!important;
   background-attachment:fixed!important;
 }
 
-/* Dithering - COINS */
+/* Quadrate - REZEPTE */
+:root[data-theme="dark"][data-seite="food-log"] #view{
+  background-image:var(--muster-quadrat-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Dithering - ESSEN, PROFIL, COINS */
+:root[data-theme="dark"][data-seite="essen"] #view,
+:root[data-theme="dark"][data-seite="profile"] #view,
 :root[data-theme="dark"][data-seite="coins"] #view{
   background-image:var(--muster-dithering-dunkel)!important;
   background-repeat:repeat!important;
+  background-position:center!important;
   background-attachment:fixed!important;
 }
 
-/* Quadrate */
-:root[data-theme="dark"][data-seite="food-log"] #view,
-:root[data-theme="dark"][data-seite="essen"] #view{
-  background-image:var(--muster-quadrat-dunkel)!important;
+/* Dreiecke - TRAINING, das Set-O-Meter-Motiv aus dem LOGMAN */
+:root[data-theme="dark"][data-seite="training"] #view{
+  background-image:var(--muster-dreieck-dunkel)!important;
   background-repeat:repeat!important;
+  background-position:center!important;
   background-attachment:fixed!important;
 }
 
