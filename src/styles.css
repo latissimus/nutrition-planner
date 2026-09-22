@@ -13803,10 +13803,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   filter:grayscale(1) brightness(1.55)!important;
 }
 :root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress{
-  background:var(--dm-surface2)!important;
+  background:#697486!important;
 }
 :root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress i{
-  background:#FFFFFF!important;
+  background:#D9DEE7!important;
 }
 
 /* ============================================================

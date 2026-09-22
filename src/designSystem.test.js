@@ -221,6 +221,8 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('--cap-tint:color-mix(in srgb,#FFD400 9%,#432C5E);');
     expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
     expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-header{--dex-ink:#fff;background:#432C5E!important;border-color:#fff!important;color:#fff!important}');
+    expect(designSystem).toContain(':root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress{\n  background:#697486!important;');
+    expect(designSystem).toContain(':root[data-theme="dark"][data-seite="coins"] .coin-dex-page .coin-progress i{\n  background:#D9DEE7!important;');
   });
 
   it('hält PROFIL als neutrale warme Systemseite', () => {
