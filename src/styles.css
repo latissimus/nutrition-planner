@@ -14870,5 +14870,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .coach-spark{background:var(--dm-text)!important;color:#111!important}
 :root[data-theme="dark"][data-seite] #app .coach-spark{background:var(--dm-text)!important;color:#111!important}
 :root[data-theme="dark"][data-seite] #app .coach-spark :is(.material-svg,svg,svg *){background:transparent!important;color:#111!important;fill:#111!important}
-:root[data-theme="dark"] .coach-message-user{background:var(--dm-text)!important;color:#111!important}
+:root[data-theme="dark"] .coach-message-user{border:1px solid var(--dm-border,#737b8c)!important;background:var(--app-field,#242733)!important;color:var(--dm-text)!important}
+:root[data-theme="dark"][data-seite] #app .coach-message-user :is(small,p,span,b,strong,em){background:transparent!important;color:var(--dm-text)!important}
 @media(max-width:370px){.app-dex-header-actions{gap:3px}.app-dex-coach,.app-dex-search{width:32px;height:32px;flex-basis:32px}.coach-card-actions{grid-template-columns:1fr}}
