@@ -422,12 +422,12 @@ function ypsiPriorityReasonMarkup(plan) {
   const active = assessment?.activeFactor;
   if (active) {
     const statusLabel = active.status === 'bestaetigt'
-      ? 'WAHRSCHEINLICHSTER ZUSAMMENHANG'
+      ? 'GESTÜTZTE SEMINAR-HYPOTHESE'
       : active.status === 'offen'
-        ? 'NOCH ZU KLÄREN'
-        : 'EINORDNUNG AUS DEN SEMINARUNTERLAGEN';
+        ? 'SEMINAR-HYPOTHESE · NOCH ZU KLÄREN'
+        : 'REGELBASIERTE SEMINAR-EINORDNUNG';
     const reason = active.status === 'bestaetigt'
-      ? 'Deine Antworten oder die zugehörigen Gegenfalten stützen diesen Zusammenhang derzeit am stärksten.'
+      ? 'Deine Angaben passen derzeit am ehesten zu diesem in den Seminarunterlagen beschriebenen Muster. Das ist kein Ursachenbeweis und keine medizinische Diagnose.'
       : active.status === 'offen'
         ? `${active.unansweredQuestionIds.length} ${active.unansweredQuestionIds.length === 1 ? 'Antwort fehlt' : 'Antworten fehlen'}, bevor die App diesen Zusammenhang sicher von den anderen Möglichkeiten trennen kann.`
         : 'Für diesen Verlaufsmarker ist keine einzelne Ursache aus den Faltenwerten ableitbar.';
@@ -440,9 +440,9 @@ function ypsiPriorityReasonMarkup(plan) {
   const relations = plan.topRelationships || [];
   const fallback = hautfaltenData.falten[plan.topFold.slug]?.interpretation?.kurzbeschreibung
     || 'Diese Falte weicht im aktuellen Vergleich am stärksten von ihrem Referenzwert ab.';
-  if (!relations.length) return `<section class="ypsi-priority-reason"><small>WARUM DAS DEINE PRIORITÄT IST</small><p>${escapeHtml(fallback)}</p></section>`;
+  if (!relations.length) return `<section class="ypsi-priority-reason"><small>REGELBASIERTE SEMINAR-EINORDNUNG</small><p>${escapeHtml(fallback)}</p></section>`;
   const [primary, ...secondary] = relations;
-  return `<section class="ypsi-priority-reason"><small>WARUM DAS DEINE PRIORITÄT IST</small><div><b>${escapeHtml(primary.title)}</b><p>${escapeHtml(primary.summary)}</p></div>${secondary.length ? `<aside class="ypsi-secondary-relations"><small>AUẞERDEM IM BLICK · NOCH KEIN ZUSÄTZLICHER SCHRITT</small>${secondary.map((relation) => `<div><b>${escapeHtml(relation.title)}</b><p>${escapeHtml(relation.summary)}</p></div>`).join('')}</aside>` : ''}</section>`;
+  return `<section class="ypsi-priority-reason"><small>REGELBASIERTE SEMINAR-EINORDNUNG</small><div><b>${escapeHtml(primary.title)}</b><p>${escapeHtml(primary.summary)}</p></div>${secondary.length ? `<aside class="ypsi-secondary-relations"><small>WEITERE SEMINAR-HYPOTHESEN · KEIN ZUSÄTZLICHER SCHRITT</small>${secondary.map((relation) => `<div><b>${escapeHtml(relation.title)}</b><p>${escapeHtml(relation.summary)}</p></div>`).join('')}</aside>` : ''}</section>`;
 }
 
 function ypsiPriorityComparisonMarkup(plan) {
@@ -467,12 +467,15 @@ function ypsiPriorityMarkup(state) {
   </section>`;
   const actionPlan = buildSkinfoldActionPlan(plan, analysisContext);
   return `<section class="ypsi-priority-block">
-    <header><span><small>HAUTFALTENMESSUNG</small><b>Deine höchste Priorität</b></span><em>${datumKurz(plan.date)}</em></header>
+    <header><span><small>HAUTFALTENMESSUNG</small><b>Regelbasierte Seminar-Auswertung</b></span><em>${datumKurz(plan.date)}</em></header>
     <div class="ypsi-top-fold"><small>PRIORITÄT 1</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm</span></div>
     ${ypsiPriorityComparisonMarkup(plan)}
-    ${ypsiPriorityReasonMarkup(plan)}
-    ${ypsiActionPlanMarkup(actionPlan, { phase: plan.activeProtocolGroup?.suggestedPhase || null })}
-    ${ypsiObservedPrioritiesMarkup(plan)}
+    <p class="ypsi-rule-note">Aus fest hinterlegten Regeln und deinen Kontextangaben abgeleitet – ohne Sprachmodell. Die Zuordnung beschreibt eine Seminar-Hypothese, keine Diagnose.</p>
+    <details class="ypsi-plan-details"><summary><span>Seminar-Hypothese und Handlungsplan</span>${materialIconMarkup('chevron_right')}</summary><div>
+      ${ypsiPriorityReasonMarkup(plan)}
+      ${ypsiActionPlanMarkup(actionPlan, { phase: plan.activeProtocolGroup?.suggestedPhase || null })}
+      ${ypsiObservedPrioritiesMarkup(plan)}
+    </div></details>
   </section>`;
 }
 
@@ -504,7 +507,7 @@ function skinfoldMarkup(state) {
     ${skinfoldHistoryMarkup(state.skinfolds)}
     <details class="body-inner-details body-skinfold-reminder"><summary><span>Hautfalten-Erinnerung</span>${materialIconMarkup('chevron_right')}</summary><p>Lege fest, ob CAPBOY dich alle drei bis vier Wochen an eine neue 13-Falten-Messung erinnert.</p><div data-skinfold-settings></div></details>
     <button class="body-reset-mini" type="button" data-reset-body="skinfolds">13-Falten-Werte zurücksetzen</button>
-  </div></section><div class="${SPECIAL_DEX_CLASSES.content}" data-coach-insight="skinfold"></div>`;
+  </div></section>`;
 }
 
 function faltenDetailMarkup(slug, state) {
@@ -765,7 +768,7 @@ function bodyCompMarkup(state) {
       <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
       <details class="body-inner-details"><summary><span>Orientierungsbereiche anpassen</span>${materialIconMarkup('chevron_right')}</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>COMP vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
     </div>
-  </details><div class="${SPECIAL_DEX_CLASSES.content}" data-coach-insight="comp"></div>`;
+  </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${materialIconMarkup('stars')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
 }
 
 function logmanMarkup(state) {
@@ -825,11 +828,6 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const pageMeta = container.querySelector('[data-food-scroll-meta]');
     if (pageMeta) pageMeta.textContent = `${state.weights.length} ${state.weights.length === 1 ? 'Wiegung' : 'Wiegungen'}`;
     bind();
-    const { mountCoachInsight } = await import('./coach.js');
-    await Promise.all([
-      mountCoachInsight(container.querySelector('[data-coach-insight="comp"]'), { userId, scope: 'comp' }),
-      mountCoachInsight(container.querySelector('[data-coach-insight="skinfold"]'), { userId, scope: 'skinfold' }),
-    ]);
     // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
     // (Update-Hinweis mit eigenen COMP-Notizen) wieder anzuhängen und
     // renderDexEntries darauf loszulassen. Sonst überlebt der Slot nur den
@@ -1196,6 +1194,14 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     };
     const thresholdForm = container.querySelector('[data-bodycomp-thresholds]');
     if (thresholdForm) thresholdForm.onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const stableLoss = zahl(form.querySelector('[data-threshold-stable-loss]').value); const slowLoss = zahl(form.querySelector('[data-threshold-slow-loss]').value); const stableGain = zahl(form.querySelector('[data-threshold-stable-gain]').value); const slowGain = zahl(form.querySelector('[data-threshold-slow-gain]').value); if (!(stableLoss > 0 && slowLoss > stableLoss && stableGain > 0 && slowGain > stableGain)) return toast('Bitte aufsteigende, positive Prozentgrenzen eintragen'); const bodycomp_thresholds = { stableLoss: -stableLoss, slowLoss: -slowLoss, stableGain, slowGain }; const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, bodycomp_thresholds }, { onConflict: 'user_id' }); if (error) return toast('Orientierungsbereiche konnten nicht gespeichert werden'); toast('Orientierungsbereiche gespeichert'); await render(); };
+    const coachButton = container.querySelector('[data-body-coach]');
+    if (coachButton) coachButton.onclick = async () => {
+      const { openCoachQuestion } = await import('./coach.js');
+      openCoachQuestion({
+        scope: 'comp',
+        question: 'Ordne meine aktuelle Körperkomposition, Hautfalten, Ernährung, mein Training und meine Erholung gemeinsam ein. Trenne klar zwischen Daten, Interpretation und Unsicherheit.',
+      });
+    };
     const settings = container.querySelector('[data-skinfold-settings]');
     if (settings) {
       settings.innerHTML = `<div class="mess-einst body-reminder-settings"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i><span>Erinnerung aktiv</span></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen${weeks === 2 ? ' · kürzer als Seminar' : ''}</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;

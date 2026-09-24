@@ -1510,7 +1510,7 @@ async function renderRoute() {
     applyPageLook('body', categoryColor('body'), 'wallpaper-comp');
     view.dataset.appDockRoute = appLetzteDexRoute();
     const { mountCoachPage } = await coachModule();
-    await mountCoachPage(view, { userId: session.user.id, signal });
+    await mountCoachPage(view, { userId: session.user.id, signal, backRoute: appLetzteDexRoute() });
   } else if (route === 'profile') {
     setSeite('profile');
     applyPageLook('profile', categoryColor('profile'), 'drops');

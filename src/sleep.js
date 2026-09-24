@@ -338,14 +338,19 @@ async function render(container, userId, state, refresh) {
       <div class="sleep-month"><span><b>30-Tage-Blick</b><small>${month.length} Check-ins</small></span><span><b>${monthSummary.averageMinutes ? durationLabel(monthSummary.averageMinutes) : '–'}</b><small>Ø Schlaf</small></span><span><b>${bestStreak(state.logs)} Tage</b><small>Beste Serie</small></span></div>
     </section>
     <section class="sleep-section sleep-insights ${SPECIAL_DEX_CLASSES.card}">
-      <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Deine Zusammenhänge</h2></div><small>Beobachtete Trends, keine medizinischen Ursachen</small></header>
+      <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Beobachtete Muster</h2></div><small>Aus ${month.length} Check-ins berechnet · keine Ursachenbehauptung</small></header>
       <div>${trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
+      <button class="sleep-coach-entry" type="button" data-sleep-coach>${materialIconMarkup('stars')}<span><b>Im Gesamtbild einordnen</b><small>KI-Coach separat öffnen</small></span>${materialIconMarkup('chevron_right')}</button>
     </section>
-    <div data-coach-insight="sleep"></div>
     ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 
-  const { mountCoachInsight } = await import('./coach.js');
-  await mountCoachInsight(content.querySelector('[data-coach-insight="sleep"]'), { userId, scope: 'sleep' });
+  content.querySelector('[data-sleep-coach]')?.addEventListener('click', async () => {
+    const { openCoachQuestion } = await import('./coach.js');
+    openCoachQuestion({
+      scope: 'sleep',
+      question: 'Ordne meine Schlafentwicklung im Zusammenhang mit Training, Ernährung, Erholung und Routinen ein. Trenne klar zwischen berechneten Mustern, KI-Interpretation und Unsicherheit.',
+    });
+  });
 
   content.querySelector('[data-toggle-sleep-analysis]')?.addEventListener('click', (event) => {
     const help = content.querySelector('[data-sleep-analysis-help]');

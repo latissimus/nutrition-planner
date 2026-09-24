@@ -228,17 +228,11 @@ Deno.serve(async (request) => {
     const question = String(body?.question || '').trim().slice(0, 2000);
     if (scope === 'coach' && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
 
-    const [snapshot, historyResult] = await Promise.all([
-      buildSnapshot(userId),
-      admin.from('ai_coach_messages').select('role,content').eq('user_id', userId).order('created_at', { ascending: false }).limit(12),
-    ]);
-    if (historyResult.error) throw historyResult.error;
-    const history = [...(historyResult.data || [])].reverse();
+    const snapshot = await buildSnapshot(userId);
     const system = `Du bist der persönliche CAPBOY Coach für Training, Ernährung, Schlaf, Muskelaufbau, Körperkomposition und allgemeine gesundheitsorientierte Gewohnheiten.
 
-Arbeite ausschließlich mit den bereitgestellten Nutzerdaten. Trenne klar zwischen gemessenen Fakten, plausiblen Interpretationen und Unsicherheiten. Behaupte nie Kausalität, wenn nur ein Zusammenhang sichtbar ist. Einzelwerte nie überbewerten. Gib höchstens drei konkrete, überprüfbare Empfehlungen und nenne einen realistischen Zeitraum. Veränderungen an Zielen oder Plänen werden nur vorgeschlagen, nie automatisch durchgeführt. Stelle keine Diagnosen und leite aus Hautfalten keine Hormone, Organe, Krankheiten oder Nährstoffmängel ab. Bei möglichen medizinischen Warnzeichen empfehle professionelle Abklärung. Antworte auf Deutsch, knapp und konkret. ${scopeInstruction[scope]}`;
+Arbeite ausschließlich mit den bereitgestellten Nutzerdaten. Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu erinnern. Trenne klar zwischen gemessenen Fakten, plausiblen Interpretationen und Unsicherheiten. Behaupte nie Kausalität, wenn nur ein Zusammenhang sichtbar ist. Einzelwerte nie überbewerten. Gib höchstens drei konkrete, überprüfbare Empfehlungen und nenne einen realistischen Zeitraum. Veränderungen an Zielen oder Plänen werden nur vorgeschlagen, nie automatisch durchgeführt. Stelle keine Diagnosen und leite aus Hautfalten keine Hormone, Organe, Krankheiten oder Nährstoffmängel ab. Die regelbasierte Seminar-Auswertung der App ist ein eigener transparenter Regelpfad; erfinde keine zusätzlichen Seminarzuordnungen. Bei möglichen medizinischen Warnzeichen empfehle professionelle Abklärung. Antworte auf Deutsch, knapp und konkret. ${scopeInstruction[scope]}`;
     const input = [
-      ...history.map((message) => ({ role: message.role, content: message.content })),
       {
         role: 'user',
         content: `${question || 'Erstelle jetzt die angeforderte Analyse.'}\n\nAktueller strukturierter CAPBOY-Datensnapshot:\n${JSON.stringify(snapshot)}`,
@@ -266,14 +260,7 @@ Arbeite ausschließlich mit den bereitgestellten Nutzerdaten. Trenne klar zwisch
     if (!raw) return json({ error: 'Die Coach-Antwort war leer.' }, 502);
     const result = JSON.parse(raw);
 
-    if (scope === 'coach') {
-      const assistantText = [result.summary, ...result.recommendations.map((item: Row) => item.action)].join('\n');
-      const { error } = await admin.from('ai_coach_messages').insert([
-        { user_id: userId, role: 'user', content: question, context: { snapshotPeriod: snapshot.period } },
-        { user_id: userId, role: 'assistant', content: assistantText.slice(0, 12000), context: { result, snapshotPeriod: snapshot.period } },
-      ]);
-      if (error) throw error;
-    } else {
+    if (scope !== 'coach') {
       const { error } = await admin.from('ai_coach_analyses').insert({
         user_id: userId,
         scope,
@@ -291,4 +278,3 @@ Arbeite ausschließlich mit den bereitgestellten Nutzerdaten. Trenne klar zwisch
     return json({ error: 'Der Coach konnte die Daten gerade nicht auswerten.' }, 500);
   }
 });
-
