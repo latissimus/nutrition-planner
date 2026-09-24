@@ -301,7 +301,7 @@ function bestStreak(logs) {
   return best;
 }
 
-function render(container, userId, state, refresh) {
+async function render(container, userId, state, refresh) {
   const tonight = planForTonight(state.schedules);
   const week = state.logs.slice(0, 7);
   const summary = calculateSleepSummary(week);
@@ -341,7 +341,11 @@ function render(container, userId, state, refresh) {
       <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Deine Zusammenhänge</h2></div><small>Beobachtete Trends, keine medizinischen Ursachen</small></header>
       <div>${trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
     </section>
+    <div data-coach-insight="sleep"></div>
     ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
+
+  const { mountCoachInsight } = await import('./coach.js');
+  await mountCoachInsight(content.querySelector('[data-coach-insight="sleep"]'), { userId, scope: 'sleep' });
 
   content.querySelector('[data-toggle-sleep-analysis]')?.addEventListener('click', (event) => {
     const help = content.querySelector('[data-sleep-analysis-help]');
@@ -362,11 +366,11 @@ export async function mountSleepDex(container, { userId, signal }) {
     const nextState = await loadState(userId, signal);
     if (signal?.aborted || version !== refreshVersion) return;
     state = nextState;
-    render(container, userId, state, refresh);
+    await render(container, userId, state, refresh);
     const meta = container.querySelector('[data-food-scroll-meta]');
     if (meta) meta.textContent = state.logs.length ? `${state.logs.length} Nächte` : 'Schlaf planen';
   };
-  render(container, userId, state, refresh);
+  await render(container, userId, state, refresh);
   subscribeToTablesChanges({
     tables: ['sleep_logs', 'sleep_schedules', 'sleep_settings'],
     bereich: 'sleep',

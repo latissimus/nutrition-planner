@@ -12,7 +12,7 @@ const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.m
 describe('CAPBOY Design-System', () => {
   it('bindet die globale Wissenssuche mit dem gelieferten Seitenicon ein', () => {
     expect(main).toContain("const knowledgeSearchModule = () => import('./knowledgeSearch.js')");
-    expect(main).toContain("['profile', 'coins', 'search'].includes(angefragt)");
+    expect(main).toContain("['profile', 'coins', 'search', 'coach'].includes(angefragt)");
     expect(main).toContain('aria-label="Wissen durchsuchen"');
     expect(designSystem).toContain('.app-dex-tab[data-sammlung="stress"] .app-dex-tab-icon{transform:scale(1.09)}');
   });
