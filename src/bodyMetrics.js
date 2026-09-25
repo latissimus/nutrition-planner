@@ -160,7 +160,7 @@ function compFactsMarkup(state) {
 function compAssessmentMarkup() {
   return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
     <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>prüft</em></span></header>
-    <div class="comp-assessment-loading"><span class="coach-cap-thinking"><span class="coach-cap-plane">${coachIconMarkup('coach-loading-cap')}</span></span><p>CAPBOY COACH prüft deine Daten und lädt die passende Gesamtbewertung.</p></div>
+    <div class="comp-assessment-loading"><p class="coach-thinking-label" role="status">Denke nach<span class="coach-thinking-dots" aria-hidden="true">...</span></p><p>CAPBOY COACH prüft deine Daten und lädt die passende Gesamtbewertung.</p></div>
   </section>`;
 }
 
