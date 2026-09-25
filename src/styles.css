@@ -14817,16 +14817,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-decoration:none;
 }
 .app-dex-coach .material-svg,.app-dex-search .material-svg{width:25px;height:25px}
+.coach-cap-icon{display:block;line-height:0}.coach-cap-icon>svg{display:block;width:100%;height:100%;overflow:visible}.app-dex-coach-icon{width:29px;height:29px;filter:drop-shadow(0 1.5px 0 #000)}
 .app-dex-coach.aktiv,.app-dex-search.aktiv{outline:2px solid currentColor;outline-offset:1px}
 
 .coach-spark{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:10px;background:var(--text,#111);color:var(--app-card,#fff);font-size:19px}
-.coach-spark .material-svg,.coach-spark .material-svg>svg{display:block;width:21px;height:21px}
-.coach-spark :is(svg,svg *){fill:currentColor!important}
+.coach-spark .coach-hero-cap{width:31px;height:31px}
 .coach-disclaimer{margin:0;padding:0 15px 14px;color:var(--muted);font:550 9.5px/1.4 var(--tech)}
 
 .coach-result{display:grid;gap:14px}
 .coach-result>header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px}
 .coach-result>header>span{display:grid;gap:4px}.coach-result>header small{font:800 9px/1 var(--tech);letter-spacing:.08em}.coach-result>header b{font:750 13px/1.45 var(--ui)}
+.coach-result>header>.coach-result-meta{display:flex;align-items:center;gap:7px}.coach-cap-badge{width:24px;height:24px;flex:0 0 24px;filter:drop-shadow(0 1px 0 #000)}
 .coach-confidence{padding:5px 7px;border:1px solid currentColor;border-radius:999px;color:var(--muted);font:750 8px/1 var(--tech);white-space:nowrap}
 .coach-result section{display:grid;gap:7px}.coach-result h3{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;font:800 10px/1.1 var(--tech);letter-spacing:.05em;text-transform:uppercase}
 .coach-result h3>em{padding:4px 6px;border:1px solid var(--app-divider);border-radius:999px;color:var(--muted);font:700 7px/1 var(--tech);font-style:normal;letter-spacing:.02em;white-space:nowrap}
@@ -14839,7 +14840,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-result details{padding:10px;border:1px solid var(--app-divider);border-radius:9px}.coach-result details summary{font-size:11px;font-weight:800;cursor:pointer}
 .coach-safety{margin:0;color:var(--muted);font:550 9.5px/1.45 var(--tech)}
 .coach-origin-note{margin:0;padding-top:10px;border-top:1px solid var(--app-divider);color:var(--muted);font:550 9.5px/1.5 var(--tech)}
-.coach-loading{display:grid;justify-items:center;gap:8px;padding:18px;text-align:center}.coach-loading span{width:22px;height:22px;border:3px solid var(--app-divider);border-top-color:var(--text);border-radius:50%;animation:coach-spin .8s linear infinite}.coach-loading p{margin:0;color:var(--muted);font-size:11px}
+.coach-loading{display:grid;justify-items:center;gap:8px;padding:18px;text-align:center}.coach-loading p{margin:0;color:var(--muted);font-size:11px}
 @keyframes coach-spin{to{transform:rotate(360deg)}}
 
 .coach-page{overflow:auto!important;background:transparent!important}
@@ -14852,7 +14853,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--text);
 }
 .coach-hero{display:grid;grid-template-columns:48px minmax(0,1fr) 34px;align-items:start;gap:13px;margin-bottom:16px;padding:18px;border:1.5px solid #111;border-radius:18px;background:var(--app-card)}
-.coach-hero .coach-spark{width:48px;height:48px;border-radius:14px;font-size:26px}.coach-hero .coach-spark .material-svg,.coach-hero .coach-spark svg{width:29px;height:29px}.coach-hero small{font:800 9px/1 var(--tech);letter-spacing:.1em}.coach-hero h1{margin:5px 0 4px;font:850 30px/.95 "Work Sans",var(--ui),sans-serif}.coach-hero p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.coach-hero .coach-spark{width:48px;height:48px;border-radius:14px;font-size:26px}.coach-hero .coach-spark .coach-hero-cap,.coach-hero .coach-spark .coach-hero-cap>svg{width:34px;height:34px}.coach-hero small{font:800 9px/1 var(--tech);letter-spacing:.1em}.coach-hero h1{margin:5px 0 4px;font:850 30px/.95 "Work Sans",var(--ui),sans-serif}.coach-hero p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
 .coach-back{display:grid;place-items:center;width:34px;height:34px;margin:0!important;border:1.5px solid currentColor;border-radius:50%;background:transparent;color:var(--text);text-decoration:none}
 .coach-back .dex-sammlungskopf-pfeil{display:block;transform:scaleX(-1)}
 .coach-back .dex-sammlungskopf-pfeil svg{display:block;width:20px;height:20px;fill:currentColor}
@@ -14870,6 +14871,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .body-coach-entry b,.sleep-coach-entry b{font:800 12px/1.2 "Work Sans",var(--ui),sans-serif}
 .body-coach-entry small,.sleep-coach-entry small{color:var(--muted);font:600 9px/1.35 var(--tech)}
 .body-coach-entry>.material-svg,.sleep-coach-entry>.material-svg{width:22px;height:22px}
+.body-coach-entry>.coach-entry-cap,.sleep-coach-entry>.coach-entry-cap{width:27px;height:27px;filter:drop-shadow(0 1px 0 #000)}
 .body-coach-entry>.material-svg:last-child,.sleep-coach-entry>.material-svg:last-child{width:18px;height:18px}
 .body-coach-entry{margin:12px auto 0}
 .sleep-coach-entry{margin-top:12px;border-inline:0;border-bottom:0;border-radius:0;background:transparent}
@@ -14921,11 +14923,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-bottom:1px solid var(--app-divider,#ddd);
 }
 .comp-central-assessment>header span{display:grid;gap:5px}
+.comp-central-assessment>header>.comp-assessment-meta{display:flex;align-items:center;gap:7px}
 .comp-central-assessment>header small{font:800 8px/1 var(--tech);letter-spacing:.08em}
 .comp-central-assessment>header h2{margin:0;font:850 20px/1 "Work Sans",var(--ui),sans-serif;letter-spacing:-.035em}
 .comp-central-assessment>header em{padding:5px 7px;border:1px solid currentColor;border-radius:999px;font:750 8px/1 var(--tech);font-style:normal;white-space:nowrap}
 .comp-assessment-loading,.comp-assessment-error{display:grid;justify-items:center;gap:9px;padding:22px 16px;text-align:center}
-.comp-assessment-loading>span{width:22px;height:22px;border:3px solid var(--app-divider);border-top-color:currentColor;border-radius:50%;animation:coach-spin .8s linear infinite}
+.comp-assessment-loading>.coach-cap-thinking,.coach-loading>.coach-cap-thinking{display:grid;place-items:center;width:52px;height:42px;perspective:120px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.35))}.coach-loading-cap{width:45px;height:38px;animation:coach-cap-thinking 1.25s cubic-bezier(.45,.05,.55,.95) infinite;transform-origin:50% 55%;will-change:transform}.coach-loading-cap>svg{backface-visibility:visible}
+@keyframes coach-cap-thinking{0%{transform:translateY(1px) rotateX(0deg) rotate(-4deg)}45%{transform:translateY(-6px) rotateX(170deg) rotate(3deg)}55%{transform:translateY(-6px) rotateX(190deg) rotate(3deg)}100%{transform:translateY(1px) rotateX(360deg) rotate(-4deg)}}
+@media(prefers-reduced-motion:reduce){.coach-loading-cap{animation:coach-cap-breathe 1.8s ease-in-out infinite}@keyframes coach-cap-breathe{50%{transform:translateY(-3px) scale(1.04)}}}
 .comp-assessment-loading p,.comp-assessment-error p{max-width:330px;margin:0;color:var(--muted);font:600 10px/1.45 var(--tech)}
 .comp-assessment-error button{min-height:34px;padding:6px 12px;border:1px solid currentColor;border-radius:9px;background:transparent;color:inherit;font-weight:750}
 .comp-assessment-body{display:grid;gap:0;padding:0 16px 16px}
@@ -14975,6 +14980,5 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] :is(.coach-hero,.coach-form){border-color:var(--dm-border,#737b8c)!important}
 :root[data-theme="dark"] .coach-spark{background:var(--dm-text)!important;color:#111!important}
 :root[data-theme="dark"][data-seite] #app .coach-spark{background:var(--dm-text)!important;color:#111!important}
-:root[data-theme="dark"][data-seite] #app .coach-spark :is(.material-svg,svg,svg *){background:transparent!important;color:#111!important;fill:#111!important}
 @media(max-width:520px){.coach-hero{grid-template-columns:42px minmax(0,1fr) 34px;padding:15px}.coach-hero .coach-spark{width:42px;height:42px}.coach-result h3{align-items:flex-start;flex-direction:column}.coach-result h3>em{white-space:normal}}
 @media(max-width:370px){.app-dex-header-actions{gap:3px}.app-dex-coach,.app-dex-search{width:32px;height:32px;flex-basis:32px}}

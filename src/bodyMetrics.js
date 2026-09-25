@@ -6,6 +6,7 @@ import { FALTEN, datumKurz, heute, summe, zahl } from './measurements.js';
 import { BODY_EXPLANATIONS, confirmedTrendChange, evaluateBodyComp, goalWeightInterpretation, weightTrendSummary } from './bodyComposition.js';
 import { parseLogmanExport, performanceTrend } from './logmanImport.js';
 import { materialIconMarkup } from './categoryIcons.js';
+import { coachIconMarkup } from './menuIcons.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
@@ -158,8 +159,8 @@ function compFactsMarkup(state) {
 
 function compAssessmentMarkup() {
   return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
-    <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><em data-comp-assessment-confidence>lädt</em></header>
-    <div class="comp-assessment-loading"><span></span><p>Berechnete Werte, Gegenprüfungen und Seminarwissen werden zusammengeführt.</p></div>
+    <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>prüft</em></span></header>
+    <div class="comp-assessment-loading"><span class="coach-cap-thinking">${coachIconMarkup('coach-loading-cap')}</span><p>CAPBOY COACH prüft deine Daten und lädt die passende Gesamtbewertung.</p></div>
   </section>`;
 }
 
@@ -798,7 +799,7 @@ function bodyCompMarkup(state) {
       <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
       <details class="body-inner-details"><summary><span>Orientierungsbereiche anpassen</span>${materialIconMarkup('chevron_right')}</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>COMP vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
     </div>
-  </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${materialIconMarkup('stars')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
+  </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
 }
 
 function compResultMarkup(result, cached = false) {
@@ -806,7 +807,7 @@ function compResultMarkup(result, cached = false) {
   const uncertainty = (result?.uncertainty || []).slice(0, 3);
   const nextSteps = (result?.nextSteps || []).slice(0, 3);
   const sources = (result?.sources || []).slice(0, 5);
-  return `<header><span><small>ZENTRALE KI-AUSWERTUNG${cached ? ' · GECACHT' : ''}</small><h2>Aktuelle Gesamtbewertung</h2></span><em>${escapeHtml(result?.confidence || 'niedrig')}</em></header>
+  return `<header><span><small>ZENTRALE KI-AUSWERTUNG · ${cached ? 'GECACHT' : 'NEU BEWERTET'}</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>${escapeHtml(result?.confidence || 'niedrig')}</em></span></header>
     <div class="comp-assessment-body">
       <section><h3>Wichtigste Entwicklung</h3><p>${escapeHtml(result?.keyDevelopment || 'Noch keine belastbare Gesamtbewertung verfügbar.')}</p></section>
       ${basis.length ? `<section><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
@@ -862,7 +863,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       if (heroConfidence) heroConfidence.textContent = `${response.result?.confidence || 'niedrig'}e Datensicherheit · ${response.cached ? 'unveränderte Daten' : 'neu ausgewertet'}`;
     } catch (error) {
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><em>nicht verfügbar</em></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;
+      panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>nicht verfügbar</em></span></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;
       panel.querySelector('[data-comp-retry]').onclick = refreshCentralAssessment;
       console.warn('COMP-Gesamtbewertung nicht geladen:', error);
     }

@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { hole, schluessel } from './datenspeicher.js';
 import { materialIconMarkup } from './categoryIcons.js';
+import { coachIconMarkup } from './menuIcons.js';
 import { openSleepSoundTimer } from './meditationTimer.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
@@ -340,7 +341,7 @@ async function render(container, userId, state, refresh) {
     <section class="sleep-section sleep-insights ${SPECIAL_DEX_CLASSES.card}">
       <header><div class="sleep-section-title">${materialIconMarkup('link')}<h2>Beobachtete Muster</h2></div><small>Aus ${month.length} Check-ins berechnet · keine Ursachenbehauptung</small></header>
       <div>${trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
-      <button class="sleep-coach-entry" type="button" data-sleep-coach>${materialIconMarkup('stars')}<span><b>Im Gesamtbild einordnen</b><small>KI-Coach separat öffnen</small></span>${materialIconMarkup('chevron_right')}</button>
+      <button class="sleep-coach-entry" type="button" data-sleep-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Im Gesamtbild einordnen</b><small>KI-Coach separat öffnen</small></span>${materialIconMarkup('chevron_right')}</button>
     </section>
     ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
 

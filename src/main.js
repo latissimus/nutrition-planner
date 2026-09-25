@@ -41,7 +41,7 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
-import { hasMenuIcon, menuIconMarkup, searchIconMarkup } from './menuIcons.js';
+import { coachIconMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup } from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -773,7 +773,7 @@ function appDexShellZeichnen(route, view) {
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
         <a class="app-dex-coach${istCoach ? ' aktiv' : ''}" href="#coach"
-           aria-label="CAPBOY Coach fragen"${istCoach ? ' aria-current="page"' : ''}>${materialIconMarkup('stars')}</a>
+           aria-label="CAPBOY Coach fragen"${istCoach ? ' aria-current="page"' : ''}>${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}

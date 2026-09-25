@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
+import { coachIconMarkup } from './menuIcons.js';
 import { toast } from './toast.js';
 
 const CONTEXT_KEY = 'muscledex:coach-context';
@@ -28,7 +29,7 @@ export function resultMarkup(result) {
     return url ? [{ title: source?.title || new URL(url).hostname, url }] : [];
   }).slice(0, 8);
   return `<div class="coach-result">
-    <header><span><small>${escapeHtml(readableModelText(result.title || 'CAPBOY COACH'))}</small><b>${escapeHtml(readableModelText(result.summary || ''))}</b></span><em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></header>
+    <header><span><small>${escapeHtml(readableModelText(result.title || 'CAPBOY COACH'))}</small><b>${escapeHtml(readableModelText(result.summary || ''))}</b></span><span class="coach-result-meta">${coachIconMarkup('coach-cap-badge')}<em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></span></header>
     ${facts.length ? `<section class="coach-result-section is-data"><h3><span>Berücksichtigte Daten</span><em>KI-Zusammenfassung deiner CAPBOY-Daten</em></h3><ul>${facts.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
     ${interpretations.length ? `<section class="coach-result-section is-ai"><h3><span>Einordnung</span><em>KI-Interpretation</em></h3><ul>${interpretations.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
     ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item) => `<article><b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p><small>${escapeHtml(readableModelText(item.timeframe))}</small></article>`).join('')}</div></section>` : ''}
@@ -65,7 +66,7 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
   container.classList.add('coach-page');
   container.innerHTML = `<main class="coach-shell">
     <header class="coach-hero">
-      <span class="coach-spark" aria-hidden="true">${materialIconMarkup('stars')}</span>
+      <span class="coach-spark" aria-hidden="true">${coachIconMarkup('coach-hero-cap')}</span>
       <div><small>PERSÖNLICHER COACH</small><h1>Frag CAPBOY</h1><p>Antworten aus deinem Gesamtbild – nicht aus einem einzelnen Messwert.</p></div>
       <a class="som-info-knopf dex-sammlungskopf-zurueck coach-back" href="#${escapeHtml(backRoute)}" aria-label="Zurück">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>
     </header>
@@ -92,7 +93,7 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     button.textContent = webResearch ? 'Coach recherchiert …' : 'Coach denkt …';
-    answer.innerHTML = `<div class="coach-loading"><span></span><p>${webResearch ? 'CAPBOY recherchiert aktuelles Wissen und verbindet es mit deinem Gesamtbild.' : 'CAPBOY verbindet die relevanten Bereiche und trennt Daten von Einordnung.'}</p></div>`;
+    answer.innerHTML = `<div class="coach-loading"><span class="coach-cap-thinking">${coachIconMarkup('coach-loading-cap')}</span><p>${webResearch ? 'CAPBOY COACH recherchiert aktuelles Wissen und verbindet es mit deinem Gesamtbild.' : 'CAPBOY COACH verbindet die relevanten Bereiche und trennt Daten von Einordnung.'}</p></div>`;
     answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     try {
       const response = await invokeCoach('coach', question, webResearch);
