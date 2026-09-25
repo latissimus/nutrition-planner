@@ -405,6 +405,33 @@ function outputText(response: Row) {
   return parts.join('');
 }
 
+function webSources(response: Row) {
+  const cited: Row[] = [];
+  const retrieved: Row[] = [];
+  for (const item of response.output || []) {
+    if (item.type === 'web_search_call') {
+      for (const source of item.action?.sources || []) retrieved.push(source);
+    }
+    if (item.type === 'message') {
+      for (const content of item.content || []) {
+        for (const annotation of content.annotations || []) {
+          if (annotation.type !== 'url_citation') continue;
+          cited.push(annotation.url_citation || annotation);
+        }
+      }
+    }
+  }
+  return [...cited, ...retrieved].flatMap((source) => {
+    try {
+      const url = new URL(String(source.url || ''));
+      if (!['http:', 'https:'].includes(url.protocol)) return [];
+      return [{ title: String(source.title || url.hostname).slice(0, 240), url: url.href }];
+    } catch {
+      return [];
+    }
+  }).filter((source, index, all) => all.findIndex((item) => item.url === source.url) === index).slice(0, 8);
+}
+
 function validateSources(sources: Row[] = []) {
   return sources.flatMap((source) => {
     const match = KNOWLEDGE_SOURCES.find((candidate) => candidate.filename === source.filename || candidate.title === source.title);
@@ -456,6 +483,7 @@ Deno.serve(async (request) => {
     const scope: Scope = ['coach', 'sleep', 'comp', 'skinfold', 'overall'].includes(requestedScope) ? requestedScope : 'coach';
     const question = String(body?.question || '').trim().slice(0, 2000);
     if (scope === 'coach' && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
+    const webResearch = scope === 'coach' && body?.webResearch === true;
 
     const snapshot = await buildSnapshot(userId);
     const clientEvidence = scope === 'comp' && body?.evidence && typeof body.evidence === 'object'
@@ -484,11 +512,17 @@ Deno.serve(async (request) => {
 Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.`
       : `Du bist der persönliche CAPBOY Coach für Training, Ernährung, Schlaf, Muskelaufbau, Körperkomposition und gesundheitsorientierte Gewohnheiten. ${sharedSafety}
 
-Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu erinnern. Trenne klar zwischen gemessenen Fakten, plausiblen Interpretationen und Unsicherheiten. Einzelwerte nie überbewerten. Gib höchstens drei konkrete, überprüfbare Empfehlungen und nenne einen realistischen Zeitraum. Bei möglichen medizinischen Warnzeichen empfehle professionelle Abklärung. Antworte auf Deutsch, knapp und konkret. ${scopeInstruction[scope]}`;
+Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu erinnern. Trenne klar zwischen gemessenen Fakten, plausiblen Interpretationen und Unsicherheiten. Einzelwerte nie überbewerten. Gib höchstens drei konkrete, überprüfbare Empfehlungen und nenne einen realistischen Zeitraum. Bei möglichen medizinischen Warnzeichen empfehle professionelle Abklärung. ${webResearch ? 'Der Nutzer hat ausdrücklich aktuelle Webrecherche aktiviert. Führe mindestens eine Websuche durch. Bevorzuge Primärquellen, systematische Übersichten, Fachgesellschaften und öffentliche Gesundheitsbehörden. Trenne externe Erkenntnisse sichtbar von den persönlichen CAPBOY-Daten und den Seminarunterlagen.' : 'Es ist keine Webrecherche erlaubt. Nutze nur den CAPBOY-Datensnapshot, die Seminar-Wissensbasis und dein allgemeines Modellwissen.'} Antworte auf Deutsch, knapp und konkret. ${scopeInstruction[scope]}`;
     const prompt = isCentralComp
       ? `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(clientEvidence)}`
       : `${question || 'Erstelle jetzt die angeforderte Analyse.'}\n\nAktueller strukturierter CAPBOY-Datensnapshot:\n${JSON.stringify(snapshot)}`;
 
+    const tools: Row[] = [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: isCentralComp ? 8 : 6 }];
+    const include = ['file_search_call.results'];
+    if (webResearch) {
+      tools.push({ type: 'web_search', search_context_size: 'medium' });
+      include.push('web_search_call.action.sources');
+    }
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -498,8 +532,9 @@ Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu e
         input: [{ role: 'user', content: prompt }],
         reasoning: { effort: isCentralComp ? 'high' : scope === 'coach' ? 'medium' : 'high' },
         max_output_tokens: isCentralComp ? 6000 : 4000,
-        tools: [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: isCentralComp ? 8 : 6 }],
-        include: ['file_search_call.results'],
+        tools,
+        tool_choice: webResearch ? 'required' : 'auto',
+        include,
         text: {
           format: {
             type: 'json_schema',
@@ -516,7 +551,11 @@ Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu e
     const raw = outputText(responsePayload);
     if (!raw) return json({ error: 'Die Coach-Antwort war leer.' }, 502);
     const parsed = JSON.parse(raw);
-    const result = isCentralComp ? enforceCompSafety(parsed, clientEvidence) : parsed;
+    const result = isCentralComp ? enforceCompSafety(parsed, clientEvidence) : {
+      ...parsed,
+      webResearchRequested: webResearch,
+      webSources: webResearch ? webSources(responsePayload) : [],
+    };
 
     if (scope !== 'coach') {
       const { error } = await admin.from('ai_coach_analyses').upsert({

@@ -6,25 +6,41 @@ const CONTEXT_KEY = 'muscledex:coach-context';
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+const readableModelText = (value = '') => String(value)
+  .replace(/\[([^\]]+)\]\(https?:\/\/[^\s)]+(?:\([^)]*\)[^\s)]*)?\)/g, '$1');
 
-function resultMarkup(result) {
+function safeExternalUrl(value = '') {
+  try {
+    const url = new URL(String(value));
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
+export function resultMarkup(result) {
   if (!result) return '';
   const facts = (result.facts || []).slice(0, 6);
   const interpretations = (result.interpretations || []).slice(0, 5);
   const recommendations = (result.recommendations || []).slice(0, 3);
+  const webSources = (result.webSources || []).flatMap((source) => {
+    const url = safeExternalUrl(source?.url);
+    return url ? [{ title: source?.title || new URL(url).hostname, url }] : [];
+  }).slice(0, 8);
   return `<div class="coach-result">
-    <header><span><small>${escapeHtml(result.title || 'CAPBOY COACH')}</small><b>${escapeHtml(result.summary || '')}</b></span><em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></header>
-    ${facts.length ? `<section class="coach-result-section is-data"><h3><span>Berücksichtigte Daten</span><em>KI-Zusammenfassung deiner CAPBOY-Daten</em></h3><ul>${facts.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
-    ${interpretations.length ? `<section class="coach-result-section is-ai"><h3><span>Einordnung</span><em>KI-Interpretation</em></h3><ul>${interpretations.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
-    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item) => `<article><b>${escapeHtml(item.action)}</b><p>${escapeHtml(item.rationale)}</p><small>${escapeHtml(item.timeframe)}</small></article>`).join('')}</div></section>` : ''}
-    ${result.uncertainties?.length ? `<details><summary>Unsicherheiten und fehlende Daten</summary><ul>${result.uncertainties.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></details>` : ''}
-    ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(result.safetyNote)}</p>` : ''}
-    <p class="coach-origin-note">Die Messwerte und regelbasierten Auswertungen auf den Fachseiten bleiben die Datenquelle. Der Coach fasst sie zusammen und priorisiert mögliche nächste Schritte.</p>
+    <header><span><small>${escapeHtml(readableModelText(result.title || 'CAPBOY COACH'))}</small><b>${escapeHtml(readableModelText(result.summary || ''))}</b></span><em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></header>
+    ${facts.length ? `<section class="coach-result-section is-data"><h3><span>Berücksichtigte Daten</span><em>KI-Zusammenfassung deiner CAPBOY-Daten</em></h3><ul>${facts.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
+    ${interpretations.length ? `<section class="coach-result-section is-ai"><h3><span>Einordnung</span><em>KI-Interpretation</em></h3><ul>${interpretations.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
+    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item) => `<article><b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p><small>${escapeHtml(readableModelText(item.timeframe))}</small></article>`).join('')}</div></section>` : ''}
+    ${result.uncertainties?.length ? `<details><summary>Unsicherheiten und fehlende Daten</summary><ul>${result.uncertainties.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></details>` : ''}
+    ${webSources.length ? `<details class="coach-web-sources" open><summary>Verwendete Webquellen</summary><ul>${webSources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`).join('')}</ul></details>` : ''}
+    ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
+    <p class="coach-origin-note">Die Messwerte und regelbasierten Auswertungen auf den Fachseiten bleiben die Datenquelle. ${result.webResearchRequested ? (webSources.length ? 'Aktuelles Webwissen wurde ergänzend recherchiert und ist oben verlinkt.' : 'Die gewünschte Webrecherche lieferte keine verwendbare externe Quelle.') : 'Es wurde keine Internetrecherche durchgeführt.'}</p>
   </div>`;
 }
 
-async function invokeCoach(scope, question = '') {
-  const { data, error } = await supabase.functions.invoke('capboy-coach', { body: { scope, question } });
+async function invokeCoach(scope, question = '', webResearch = false) {
+  const { data, error } = await supabase.functions.invoke('capboy-coach', { body: { scope, question, webResearch } });
   if (error) {
     let message = error.message;
     try {
@@ -56,8 +72,9 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
     <form class="coach-form" data-coach-form>
       <label for="coach-question">Deine Frage</label>
       <textarea id="coach-question" rows="3" maxlength="2000" placeholder="Zum Beispiel: Warum stagniert mein Fortschritt, obwohl ich regelmäßig trainiere?">${escapeHtml(pending.question || '')}</textarea>
+      <label class="coach-web-option"><input type="checkbox" data-coach-web><span><b>Aktuelles Webwissen recherchieren</b><small>Für aktuelle Studien, Leitlinien oder externes Wissen. Die verwendeten Quellen werden verlinkt.</small></span></label>
       <button class="btn btn-primary" type="submit">Coach fragen</button>
-      <small class="coach-scope-note">Betrachtet COMP, Training, Ernährung, Schlaf, Erholung und Routinen gemeinsam.</small>
+      <small class="coach-scope-note">Betrachtet immer COMP, Training, Ernährung, Schlaf, Erholung und Routinen gemeinsam. Webrecherche ist optional.</small>
     </form>
     <section class="coach-answer" data-coach-answer aria-live="polite">
       <div class="coach-welcome"><b>Eine Antwort, ein Gesamtbild.</b><p>Stelle deine Frage. CAPBOY trennt die verwendeten Daten, die KI-Einordnung und vorgeschlagene nächste Schritte sichtbar voneinander.</p></div>
@@ -71,13 +88,14 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
     event.preventDefault();
     const question = field.value.trim();
     if (question.length < 2) return;
+    const webResearch = Boolean(form.querySelector('[data-coach-web]')?.checked);
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    button.textContent = 'Coach denkt …';
-    answer.innerHTML = '<div class="coach-loading"><span></span><p>CAPBOY verbindet die relevanten Bereiche und trennt Daten von Einordnung.</p></div>';
+    button.textContent = webResearch ? 'Coach recherchiert …' : 'Coach denkt …';
+    answer.innerHTML = `<div class="coach-loading"><span></span><p>${webResearch ? 'CAPBOY recherchiert aktuelles Wissen und verbindet es mit deinem Gesamtbild.' : 'CAPBOY verbindet die relevanten Bereiche und trennt Daten von Einordnung.'}</p></div>`;
     answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     try {
-      const response = await invokeCoach('coach', question);
+      const response = await invokeCoach('coach', question, webResearch);
       if (signal?.aborted) return;
       answer.innerHTML = resultMarkup(response.result);
       field.value = '';
