@@ -93,7 +93,7 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     button.textContent = webResearch ? 'Coach recherchiert …' : 'Coach denkt …';
-    answer.innerHTML = `<div class="coach-loading"><span class="coach-cap-thinking">${coachIconMarkup('coach-loading-cap')}</span><p>${webResearch ? 'CAPBOY COACH recherchiert aktuelles Wissen und verbindet es mit deinem Gesamtbild.' : 'CAPBOY COACH verbindet die relevanten Bereiche und trennt Daten von Einordnung.'}</p></div>`;
+    answer.innerHTML = `<div class="coach-loading"><span class="coach-cap-thinking"><span class="coach-cap-plane">${coachIconMarkup('coach-loading-cap')}</span></span><p>${webResearch ? 'CAPBOY COACH recherchiert aktuelles Wissen und verbindet es mit deinem Gesamtbild.' : 'CAPBOY COACH verbindet die relevanten Bereiche und trennt Daten von Einordnung.'}</p></div>`;
     answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     try {
       const response = await invokeCoach('coach', question, webResearch);

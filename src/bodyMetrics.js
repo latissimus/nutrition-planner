@@ -160,7 +160,7 @@ function compFactsMarkup(state) {
 function compAssessmentMarkup() {
   return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
     <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>prüft</em></span></header>
-    <div class="comp-assessment-loading"><span class="coach-cap-thinking">${coachIconMarkup('coach-loading-cap')}</span><p>CAPBOY COACH prüft deine Daten und lädt die passende Gesamtbewertung.</p></div>
+    <div class="comp-assessment-loading"><span class="coach-cap-thinking"><span class="coach-cap-plane">${coachIconMarkup('coach-loading-cap')}</span></span><p>CAPBOY COACH prüft deine Daten und lädt die passende Gesamtbewertung.</p></div>
   </section>`;
 }
 
@@ -856,7 +856,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
       const [response] = await Promise.all([
         requestCompAssessment(buildCompEvidence(state, context)),
-        new Promise((resolve) => setTimeout(resolve, 1800)),
+        new Promise((resolve) => setTimeout(resolve, 3000)),
       ]);
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
       panel.innerHTML = compResultMarkup(response.result, response.cached === true);
