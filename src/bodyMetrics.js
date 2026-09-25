@@ -9,6 +9,7 @@ import { materialIconMarkup } from './categoryIcons.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
+import { buildCompEvidence, requestCompAssessment } from './compAssessment.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import { alterAmMessdatum, koerperfettAnteil, magermasse } from './ypsiFormel.js';
@@ -124,27 +125,56 @@ function recoveryTrend(sleep, checkins) {
 function infoDetails(title, text) { return `<details class="body-info"><summary>${title}<span aria-hidden="true">?</span></summary><p>${text}</p></details>`; }
 
 function bodyHeroMarkup(state) {
-  const latest = state.weights.at(-1);
-  const trend = weightTrendSummary(state.weights, state.settings.bodycomp_thresholds || undefined);
-  const recentDays = new Set(state.weights
-    .filter((row) => day(heute()) - day(row.gemessen_am) < 7)
-    .map((row) => row.gemessen_am)).size;
-  const progress = Math.min(100, Math.round(recentDays / 7 * 100));
-  const weekly = Number(trend.weeklyKg || 0);
-  const weeklyLabel = latest
-    ? `${weekly > 0 ? '+' : ''}${display(weekly, 2)} kg pro Woche`
-    : 'Noch keine Messung';
-  return `<div class="body-v2-stack ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}"><section class="body-v2-hero ${SPECIAL_DEX_CLASSES.hero}" style="--body-progress:${progress}%">
-    <div class="body-v2-ring"><span><b>${latest ? display(trend.average7Kg) : '–'}</b><small>7-TAGE Ø</small></span></div>
-    <div class="body-v2-hero-value"><small>AKTUELLES GEWICHT</small><div><strong>${latest ? display(latest.kg) : '–'}</strong>${latest ? '<b>kg</b>' : ''}</div><span>${latest ? weeklyLabel : 'Noch keine Messung'}</span></div>
+  const evidence = buildCompEvidence(state, getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {});
+  const facts = evidence.objectiveFacts;
+  const available = [facts.weight.currentKg, facts.skinfolds.sumMm, facts.waist.currentCm, facts.performance.direction]
+    .filter((value) => value != null).length;
+  const progress = available * 25;
+  return `<div class="body-v2-stack ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}"><section class="body-v2-hero body-comp-hero ${SPECIAL_DEX_CLASSES.hero}" style="--body-progress:${progress}%">
+    <div class="body-v2-ring"><span><b>${available}/4</b><small>SIGNALE</small></span></div>
+    <div class="body-v2-hero-value"><small>AKTUELLER GESAMTSTATUS</small><div><strong data-comp-hero-status>${escapeHtml(evidence.deterministicAssessment.message)}</strong></div><span data-comp-hero-confidence>${escapeHtml(evidence.deterministicAssessment.confidence)}e Datensicherheit · KI-Einordnung wird geladen</span></div>
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="COMP-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
-    <p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>Falten-Summe</b> fest. Neue Messungen trägst du über den zentralen Hinzufügen-Button ein.</p>
-    <p><b>COMP</b> bewertet nicht einzelne Tageswerte, sondern deinen geglätteten Gewichtsverlauf.</p>
-    <p>Ergänzende Daten wie <b>Taillenumfang</b>, <b>Falten-Summe</b>, Training und Erholung helfen dabei, Veränderungen sinnvoll einzuordnen.</p>
+    <p>Der Status verbindet die im Code berechneten Trends aus Gewicht, Faltensumme, Taille und Leistung. Das Sprachmodell erklärt diese Ergebnisse mit passenden Seminarstellen, berechnet sie aber nicht selbst.</p>
     <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und <b>keine medizinische Diagnose</b>.</p>
   </div></div>`;
+}
+
+function compFactsMarkup(state) {
+  const evidence = buildCompEvidence(state, getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {});
+  const facts = evidence.objectiveFacts;
+  const value = (number, unit) => number == null ? '–' : `${display(number)}${unit ? ` ${unit}` : ''}`;
+  const performance = facts.performance.direction == null
+    ? '–'
+    : `${facts.performance.changePercent > 0 ? '+' : ''}${display(facts.performance.changePercent)} %`;
+  return `<section class="comp-facts ${SPECIAL_DEX_CLASSES.content}" aria-label="Aktuelle COMP-Fakten">
+    <article><small>GEWICHT</small><b>${value(facts.weight.currentKg, 'kg')}</b><span>7-Tage Ø ${value(facts.weight.average7Kg, 'kg')}</span></article>
+    <article><small>FALTENSUMME</small><b>${value(facts.skinfolds.sumMm, 'mm')}</b><span>${facts.skinfolds.count} vollständige Messungen</span></article>
+    <article><small>TAILLE</small><b>${value(facts.waist.currentCm, 'cm')}</b><span>${facts.waist.count} Messungen</span></article>
+    <article><small>LEISTUNG</small><b>${performance}</b><span>${facts.performance.importedValues} LOGMAN-Werte</span></article>
+  </section>`;
+}
+
+function compAssessmentMarkup() {
+  return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
+    <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><em data-comp-assessment-confidence>lädt</em></header>
+    <div class="comp-assessment-loading"><span></span><p>Berechnete Werte, Gegenprüfungen und Seminarwissen werden zusammengeführt.</p></div>
+  </section>`;
+}
+
+function compDetailsMarkup(state) {
+  return `<details class="comp-details ${SPECIAL_DEX_CLASSES.content}">
+    <summary><span><b>Details</b><small>Messreihen, Hautfalten, Formeln und Quellen</small></span>${materialIconMarkup('chevron_right')}</summary>
+    <div class="comp-details-content">
+      ${weightMarkup(state)}
+      ${skinfoldMarkup(state)}
+      ${ypsiKfaMarkup(state)}
+      ${neurotransmitterMarkup()}
+      ${waistMarkup(state)}
+      ${logmanMarkup(state)}
+    </div>
+  </details>`;
 }
 
 function weightEntryMarkup() {
@@ -771,6 +801,22 @@ function bodyCompMarkup(state) {
   </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${materialIconMarkup('stars')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
 }
 
+function compResultMarkup(result, cached = false) {
+  const basis = (result?.basis || []).slice(0, 4);
+  const uncertainty = (result?.uncertainty || []).slice(0, 3);
+  const nextSteps = (result?.nextSteps || []).slice(0, 3);
+  const sources = (result?.sources || []).slice(0, 5);
+  return `<header><span><small>ZENTRALE KI-AUSWERTUNG${cached ? ' · GECACHT' : ''}</small><h2>Aktuelle Gesamtbewertung</h2></span><em>${escapeHtml(result?.confidence || 'niedrig')}</em></header>
+    <div class="comp-assessment-body">
+      <section><h3>Wichtigste Entwicklung</h3><p>${escapeHtml(result?.keyDevelopment || 'Noch keine belastbare Gesamtbewertung verfügbar.')}</p></section>
+      ${basis.length ? `<section><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
+      ${uncertainty.length ? `<section><h3>Was noch unsicher ist</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
+      ${nextSteps.length ? `<section><h3>Nächste Schritte</h3><ol>${nextSteps.map((item) => `<li><b>${escapeHtml(item.action)}</b><span>${escapeHtml(item.rationale)}</span><small>${escapeHtml(item.timeframe)}</small></li>`).join('')}</ol></section>` : ''}
+      ${sources.length ? `<details class="comp-assessment-sources"><summary>Verwendete Seminarquellen</summary><ul>${sources.map((source) => `<li><b>${escapeHtml(source.title || source.filename)}</b>${source.page ? `<span>Seite ${escapeHtml(source.page)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}
+      <p class="comp-assessment-safety">Messwerte und Regeln werden im Code berechnet. Die KI erklärt und priorisiert; sie stellt keine Diagnose und verändert keine Ziele automatisch.</p>
+    </div>`;
+}
+
 function logmanMarkup(state) {
   const trend = performanceTrend(state.performance);
   const baselines = new Map();
@@ -799,19 +845,37 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   let state;
   let activeRender = null;
   let renderQueued = false;
+  let assessmentSequence = 0;
+
+  const refreshCentralAssessment = async () => {
+    const panel = container.querySelector('[data-comp-assessment]');
+    if (!panel || !state) return;
+    const sequence = ++assessmentSequence;
+    try {
+      const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
+      const response = await requestCompAssessment(buildCompEvidence(state, context));
+      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
+      panel.innerHTML = compResultMarkup(response.result, response.cached === true);
+      const heroStatus = container.querySelector('[data-comp-hero-status]');
+      const heroConfidence = container.querySelector('[data-comp-hero-confidence]');
+      if (heroStatus) heroStatus.textContent = response.result?.status || response.result?.title || 'Gesamtbild aktualisiert';
+      if (heroConfidence) heroConfidence.textContent = `${response.result?.confidence || 'niedrig'}e Datensicherheit · ${response.cached ? 'unveränderte Daten' : 'neu ausgewertet'}`;
+    } catch (error) {
+      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
+      panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><em>nicht verfügbar</em></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;
+      panel.querySelector('[data-comp-retry]').onclick = refreshCentralAssessment;
+      console.warn('COMP-Gesamtbewertung nicht geladen:', error);
+    }
+  };
 
   const renderOnce = async () => {
     state = await queryState(userId, signal);
     if (signal?.aborted) return;
     const markup = `
       ${bodyHeroMarkup(state)}
-      ${bodyCompMarkup(state)}
-      ${weightMarkup(state)}
-      ${skinfoldMarkup(state)}
-      ${ypsiKfaMarkup(state)}
-      ${neurotransmitterMarkup()}
-      ${waistMarkup(state)}
-      ${logmanMarkup(state)}`;
+      ${compFactsMarkup(state)}
+      ${compAssessmentMarkup()}
+      ${compDetailsMarkup(state)}`;
     const content = container.querySelector(':scope > .body-metrics-wrap > .kategorie-scrollinhalt');
     if (content) {
       // Nach dem ersten Mount liegen Titel und Aktionsknöpfe außerhalb dieses
@@ -828,6 +892,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const pageMeta = container.querySelector('[data-food-scroll-meta]');
     if (pageMeta) pageMeta.textContent = `${state.weights.length} ${state.weights.length === 1 ? 'Wiegung' : 'Wiegungen'}`;
     bind();
+    refreshCentralAssessment();
     // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
     // (Update-Hinweis mit eigenen COMP-Notizen) wieder anzuhängen und
     // renderDexEntries darauf loszulassen. Sonst überlebt der Slot nur den
@@ -1194,14 +1259,6 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     };
     const thresholdForm = container.querySelector('[data-bodycomp-thresholds]');
     if (thresholdForm) thresholdForm.onsubmit = async (event) => { event.preventDefault(); const form = event.currentTarget; const stableLoss = zahl(form.querySelector('[data-threshold-stable-loss]').value); const slowLoss = zahl(form.querySelector('[data-threshold-slow-loss]').value); const stableGain = zahl(form.querySelector('[data-threshold-stable-gain]').value); const slowGain = zahl(form.querySelector('[data-threshold-slow-gain]').value); if (!(stableLoss > 0 && slowLoss > stableLoss && stableGain > 0 && slowGain > stableGain)) return toast('Bitte aufsteigende, positive Prozentgrenzen eintragen'); const bodycomp_thresholds = { stableLoss: -stableLoss, slowLoss: -slowLoss, stableGain, slowGain }; const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, bodycomp_thresholds }, { onConflict: 'user_id' }); if (error) return toast('Orientierungsbereiche konnten nicht gespeichert werden'); toast('Orientierungsbereiche gespeichert'); await render(); };
-    const coachButton = container.querySelector('[data-body-coach]');
-    if (coachButton) coachButton.onclick = async () => {
-      const { openCoachQuestion } = await import('./coach.js');
-      openCoachQuestion({
-        scope: 'comp',
-        question: 'Ordne meine aktuelle Körperkomposition, Hautfalten, Ernährung, mein Training und meine Erholung gemeinsam ein. Trenne klar zwischen Daten, Interpretation und Unsicherheit.',
-      });
-    };
     const settings = container.querySelector('[data-skinfold-settings]');
     if (settings) {
       settings.innerHTML = `<div class="mess-einst body-reminder-settings"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i><span>Erinnerung aktiv</span></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen${weeks === 2 ? ' · kürzer als Seminar' : ''}</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;
