@@ -807,7 +807,7 @@ function compResultMarkup(result, cached = false) {
   const uncertainty = (result?.uncertainty || []).slice(0, 3);
   const nextSteps = (result?.nextSteps || []).slice(0, 3);
   const sources = (result?.sources || []).slice(0, 5);
-  return `<header><span><small>ZENTRALE KI-AUSWERTUNG · ${cached ? 'GECACHT' : 'NEU BEWERTET'}</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>${escapeHtml(result?.confidence || 'niedrig')}</em></span></header>
+  return `<header><span><small>ZENTRALE KI-AUSWERTUNG · ${cached ? 'UNVERÄNDERT' : 'NEU BEWERTET'}</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>${escapeHtml(result?.confidence || 'niedrig')}</em></span></header>
     <div class="comp-assessment-body">
       <section><h3>Wichtigste Entwicklung</h3><p>${escapeHtml(result?.keyDevelopment || 'Noch keine belastbare Gesamtbewertung verfügbar.')}</p></section>
       ${basis.length ? `<section><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
