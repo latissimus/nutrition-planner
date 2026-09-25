@@ -854,7 +854,10 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const sequence = ++assessmentSequence;
     try {
       const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
-      const response = await requestCompAssessment(buildCompEvidence(state, context));
+      const [response] = await Promise.all([
+        requestCompAssessment(buildCompEvidence(state, context)),
+        new Promise((resolve) => setTimeout(resolve, 1800)),
+      ]);
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
       panel.innerHTML = compResultMarkup(response.result, response.cached === true);
       const heroStatus = container.querySelector('[data-comp-hero-status]');
