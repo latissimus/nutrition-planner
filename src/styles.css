@@ -14598,9 +14598,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      Zwei Staerken, jede in sich gleich eingestellt. Massgroesse ist
      Helligkeitsabstand zum Grund MAL Flaechendeckung, gemessen ueber dem
      echten Seitengrund (16 von 255):
-       Bildschirm-Texturen (Gitter, Dithering)  rund 1,6
-       gezeichnete Motive (Dreieck, Quadrat, Steuerkreuz, Punkt- und
-       Millimeterraster)                        rund 0,8
+       Bildschirm-Texturen (Gitter, Dithering,
+       Bildroehren-Zeilen)                      rund 1,6
+       gezeichnete Motive (Dreieck, Quadrat, Punkt- und Millimeterraster,
+       Ziegel, Rechteckwelle, Kreuzchen, Tetris) rund 0,5
      Je sparsamer ein Muster die Flaeche bedeckt, desto heller steht
      deshalb der einzelne Punkt - beim Dithering 29 Stufen ueber dem
      Grund, beim flaechigen Gitter nur 7.
@@ -14610,7 +14611,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      Motiv (Gitter 23 %, Dithering 12,5 % gegen 5 % beim Dreieck). Sie standen
      deshalb zuerst sehr niedrig - waren dann aber kaum zu sehen. Jetzt so
      eingestellt, dass die Textur wirklich traegt. */
-  --muster-steuerkreuz-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' shape-rendering='crispEdges'%3E%3Cpath d='M17 12h6v5h5v6h-5v5h-6v-5h-5v-6h5z' fill='%23EDF0F6' fill-opacity='.037'/%3E%3C/svg%3E");
+  --muster-bildroehre-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%23EDF0F6' fill-opacity='.029'/%3E%3C/svg%3E");
+  --muster-ziegel-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%23EDF0F6' stroke-opacity='.014' fill='none'/%3E%3C/svg%3E");
+  --muster-rechteckwelle-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%23EDF0F6' stroke-opacity='.02' fill='none'/%3E%3C/svg%3E");
+  --muster-kreuzchen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.054'%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='8' y='5' width='1' height='1'/%3E%3Crect x='6' y='6' width='2' height='2'/%3E%3Crect x='5' y='8' width='1' height='1'/%3E%3Crect x='8' y='8' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-tetris-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='30' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.024'%3E%3Crect x='8' y='9' width='5' height='5'/%3E%3Crect x='14' y='9' width='5' height='5'/%3E%3Crect x='20' y='9' width='5' height='5'/%3E%3Crect x='14' y='15' width='5' height='5'/%3E%3C/g%3E%3C/svg%3E");
   --muster-millimeter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%23EDF0F6' stroke-opacity='.082' stroke-width='1' fill='none'/%3E%3C/svg%3E");
   --muster-punktraster-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%23EDF0F6' fill-opacity='.058'/%3E%3C/svg%3E");
   --muster-gitter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%23EDF0F6' stroke-opacity='.042' stroke-width='1' fill='none'/%3E%3C/svg%3E");
@@ -14618,46 +14623,46 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.029'/%3E%3C/svg%3E");
 }
 
-/* Reihenfolge im Menuband, links nach rechts: TRACKER, ROUTINEN, COMP,
-   SCHLAF, REZEPTE, ESSEN, SUPPS, EINKAUF, TRAINING, MIND. Die Muster sind so
-   verteilt, dass beim Durchklicken nie zweimal hintereinander dasselbe kommt:
-   Steuerkreuz, Punkt, Millimeter, Gitter, Quadrat, Dithering, Gitter, Punkt,
-   Dreieck, Millimeter. */
+/* Reihenfolge im Menuband, links nach rechts - jedes Muster genau einmal:
+     TRACKER   Gameboy-Gitter       COMP     Millimeterraster
+     ROUTINEN  Pixel-Kreuzchen      SCHLAF   Bildroehren-Zeilen
+     REZEPTE   Quadrate             ESSEN    Dithering
+     SUPPS     Punktraster          EINKAUF  Ziegel
+     TRAINING  Dreiecke             MIND     Rechteckwelle
+   Ausserhalb des Bandes: COACH Millimeter, SUCHE Bildroehren-Zeilen,
+   PROFIL Dithering, CAPCOIN Tetris-Kloetze (fest).
+   Gitter und Millimeterraster bleiben den technischen Seiten vorbehalten
+   (TRACKER, COMP, COACH). */
 
-/* Steuerkreuz - TRACKER */
+/* Gameboy-Gitter - TRACKER */
 :root[data-theme="dark"][data-seite="reminders"] #view{
-  background-image:var(--muster-steuerkreuz-dunkel)!important;
+  background-image:var(--muster-gitter-dunkel)!important;
   background-repeat:repeat!important;
   background-position:center!important;
   background-attachment:fixed!important;
 }
 
-/* Punktraster - ROUTINEN, EINKAUF */
-:root[data-theme="dark"][data-seite="habits"] #view,
-:root[data-theme="dark"][data-seite="shopping"] #view{
-  background-image:var(--muster-punktraster-dunkel)!important;
-  background-repeat:repeat!important;
-  background-position:center!important;
-  background-attachment:fixed!important;
-}
-
-/* Millimeterraster - COMP, MIND */
+/* Millimeterraster - COMP, COACH */
 :root[data-theme="dark"][data-seite="body"] #view,
-:root[data-theme="dark"][data-seite="stress"] #view{
+:root[data-theme="dark"][data-seite="coach"] #view{
   background-image:var(--muster-millimeter-dunkel)!important;
   background-repeat:repeat!important;
   background-position:center!important;
   background-attachment:fixed!important;
 }
 
-/* Gameboy-Gitter - SCHLAF, SUPPS, SUCHE. Eine Textur aus 1-px-Linien lebt
-   davon, dass man sie ueber eine weite Strecke sieht; sie traegt aber auch
-   in den schmalen Streifen zwischen Karten, wo ein Motiv keinen Platz mehr
-   haette. */
+/* Pixel-Kreuzchen - ROUTINEN */
+:root[data-theme="dark"][data-seite="habits"] #view{
+  background-image:var(--muster-kreuzchen-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Bildroehren-Zeilen - SCHLAF, SUCHE */
 :root[data-theme="dark"][data-seite="sleep"] #view,
-:root[data-theme="dark"][data-seite="supps"] #view,
 :root[data-theme="dark"][data-seite="search"] #view{
-  background-image:var(--muster-gitter-dunkel)!important;
+  background-image:var(--muster-bildroehre-dunkel)!important;
   background-repeat:repeat!important;
   background-position:center!important;
   background-attachment:fixed!important;
@@ -14671,11 +14676,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-attachment:fixed!important;
 }
 
-/* Dithering - ESSEN, PROFIL, COINS */
+/* Dithering - ESSEN, PROFIL */
 :root[data-theme="dark"][data-seite="essen"] #view,
-:root[data-theme="dark"][data-seite="profile"] #view,
-:root[data-theme="dark"][data-seite="coins"] #view{
+:root[data-theme="dark"][data-seite="profile"] #view{
   background-image:var(--muster-dithering-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Punktraster - SUPPS */
+:root[data-theme="dark"][data-seite="supps"] #view{
+  background-image:var(--muster-punktraster-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Ziegel - EINKAUF */
+:root[data-theme="dark"][data-seite="shopping"] #view{
+  background-image:var(--muster-ziegel-dunkel)!important;
   background-repeat:repeat!important;
   background-position:center!important;
   background-attachment:fixed!important;
@@ -14684,6 +14704,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Dreiecke - TRAINING, das Set-O-Meter-Motiv aus dem LOGMAN */
 :root[data-theme="dark"][data-seite="training"] #view{
   background-image:var(--muster-dreieck-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Rechteckwelle - MIND */
+:root[data-theme="dark"][data-seite="stress"] #view{
+  background-image:var(--muster-rechteckwelle-dunkel)!important;
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+/* Tetris-Kloetze - CAPCOIN */
+:root[data-theme="dark"][data-seite="coins"] #view{
+  background-image:var(--muster-tetris-dunkel)!important;
   background-repeat:repeat!important;
   background-position:center!important;
   background-attachment:fixed!important;
