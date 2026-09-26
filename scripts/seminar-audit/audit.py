@@ -16,6 +16,7 @@ PDF-Seite selbst ansehen muss - kein Beweis, dass Gemini falsch liegt.
 """
 
 import argparse
+from collections import Counter
 import difflib
 import hashlib
 import json
@@ -35,6 +36,7 @@ HIER = Path(__file__).resolve().parent
 REPO = HIER.parent.parent
 STANDARD_MD = Path('/Users/flrn/Desktop/Seminarunterlagen-bereinigt:')
 STANDARD_PDF = REPO / 'Seminarunterlagen'
+ERWARTETE_PYPDF_VERSION = '6.14.2'
 
 # Schwellen. Bewusst einfach gehalten und im Bericht ausgewiesen.
 SCHWELLEN = {
@@ -87,6 +89,19 @@ ZAHL = re.compile(
 FUELLWOERTER_ENDE = {'und', 'oder', 'der', 'die', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'einer', 'mit', 'zu', 'zum',
                      'zur', 'von', 'vom', 'für', 'bei', 'auf', 'in', 'im', 'an', 'am', 'als', 'wie', 'dass', 'wenn', 'weil'}
 KONJUNKTIONEN_NACH_TRENNSTRICH = {'oder', 'und', 'bzw', 'bis', 'sowie'}
+EINHEIT_ALIASE = {
+    'μg': 'µg', 'ug': 'µg', 'mcg': 'µg',
+    'μmol': 'µmol',
+    'i.e.': 'ie', 'iu': 'ie',
+    'std': 'h',
+    'tage': 'tag', 'wochen': 'woche', 'monate': 'monat', 'jahre': 'jahr',
+}
+SATZENDE = re.compile(r'[.!?;:](?:[)\]"\u201c\u201d\u00bb]*)$')
+PROSA_SIGNAL = {
+    'ist', 'sind', 'war', 'waren', 'wird', 'werden', 'hat', 'haben', 'kann', 'können',
+    'die', 'der', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'einer', 'einen',
+    'von', 'mit', 'für', 'auf', 'in', 'an', 'zu', 'dass', 'wenn', 'weil', 'damit',
+}
 
 
 def sha256(pfad):
@@ -112,11 +127,13 @@ def zahlen(text):
         roh, einheit = treffer.group(1), (treffer.group(2) or '').lower()
         wert = roh.replace('−', '-').replace(',', '.')
         vorher = text[max(0, treffer.start() - 12):treffer.start()]
+        einheit = einheit.replace('μ', 'µ')
+        einheit = EINHEIT_ALIASE.get(einheit, einheit)
         gefunden.append({
             'roh': treffer.group(0).strip(),
             'wert': wert.lstrip('+'),
-            'einheit': einheit.replace('μ', 'µ'),
-            'dosis': einheit.replace('μ', 'µ') in DOSIS_EINHEITEN,
+            'einheit': einheit,
+            'dosis': einheit in {EINHEIT_ALIASE.get(e.replace('μ', 'µ'), e.replace('μ', 'µ')) for e in DOSIS_EINHEITEN},
             'grenzwert': bool(GRENZ_WOERTER.search(vorher)),
         })
     return gefunden
@@ -132,6 +149,64 @@ def gruppiert(liste):
         else:
             gruppen[schluessel] = [z, 1]
     return [(z, anzahl) for z, anzahl in gruppen.values()]
+
+
+def zahlenabweichungen(pdf_text, md_text, alle_pdf_text=''):
+    """Vergleicht Zahlen als Multiset aus Wert und normalisierter Einheit.
+
+    Gleiche Werte mit anderer oder fehlender Einheit werden als harter
+    Einheitenfehler gepaart, bevor verbleibende Zahlen als fehlend/zusätzlich
+    gemeldet werden. So bleiben auch unterschiedliche Häufigkeiten sichtbar.
+    """
+    pdf_z = zahlen(pdf_text)
+    md_z = zahlen(ohne_artefakte(md_text))
+    pdf_paare = Counter((z['wert'], z['einheit']) for z in pdf_z)
+    md_paare = Counter((z['wert'], z['einheit']) for z in md_z)
+    gemeinsam = pdf_paare & md_paare
+    pdf_rest = pdf_paare - gemeinsam
+    md_rest = md_paare - gemeinsam
+    befunde = []
+
+    # Gleicher Wert, aber andere/fehlende Einheit: nicht als zwei unabhängige
+    # Zahlenfehler ausgeben, sondern als eindeutigen Einheitenfehler.
+    for wert in sorted({w for w, _ in pdf_rest} & {w for w, _ in md_rest}):
+        pdf_einheiten = sorted(e for (w, e), n in pdf_rest.items() if w == wert for _ in range(n))
+        md_einheiten = sorted(e for (w, e), n in md_rest.items() if w == wert for _ in range(n))
+        for pdf_einheit, md_einheit in zip(pdf_einheiten, md_einheiten):
+            pdf_rest[(wert, pdf_einheit)] -= 1
+            md_rest[(wert, md_einheit)] -= 1
+            befunde.append(befund(
+                'zahl', 'fehler',
+                f'Einheit bei Zahl "{wert}" weicht ab: PDF "{pdf_einheit or "ohne Einheit"}", Markdown "{md_einheit or "ohne Einheit"}".',
+                grund='einheitenabweichung', wert=wert,
+                pdf_einheit=pdf_einheit, markdown_einheit=md_einheit,
+            ))
+    pdf_rest += Counter()
+    md_rest += Counter()
+
+    alle_pdf_paare = Counter((z['wert'], z['einheit']) for z in zahlen(alle_pdf_text or pdf_text))
+    beispiel_md = {(z['wert'], z['einheit']): z for z in md_z}
+    beispiel_pdf = {(z['wert'], z['einheit']): z for z in pdf_z}
+    for paar, anzahl in md_rest.items():
+        z = beispiel_md[paar]
+        anderswo = alle_pdf_paare[paar] > 0
+        schwere = 'fehler' if (z['dosis'] or z['grenzwert']) else 'warnung'
+        befunde.append(befund(
+            'zahl', schwere,
+            f'Zahl "{z["roh"]}"{mal(anzahl)} steht nicht auf der PDF-Seite'
+            + (' (aber mit derselben Einheit auf einer anderen Seite des PDFs).' if anderswo else ' und nirgends so im PDF.'),
+            grund='nur_markdown', richtung='nur_markdown', zahl=z,
+            anzahl=anzahl, anderswo_im_pdf=anderswo,
+        ))
+    for paar, anzahl in pdf_rest.items():
+        z = beispiel_pdf[paar]
+        schwere = 'fehler' if (z['dosis'] or z['grenzwert']) else 'warnung'
+        befunde.append(befund(
+            'zahl', schwere,
+            f'Zahl "{z["roh"]}"{mal(anzahl)} der PDF-Seite fehlt im Markdown.',
+            grund='nur_pdf', richtung='nur_pdf', zahl=z, anzahl=anzahl,
+        ))
+    return befunde, md_z
 
 
 def mal(anzahl):
@@ -287,6 +362,18 @@ def fragmente(seite):
         # Einzelne kleingeschriebene Wörter als eigener Absatz
         if not vorher and not nachher and len(worte) <= 2 and erstes[:1].islower() and not re.search(r'[.!?:]$', zeile):
             treffer.append({'zeile': nummer, 'typ': 'isoliertes_fragment', 'text': zeile})
+        # Fortlaufender Fließtext wurde in rohe OCR-Zeilen zerlegt. Das ist
+        # nicht zwingend falsch, verhindert aber atomare, zitierbare Aussagen.
+        # Nur Zeilen mit einem Prosasignal markieren; reine Titel/Stichworte
+        # bleiben dadurch weitgehend außen vor.
+        naechste_plain = bool(nachher) and not nachher.startswith(('|', '#', '<!--')) and not re.match(r'^[-*+]\s', nachher)
+        wortmenge = {w.strip('.,;:!?()[]"').lower() for w in worte}
+        if naechste_plain and len(worte) >= 3 and wortmenge & PROSA_SIGNAL and not SATZENDE.search(zeile):
+            treffer.append({
+                'zeile': nummer,
+                'typ': 'prosazeile_ohne_satzabschluss',
+                'text': f'{zeile} / {nachher}',
+            })
     return treffer
 
 
@@ -406,18 +493,14 @@ def pruefe_datei(md_pfad, pdf_pfad, relativ):
             if zeilen_fehlen:
                 bericht['befunde'].append(befund('auslassung', 'pruefen', f'{len(zeilen_fehlen)} Zeile(n) der PDF-Seite nicht im Markdown gefunden.', zeilen=zeilen_fehlen))
 
-            pdf_z = zahlen(pdf_seite['text'])
-            md_z = zahlen(ohne_artefakte(seite['text']))
-            pdf_werte = {z['wert'] for z in pdf_z}
-            md_werte = {z['wert'] for z in md_z}
-            alle_pdf_werte = {z['wert'] for s in pdf for z in zahlen(s['text'])}
-            for z, anzahl in gruppiert(z for z in md_z if z['wert'] not in pdf_werte):
-                anderswo = z['wert'] in alle_pdf_werte
-                schwere = 'fehler' if (z['dosis'] or z['grenzwert']) else 'warnung'
-                bericht['befunde'].append(befund('zahl', schwere, f'Zahl "{z["roh"]}"{mal(anzahl)} steht nicht auf PDF-Seite {ziel}' + (' (aber auf einer anderen Seite des PDFs).' if anderswo else ' und nirgends im PDF.'), richtung='nur_markdown', zahl=z, anzahl=anzahl, anderswo_im_pdf=anderswo))
-            for z, anzahl in gruppiert(z for z in pdf_z if z['wert'] not in md_werte):
-                schwere = 'fehler' if (z['dosis'] or z['grenzwert']) else 'warnung'
-                bericht['befunde'].append(befund('zahl', schwere, f'Zahl "{z["roh"]}"{mal(anzahl)} der PDF-Seite fehlt im Markdown.', richtung='nur_pdf', zahl=z, anzahl=anzahl))
+            zahlen_befunde, md_z = zahlenabweichungen(
+                pdf_seite['text'], seite['text'], '\n'.join(s['text'] for s in pdf),
+            )
+            for zahlen_befund in zahlen_befunde:
+                # Seite in die menschenlesbare Meldung einsetzen, ohne die
+                # strukturierte Ursache zu verändern.
+                zahlen_befund['beschreibung'] = zahlen_befund['beschreibung'].replace('der PDF-Seite', f'der PDF-Seite {ziel}')
+                bericht['befunde'].append(zahlen_befund)
             bericht['dosis_oder_grenzwerte_md'] = [z['roh'] for z in md_z if z['dosis'] or z['grenzwert']]
 
             e_pdf, e_md = einschraenkungen(pdf_seite['text']), einschraenkungen(ohne_artefakte(seite['text']))
@@ -475,7 +558,7 @@ DETERMINISTISCH = [
     'Artefakte und Platzhalter: [cite: …], [unleserlich], <Ordner> und andere Platzhalter in spitzen Klammern, [...], ??, Ersatz- und unsichtbare Zeichen, TODO.',
     'Quellenpfad in "# Quelle:" gegen den tatsächlichen Pfad des PDFs.',
     'Einstufung: vorhanden, erlaubter Wert, Begründung vorhanden, pro Seite oder pro Aussage.',
-    'Zahlen mit Einheit gegen die Textschicht der beanspruchten PDF-Seite, in beide Richtungen; Dosis- und Grenzwertangaben getrennt ausgewiesen.',
+        'Zahlen als Multiset aus Wert und normalisierter Einheit gegen die Textschicht der beanspruchten PDF-Seite; Einheitenwechsel und -verlust sind harte Fehler.',
     'Abdeckung: Anteil der Wörter der PDF-Seite im Markdown (exakt und mit OCR-Korrektur), nicht gefundene PDF-Zeilen.',
     'Anzahl verneinender und einschränkender Wörter (nicht, kein, nur, ohne, möglicherweise, …) je Seite im Vergleich.',
     'Unverändertheit: SHA-256 aller Eingabedateien vor und nach dem Audit.',
@@ -512,7 +595,7 @@ def schreibe_berichte(ergebnisse, meta, ziel_json, ziel_md):
         '',
         '## Überblick',
         '',
-        '| Datei | Seiten PDF/MD | Quelle | Seitenmarker | Artefakte | Zahlen (Dosis/Grenzwert) | Auslassung prüfen | Einschränkungen prüfen | Fragmente | Nur visuell |',
+        '| Datei | Seiten PDF/MD | Quelle | Seitenmarker | Artefakte | Zahlen (harte Fehler) | Auslassung prüfen | Einschränkungen prüfen | Fragmenthinweise | Nur visuell |',
         '|---|---|---|---|---|---|---|---|---|---|',
     ]
     for datei in ergebnisse:
@@ -532,7 +615,7 @@ def schreibe_berichte(ergebnisse, meta, ziel_json, ziel_md):
         ))
     zeilen += [
         '',
-        'Spalten: Anzahl Befunde, bei „Auslassung“ und „Einschränkungen“ die Anzahl betroffener Seiten, bei „Nur visuell“ die PDF-Seiten ohne Textschicht.',
+        'Spalten: Anzahl Befunde, bei „Auslassung“ und „Einschränkungen“ die Anzahl betroffener Seiten, bei „Fragmenthinweise“ konservative Heuristiktreffer (keine Entwarnung bei 0), bei „Nur visuell“ die PDF-Seiten ohne Textschicht.',
         '',
         '## Befunde, die für alle Dateien gelten',
         '',
@@ -542,6 +625,12 @@ def schreibe_berichte(ergebnisse, meta, ziel_json, ziel_md):
                   'Eine Seite mischt aber oft belegte, hypothetische und praktische Aussagen; die geforderte Einstufung pro Abschnitt bzw. Aussage fehlt.')
     werte = sorted({w for d in ergebnisse for w in d['einstufungswerte']})
     zeilen.append(f'- **Verwendete Einstufungen:** {", ".join(werte) or "keine"}.')
+    ohne_partner = meta.get('ohne_partner') or []
+    if ohne_partner:
+        zeilen += [
+            f'- **Fehlende Dateipartner:** {len(ohne_partner)}. Der Audit ist unvollständig und darf nicht als bestanden gelten.',
+            *[f'  - `{eintrag.get("markdown") or eintrag.get("pdf")}`: {eintrag["grund"]}' for eintrag in ohne_partner],
+        ]
     zeilen.append('')
 
     for datei in ergebnisse:
@@ -617,6 +706,16 @@ def main():
     parser.add_argument('--ausgabe', type=Path, default=HIER)
     args = parser.parse_args()
 
+    if pypdf.__version__ != ERWARTETE_PYPDF_VERSION:
+        parser.error(
+            f'pypdf {ERWARTETE_PYPDF_VERSION} erforderlich, gefunden {pypdf.__version__}. '
+            f'Installiere scripts/seminar-audit/requirements.txt in einer isolierten Umgebung.'
+        )
+    if not args.md.is_dir():
+        parser.error(f'Markdown-Ordner nicht gefunden: {args.md}')
+    if not args.pdf.is_dir():
+        parser.error(f'PDF-Ordner nicht gefunden: {args.pdf}')
+
     md_dateien = sorted(p for p in args.md.rglob('*.md'))
     pdf_dateien = sorted(p for p in args.pdf.rglob('*.pdf'))
     eingaben = md_dateien + pdf_dateien
@@ -651,9 +750,10 @@ def main():
     }
     args.ausgabe.mkdir(parents=True, exist_ok=True)
     schreibe_berichte(ergebnisse, meta, args.ausgabe / 'bericht.json', args.ausgabe / 'bericht.md')
+    vollstaendig = bool(ergebnisse) and not ohne_partner
     print(f'{len(ergebnisse)} Dateipaare geprüft, {len(ohne_partner)} ohne Partner. Eingaben unverändert: {vorher == nachher}.')
     print(f'Bericht: {args.ausgabe / "bericht.md"}')
-    return 0 if vorher == nachher else 1
+    return 0 if vorher == nachher and vollstaendig else 1
 
 
 if __name__ == '__main__':
