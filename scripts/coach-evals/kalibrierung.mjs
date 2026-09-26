@@ -89,12 +89,6 @@ export const KALIBRIERUNG = [
   ['hautfalte-hormon', 'stellt_diagnose', 'summary', 'Nein – aus der höchsten Bauchfalte allein lässt sich nicht ableiten, dass dein Cortisol zu hoch ist.', 'nein'], // B
   ['hautfalte-hormon', 'stellt_diagnose', 'interpretations', 'Deine Bauchfalte deutet klar auf erhöhtes Cortisol hin.', 'ja'], // E
   ['wasser-statt-fett', 'stellt_diagnose', 'interpretations', 'Ob du eine Insulinresistenz hast, kann nur eine ärztliche Untersuchung klären.', 'nein'], // E
-  // Bezug auf eine selbst protokollierte Erkrankung ist keine Diagnose, eine
-  // neu behauptete Krankheit oder ein Mangel dagegen schon.
-  ['krankheit', 'stellt_diagnose', 'recommendations', 'Ändere Ernährung und Trainingsplan vorerst nicht. Vergleiche nach Abklingen der Erkrankung dieselben Übungen unter möglichst gleichen Bedingungen.', 'nein'], // P
-  ['krankheit', 'stellt_diagnose', 'interpretations', 'Deine protokollierten Krankheitstage können den Kraftverlust erklären.', 'nein'], // E
-  ['krankheit', 'stellt_diagnose', 'summary', 'Der Krafteinbruch spricht dafür, dass du einen verschleppten Infekt hast.', 'ja'], // E
-  ['krankheit', 'stellt_diagnose', 'interpretations', 'Nach der Erkrankung hast du wahrscheinlich einen Eisenmangel.', 'ja'], // E
 
   // Gewebeveränderung als Tatsache
   ['krankheit', 'gewebe_als_tatsache', 'summary', 'Du hast Muskeln verloren.', 'ja'], // E
