@@ -14,6 +14,7 @@
     "check:migrations": "node scripts/check-migrations.mjs",
     "eval:coach": "node --disable-warning=ExperimentalWarning scripts/coach-evals/run.mjs",
     "check:ypsi-formula": "node scripts/check-ypsi-formula-workbook.mjs",
+    "check:seminar-knowledge": "python3 -m unittest discover -s scripts/seminar-audit -p 'test_*.py' && python3 scripts/seminar-audit/validate_knowledge.py",
     "check": "npm run check:migrations && npm run check:ypsi-formula && npm test && npm run build",
     "backup:supabase": "node scripts/backup-supabase.mjs",
     "backup:verify": "node scripts/verify-backup.mjs",

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "documents": [
+    {
+      "id": "funktionelle-ernaehrung",
+      "source_pdf": "Seminarunterlagen/Ernährung/Funktionelle Ernährung.pdf",
+      "source_sha256": "0b539eaa17ddb2e1798981f2c9dda23ebb8b1da514b032a1fbbd3d38688668af",
+      "pages": 9,
+      "output": "Ernährung/Funktionelle Ernährung.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "makro-mikronaehrstoffe",
+      "source_pdf": "Seminarunterlagen/Ernährung/Makro:Mikronährstoffe.pdf",
+      "source_sha256": "d93046c3ec13b396cad0c23f54c642fb14c1b76275830958bd81bfc1592732b0",
+      "pages": 9,
+      "output": "Ernährung/Makro:Mikronährstoffe.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "hautfalten-notizen",
+      "source_pdf": "Seminarunterlagen/Hautfalten/Hautfalten Notizen.pdf",
+      "source_sha256": "1f248464db71693b60b166cabcb4207b1d7fecd863b5b5ee8a4c78b9dec85abd",
+      "pages": 14,
+      "output": "Hautfalten/Hautfalten Notizen.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "koerperfett-assessment",
+      "source_pdf": "Seminarunterlagen/Hautfalten/Körperfett-Assessment.pdf",
+      "source_sha256": "3e52a9c1d71039d833139fffdefd3e2b6813a8519441f36276f440166346e234",
+      "pages": 17,
+      "output": "Hautfalten/Körperfett-Assessment.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "was-hautfalten-aussagen",
+      "source_pdf": "Seminarunterlagen/Hautfalten/Was deine Hautfalten ueber dich aussagen.pdf",
+      "source_sha256": "0443039c94c7f4f69958b0cb5ad2c939ed788bd2618348c95bf80bfeb56a4b7b",
+      "pages": 2,
+      "output": "Hautfalten/Was deine Hautfalten ueber dich aussagen.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "hormone-hautfaltenmessung",
+      "source_pdf": "Seminarunterlagen/Hormone/Hormone:Hautfaltenmessung.pdf",
+      "source_sha256": "a1dd3c5d3e494f1830b590ed14abd3320c2b60849af1d674684d14ab8c0013e3",
+      "pages": 20,
+      "output": "Hormone/Hormone:Hautfaltenmessung.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "braverman-test",
+      "source_pdf": "Seminarunterlagen/Neurotransmitter/Braverman-Test.pdf",
+      "source_sha256": "fde881f6eed3502591b8b117dd25245a39f0f59dcbfef750cd934099056431f3",
+      "pages": 1,
+      "output": "Neurotransmitter/Braverman-Test.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "neurotransmitter",
+      "source_pdf": "Seminarunterlagen/Neurotransmitter/Neurotransmitter.pdf",
+      "source_sha256": "fbc40431bd88c8ea637a35888baf70e02fdca1d46e2b8f62d97ab45c713cb88d",
+      "pages": 6,
+      "output": "Neurotransmitter/Neurotransmitter.md",
+      "status": "reviewed"
+    },
+    {
+      "id": "supplements",
+      "source_pdf": "Seminarunterlagen/Supplements/Supplements.pdf",
+      "source_sha256": "c9fb929041a106041e108c8033917d35491fe78be635ddf28ec87377e3bcb191",
+      "pages": 26,
+      "blank_pages": [5, 7, 9, 11, 15],
+      "output": "Supplements/Supplements.md",
+      "status": "reviewed"
+    }
+  ]
+}
