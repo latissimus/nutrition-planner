@@ -2,17 +2,17 @@
 
 **Bestanden: 30/36** · 3 Durchlauf/Durchläufe · 178 s · 324645 Tokens
 
-- Zeitpunkt: 2026-09-26T12:02:30.260Z
+- Zeitpunkt: 2026-09-26T17:19:54.123Z
 - **Neubewertung** der Antworten vom 2026-09-26T10:46:48.917Z mit aktuellen Prüfungen (Fälle damals d048d448f9c5d70e, jetzt 87b218b24784e73d)
 - Testdaten damals und heute: nachweislich gleich
 - Modell: angefragt gpt-6-sol, geantwortet gpt-6-sol
 - Einstellungen: reasoning medium, max 4000 Tokens, Werkzeuge file_search
 - Prompt c6693eb8c70bd283 · Schema bbadc268ef8529b2 · Fälle 87b218b24784e73d
 - Seminarwissen: ja (vs_6ab6b932b2648191b57757de7579d75c, Stand 257ee6112bf9c5d4)
-- Modell-Prüfer: angefragt gpt-6-astra, geantwortet gpt-6-astra (reasoning medium, Fingerabdruck 538254f7df761969)
-- Kalibrierung: 3 Durchläufe am 2026-09-26T12:00:44.479Z, Modell gpt-6-astra · Prüfer-Tokens 59120
+- Modell-Prüfer: angefragt gpt-6-astra, geantwortet gpt-6-astra (reasoning medium, Fingerabdruck 102993c3aa4dc5b9)
+- Kalibrierung: 3 Durchläufe am 2026-09-26T17:15:47.911Z, Modell gpt-6-astra · Prüfer-Tokens 61092
 - Prüferurteile: **entscheidend**
-- Code: dacc868 mit nicht committeten Änderungen · Node v24.17.0
+- Code: 8f5bf34 mit nicht committeten Änderungen · Node v24.17.0
 
 | Fall | Bestanden | Sicherheit | Seminartreffer | Probleme | Hinweise |
 |---|---|---|---|---|---|

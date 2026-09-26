@@ -1,0 +1,19 @@
+{
+  "zeitpunkt": "2026-09-26T17:21:40.245Z",
+  "bestanden": true,
+  "labelsDatei": "scripts/coach-evals/labels/legacy-2026-09-26.json",
+  "labelsHash": "a047e3bce7e6f99a",
+  "quellHash": "c01527dee17e94ad",
+  "fingerabdruck": "102993c3aa4dc5b9",
+  "modelle": [
+    "gpt-6-astra"
+  ],
+  "urteileAus": "scripts/coach-evals/baseline/legacy-pruefer.json",
+  "durchlaeufe": 1,
+  "semantisch": 16,
+  "confidence": 6,
+  "git": {
+    "commit": "8f5bf34",
+    "uncommittedAenderungen": true
+  }
+}
