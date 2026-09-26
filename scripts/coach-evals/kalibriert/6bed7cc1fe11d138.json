@@ -1,0 +1,22 @@
+{
+  "zeitpunkt": "2026-09-26T11:42:41.287Z",
+  "fingerabdruck": "6bed7cc1fe11d138",
+  "kalibrierungHash": "22f020182a06f428",
+  "einstellungen": {
+    "modell": "gpt-6-astra",
+    "reasoning": "medium"
+  },
+  "tatsaechlicheModelle": [
+    "gpt-6-astra"
+  ],
+  "durchlaeufe": 3,
+  "fehlerfrei": true,
+  "tokens": 123382,
+  "urteileOhneNachweis": 0,
+  "richtig": "66/66",
+  "git": {
+    "commit": "e141c74",
+    "uncommittedAenderungen": false
+  },
+  "bericht": "results/2026-09-26T11-42-41-kalibrierung.md"
+}
