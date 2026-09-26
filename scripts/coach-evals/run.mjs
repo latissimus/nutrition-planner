@@ -36,6 +36,10 @@
 // ai_knowledge_bases.vector_store_id.
 //
 // Ergebnisse: scripts/coach-evals/results/<Zeitpunkt>-<Variante>.json und .md
+//
+// Exit-Codes: 0 bestanden, 1 nicht bestanden, 2 Prüfer nicht vertrauenswürdig,
+// 3 abgebrochen wegen Konto oder Schlüssel (Budget, Kontingent, ungültiger
+// Schlüssel, Modell nicht verfügbar) - dann ohne Bericht.
 
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
@@ -119,6 +123,27 @@ const durchlaeufe = gespeichert?.durchlaeufe || Math.max(1, Number(wert('--durch
 const nurFall = wert('--fall', null);
 const parallel = Math.max(1, Number(wert('--parallel', 3)) || 3);
 const apiKey = process.env.OPENAI_API_KEY || '';
+
+// Fehler, nach denen weitere Anfragen sinnlos sind: ungültiger Schlüssel,
+// erschöpftes Budget oder Kontingent, nicht verfügbares Modell. Dann bricht
+// der Lauf ab, statt jede Anfrage einzeln scheitern zu lassen und einen
+// Bericht zu schreiben, der nichts über den Prompt aussagt. Ein reines
+// Ratenlimit gehört nicht dazu. Coach und Prüfer melden Fehler beide als
+// "OpenAI <Status>: <Meldung>".
+let abbruch = null;
+const istAbbruchFehler = (fehler) => /^OpenAI (401|403|404):/.test(fehler?.message || '')
+  || /^OpenAI 429:.*(quota|spend limit|billing)/i.test(fehler?.message || '');
+function merkeAbbruch(fehler) {
+  if (!abbruch && istAbbruchFehler(fehler)) abbruch = fehler;
+}
+function beendeBeiAbbruch() {
+  if (!abbruch) return;
+  console.error([
+    `Lauf abgebrochen: ${abbruch.message}`,
+    'Das liegt am OpenAI-Konto oder am Schlüssel, nicht am Prompt. Kein Bericht und kein Nachweis gespeichert.',
+  ].join('\n'));
+  process.exit(3);
+}
 const vectorStoreId = gespeichert?.reproduktion?.vectorStoreId || process.env.COACH_VECTOR_STORE_ID || null;
 
 if (!VARIANTEN[variante]) {
@@ -221,7 +246,7 @@ async function abarbeiten(aufgaben, arbeit) {
   const ergebnisse = new Array(aufgaben.length);
   let naechste = 0;
   const arbeiter = Array.from({ length: Math.min(parallel, aufgaben.length) }, async () => {
-    while (naechste < aufgaben.length) {
+    while (naechste < aufgaben.length && !abbruch) {
       const index = naechste++;
       ergebnisse[index] = await arbeit(aufgaben[index]);
     }
@@ -232,6 +257,7 @@ async function abarbeiten(aufgaben, arbeit) {
 
 const beginn = Date.now();
 const laeufe = gespeichert ? neuBewertet() : await abfragen();
+beendeBeiAbbruch();
 
 // Bewertet die gespeicherten Antworten mit den aktuellen Prüfungen neu.
 function neuBewertet() {
@@ -265,6 +291,7 @@ return abarbeiten(aufgaben, async ({ fall, lauf }) => {
     console.log(`${bestanden ? '✓' : '✗'} ${fall.id} #${lauf} (${Math.round((Date.now() - start) / 1000)} s)`);
     return { fall: fall.id, lauf, bestanden, sekunden: (Date.now() - start) / 1000, nachweis, pruefungen, antwort };
   } catch (fehler) {
+    merkeAbbruch(fehler);
     console.log(`! ${fall.id} #${lauf}: ${fehler.message}`);
     return { fall: fall.id, lauf, bestanden: false, fehler: fehler.message, pruefungen: [], antwort: null };
   }
@@ -309,11 +336,13 @@ if (mitPruefer) {
       eintrag.modellUrteile = urteile;
       eintrag.prueferNachweis = { ...nachweis, fingerabdruck: prueferFingerabdruck(), kriterienHash: kriterienFingerabdruck(kriterienFuer(fall)) };
     } catch (fehler) {
+      merkeAbbruch(fehler);
       console.log(`! Prüfer ${eintrag.fall} #${eintrag.lauf}: ${fehler.message}`);
       eintrag.modellUrteile = [];
       eintrag.prueferNachweis = { fehler: fehler.message };
     }
   });
+  beendeBeiAbbruch();
 }
 const prueferGenutzt = laeufe.some((eintrag) => Array.isArray(eintrag.modellUrteile));
 // Dürfen die Urteile entscheiden? Nur bei gültiger Kalibrierung, kalibriertem
@@ -728,6 +757,19 @@ async function trockenlauf() {
   if (!hinweis?.weich || hinweis.bestanden || !zahlFehler.bestanden) fehler.push('Gegenprobe: Zahl ohne Messgröße wird nicht als weicher Hinweis gemeldet');
 
   trockenlaufPruefer(fehler);
+  // Konto- und Schlüsselfehler brechen ab, Ratenlimits und Zeitüberschreitungen nicht.
+  for (const [meldung, soll] of [
+    ['OpenAI 429: Your project has reached its configured enforced spend limit. Update your limit at https://platform.openai.com/settings/x/limits.', true],
+    ['OpenAI 429: You exceeded your current quota, please check your plan and billing details.', true],
+    ['OpenAI 401: Incorrect API key provided: dein-sch***.', true],
+    ['OpenAI 404: The model `gpt-x` does not exist or you do not have access to it.', true],
+    ['OpenAI 429: Rate limit reached for gpt-6-sol on tokens per min (TPM): Limit 30000, Used 29000, Requested 2000.', false],
+    ['OpenAI 500: The server had an error while processing your request.', false],
+    ['The operation was aborted due to timeout', false],
+    ['Antwort unvollständig: max_output_tokens', false],
+  ]) {
+    if (istAbbruchFehler(new Error(meldung)) !== soll) fehler.push(`Abbruch: „${meldung.slice(0, 50)}…“ sollte ${soll ? '' : 'nicht '}abbrechen`);
+  }
   const gateProben = await trockenlaufGate(fehler);
   const promptProben = trockenlaufPrompt(fehler);
 
@@ -782,9 +824,11 @@ async function kalibrierung() {
         modell: nachweis?.modell || null, responseId: nachweis?.responseId || null, tokens: nachweis?.tokens ?? null,
       };
     } catch (fehler) {
+      merkeAbbruch(fehler);
       return { index, lauf, urteil: 'fehler', begruendung: fehler.message, modell: null, responseId: null, tokens: null };
     }
   });
+  beendeBeiAbbruch();
 
   const ergebnisse = KALIBRIERUNG.map(([id, kriterium, feld, satz, erwartet], index) => {
     const eigene = urteile.filter((urteil) => urteil.index === index);
@@ -889,17 +933,19 @@ async function labelRegression(datei) {
     else {
       const anzahl = Math.max(1, Number(wert('--durchlaeufe', MIN_KALIBRIER_DURCHLAEUFE)) || MIN_KALIBRIER_DURCHLAEUFE);
       console.log(`Label-Regression: ${benoetigt.length} Antworten × ${anzahl} Durchläufe, Prüfer ${PRUEFER_EINSTELLUNGEN.modell} …`);
-      for (let runde = 0; runde < anzahl; runde += 1) {
+      for (let runde = 0; runde < anzahl && !abbruch; runde += 1) {
         runden.push(await abarbeiten(benoetigt, async (lauf) => {
           const fall = FAELLE.find((kandidat) => kandidat.id === lauf.fall);
           try {
             const { urteile, nachweis } = await pruefeSemantisch({ frage: fall.frage, antwort: lauf.antwort, eintraege: kriterienFuer(fall), apiKey });
             return { fall: lauf.fall, lauf: lauf.lauf, modellUrteile: urteile, prueferNachweis: { ...nachweis, fingerabdruck, kriterienHash: kriterienFingerabdruck(kriterienFuer(fall)) } };
           } catch (fehlerAufruf) {
+            merkeAbbruch(fehlerAufruf);
             return { fall: lauf.fall, lauf: lauf.lauf, modellUrteile: [], prueferNachweis: { fehler: fehlerAufruf.message } };
           }
         }));
       }
+      beendeBeiAbbruch();
       urteileAus = 'neu geholt';
     }
   } else {
@@ -1184,8 +1230,10 @@ async function trockenlaufGate(fehler) {
     }
   }
   if (gate(() => {}, { gueltig: false, gruende: ['keine Label-Regression'] }).bestanden) fehler.push('Gate: ohne Label-Regression darf es nicht bestehen');
+  const ohneAntwort = gate((neu) => { Object.assign(lauf(neu, gescheitert), { antwort: null, pruefungen: [], modellUrteile: undefined, fehler: 'Zeitüberschreitung' }); }).gruende;
+  if (!ohneAntwort[0]?.includes('ohne Antwort')) fehler.push('Gate: Läufe ohne Antwort müssen zuerst und als solche genannt werden');
   if (!gate((neu) => { neu.reproduktion.tatsaechlicheModelle = ['gpt-6-sol-neu']; }).hinweise.length) fehler.push('Gate: anderer ausgelieferter Modellstand wird nicht vermerkt');
-  return { labelDateien: geladen.length, labelFehler: verfaelschungen.length + 4, gate: szenarien.length + 5 };
+  return { labelDateien: geladen.length, labelFehler: verfaelschungen.length + 4, gate: szenarien.length + 6 };
 }
 
 // Prüft die Prüferlogik ohne API: Verweise, Anfrageaufbau, Belegprüfung und

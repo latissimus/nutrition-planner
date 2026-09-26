@@ -120,7 +120,13 @@ export function vergleicheMitBaseline({ baseline, neu, labelNachweis }) {
   if (baseline.reproduktion?.faelleHash !== neu.reproduktion?.faelleHash) gruende.push('Testfälle unterscheiden sich von der Baseline (faelleHash)');
   if (!baseline.reproduktion?.datenVerifiziert || !neu.reproduktion?.datenVerifiziert) gruende.push('Testdaten nicht nachweisbar (datenVerifiziert)');
   if (JSON.stringify(baseline.reproduktion?.datenHashes) !== JSON.stringify(neu.reproduktion?.datenHashes)) gruende.push('Testdaten unterscheiden sich von der Baseline (datenHashes)');
-  if (baseline.pruefer?.fingerabdruck !== neu.pruefer?.fingerabdruck) gruende.push('Baseline und neue Variante wurden mit verschiedenen Prüfern bewertet');
+  // Läufe ohne Antwort zuerst nennen: Sie sagen nichts über den Prompt.
+  const ohneAntwort = neu.laeufe.filter((lauf) => !lauf.antwort);
+  if (ohneAntwort.length) {
+    gruende.push(`${ohneAntwort.length} von ${neu.laeufe.length} Läufen ohne Antwort (${[...new Set(ohneAntwort.map((lauf) => lauf.fehler || 'unbekannt'))].join('; ')}) – das sagt nichts über den Prompt`);
+  }
+  // Ohne Prüfer greift Bedingung 6; hier nur ein abweichender Prüfer.
+  if (neu.pruefer && baseline.pruefer?.fingerabdruck !== neu.pruefer.fingerabdruck) gruende.push('Baseline und neue Variante wurden mit verschiedenen Prüfern bewertet');
   if (!baseline.pruefer?.vertrauenswuerdig) gruende.push('Baseline wurde nicht mit vertrauenswürdigem Prüfer bewertet');
   const alt = baseline.reproduktion || {};
   const jetzt = neu.reproduktion || {};
