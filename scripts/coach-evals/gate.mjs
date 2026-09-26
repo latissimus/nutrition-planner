@@ -4,7 +4,7 @@
 // prüfen kann. run.mjs holt die Daten und ruft diese Funktionen auf.
 
 import { createHash } from 'node:crypto';
-import { pruefe } from './checks.mjs';
+import { pruefe, zahlenBefund } from './checks.mjs';
 import { KRITERIEN, kriterienFuer } from './pruefer.mjs';
 
 export const kurzHash = (text) => createHash('sha256').update(text).digest('hex').slice(0, 16);
@@ -92,6 +92,9 @@ export function vergleicheLabels(labels, urteile) {
 //   4. die menschlichen Labels stimmen mit dem eingesetzten Prüfer überein
 //   5. kein Urteil "unklar"
 //   6. alle Prüferurteile von einem gültig kalibrierten Modellstand
+//   7. insgesamt nicht mehr Zahlen ohne erkennbare Messgröße als die Baseline
+//      (Review vom 26.09.: sonst kann ein Prompt die Zahlenprüfung durch
+//      bloßes Umformatieren abschwächen). Je Fall nur angezeigt.
 // Dazu muss der Vergleich fair sein: gleiche Fälle, gleiche Testdaten,
 // gleicher Prüfer, gleich viele Läufe je Fall, und bis auf den Prompt die
 // gleiche Anfrage (Modell, Einstellungen, Schema, Seminarwissen). Ein anderer
@@ -113,7 +116,16 @@ function harteFehlschlaege(laeufe) {
   return zaehler;
 }
 
-export function vergleicheMitBaseline({ baseline, neu, labelNachweis }) {
+// Zahlen ohne erkennbare Messgröße, mit dem aktuellen Zahlenabgleich für
+// beide Seiten neu gezählt - so vergleicht das Gate Gleiches mit Gleichem.
+function ungebundeneZahlen(laeufe, faelle) {
+  return laeufe.reduce((summe, lauf) => {
+    const fall = faelle.find((kandidat) => kandidat.id === lauf.fall);
+    return summe + (fall && lauf.antwort ? zahlenBefund(fall, lauf.antwort).ungebunden.length : 0);
+  }, 0);
+}
+
+export function vergleicheMitBaseline({ baseline, neu, labelNachweis, faelle }) {
   const gruende = [];
   const zahl = (datei) => datei.laeufe.filter((lauf) => lauf.bestanden).length;
 
@@ -141,8 +153,8 @@ export function vergleicheMitBaseline({ baseline, neu, labelNachweis }) {
   // 1
   if (zahl(neu) < zahl(baseline)) gruende.push(`Gesamt ${zahl(neu)}/${neu.laeufe.length} schlechter als Baseline ${zahl(baseline)}/${baseline.laeufe.length}`);
   // 2 und 3
-  const faelle = [...new Set(baseline.laeufe.map((lauf) => lauf.fall))];
-  const jeFall = faelle.map((fall) => {
+  const fallIds = [...new Set(baseline.laeufe.map((lauf) => lauf.fall))];
+  const jeFall = fallIds.map((fall) => {
     const vorher = baseline.laeufe.filter((lauf) => lauf.fall === fall);
     const nachher = neu.laeufe.filter((lauf) => lauf.fall === fall);
     const altBestanden = vorher.filter((lauf) => lauf.bestanden).length;
@@ -154,17 +166,21 @@ export function vergleicheMitBaseline({ baseline, neu, labelNachweis }) {
     if (nachher.length !== vorher.length) gruende.push(`${fall}: ${nachher.length} Läufe, Baseline ${vorher.length}`);
     if (neuBestanden < altBestanden) gruende.push(`${fall}: ${neuBestanden}/${nachher.length} schlechter als Baseline ${altBestanden}/${vorher.length}`);
     if (regressionen.length) gruende.push(`${fall}: harte Prüfung scheitert öfter – ${regressionen.join(', ')}`);
-    return { fall, alt: `${altBestanden}/${vorher.length}`, neu: `${neuBestanden}/${nachher.length}`, regressionen };
+    const ungebunden = { alt: ungebundeneZahlen(vorher, faelle), neu: ungebundeneZahlen(nachher, faelle) };
+    return { fall, alt: `${altBestanden}/${vorher.length}`, neu: `${neuBestanden}/${nachher.length}`, regressionen, ungebunden };
   });
-  const zusaetzlich = [...new Set(neu.laeufe.map((lauf) => lauf.fall))].filter((fall) => !faelle.includes(fall));
+  const zusaetzlich = [...new Set(neu.laeufe.map((lauf) => lauf.fall))].filter((fall) => !fallIds.includes(fall));
   if (zusaetzlich.length) gruende.push(`Fälle ohne Baseline: ${zusaetzlich.join(', ')}`);
   // 4
   if (!labelNachweis?.gueltig) gruende.push(`Label-Regression fehlt oder ungültig: ${(labelNachweis?.gruende || []).join('; ') || 'kein Nachweis'}`);
   // 5
   const unklar = neu.laeufe.flatMap((lauf) => (lauf.modellUrteile || []).filter((urteil) => urteil.urteil === 'unklar').map((urteil) => `${lauf.fall} #${lauf.lauf} ${urteil.kriterium}`));
   if (unklar.length) gruende.push(`unklare Urteile: ${unklar.join(', ')}`);
+  // 7
+  const ungebunden = { baseline: ungebundeneZahlen(baseline.laeufe, faelle), neu: ungebundeneZahlen(neu.laeufe, faelle) };
+  if (ungebunden.neu > ungebunden.baseline) gruende.push(`mehr Zahlen ohne erkennbare Messgröße: ${ungebunden.neu}, Baseline ${ungebunden.baseline}`);
   // 6
   if (!neu.pruefer?.vertrauenswuerdig) gruende.push(`Prüfer nicht vertrauenswürdig: ${(neu.pruefer?.gruende || []).join('; ') || 'nicht eingesetzt'}`);
 
-  return { bestanden: gruende.length === 0, gruende, hinweise, jeFall, gesamt: { baseline: zahl(baseline), neu: zahl(neu), von: neu.laeufe.length } };
+  return { bestanden: gruende.length === 0, gruende, hinweise, ungebunden, jeFall, gesamt: { baseline: zahl(baseline), neu: zahl(neu), von: neu.laeufe.length } };
 }

@@ -54,7 +54,7 @@ import { pruefe } from './checks.mjs';
 import { antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
 import {
-  KRITERIEN, MIN_KALIBRIER_DURCHLAEUFE, PRUEFER_EINSTELLUNGEN, kalibrierungGueltig, kriterienFingerabdruck,
+  KRITERIEN, MIN_KALIBRIER_DURCHLAEUFE, PRUEFER_EINSTELLUNGEN, antwortText, kalibrierungGueltig, kriterienFingerabdruck,
   kriterienFuer, pruefAnfrage, pruefeSemantisch, prueferFingerabdruck, prueferVertrauen, verarbeiteUrteile,
   veralteteUrteile,
 } from './pruefer.mjs';
@@ -272,6 +272,19 @@ async function abarbeiten(aufgaben, arbeit) {
   return ergebnisse;
 }
 
+// Vor den kostenpflichtigen Coach-Anfragen: Ohne gültige Kalibrierung darf
+// der Prüfer ohnehin nicht urteilen.
+const kalibrierNachweis = await gespeicherteKalibrierung();
+const kalibriert = kalibrierungGueltig(kalibrierNachweis, { fingerabdruck: prueferFingerabdruck(), kalibrierungHash: kalibrierungHash() });
+if (mitPruefer && !kalibriert && !ohneKalibrierung) {
+  console.error([
+    `Kein gültiger Kalibrierungsnachweis für diesen Prüfer (Fingerabdruck ${prueferFingerabdruck()}, Modell ${PRUEFER_EINSTELLUNGEN.modell}).`,
+    `Zuerst kalibrieren: npm run eval:coach -- --kalibrieren`,
+    'Nur ausnahmsweise und mit Vermerk im Bericht: --ohne-kalibrierung',
+  ].join('\n'));
+  process.exit(1);
+}
+
 const beginn = Date.now();
 const laeufe = gespeichert ? neuBewertet() : await abfragen();
 beendeBeiAbbruch();
@@ -317,16 +330,6 @@ return abarbeiten(aufgaben, async ({ fall, lauf }) => {
 
 // Modell-Prüfer: neue Urteile holen (--mit-pruefer) oder gespeicherte
 // wiederverwenden, und die Läufe damit neu bewerten.
-const kalibrierNachweis = await gespeicherteKalibrierung();
-const kalibriert = kalibrierungGueltig(kalibrierNachweis, { fingerabdruck: prueferFingerabdruck(), kalibrierungHash: kalibrierungHash() });
-if (mitPruefer && !kalibriert && !ohneKalibrierung) {
-  console.error([
-    `Kein gültiger Kalibrierungsnachweis für diesen Prüfer (Fingerabdruck ${prueferFingerabdruck()}, Modell ${PRUEFER_EINSTELLUNGEN.modell}).`,
-    `Zuerst kalibrieren: npm run eval:coach -- --kalibrieren`,
-    'Nur ausnahmsweise und mit Vermerk im Bericht: --ohne-kalibrierung',
-  ].join('\n'));
-  process.exit(1);
-}
 if (ohnePruefer) {
   for (const eintrag of laeufe) {
     delete eintrag.modellUrteile;
@@ -500,7 +503,7 @@ const zeilen = [
 ];
 
 const vergleich = vergleichsBasis
-  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis() })
+  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis(), faelle: FAELLE })
   : null;
 if (vergleich) {
   kopf.vergleich = { baseline: vergleichDatei, ...vergleich };
@@ -508,11 +511,11 @@ if (vergleich) {
     '',
     `## Vergleichs-Gate gegen ${vergleichDatei}: ${vergleich.bestanden ? '**BESTANDEN**' : '**NICHT BESTANDEN**'}`,
     '',
-    `Gesamt ${vergleich.gesamt.neu}/${vergleich.gesamt.von}, Baseline ${vergleich.gesamt.baseline}/${vergleichsBasis.laeufe.length}`,
+    `Gesamt ${vergleich.gesamt.neu}/${vergleich.gesamt.von}, Baseline ${vergleich.gesamt.baseline}/${vergleichsBasis.laeufe.length} · Zahlen ohne erkennbare Messgröße: ${vergleich.ungebunden.neu}, Baseline ${vergleich.ungebunden.baseline}`,
     '',
-    '| Fall | Baseline | Neu | Harte Prüfungen öfter gescheitert |',
-    '|---|---|---|---|',
-    ...vergleich.jeFall.map((eintrag) => `| ${eintrag.fall} | ${eintrag.alt} | ${eintrag.neu} | ${eintrag.regressionen.join('; ').replaceAll('|', '/') || '–'} |`),
+    '| Fall | Baseline | Neu | Harte Prüfungen öfter gescheitert | Ungebundene Zahlen |',
+    '|---|---|---|---|---|',
+    ...vergleich.jeFall.map((eintrag) => `| ${eintrag.fall} | ${eintrag.alt} | ${eintrag.neu} | ${eintrag.regressionen.join('; ').replaceAll('|', '/') || '–'} | ${eintrag.ungebunden.alt} → ${eintrag.ungebunden.neu} |`),
     ...(vergleich.gruende.length ? ['', ...vergleich.gruende.map((grund) => `- ${grund}`)] : []),
     ...(vergleich.hinweise.length ? ['', ...vergleich.hinweise.map((hinweis) => `- Hinweis: ${hinweis}`)] : []),
   );
@@ -813,6 +816,7 @@ function antwortMitSatz(feld, satz) {
     recommendations: [], uncertainties: [], followUpQuestions: [], safetyNote: '',
   };
   if (feld === 'recommendations') antwort.recommendations = [{ action: satz, rationale: '', timeframe: '' }];
+  else if (feld === 'timeframe') antwort.recommendations = [{ action: '', rationale: '', timeframe: satz }];
   else if (Array.isArray(antwort[feld])) antwort[feld] = [satz];
   else antwort[feld] = satz;
   return antwort;
@@ -1069,15 +1073,26 @@ function trockenlaufPrompt(fehler) {
     regel(neu.instructions !== alt.instructions, 'freier Coach hat noch den alten Prompt');
     regel(neu.instructions.includes(webResearch ? 'Web search is enabled' : 'Web search is not available'), `Websuche ${webResearch ? 'an' : 'aus'} nicht im Prompt abgebildet`);
     const inhalt = neu.input[0].content;
-    const daten = inhalt.indexOf('<capboy_data>');
-    const frage = inhalt.indexOf('<user_question>');
-    regel(daten === 0 && frage > daten && inhalt.includes(`\n${JSON.stringify(fall.daten)}\n</capboy_data>`) && inhalt.endsWith(`\n${fall.frage}\n</user_question>`), 'Eingabe nicht als <capboy_data> vor <user_question>');
+    regel(inhalt === `<comp_facts>\n${JSON.stringify(fall.daten)}\n</comp_facts>\n\n<user_question>\n${fall.frage}\n</user_question>`, 'Eingabe nicht als <comp_facts> vor <user_question>');
   }
   const prompt = produktion.coachSystemPrompt('coach', false);
-  // Der Prompt beschreibt nur Blöcke, die das Backend tatsächlich befüllt.
-  for (const block of ['<allowed_actions>', '<limits>', '<profile_memory>', '<timeseries>', '<intervention_log>', '<conversation>', '<comp_facts>']) {
-    regel(!prompt.includes(block), `beschreibt den nicht befüllten Block ${block}`);
-  }
+  // Feste Blockschnittstelle des Coach-Plans. Spätere Schritte befüllen
+  // weitere Blöcke, benennen aber keinen um. Die Liste steht hier bewusst
+  // ein zweites Mal, damit eine Umbenennung in coachPrompt.ts auffällt.
+  const bloecke = ['comp_facts', 'timeseries', 'profile_memory', 'conversation', 'intervention_log', 'allowed_actions', 'limits', 'user_question'];
+  regel(JSON.stringify(produktion.COACH_INPUT_BLOCKS) === JSON.stringify(bloecke), `Blockschnittstelle geändert: ${produktion.COACH_INPUT_BLOCKS.join(', ')}`);
+  for (const block of bloecke) regel(prompt.includes(`- <${block}>:`), `beschreibt den Block <${block}> nicht`);
+  // Jeder andere Tag im Prompt muss ein Abschnitt sein - kein Eingabeblock
+  // unter fremdem Namen.
+  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
+  const fremd = [...new Set([...prompt.matchAll(/<\/?([a-z_]+)>/g)].map((treffer) => treffer[1]))].filter((name) => !bloecke.includes(name) && !abschnitte.includes(name));
+  regel(!fremd.length, `nennt unbekannte Blöcke: ${fremd.join(', ')}`);
+  // Die Eingabe enthält nur bekannte Blöcke, in fester Reihenfolge, ohne leere.
+  const probe = produktion.coachInput({ user_question: 'Frage', timeseries: '  ', comp_facts: '{}' });
+  regel(probe === '<comp_facts>\n{}\n</comp_facts>\n\n<user_question>\nFrage\n</user_question>', 'coachInput hält Reihenfolge nicht ein oder sendet leere Blöcke');
+  let abgelehnt = false;
+  try { produktion.coachInput({ capboy_data: '{}' }); } catch { abgelehnt = true; }
+  regel(abgelehnt, 'coachInput nimmt unbekannte Blöcke an');
   // confidence muss genau die Werte des Schemas definieren.
   for (const stufe of produktion.resultSchema.properties.confidence.enum) regel(prompt.includes(`- "${stufe}":`), `definiert confidence "${stufe}" nicht`);
   // Kein Unterrichten auf die Testfälle: keine Fallfrage und keine
@@ -1164,7 +1179,7 @@ async function trockenlaufGate(fehler) {
   const gate = (abwandeln, labelNachweis = gueltigeLabels) => {
     const neu = structuredClone(baseline);
     abwandeln(neu);
-    return vergleicheMitBaseline({ baseline, neu, labelNachweis });
+    return vergleicheMitBaseline({ baseline, neu, labelNachweis, faelle: FAELLE });
   };
   const lauf = (datei, bedingung) => datei.laeufe.find(bedingung);
   const bestandenIn = (fall) => (kandidat) => kandidat.fall === fall && kandidat.bestanden;
@@ -1203,6 +1218,7 @@ async function trockenlaufGate(fehler) {
     ['ohne Seminarwissen', (neu) => { neu.reproduktion.vectorStoreId = null; }, false],
     ['anderer Wissensstand', (neu) => { neu.reproduktion.wissensstand = 'alt'; }, false],
     ['anderer ausgelieferter Modellstand (nur Hinweis)', (neu) => { neu.reproduktion.tatsaechlicheModelle = ['gpt-6-sol-neu']; }, true],
+    ['mehr Zahlen ohne erkennbare Messgröße', (neu) => { lauf(neu, (kandidat) => kandidat.fall === 'wasser-statt-fett' && kandidat.antwort).antwort.facts.push('Aktuell 2.680 kcal'); }, false],
   ];
   for (const [beschreibung, abwandeln, soll] of szenarien) {
     const ergebnis = gate(abwandeln);
@@ -1244,7 +1260,7 @@ async function trockenlaufGate(fehler) {
     verbessere(geheilt);
     scheitere(heil1, ersterFehler);
     scheitere(heil2, zweiterFehler);
-    const verteilt = vergleicheMitBaseline({ baseline: vorher, neu: nachher, labelNachweis: gueltigeLabels });
+    const verteilt = vergleicheMitBaseline({ baseline: vorher, neu: nachher, labelNachweis: gueltigeLabels, faelle: FAELLE });
     if (verteilt.bestanden || !fallSchlechter(verteilt.gruende, gemischt) || verteilt.gruende.some((grund) => grund.includes('öfter'))) {
       fehler.push(`Gate: umverteilte Fehlschläge mit weniger bestandenen Läufen nicht allein über den Fall erkannt (${verteilt.gruende.join('; ')})`);
     }
@@ -1273,9 +1289,13 @@ function trockenlaufPruefer(fehler) {
       if (!anfrage.input[0].content.includes(`[${eintrag.kriterium}]`)) fehler.push(`${fall.id}: Kriterium ${eintrag.kriterium} fehlt in der Prüferanfrage`);
     }
   }
-  for (const [id, kriterium] of KALIBRIERUNG) {
+  const felder = ['title', 'summary', 'facts', 'interpretations', 'recommendations', 'timeframe', 'uncertainties', 'followUpQuestions', 'safetyNote'];
+  for (const [id, kriterium, feld, satz] of KALIBRIERUNG) {
     if (!FAELLE.some((fall) => fall.id === id)) fehler.push(`Kalibrierung: unbekannter Fall ${id}`);
     if (!KRITERIEN[kriterium]) fehler.push(`Kalibrierung: unbekanntes Kriterium ${kriterium}`);
+    if (!felder.includes(feld)) fehler.push(`Kalibrierung: unbekanntes Feld ${feld}`);
+    // Der Satz muss genau dort ankommen, wo der Prüfer ihn lesen soll.
+    else if (!antwortText(antwortMitSatz(feld, satz)).includes(feld === 'timeframe' ? `Zeitraum: ${satz}` : satz)) fehler.push(`Kalibrierung: Satz landet nicht im Feld ${feld}`);
   }
 
   // Belegprüfung: Ein "ja" ohne wörtlichen Beleg wird zu "unklar".
