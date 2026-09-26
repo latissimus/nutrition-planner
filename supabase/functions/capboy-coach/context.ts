@@ -334,7 +334,7 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
     .filter((id) => !routineIds.has(id)).map((id) => ({ id, name: null, active: null }))]
     .map((routine) => {
       const weekly = mondays.map((monday) => completions.get(monday)!.filter((row) => row.routine_id === routine.id).length);
-      return { name: routine.name ?? null, active: routine.active ?? null, weeklyCompletions: weekly, totalCompletions: weekly.reduce((sum, value) => sum + value, 0) };
+      return { routineId: routine.id, name: routine.name ?? null, active: routine.active ?? null, weeklyCompletions: weekly, totalCompletions: weekly.reduce((sum, value) => sum + value, 0) };
     })
     .filter((routine) => routine.active === true || routine.totalCompletions > 0);
 

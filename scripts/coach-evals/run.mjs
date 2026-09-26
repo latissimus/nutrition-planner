@@ -1203,9 +1203,9 @@ function trockenlaufZeitreihe(fehler) {
   gleich([verlauf.summary.skinfoldChangeMm, verlauf.summary.waistChangeCm], [-5, null], 'Veränderung Falten und Taille');
   const nullen = (anzahl) => Array(anzahl).fill(0);
   gleich(verlauf.routines, [
-    { name: 'Kreatin', active: true, weeklyCompletions: [...nullen(10), 1, 2], totalCompletions: 3 },
-    { name: 'Kältedusche', active: false, weeklyCompletions: [1, ...nullen(11)], totalCompletions: 1 },
-    { name: null, active: null, weeklyCompletions: [...nullen(11), 1], totalCompletions: 1 },
+    { routineId: 'a', name: 'Kreatin', active: true, weeklyCompletions: [...nullen(10), 1, 2], totalCompletions: 3 },
+    { routineId: 'b', name: 'Kältedusche', active: false, weeklyCompletions: [1, ...nullen(11)], totalCompletions: 1 },
+    { routineId: 'x', name: null, active: null, weeklyCompletions: [...nullen(11), 1], totalCompletions: 1 },
   ], 'Routinenabschlüsse je Routine und Woche');
   gleich([kw39.routines.completions, kw38.routines.completions, erste.routines.completions], [3, 1, 1], 'Routinenabschlüsse je Woche');
   gleich(/adherence|quote/i.test(JSON.stringify(verlauf)), false, 'keine historische Umsetzungsquote');
