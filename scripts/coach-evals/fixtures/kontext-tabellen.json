@@ -1,0 +1,8967 @@
+{
+ "zweck": "Feste Rohdaten für die Absicherung von buildCompFacts gegen die bisherige Snapshot-Ausgabe. Nicht verändern; bei Bedarf eine neue Fixture anlegen.",
+ "jetzt": "2026-09-26T08:00:00.000Z",
+ "nutrition_settings": {
+  "goal": "fat_loss",
+  "custom_calorie_target": 2400,
+  "adaptive_target": 2350,
+  "height_cm": 178,
+  "birth_date": "1988-11-02",
+  "calculation_basis": "male",
+  "bodycomp_thresholds": null
+ },
+ "user_preferences": {
+  "value": {
+   "schlafProbleme": "ja",
+   "stress": "mittel"
+  }
+ },
+ "routines": [
+  {
+   "id": "r3",
+   "name": "Kältedusche",
+   "period": "morning",
+   "weekdays": [
+    1
+   ],
+   "active": false,
+   "position": 0
+  },
+  {
+   "id": "r1",
+   "name": "Kreatin",
+   "period": "morning",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "active": true,
+   "position": 1
+  },
+  {
+   "id": "r2",
+   "name": "Spaziergang",
+   "period": "evening",
+   "weekdays": [
+    2,
+    4
+   ],
+   "active": true,
+   "position": 2
+  }
+ ],
+ "weights": [
+  {
+   "gemessen_am": "2026-09-26",
+   "kg": 84.3
+  },
+  {
+   "gemessen_am": "2026-09-26",
+   "kg": 84.5
+  },
+  {
+   "gemessen_am": "2026-09-25",
+   "kg": 84.3
+  },
+  {
+   "gemessen_am": "2026-09-24",
+   "kg": 84.8
+  },
+  {
+   "gemessen_am": "2026-09-23",
+   "kg": 84.3
+  },
+  {
+   "gemessen_am": "2026-09-23",
+   "kg": 84.8
+  },
+  {
+   "gemessen_am": "2026-09-22",
+   "kg": 84.4
+  },
+  {
+   "gemessen_am": "2026-09-21",
+   "kg": 84.7
+  },
+  {
+   "gemessen_am": "2026-09-20",
+   "kg": 84.7
+  },
+  {
+   "gemessen_am": "2026-09-20",
+   "kg": 85.3
+  },
+  {
+   "gemessen_am": "2026-09-19",
+   "kg": 84.4
+  },
+  {
+   "gemessen_am": "2026-09-18",
+   "kg": 84.3
+  },
+  {
+   "gemessen_am": "2026-09-17",
+   "kg": 84.3
+  },
+  {
+   "gemessen_am": "2026-09-17",
+   "kg": 84.6
+  },
+  {
+   "gemessen_am": "2026-09-16",
+   "kg": 84.9
+  },
+  {
+   "gemessen_am": "2026-09-15",
+   "kg": 84.5
+  },
+  {
+   "gemessen_am": "2026-09-14",
+   "kg": 84.8
+  },
+  {
+   "gemessen_am": "2026-09-14",
+   "kg": 85
+  },
+  {
+   "gemessen_am": "2026-09-13",
+   "kg": 84.3
+  },
+  {
+   "gemessen_am": "2026-09-12",
+   "kg": 85
+  },
+  {
+   "gemessen_am": "2026-09-11",
+   "kg": 84.8
+  },
+  {
+   "gemessen_am": "2026-09-11",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-09-10",
+   "kg": 84.6
+  },
+  {
+   "gemessen_am": "2026-09-09",
+   "kg": 84.4
+  },
+  {
+   "gemessen_am": "2026-09-08",
+   "kg": 84.6
+  },
+  {
+   "gemessen_am": "2026-09-08",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-09-07",
+   "kg": 84.6
+  },
+  {
+   "gemessen_am": "2026-09-06",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-09-05",
+   "kg": 84.7
+  },
+  {
+   "gemessen_am": "2026-09-05",
+   "kg": 84.9
+  },
+  {
+   "gemessen_am": "2026-09-04",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-09-03",
+   "kg": 85
+  },
+  {
+   "gemessen_am": "2026-09-02",
+   "kg": 84.7
+  },
+  {
+   "gemessen_am": "2026-09-02",
+   "kg": 85.3
+  },
+  {
+   "gemessen_am": "2026-09-01",
+   "kg": 84.6
+  },
+  {
+   "gemessen_am": "2026-08-31",
+   "kg": 84.6
+  },
+  {
+   "gemessen_am": "2026-08-30",
+   "kg": 85.3
+  },
+  {
+   "gemessen_am": "2026-08-30",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-08-29",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-08-28",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-08-27",
+   "kg": 85.4
+  },
+  {
+   "gemessen_am": "2026-08-27",
+   "kg": 85.2
+  },
+  {
+   "gemessen_am": "2026-08-26",
+   "kg": 84.7
+  },
+  {
+   "gemessen_am": "2026-08-25",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-08-24",
+   "kg": 84.7
+  },
+  {
+   "gemessen_am": "2026-08-24",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-08-23",
+   "kg": 85.4
+  },
+  {
+   "gemessen_am": "2026-08-22",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-08-21",
+   "kg": 84.8
+  },
+  {
+   "gemessen_am": "2026-08-21",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-08-20",
+   "kg": 85.2
+  },
+  {
+   "gemessen_am": "2026-08-19",
+   "kg": 84.8
+  },
+  {
+   "gemessen_am": "2026-08-18",
+   "kg": 85.2
+  },
+  {
+   "gemessen_am": "2026-08-18",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-08-17",
+   "kg": 85.3
+  },
+  {
+   "gemessen_am": "2026-08-16",
+   "kg": 84.9
+  },
+  {
+   "gemessen_am": "2026-08-15",
+   "kg": 85.2
+  },
+  {
+   "gemessen_am": "2026-08-15",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-08-14",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-08-13",
+   "kg": 85.4
+  },
+  {
+   "gemessen_am": "2026-08-12",
+   "kg": 85.1
+  },
+  {
+   "gemessen_am": "2026-08-12",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-08-11",
+   "kg": 85
+  },
+  {
+   "gemessen_am": "2026-08-10",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-08-09",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-08-09",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-08-08",
+   "kg": 85.2
+  },
+  {
+   "gemessen_am": "2026-08-07",
+   "kg": 85.7
+  },
+  {
+   "gemessen_am": "2026-08-06",
+   "kg": 85.4
+  },
+  {
+   "gemessen_am": "2026-08-06",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-08-05",
+   "kg": 85.4
+  },
+  {
+   "gemessen_am": "2026-08-04",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-08-03",
+   "kg": 85.7
+  },
+  {
+   "gemessen_am": "2026-08-03",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-08-02",
+   "kg": 85.2
+  },
+  {
+   "gemessen_am": "2026-08-01",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-07-31",
+   "kg": 85.7
+  },
+  {
+   "gemessen_am": "2026-07-31",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-07-30",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-07-29",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-07-28",
+   "kg": 85.7
+  },
+  {
+   "gemessen_am": "2026-07-28",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-07-27",
+   "kg": 85.7
+  },
+  {
+   "gemessen_am": "2026-07-26",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-07-25",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-07-25",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-07-24",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-07-23",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-07-22",
+   "kg": 85.7
+  },
+  {
+   "gemessen_am": "2026-07-22",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-07-21",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-07-20",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-07-19",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-07-19",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-07-18",
+   "kg": 85.5
+  },
+  {
+   "gemessen_am": "2026-07-17",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-07-16",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-07-16",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-07-15",
+   "kg": 85.8
+  },
+  {
+   "gemessen_am": "2026-07-14",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-07-13",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-07-13",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-07-12",
+   "kg": 86.3
+  },
+  {
+   "gemessen_am": "2026-07-11",
+   "kg": 86.3
+  },
+  {
+   "gemessen_am": "2026-07-10",
+   "kg": 85.6
+  },
+  {
+   "gemessen_am": "2026-07-10",
+   "kg": 86.5
+  },
+  {
+   "gemessen_am": "2026-07-09",
+   "kg": 86.2
+  },
+  {
+   "gemessen_am": "2026-07-08",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-07-07",
+   "kg": 86.2
+  },
+  {
+   "gemessen_am": "2026-07-07",
+   "kg": 86.6
+  },
+  {
+   "gemessen_am": "2026-07-06",
+   "kg": 86.3
+  },
+  {
+   "gemessen_am": "2026-07-05",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-07-04",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-07-04",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-07-03",
+   "kg": 86
+  },
+  {
+   "gemessen_am": "2026-07-02",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-07-01",
+   "kg": 86.5
+  },
+  {
+   "gemessen_am": "2026-07-01",
+   "kg": 86.3
+  },
+  {
+   "gemessen_am": "2026-06-30",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-06-29",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-06-28",
+   "kg": 85.9
+  },
+  {
+   "gemessen_am": "2026-06-28",
+   "kg": 86.5
+  },
+  {
+   "gemessen_am": "2026-06-27",
+   "kg": 86.5
+  },
+  {
+   "gemessen_am": "2026-06-26",
+   "kg": 86.6
+  },
+  {
+   "gemessen_am": "2026-06-25",
+   "kg": 86.1
+  },
+  {
+   "gemessen_am": "2026-06-25",
+   "kg": 86.3
+  },
+  {
+   "gemessen_am": "2026-06-24",
+   "kg": 86.7
+  },
+  {
+   "gemessen_am": "2026-06-23",
+   "kg": 86.2
+  },
+  {
+   "gemessen_am": "2026-06-22",
+   "kg": 86.6
+  },
+  {
+   "gemessen_am": "2026-06-22",
+   "kg": 86.8
+  },
+  {
+   "gemessen_am": "2026-06-21",
+   "kg": 86.2
+  },
+  {
+   "gemessen_am": "2026-06-20",
+   "kg": 86.3
+  },
+  {
+   "gemessen_am": "2026-06-19",
+   "kg": 86.6
+  },
+  {
+   "gemessen_am": "2026-06-19",
+   "kg": 86.9
+  }
+ ],
+ "skinfolds": [
+  {
+   "gemessen_am": "2026-09-25",
+   "falten": {
+    "kinn": 3.2,
+    "wange": 4.9,
+    "brust": 5.5,
+    "trizeps": 6.2,
+    "ruecken": 7.6,
+    "rippe": 9,
+    "huefte": 3.7,
+    "bauch": 4.1,
+    "knie": 5.3,
+    "wade": 6.2,
+    "quadrizeps": 7,
+    "beinbizeps": 8.1,
+    "bizeps": 3.1
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-09-19",
+   "falten": {
+    "kinn": 4.1,
+    "wange": 4.7,
+    "brust": 5.2,
+    "trizeps": 6.3,
+    "ruecken": 7.2,
+    "rippe": 9.1,
+    "huefte": 3.4,
+    "bauch": 4.8,
+    "knie": 5.3,
+    "wade": 6.6,
+    "quadrizeps": 8.1,
+    "beinbizeps": 9,
+    "bizeps": 3.6
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-09-13",
+   "falten": {
+    "kinn": 4.4,
+    "wange": 4.4,
+    "brust": 5.5,
+    "trizeps": 6.6,
+    "ruecken": 7.6,
+    "rippe": 8.7,
+    "huefte": 3.6,
+    "bauch": 5,
+    "knie": 6.3,
+    "wade": 6.9,
+    "quadrizeps": 7.5,
+    "beinbizeps": 8.8,
+    "bizeps": 3.4
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel",
+   "total": 71.5
+  },
+  {
+   "gemessen_am": "2026-09-07",
+   "falten": {
+    "kinn": 3.8,
+    "wange": 5.4,
+    "brust": 6.3,
+    "trizeps": 7.1,
+    "ruecken": 8,
+    "rippe": 8.6,
+    "huefte": 3.6,
+    "bauch": 5.4,
+    "knie": 6.3,
+    "wade": 7.6,
+    "quadrizeps": 8.3,
+    "beinbizeps": 8.7,
+    "bizeps": 3.9
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-09-01",
+   "falten": {
+    "kinn": 3.9,
+    "wange": 5,
+    "brust": 5.9,
+    "trizeps": 7.2,
+    "ruecken": 8,
+    "rippe": 8.9,
+    "huefte": 4.6,
+    "bauch": 5,
+    "knie": 6.2,
+    "wade": 6.8,
+    "quadrizeps": 8.4,
+    "beinbizeps": 8.8,
+    "bizeps": 3.8
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-08-26",
+   "falten": {
+    "kinn": 4.4,
+    "wange": 5.7,
+    "brust": 6.6,
+    "trizeps": 7.4,
+    "ruecken": 8.3,
+    "rippe": 9.6,
+    "huefte": 4.6,
+    "bauch": 5.7,
+    "knie": 6.6,
+    "wade": 7.7,
+    "quadrizeps": 8.5,
+    "beinbizeps": 9.2,
+    "bizeps": 4.8
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-08-20",
+   "falten": {
+    "kinn": 4.6,
+    "wange": 5.9,
+    "brust": 7.1,
+    "trizeps": 8.1,
+    "ruecken": 8.1,
+    "rippe": 9.1,
+    "huefte": 4.7,
+    "bauch": 5.5,
+    "knie": 6.4,
+    "wade": 7.3,
+    "quadrizeps": 9.1,
+    "beinbizeps": 10.1,
+    "bizeps": 4.6
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-08-14",
+   "falten": {
+    "kinn": 5.2,
+    "wange": 5.8,
+    "brust": 6.9,
+    "trizeps": 7.3,
+    "ruecken": 8.6,
+    "rippe": 10.3,
+    "huefte": 5.1,
+    "bauch": 5.7,
+    "knie": 6.8,
+    "wade": 7.4,
+    "quadrizeps": 8.4,
+    "beinbizeps": 9.9,
+    "bizeps": 5.3
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-08-08",
+   "falten": {
+    "kinn": 5.4,
+    "wange": 6.2,
+    "brust": 7,
+    "trizeps": 8.4,
+    "ruecken": 9,
+    "rippe": 9.8,
+    "huefte": 5.2,
+    "bauch": 6.1,
+    "knie": 6.9,
+    "wade": 7.9,
+    "quadrizeps": 9.3,
+    "beinbizeps": 10,
+    "bizeps": 5.3
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-08-02",
+   "falten": {
+    "kinn": 4.9,
+    "wange": 5.7,
+    "brust": 6.8,
+    "trizeps": 7.8,
+    "ruecken": 8.9,
+    "rippe": 10.1,
+    "huefte": 5.6,
+    "bauch": 6.2,
+    "knie": 6.8,
+    "wade": 8.3,
+    "quadrizeps": 9.3,
+    "beinbizeps": 10.1,
+    "bizeps": 5.1
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-07-27",
+   "falten": {
+    "kinn": 5.5,
+    "wange": 6,
+    "brust": 7.7,
+    "trizeps": 8.7,
+    "ruecken": 9.7,
+    "rippe": 10.7,
+    "huefte": 4.9,
+    "bauch": 6.4,
+    "knie": 6.9,
+    "wade": 8.1,
+    "quadrizeps": 8.9,
+    "beinbizeps": 10.1,
+    "bizeps": 5.4
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-07-21",
+   "falten": {
+    "kinn": 5.8,
+    "wange": 6.6,
+    "brust": 7.6,
+    "trizeps": 8.7,
+    "ruecken": 9.9,
+    "rippe": 10.9,
+    "huefte": 5.9,
+    "bauch": 7,
+    "knie": 7.6,
+    "wade": 8.2,
+    "quadrizeps": 9.6,
+    "beinbizeps": 10.8,
+    "bizeps": 5.1
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-07-15",
+   "falten": {
+    "kinn": 5.7,
+    "wange": 6.4,
+    "brust": 7.9,
+    "trizeps": 9.1,
+    "ruecken": 10,
+    "rippe": 11.1,
+    "huefte": 5.5,
+    "bauch": 6.8,
+    "knie": 7.6,
+    "wade": 8.7,
+    "quadrizeps": 9.8,
+    "beinbizeps": 10.4,
+    "bizeps": 5.8
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-07-09",
+   "falten": {
+    "kinn": 5.8,
+    "wange": 6.8,
+    "brust": 8,
+    "trizeps": 8.6,
+    "ruecken": 10.4,
+    "rippe": 10.7,
+    "huefte": 5.9,
+    "bauch": 7.1,
+    "knie": 8.1,
+    "wade": 9.3,
+    "quadrizeps": 9.4,
+    "beinbizeps": 11.2,
+    "bizeps": 6
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-07-03",
+   "falten": {
+    "kinn": 6,
+    "wange": 7.5,
+    "brust": 8,
+    "trizeps": 9.2,
+    "ruecken": 10.5,
+    "rippe": 10.9,
+    "huefte": 5.8,
+    "bauch": 7.4,
+    "knie": 8,
+    "wade": 9.4,
+    "quadrizeps": 10.2,
+    "beinbizeps": 10.8,
+    "bizeps": 5.8
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-06-27",
+   "falten": {
+    "kinn": 6.4,
+    "wange": 6.9,
+    "brust": 8.1,
+    "trizeps": 9.4,
+    "ruecken": 10.5,
+    "rippe": 11.4,
+    "huefte": 6,
+    "bauch": 7.5,
+    "knie": 8.6,
+    "wade": 9.2,
+    "quadrizeps": 10.4,
+    "beinbizeps": 11.2,
+    "bizeps": 6.2
+   },
+   "standardisiert": false,
+   "messqualitaet": "mittel"
+  },
+  {
+   "gemessen_am": "2026-06-21",
+   "falten": {
+    "kinn": 6.7,
+    "wange": 6.9,
+    "brust": 8.2,
+    "trizeps": 8.9,
+    "ruecken": 10.7,
+    "rippe": 11.6,
+    "huefte": 6.5,
+    "bauch": 7.2,
+    "knie": 8.1,
+    "wade": 9.5,
+    "quadrizeps": 10,
+    "beinbizeps": 11.1,
+    "bizeps": 6.9
+   },
+   "standardisiert": true,
+   "messqualitaet": "mittel"
+  }
+ ],
+ "waist_measurements": [
+  {
+   "gemessen_am": "2026-09-24",
+   "cm": 86.6,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-09-20",
+   "cm": 86.7,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-09-16",
+   "cm": 86.5,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-09-12",
+   "cm": 86.9,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-09-08",
+   "cm": 86.8,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-09-04",
+   "cm": 86.8,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-08-31",
+   "cm": 87.7,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-08-27",
+   "cm": 87.5,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-08-23",
+   "cm": 87.5,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-08-19",
+   "cm": 87.4,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-08-15",
+   "cm": 87.8,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-08-11",
+   "cm": 88.4,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-08-07",
+   "cm": 87.8,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-08-03",
+   "cm": 88.2,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-07-30",
+   "cm": 88.7,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-07-26",
+   "cm": 88.2,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-07-22",
+   "cm": 88.2,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-07-18",
+   "cm": 88.2,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-07-14",
+   "cm": 88.8,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-07-10",
+   "cm": 88.4,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-07-06",
+   "cm": 89.4,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-07-02",
+   "cm": 89.2,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-06-28",
+   "cm": 88.9,
+   "standardisiert": true
+  },
+  {
+   "gemessen_am": "2026-06-24",
+   "cm": 89.5,
+   "standardisiert": false
+  },
+  {
+   "gemessen_am": "2026-06-20",
+   "cm": 89.1,
+   "standardisiert": true
+  }
+ ],
+ "logman_performance": [
+  {
+   "performed_on": "2026-09-26",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 92.5,
+   "volume": 3053
+  },
+  {
+   "performed_on": "2026-09-26",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 93.4,
+   "volume": 3215
+  },
+  {
+   "performed_on": "2026-09-26",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.3,
+   "volume": 3250
+  },
+  {
+   "performed_on": "2026-09-26",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3182
+  },
+  {
+   "performed_on": "2026-09-25",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 93.8,
+   "volume": 3403
+  },
+  {
+   "performed_on": "2026-09-25",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 93.8,
+   "volume": 3412
+  },
+  {
+   "performed_on": "2026-09-25",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 92.8,
+   "volume": 3427
+  },
+  {
+   "performed_on": "2026-09-25",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.9,
+   "volume": 3140
+  },
+  {
+   "performed_on": "2026-09-24",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 92.3,
+   "volume": 3275
+  },
+  {
+   "performed_on": "2026-09-24",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 92.2,
+   "volume": 3131
+  },
+  {
+   "performed_on": "2026-09-24",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 92.9,
+   "volume": 3450
+  },
+  {
+   "performed_on": "2026-09-24",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 93.4,
+   "volume": 3076
+  },
+  {
+   "performed_on": "2026-09-23",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 93.5,
+   "volume": 3321
+  },
+  {
+   "performed_on": "2026-09-23",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.8,
+   "volume": 3184
+  },
+  {
+   "performed_on": "2026-09-23",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 91.1,
+   "volume": 3106
+  },
+  {
+   "performed_on": "2026-09-23",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 92.6,
+   "volume": 3167
+  },
+  {
+   "performed_on": "2026-09-22",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 92.2,
+   "volume": 3403
+  },
+  {
+   "performed_on": "2026-09-22",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 93.2,
+   "volume": 3217
+  },
+  {
+   "performed_on": "2026-09-22",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 93.4,
+   "volume": 3325
+  },
+  {
+   "performed_on": "2026-09-22",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91.2,
+   "volume": 3135
+  },
+  {
+   "performed_on": "2026-09-21",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 91.9,
+   "volume": 3205
+  },
+  {
+   "performed_on": "2026-09-21",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.4,
+   "volume": 3115
+  },
+  {
+   "performed_on": "2026-09-21",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.3,
+   "volume": 3393
+  },
+  {
+   "performed_on": "2026-09-21",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3236
+  },
+  {
+   "performed_on": "2026-09-20",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90,
+   "volume": 3029
+  },
+  {
+   "performed_on": "2026-09-20",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.4,
+   "volume": 3039
+  },
+  {
+   "performed_on": "2026-09-20",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.3,
+   "volume": 3470
+  },
+  {
+   "performed_on": "2026-09-20",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.5,
+   "volume": 3024
+  },
+  {
+   "performed_on": "2026-09-19",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.8,
+   "volume": 3346
+  },
+  {
+   "performed_on": "2026-09-19",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.2,
+   "volume": 3034
+  },
+  {
+   "performed_on": "2026-09-19",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 92.7,
+   "volume": 3229
+  },
+  {
+   "performed_on": "2026-09-19",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 92.8,
+   "volume": 3332
+  },
+  {
+   "performed_on": "2026-09-18",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90,
+   "volume": 3152
+  },
+  {
+   "performed_on": "2026-09-18",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.9,
+   "volume": 3005
+  },
+  {
+   "performed_on": "2026-09-18",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.4,
+   "volume": 3325
+  },
+  {
+   "performed_on": "2026-09-18",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91.4,
+   "volume": 3095
+  },
+  {
+   "performed_on": "2026-09-17",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 91.9,
+   "volume": 3257
+  },
+  {
+   "performed_on": "2026-09-17",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.8,
+   "volume": 3222
+  },
+  {
+   "performed_on": "2026-09-17",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.6,
+   "volume": 3208
+  },
+  {
+   "performed_on": "2026-09-17",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.7,
+   "volume": 3289
+  },
+  {
+   "performed_on": "2026-09-16",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.5,
+   "volume": 3066
+  },
+  {
+   "performed_on": "2026-09-16",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90,
+   "volume": 3430
+  },
+  {
+   "performed_on": "2026-09-16",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.5,
+   "volume": 3172
+  },
+  {
+   "performed_on": "2026-09-16",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3391
+  },
+  {
+   "performed_on": "2026-09-15",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.2,
+   "volume": 3043
+  },
+  {
+   "performed_on": "2026-09-15",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.9,
+   "volume": 3274
+  },
+  {
+   "performed_on": "2026-09-15",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 91.6,
+   "volume": 3492
+  },
+  {
+   "performed_on": "2026-09-15",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.4,
+   "volume": 3016
+  },
+  {
+   "performed_on": "2026-09-14",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90,
+   "volume": 3200
+  },
+  {
+   "performed_on": "2026-09-14",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.3,
+   "volume": 3338
+  },
+  {
+   "performed_on": "2026-09-14",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 92.4,
+   "volume": 3365
+  },
+  {
+   "performed_on": "2026-09-14",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.8,
+   "volume": 3199
+  },
+  {
+   "performed_on": "2026-09-13",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.4,
+   "volume": 3454
+  },
+  {
+   "performed_on": "2026-09-13",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.4,
+   "volume": 3300
+  },
+  {
+   "performed_on": "2026-09-13",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.7,
+   "volume": 3276
+  },
+  {
+   "performed_on": "2026-09-13",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.4,
+   "volume": 3433
+  },
+  {
+   "performed_on": "2026-09-12",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 91.2,
+   "volume": 3132
+  },
+  {
+   "performed_on": "2026-09-12",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.9,
+   "volume": 3100
+  },
+  {
+   "performed_on": "2026-09-12",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.4,
+   "volume": 3293
+  },
+  {
+   "performed_on": "2026-09-12",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91.4,
+   "volume": 3076
+  },
+  {
+   "performed_on": "2026-09-11",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 92,
+   "volume": 3237
+  },
+  {
+   "performed_on": "2026-09-11",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.5,
+   "volume": 3228
+  },
+  {
+   "performed_on": "2026-09-11",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.7,
+   "volume": 3261
+  },
+  {
+   "performed_on": "2026-09-11",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3471
+  },
+  {
+   "performed_on": "2026-09-10",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 92.6,
+   "volume": 3286
+  },
+  {
+   "performed_on": "2026-09-10",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.8,
+   "volume": 3097
+  },
+  {
+   "performed_on": "2026-09-10",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 92.4,
+   "volume": 3343
+  },
+  {
+   "performed_on": "2026-09-10",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.1,
+   "volume": 3452
+  },
+  {
+   "performed_on": "2026-09-09",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.9,
+   "volume": 3432
+  },
+  {
+   "performed_on": "2026-09-09",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 92.2,
+   "volume": 3026
+  },
+  {
+   "performed_on": "2026-09-09",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.6,
+   "volume": 3059
+  },
+  {
+   "performed_on": "2026-09-09",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.7,
+   "volume": 3003
+  },
+  {
+   "performed_on": "2026-09-08",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.5,
+   "volume": 3029
+  },
+  {
+   "performed_on": "2026-09-08",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.9,
+   "volume": 3412
+  },
+  {
+   "performed_on": "2026-09-08",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.1,
+   "volume": 3373
+  },
+  {
+   "performed_on": "2026-09-08",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91,
+   "volume": 3056
+  },
+  {
+   "performed_on": "2026-09-07",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.8,
+   "volume": 3204
+  },
+  {
+   "performed_on": "2026-09-07",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.2,
+   "volume": 3498
+  },
+  {
+   "performed_on": "2026-09-07",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.1,
+   "volume": 3056
+  },
+  {
+   "performed_on": "2026-09-07",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91.3,
+   "volume": 3324
+  },
+  {
+   "performed_on": "2026-09-06",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.4,
+   "volume": 3231
+  },
+  {
+   "performed_on": "2026-09-06",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 92.4,
+   "volume": 3145
+  },
+  {
+   "performed_on": "2026-09-06",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.6,
+   "volume": 3490
+  },
+  {
+   "performed_on": "2026-09-06",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3194
+  },
+  {
+   "performed_on": "2026-09-05",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 92,
+   "volume": 3003
+  },
+  {
+   "performed_on": "2026-09-05",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.3,
+   "volume": 3057
+  },
+  {
+   "performed_on": "2026-09-05",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 91.8,
+   "volume": 3095
+  },
+  {
+   "performed_on": "2026-09-05",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91.7,
+   "volume": 3185
+  },
+  {
+   "performed_on": "2026-09-04",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.7,
+   "volume": 3475
+  },
+  {
+   "performed_on": "2026-09-04",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.4,
+   "volume": 3208
+  },
+  {
+   "performed_on": "2026-09-04",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 91.3,
+   "volume": 3024
+  },
+  {
+   "performed_on": "2026-09-04",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 92,
+   "volume": 3033
+  },
+  {
+   "performed_on": "2026-09-03",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.8,
+   "volume": 3046
+  },
+  {
+   "performed_on": "2026-09-03",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.7,
+   "volume": 3020
+  },
+  {
+   "performed_on": "2026-09-03",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.4,
+   "volume": 3034
+  },
+  {
+   "performed_on": "2026-09-03",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.3,
+   "volume": 3325
+  },
+  {
+   "performed_on": "2026-09-02",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 91.7,
+   "volume": 3206
+  },
+  {
+   "performed_on": "2026-09-02",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.2,
+   "volume": 3193
+  },
+  {
+   "performed_on": "2026-09-02",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.7,
+   "volume": 3380
+  },
+  {
+   "performed_on": "2026-09-02",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.6,
+   "volume": 3119
+  },
+  {
+   "performed_on": "2026-09-01",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.4,
+   "volume": 3404
+  },
+  {
+   "performed_on": "2026-09-01",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.9,
+   "volume": 3418
+  },
+  {
+   "performed_on": "2026-09-01",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 91.1,
+   "volume": 3293
+  },
+  {
+   "performed_on": "2026-09-01",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3251
+  },
+  {
+   "performed_on": "2026-08-31",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.6,
+   "volume": 3190
+  },
+  {
+   "performed_on": "2026-08-31",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.3,
+   "volume": 3267
+  },
+  {
+   "performed_on": "2026-08-31",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.5,
+   "volume": 3405
+  },
+  {
+   "performed_on": "2026-08-31",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.8,
+   "volume": 3357
+  },
+  {
+   "performed_on": "2026-08-30",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.6,
+   "volume": 3429
+  },
+  {
+   "performed_on": "2026-08-30",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.1,
+   "volume": 3426
+  },
+  {
+   "performed_on": "2026-08-30",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.5,
+   "volume": 3157
+  },
+  {
+   "performed_on": "2026-08-30",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 91.5,
+   "volume": 3020
+  },
+  {
+   "performed_on": "2026-08-29",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.4,
+   "volume": 3215
+  },
+  {
+   "performed_on": "2026-08-29",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.5,
+   "volume": 3335
+  },
+  {
+   "performed_on": "2026-08-29",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.7,
+   "volume": 3227
+  },
+  {
+   "performed_on": "2026-08-29",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.3,
+   "volume": 3313
+  },
+  {
+   "performed_on": "2026-08-28",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 91.1,
+   "volume": 3185
+  },
+  {
+   "performed_on": "2026-08-28",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.9,
+   "volume": 3221
+  },
+  {
+   "performed_on": "2026-08-28",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.6,
+   "volume": 3265
+  },
+  {
+   "performed_on": "2026-08-28",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.1,
+   "volume": 3233
+  },
+  {
+   "performed_on": "2026-08-27",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.3,
+   "volume": 3292
+  },
+  {
+   "performed_on": "2026-08-27",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 91.3,
+   "volume": 3398
+  },
+  {
+   "performed_on": "2026-08-27",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.7,
+   "volume": 3325
+  },
+  {
+   "performed_on": "2026-08-27",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3247
+  },
+  {
+   "performed_on": "2026-08-26",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.3,
+   "volume": 3474
+  },
+  {
+   "performed_on": "2026-08-26",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.1,
+   "volume": 3258
+  },
+  {
+   "performed_on": "2026-08-26",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 91.2,
+   "volume": 3365
+  },
+  {
+   "performed_on": "2026-08-26",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.8,
+   "volume": 3477
+  },
+  {
+   "performed_on": "2026-08-25",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.6,
+   "volume": 3177
+  },
+  {
+   "performed_on": "2026-08-25",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.8,
+   "volume": 3350
+  },
+  {
+   "performed_on": "2026-08-25",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.1,
+   "volume": 3455
+  },
+  {
+   "performed_on": "2026-08-25",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.4,
+   "volume": 3217
+  },
+  {
+   "performed_on": "2026-08-24",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.2,
+   "volume": 3417
+  },
+  {
+   "performed_on": "2026-08-24",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.5,
+   "volume": 3496
+  },
+  {
+   "performed_on": "2026-08-24",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.8,
+   "volume": 3143
+  },
+  {
+   "performed_on": "2026-08-24",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.9,
+   "volume": 3046
+  },
+  {
+   "performed_on": "2026-08-23",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88,
+   "volume": 3008
+  },
+  {
+   "performed_on": "2026-08-23",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.4,
+   "volume": 3424
+  },
+  {
+   "performed_on": "2026-08-23",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.5,
+   "volume": 3480
+  },
+  {
+   "performed_on": "2026-08-23",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.8,
+   "volume": 3390
+  },
+  {
+   "performed_on": "2026-08-22",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 91.2,
+   "volume": 3226
+  },
+  {
+   "performed_on": "2026-08-22",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.4,
+   "volume": 3216
+  },
+  {
+   "performed_on": "2026-08-22",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.7,
+   "volume": 3304
+  },
+  {
+   "performed_on": "2026-08-22",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3399
+  },
+  {
+   "performed_on": "2026-08-21",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.4,
+   "volume": 3410
+  },
+  {
+   "performed_on": "2026-08-21",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.4,
+   "volume": 3301
+  },
+  {
+   "performed_on": "2026-08-21",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.6,
+   "volume": 3149
+  },
+  {
+   "performed_on": "2026-08-21",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.2,
+   "volume": 3215
+  },
+  {
+   "performed_on": "2026-08-20",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.4,
+   "volume": 3214
+  },
+  {
+   "performed_on": "2026-08-20",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.5,
+   "volume": 3427
+  },
+  {
+   "performed_on": "2026-08-20",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90.8,
+   "volume": 3341
+  },
+  {
+   "performed_on": "2026-08-20",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.6,
+   "volume": 3449
+  },
+  {
+   "performed_on": "2026-08-19",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.3,
+   "volume": 3313
+  },
+  {
+   "performed_on": "2026-08-19",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 90.9,
+   "volume": 3307
+  },
+  {
+   "performed_on": "2026-08-19",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 88.4,
+   "volume": 3388
+  },
+  {
+   "performed_on": "2026-08-19",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.6,
+   "volume": 3328
+  },
+  {
+   "performed_on": "2026-08-18",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89,
+   "volume": 3207
+  },
+  {
+   "performed_on": "2026-08-18",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.7,
+   "volume": 3436
+  },
+  {
+   "performed_on": "2026-08-18",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.8,
+   "volume": 3291
+  },
+  {
+   "performed_on": "2026-08-18",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 90.2,
+   "volume": 3036
+  },
+  {
+   "performed_on": "2026-08-17",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.4,
+   "volume": 3390
+  },
+  {
+   "performed_on": "2026-08-17",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.8,
+   "volume": 3490
+  },
+  {
+   "performed_on": "2026-08-17",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.2,
+   "volume": 3006
+  },
+  {
+   "performed_on": "2026-08-17",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3092
+  },
+  {
+   "performed_on": "2026-08-16",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.3,
+   "volume": 3093
+  },
+  {
+   "performed_on": "2026-08-16",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.8,
+   "volume": 3295
+  },
+  {
+   "performed_on": "2026-08-16",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.8,
+   "volume": 3406
+  },
+  {
+   "performed_on": "2026-08-16",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.8,
+   "volume": 3423
+  },
+  {
+   "performed_on": "2026-08-15",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.3,
+   "volume": 3044
+  },
+  {
+   "performed_on": "2026-08-15",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.2,
+   "volume": 3116
+  },
+  {
+   "performed_on": "2026-08-15",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 88.9,
+   "volume": 3423
+  },
+  {
+   "performed_on": "2026-08-15",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.2,
+   "volume": 3067
+  },
+  {
+   "performed_on": "2026-08-14",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.9,
+   "volume": 3096
+  },
+  {
+   "performed_on": "2026-08-14",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.4,
+   "volume": 3218
+  },
+  {
+   "performed_on": "2026-08-14",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.3,
+   "volume": 3091
+  },
+  {
+   "performed_on": "2026-08-14",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.3,
+   "volume": 3423
+  },
+  {
+   "performed_on": "2026-08-13",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.6,
+   "volume": 3293
+  },
+  {
+   "performed_on": "2026-08-13",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.5,
+   "volume": 3374
+  },
+  {
+   "performed_on": "2026-08-13",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 90,
+   "volume": 3148
+  },
+  {
+   "performed_on": "2026-08-13",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.9,
+   "volume": 3499
+  },
+  {
+   "performed_on": "2026-08-12",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.7,
+   "volume": 3262
+  },
+  {
+   "performed_on": "2026-08-12",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.3,
+   "volume": 3218
+  },
+  {
+   "performed_on": "2026-08-12",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87,
+   "volume": 3293
+  },
+  {
+   "performed_on": "2026-08-12",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3343
+  },
+  {
+   "performed_on": "2026-08-11",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.5,
+   "volume": 3407
+  },
+  {
+   "performed_on": "2026-08-11",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.7,
+   "volume": 3153
+  },
+  {
+   "performed_on": "2026-08-11",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 88.5,
+   "volume": 3144
+  },
+  {
+   "performed_on": "2026-08-11",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.2,
+   "volume": 3351
+  },
+  {
+   "performed_on": "2026-08-10",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 90.2,
+   "volume": 3290
+  },
+  {
+   "performed_on": "2026-08-10",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.8,
+   "volume": 3308
+  },
+  {
+   "performed_on": "2026-08-10",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.5,
+   "volume": 3033
+  },
+  {
+   "performed_on": "2026-08-10",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.5,
+   "volume": 3389
+  },
+  {
+   "performed_on": "2026-08-09",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.3,
+   "volume": 3166
+  },
+  {
+   "performed_on": "2026-08-09",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 89.6,
+   "volume": 3042
+  },
+  {
+   "performed_on": "2026-08-09",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.2,
+   "volume": 3368
+  },
+  {
+   "performed_on": "2026-08-09",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.7,
+   "volume": 3228
+  },
+  {
+   "performed_on": "2026-08-08",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.9,
+   "volume": 3306
+  },
+  {
+   "performed_on": "2026-08-08",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.9,
+   "volume": 3330
+  },
+  {
+   "performed_on": "2026-08-08",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.4,
+   "volume": 3343
+  },
+  {
+   "performed_on": "2026-08-08",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.5,
+   "volume": 3055
+  },
+  {
+   "performed_on": "2026-08-07",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.2,
+   "volume": 3200
+  },
+  {
+   "performed_on": "2026-08-07",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.5,
+   "volume": 3070
+  },
+  {
+   "performed_on": "2026-08-07",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.7,
+   "volume": 3246
+  },
+  {
+   "performed_on": "2026-08-07",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3053
+  },
+  {
+   "performed_on": "2026-08-06",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.9,
+   "volume": 3353
+  },
+  {
+   "performed_on": "2026-08-06",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.2,
+   "volume": 3438
+  },
+  {
+   "performed_on": "2026-08-06",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.7,
+   "volume": 3407
+  },
+  {
+   "performed_on": "2026-08-06",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 89.3,
+   "volume": 3163
+  },
+  {
+   "performed_on": "2026-08-05",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86,
+   "volume": 3156
+  },
+  {
+   "performed_on": "2026-08-05",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.5,
+   "volume": 3135
+  },
+  {
+   "performed_on": "2026-08-05",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89,
+   "volume": 3278
+  },
+  {
+   "performed_on": "2026-08-05",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.9,
+   "volume": 3300
+  },
+  {
+   "performed_on": "2026-08-04",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.7,
+   "volume": 3169
+  },
+  {
+   "performed_on": "2026-08-04",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88,
+   "volume": 3350
+  },
+  {
+   "performed_on": "2026-08-04",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.7,
+   "volume": 3018
+  },
+  {
+   "performed_on": "2026-08-04",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86,
+   "volume": 3191
+  },
+  {
+   "performed_on": "2026-08-03",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.8,
+   "volume": 3222
+  },
+  {
+   "performed_on": "2026-08-03",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.4,
+   "volume": 3308
+  },
+  {
+   "performed_on": "2026-08-03",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.2,
+   "volume": 3099
+  },
+  {
+   "performed_on": "2026-08-03",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.2,
+   "volume": 3332
+  },
+  {
+   "performed_on": "2026-08-02",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.8,
+   "volume": 3276
+  },
+  {
+   "performed_on": "2026-08-02",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.5,
+   "volume": 3408
+  },
+  {
+   "performed_on": "2026-08-02",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89,
+   "volume": 3303
+  },
+  {
+   "performed_on": "2026-08-02",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3207
+  },
+  {
+   "performed_on": "2026-08-01",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.6,
+   "volume": 3081
+  },
+  {
+   "performed_on": "2026-08-01",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.8,
+   "volume": 3050
+  },
+  {
+   "performed_on": "2026-08-01",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.1,
+   "volume": 3091
+  },
+  {
+   "performed_on": "2026-08-01",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.5,
+   "volume": 3263
+  },
+  {
+   "performed_on": "2026-07-31",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.1,
+   "volume": 3410
+  },
+  {
+   "performed_on": "2026-07-31",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.9,
+   "volume": 3191
+  },
+  {
+   "performed_on": "2026-07-31",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 89.4,
+   "volume": 3272
+  },
+  {
+   "performed_on": "2026-07-31",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.4,
+   "volume": 3457
+  },
+  {
+   "performed_on": "2026-07-30",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.1,
+   "volume": 3311
+  },
+  {
+   "performed_on": "2026-07-30",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88,
+   "volume": 3367
+  },
+  {
+   "performed_on": "2026-07-30",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.5,
+   "volume": 3294
+  },
+  {
+   "performed_on": "2026-07-30",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.6,
+   "volume": 3462
+  },
+  {
+   "performed_on": "2026-07-29",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 89.2,
+   "volume": 3048
+  },
+  {
+   "performed_on": "2026-07-29",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.7,
+   "volume": 3017
+  },
+  {
+   "performed_on": "2026-07-29",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.5,
+   "volume": 3420
+  },
+  {
+   "performed_on": "2026-07-29",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.3,
+   "volume": 3014
+  },
+  {
+   "performed_on": "2026-07-28",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.9,
+   "volume": 3175
+  },
+  {
+   "performed_on": "2026-07-28",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.8,
+   "volume": 3359
+  },
+  {
+   "performed_on": "2026-07-28",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.9,
+   "volume": 3320
+  },
+  {
+   "performed_on": "2026-07-28",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3057
+  },
+  {
+   "performed_on": "2026-07-27",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.4,
+   "volume": 3062
+  },
+  {
+   "performed_on": "2026-07-27",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.1,
+   "volume": 3237
+  },
+  {
+   "performed_on": "2026-07-27",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.2,
+   "volume": 3237
+  },
+  {
+   "performed_on": "2026-07-27",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.7,
+   "volume": 3288
+  },
+  {
+   "performed_on": "2026-07-26",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.5,
+   "volume": 3417
+  },
+  {
+   "performed_on": "2026-07-26",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.8,
+   "volume": 3451
+  },
+  {
+   "performed_on": "2026-07-26",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.6,
+   "volume": 3410
+  },
+  {
+   "performed_on": "2026-07-26",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.6,
+   "volume": 3015
+  },
+  {
+   "performed_on": "2026-07-25",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.3,
+   "volume": 3056
+  },
+  {
+   "performed_on": "2026-07-25",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.6,
+   "volume": 3098
+  },
+  {
+   "performed_on": "2026-07-25",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.4,
+   "volume": 3224
+  },
+  {
+   "performed_on": "2026-07-25",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.6,
+   "volume": 3365
+  },
+  {
+   "performed_on": "2026-07-24",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.7,
+   "volume": 3457
+  },
+  {
+   "performed_on": "2026-07-24",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.7,
+   "volume": 3066
+  },
+  {
+   "performed_on": "2026-07-24",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.6,
+   "volume": 3055
+  },
+  {
+   "performed_on": "2026-07-24",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86,
+   "volume": 3104
+  },
+  {
+   "performed_on": "2026-07-23",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.4,
+   "volume": 3435
+  },
+  {
+   "performed_on": "2026-07-23",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.1,
+   "volume": 3312
+  },
+  {
+   "performed_on": "2026-07-23",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.4,
+   "volume": 3146
+  },
+  {
+   "performed_on": "2026-07-23",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3497
+  },
+  {
+   "performed_on": "2026-07-22",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.6,
+   "volume": 3228
+  },
+  {
+   "performed_on": "2026-07-22",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.3,
+   "volume": 3447
+  },
+  {
+   "performed_on": "2026-07-22",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.6,
+   "volume": 3475
+  },
+  {
+   "performed_on": "2026-07-22",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 85.6,
+   "volume": 3038
+  },
+  {
+   "performed_on": "2026-07-21",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.1,
+   "volume": 3480
+  },
+  {
+   "performed_on": "2026-07-21",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.9,
+   "volume": 3324
+  },
+  {
+   "performed_on": "2026-07-21",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87,
+   "volume": 3244
+  },
+  {
+   "performed_on": "2026-07-21",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.1,
+   "volume": 3368
+  },
+  {
+   "performed_on": "2026-07-20",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 88.1,
+   "volume": 3102
+  },
+  {
+   "performed_on": "2026-07-20",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.1,
+   "volume": 3255
+  },
+  {
+   "performed_on": "2026-07-20",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.5,
+   "volume": 3321
+  },
+  {
+   "performed_on": "2026-07-20",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 88.5,
+   "volume": 3093
+  },
+  {
+   "performed_on": "2026-07-19",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87,
+   "volume": 3374
+  },
+  {
+   "performed_on": "2026-07-19",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.7,
+   "volume": 3243
+  },
+  {
+   "performed_on": "2026-07-19",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.9,
+   "volume": 3477
+  },
+  {
+   "performed_on": "2026-07-19",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 85.2,
+   "volume": 3289
+  },
+  {
+   "performed_on": "2026-07-18",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.6,
+   "volume": 3395
+  },
+  {
+   "performed_on": "2026-07-18",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 88.2,
+   "volume": 3463
+  },
+  {
+   "performed_on": "2026-07-18",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87,
+   "volume": 3266
+  },
+  {
+   "performed_on": "2026-07-18",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3231
+  },
+  {
+   "performed_on": "2026-07-17",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.2,
+   "volume": 3287
+  },
+  {
+   "performed_on": "2026-07-17",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.5,
+   "volume": 3188
+  },
+  {
+   "performed_on": "2026-07-17",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.3,
+   "volume": 3311
+  },
+  {
+   "performed_on": "2026-07-17",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.3,
+   "volume": 3009
+  },
+  {
+   "performed_on": "2026-07-16",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 87.2,
+   "volume": 3189
+  },
+  {
+   "performed_on": "2026-07-16",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87,
+   "volume": 3048
+  },
+  {
+   "performed_on": "2026-07-16",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.6,
+   "volume": 3202
+  },
+  {
+   "performed_on": "2026-07-16",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.3,
+   "volume": 3235
+  },
+  {
+   "performed_on": "2026-07-15",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.6,
+   "volume": 3373
+  },
+  {
+   "performed_on": "2026-07-15",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.5,
+   "volume": 3283
+  },
+  {
+   "performed_on": "2026-07-15",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.4,
+   "volume": 3031
+  },
+  {
+   "performed_on": "2026-07-15",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.6,
+   "volume": 3408
+  },
+  {
+   "performed_on": "2026-07-14",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.3,
+   "volume": 3363
+  },
+  {
+   "performed_on": "2026-07-14",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.1,
+   "volume": 3293
+  },
+  {
+   "performed_on": "2026-07-14",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.4,
+   "volume": 3052
+  },
+  {
+   "performed_on": "2026-07-14",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.2,
+   "volume": 3340
+  },
+  {
+   "performed_on": "2026-07-13",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.9,
+   "volume": 3324
+  },
+  {
+   "performed_on": "2026-07-13",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.3,
+   "volume": 3279
+  },
+  {
+   "performed_on": "2026-07-13",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.3,
+   "volume": 3126
+  },
+  {
+   "performed_on": "2026-07-13",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3429
+  },
+  {
+   "performed_on": "2026-07-12",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 84.3,
+   "volume": 3198
+  },
+  {
+   "performed_on": "2026-07-12",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.8,
+   "volume": 3063
+  },
+  {
+   "performed_on": "2026-07-12",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.5,
+   "volume": 3123
+  },
+  {
+   "performed_on": "2026-07-12",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 85.5,
+   "volume": 3315
+  },
+  {
+   "performed_on": "2026-07-11",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 84,
+   "volume": 3046
+  },
+  {
+   "performed_on": "2026-07-11",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.7,
+   "volume": 3400
+  },
+  {
+   "performed_on": "2026-07-11",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.7,
+   "volume": 3020
+  },
+  {
+   "performed_on": "2026-07-11",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 84.6,
+   "volume": 3056
+  },
+  {
+   "performed_on": "2026-07-10",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.3,
+   "volume": 3329
+  },
+  {
+   "performed_on": "2026-07-10",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.6,
+   "volume": 3228
+  },
+  {
+   "performed_on": "2026-07-10",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.5,
+   "volume": 3351
+  },
+  {
+   "performed_on": "2026-07-10",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.3,
+   "volume": 3486
+  },
+  {
+   "performed_on": "2026-07-09",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.9,
+   "volume": 3149
+  },
+  {
+   "performed_on": "2026-07-09",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 87.4,
+   "volume": 3392
+  },
+  {
+   "performed_on": "2026-07-09",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86,
+   "volume": 3410
+  },
+  {
+   "performed_on": "2026-07-09",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 84.4,
+   "volume": 3269
+  },
+  {
+   "performed_on": "2026-07-08",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 84.2,
+   "volume": 3271
+  },
+  {
+   "performed_on": "2026-07-08",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.4,
+   "volume": 3086
+  },
+  {
+   "performed_on": "2026-07-08",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.4,
+   "volume": 3066
+  },
+  {
+   "performed_on": "2026-07-08",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3282
+  },
+  {
+   "performed_on": "2026-07-07",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 83.7,
+   "volume": 3479
+  },
+  {
+   "performed_on": "2026-07-07",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.5,
+   "volume": 3141
+  },
+  {
+   "performed_on": "2026-07-07",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.1,
+   "volume": 3284
+  },
+  {
+   "performed_on": "2026-07-07",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 87.3,
+   "volume": 3310
+  },
+  {
+   "performed_on": "2026-07-06",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.5,
+   "volume": 3226
+  },
+  {
+   "performed_on": "2026-07-06",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85,
+   "volume": 3089
+  },
+  {
+   "performed_on": "2026-07-06",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.7,
+   "volume": 3324
+  },
+  {
+   "performed_on": "2026-07-06",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.2,
+   "volume": 3040
+  },
+  {
+   "performed_on": "2026-07-05",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.9,
+   "volume": 3054
+  },
+  {
+   "performed_on": "2026-07-05",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 86.3,
+   "volume": 3488
+  },
+  {
+   "performed_on": "2026-07-05",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 87.1,
+   "volume": 3472
+  },
+  {
+   "performed_on": "2026-07-05",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.3,
+   "volume": 3288
+  },
+  {
+   "performed_on": "2026-07-04",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.3,
+   "volume": 3265
+  },
+  {
+   "performed_on": "2026-07-04",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.6,
+   "volume": 3198
+  },
+  {
+   "performed_on": "2026-07-04",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 86.1,
+   "volume": 3164
+  },
+  {
+   "performed_on": "2026-07-04",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 84.9,
+   "volume": 3229
+  },
+  {
+   "performed_on": "2026-07-03",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 83.9,
+   "volume": 3368
+  },
+  {
+   "performed_on": "2026-07-03",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.6,
+   "volume": 3016
+  },
+  {
+   "performed_on": "2026-07-03",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.1,
+   "volume": 3022
+  },
+  {
+   "performed_on": "2026-07-03",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3116
+  },
+  {
+   "performed_on": "2026-07-02",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.7,
+   "volume": 3061
+  },
+  {
+   "performed_on": "2026-07-02",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.9,
+   "volume": 3469
+  },
+  {
+   "performed_on": "2026-07-02",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.5,
+   "volume": 3462
+  },
+  {
+   "performed_on": "2026-07-02",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 84.1,
+   "volume": 3471
+  },
+  {
+   "performed_on": "2026-07-01",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.3,
+   "volume": 3133
+  },
+  {
+   "performed_on": "2026-07-01",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.1,
+   "volume": 3056
+  },
+  {
+   "performed_on": "2026-07-01",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 83.9,
+   "volume": 3487
+  },
+  {
+   "performed_on": "2026-07-01",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 85.5,
+   "volume": 3272
+  },
+  {
+   "performed_on": "2026-06-30",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.5,
+   "volume": 3025
+  },
+  {
+   "performed_on": "2026-06-30",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.4,
+   "volume": 3077
+  },
+  {
+   "performed_on": "2026-06-30",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.8,
+   "volume": 3225
+  },
+  {
+   "performed_on": "2026-06-30",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 86.6,
+   "volume": 3404
+  },
+  {
+   "performed_on": "2026-06-29",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.4,
+   "volume": 3197
+  },
+  {
+   "performed_on": "2026-06-29",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.5,
+   "volume": 3422
+  },
+  {
+   "performed_on": "2026-06-29",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.5,
+   "volume": 3279
+  },
+  {
+   "performed_on": "2026-06-29",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 83.6,
+   "volume": 3190
+  },
+  {
+   "performed_on": "2026-06-28",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 86.4,
+   "volume": 3423
+  },
+  {
+   "performed_on": "2026-06-28",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 83.5,
+   "volume": 3482
+  },
+  {
+   "performed_on": "2026-06-28",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 83.2,
+   "volume": 3133
+  },
+  {
+   "performed_on": "2026-06-28",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3190
+  },
+  {
+   "performed_on": "2026-06-27",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.8,
+   "volume": 3444
+  },
+  {
+   "performed_on": "2026-06-27",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.5,
+   "volume": 3316
+  },
+  {
+   "performed_on": "2026-06-27",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.5,
+   "volume": 3433
+  },
+  {
+   "performed_on": "2026-06-27",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 84.9,
+   "volume": 3291
+  },
+  {
+   "performed_on": "2026-06-26",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 84.7,
+   "volume": 3163
+  },
+  {
+   "performed_on": "2026-06-26",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.4,
+   "volume": 3361
+  },
+  {
+   "performed_on": "2026-06-26",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.2,
+   "volume": 3096
+  },
+  {
+   "performed_on": "2026-06-26",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 82.7,
+   "volume": 3128
+  },
+  {
+   "performed_on": "2026-06-25",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 84,
+   "volume": 3300
+  },
+  {
+   "performed_on": "2026-06-25",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.2,
+   "volume": 3141
+  },
+  {
+   "performed_on": "2026-06-25",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 82.7,
+   "volume": 3315
+  },
+  {
+   "performed_on": "2026-06-25",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 84.8,
+   "volume": 3115
+  },
+  {
+   "performed_on": "2026-06-24",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 82.6,
+   "volume": 3217
+  },
+  {
+   "performed_on": "2026-06-24",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.2,
+   "volume": 3366
+  },
+  {
+   "performed_on": "2026-06-24",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.1,
+   "volume": 3122
+  },
+  {
+   "performed_on": "2026-06-24",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 83.6,
+   "volume": 3358
+  },
+  {
+   "performed_on": "2026-06-23",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.9,
+   "volume": 3374
+  },
+  {
+   "performed_on": "2026-06-23",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 84.6,
+   "volume": 3224
+  },
+  {
+   "performed_on": "2026-06-23",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.2,
+   "volume": 3217
+  },
+  {
+   "performed_on": "2026-06-23",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": null,
+   "volume": 3037
+  },
+  {
+   "performed_on": "2026-06-22",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.6,
+   "volume": 3152
+  },
+  {
+   "performed_on": "2026-06-22",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 85.1,
+   "volume": 3369
+  },
+  {
+   "performed_on": "2026-06-22",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.6,
+   "volume": 3365
+  },
+  {
+   "performed_on": "2026-06-22",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 83.9,
+   "volume": 3033
+  },
+  {
+   "performed_on": "2026-06-21",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 84.9,
+   "volume": 3035
+  },
+  {
+   "performed_on": "2026-06-21",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 83,
+   "volume": 3059
+  },
+  {
+   "performed_on": "2026-06-21",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84,
+   "volume": 3152
+  },
+  {
+   "performed_on": "2026-06-21",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 82.4,
+   "volume": 3423
+  },
+  {
+   "performed_on": "2026-06-20",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 85.5,
+   "volume": 3016
+  },
+  {
+   "performed_on": "2026-06-20",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 82.5,
+   "volume": 3497
+  },
+  {
+   "performed_on": "2026-06-20",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 84.8,
+   "volume": 3192
+  },
+  {
+   "performed_on": "2026-06-20",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 85.4,
+   "volume": 3473
+  },
+  {
+   "performed_on": "2026-06-19",
+   "exercise": "Kniebeuge",
+   "category": "legs",
+   "estimated_1rm": 82.5,
+   "volume": 3294
+  },
+  {
+   "performed_on": "2026-06-19",
+   "exercise": "Bankdrücken",
+   "category": "push",
+   "estimated_1rm": 82.2,
+   "volume": 3056
+  },
+  {
+   "performed_on": "2026-06-19",
+   "exercise": "Klimmzug",
+   "category": "pull",
+   "estimated_1rm": 85.8,
+   "volume": 3333
+  },
+  {
+   "performed_on": "2026-06-19",
+   "exercise": "Rudern",
+   "category": "pull",
+   "estimated_1rm": 85.6,
+   "volume": 3436
+  }
+ ],
+ "sleep_logs": [
+  {
+   "sleep_date": "2026-09-26",
+   "bedtime": "00:30",
+   "wake_time": "23:30",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 0,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-09-25",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-24",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-23",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-22",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-21",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-20",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-19",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 3,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-09-18",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-17",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-16",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-15",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 3,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-09-14",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-13",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-12",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 2,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-09-11",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-10",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-09",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-08",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-07",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-06",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-05",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 1,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-09-04",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 2,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-09-03",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-02",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-09-01",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-31",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-30",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-29",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 0,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-28",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-27",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-26",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-25",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-24",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 1,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-23",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-22",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 3,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-21",
+   "bedtime": "00:30",
+   "wake_time": "23:30",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-20",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-19",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-18",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-17",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-16",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-15",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 2,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-14",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-13",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 0,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-12",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-11",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-10",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-09",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-08",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 1,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-07",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-06",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-05",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-04",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-03",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-08-02",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 3,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-08-01",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 0,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-07-31",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-30",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-29",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-28",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-27",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-26",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-25",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 3,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-07-24",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-23",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-22",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 2,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-07-21",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-20",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-19",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-18",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 2,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-07-17",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-16",
+   "bedtime": "00:30",
+   "wake_time": "23:30",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-15",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-14",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-13",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-12",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-11",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 1,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-07-10",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-09",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-08",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-07",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-06",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-05",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-04",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 0,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-07-03",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-02",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-07-01",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-30",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 0,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  },
+  {
+   "sleep_date": "2026-06-29",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-28",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-27",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 3,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-06-26",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-25",
+   "bedtime": "22:45",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-24",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 2,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-23",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 1,
+   "energy": 1,
+   "awakenings": 3,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-22",
+   "bedtime": "00:30",
+   "wake_time": "06:50",
+   "quality": 2,
+   "energy": 4,
+   "awakenings": 0,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-21",
+   "bedtime": "23:10",
+   "wake_time": "06:50",
+   "quality": 3,
+   "energy": 2,
+   "awakenings": 1,
+   "tags": []
+  },
+  {
+   "sleep_date": "2026-06-20",
+   "bedtime": "23:40",
+   "wake_time": "06:50",
+   "quality": 4,
+   "energy": 5,
+   "awakenings": 2,
+   "tags": [
+    "spät gegessen"
+   ]
+  },
+  {
+   "sleep_date": "2026-06-19",
+   "bedtime": "22:45",
+   "wake_time": "23:30",
+   "quality": 5,
+   "energy": 3,
+   "awakenings": 3,
+   "tags": [
+    "alkohol",
+    "stress"
+   ]
+  }
+ ],
+ "bodycomp_checkins": [
+  {
+   "checkin_date": "2026-09-26",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": true
+  },
+  {
+   "checkin_date": "2026-09-25",
+   "recovery": 2,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-24",
+   "recovery": 3,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-23",
+   "recovery": 4,
+   "mood": 4,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-22",
+   "recovery": 5,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-21",
+   "recovery": 1,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-20",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-19",
+   "recovery": 3,
+   "mood": 4,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-18",
+   "recovery": 4,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-17",
+   "recovery": 5,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-16",
+   "recovery": 1,
+   "mood": 3,
+   "hunger": 2,
+   "illness": true,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-15",
+   "recovery": 2,
+   "mood": 4,
+   "hunger": 3,
+   "illness": true,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-14",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": true,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-13",
+   "recovery": 4,
+   "mood": 2,
+   "hunger": 2,
+   "illness": true,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-12",
+   "recovery": 5,
+   "mood": 3,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-11",
+   "recovery": 1,
+   "mood": 4,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-10",
+   "recovery": 2,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-09",
+   "recovery": 3,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": true
+  },
+  {
+   "checkin_date": "2026-09-08",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-06",
+   "recovery": 1,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-05",
+   "recovery": 2,
+   "mood": 2,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-04",
+   "recovery": 3,
+   "mood": 3,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-03",
+   "recovery": 4,
+   "mood": 4,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-02",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-09-01",
+   "recovery": 1,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-31",
+   "recovery": 2,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-30",
+   "recovery": 3,
+   "mood": 4,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-29",
+   "recovery": 4,
+   "mood": 1,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-28",
+   "recovery": 5,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-27",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-26",
+   "recovery": 2,
+   "mood": 4,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-25",
+   "recovery": 3,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-24",
+   "recovery": 4,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-23",
+   "recovery": 5,
+   "mood": 3,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": true
+  },
+  {
+   "checkin_date": "2026-08-22",
+   "recovery": 1,
+   "mood": 4,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-21",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-20",
+   "recovery": 3,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-19",
+   "recovery": 4,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-17",
+   "recovery": 1,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-16",
+   "recovery": 2,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-15",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-14",
+   "recovery": 4,
+   "mood": 4,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-13",
+   "recovery": 5,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-12",
+   "recovery": 1,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-11",
+   "recovery": 2,
+   "mood": 3,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-10",
+   "recovery": 3,
+   "mood": 4,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-09",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-08",
+   "recovery": 5,
+   "mood": 2,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-07",
+   "recovery": 1,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": true,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-06",
+   "recovery": 2,
+   "mood": 4,
+   "hunger": 1,
+   "illness": false,
+   "travel": true,
+   "unusual_meals": true
+  },
+  {
+   "checkin_date": "2026-08-05",
+   "recovery": 3,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": true,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-04",
+   "recovery": 4,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": true,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-03",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-02",
+   "recovery": 1,
+   "mood": 4,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-08-01",
+   "recovery": 2,
+   "mood": 1,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-31",
+   "recovery": 3,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-30",
+   "recovery": 4,
+   "mood": 3,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-28",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-27",
+   "recovery": 2,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-26",
+   "recovery": 3,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-25",
+   "recovery": 4,
+   "mood": 4,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-24",
+   "recovery": 5,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-23",
+   "recovery": 1,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-22",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-21",
+   "recovery": 3,
+   "mood": 4,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-20",
+   "recovery": 4,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": true
+  },
+  {
+   "checkin_date": "2026-07-19",
+   "recovery": 5,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-18",
+   "recovery": 1,
+   "mood": 3,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-17",
+   "recovery": 2,
+   "mood": 4,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-16",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-15",
+   "recovery": 4,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-14",
+   "recovery": 5,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-13",
+   "recovery": 1,
+   "mood": 4,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-12",
+   "recovery": 2,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-11",
+   "recovery": 3,
+   "mood": 2,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-10",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-08",
+   "recovery": 1,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-07",
+   "recovery": 2,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-06",
+   "recovery": 3,
+   "mood": 3,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-05",
+   "recovery": 4,
+   "mood": 4,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-04",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-03",
+   "recovery": 1,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": true
+  },
+  {
+   "checkin_date": "2026-07-02",
+   "recovery": 2,
+   "mood": 3,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-07-01",
+   "recovery": 3,
+   "mood": 4,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-30",
+   "recovery": 4,
+   "mood": 1,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-29",
+   "recovery": 5,
+   "mood": 2,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-28",
+   "recovery": 0,
+   "mood": 3,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-27",
+   "recovery": 2,
+   "mood": 4,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-26",
+   "recovery": 3,
+   "mood": 1,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-25",
+   "recovery": 4,
+   "mood": 2,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-24",
+   "recovery": 5,
+   "mood": 3,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-23",
+   "recovery": 1,
+   "mood": 4,
+   "hunger": 3,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-22",
+   "recovery": 0,
+   "mood": 1,
+   "hunger": 1,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-21",
+   "recovery": 3,
+   "mood": 2,
+   "hunger": 2,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  },
+  {
+   "checkin_date": "2026-06-20",
+   "recovery": 4,
+   "mood": 3,
+   "hunger": 0,
+   "illness": false,
+   "travel": false,
+   "unusual_meals": false
+  }
+ ],
+ "nutrition_log_entries": [
+  {
+   "id": "e-0001",
+   "log_date": "2026-09-26",
+   "energy_kcal": 880,
+   "protein_g": 52,
+   "carbs_g": 85,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0002",
+   "log_date": "2026-09-26",
+   "energy_kcal": 527,
+   "protein_g": 52,
+   "carbs_g": 57,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0003",
+   "log_date": "2026-09-26",
+   "energy_kcal": 694,
+   "protein_g": 36,
+   "carbs_g": 62,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0004",
+   "log_date": "2026-09-25",
+   "energy_kcal": 653,
+   "protein_g": 55,
+   "carbs_g": 51,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0005",
+   "log_date": "2026-09-25",
+   "energy_kcal": 543,
+   "protein_g": 47,
+   "carbs_g": 59,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0006",
+   "log_date": "2026-09-25",
+   "energy_kcal": 887,
+   "protein_g": 46,
+   "carbs_g": 52,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0007",
+   "log_date": "2026-09-24",
+   "energy_kcal": 669,
+   "protein_g": 48,
+   "carbs_g": 59,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0008",
+   "log_date": "2026-09-24",
+   "energy_kcal": 902,
+   "protein_g": 49,
+   "carbs_g": 64,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0009",
+   "log_date": "2026-09-24",
+   "energy_kcal": 612,
+   "protein_g": 47,
+   "carbs_g": 77,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0010",
+   "log_date": "2026-09-23",
+   "energy_kcal": 750,
+   "protein_g": 41,
+   "carbs_g": 66,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0011",
+   "log_date": "2026-09-23",
+   "energy_kcal": 933,
+   "protein_g": 51,
+   "carbs_g": 73,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0012",
+   "log_date": "2026-09-23",
+   "energy_kcal": 945,
+   "protein_g": 46,
+   "carbs_g": 61,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0013",
+   "log_date": "2026-09-22",
+   "energy_kcal": 894,
+   "protein_g": 58,
+   "carbs_g": 87,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0014",
+   "log_date": "2026-09-22",
+   "energy_kcal": 762,
+   "protein_g": 48,
+   "carbs_g": 90,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0015",
+   "log_date": "2026-09-22",
+   "energy_kcal": 705,
+   "protein_g": 44,
+   "carbs_g": 75,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0016",
+   "log_date": "2026-09-21",
+   "energy_kcal": 832,
+   "protein_g": 34,
+   "carbs_g": 82,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0017",
+   "log_date": "2026-09-21",
+   "energy_kcal": 686,
+   "protein_g": 38,
+   "carbs_g": 73,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0018",
+   "log_date": "2026-09-21",
+   "energy_kcal": 793,
+   "protein_g": 59,
+   "carbs_g": 69,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0019",
+   "log_date": "2026-09-20",
+   "energy_kcal": 956,
+   "protein_g": 47,
+   "carbs_g": 64,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0020",
+   "log_date": "2026-09-20",
+   "energy_kcal": 821,
+   "protein_g": 35,
+   "carbs_g": 51,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0021",
+   "log_date": "2026-09-20",
+   "energy_kcal": 910,
+   "protein_g": 32,
+   "carbs_g": 65,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0022",
+   "log_date": "2026-09-19",
+   "energy_kcal": 716,
+   "protein_g": 53,
+   "carbs_g": 74,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0023",
+   "log_date": "2026-09-19",
+   "energy_kcal": 524,
+   "protein_g": 40,
+   "carbs_g": 61,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0024",
+   "log_date": "2026-09-19",
+   "energy_kcal": 950,
+   "protein_g": 32,
+   "carbs_g": 67,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0025",
+   "log_date": "2026-09-18",
+   "energy_kcal": 549,
+   "protein_g": 48,
+   "carbs_g": 68,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0026",
+   "log_date": "2026-09-18",
+   "energy_kcal": 823,
+   "protein_g": 41,
+   "carbs_g": 68,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0027",
+   "log_date": "2026-09-18",
+   "energy_kcal": 840,
+   "protein_g": 35,
+   "carbs_g": 86,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0028",
+   "log_date": "2026-09-17",
+   "energy_kcal": 873,
+   "protein_g": 54,
+   "carbs_g": 79,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0029",
+   "log_date": "2026-09-17",
+   "energy_kcal": 764,
+   "protein_g": 32,
+   "carbs_g": 66,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0030",
+   "log_date": "2026-09-17",
+   "energy_kcal": 832,
+   "protein_g": 32,
+   "carbs_g": 77,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0031",
+   "log_date": "2026-09-16",
+   "energy_kcal": 682,
+   "protein_g": 53,
+   "carbs_g": 84,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0032",
+   "log_date": "2026-09-16",
+   "energy_kcal": 612,
+   "protein_g": 42,
+   "carbs_g": 78,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0033",
+   "log_date": "2026-09-16",
+   "energy_kcal": 741,
+   "protein_g": 41,
+   "carbs_g": 81,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0034",
+   "log_date": "2026-09-15",
+   "energy_kcal": 866,
+   "protein_g": 49,
+   "carbs_g": 90,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0035",
+   "log_date": "2026-09-15",
+   "energy_kcal": 575,
+   "protein_g": 36,
+   "carbs_g": 66,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0036",
+   "log_date": "2026-09-15",
+   "energy_kcal": 536,
+   "protein_g": 39,
+   "carbs_g": 62,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0037",
+   "log_date": "2026-09-14",
+   "energy_kcal": 989,
+   "protein_g": 47,
+   "carbs_g": 78,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0038",
+   "log_date": "2026-09-14",
+   "energy_kcal": 552,
+   "protein_g": 59,
+   "carbs_g": 57,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0039",
+   "log_date": "2026-09-14",
+   "energy_kcal": 904,
+   "protein_g": 46,
+   "carbs_g": 55,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0040",
+   "log_date": "2026-09-13",
+   "energy_kcal": 765,
+   "protein_g": 58,
+   "carbs_g": 72,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0041",
+   "log_date": "2026-09-13",
+   "energy_kcal": 806,
+   "protein_g": 37,
+   "carbs_g": 73,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0042",
+   "log_date": "2026-09-13",
+   "energy_kcal": 777,
+   "protein_g": 30,
+   "carbs_g": 76,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0043",
+   "log_date": "2026-09-12",
+   "energy_kcal": 872,
+   "protein_g": 38,
+   "carbs_g": 80,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0044",
+   "log_date": "2026-09-12",
+   "energy_kcal": 537,
+   "protein_g": 38,
+   "carbs_g": 59,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0045",
+   "log_date": "2026-09-12",
+   "energy_kcal": 540,
+   "protein_g": 37,
+   "carbs_g": 67,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0046",
+   "log_date": "2026-09-11",
+   "energy_kcal": 588,
+   "protein_g": 53,
+   "carbs_g": 56,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0047",
+   "log_date": "2026-09-11",
+   "energy_kcal": 552,
+   "protein_g": 42,
+   "carbs_g": 81,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0048",
+   "log_date": "2026-09-11",
+   "energy_kcal": 835,
+   "protein_g": 53,
+   "carbs_g": 53,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0049",
+   "log_date": "2026-09-10",
+   "energy_kcal": 765,
+   "protein_g": 57,
+   "carbs_g": 88,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0050",
+   "log_date": "2026-09-10",
+   "energy_kcal": 726,
+   "protein_g": 41,
+   "carbs_g": 57,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0051",
+   "log_date": "2026-09-10",
+   "energy_kcal": 952,
+   "protein_g": 43,
+   "carbs_g": 81,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0052",
+   "log_date": "2026-09-09",
+   "energy_kcal": 694,
+   "protein_g": 39,
+   "carbs_g": 80,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0053",
+   "log_date": "2026-09-09",
+   "energy_kcal": 857,
+   "protein_g": 56,
+   "carbs_g": 88,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0054",
+   "log_date": "2026-09-09",
+   "energy_kcal": 909,
+   "protein_g": 45,
+   "carbs_g": 65,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0055",
+   "log_date": "2026-09-08",
+   "energy_kcal": 902,
+   "protein_g": 38,
+   "carbs_g": 57,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0056",
+   "log_date": "2026-09-08",
+   "energy_kcal": 579,
+   "protein_g": 56,
+   "carbs_g": 70,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0057",
+   "log_date": "2026-09-08",
+   "energy_kcal": 846,
+   "protein_g": 50,
+   "carbs_g": 50,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0058",
+   "log_date": "2026-09-07",
+   "energy_kcal": 518,
+   "protein_g": 30,
+   "carbs_g": 70,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0059",
+   "log_date": "2026-09-07",
+   "energy_kcal": 565,
+   "protein_g": 40,
+   "carbs_g": 68,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0060",
+   "log_date": "2026-09-07",
+   "energy_kcal": 611,
+   "protein_g": 35,
+   "carbs_g": 82,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0061",
+   "log_date": "2026-09-06",
+   "energy_kcal": 921,
+   "protein_g": 52,
+   "carbs_g": 67,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0062",
+   "log_date": "2026-09-06",
+   "energy_kcal": 718,
+   "protein_g": 37,
+   "carbs_g": 61,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0063",
+   "log_date": "2026-09-06",
+   "energy_kcal": 650,
+   "protein_g": 32,
+   "carbs_g": 79,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0064",
+   "log_date": "2026-09-05",
+   "energy_kcal": 595,
+   "protein_g": 58,
+   "carbs_g": 56,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0065",
+   "log_date": "2026-09-05",
+   "energy_kcal": 964,
+   "protein_g": 52,
+   "carbs_g": 86,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0066",
+   "log_date": "2026-09-05",
+   "energy_kcal": 635,
+   "protein_g": 57,
+   "carbs_g": 58,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0067",
+   "log_date": "2026-09-04",
+   "energy_kcal": 666,
+   "protein_g": 34,
+   "carbs_g": 67,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0068",
+   "log_date": "2026-09-04",
+   "energy_kcal": 554,
+   "protein_g": 51,
+   "carbs_g": 58,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0069",
+   "log_date": "2026-09-04",
+   "energy_kcal": 549,
+   "protein_g": 39,
+   "carbs_g": 75,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0070",
+   "log_date": "2026-09-03",
+   "energy_kcal": 680,
+   "protein_g": 35,
+   "carbs_g": 74,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0071",
+   "log_date": "2026-09-03",
+   "energy_kcal": 757,
+   "protein_g": 46,
+   "carbs_g": 67,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0072",
+   "log_date": "2026-09-03",
+   "energy_kcal": 905,
+   "protein_g": 60,
+   "carbs_g": 60,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0073",
+   "log_date": "2026-09-02",
+   "energy_kcal": 612,
+   "protein_g": 50,
+   "carbs_g": 53,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0074",
+   "log_date": "2026-09-02",
+   "energy_kcal": 805,
+   "protein_g": 49,
+   "carbs_g": 59,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0075",
+   "log_date": "2026-09-02",
+   "energy_kcal": 857,
+   "protein_g": 46,
+   "carbs_g": 65,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0076",
+   "log_date": "2026-09-01",
+   "energy_kcal": 875,
+   "protein_g": 59,
+   "carbs_g": 56,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0077",
+   "log_date": "2026-09-01",
+   "energy_kcal": 632,
+   "protein_g": 31,
+   "carbs_g": 61,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0078",
+   "log_date": "2026-09-01",
+   "energy_kcal": 709,
+   "protein_g": 47,
+   "carbs_g": 85,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0079",
+   "log_date": "2026-08-31",
+   "energy_kcal": 702,
+   "protein_g": 34,
+   "carbs_g": 86,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0080",
+   "log_date": "2026-08-31",
+   "energy_kcal": 898,
+   "protein_g": 56,
+   "carbs_g": 90,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0081",
+   "log_date": "2026-08-31",
+   "energy_kcal": 922,
+   "protein_g": 37,
+   "carbs_g": 59,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0082",
+   "log_date": "2026-08-30",
+   "energy_kcal": 847,
+   "protein_g": 50,
+   "carbs_g": 65,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0083",
+   "log_date": "2026-08-30",
+   "energy_kcal": 747,
+   "protein_g": 50,
+   "carbs_g": 58,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0084",
+   "log_date": "2026-08-30",
+   "energy_kcal": 737,
+   "protein_g": 45,
+   "carbs_g": 79,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0085",
+   "log_date": "2026-08-29",
+   "energy_kcal": 877,
+   "protein_g": 31,
+   "carbs_g": 61,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0086",
+   "log_date": "2026-08-29",
+   "energy_kcal": 578,
+   "protein_g": 41,
+   "carbs_g": 82,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0087",
+   "log_date": "2026-08-29",
+   "energy_kcal": 697,
+   "protein_g": 55,
+   "carbs_g": 70,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0088",
+   "log_date": "2026-08-28",
+   "energy_kcal": 718,
+   "protein_g": 56,
+   "carbs_g": 58,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0089",
+   "log_date": "2026-08-28",
+   "energy_kcal": 830,
+   "protein_g": 44,
+   "carbs_g": 78,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0090",
+   "log_date": "2026-08-28",
+   "energy_kcal": 781,
+   "protein_g": 52,
+   "carbs_g": 51,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0091",
+   "log_date": "2026-08-27",
+   "energy_kcal": 687,
+   "protein_g": 39,
+   "carbs_g": 85,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0092",
+   "log_date": "2026-08-27",
+   "energy_kcal": 803,
+   "protein_g": 40,
+   "carbs_g": 53,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0093",
+   "log_date": "2026-08-27",
+   "energy_kcal": 802,
+   "protein_g": 47,
+   "carbs_g": 60,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0094",
+   "log_date": "2026-08-26",
+   "energy_kcal": 672,
+   "protein_g": 59,
+   "carbs_g": 54,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0095",
+   "log_date": "2026-08-26",
+   "energy_kcal": 944,
+   "protein_g": 36,
+   "carbs_g": 61,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0096",
+   "log_date": "2026-08-26",
+   "energy_kcal": 952,
+   "protein_g": 53,
+   "carbs_g": 65,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0097",
+   "log_date": "2026-08-25",
+   "energy_kcal": 742,
+   "protein_g": 58,
+   "carbs_g": 77,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0098",
+   "log_date": "2026-08-25",
+   "energy_kcal": 503,
+   "protein_g": 57,
+   "carbs_g": 71,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0099",
+   "log_date": "2026-08-25",
+   "energy_kcal": 752,
+   "protein_g": 48,
+   "carbs_g": 63,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0100",
+   "log_date": "2026-08-24",
+   "energy_kcal": 509,
+   "protein_g": 56,
+   "carbs_g": 59,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0101",
+   "log_date": "2026-08-24",
+   "energy_kcal": 911,
+   "protein_g": 49,
+   "carbs_g": 85,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0102",
+   "log_date": "2026-08-24",
+   "energy_kcal": 612,
+   "protein_g": 57,
+   "carbs_g": 76,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0103",
+   "log_date": "2026-08-23",
+   "energy_kcal": 541,
+   "protein_g": 36,
+   "carbs_g": 54,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0104",
+   "log_date": "2026-08-23",
+   "energy_kcal": 863,
+   "protein_g": 57,
+   "carbs_g": 77,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0105",
+   "log_date": "2026-08-23",
+   "energy_kcal": 642,
+   "protein_g": 53,
+   "carbs_g": 63,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0106",
+   "log_date": "2026-08-22",
+   "energy_kcal": 587,
+   "protein_g": 44,
+   "carbs_g": 83,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0107",
+   "log_date": "2026-08-22",
+   "energy_kcal": 948,
+   "protein_g": 38,
+   "carbs_g": 79,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0108",
+   "log_date": "2026-08-22",
+   "energy_kcal": 937,
+   "protein_g": 57,
+   "carbs_g": 63,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0109",
+   "log_date": "2026-08-21",
+   "energy_kcal": 525,
+   "protein_g": 44,
+   "carbs_g": 67,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0110",
+   "log_date": "2026-08-21",
+   "energy_kcal": 839,
+   "protein_g": 43,
+   "carbs_g": 62,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0111",
+   "log_date": "2026-08-21",
+   "energy_kcal": 533,
+   "protein_g": 41,
+   "carbs_g": 69,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0112",
+   "log_date": "2026-08-20",
+   "energy_kcal": 960,
+   "protein_g": 32,
+   "carbs_g": 79,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0113",
+   "log_date": "2026-08-20",
+   "energy_kcal": 571,
+   "protein_g": 55,
+   "carbs_g": 80,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0114",
+   "log_date": "2026-08-20",
+   "energy_kcal": 571,
+   "protein_g": 54,
+   "carbs_g": 73,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0115",
+   "log_date": "2026-08-19",
+   "energy_kcal": 929,
+   "protein_g": 57,
+   "carbs_g": 56,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0116",
+   "log_date": "2026-08-19",
+   "energy_kcal": 786,
+   "protein_g": 32,
+   "carbs_g": 54,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0117",
+   "log_date": "2026-08-19",
+   "energy_kcal": 700,
+   "protein_g": 51,
+   "carbs_g": 54,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0118",
+   "log_date": "2026-08-18",
+   "energy_kcal": 582,
+   "protein_g": 47,
+   "carbs_g": 86,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0119",
+   "log_date": "2026-08-18",
+   "energy_kcal": 513,
+   "protein_g": 47,
+   "carbs_g": 73,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0120",
+   "log_date": "2026-08-18",
+   "energy_kcal": 784,
+   "protein_g": 49,
+   "carbs_g": 51,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0121",
+   "log_date": "2026-08-17",
+   "energy_kcal": 555,
+   "protein_g": 55,
+   "carbs_g": 83,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0122",
+   "log_date": "2026-08-17",
+   "energy_kcal": 932,
+   "protein_g": 32,
+   "carbs_g": 57,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0123",
+   "log_date": "2026-08-17",
+   "energy_kcal": 669,
+   "protein_g": 35,
+   "carbs_g": 81,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0124",
+   "log_date": "2026-08-16",
+   "energy_kcal": 508,
+   "protein_g": 53,
+   "carbs_g": 58,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0125",
+   "log_date": "2026-08-16",
+   "energy_kcal": 895,
+   "protein_g": 33,
+   "carbs_g": 86,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0126",
+   "log_date": "2026-08-16",
+   "energy_kcal": 553,
+   "protein_g": 51,
+   "carbs_g": 61,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0127",
+   "log_date": "2026-08-15",
+   "energy_kcal": 973,
+   "protein_g": 40,
+   "carbs_g": 87,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0128",
+   "log_date": "2026-08-15",
+   "energy_kcal": 927,
+   "protein_g": 36,
+   "carbs_g": 73,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0129",
+   "log_date": "2026-08-15",
+   "energy_kcal": 859,
+   "protein_g": 59,
+   "carbs_g": 73,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0130",
+   "log_date": "2026-08-14",
+   "energy_kcal": 993,
+   "protein_g": 31,
+   "carbs_g": 62,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0131",
+   "log_date": "2026-08-14",
+   "energy_kcal": 724,
+   "protein_g": 55,
+   "carbs_g": 75,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0132",
+   "log_date": "2026-08-14",
+   "energy_kcal": 644,
+   "protein_g": 48,
+   "carbs_g": 50,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0133",
+   "log_date": "2026-08-13",
+   "energy_kcal": 532,
+   "protein_g": 42,
+   "carbs_g": 69,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0134",
+   "log_date": "2026-08-13",
+   "energy_kcal": 729,
+   "protein_g": 49,
+   "carbs_g": 57,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0135",
+   "log_date": "2026-08-13",
+   "energy_kcal": 785,
+   "protein_g": 54,
+   "carbs_g": 56,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0136",
+   "log_date": "2026-08-12",
+   "energy_kcal": 946,
+   "protein_g": 43,
+   "carbs_g": 62,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0137",
+   "log_date": "2026-08-12",
+   "energy_kcal": 798,
+   "protein_g": 47,
+   "carbs_g": 84,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0138",
+   "log_date": "2026-08-12",
+   "energy_kcal": 747,
+   "protein_g": 53,
+   "carbs_g": 77,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0139",
+   "log_date": "2026-08-11",
+   "energy_kcal": 603,
+   "protein_g": 34,
+   "carbs_g": 78,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0140",
+   "log_date": "2026-08-11",
+   "energy_kcal": 966,
+   "protein_g": 35,
+   "carbs_g": 90,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0141",
+   "log_date": "2026-08-11",
+   "energy_kcal": 634,
+   "protein_g": 32,
+   "carbs_g": 50,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0142",
+   "log_date": "2026-08-10",
+   "energy_kcal": 783,
+   "protein_g": 43,
+   "carbs_g": 80,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0143",
+   "log_date": "2026-08-10",
+   "energy_kcal": 554,
+   "protein_g": 56,
+   "carbs_g": 74,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0144",
+   "log_date": "2026-08-10",
+   "energy_kcal": 525,
+   "protein_g": 57,
+   "carbs_g": 85,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0145",
+   "log_date": "2026-08-09",
+   "energy_kcal": 880,
+   "protein_g": 52,
+   "carbs_g": 78,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0146",
+   "log_date": "2026-08-09",
+   "energy_kcal": 613,
+   "protein_g": 47,
+   "carbs_g": 63,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0147",
+   "log_date": "2026-08-09",
+   "energy_kcal": 866,
+   "protein_g": 33,
+   "carbs_g": 83,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0148",
+   "log_date": "2026-08-08",
+   "energy_kcal": 527,
+   "protein_g": 36,
+   "carbs_g": 67,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0149",
+   "log_date": "2026-08-08",
+   "energy_kcal": 975,
+   "protein_g": 57,
+   "carbs_g": 67,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0150",
+   "log_date": "2026-08-08",
+   "energy_kcal": 859,
+   "protein_g": 52,
+   "carbs_g": 72,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0151",
+   "log_date": "2026-08-07",
+   "energy_kcal": 891,
+   "protein_g": 49,
+   "carbs_g": 79,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0152",
+   "log_date": "2026-08-07",
+   "energy_kcal": 541,
+   "protein_g": 54,
+   "carbs_g": 66,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0153",
+   "log_date": "2026-08-07",
+   "energy_kcal": 558,
+   "protein_g": 56,
+   "carbs_g": 86,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0154",
+   "log_date": "2026-08-06",
+   "energy_kcal": 550,
+   "protein_g": 31,
+   "carbs_g": 69,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0155",
+   "log_date": "2026-08-06",
+   "energy_kcal": 653,
+   "protein_g": 48,
+   "carbs_g": 71,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0156",
+   "log_date": "2026-08-06",
+   "energy_kcal": 812,
+   "protein_g": 33,
+   "carbs_g": 76,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0157",
+   "log_date": "2026-08-05",
+   "energy_kcal": 958,
+   "protein_g": 47,
+   "carbs_g": 76,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0158",
+   "log_date": "2026-08-05",
+   "energy_kcal": 740,
+   "protein_g": 42,
+   "carbs_g": 77,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0159",
+   "log_date": "2026-08-05",
+   "energy_kcal": 748,
+   "protein_g": 60,
+   "carbs_g": 51,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0160",
+   "log_date": "2026-08-04",
+   "energy_kcal": 593,
+   "protein_g": 37,
+   "carbs_g": 84,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0161",
+   "log_date": "2026-08-04",
+   "energy_kcal": 591,
+   "protein_g": 55,
+   "carbs_g": 72,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0162",
+   "log_date": "2026-08-04",
+   "energy_kcal": 832,
+   "protein_g": 30,
+   "carbs_g": 83,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0163",
+   "log_date": "2026-08-03",
+   "energy_kcal": 640,
+   "protein_g": 48,
+   "carbs_g": 61,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0164",
+   "log_date": "2026-08-03",
+   "energy_kcal": 777,
+   "protein_g": 59,
+   "carbs_g": 53,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0165",
+   "log_date": "2026-08-03",
+   "energy_kcal": 640,
+   "protein_g": 34,
+   "carbs_g": 86,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0166",
+   "log_date": "2026-08-02",
+   "energy_kcal": 624,
+   "protein_g": 32,
+   "carbs_g": 53,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0167",
+   "log_date": "2026-08-02",
+   "energy_kcal": 877,
+   "protein_g": 30,
+   "carbs_g": 58,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0168",
+   "log_date": "2026-08-02",
+   "energy_kcal": 565,
+   "protein_g": 35,
+   "carbs_g": 63,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0169",
+   "log_date": "2026-08-01",
+   "energy_kcal": 891,
+   "protein_g": 59,
+   "carbs_g": 54,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0170",
+   "log_date": "2026-08-01",
+   "energy_kcal": 636,
+   "protein_g": 32,
+   "carbs_g": 62,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0171",
+   "log_date": "2026-08-01",
+   "energy_kcal": 663,
+   "protein_g": 60,
+   "carbs_g": 58,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0172",
+   "log_date": "2026-07-31",
+   "energy_kcal": 544,
+   "protein_g": 48,
+   "carbs_g": 68,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0173",
+   "log_date": "2026-07-31",
+   "energy_kcal": 808,
+   "protein_g": 43,
+   "carbs_g": 72,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0174",
+   "log_date": "2026-07-31",
+   "energy_kcal": 874,
+   "protein_g": 46,
+   "carbs_g": 81,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0175",
+   "log_date": "2026-07-30",
+   "energy_kcal": 531,
+   "protein_g": 53,
+   "carbs_g": 71,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0176",
+   "log_date": "2026-07-30",
+   "energy_kcal": 874,
+   "protein_g": 48,
+   "carbs_g": 64,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0177",
+   "log_date": "2026-07-30",
+   "energy_kcal": 723,
+   "protein_g": 41,
+   "carbs_g": 80,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0178",
+   "log_date": "2026-07-29",
+   "energy_kcal": 809,
+   "protein_g": 56,
+   "carbs_g": 86,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0179",
+   "log_date": "2026-07-29",
+   "energy_kcal": 501,
+   "protein_g": 44,
+   "carbs_g": 53,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0180",
+   "log_date": "2026-07-29",
+   "energy_kcal": 735,
+   "protein_g": 34,
+   "carbs_g": 78,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0181",
+   "log_date": "2026-07-28",
+   "energy_kcal": 722,
+   "protein_g": 37,
+   "carbs_g": 55,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0182",
+   "log_date": "2026-07-28",
+   "energy_kcal": 521,
+   "protein_g": 40,
+   "carbs_g": 76,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0183",
+   "log_date": "2026-07-28",
+   "energy_kcal": 579,
+   "protein_g": 51,
+   "carbs_g": 80,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0184",
+   "log_date": "2026-07-27",
+   "energy_kcal": 546,
+   "protein_g": 47,
+   "carbs_g": 60,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0185",
+   "log_date": "2026-07-27",
+   "energy_kcal": 637,
+   "protein_g": 39,
+   "carbs_g": 85,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0186",
+   "log_date": "2026-07-27",
+   "energy_kcal": 817,
+   "protein_g": 52,
+   "carbs_g": 88,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0187",
+   "log_date": "2026-07-26",
+   "energy_kcal": 911,
+   "protein_g": 34,
+   "carbs_g": 85,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0188",
+   "log_date": "2026-07-26",
+   "energy_kcal": 706,
+   "protein_g": 59,
+   "carbs_g": 59,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0189",
+   "log_date": "2026-07-26",
+   "energy_kcal": 998,
+   "protein_g": 45,
+   "carbs_g": 89,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0190",
+   "log_date": "2026-07-25",
+   "energy_kcal": 957,
+   "protein_g": 31,
+   "carbs_g": 88,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0191",
+   "log_date": "2026-07-25",
+   "energy_kcal": 557,
+   "protein_g": 36,
+   "carbs_g": 51,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0192",
+   "log_date": "2026-07-25",
+   "energy_kcal": 624,
+   "protein_g": 52,
+   "carbs_g": 70,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0193",
+   "log_date": "2026-07-24",
+   "energy_kcal": 568,
+   "protein_g": 48,
+   "carbs_g": 73,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0194",
+   "log_date": "2026-07-24",
+   "energy_kcal": 583,
+   "protein_g": 39,
+   "carbs_g": 87,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0195",
+   "log_date": "2026-07-24",
+   "energy_kcal": 714,
+   "protein_g": 42,
+   "carbs_g": 55,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0196",
+   "log_date": "2026-07-23",
+   "energy_kcal": 963,
+   "protein_g": 54,
+   "carbs_g": 63,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0197",
+   "log_date": "2026-07-23",
+   "energy_kcal": 669,
+   "protein_g": 42,
+   "carbs_g": 83,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0198",
+   "log_date": "2026-07-23",
+   "energy_kcal": 895,
+   "protein_g": 41,
+   "carbs_g": 77,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0199",
+   "log_date": "2026-07-22",
+   "energy_kcal": 619,
+   "protein_g": 51,
+   "carbs_g": 51,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0200",
+   "log_date": "2026-07-22",
+   "energy_kcal": 644,
+   "protein_g": 36,
+   "carbs_g": 53,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0201",
+   "log_date": "2026-07-22",
+   "energy_kcal": 880,
+   "protein_g": 51,
+   "carbs_g": 65,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0202",
+   "log_date": "2026-07-21",
+   "energy_kcal": 923,
+   "protein_g": 41,
+   "carbs_g": 76,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0203",
+   "log_date": "2026-07-21",
+   "energy_kcal": 763,
+   "protein_g": 45,
+   "carbs_g": 82,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0204",
+   "log_date": "2026-07-21",
+   "energy_kcal": 644,
+   "protein_g": 45,
+   "carbs_g": 65,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0205",
+   "log_date": "2026-07-20",
+   "energy_kcal": 782,
+   "protein_g": 52,
+   "carbs_g": 57,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0206",
+   "log_date": "2026-07-20",
+   "energy_kcal": 657,
+   "protein_g": 52,
+   "carbs_g": 85,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0207",
+   "log_date": "2026-07-20",
+   "energy_kcal": 852,
+   "protein_g": 53,
+   "carbs_g": 54,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0208",
+   "log_date": "2026-07-19",
+   "energy_kcal": 850,
+   "protein_g": 37,
+   "carbs_g": 75,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0209",
+   "log_date": "2026-07-19",
+   "energy_kcal": 865,
+   "protein_g": 44,
+   "carbs_g": 85,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0210",
+   "log_date": "2026-07-19",
+   "energy_kcal": 746,
+   "protein_g": 38,
+   "carbs_g": 52,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0211",
+   "log_date": "2026-07-18",
+   "energy_kcal": 921,
+   "protein_g": 51,
+   "carbs_g": 67,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0212",
+   "log_date": "2026-07-18",
+   "energy_kcal": 996,
+   "protein_g": 58,
+   "carbs_g": 56,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0213",
+   "log_date": "2026-07-18",
+   "energy_kcal": 533,
+   "protein_g": 33,
+   "carbs_g": 63,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0214",
+   "log_date": "2026-07-17",
+   "energy_kcal": 648,
+   "protein_g": 49,
+   "carbs_g": 74,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0215",
+   "log_date": "2026-07-17",
+   "energy_kcal": 554,
+   "protein_g": 51,
+   "carbs_g": 71,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0216",
+   "log_date": "2026-07-17",
+   "energy_kcal": 577,
+   "protein_g": 46,
+   "carbs_g": 64,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0217",
+   "log_date": "2026-07-16",
+   "energy_kcal": 951,
+   "protein_g": 60,
+   "carbs_g": 64,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0218",
+   "log_date": "2026-07-16",
+   "energy_kcal": 961,
+   "protein_g": 54,
+   "carbs_g": 81,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0219",
+   "log_date": "2026-07-16",
+   "energy_kcal": 704,
+   "protein_g": 44,
+   "carbs_g": 76,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0220",
+   "log_date": "2026-07-15",
+   "energy_kcal": 557,
+   "protein_g": 57,
+   "carbs_g": 76,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0221",
+   "log_date": "2026-07-15",
+   "energy_kcal": 592,
+   "protein_g": 57,
+   "carbs_g": 86,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0222",
+   "log_date": "2026-07-15",
+   "energy_kcal": 808,
+   "protein_g": 58,
+   "carbs_g": 53,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0223",
+   "log_date": "2026-07-14",
+   "energy_kcal": 680,
+   "protein_g": 45,
+   "carbs_g": 80,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0224",
+   "log_date": "2026-07-14",
+   "energy_kcal": 529,
+   "protein_g": 56,
+   "carbs_g": 76,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0225",
+   "log_date": "2026-07-14",
+   "energy_kcal": 918,
+   "protein_g": 32,
+   "carbs_g": 52,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0226",
+   "log_date": "2026-07-13",
+   "energy_kcal": 534,
+   "protein_g": 53,
+   "carbs_g": 78,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0227",
+   "log_date": "2026-07-13",
+   "energy_kcal": 947,
+   "protein_g": 41,
+   "carbs_g": 63,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0228",
+   "log_date": "2026-07-13",
+   "energy_kcal": 788,
+   "protein_g": 40,
+   "carbs_g": 89,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0229",
+   "log_date": "2026-07-12",
+   "energy_kcal": 915,
+   "protein_g": 37,
+   "carbs_g": 67,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0230",
+   "log_date": "2026-07-12",
+   "energy_kcal": 844,
+   "protein_g": 56,
+   "carbs_g": 56,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0231",
+   "log_date": "2026-07-12",
+   "energy_kcal": 927,
+   "protein_g": 44,
+   "carbs_g": 81,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0232",
+   "log_date": "2026-07-11",
+   "energy_kcal": 668,
+   "protein_g": 57,
+   "carbs_g": 59,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0233",
+   "log_date": "2026-07-11",
+   "energy_kcal": 910,
+   "protein_g": 59,
+   "carbs_g": 64,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0234",
+   "log_date": "2026-07-11",
+   "energy_kcal": 765,
+   "protein_g": 53,
+   "carbs_g": 68,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0235",
+   "log_date": "2026-07-10",
+   "energy_kcal": 705,
+   "protein_g": 34,
+   "carbs_g": 51,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0236",
+   "log_date": "2026-07-10",
+   "energy_kcal": 959,
+   "protein_g": 52,
+   "carbs_g": 55,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0237",
+   "log_date": "2026-07-10",
+   "energy_kcal": 788,
+   "protein_g": 31,
+   "carbs_g": 54,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0238",
+   "log_date": "2026-07-09",
+   "energy_kcal": 611,
+   "protein_g": 41,
+   "carbs_g": 74,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0239",
+   "log_date": "2026-07-09",
+   "energy_kcal": 802,
+   "protein_g": 35,
+   "carbs_g": 60,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0240",
+   "log_date": "2026-07-09",
+   "energy_kcal": 766,
+   "protein_g": 56,
+   "carbs_g": 57,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0241",
+   "log_date": "2026-07-08",
+   "energy_kcal": 611,
+   "protein_g": 49,
+   "carbs_g": 51,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0242",
+   "log_date": "2026-07-08",
+   "energy_kcal": 969,
+   "protein_g": 56,
+   "carbs_g": 70,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0243",
+   "log_date": "2026-07-08",
+   "energy_kcal": 764,
+   "protein_g": 49,
+   "carbs_g": 73,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0244",
+   "log_date": "2026-07-07",
+   "energy_kcal": 748,
+   "protein_g": 56,
+   "carbs_g": 72,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0245",
+   "log_date": "2026-07-07",
+   "energy_kcal": 506,
+   "protein_g": 54,
+   "carbs_g": 75,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0246",
+   "log_date": "2026-07-07",
+   "energy_kcal": 758,
+   "protein_g": 40,
+   "carbs_g": 79,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0247",
+   "log_date": "2026-07-06",
+   "energy_kcal": 557,
+   "protein_g": 31,
+   "carbs_g": 63,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0248",
+   "log_date": "2026-07-06",
+   "energy_kcal": 675,
+   "protein_g": 40,
+   "carbs_g": 86,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0249",
+   "log_date": "2026-07-06",
+   "energy_kcal": 871,
+   "protein_g": 34,
+   "carbs_g": 69,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0250",
+   "log_date": "2026-07-05",
+   "energy_kcal": 959,
+   "protein_g": 56,
+   "carbs_g": 51,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0251",
+   "log_date": "2026-07-05",
+   "energy_kcal": 935,
+   "protein_g": 34,
+   "carbs_g": 60,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0252",
+   "log_date": "2026-07-05",
+   "energy_kcal": 910,
+   "protein_g": 44,
+   "carbs_g": 75,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0253",
+   "log_date": "2026-07-04",
+   "energy_kcal": 638,
+   "protein_g": 51,
+   "carbs_g": 57,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0254",
+   "log_date": "2026-07-04",
+   "energy_kcal": 771,
+   "protein_g": 37,
+   "carbs_g": 50,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0255",
+   "log_date": "2026-07-04",
+   "energy_kcal": 993,
+   "protein_g": 54,
+   "carbs_g": 52,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0256",
+   "log_date": "2026-07-03",
+   "energy_kcal": 948,
+   "protein_g": 56,
+   "carbs_g": 87,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0257",
+   "log_date": "2026-07-03",
+   "energy_kcal": 813,
+   "protein_g": 45,
+   "carbs_g": 83,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0258",
+   "log_date": "2026-07-03",
+   "energy_kcal": 761,
+   "protein_g": 42,
+   "carbs_g": 71,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0259",
+   "log_date": "2026-07-02",
+   "energy_kcal": 606,
+   "protein_g": 50,
+   "carbs_g": 68,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0260",
+   "log_date": "2026-07-02",
+   "energy_kcal": 890,
+   "protein_g": 33,
+   "carbs_g": 55,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0261",
+   "log_date": "2026-07-02",
+   "energy_kcal": 914,
+   "protein_g": 30,
+   "carbs_g": 50,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0262",
+   "log_date": "2026-07-01",
+   "energy_kcal": 684,
+   "protein_g": 33,
+   "carbs_g": 62,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0263",
+   "log_date": "2026-07-01",
+   "energy_kcal": 795,
+   "protein_g": 37,
+   "carbs_g": 77,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0264",
+   "log_date": "2026-07-01",
+   "energy_kcal": 522,
+   "protein_g": 59,
+   "carbs_g": 87,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0265",
+   "log_date": "2026-06-30",
+   "energy_kcal": 896,
+   "protein_g": 55,
+   "carbs_g": 75,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0266",
+   "log_date": "2026-06-30",
+   "energy_kcal": 882,
+   "protein_g": 39,
+   "carbs_g": 64,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0267",
+   "log_date": "2026-06-30",
+   "energy_kcal": 960,
+   "protein_g": 39,
+   "carbs_g": 77,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0268",
+   "log_date": "2026-06-29",
+   "energy_kcal": 975,
+   "protein_g": 50,
+   "carbs_g": 59,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0269",
+   "log_date": "2026-06-29",
+   "energy_kcal": 932,
+   "protein_g": 40,
+   "carbs_g": 70,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0270",
+   "log_date": "2026-06-29",
+   "energy_kcal": 861,
+   "protein_g": 48,
+   "carbs_g": 62,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0271",
+   "log_date": "2026-06-28",
+   "energy_kcal": 812,
+   "protein_g": 48,
+   "carbs_g": 65,
+   "fat_g": 24
+  },
+  {
+   "id": "e-0272",
+   "log_date": "2026-06-28",
+   "energy_kcal": 581,
+   "protein_g": 32,
+   "carbs_g": 71,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0273",
+   "log_date": "2026-06-28",
+   "energy_kcal": 538,
+   "protein_g": 56,
+   "carbs_g": 70,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0274",
+   "log_date": "2026-06-27",
+   "energy_kcal": 679,
+   "protein_g": 37,
+   "carbs_g": 59,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0275",
+   "log_date": "2026-06-27",
+   "energy_kcal": 581,
+   "protein_g": 41,
+   "carbs_g": 73,
+   "fat_g": 30
+  },
+  {
+   "id": "e-0276",
+   "log_date": "2026-06-27",
+   "energy_kcal": 564,
+   "protein_g": 58,
+   "carbs_g": 53,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0277",
+   "log_date": "2026-06-26",
+   "energy_kcal": 935,
+   "protein_g": 36,
+   "carbs_g": 65,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0278",
+   "log_date": "2026-06-26",
+   "energy_kcal": 705,
+   "protein_g": 40,
+   "carbs_g": 59,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0279",
+   "log_date": "2026-06-26",
+   "energy_kcal": 649,
+   "protein_g": 41,
+   "carbs_g": 55,
+   "fat_g": 21
+  },
+  {
+   "id": "e-0280",
+   "log_date": "2026-06-25",
+   "energy_kcal": 927,
+   "protein_g": 43,
+   "carbs_g": 80,
+   "fat_g": 20
+  },
+  {
+   "id": "e-0281",
+   "log_date": "2026-06-25",
+   "energy_kcal": 525,
+   "protein_g": 36,
+   "carbs_g": 89,
+   "fat_g": 22
+  },
+  {
+   "id": "e-0282",
+   "log_date": "2026-06-25",
+   "energy_kcal": 589,
+   "protein_g": 55,
+   "carbs_g": 61,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0283",
+   "log_date": "2026-06-24",
+   "energy_kcal": 899,
+   "protein_g": 42,
+   "carbs_g": 80,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0284",
+   "log_date": "2026-06-24",
+   "energy_kcal": 841,
+   "protein_g": 39,
+   "carbs_g": 70,
+   "fat_g": 15
+  },
+  {
+   "id": "e-0285",
+   "log_date": "2026-06-24",
+   "energy_kcal": 742,
+   "protein_g": 52,
+   "carbs_g": 52,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0286",
+   "log_date": "2026-06-23",
+   "energy_kcal": 657,
+   "protein_g": 37,
+   "carbs_g": 83,
+   "fat_g": 28
+  },
+  {
+   "id": "e-0287",
+   "log_date": "2026-06-23",
+   "energy_kcal": 848,
+   "protein_g": 42,
+   "carbs_g": 80,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0288",
+   "log_date": "2026-06-23",
+   "energy_kcal": 760,
+   "protein_g": 50,
+   "carbs_g": 85,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0289",
+   "log_date": "2026-06-22",
+   "energy_kcal": 553,
+   "protein_g": 43,
+   "carbs_g": 88,
+   "fat_g": 26
+  },
+  {
+   "id": "e-0290",
+   "log_date": "2026-06-22",
+   "energy_kcal": 912,
+   "protein_g": 32,
+   "carbs_g": 60,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0291",
+   "log_date": "2026-06-22",
+   "energy_kcal": 645,
+   "protein_g": 39,
+   "carbs_g": 53,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0292",
+   "log_date": "2026-06-21",
+   "energy_kcal": 765,
+   "protein_g": 57,
+   "carbs_g": 50,
+   "fat_g": 23
+  },
+  {
+   "id": "e-0293",
+   "log_date": "2026-06-21",
+   "energy_kcal": 612,
+   "protein_g": 34,
+   "carbs_g": 88,
+   "fat_g": 17
+  },
+  {
+   "id": "e-0294",
+   "log_date": "2026-06-21",
+   "energy_kcal": 581,
+   "protein_g": 57,
+   "carbs_g": 80,
+   "fat_g": 25
+  },
+  {
+   "id": "e-0295",
+   "log_date": "2026-06-20",
+   "energy_kcal": 971,
+   "protein_g": 30,
+   "carbs_g": 89,
+   "fat_g": 29
+  },
+  {
+   "id": "e-0296",
+   "log_date": "2026-06-20",
+   "energy_kcal": 950,
+   "protein_g": 36,
+   "carbs_g": 86,
+   "fat_g": 27
+  },
+  {
+   "id": "e-0297",
+   "log_date": "2026-06-20",
+   "energy_kcal": 557,
+   "protein_g": 39,
+   "carbs_g": 73,
+   "fat_g": 19
+  },
+  {
+   "id": "e-0298",
+   "log_date": "2026-06-19",
+   "energy_kcal": 621,
+   "protein_g": 57,
+   "carbs_g": 59,
+   "fat_g": 18
+  },
+  {
+   "id": "e-0299",
+   "log_date": "2026-06-19",
+   "energy_kcal": 518,
+   "protein_g": 52,
+   "carbs_g": 81,
+   "fat_g": 16
+  },
+  {
+   "id": "e-0300",
+   "log_date": "2026-06-19",
+   "energy_kcal": 550,
+   "protein_g": 33,
+   "carbs_g": 73,
+   "fat_g": 19
+  }
+ ],
+ "nutrition_day_status": [
+  {
+   "log_date": "2026-09-26",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-25",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-24",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-23",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-22",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-09-21",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-20",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-19",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-18",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-17",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-16",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-15",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-14",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-13",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-12",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-11",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-10",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-09",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-09-08",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-07",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-06",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-05",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-04",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-03",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-02",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-09-01",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-31",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-30",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-29",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-28",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-27",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-08-26",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-25",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-24",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-23",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-22",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-21",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-20",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-19",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-18",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-17",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-16",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-15",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-14",
+   "complete": false,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-08-13",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-12",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-11",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-10",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-09",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-08",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-07",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-06",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-05",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-04",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-03",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-02",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-08-01",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-07-31",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-30",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-29",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-28",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-27",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-26",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-25",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-24",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-23",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-22",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-21",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-20",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-19",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-07-18",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-17",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-16",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-15",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-14",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-13",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-12",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-11",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-10",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-09",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-08",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-07",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-06",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-07-05",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-04",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-03",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-02",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-07-01",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-30",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-29",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-28",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-27",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-26",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-25",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-24",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-23",
+   "complete": true,
+   "excluded": true
+  },
+  {
+   "log_date": "2026-06-22",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-21",
+   "complete": true,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-20",
+   "complete": false,
+   "excluded": false
+  },
+  {
+   "log_date": "2026-06-19",
+   "complete": true,
+   "excluded": false
+  }
+ ],
+ "routine_completions": [
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-26"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-25"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-09-25"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-24"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-23"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-22"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-20"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-19"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-18"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-09-18"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-17"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-16"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-14"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-13"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-12"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-11"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-09-11"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-10"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-08"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-07"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-06"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-05"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-09-05"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-04"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-09-04"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-02"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-09-02"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-09-01"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-31"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-30"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-30"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-29"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-08-28"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-27"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-27"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-26"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-25"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-24"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-24"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-23"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-21"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-08-21"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-21"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-20"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-19"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-18"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-18"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-17"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-15"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-15"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-14"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-08-14"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-13"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-12"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-12"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-11"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-09"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-09"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-08"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-07"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-08-07"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-06"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-06"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-05"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-03"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-08-03"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-02"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-08-01"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-31"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-07-31"
+  },
+  {
+   "routine_id": "r3",
+   "completed_on": "2026-07-31"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-30"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-28"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-27"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-26"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-25"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-24"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-07-24"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-22"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-21"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-20"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-19"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-18"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-07-17"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-16"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-15"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-14"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-13"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-12"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-10"
+  },
+  {
+   "routine_id": "r2",
+   "completed_on": "2026-07-10"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-09"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-08"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-07"
+  },
+  {
+   "routine_id": "r1",
+   "completed_on": "2026-07-06"
+  }
+ ]
+}

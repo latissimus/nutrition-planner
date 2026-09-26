@@ -1,0 +1,205 @@
+{
+  "zweck": "Erwartete Ausgabe von buildCompFacts für kontext-tabellen.json, erzeugt aus der bisherigen buildSnapshot()-Berechnung.",
+  "quelle": {
+    "commit": "3d89c44",
+    "datei": "supabase/functions/capboy-coach/index.ts",
+    "funktion": "buildSnapshot"
+  },
+  "erzeugtMit": "node scripts/coach-evals/fixtures/erzeuge-comp-facts-referenz.mjs",
+  "snapshot": {
+    "generatedAt": "2026-09-26T08:00:00.000Z",
+    "period": {
+      "from": "2026-08-15",
+      "to": "2026-09-26"
+    },
+    "profile": {
+      "age": 37,
+      "heightCm": 178,
+      "goal": "fat_loss",
+      "calorieTarget": 2350
+    },
+    "bodyComposition": {
+      "currentWeightKg": 84.3,
+      "weightMeasurements": 90,
+      "weightTrendPercent": -1.4,
+      "latestSkinfoldSumMm": 55.7,
+      "skinfoldChangeMm": -22.5,
+      "skinfoldMeasurements": 12,
+      "latestSkinfoldDate": "2026-09-25",
+      "latestSkinfoldsMm": {
+        "kinn": 3.2,
+        "wange": 4.9,
+        "brust": 5.5,
+        "trizeps": 6.2,
+        "ruecken": 7.6,
+        "rippe": 9,
+        "huefte": 3.7,
+        "bauch": 4.1,
+        "knie": 5.3,
+        "wade": 6.2,
+        "quadrizeps": 7,
+        "beinbizeps": 8.1,
+        "bizeps": 3.1
+      },
+      "skinfoldRanking": [
+        {
+          "slug": "huefte",
+          "valueMm": 3.7,
+          "reference": 2.15,
+          "score": 1.2249999999999999,
+          "direction": "unter",
+          "rank": 1
+        },
+        {
+          "slug": "bauch",
+          "valueMm": 4.1,
+          "reference": 2.01,
+          "score": 0.9849999999999999,
+          "direction": "unter",
+          "rank": 2
+        },
+        {
+          "slug": "rippe",
+          "valueMm": 9,
+          "reference": 1.405,
+          "score": 0.845,
+          "direction": "ueber",
+          "rank": 3
+        },
+        {
+          "slug": "wange",
+          "valueMm": 4.9,
+          "reference": 1.9849999999999999,
+          "score": 0.7599999999999998,
+          "direction": "unter",
+          "rank": 4
+        },
+        {
+          "slug": "beinbizeps",
+          "valueMm": 8.1,
+          "reference": 1.325,
+          "score": 0.7,
+          "direction": "ueber",
+          "rank": 5
+        },
+        {
+          "slug": "kinn",
+          "valueMm": 3.2,
+          "reference": 1.405,
+          "score": 0.605,
+          "direction": "unter",
+          "rank": 6
+        },
+        {
+          "slug": "wade",
+          "valueMm": 6.2,
+          "reference": 0.95,
+          "score": 0.6000000000000001,
+          "direction": "ueber",
+          "rank": 7
+        },
+        {
+          "slug": "brust",
+          "valueMm": 5.5,
+          "reference": 0.795,
+          "score": 0.58,
+          "direction": "ueber",
+          "rank": 8
+        },
+        {
+          "slug": "trizeps",
+          "valueMm": 6.2,
+          "reference": 1,
+          "score": 0.55,
+          "direction": "ueber",
+          "rank": 9
+        },
+        {
+          "slug": "quadrizeps",
+          "valueMm": 7,
+          "reference": 1.325,
+          "score": 0.42500000000000004,
+          "direction": "ueber",
+          "rank": 10
+        },
+        {
+          "slug": "ruecken",
+          "valueMm": 7.6,
+          "reference": 2.255,
+          "score": 0.355,
+          "direction": "unter",
+          "rank": 11
+        },
+        {
+          "slug": "knie",
+          "valueMm": 5.3,
+          "reference": 1.625,
+          "score": 0.30000000000000004,
+          "direction": "unter",
+          "rank": 12
+        },
+        {
+          "slug": "bizeps",
+          "valueMm": 3.1,
+          "reference": 0.84,
+          "score": 0.06499999999999995,
+          "direction": "unter",
+          "rank": 13
+        }
+      ],
+      "skinfoldRatios": {
+        "quadricepsToHamstring": 0.864,
+        "bicepsToTriceps": 0.5,
+        "chinToCheek": 0.653
+      },
+      "measurementQuality": "mittel",
+      "standardized": true,
+      "latestWaistCm": 86.6,
+      "waistChangeCm": -1.8,
+      "waistMeasurements": 20
+    },
+    "training": {
+      "importedValues": 300,
+      "comparableExercises": 4,
+      "averagePerformanceChangePercent": -19.6
+    },
+    "sleep": {
+      "checkins": 42,
+      "averageDurationMinutes": 453,
+      "averageQuality": 2.9,
+      "averageMorningEnergy": 3,
+      "averageAwakenings": 1.5,
+      "recentTags": [
+        "spät gegessen",
+        "alkohol",
+        "stress"
+      ]
+    },
+    "recovery": {
+      "checkins": 42,
+      "averageRecovery": 2.9,
+      "averageMood": 2.4,
+      "averageHunger": 2,
+      "illnessDays": 4
+    },
+    "nutrition": {
+      "completeDays": 32,
+      "averageKcal": 2197,
+      "averageProteinG": 136,
+      "averageCarbsG": 206,
+      "averageFatG": 66
+    },
+    "routines": {
+      "active": [
+        "Kreatin",
+        "Spaziergang"
+      ],
+      "completionsLast30Days": 35,
+      "adherencePercent": 91
+    },
+    "ruleContext": {
+      "schlafProbleme": "ja",
+      "stress": "mittel"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
-import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION, YPSI_FORMULA } from './knowledge.ts';
+import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION } from './knowledge.ts';
 import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
+import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,15 +22,6 @@ const admin = createClient(supabaseUrl, serviceRoleKey, {
 
 type Row = Record<string, any>;
 
-
-const number = (value: unknown) => Number.isFinite(Number(value)) ? Number(value) : 0;
-const mean = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
-const round = (value: number | null, digits = 1) => value == null ? null : Number(value.toFixed(digits));
-const dateDaysAgo = (days: number) => {
-  const date = new Date();
-  date.setDate(date.getDate() - days);
-  return date.toISOString().slice(0, 10);
-};
 
 const sleep = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -156,44 +148,6 @@ async function ensureKnowledgeBase() {
   }
 }
 
-function durationMinutes(bedtime: string, wakeTime: string) {
-  const toMinutes = (value: string) => {
-    const [hours, minutes] = String(value || '0:0').split(':').map(Number);
-    return (hours * 60) + minutes;
-  };
-  let duration = toMinutes(wakeTime) - toMinutes(bedtime);
-  if (duration <= 0) duration += 24 * 60;
-  return duration;
-}
-
-function foldTotal(row: Row | undefined) {
-  if (!row) return null;
-  if (Number.isFinite(Number(row.total))) return Number(row.total);
-  const values = (YPSI_FORMULA.summenfalten.slugs || []).map((slug) => number(row.falten?.[slug])).filter((value) => value >= 0);
-  return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
-}
-
-function rankedFolds(folds: Row = {}, calculationBasis = 'male') {
-  const sex = calculationBasis === 'female' ? 'frau' : 'mann';
-  const references = YPSI_FORMULA.referenzen[sex] as Row;
-  const ranked = Object.entries(references).flatMap(([slug, reference]: [string, any]) => {
-    const value = Number(folds?.[slug]);
-    if (!Number.isFinite(value) || value < 0) return [];
-    const middle = (Number(reference.min) + Number(reference.max)) / 2;
-    return [{ slug, valueMm: value, reference: middle, score: Math.abs(value / 4 - middle), direction: value / 4 > middle ? 'ueber' : value / 4 < middle ? 'unter' : 'exakt' }];
-  });
-  const scores = ranked.map((item) => item.score).sort((left, right) => right - left);
-  return ranked.map((item) => ({ ...item, rank: scores.indexOf(item.score) + 1 }))
-    .sort((left, right) => left.rank - right.rank || right.score - left.score);
-}
-
-function relativeTrend(rows: Row[], dateKey: string, value: (row: Row) => number | null) {
-  const sorted = [...rows].sort((a, b) => String(a[dateKey]).localeCompare(String(b[dateKey])));
-  const usable = sorted.map(value).filter((item): item is number => item != null && Number.isFinite(item));
-  if (usable.length < 2 || !usable[0]) return null;
-  return round(((usable.at(-1)! - usable[0]) / usable[0]) * 100, 1);
-}
-
 async function userRows(table: string, userId: string, order: string, limit: number, columns = '*') {
   const { data, error } = await admin.from(table).select(columns).eq('user_id', userId)
     .order(order, { ascending: false }).limit(limit);
@@ -201,123 +155,52 @@ async function userRows(table: string, userId: string, order: string, limit: num
   return data || [];
 }
 
-async function buildSnapshot(userId: string) {
-  const since42 = dateDaysAgo(42);
-  const since30 = dateDaysAgo(30);
+// PostgREST returns at most 1000 rows per request by default. Twelve weeks of
+// nutrition entries or routine completions can exceed that, so they are
+// loaded page by page; the query must sort by a unique key, otherwise rows
+// could repeat or go missing at page borders.
+const PAGE_SIZE = 1000;
+async function pagedRows(query: () => any): Promise<Row[]> {
+  const rows: Row[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await query().range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    rows.push(...(data || []));
+    if (!data || data.length < PAGE_SIZE) return rows;
+  }
+}
+
+// Loads the rows for the shared context. The time series needs twelve weeks;
+// buildCompFacts cuts the rows back to the previous windows and limits.
+async function fetchContextRows(userId: string, now: Date): Promise<ContextRows> {
+  const since = dateDaysAgo(now, FETCH_WINDOW_DAYS);
   const [
     nutritionSettings, weights, skinfolds, waists, performance, sleep, checkins,
     nutritionEntries, dayStatus, routines, completions, preferences,
   ] = await Promise.all([
     admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,bodycomp_thresholds').eq('user_id', userId).maybeSingle(),
-    userRows('weights', userId, 'gemessen_am', 90, 'gemessen_am,kg'),
-    userRows('skinfolds', userId, 'gemessen_am', 12, 'gemessen_am,falten,standardisiert,messqualitaet'),
-    userRows('waist_measurements', userId, 'gemessen_am', 20, 'gemessen_am,cm,standardisiert'),
-    userRows('logman_performance', userId, 'performed_on', 300, 'performed_on,exercise,category,estimated_1rm,volume'),
-    userRows('sleep_logs', userId, 'sleep_date', 42, 'sleep_date,bedtime,wake_time,quality,energy,awakenings,tags'),
-    userRows('bodycomp_checkins', userId, 'checkin_date', 42, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals'),
-    admin.from('nutrition_log_entries').select('log_date,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since42).order('log_date', { ascending: false }),
-    admin.from('nutrition_day_status').select('log_date,complete,excluded').eq('user_id', userId).gte('log_date', since42).order('log_date', { ascending: false }),
-    admin.from('routines').select('id,name,period,weekdays,active').eq('user_id', userId).eq('active', true).order('position'),
-    admin.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', since30),
+    userRows('weights', userId, 'gemessen_am', FETCH_LIMITS.weights, 'gemessen_am,kg'),
+    userRows('skinfolds', userId, 'gemessen_am', FETCH_LIMITS.skinfolds, 'gemessen_am,falten,standardisiert,messqualitaet'),
+    userRows('waist_measurements', userId, 'gemessen_am', FETCH_LIMITS.waists, 'gemessen_am,cm,standardisiert'),
+    userRows('logman_performance', userId, 'performed_on', FETCH_LIMITS.performance, 'performed_on,exercise,category,estimated_1rm,volume'),
+    userRows('sleep_logs', userId, 'sleep_date', FETCH_LIMITS.sleep, 'sleep_date,bedtime,wake_time,quality,energy,awakenings,tags'),
+    userRows('bodycomp_checkins', userId, 'checkin_date', FETCH_LIMITS.checkins, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals'),
+    pagedRows(() => admin.from('nutrition_log_entries').select('log_date,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }).order('id')),
+    admin.from('nutrition_day_status').select('log_date,complete,excluded').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }),
+    // All routines, paused ones included, so every completion has a name.
+    admin.from('routines').select('id,name,period,weekdays,active').eq('user_id', userId).order('position'),
+    pagedRows(() => admin.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', since).order('completed_on', { ascending: false }).order('routine_id')),
     admin.from('user_preferences').select('value').eq('user_id', userId).eq('key', 'comp:hautfalten-kontext-v1').maybeSingle(),
   ]);
-  const failures = [nutritionSettings, nutritionEntries, dayStatus, routines, completions, preferences].filter((result) => result.error);
+  const failures = [nutritionSettings, dayStatus, routines, preferences].filter((result) => result.error);
   if (failures.length) throw failures[0].error;
-
-  const nutritionByDay = new Map<string, { kcal: number; protein: number; carbs: number; fat: number }>();
-  for (const row of nutritionEntries.data || []) {
-    const current = nutritionByDay.get(row.log_date) || { kcal: 0, protein: 0, carbs: 0, fat: 0 };
-    current.kcal += number(row.energy_kcal);
-    current.protein += number(row.protein_g);
-    current.carbs += number(row.carbs_g);
-    current.fat += number(row.fat_g);
-    nutritionByDay.set(row.log_date, current);
-  }
-  const completeDates = new Set((dayStatus.data || []).filter((row) => row.complete && !row.excluded).map((row) => row.log_date));
-  const nutritionDays = [...nutritionByDay.entries()].filter(([date]) => completeDates.has(date)).map(([, values]) => values);
-  const sleepDurations = sleep.map((row) => durationMinutes(row.bedtime, row.wake_time));
-  const latestWeight = weights[0] ? number(weights[0].kg) : null;
-  const latestFold = foldTotal(skinfolds[0]);
-  const oldestFold = foldTotal(skinfolds.at(-1));
-  const latestWaist = waists[0] ? number(waists[0].cm) : null;
-  const oldestWaist = waists.at(-1) ? number(waists.at(-1).cm) : null;
-
-  const exerciseGroups = new Map<string, Row[]>();
-  performance.forEach((row) => {
-    const key = `${row.category}:${String(row.exercise).toLowerCase()}`;
-    exerciseGroups.set(key, [...(exerciseGroups.get(key) || []), row]);
-  });
-  const exerciseTrends = [...exerciseGroups.values()].map((rows) => relativeTrend(rows, 'performed_on', (row) => number(row.estimated_1rm))).filter((value): value is number => value != null);
-
-  const age = nutritionSettings.data?.birth_date
-    ? Math.floor((Date.now() - new Date(`${nutritionSettings.data.birth_date}T12:00:00`).getTime()) / 31_557_600_000)
-    : null;
-  const totalRoutineOpportunities = (routines.data || []).reduce((sum, routine) => sum + Math.max(1, (routine.weekdays || []).length) * (30 / 7), 0);
-  const latestFoldValues = skinfolds[0]?.falten || {};
-  const foldRanks = rankedFolds(latestFoldValues, nutritionSettings.data?.calculation_basis || 'male');
-
   return {
-    generatedAt: new Date().toISOString(),
-    period: { from: since42, to: new Date().toISOString().slice(0, 10) },
-    profile: {
-      age,
-      heightCm: nutritionSettings.data?.height_cm || null,
-      goal: nutritionSettings.data?.goal || 'unknown',
-      calorieTarget: nutritionSettings.data?.adaptive_target || nutritionSettings.data?.custom_calorie_target || null,
-    },
-    bodyComposition: {
-      currentWeightKg: latestWeight,
-      weightMeasurements: weights.length,
-      weightTrendPercent: relativeTrend(weights, 'gemessen_am', (row) => number(row.kg)),
-      latestSkinfoldSumMm: latestFold,
-      skinfoldChangeMm: latestFold != null && oldestFold != null ? round(latestFold - oldestFold) : null,
-      skinfoldMeasurements: skinfolds.length,
-      latestSkinfoldDate: skinfolds[0]?.gemessen_am || null,
-      latestSkinfoldsMm: latestFoldValues,
-      skinfoldRanking: foldRanks,
-      skinfoldRatios: {
-        quadricepsToHamstring: number(latestFoldValues.beinbizeps) ? round(number(latestFoldValues.quadrizeps) / number(latestFoldValues.beinbizeps), 3) : null,
-        bicepsToTriceps: number(latestFoldValues.trizeps) ? round(number(latestFoldValues.bizeps) / number(latestFoldValues.trizeps), 3) : null,
-        chinToCheek: number(latestFoldValues.wange) ? round(number(latestFoldValues.kinn) / number(latestFoldValues.wange), 3) : null,
-      },
-      measurementQuality: skinfolds[0]?.messqualitaet || null,
-      standardized: skinfolds[0]?.standardisiert === true,
-      latestWaistCm: latestWaist,
-      waistChangeCm: latestWaist != null && oldestWaist != null ? round(latestWaist - oldestWaist) : null,
-      waistMeasurements: waists.length,
-    },
-    training: {
-      importedValues: performance.length,
-      comparableExercises: exerciseTrends.length,
-      averagePerformanceChangePercent: round(mean(exerciseTrends)),
-    },
-    sleep: {
-      checkins: sleep.length,
-      averageDurationMinutes: round(mean(sleepDurations), 0),
-      averageQuality: round(mean(sleep.map((row) => number(row.quality)))),
-      averageMorningEnergy: round(mean(sleep.map((row) => number(row.energy)))),
-      averageAwakenings: round(mean(sleep.map((row) => number(row.awakenings)))),
-      recentTags: [...new Set(sleep.slice(0, 14).flatMap((row) => row.tags || []))].slice(0, 12),
-    },
-    recovery: {
-      checkins: checkins.length,
-      averageRecovery: round(mean(checkins.map((row) => number(row.recovery)).filter(Boolean))),
-      averageMood: round(mean(checkins.map((row) => number(row.mood)).filter(Boolean))),
-      averageHunger: round(mean(checkins.map((row) => number(row.hunger)).filter(Boolean))),
-      illnessDays: checkins.filter((row) => row.illness).length,
-    },
-    nutrition: {
-      completeDays: nutritionDays.length,
-      averageKcal: round(mean(nutritionDays.map((day) => day.kcal)), 0),
-      averageProteinG: round(mean(nutritionDays.map((day) => day.protein)), 0),
-      averageCarbsG: round(mean(nutritionDays.map((day) => day.carbs)), 0),
-      averageFatG: round(mean(nutritionDays.map((day) => day.fat)), 0),
-    },
-    routines: {
-      active: (routines.data || []).map((routine) => routine.name).slice(0, 12),
-      completionsLast30Days: (completions.data || []).length,
-      adherencePercent: totalRoutineOpportunities ? round(((completions.data || []).length / totalRoutineOpportunities) * 100, 0) : null,
-    },
+    settings: nutritionSettings.data || null,
+    weights, skinfolds, waists, performance, sleep, checkins,
+    nutritionEntries,
+    dayStatus: dayStatus.data || [],
+    routines: routines.data || [],
+    completions,
     ruleContext: preferences.data?.value || {},
   };
 }
@@ -434,16 +317,25 @@ Deno.serve(async (request) => {
     if (scope === 'coach' && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
     const webResearch = scope === 'coach' && body?.webResearch === true;
 
-    const snapshot = await buildSnapshot(userId);
+    // Shared context: the same facts and time series for coach and COMP.
+    const now = new Date();
+    const contextRows = await fetchContextRows(userId, now);
+    const snapshot = buildCompFacts(contextRows, now);
+    const timeseries = buildTimeseries(contextRows, now);
     const clientEvidence = scope === 'comp' && body?.evidence && typeof body.evidence === 'object'
       ? body.evidence as Row : null;
     if (clientEvidence && JSON.stringify(clientEvidence).length > 120_000) return json({ error: 'Die COMP-Daten sind zu umfangreich.' }, 413);
+    const isCentralComp = scope === 'comp' && clientEvidence;
 
     const canonicalSnapshot = { ...snapshot } as Row;
     delete canonicalSnapshot.generatedAt;
     const canonicalEvidence = clientEvidence ? { ...clientEvidence } : null;
     if (canonicalEvidence) delete canonicalEvidence.generatedAt;
-    const inputFingerprint = await fingerprint({ scope, snapshot: canonicalSnapshot, evidence: canonicalEvidence });
+    // Only the central COMP assessment reads the time series; the cache keys
+    // of the other scopes stay as they were.
+    const inputFingerprint = await fingerprint(isCentralComp
+      ? { scope, snapshot: canonicalSnapshot, timeseries, evidence: canonicalEvidence }
+      : { scope, snapshot: canonicalSnapshot, evidence: canonicalEvidence });
 
     if (scope === 'comp' && body?.mode === 'ensure') {
       const { data: cached } = await admin.from('ai_coach_analyses').select('result,created_at,source_manifest')
@@ -453,13 +345,12 @@ Deno.serve(async (request) => {
 
     const vectorStoreId = await ensureKnowledgeBase();
 
-    const isCentralComp = scope === 'comp' && clientEvidence;
     const requestBody = isCentralComp ? {
       model: COACH_MODEL,
       instructions: `Du erstellst die einzige sichtbare Gesamtbewertung auf der CAPBOY-COMP-Seite. ${SHARED_SAFETY}
 
 Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.`,
-      input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(clientEvidence)}` }],
+      input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nWöchentlicher Verlauf der letzten 12 Wochen (deterministisch, dieselbe Grundlage wie beim Coach; Veränderungen stehen in summary und werden nicht selbst berechnet):\n${JSON.stringify(timeseries)}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(clientEvidence)}` }],
       reasoning: { effort: 'high' },
       max_output_tokens: 6000,
       tools: [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 8 }],
@@ -473,7 +364,7 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
           schema: compResultSchema,
         },
       },
-    } : coachRequestBody({ scope, question, snapshot, webResearch, vectorStoreId });
+    } : coachRequestBody({ scope, question, snapshot, timeseries, webResearch, vectorStoreId });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

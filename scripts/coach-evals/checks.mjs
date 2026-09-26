@@ -107,7 +107,7 @@ export function feldText(antwort, feld = 'alle') {
 
 // Einheit eines Snapshot-Felds, abgeleitet aus seinem Pfad.
 const FELD_EINHEITEN = [
-  [/\.currentWeightKg$/, 'kg'],
+  [/\.currentWeightKg$|\.averageWeightKg$|ChangeKg$|Estimated1rmKg\.\d+$/, 'kg'],
   [/Percent$/, '%'],
   [/\.latestSkinfoldsMm\.|Mm$/, 'mm'],
   [/\.heightCm$|WaistCm$|ChangeCm$/, 'cm'],
@@ -115,9 +115,9 @@ const FELD_EINHEITEN = [
   [/\.average(Protein|Carbs|Fat)G$/, 'g'],
   [/DurationMinutes$/, 'min'],
   [/\.age$/, 'jahre'],
-  [/Measurements$|\.checkins$|\.completeDays$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$/, 'anzahl'],
+  [/Measurements$|\.checkins$|\.completeDays$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$/, 'anzahl'],
 ];
-const VERAENDERUNG = /TrendPercent$|ChangeMm$|ChangeCm$|ChangePercent$/;
+const VERAENDERUNG = /TrendPercent$|ChangeKg$|ChangeMm$|ChangeCm$|ChangePercent$/;
 
 // Einheit im Text, direkt hinter der Zahl.
 const TEXT_EINHEITEN = [
@@ -142,6 +142,13 @@ const ERLAUBT = {
 // Zeitfenster darf der Coach nennen, ohne dass sie als Messwert im Snapshot
 // stehen - aber nur als Zeitangabe, nicht als beliebige Zahl ("7 kg").
 const FENSTER = { tage: [7, 14, 21, 28, 30, 42, 90], wochen: [1, 2, 3, 4, 6] };
+// Mit Wochenverlauf darf der Coach jede Wochenzahl innerhalb des Verlaufs als
+// Zeitraum nennen ("seit 5 Wochen") - als Zeitangabe, nicht als Messwert.
+function zeitfenster(felder) {
+  const wochen = felder.find((feld) => feld.pfad === '.timeseries.window.weeks')?.wert;
+  if (!wochen) return FENSTER;
+  return { ...FENSTER, wochen: [...new Set([...FENSTER.wochen, ...Array.from({ length: wochen }, (_, index) => index + 1)])] };
+}
 
 // Kurze Wörter mit Wortgrenze, sonst zählt "mehr" auch in "mehrere".
 const ABWAERTS = /gesunken|sinkt|abgenommen|verringert|\bweniger\b|rückgang|gefallen|fällt|niedriger|verloren|reduziert|\bminus\b|abnahme/i;
@@ -176,7 +183,8 @@ const MESSGROESSEN = [
   [/taille|bauchumfang/i, /\.latestWaistCm$|\.waistChangeCm$/],
   [/(körper)?größe/i, /\.heightCm$/],
   [/\balter\b|jahre alt/i, /\.age$/],
-  [/gewicht|wiegst|waage/i, /\.currentWeightKg$|\.weightTrendPercent$/],
+  // Mit Wochenverlauf auch das Wochenmittel und die berechnete Veränderung.
+  [/gewicht|wiegst|waage/i, /\.currentWeightKg$|\.weightTrendPercent$|\.averageWeightKg$|\.weightChangeKg$/],
   [/(kalorien)?ziel|vorgabe|zielwert/i, /\.calorieTarget$/],
   // Zufuhr-Begriffe binden nur die Kalorien; Makros haben eigene Begriffe.
   [/(kalorien|energie)?zufuhr|(kalorien|energie)?aufnahme|kalorien(?!ziel)|gegessen|aufgenommen|\bisst\b/i, /\.averageKcal$/],
@@ -198,11 +206,15 @@ const MESSGROESSEN = [
   [/hunger/i, /\.averageHunger$/],
   [/krank/i, /\.illnessDays$/],
   [/check-?ins?/i, /\.checkins$/],
-  [/leistung|kraft|performance/i, /\.averagePerformanceChangePercent$/],
+  [/leistung|kraft|performance/i, /\.averagePerformanceChangePercent$|\.estimated1rmChangePercent$|\.averageEstimated1rmChangePercent$/],
+  // Nur im Wochenverlauf vorhanden.
+  [/trainingstag|trainingseinheit|trainiert/i, /\.trainingDays$/],
+  [/1rm|maximalkraft|bestwert|höchstlast/i, /Estimated1rmKg\.\d+$/],
+  [/reise|unterwegs/i, /\.travelDays$/],
   [/übungen/i, /\.comparableExercises$/],
   [/trainingswerte|importiert/i, /\.importedValues$/],
-  [/routine|treue|eingehalten|umsetzung|adhärenz|quote|erfüllung/i, /\.adherencePercent$|\.completionsLast30Days$/],
-  [/erledig|abgehakt/i, /\.completionsLast30Days$/],
+  [/routine|treue|eingehalten|umsetzung|adhärenz|quote|erfüllung/i, /\.adherencePercent$|\.completionsLast30Days$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$/],
+  [/erledig|abgehakt|abschlüss/i, /\.completionsLast30Days$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$/],
   ...FALTEN.map((slug) => [new RegExp(`${FALTEN_WORT[slug]}(?![a-zäöü]*umfang)`, 'i'), new RegExp(`\\.latestSkinfoldsMm\\.${slug}$`)]),
 ];
 
@@ -368,7 +380,7 @@ function aussage(eintrag, satz) {
 // Prüft eine Zahl gegen die Snapshot-Felder. Rückgabe: { grund, ungebunden }
 // mit grund = null, wenn die Zahl belegt ist.
 function pruefeZahl(eintrag, felder, satz, vorgabe) {
-  if ((FENSTER[eintrag.einheit] || []).includes(eintrag.zahl)) return { grund: null };
+  if ((zeitfenster(felder)[eintrag.einheit] || []).includes(eintrag.zahl)) return { grund: null };
   // Obergrenze einer Skala: "3,6 von 5", "3,4/5", "7 von 10".
   if ([5, 10, 100].includes(eintrag.zahl) && /(\bvon|\/)\s*$/i.test(satz.slice(Math.max(0, eintrag.position - 5), eintrag.position))) {
     return { grund: null };
@@ -400,7 +412,8 @@ function pruefeZahl(eintrag, felder, satz, vorgabe) {
 // Liefert unbelegte Zahlen (Fehler) und Zahlen ohne erkennbare Messgröße
 // (Hinweise) aus dem Feld facts.
 export function zahlenBefund(fall, antwort) {
-  const felder = snapshotFelder(fall.daten);
+  // Mit Wochenverlauf zählen auch dessen Werte als geliefert.
+  const felder = snapshotFelder(fall.zeitreihe ? { ...fall.daten, timeseries: fall.zeitreihe } : fall.daten);
   // Ein Fakt enthält oft mehrere Sätze. Begriffe werden nur im selben Satz
   // gesucht, sonst bindet "Ziel" aus dem Vorsatz die Zahl im nächsten.
   const saetze = (Array.isArray(antwort?.facts) ? antwort.facts.map(String) : [])

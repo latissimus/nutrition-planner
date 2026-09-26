@@ -4,6 +4,8 @@
 //   npm run eval:coach -- --variante legacy      eingefrorener Stand vor Schritt 2
 //   npm run eval:coach -- --durchlaeufe 3        jeden Fall dreimal (Konstanz)
 //   npm run eval:coach -- --fall krankheit       nur einen Fall
+//   npm run eval:coach -- --faelle zeitreihe     Fallsatz: standard (12 Fälle, Vorgabe) oder
+//                                                zeitreihe (Fälle mit Wochenverlauf, cases-zeitreihe.mjs)
 //   npm run eval:coach -- --trocken              ohne API: Fälle, Anfragen und Prüfungen testen
 //   npm run eval:coach -- --als-baseline         Bericht zusätzlich versioniert unter baseline/ ablegen
 //   npm run eval:coach -- --neu-bewerten <datei> gespeicherte Antworten mit den aktuellen Prüfungen
@@ -49,7 +51,11 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import * as produktion from '../../supabase/functions/capboy-coach/coachPrompt.ts';
 import { KNOWLEDGE_VERSION } from '../../supabase/functions/capboy-coach/knowledge.ts';
 import * as legacy from './legacy/coachPrompt.legacy.ts';
+import {
+  FACT_COMPLETION_DAYS, FACT_LIMITS, FACT_WINDOW_DAYS, FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo,
+} from '../../supabase/functions/capboy-coach/context.ts';
 import { FAELLE } from './cases.mjs';
+import { FAELLE_ZEITREIHE } from './cases-zeitreihe.mjs';
 import { pruefe } from './checks.mjs';
 import { antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
@@ -65,18 +71,19 @@ const MODULE = { produktion, legacy };
 const VARIANTEN = Object.fromEntries(Object.entries(MODULE).map(([name, modul]) => [
   name,
   ({ fall, vectorStoreId }) => modul.coachRequestBody({
-    scope: 'coach', question: fall.frage, snapshot: fall.daten, webResearch: false, vectorStoreId,
+    scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, webResearch: false, vectorStoreId,
   }),
 ]));
 
 const sha = (wert) => createHash('sha256').update(typeof wert === 'string' ? wert : JSON.stringify(wert)).digest('hex').slice(0, 16);
 // Regex-Muster serialisiert JSON.stringify als {} - für den Fingerabdruck der
 // Fälle deshalb ihren Quelltext verwenden.
-const faelleFingerabdruck = () => sha(JSON.stringify(FAELLE, (_, wert) => (wert instanceof RegExp ? wert.toString() : wert)));
+const faelleFingerabdruck = (faelle) => sha(JSON.stringify(faelle, (_, wert) => (wert instanceof RegExp ? wert.toString() : wert)));
 // Fingerabdruck nur der Testdaten je Fall. Bei einer Neubewertung dürfen sich
 // die Erwartungen ändern, die Daten nicht - sonst passen Antwort und Fall
 // nicht mehr zusammen.
-const datenFingerabdruecke = () => Object.fromEntries(FAELLE.map((fall) => [fall.id, sha(fall.daten)]));
+// Mit Wochenverlauf gehört er zu den Testdaten; ohne bleibt der Fingerabdruck wie bisher.
+const datenFingerabdruecke = (faelle) => Object.fromEntries(faelle.map((fall) => [fall.id, sha(fall.zeitreihe ? { daten: fall.daten, zeitreihe: fall.zeitreihe } : fall.daten)]));
 function gitStand() {
   try {
     const commit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
@@ -118,6 +125,15 @@ const labelDatei = wert('--labels', null);
 const vergleichDatei = wert('--vergleiche', null);
 const vergleichsBasis = vergleichDatei ? JSON.parse(await readFile(vergleichDatei, 'utf8')) : null;
 const variante = gespeichert?.variante || wert('--variante', 'produktion');
+// Kalibrierung und Labels beziehen sich immer auf die Standardfälle (FAELLE);
+// der Lauf selbst auf den gewählten Fallsatz.
+const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE };
+const fallsatz = gespeichert?.fallsatz || wert('--faelle', 'standard');
+if (!FALLSAETZE[fallsatz]) {
+  console.error(`Unbekannter Fallsatz "${fallsatz}". Vorhanden: ${Object.keys(FALLSAETZE).join(', ')}`);
+  process.exit(1);
+}
+const LAUF_FAELLE = FALLSAETZE[fallsatz];
 // Beim Vergleich standardmäßig so viele Durchläufe wie die Baseline.
 const durchlaeufe = gespeichert?.durchlaeufe || Math.max(1, Number(wert('--durchlaeufe', vergleichsBasis?.durchlaeufe || 1)) || 1);
 const nurFall = wert('--fall', null);
@@ -166,11 +182,11 @@ if (!VARIANTEN[variante]) {
   console.error(`Unbekannte Variante "${variante}". Vorhanden: ${Object.keys(VARIANTEN).join(', ')}`);
   process.exit(1);
 }
-const faelle = FAELLE.filter((fall) => (gespeichert
+const faelle = LAUF_FAELLE.filter((fall) => (gespeichert
   ? gespeichert.laeufe.some((eintrag) => eintrag.fall === fall.id)
   : !nurFall || fall.id === nurFall));
 if (!faelle.length) {
-  console.error(`Kein Fall "${nurFall}". Vorhanden: ${FAELLE.map((fall) => fall.id).join(', ')}`);
+  console.error(`Kein Fall "${nurFall}". Vorhanden: ${LAUF_FAELLE.map((fall) => fall.id).join(', ')}`);
   process.exit(1);
 }
 
@@ -292,7 +308,7 @@ beendeBeiAbbruch();
 // Bewertet die gespeicherten Antworten mit den aktuellen Prüfungen neu.
 function neuBewertet() {
   const damals = gespeichert.reproduktion?.datenHashes;
-  const heute = datenFingerabdruecke();
+  const heute = datenFingerabdruecke(LAUF_FAELLE);
   const geaendert = damals ? Object.keys(damals).filter((id) => heute[id] && damals[id] !== heute[id]) : [];
   if (geaendert.length) {
     console.error(`Neubewertung abgebrochen: Die Testdaten folgender Fälle haben sich geändert: ${geaendert.join(', ')}`);
@@ -302,7 +318,7 @@ function neuBewertet() {
   console.log(`Neubewertung von ${gespeichert.laeufe.length} gespeicherten Antworten (Variante "${variante}") …`);
   return gespeichert.laeufe.map((eintrag) => {
     if (!eintrag.antwort) return eintrag;
-    const fall = FAELLE.find((kandidat) => kandidat.id === eintrag.fall);
+    const fall = LAUF_FAELLE.find((kandidat) => kandidat.id === eintrag.fall);
     const pruefungen = pruefe(fall, eintrag.antwort);
     return { ...eintrag, pruefungen, bestanden: pruefungen.every((pruefung) => pruefung.weich || pruefung.bestanden) };
   });
@@ -338,7 +354,7 @@ if (ohnePruefer) {
 } else if (!mitPruefer) {
   // Gespeicherte Urteile nur wiederverwenden, wenn sie zum aktuellen Prüfer
   // und zu den aktuellen Kriterien ihres Falls passen.
-  const veraltet = veralteteUrteile(laeufe, FAELLE);
+  const veraltet = veralteteUrteile(laeufe, LAUF_FAELLE);
   if (veraltet.length) {
     console.error([
       `Gespeicherte Prüferurteile passen nicht mehr zum aktuellen Prüfer oder zu den Kriterien: ${veraltet.join(', ')}`,
@@ -350,7 +366,7 @@ if (ohnePruefer) {
 if (mitPruefer) {
   console.log(`Modell-Prüfer (${PRUEFER_EINSTELLUNGEN.modell}) bewertet ${laeufe.filter((eintrag) => eintrag.antwort).length} Antworten …`);
   await abarbeiten(laeufe.filter((eintrag) => eintrag.antwort), async (eintrag) => {
-    const fall = FAELLE.find((kandidat) => kandidat.id === eintrag.fall);
+    const fall = LAUF_FAELLE.find((kandidat) => kandidat.id === eintrag.fall);
     try {
       const { urteile, nachweis } = await pruefeSemantisch({ frage: fall.frage, antwort: eintrag.antwort, eintraege: kriterienFuer(fall), apiKey });
       eintrag.modellUrteile = urteile;
@@ -372,7 +388,7 @@ const prueferGenutzt = laeufe.some((eintrag) => Array.isArray(eintrag.modellUrte
 const vertrauen = prueferVertrauen({ kalibriert, kalibrierteModelle: kalibrierNachweis?.tatsaechlicheModelle || [], laeufe });
 for (const eintrag of laeufe) {
   if (!eintrag.antwort || !Array.isArray(eintrag.modellUrteile)) continue;
-  const fall = FAELLE.find((kandidat) => kandidat.id === eintrag.fall);
+  const fall = LAUF_FAELLE.find((kandidat) => kandidat.id === eintrag.fall);
   eintrag.pruefungen = pruefe(fall, eintrag.antwort, { modellUrteile: eintrag.modellUrteile, prueferInformativ: !vertrauen.vertrauenswuerdig });
   eintrag.bestanden = eintrag.pruefungen.every((pruefung) => pruefung.weich || pruefung.bestanden);
 }
@@ -417,6 +433,7 @@ const beispiel = VARIANTEN[variante]({ fall: faelle[0], vectorStoreId });
 const modelle = [...new Set(laeufe.map((eintrag) => eintrag.nachweis?.modell).filter(Boolean))];
 const kopf = gespeichert ? {
   variante,
+  fallsatz,
   zeitpunkt: new Date().toISOString(),
   bestanden: `${bestandenGesamt}/${laeufe.length}`,
   durchlaeufe,
@@ -429,7 +446,7 @@ const kopf = gespeichert ? {
   },
   reproduktion: {
     ...gespeichert.reproduktion,
-    faelleHash: faelleFingerabdruck(),
+    faelleHash: faelleFingerabdruck(LAUF_FAELLE),
     // Nur übernehmen, was die Quelldatei selbst belegt. Die heutigen
     // Fingerabdrücke einzutragen, würde eine Prüfung vortäuschen, die für
     // ältere Dateien nicht mehr möglich ist.
@@ -441,6 +458,7 @@ const kopf = gespeichert ? {
   pruefer: prueferKopf,
 } : {
   variante,
+  fallsatz,
   zeitpunkt: new Date().toISOString(),
   bestanden: `${bestandenGesamt}/${laeufe.length}`,
   durchlaeufe,
@@ -455,8 +473,8 @@ const kopf = gespeichert ? {
     },
     promptHash: sha(beispiel.instructions),
     schemaHash: sha(beispiel.text.format.schema),
-    faelleHash: faelleFingerabdruck(),
-    datenHashes: datenFingerabdruecke(),
+    faelleHash: faelleFingerabdruck(LAUF_FAELLE),
+    datenHashes: datenFingerabdruecke(LAUF_FAELLE),
     datenVerifiziert: true,
     seminarwissen: Boolean(vectorStoreId),
     vectorStoreId,
@@ -470,7 +488,7 @@ const kopf = gespeichert ? {
 
 const r = kopf.reproduktion;
 const zeilen = [
-  `# Coach-Eval: ${variante}`,
+  `# Coach-Eval: ${variante}${fallsatz === 'standard' ? '' : ` · Fallsatz ${fallsatz}`}`,
   '',
   `**Bestanden: ${kopf.bestanden}** · ${durchlaeufe} Durchlauf/Durchläufe · ${kopf.dauerSekunden} s · ${kopf.tokens} Tokens`,
   '',
@@ -503,7 +521,7 @@ const zeilen = [
 ];
 
 const vergleich = vergleichsBasis
-  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis(), faelle: FAELLE })
+  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis(), faelle: LAUF_FAELLE })
   : null;
 if (vergleich) {
   kopf.vergleich = { baseline: vergleichDatei, ...vergleich };
@@ -523,7 +541,8 @@ if (vergleich) {
 
 const ordner = new URL('./results/', import.meta.url);
 await mkdir(ordner, { recursive: true });
-const name = `${kopf.zeitpunkt.replaceAll(':', '-').slice(0, 19)}-${variante}${kopf.neubewertung ? '-neubewertet' : ''}${kopf.pruefer ? '-pruefer' : ''}`;
+const satzZusatz = fallsatz === 'standard' ? '' : `-${fallsatz}`;
+const name = `${kopf.zeitpunkt.replaceAll(':', '-').slice(0, 19)}-${variante}${satzZusatz}${kopf.neubewertung ? '-neubewertet' : ''}${kopf.pruefer ? '-pruefer' : ''}`;
 await writeFile(new URL(`${name}.json`, ordner), JSON.stringify({ ...kopf, zusammenfassung, laeufe }, null, 2));
 await writeFile(new URL(`${name}.md`, ordner), `${zeilen.join('\n')}\n`);
 console.log(`\n${zeilen.join('\n')}\n\nGespeichert: scripts/coach-evals/results/${name}.md`);
@@ -535,7 +554,7 @@ if (alsBaseline && kopf.pruefer && !kopf.pruefer.vertrauenswuerdig) {
   const baseline = new URL('./baseline/', import.meta.url);
   await mkdir(baseline, { recursive: true });
   // Eine Bewertung mit Modell-Prüfer überschreibt nie die reine Baseline.
-  const baselineName = `${variante}${kopf.pruefer ? '-pruefer' : ''}`;
+  const baselineName = `${variante}${satzZusatz}${kopf.pruefer ? '-pruefer' : ''}`;
   await writeFile(new URL(`${baselineName}.json`, baseline), JSON.stringify({ ...kopf, zusammenfassung, laeufe }, null, 2));
   await writeFile(new URL(`${baselineName}.md`, baseline), `${zeilen.join('\n')}\n`);
   console.log(`Als Baseline gesichert: scripts/coach-evals/baseline/${baselineName}.md`);
@@ -795,6 +814,8 @@ async function trockenlauf() {
   }
   const gateProben = await trockenlaufGate(fehler);
   const promptProben = trockenlaufPrompt(fehler);
+  const verlaufProben = trockenlaufZeitreihe(fehler);
+  const fixtureProbe = await trockenlaufFixture(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
@@ -806,6 +827,8 @@ async function trockenlauf() {
     `Modell-Prüfer: ${Object.keys(KRITERIEN).length} Kriterien, ${KALIBRIERUNG.length} Kalibrierungssätze verknüpft, Beleg- und Verrechnungsproben richtig.`,
     `Labels und Gate: ${gateProben.labelDateien} Label-Datei(en) stimmig, ${gateProben.labelFehler} Label-Fehler und ${gateProben.gate} Gate-Szenarien richtig erkannt.`,
     `Prompt: freier Coach neu (${promptProben.hash}), ${promptProben.bereiche} andere Bereiche unverändert wie legacy, Anfrage sonst gleich, ${promptProben.regeln} Regeln zum Prompt richtig.`,
+    `Wochenverlauf: ${verlaufProben.rechnung} Rechenproben, ${verlaufProben.faelle} Fälle mit <timeseries>, ${verlaufProben.zahlen} Zahlenproben – alles richtig; Standardfälle ohne Verlauf.`,
+    `Fixture: buildCompFacts gleicht der bisherigen Snapshot-Ausgabe (${fixtureProbe.werte} Werte, Referenz aus ${fixtureProbe.commit}); alle alten Grenzen überschritten.`,
   ].join('\n'));
 }
 
@@ -938,7 +961,7 @@ async function labelRegression(datei) {
   const fehler = pruefeLabelStruktur({ labels, quelle, quellText, faelle: FAELLE });
 
   const damals = quelle.reproduktion?.datenHashes;
-  const heute = datenFingerabdruecke();
+  const heute = datenFingerabdruecke(FAELLE);
   const betroffen = [...new Set([...labels.semantisch || [], ...labels.confidence || []].map((eintrag) => eintrag.fall))];
   if (!damals) fehler.push('Die Antwortdatei enthält keine Fingerabdrücke der Testdaten');
   else if (betroffen.some((id) => damals[id] !== heute[id])) fehler.push(`Testdaten geändert seit den Antworten: ${betroffen.filter((id) => damals[id] !== heute[id]).join(', ')}`);
@@ -1102,6 +1125,213 @@ function trockenlaufPrompt(fehler) {
   return { hash: sha(prompt), bereiche: andere.length, regeln };
 }
 
+// Prüft den Wochenverlauf ohne API: die Rechnung an Hand nachprüfbaren
+// Daten, die Fälle mit Verlauf und den Zahlenabgleich gegen Wochenwerte.
+function trockenlaufZeitreihe(fehler) {
+  let rechnung = 0;
+  const gleich = (ist, soll, was) => {
+    rechnung += 1;
+    if (JSON.stringify(ist) !== JSON.stringify(soll)) fehler.push(`Verlauf: ${was} ist ${JSON.stringify(ist)}, erwartet ${JSON.stringify(soll)}`);
+  };
+  // Samstag, 26.09.2026: Die laufende Woche beginnt Montag, 21.09. (KW 39).
+  const jetzt = new Date('2026-09-26T08:00:00.000Z');
+  const zeilen = {
+    settings: null, ruleContext: {},
+    routines: [
+      { id: 'a', name: 'Kreatin', active: true },
+      { id: 'b', name: 'Kältedusche', active: false },  // pausiert, aber mit Abschluss
+      { id: 'c', name: 'Leer', active: false },         // pausiert, ohne Abschluss: fehlt
+    ],
+    completions: [
+      { routine_id: 'x', completed_on: '2026-09-23' },  // Routine nicht mehr vorhanden
+      { routine_id: 'a', completed_on: '2026-09-22' },
+      { routine_id: 'a', completed_on: '2026-09-21' },
+      { routine_id: 'a', completed_on: '2026-09-15' },
+      { routine_id: 'b', completed_on: '2026-07-07' },
+      { routine_id: 'a', completed_on: '2026-07-01' },  // vor dem Fenster
+    ],
+    weights: [
+      { gemessen_am: '2026-09-27', kg: 70 },          // Zukunft: nicht im Fenster
+      { gemessen_am: '2026-09-25', kg: 80 },
+      { gemessen_am: '2026-09-22', kg: 81 },
+      { gemessen_am: '2026-09-14', kg: 82 },
+      { gemessen_am: '2026-07-05', kg: 90 },          // Sonntag vor dem Fenster
+    ],
+    skinfolds: [{ gemessen_am: '2026-09-24', total: 85, falten: {}, standardisiert: true, messqualitaet: 'gut' }, { gemessen_am: '2026-07-07', total: 90, falten: {}, standardisiert: false, messqualitaet: 'mittel' }],
+    waists: [],
+    performance: [
+      { performed_on: '2026-09-24', exercise: 'Kniebeuge', category: 'legs', estimated_1rm: 105 },
+      { performed_on: '2026-09-22', exercise: 'Kniebeuge', category: 'legs', estimated_1rm: 110 },
+      { performed_on: '2026-09-22', exercise: 'Bankdrücken', category: 'push', estimated_1rm: 80 },  // nur eine Woche: nicht vergleichbar
+      { performed_on: '2026-09-15', exercise: 'Rudern', category: 'pull', estimated_1rm: 66 },
+      { performed_on: '2026-09-14', exercise: 'Kniebeuge', category: 'legs', estimated_1rm: 100 },
+      { performed_on: '2026-07-07', exercise: 'Rudern', category: 'pull', estimated_1rm: 60 },
+      { performed_on: '2026-07-08', exercise: 'Rudern', category: 'pull', estimated_1rm: null },    // ohne Wert: zählt nicht
+    ],
+    sleep: [{ sleep_date: '2026-09-21', bedtime: '23:00', wake_time: '07:00', quality: 4, energy: 3 }],
+    checkins: [
+      { checkin_date: '2026-09-16', travel: true, unusual_meals: true, recovery: 2 },
+      { checkin_date: '2026-09-15', illness: true, recovery: 0 },
+    ],
+    nutritionEntries: [
+      { log_date: '2026-09-23', energy_kcal: 700, protein_g: 50 },
+      { log_date: '2026-09-22', energy_kcal: 800, protein_g: 60 },
+      { log_date: '2026-09-21', energy_kcal: 1000, protein_g: 70 },
+      { log_date: '2026-09-21', energy_kcal: 500, protein_g: 30 },
+    ],
+    dayStatus: [
+      { log_date: '2026-09-23', complete: true, excluded: true },   // ausgeschlossen
+      { log_date: '2026-09-22', complete: false, excluded: false }, // unvollständig
+      { log_date: '2026-09-21', complete: true, excluded: false },
+    ],
+  };
+  const verlauf = buildTimeseries(zeilen, jetzt);
+  const [erste, , kw30] = verlauf.weeks;
+  const kw38 = verlauf.weeks.at(-2);
+  const kw39 = verlauf.weeks.at(-1);
+  gleich(verlauf.window, { from: '2026-07-06', to: '2026-09-26', weeks: 12 }, 'Fenster');
+  gleich([erste.week, kw38.week, kw39.week], ['2026-W28', '2026-W38', '2026-W39'], 'Kalenderwochen');
+  gleich([kw39.from, kw39.to, kw39.partial, kw38.to, kw38.partial], ['2026-09-21', '2026-09-26', true, '2026-09-20', false], 'angebrochene Woche');
+  gleich([kw39.bodyComposition.weightMeasurements, kw39.bodyComposition.averageWeightKg, kw38.bodyComposition.averageWeightKg, erste.bodyComposition.weightMeasurements], [2, 80.5, 82, 0], 'Wochengewicht (Zukunft und Vorwoche ausgelassen)');
+  gleich([kw30.bodyComposition.averageWeightKg, kw30.nutrition.completeDays, kw30.nutrition.averageKcal], [null, 0, null], 'leere Woche');
+  gleich([kw39.nutrition.completeDays, kw39.nutrition.averageKcal, kw39.nutrition.averageProteinG], [1, 1500, 100], 'nur vollständige, nicht ausgeschlossene Tage');
+  gleich([kw39.bodyComposition.latestSkinfoldSumMm, erste.bodyComposition.latestSkinfoldQuality, erste.bodyComposition.latestSkinfoldStandardized], [85, 'mittel', false], 'Hautfalten je Woche');
+  gleich([kw39.training.trainingDays, kw39.sleep.averageDurationMinutes], [2, 480], 'Trainingstage und Schlafdauer');
+  gleich([kw38.recovery.illnessDays, kw38.recovery.travelDays, kw38.recovery.checkins, kw38.recovery.averageRecovery], [1, 1, 2, 2], 'Erholung (0 zählt wie in den Fakten nicht zum Mittel)');
+  gleich(verlauf.events, [{ date: '2026-09-15', type: 'illness' }, { date: '2026-09-16', type: 'travel' }, { date: '2026-09-16', type: 'unusual_meals' }], 'Ereignisse');
+  gleich([verlauf.summary.weightChangeKg, verlauf.summary.weightChangeFromWeek, verlauf.summary.weightChangeToWeek, verlauf.summary.weeksWithWeight], [-1.5, '2026-W38', '2026-W39', 2], 'Gewichtsveränderung');
+  gleich([verlauf.summary.skinfoldChangeMm, verlauf.summary.waistChangeCm], [-5, null], 'Veränderung Falten und Taille');
+  const nullen = (anzahl) => Array(anzahl).fill(0);
+  gleich(verlauf.routines, [
+    { name: 'Kreatin', active: true, weeklyCompletions: [...nullen(10), 1, 2], totalCompletions: 3 },
+    { name: 'Kältedusche', active: false, weeklyCompletions: [1, ...nullen(11)], totalCompletions: 1 },
+    { name: null, active: null, weeklyCompletions: [...nullen(11), 1], totalCompletions: 1 },
+  ], 'Routinenabschlüsse je Routine und Woche');
+  gleich([kw39.routines.completions, kw38.routines.completions, erste.routines.completions], [3, 1, 1], 'Routinenabschlüsse je Woche');
+  gleich(/adherence|quote/i.test(JSON.stringify(verlauf)), false, 'keine historische Umsetzungsquote');
+  const ohneNull = (anzahl) => Array(anzahl).fill(null);
+  gleich(verlauf.training.exercises, [
+    { exercise: 'Kniebeuge', category: 'legs', sessions: 3, weeksWithValue: 2, weeklyBestEstimated1rmKg: [...ohneNull(10), 100, 110], estimated1rmChangePercent: 10, changeFromWeek: '2026-W38', changeToWeek: '2026-W39' },
+    { exercise: 'Rudern', category: 'pull', sessions: 2, weeksWithValue: 2, weeklyBestEstimated1rmKg: [60, ...ohneNull(9), 66, null], estimated1rmChangePercent: 10, changeFromWeek: '2026-W28', changeToWeek: '2026-W38' },
+  ], 'Trainingsentwicklung je vergleichbarer Übung');
+  gleich([verlauf.training.categories, verlauf.training.comparableExercisesTotal, verlauf.training.nonComparableExercises],
+    [[{ category: 'legs', comparableExercises: 1, averageEstimated1rmChangePercent: 10 }, { category: 'pull', comparableExercises: 1, averageEstimated1rmChangePercent: 10 }], 2, 1], 'Trainingsentwicklung je Kategorie');
+
+  // Fälle mit Verlauf: vollständig, eindeutig, und der Verlauf steht als
+  // eigener Block zwischen Fakten und Frage.
+  const standardIds = new Set(FAELLE.map((fall) => fall.id));
+  for (const fall of FAELLE_ZEITREIHE) {
+    if (standardIds.has(fall.id)) fehler.push(`Verlauf: Fall-ID ${fall.id} gibt es auch im Standardsatz`);
+    if (fall.zeitreihe?.weeks?.length !== 12) fehler.push(`Verlauf: ${fall.id} hat keinen vollständigen Verlauf`);
+    if (!fall.erwartet?.sicherheit?.length) fehler.push(`Verlauf: ${fall.id} ohne erlaubte Sicherheit`);
+    for (const eintrag of kriterienFuer(fall)) if (!KRITERIEN[eintrag.kriterium]) fehler.push(`Verlauf: ${fall.id} nutzt unbekanntes Kriterium ${eintrag.kriterium}`);
+    const inhalt = VARIANTEN.produktion({ fall, vectorStoreId: 'vs' }).input[0].content;
+    const soll = `<comp_facts>\n${JSON.stringify(fall.daten)}\n</comp_facts>\n\n<timeseries>\n${JSON.stringify(fall.zeitreihe)}\n</timeseries>\n\n<user_question>\n${fall.frage}\n</user_question>`;
+    if (inhalt !== soll) fehler.push(`Verlauf: Eingabe von ${fall.id} nicht als <comp_facts>, <timeseries>, <user_question>`);
+  }
+  if (new Set(FAELLE_ZEITREIHE.map((fall) => fall.id)).size !== FAELLE_ZEITREIHE.length) fehler.push('Verlauf: doppelte Fall-IDs');
+  for (const fall of FAELLE) {
+    if (VARIANTEN.produktion({ fall, vectorStoreId: 'vs' }).input[0].content.includes('<timeseries>')) fehler.push(`Verlauf: Standardfall ${fall.id} bekommt einen Verlauf`);
+  }
+
+  // Zahlenabgleich gegen Wochenwerte (Fall mit Reise: Wochenmittel 93,9 … 90,6 kg,
+  // Veränderung -3,3 kg, Reisetage 5, Trainingstage 3).
+  const reise = FAELLE_ZEITREIHE.find((fall) => fall.id === 'verlauf-reise-stillstand');
+  const zahlenProben = [
+    ['Wochenmittel des Gewichts ab 14.09.: 90,6 kg', true],
+    ['Das Gewicht ist über den Verlauf um 3,3 kg gesunken.', true],
+    ['Seit 10 Wochen sinkt das Gewicht.', true],
+    ['5 Reisetage in der Woche ab 14.09.', true],
+    ['3 Trainingstage pro Woche', true],
+    ['Wochenmittel des Gewichts: 91,3 kg', false],       // kein Wochenwert
+    ['Das Gewicht ist um 3,3 kg gestiegen.', false],     // Richtung falsch
+    ['7 Trainingstage pro Woche', false],
+    ['Seit 20 Wochen sinkt das Gewicht.', false],         // länger als der Verlauf
+  ];
+  const rekomposition = FAELLE_ZEITREIHE.find((fall) => fall.id === 'verlauf-rekomposition');
+  const deutsch = (zahl) => String(zahl).replace('.', ',');
+  const [uebung] = rekomposition.zeitreihe.training.exercises;
+  const [routine] = rekomposition.zeitreihe.routines;
+  const woche = rekomposition.zeitreihe.weeks.at(-2);
+  const erledigt = routine.weeklyCompletions.at(-2);
+  const zahlenProbenRekomposition = [
+    [`Kraft ${uebung.exercise}: +${deutsch(uebung.estimated1rmChangePercent)} %`, true],
+    [`Kraft ${uebung.exercise}: +${deutsch(uebung.estimated1rmChangePercent + 5)} %`, false],
+    [`Geschätztes 1RM ${uebung.exercise} zuletzt ${deutsch(uebung.weeklyBestEstimated1rmKg.at(-2))} kg`, true],
+    [`Geschätztes 1RM ${uebung.exercise} zuletzt 250 kg`, false],
+    [`${routine.name} wurde in der Woche ab ${woche.from.split('-').reverse().join('.')} ${erledigt}-mal erledigt`, true],
+    [`${routine.name} wurde in der letzten Woche 99-mal erledigt`, false],
+  ];
+  const alleProben = [...zahlenProben.map((probe) => [reise, ...probe]), ...zahlenProbenRekomposition.map((probe) => [rekomposition, ...probe])];
+  for (const [probeFall, satz, soll] of alleProben) {
+    const ergebnis = pruefe(probeFall, { ...antwortMitSatz('facts', satz) }).find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
+    if (ergebnis.bestanden !== soll) fehler.push(`Verlauf: „${satz}“ sollte ${soll ? 'bestehen' : 'auffallen'} (${ergebnis.detail})`);
+  }
+  return { rechnung, faelle: FAELLE_ZEITREIHE.length, zahlen: alleProben.length };
+}
+
+// buildCompFacts gegen die Ausgabe der bisherigen Snapshot-Berechnung (fixtures/).
+// Die Rohdaten werden so zugeschnitten, wie fetchContextRows() in der Edge
+// Function sie lädt: größere Fenster und Grenzen für den Verlauf. Die Fakten
+// müssen trotzdem exakt der alten Ausgabe entsprechen.
+async function trockenlaufFixture(fehler) {
+  const ordner = new URL('./fixtures/', import.meta.url);
+  const tabellen = JSON.parse(await readFile(new URL('kontext-tabellen.json', ordner), 'utf8'));
+  const referenz = JSON.parse(await readFile(new URL('comp-facts-referenz.json', ordner), 'utf8'));
+  const jetzt = new Date(tabellen.jetzt);
+  const seit = dateDaysAgo(jetzt, FETCH_WINDOW_DAYS);
+  const sortiert = (liste, ...schluessel) => {
+    let zeilen = [...liste];
+    for (const [spalte, aufsteigend] of [...schluessel].reverse()) {
+      zeilen = zeilen.sort((a, b) => (aufsteigend ? 1 : -1) * String(a[spalte]).localeCompare(String(b[spalte]), 'en', { numeric: true }));
+    }
+    return zeilen;
+  };
+  const neueste = (tabelle, spalte, grenze) => sortiert(tabellen[tabelle], [spalte, false]).slice(0, grenze);
+  const zeilen = {
+    settings: tabellen.nutrition_settings,
+    weights: neueste('weights', 'gemessen_am', FETCH_LIMITS.weights),
+    skinfolds: neueste('skinfolds', 'gemessen_am', FETCH_LIMITS.skinfolds),
+    waists: neueste('waist_measurements', 'gemessen_am', FETCH_LIMITS.waists),
+    performance: neueste('logman_performance', 'performed_on', FETCH_LIMITS.performance),
+    sleep: neueste('sleep_logs', 'sleep_date', FETCH_LIMITS.sleep),
+    checkins: neueste('bodycomp_checkins', 'checkin_date', FETCH_LIMITS.checkins),
+    nutritionEntries: sortiert(tabellen.nutrition_log_entries.filter((zeile) => zeile.log_date >= seit), ['log_date', false], ['id', true]),
+    dayStatus: sortiert(tabellen.nutrition_day_status.filter((zeile) => zeile.log_date >= seit), ['log_date', false]),
+    routines: sortiert(tabellen.routines, ['position', true]),
+    completions: sortiert(tabellen.routine_completions.filter((zeile) => zeile.completed_on >= seit), ['completed_on', false], ['routine_id', true]),
+    ruleContext: tabellen.user_preferences.value,
+  };
+  // Die Fixture muss jede alte Grenze wirklich überschreiten, sonst beweist sie nichts.
+  for (const [tabelle, schluessel] of [['weights', 'weights'], ['skinfolds', 'skinfolds'], ['waist_measurements', 'waists'], ['logman_performance', 'performance'], ['sleep_logs', 'sleep'], ['bodycomp_checkins', 'checkins']]) {
+    if (tabellen[tabelle].length <= FACT_LIMITS[schluessel]) fehler.push(`Fixture: ${tabelle} überschreitet die alte Grenze ${FACT_LIMITS[schluessel]} nicht`);
+  }
+  if (!tabellen.nutrition_log_entries.some((zeile) => zeile.log_date < dateDaysAgo(jetzt, FACT_WINDOW_DAYS) && zeile.log_date >= seit)) fehler.push('Fixture: keine Ernährung zwischen 42 und 84 Tagen');
+  if (!tabellen.routine_completions.some((zeile) => zeile.completed_on < dateDaysAgo(jetzt, FACT_COMPLETION_DAYS) && zeile.completed_on >= seit)) fehler.push('Fixture: keine Abschlüsse zwischen 30 und 84 Tagen');
+  if (!tabellen.routines.some((routine) => !routine.active && tabellen.routine_completions.some((zeile) => zeile.routine_id === routine.id))) fehler.push('Fixture: keine pausierte Routine mit Abschlüssen');
+
+  const ist = JSON.parse(JSON.stringify(buildCompFacts(zeilen, jetzt)));
+  const unterschiede = [];
+  let werte = 0;
+  const vergleiche = (soll, wert, pfad) => {
+    if (soll && typeof soll === 'object' && wert && typeof wert === 'object' && Array.isArray(soll) === Array.isArray(wert)) {
+      for (const schluessel of new Set([...Object.keys(soll), ...Object.keys(wert)])) vergleiche(soll[schluessel], wert[schluessel], `${pfad}.${schluessel}`);
+      return;
+    }
+    werte += 1;
+    if (!Object.is(soll, wert)) unterschiede.push(`${pfad}: erwartet ${JSON.stringify(soll)}, ist ${JSON.stringify(wert)}`);
+  };
+  vergleiche(referenz.snapshot, ist, 'snapshot');
+  if (unterschiede.length) fehler.push(`Fixture: buildCompFacts weicht von der bisherigen Ausgabe ab – ${unterschiede.slice(0, 5).join('; ')}${unterschiede.length > 5 ? ` (+${unterschiede.length - 5})` : ''}`);
+  if (JSON.stringify(ist) !== JSON.stringify(referenz.snapshot)) fehler.push('Fixture: Reihenfolge der Felder weicht ab (wichtig für den Cache-Schlüssel der COMP-Bewertung)');
+
+  // Der Verlauf aus denselben Zeilen: pausierte Routine mit Abschlüssen enthalten, keine Quote.
+  const verlauf = buildTimeseries(zeilen, jetzt);
+  if (!verlauf.routines.some((routine) => routine.active === false && routine.totalCompletions > 0)) fehler.push('Fixture: pausierte Routine fehlt im Verlauf');
+  if (/adherence|quote/i.test(JSON.stringify(verlauf))) fehler.push('Fixture: Verlauf enthält eine Quote');
+  return { werte, commit: referenz.quelle.commit };
+}
+
 // Prüft Label-Regression und Vergleichs-Gate ohne API: die echten Label-
 // Dateien müssen zu ihren Antworten passen, und jede Art von Fehler muss
 // erkannt werden.
@@ -1173,8 +1403,8 @@ async function trockenlaufGate(fehler) {
 
   // Vergleichs-Gate an der echten Baseline.
   const baseline = JSON.parse(await readFile(new URL('./baseline/legacy-pruefer.json', import.meta.url), 'utf8'));
-  if (baseline.reproduktion?.faelleHash !== faelleFingerabdruck()) fehler.push('Gate: baseline/legacy-pruefer.json passt nicht mehr zu den aktuellen Fällen – Baseline neu bewerten');
-  if (JSON.stringify(baseline.reproduktion?.datenHashes) !== JSON.stringify(datenFingerabdruecke())) fehler.push('Gate: baseline/legacy-pruefer.json passt nicht mehr zu den aktuellen Testdaten');
+  if (baseline.reproduktion?.faelleHash !== faelleFingerabdruck(FAELLE)) fehler.push('Gate: baseline/legacy-pruefer.json passt nicht mehr zu den aktuellen Fällen – Baseline neu bewerten');
+  if (JSON.stringify(baseline.reproduktion?.datenHashes) !== JSON.stringify(datenFingerabdruecke(FAELLE))) fehler.push('Gate: baseline/legacy-pruefer.json passt nicht mehr zu den aktuellen Testdaten');
   const gueltigeLabels = { gueltig: true, gruende: [] };
   const gate = (abwandeln, labelNachweis = gueltigeLabels) => {
     const neu = structuredClone(baseline);

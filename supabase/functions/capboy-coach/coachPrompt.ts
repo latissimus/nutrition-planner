@@ -199,19 +199,20 @@ export function coachSystemPrompt(scope: Scope, webResearch: boolean) {
 Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu erinnern. Trenne klar zwischen gemessenen Fakten, plausiblen Interpretationen und Unsicherheiten. Einzelwerte nie überbewerten. Gib höchstens drei konkrete, überprüfbare Empfehlungen und nenne einen realistischen Zeitraum. Bei möglichen medizinischen Warnzeichen empfehle professionelle Abklärung. ${webResearch ? 'Der Nutzer hat ausdrücklich aktuelle Webrecherche aktiviert. Führe mindestens eine Websuche durch. Bevorzuge Primärquellen, systematische Übersichten, Fachgesellschaften und öffentliche Gesundheitsbehörden. Trenne externe Erkenntnisse sichtbar von den persönlichen CAPBOY-Daten und den Seminarunterlagen.' : 'Es ist keine Webrecherche erlaubt. Nutze nur den CAPBOY-Datensnapshot, die Seminar-Wissensbasis und dein allgemeines Modellwissen.'} Antworte auf Deutsch, knapp und konkret. ${scopeInstruction[scope]}`;
 }
 
-export function coachUserPrompt(scope: Scope, question: string, snapshot: unknown) {
+export function coachUserPrompt(scope: Scope, question: string, snapshot: unknown, timeseries?: unknown) {
   const frage = question || 'Erstelle jetzt die angeforderte Analyse.';
   // The free coach gets the blocks its prompt describes. Blocks without a
-  // data source yet (time series, memory, experiments, actions, limits) are
-  // left out.
-  if (scope === 'coach') return coachInput({ comp_facts: JSON.stringify(snapshot), user_question: frage });
+  // data source yet (memory, experiments, actions, limits) are left out.
+  if (scope === 'coach') {
+    return coachInput({ comp_facts: JSON.stringify(snapshot), timeseries: timeseries ? JSON.stringify(timeseries) : '', user_question: frage });
+  }
   return `${frage}\n\nAktueller strukturierter CAPBOY-Datensnapshot:\n${JSON.stringify(snapshot)}`;
 }
 
 // Request body of the free coach and of the non-central scopes. The central
 // COMP assessment builds its own body in index.ts.
-export function coachRequestBody({ scope, question, snapshot, webResearch, vectorStoreId }: {
-  scope: Scope; question: string; snapshot: unknown; webResearch: boolean; vectorStoreId: string | null;
+export function coachRequestBody({ scope, question, snapshot, timeseries, webResearch, vectorStoreId }: {
+  scope: Scope; question: string; snapshot: unknown; timeseries?: unknown; webResearch: boolean; vectorStoreId: string | null;
 }) {
   const tools: Row[] = vectorStoreId
     ? [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 6 }]
@@ -224,7 +225,7 @@ export function coachRequestBody({ scope, question, snapshot, webResearch, vecto
   return {
     model: COACH_MODEL,
     instructions: coachSystemPrompt(scope, webResearch),
-    input: [{ role: 'user', content: coachUserPrompt(scope, question, snapshot) }],
+    input: [{ role: 'user', content: coachUserPrompt(scope, question, snapshot, timeseries) }],
     reasoning: { effort: scope === 'coach' ? 'medium' : 'high' },
     max_output_tokens: 4000,
     tools,
