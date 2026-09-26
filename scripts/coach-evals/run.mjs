@@ -16,6 +16,14 @@
 //                                                ignorieren und rein deterministisch bewerten
 //   npm run eval:coach -- --ohne-kalibrierung    --mit-pruefer ausnahmsweise ohne gültige Kalibrierung
 //                                                (wird im Bericht deutlich vermerkt)
+//   npm run eval:coach -- --labels <datei>       Label-Regression: menschlich bestätigte Urteile an
+//                                                vollständigen Antworten gegen den aktuellen Prüfer
+//                                                prüfen (gespeicherte Urteile; mit --mit-pruefer neu
+//                                                geholt, standardmäßig 3 Durchläufe)
+//   npm run eval:coach -- --vergleiche <datei>   Vergleichs-Gate: den Lauf gegen eine Baseline prüfen
+//                                                (braucht --mit-pruefer oder --neu-bewerten und eine
+//                                                bestandene Label-Regression; Exit-Code 0 nur bei
+//                                                bestandenem Gate)
 //
 // Das Skript schickt exakt die Anfrage, die auch die Edge Function schickt:
 // Prompt, Schema, Modell und Werkzeuge kommen aus
@@ -32,12 +40,14 @@
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { basename } from 'node:path';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import * as produktion from '../../supabase/functions/capboy-coach/coachPrompt.ts';
 import { KNOWLEDGE_VERSION } from '../../supabase/functions/capboy-coach/knowledge.ts';
 import * as legacy from './legacy/coachPrompt.legacy.ts';
 import { FAELLE } from './cases.mjs';
 import { pruefe } from './checks.mjs';
+import { antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
 import {
   KRITERIEN, MIN_KALIBRIER_DURCHLAEUFE, PRUEFER_EINSTELLUNGEN, kalibrierungGueltig, kriterienFingerabdruck,
@@ -100,8 +110,12 @@ async function gespeicherteKalibrierung() {
 }
 const neuBewerten = wert('--neu-bewerten', null);
 const gespeichert = neuBewerten ? JSON.parse(await readFile(neuBewerten, 'utf8')) : null;
+const labelDatei = wert('--labels', null);
+const vergleichDatei = wert('--vergleiche', null);
+const vergleichsBasis = vergleichDatei ? JSON.parse(await readFile(vergleichDatei, 'utf8')) : null;
 const variante = gespeichert?.variante || wert('--variante', 'produktion');
-const durchlaeufe = gespeichert?.durchlaeufe || Math.max(1, Number(wert('--durchlaeufe', 1)) || 1);
+// Beim Vergleich standardmäßig so viele Durchläufe wie die Baseline.
+const durchlaeufe = gespeichert?.durchlaeufe || Math.max(1, Number(wert('--durchlaeufe', vergleichsBasis?.durchlaeufe || 1)) || 1);
 const nurFall = wert('--fall', null);
 const parallel = Math.max(1, Number(wert('--parallel', 3)) || 3);
 const apiKey = process.env.OPENAI_API_KEY || '';
@@ -130,6 +144,28 @@ if (kalibrieren) {
   }
   await kalibrierung();
   process.exit(0);
+}
+if (labelDatei) {
+  if (mitPruefer && !apiKey) {
+    console.error('OPENAI_API_KEY fehlt.');
+    process.exit(1);
+  }
+  process.exit(await labelRegression(labelDatei));
+}
+if (vergleichsBasis) {
+  // Vor den kostenpflichtigen Aufrufen prüfen, was das Gate sonst erst am
+  // Ende ablehnen würde.
+  const hindernisse = [];
+  if (!mitPruefer && !gespeichert) hindernisse.push('Der Vergleich braucht Prüferurteile: --mit-pruefer');
+  if (nurFall) hindernisse.push('Der Vergleich gilt nur für alle Fälle, nicht mit --fall');
+  if (durchlaeufe !== vergleichsBasis.durchlaeufe) hindernisse.push(`Die Baseline hat ${vergleichsBasis.durchlaeufe} Durchläufe je Fall, dieser Lauf ${durchlaeufe}`);
+  if (!gespeichert && vectorStoreId !== (vergleichsBasis.reproduktion?.vectorStoreId ?? null)) hindernisse.push(`Seminarwissen passt nicht zur Baseline: Baseline ${vergleichsBasis.reproduktion?.vectorStoreId || 'ohne'}, dieser Lauf ${vectorStoreId || 'ohne'} – COACH_VECTOR_STORE_ID setzen`);
+  const labels = await labelNachweis();
+  if (!labels.gueltig) hindernisse.push(`Label-Regression fehlt oder ungültig: ${labels.gruende.join('; ')}\nZuerst: npm run eval:coach -- --labels scripts/coach-evals/labels/<datei>.json`);
+  if (hindernisse.length) {
+    console.error(`Vergleich nicht möglich:\n- ${hindernisse.join('\n- ')}`);
+    process.exit(1);
+  }
 }
 if (!apiKey && (!gespeichert || mitPruefer)) {
   console.error('OPENAI_API_KEY fehlt. Für einen Lauf ohne API: --trocken');
@@ -417,6 +453,25 @@ const zeilen = [
   'Die vollständigen Antworten, Suchanfragen und gefundenen Seminarquellen stehen in der gleichnamigen JSON-Datei.',
 ];
 
+const vergleich = vergleichsBasis
+  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis() })
+  : null;
+if (vergleich) {
+  kopf.vergleich = { baseline: vergleichDatei, ...vergleich };
+  zeilen.push(
+    '',
+    `## Vergleichs-Gate gegen ${vergleichDatei}: ${vergleich.bestanden ? '**BESTANDEN**' : '**NICHT BESTANDEN**'}`,
+    '',
+    `Gesamt ${vergleich.gesamt.neu}/${vergleich.gesamt.von}, Baseline ${vergleich.gesamt.baseline}/${vergleichsBasis.laeufe.length}`,
+    '',
+    '| Fall | Baseline | Neu | Harte Prüfungen öfter gescheitert |',
+    '|---|---|---|---|',
+    ...vergleich.jeFall.map((eintrag) => `| ${eintrag.fall} | ${eintrag.alt} | ${eintrag.neu} | ${eintrag.regressionen.join('; ').replaceAll('|', '/') || '–'} |`),
+    ...(vergleich.gruende.length ? ['', ...vergleich.gruende.map((grund) => `- ${grund}`)] : []),
+    ...(vergleich.hinweise.length ? ['', ...vergleich.hinweise.map((hinweis) => `- Hinweis: ${hinweis}`)] : []),
+  );
+}
+
 const ordner = new URL('./results/', import.meta.url);
 await mkdir(ordner, { recursive: true });
 const name = `${kopf.zeitpunkt.replaceAll(':', '-').slice(0, 19)}-${variante}${kopf.neubewertung ? '-neubewertet' : ''}${kopf.pruefer ? '-pruefer' : ''}`;
@@ -437,7 +492,9 @@ if (alsBaseline && kopf.pruefer && !kopf.pruefer.vertrauenswuerdig) {
   console.log(`Als Baseline gesichert: scripts/coach-evals/baseline/${baselineName}.md`);
 }
 // 2 = Prüfer eingesetzt, aber nicht vertrauenswürdig: Ergebnis ungültig als Gate.
-process.exit(kopf.pruefer && !kopf.pruefer.vertrauenswuerdig ? 2 : (bestandenGesamt === laeufe.length ? 0 : 1));
+// Mit --vergleiche entscheidet das Gate, sonst ob alle Läufe bestanden haben.
+const erfolgreich = vergleich ? vergleich.bestanden : bestandenGesamt === laeufe.length;
+process.exit(kopf.pruefer && !kopf.pruefer.vertrauenswuerdig ? 2 : (erfolgreich ? 0 : 1));
 
 // Prüft ohne API, ob Fälle, Anfragen und Prüfungen in sich stimmen - und ob
 // die Prüfungen Verstöße tatsächlich erkennen.
@@ -671,18 +728,19 @@ async function trockenlauf() {
   if (!hinweis?.weich || hinweis.bestanden || !zahlFehler.bestanden) fehler.push('Gegenprobe: Zahl ohne Messgröße wird nicht als weicher Hinweis gemeldet');
 
   trockenlaufPruefer(fehler);
+  const gateProben = await trockenlaufGate(fehler);
+  const promptProben = trockenlaufPrompt(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
     process.exit(1);
   }
-  const gleich = FAELLE.every((fall) => JSON.stringify(VARIANTEN.legacy({ fall, vectorStoreId: 'vs' }))
-    === JSON.stringify(VARIANTEN.produktion({ fall, vectorStoreId: 'vs' })));
   console.log([
     `Trockenlauf in Ordnung: ${faelle.length} Fälle, Anfragen beider Varianten vollständig.`,
     `Gegenproben: ${erwarteteTreffer.length} Verstöße erkannt, Zahlenprüfung ${zahlenFaelle.length}/${zahlenFaelle.length}, Zahlenbindung ${bindungsFaelle.length}/${bindungsFaelle.length}, ${echteSaetze.length} echte Baseline-Sätze, ${verneinung.length} Verneinungsfälle, Hinweis ohne Messgröße – alles richtig.`,
     `Modell-Prüfer: ${Object.keys(KRITERIEN).length} Kriterien, ${KALIBRIERUNG.length} Kalibrierungssätze verknüpft, Beleg- und Verrechnungsproben richtig.`,
-    `legacy und produktion sind ${gleich ? 'identisch (erwartet vor Schritt 2)' : 'VERSCHIEDEN'}.`,
+    `Labels und Gate: ${gateProben.labelDateien} Label-Datei(en) stimmig, ${gateProben.labelFehler} Label-Fehler und ${gateProben.gate} Gate-Szenarien richtig erkannt.`,
+    `Prompt: freier Coach neu (${promptProben.hash}), ${promptProben.bereiche} andere Bereiche unverändert wie legacy, Anfrage sonst gleich, ${promptProben.regeln} Regeln zum Prompt richtig.`,
   ].join('\n'));
 }
 
@@ -796,6 +854,338 @@ async function kalibrierung() {
   }
   console.log(`\n${zeilen.join('\n')}\n\nGespeichert: scripts/coach-evals/results/${name}.md`);
   process.exit(freigabe ? 0 : 1);
+}
+
+// Label-Regression: Stimmt der aktuelle Prüfer an vollständigen Antworten
+// noch mit den menschlich bestätigten Labels überein? Getrennt von der
+// Satz-Kalibrierung, weil hier ganze Antworten bewertet werden. Ohne
+// --mit-pruefer werden die gespeicherten Urteile aus prueferUrteileAus
+// verwendet (kostenlos), mit --mit-pruefer neu geholt.
+// Rückgabe: Exit-Code (0 bestanden, 1 Abweichung, 2 Prüfer nicht vertrauenswürdig).
+async function labelRegression(datei) {
+  const labelText = await readFile(datei, 'utf8');
+  const labels = JSON.parse(labelText);
+  const quellText = await readFile(labels.antwortenAus?.datei || '', 'utf8');
+  const quelle = JSON.parse(quellText);
+  const fehler = pruefeLabelStruktur({ labels, quelle, quellText, faelle: FAELLE });
+
+  const damals = quelle.reproduktion?.datenHashes;
+  const heute = datenFingerabdruecke();
+  const betroffen = [...new Set([...labels.semantisch || [], ...labels.confidence || []].map((eintrag) => eintrag.fall))];
+  if (!damals) fehler.push('Die Antwortdatei enthält keine Fingerabdrücke der Testdaten');
+  else if (betroffen.some((id) => damals[id] !== heute[id])) fehler.push(`Testdaten geändert seit den Antworten: ${betroffen.filter((id) => damals[id] !== heute[id]).join(', ')}`);
+
+  const fingerabdruck = prueferFingerabdruck();
+  const kalibrierNachweis = await gespeicherteKalibrierung();
+  const kalibriert = kalibrierungGueltig(kalibrierNachweis, { fingerabdruck, kalibrierungHash: kalibrierungHash() });
+  const benoetigt = [...new Set((labels.semantisch || []).map((eintrag) => `${eintrag.fall}|${eintrag.lauf}`))]
+    .map((schluessel) => quelle.laeufe.find((lauf) => `${lauf.fall}|${lauf.lauf}` === schluessel))
+    .filter((lauf) => lauf?.antwort);
+
+  let runden = [];
+  let urteileAus;
+  if (mitPruefer) {
+    if (!kalibriert) fehler.push(`Kein gültiger Kalibrierungsnachweis für Prüfer ${fingerabdruck} – zuerst --kalibrieren`);
+    else {
+      const anzahl = Math.max(1, Number(wert('--durchlaeufe', MIN_KALIBRIER_DURCHLAEUFE)) || MIN_KALIBRIER_DURCHLAEUFE);
+      console.log(`Label-Regression: ${benoetigt.length} Antworten × ${anzahl} Durchläufe, Prüfer ${PRUEFER_EINSTELLUNGEN.modell} …`);
+      for (let runde = 0; runde < anzahl; runde += 1) {
+        runden.push(await abarbeiten(benoetigt, async (lauf) => {
+          const fall = FAELLE.find((kandidat) => kandidat.id === lauf.fall);
+          try {
+            const { urteile, nachweis } = await pruefeSemantisch({ frage: fall.frage, antwort: lauf.antwort, eintraege: kriterienFuer(fall), apiKey });
+            return { fall: lauf.fall, lauf: lauf.lauf, modellUrteile: urteile, prueferNachweis: { ...nachweis, fingerabdruck, kriterienHash: kriterienFingerabdruck(kriterienFuer(fall)) } };
+          } catch (fehlerAufruf) {
+            return { fall: lauf.fall, lauf: lauf.lauf, modellUrteile: [], prueferNachweis: { fehler: fehlerAufruf.message } };
+          }
+        }));
+      }
+      urteileAus = 'neu geholt';
+    }
+  } else {
+    urteileAus = labels.prueferUrteileAus?.datei;
+    const urteilsDatei = JSON.parse(await readFile(urteileAus || '', 'utf8'));
+    if (urteilsDatei.pruefer?.fingerabdruck !== fingerabdruck) fehler.push(`Gespeicherte Urteile stammen von Prüfer ${urteilsDatei.pruefer?.fingerabdruck}, aktuell ${fingerabdruck} – neu holen mit --mit-pruefer`);
+    const gespeicherteLaeufe = benoetigt.map((lauf) => {
+      const eintrag = urteilsDatei.laeufe.find((kandidat) => kandidat.fall === lauf.fall && kandidat.lauf === lauf.lauf);
+      if (!eintrag?.antwort || antwortHash(eintrag.antwort) !== antwortHash(lauf.antwort)) fehler.push(`${lauf.fall} #${lauf.lauf}: gespeicherte Urteile gehören zu einer anderen Antwort`);
+      return eintrag;
+    }).filter(Boolean);
+    const veraltet = veralteteUrteile(gespeicherteLaeufe, FAELLE);
+    if (veraltet.length) fehler.push(`Gespeicherte Urteile veraltet: ${veraltet.join(', ')}`);
+    runden = [gespeicherteLaeufe];
+  }
+
+  const vertrauen = prueferVertrauen({ kalibriert, kalibrierteModelle: kalibrierNachweis?.tatsaechlicheModelle || [], laeufe: runden.flat() });
+  if (!vertrauen.vertrauenswuerdig) fehler.push(`Prüfer nicht vertrauenswürdig: ${vertrauen.gruende.join('; ')}`);
+  runden.forEach((runde, index) => {
+    const urteile = new Map(runde.map((lauf) => [`${lauf.fall}|${lauf.lauf}`, lauf.modellUrteile]));
+    for (const abweichung of vergleicheLabels(labels, urteile)) fehler.push(`${runden.length > 1 ? `Durchlauf ${index + 1}: ` : ''}${abweichung}`);
+  });
+
+  const kopfzeile = `${(labels.semantisch || []).length} semantische Labels an ${benoetigt.length} Antworten, ${(labels.confidence || []).length} confidence-Labels, Prüfer ${fingerabdruck}, Urteile ${urteileAus === 'neu geholt' ? `neu geholt (${runden.length} Durchläufe)` : `aus ${urteileAus}`}`;
+  if (fehler.length) {
+    console.error(`Label-Regression NICHT bestanden: ${datei}\n${kopfzeile}\n- ${fehler.join('\n- ')}`);
+    return vertrauen.vertrauenswuerdig ? 1 : 2;
+  }
+  // Nachweis für das Vergleichs-Gate: gilt nur für genau diese Labels und
+  // genau diesen Prüfer.
+  const nachweis = {
+    zeitpunkt: new Date().toISOString(),
+    bestanden: true,
+    labelsDatei: datei,
+    labelsHash: sha(labelText),
+    quellHash: labels.antwortenAus.quellHash,
+    fingerabdruck,
+    modelle: vertrauen.modelle,
+    urteileAus,
+    durchlaeufe: runden.length,
+    semantisch: labels.semantisch.length,
+    confidence: (labels.confidence || []).length,
+    git: gitStand(),
+  };
+  await mkdir(new URL('./labels/geprueft/', import.meta.url), { recursive: true });
+  await writeFile(labelNachweisDatei(basename(datei)), `${JSON.stringify(nachweis, null, 2)}\n`);
+  console.log(`Label-Regression bestanden: ${datei}\n${kopfzeile}\nNachweis: scripts/coach-evals/labels/geprueft/${basename(labelNachweisDatei(basename(datei)).pathname)}`);
+  return 0;
+}
+
+// Funktionsdeklaration statt Konstante: wird schon vor dieser Zeile aufgerufen.
+function labelNachweisDatei(name) {
+  return new URL(`./labels/geprueft/${name.replace(/\.json$/, '')}-${prueferFingerabdruck()}.json`, import.meta.url);
+}
+
+// Gilt eine bestandene Label-Regression für alle Label-Dateien, genau in
+// ihrem aktuellen Inhalt und für den aktuellen Prüfer?
+async function labelNachweis() {
+  const ordner = new URL('./labels/', import.meta.url);
+  const namen = (await readdir(ordner)).filter((name) => name.endsWith('.json'));
+  const gruende = namen.length ? [] : ['keine Label-Dateien'];
+  for (const name of namen) {
+    const datei = labelNachweisDatei(name);
+    if (!existsSync(datei)) {
+      gruende.push(`${name}: keine Label-Regression für Prüfer ${prueferFingerabdruck()}`);
+      continue;
+    }
+    const nachweis = JSON.parse(await readFile(datei, 'utf8'));
+    const text = await readFile(new URL(name, ordner), 'utf8');
+    if (nachweis.bestanden !== true || nachweis.fingerabdruck !== prueferFingerabdruck() || nachweis.labelsHash !== sha(text)) {
+      gruende.push(`${name}: Nachweis passt nicht zu den aktuellen Labels oder zum Prüfer`);
+    }
+  }
+  return { gueltig: gruende.length === 0, gruende };
+}
+
+// Prüft den Prompt ohne API: Neu ist nur der freie Coach, und dort nur Prompt
+// und Eingabe. Alles andere muss dem eingefrorenen Stand entsprechen, sonst
+// misst der Vergleich mit der Baseline mehr als den Prompt.
+function trockenlaufPrompt(fehler) {
+  const fall = FAELLE[0];
+  const anfrage = (modul, scope, webResearch) => modul.coachRequestBody({ scope, question: fall.frage, snapshot: fall.daten, webResearch, vectorStoreId: 'vs_trocken' });
+  const andere = ['overall', 'sleep', 'comp', 'skinfold'];
+  for (const scope of andere) {
+    for (const webResearch of [false, true]) {
+      if (JSON.stringify(anfrage(produktion, scope, webResearch)) !== JSON.stringify(anfrage(legacy, scope, webResearch))) {
+        fehler.push(`Prompt: Bereich ${scope}${webResearch ? ' mit Websuche' : ''} weicht vom eingefrorenen Stand ab`);
+      }
+    }
+  }
+  let regeln = 0;
+  const regel = (bedingung, meldung) => {
+    regeln += 1;
+    if (!bedingung) fehler.push(`Prompt: ${meldung}`);
+  };
+  for (const webResearch of [false, true]) {
+    const neu = anfrage(produktion, 'coach', webResearch);
+    const alt = anfrage(legacy, 'coach', webResearch);
+    const ohne = ({ instructions, input, ...rest }) => rest;
+    regel(JSON.stringify(ohne(neu)) === JSON.stringify(ohne(alt)), `freier Coach${webResearch ? ' mit Websuche' : ''}: Modell, Einstellungen, Werkzeuge oder Schema weichen ab`);
+    regel(neu.instructions !== alt.instructions, 'freier Coach hat noch den alten Prompt');
+    regel(neu.instructions.includes(webResearch ? 'Web search is enabled' : 'Web search is not available'), `Websuche ${webResearch ? 'an' : 'aus'} nicht im Prompt abgebildet`);
+    const inhalt = neu.input[0].content;
+    const daten = inhalt.indexOf('<capboy_data>');
+    const frage = inhalt.indexOf('<user_question>');
+    regel(daten === 0 && frage > daten && inhalt.includes(`\n${JSON.stringify(fall.daten)}\n</capboy_data>`) && inhalt.endsWith(`\n${fall.frage}\n</user_question>`), 'Eingabe nicht als <capboy_data> vor <user_question>');
+  }
+  const prompt = produktion.coachSystemPrompt('coach', false);
+  // Der Prompt beschreibt nur Blöcke, die das Backend tatsächlich befüllt.
+  for (const block of ['<allowed_actions>', '<limits>', '<profile_memory>', '<timeseries>', '<intervention_log>', '<conversation>', '<comp_facts>']) {
+    regel(!prompt.includes(block), `beschreibt den nicht befüllten Block ${block}`);
+  }
+  // confidence muss genau die Werte des Schemas definieren.
+  for (const stufe of produktion.resultSchema.properties.confidence.enum) regel(prompt.includes(`- "${stufe}":`), `definiert confidence "${stufe}" nicht`);
+  // Kein Unterrichten auf die Testfälle: keine Fallfrage und keine
+  // fallspezifischen Begriffe im Prompt.
+  for (const kandidat of FAELLE) regel(!prompt.includes(kandidat.frage), `enthält die Frage des Falls ${kandidat.id}`);
+  for (const begriff of ['cortisol', 'clenbuterol', 'yohimbin', '1500', '1100', '10 kg']) regel(!prompt.toLowerCase().includes(begriff), `enthält den fallspezifischen Begriff "${begriff}"`);
+  return { hash: sha(prompt), bereiche: andere.length, regeln };
+}
+
+// Prüft Label-Regression und Vergleichs-Gate ohne API: die echten Label-
+// Dateien müssen zu ihren Antworten passen, und jede Art von Fehler muss
+// erkannt werden.
+async function trockenlaufGate(fehler) {
+  const ordner = new URL('./labels/', import.meta.url);
+  const namen = (await readdir(ordner)).filter((name) => name.endsWith('.json'));
+  if (!namen.length) fehler.push('Labels: keine Label-Datei');
+  const geladen = [];
+  for (const name of namen) {
+    const labels = JSON.parse(await readFile(new URL(name, ordner), 'utf8'));
+    const quellText = await readFile(labels.antwortenAus.datei, 'utf8');
+    const quelle = JSON.parse(quellText);
+    const befund = pruefeLabelStruktur({ labels, quelle, quellText, faelle: FAELLE });
+    if (befund.length) fehler.push(`Labels ${name}: ${befund.join('; ')}`);
+    geladen.push({ labels, quelle, quellText });
+  }
+  if (!geladen.length) return { labelDateien: 0, labelFehler: 0, gate: 0 };
+
+  // Jede Verfälschung einer gültigen Label-Datei muss auffallen.
+  const { labels, quelle, quellText } = geladen[0];
+  const erster = labels.semantisch[0];
+  const fremdesKriterium = Object.keys(KRITERIEN).find((kriterium) => !kriterienFuer(FAELLE.find((fall) => fall.id === erster.fall)).some((eintrag) => eintrag.kriterium === kriterium));
+  const verfaelschungen = [
+    ['falscher Antwort-Hash', (kopie) => { kopie.semantisch[0].antwortHash = '0000000000000000'; }],
+    ['doppeltes Label', (kopie) => { kopie.semantisch.push({ ...kopie.semantisch[0] }); }],
+    ['unbekanntes Kriterium', (kopie) => { kopie.semantisch[0].kriterium = 'gibt_es_nicht'; }],
+    ['Kriterium gilt nicht für den Fall', (kopie) => { kopie.semantisch[0].kriterium = fremdesKriterium; }],
+    ['verwaister Fall', (kopie) => { kopie.semantisch[0].fall = 'gibt-es-nicht'; }],
+    ['verwaister Lauf', (kopie) => { kopie.semantisch[0].lauf = 99; }],
+    ['Label "unklar"', (kopie) => { kopie.semantisch[0].label = 'unklar'; }],
+    ['fehlendes Feld', (kopie) => { delete kopie.semantisch[0].antwortHash; }],
+    ['keine semantischen Labels', (kopie) => { kopie.semantisch = []; }],
+    ['falscher Quell-Hash', (kopie) => { kopie.antwortenAus.quellHash = '0000000000000000'; }],
+    ['falsche Schema-Version', (kopie) => { kopie.schemaVersion = 2; }],
+    ...(labels.confidence?.length ? [
+      ['falscher confidence-Wert', (kopie) => { kopie.confidence[0].wert = kopie.confidence[0].wert === 'mittel' ? 'hoch' : 'mittel'; }],
+      ['falsche Angemessenheit', (kopie) => { kopie.confidence[0].angemessen = !kopie.confidence[0].angemessen; }],
+      ['doppeltes confidence-Label', (kopie) => { kopie.confidence.push({ ...kopie.confidence[0] }); }],
+      ['verwaistes confidence-Label', (kopie) => { kopie.confidence[0].lauf = 99; }],
+    ] : []),
+  ];
+  for (const [beschreibung, verfaelsche] of verfaelschungen) {
+    const kopie = structuredClone(labels);
+    verfaelsche(kopie);
+    if (!pruefeLabelStruktur({ labels: kopie, quelle, quellText, faelle: FAELLE }).length) fehler.push(`Labels: „${beschreibung}“ nicht erkannt`);
+  }
+  if (!pruefeLabelStruktur({ labels, quelle, quellText: `${quellText} `, faelle: FAELLE }).length) fehler.push('Labels: geänderte Antwortdatei nicht erkannt');
+
+  // Vergleich mit Prüferurteilen: übereinstimmend, widersprechend, unklar, fehlend.
+  const urteileAus = (abwandeln = (liste) => liste) => {
+    const karte = new Map();
+    for (const eintrag of labels.semantisch) {
+      const schluessel = `${eintrag.fall}|${eintrag.lauf}`;
+      karte.set(schluessel, [...(karte.get(schluessel) || []), { kriterium: eintrag.kriterium, urteil: eintrag.label }]);
+    }
+    const schluessel = `${erster.fall}|${erster.lauf}`;
+    karte.set(schluessel, abwandeln(karte.get(schluessel)));
+    return karte;
+  };
+  const zuErstem = (urteil) => (liste) => liste.map((eintrag) => (eintrag.kriterium === erster.kriterium ? { ...eintrag, urteil } : eintrag));
+  if (vergleicheLabels(labels, urteileAus()).length) fehler.push('Labels: übereinstimmende Urteile als Abweichung gemeldet');
+  for (const [beschreibung, karte] of [
+    ['widersprechendes Urteil', urteileAus(zuErstem(erster.label === 'ja' ? 'nein' : 'ja'))],
+    ['unklares Urteil', urteileAus(zuErstem('unklar'))],
+    ['fehlendes Urteil', urteileAus((liste) => liste.filter((eintrag) => eintrag.kriterium !== erster.kriterium))],
+  ]) {
+    if (vergleicheLabels(labels, karte).length !== 1) fehler.push(`Labels: ${beschreibung} nicht genau einmal gemeldet`);
+  }
+
+  // Vergleichs-Gate an der echten Baseline.
+  const baseline = JSON.parse(await readFile(new URL('./baseline/legacy-pruefer.json', import.meta.url), 'utf8'));
+  if (baseline.reproduktion?.faelleHash !== faelleFingerabdruck()) fehler.push('Gate: baseline/legacy-pruefer.json passt nicht mehr zu den aktuellen Fällen – Baseline neu bewerten');
+  if (JSON.stringify(baseline.reproduktion?.datenHashes) !== JSON.stringify(datenFingerabdruecke())) fehler.push('Gate: baseline/legacy-pruefer.json passt nicht mehr zu den aktuellen Testdaten');
+  const gueltigeLabels = { gueltig: true, gruende: [] };
+  const gate = (abwandeln, labelNachweis = gueltigeLabels) => {
+    const neu = structuredClone(baseline);
+    abwandeln(neu);
+    return vergleicheMitBaseline({ baseline, neu, labelNachweis });
+  };
+  const lauf = (datei, bedingung) => datei.laeufe.find(bedingung);
+  const bestandenIn = (fall) => (kandidat) => kandidat.fall === fall && kandidat.bestanden;
+  const gescheitert = (kandidat) => !kandidat.bestanden && kandidat.antwort;
+  // Ein bestandener Lauf scheitert an einer harten Prüfung, ein gescheiterter
+  // besteht plötzlich.
+  const verschlechtere = (eintrag) => {
+    eintrag.bestanden = false;
+    eintrag.pruefungen.find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen').bestanden = false;
+  };
+  const verbessere = (eintrag) => {
+    eintrag.bestanden = true;
+    for (const pruefung of eintrag.pruefungen) pruefung.bestanden = true;
+  };
+  const schwacherFall = lauf(baseline, gescheitert).fall;
+  const starkerFall = baseline.laeufe.find((kandidat) => kandidat.fall !== schwacherFall && baseline.laeufe.filter((andere) => andere.fall === kandidat.fall).every((andere) => andere.bestanden)).fall;
+  const szenarien = [
+    ['unverändert', () => {}, true],
+    ['ein gescheiterter Lauf besteht jetzt', (neu) => verbessere(lauf(neu, gescheitert)), true],
+    ['ein Fall schlechter', (neu) => verschlechtere(lauf(neu, bestandenIn(starkerFall))), false],
+    ['Summe gleich, aber ein Fall schlechter', (neu) => { verbessere(lauf(neu, gescheitert)); verschlechtere(lauf(neu, bestandenIn(starkerFall))); }, false],
+    ['neue harte Fehlprüfung bei gleicher Punktzahl', (neu) => { lauf(neu, gescheitert).pruefungen.find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen').bestanden = false; }, false],
+    ['Lauf abgebrochen', (neu) => { Object.assign(lauf(neu, gescheitert), { antwort: null, pruefungen: [], modellUrteile: undefined, fehler: 'Zeitüberschreitung' }); }, false],
+    ['Lauf fehlt', (neu) => { neu.laeufe = neu.laeufe.filter((kandidat) => kandidat !== lauf(neu, gescheitert)); }, false],
+    ['zusätzlicher Fall', (neu) => { neu.laeufe.push({ ...structuredClone(neu.laeufe[0]), fall: 'neuer-fall' }); }, false],
+    ['unklares Prüferurteil', (neu) => { lauf(neu, (kandidat) => kandidat.modellUrteile?.length).modellUrteile[0].urteil = 'unklar'; }, false],
+    ['Prüfer nicht vertrauenswürdig', (neu) => { neu.pruefer.vertrauenswuerdig = false; neu.pruefer.gruende = ['keine gültige Kalibrierung']; }, false],
+    ['ohne Prüfer', (neu) => { neu.pruefer = null; }, false],
+    ['anderer Prüfer', (neu) => { neu.pruefer.fingerabdruck = 'alt'; }, false],
+    ['andere Fälle', (neu) => { neu.reproduktion.faelleHash = 'alt'; }, false],
+    ['andere Testdaten', (neu) => { neu.reproduktion.datenHashes = { ...neu.reproduktion.datenHashes, [starkerFall]: 'alt' }; }, false],
+    ['Testdaten nicht nachweisbar', (neu) => { neu.reproduktion.datenVerifiziert = false; }, false],
+    ['anderes Coach-Modell', (neu) => { neu.reproduktion.angefragtesModell = 'anderes-modell'; }, false],
+    ['andere Einstellungen', (neu) => { neu.reproduktion.einstellungen = { ...neu.reproduktion.einstellungen, max_output_tokens: 1 }; }, false],
+    ['anderes Antwortschema', (neu) => { neu.reproduktion.schemaHash = 'alt'; }, false],
+    ['ohne Seminarwissen', (neu) => { neu.reproduktion.vectorStoreId = null; }, false],
+    ['anderer Wissensstand', (neu) => { neu.reproduktion.wissensstand = 'alt'; }, false],
+    ['anderer ausgelieferter Modellstand (nur Hinweis)', (neu) => { neu.reproduktion.tatsaechlicheModelle = ['gpt-6-sol-neu']; }, true],
+  ];
+  for (const [beschreibung, abwandeln, soll] of szenarien) {
+    const ergebnis = gate(abwandeln);
+    if (ergebnis.bestanden !== soll) fehler.push(`Gate: „${beschreibung}“ sollte ${soll ? 'bestehen' : 'scheitern'}${ergebnis.gruende.length ? ` (${ergebnis.gruende.join('; ')})` : ''}`);
+  }
+  // Bedingung 1 folgt aus 2 (kein Fall schlechter, also auch keine
+  // schlechtere Summe), muss aber als eigener Grund erscheinen.
+  if (!gate((neu) => verschlechtere(lauf(neu, bestandenIn(starkerFall)))).gruende.some((grund) => grund.startsWith('Gesamt'))) {
+    fehler.push('Gate: gesunkene Gesamtsumme wird nicht als Grund genannt');
+  }
+  const fallSchlechter = (gruende, fall) => gruende.some((grund) => grund.startsWith(`${fall}: `) && grund.includes('schlechter als Baseline'));
+  const nurFallGrund = gate((neu) => { verbessere(lauf(neu, gescheitert)); verschlechtere(lauf(neu, bestandenIn(starkerFall))); }).gruende;
+  if (nurFallGrund.some((grund) => grund.startsWith('Gesamt')) || !fallSchlechter(nurFallGrund, starkerFall)) {
+    fehler.push('Gate: Bei gleicher Summe muss die Verschlechterung des Falls als Grund genannt werden');
+  }
+  // Bedingung 2 unabhängig von 3: Die Fehlschläge verteilen sich nur anders,
+  // keine Prüfung scheitert öfter, der Fall hat aber weniger bestandene Läufe.
+  const gemischt = [...new Set(baseline.laeufe.map((kandidat) => kandidat.fall))].find((fall) => {
+    const eigene = baseline.laeufe.filter((kandidat) => kandidat.fall === fall);
+    return eigene.filter(gescheitert).length === 1 && eigene.filter((kandidat) => kandidat.bestanden).length >= 2;
+  });
+  if (!gemischt) fehler.push('Gate: kein Fall mit genau einem gescheiterten Lauf für die Verteilungsprobe');
+  else {
+    const scheitere = (eintrag, name) => {
+      eintrag.bestanden = false;
+      eintrag.pruefungen.find((pruefung) => pruefung.name === name).bestanden = false;
+    };
+    const teile = (datei) => [
+      lauf(datei, (kandidat) => kandidat.fall === gemischt && gescheitert(kandidat)),
+      ...datei.laeufe.filter(bestandenIn(gemischt)).slice(0, 2),
+    ];
+    const vorher = structuredClone(baseline);
+    const [kaputt] = teile(vorher);
+    const ersterFehler = kaputt.pruefungen.find((pruefung) => !pruefung.weich && !pruefung.bestanden).name;
+    const zweiterFehler = kaputt.pruefungen.find((pruefung) => !pruefung.weich && pruefung.bestanden && !pruefung.name.startsWith('Prüfer')).name;
+    scheitere(kaputt, zweiterFehler);
+    const nachher = structuredClone(vorher);
+    const [geheilt, heil1, heil2] = teile(nachher);
+    verbessere(geheilt);
+    scheitere(heil1, ersterFehler);
+    scheitere(heil2, zweiterFehler);
+    const verteilt = vergleicheMitBaseline({ baseline: vorher, neu: nachher, labelNachweis: gueltigeLabels });
+    if (verteilt.bestanden || !fallSchlechter(verteilt.gruende, gemischt) || verteilt.gruende.some((grund) => grund.includes('öfter'))) {
+      fehler.push(`Gate: umverteilte Fehlschläge mit weniger bestandenen Läufen nicht allein über den Fall erkannt (${verteilt.gruende.join('; ')})`);
+    }
+  }
+  if (gate(() => {}, { gueltig: false, gruende: ['keine Label-Regression'] }).bestanden) fehler.push('Gate: ohne Label-Regression darf es nicht bestehen');
+  if (!gate((neu) => { neu.reproduktion.tatsaechlicheModelle = ['gpt-6-sol-neu']; }).hinweise.length) fehler.push('Gate: anderer ausgelieferter Modellstand wird nicht vermerkt');
+  return { labelDateien: geladen.length, labelFehler: verfaelschungen.length + 4, gate: szenarien.length + 5 };
 }
 
 // Prüft die Prüferlogik ohne API: Verweise, Anfrageaufbau, Belegprüfung und

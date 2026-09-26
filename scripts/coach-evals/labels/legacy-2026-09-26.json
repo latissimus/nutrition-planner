@@ -1,11 +1,14 @@
 {
+  "schemaVersion": 1,
+  "hashAlgorithmus": "antwortHash = sha256(JSON.stringify(antwort)), erste 16 Hex-Zeichen; quellHash = sha256 des Dateiinhalts, erste 16 Hex-Zeichen",
   "zweck": "Menschliche Bestätigung der semantischen Urteile an vollständigen Antworten des Legacy-Baseline-Laufs.",
   "bestaetigtVon": "latissimus (Projektinhaber)",
   "bestaetigtAm": "2026-09-26",
   "antwortenAus": {
     "datei": "scripts/coach-evals/baseline/legacy.json",
     "zeitpunkt": "2026-09-26T10:46:48.917Z",
-    "git": "3d89c44"
+    "git": "3d89c44",
+    "quellHash": "c01527dee17e94ad"
   },
   "prueferUrteileAus": {
     "datei": "scripts/coach-evals/baseline/legacy-pruefer.json",
