@@ -174,10 +174,12 @@ const MESSGROESSEN = [
   [/\balter\b|jahre alt/i, /\.age$/],
   [/gewicht|wiegst|waage/i, /\.currentWeightKg$|\.weightTrendPercent$/],
   [/(kalorien)?ziel|vorgabe|zielwert/i, /\.calorieTarget$/],
-  // Nur eindeutige Begriffe: Ein Sammelwort wie "im Schnitt" würde Kalorien
-  // und alle Makros zugleich belegen, und "Protein im Schnitt 80 g" ginge
-  // durch, weil das Fett 80 g beträgt.
+  // Zufuhr-Begriffe binden nur die Kalorien; Makros haben eigene Begriffe.
   [/(kalorien|energie)?zufuhr|(kalorien|energie)?aufnahme|kalorien(?!ziel)|gegessen|aufgenommen|\bisst\b/i, /\.averageKcal$/],
+  // "Durchschnitt" bindet nur dort, wo es eindeutig ist: Kalorien und
+  // Schlafdauer. Makros und Skalen haben je mehrere Durchschnittsfelder;
+  // dort würde "Protein im Schnitt 80 g" sonst durch das Fett belegt.
+  [/\b(im )?(durch)?schnitt(lich\w*)?\b/i, /\.averageKcal$|\.averageDurationMinutes$/],
   [/protein|eiweiß/i, /\.averageProteinG$/],
   [/kohlenhydrat|\bkh\b/i, /\.averageCarbsG$/],
   [/(?<![a-zäöü])fett(?![a-zäöü])/i, /\.averageFatG$/],
@@ -211,11 +213,44 @@ const MESSGROESSEN = [
 // 8 %" an die Leistung und nicht an die Übungen, die keine Prozentangabe haben.
 // Ein genanntes Verhältnis hat Vorrang vor den Faltennamen darin.
 const BINDEWORT = /^(und|oder|sowie|bei|von|vom|mit|gegenüber|im|in|pro|je|als|zu|zum|zur|seit|über|unter|für)$/i;
+// Satzteil-Grenzen sind ; und ein Komma, das NICHT vor einer Ziffer steht -
+// das Komma in "91,0" ist ein Dezimalkomma. Klammern trennen bewusst nicht:
+// In "Gewicht 91 kg (+1,4 %)" gehört die Klammer zum Gewicht.
+function satzteilAnfang(satz, position) {
+  for (let index = position - 1; index >= 0; index -= 1) {
+    if (satz[index] === ';' || (satz[index] === ',' && !/\d/.test(satz[index + 1] || ''))) return index + 1;
+  }
+  return 0;
+}
+
+// Alle Begriffe aus MESSGROESSEN in einem Textstück, nach Position, ohne
+// Überlappung (bei gleichem Anfang gewinnt der längere Treffer).
+function begriffeIn(text, versatz = 0) {
+  const treffer = MESSGROESSEN.flatMap(([muster, feldmuster]) => [...text.matchAll(new RegExp(muster.source, `${muster.flags.replace('g', '')}g`))]
+    .map((t) => ({ index: versatz + t.index, ende: versatz + t.index + t[0].length, feldmuster })));
+  treffer.sort((links, rechts) => links.index - rechts.index || rechts.ende - links.ende);
+  const ohneUeberlappung = [];
+  for (const eintrag of treffer) {
+    if (!ohneUeberlappung.length || eintrag.index >= ohneUeberlappung.at(-1).ende) ohneUeberlappung.push(eintrag);
+  }
+  return ohneUeberlappung;
+}
+
+// Findet die Messgröße, die eine Zahl meint - NUR im eigenen Satzteil:
+//   1. ein Begriff unmittelbar dahinter ("4 Hautfaltenmessungen") - höchstens
+//      drei Wörter weit und nie über ein Bindewort hinweg,
+//   2. sonst der nächste Begriff davor im selben Satzteil.
+// Genommen wird der erste Kandidat, zu dem ein Feld mit passender Einheit
+// existiert ("Die Leistung vergleichbarer Übungen sank um 8 %" bindet an die
+// Leistung, nicht an die Übungen). Über ein Komma hinweg wird nicht
+// gebunden: In "Kalorienziel 2400 kcal, der Durchschnitt 2400 kcal" gehört
+// die zweite Zahl nicht zum Ziel. Ohne Begriff im Satzteil bleibt die Zahl
+// ungebunden und wird nur nach Einheit geprüft - als prüfpflichtiger Hinweis.
 function messgroesse(eintrag, satz, felder) {
   const ende = eintrag.position + eintrag.laenge;
-  const rest = satz.slice(ende).search(/[,;()]/);
+  const rest = satz.slice(ende).search(/[;()]|,(?!\d)|[.!?](\s|$)/);
   const teilEnde = rest === -1 ? satz.length : ende + rest;
-  const teilAnfang = Math.max(0, ...[',', ';', '(', ')'].map((zeichen) => satz.lastIndexOf(zeichen, eintrag.position - 1) + 1));
+  const teilAnfang = satzteilAnfang(satz, eintrag.position);
   if (/verhältnis|quotient/i.test(satz.slice(teilAnfang, teilEnde))) return VERHAELTNIS;
 
   let naheDahinter = ende;
@@ -225,18 +260,43 @@ function messgroesse(eintrag, satz, felder) {
     if (satz.slice(ende, naheDahinter).trim().split(/\s+/).length >= 3) break;
   }
 
-  const kandidaten = [];
-  for (const [muster, feldmuster] of MESSGROESSEN) {
-    for (const treffer of satz.matchAll(new RegExp(muster.source, `${muster.flags.replace('g', '')}g`))) {
-      const trefferEnde = treffer.index + treffer[0].length;
-      if (treffer.index >= ende && treffer.index < naheDahinter) kandidaten.push({ rang: treffer.index - ende, feldmuster });
-      else if (trefferEnde <= eintrag.position) kandidaten.push({ rang: 1000 + (eintrag.position - trefferEnde), feldmuster });
-    }
-  }
-  kandidaten.sort((links, rechts) => links.rang - rechts.rang);
+  const kandidaten = begriffeIn(satz)
+    .filter((begriff) => (begriff.index >= ende && begriff.index < naheDahinter)
+      || (begriff.index >= teilAnfang && begriff.ende <= eintrag.position))
+    .map((begriff) => ({ ...begriff, rang: begriff.index >= ende ? begriff.index - ende : 1000 + (eintrag.position - begriff.ende) }))
+    .sort((links, rechts) => links.rang - rechts.rang);
   const tauglich = kandidaten.find(({ feldmuster }) => feldmuster === KEIN_FELD
     || felder.some((feld) => feldmuster.test(feld.pfad) && ERLAUBT[eintrag.einheit].includes(feld.einheit)));
   return tauglich?.feldmuster || null;
+}
+
+// "Schlafqualität und Erholung liegen bei 3,6 beziehungsweise 3,5": Hier
+// ordnet die Reihenfolge zu, nicht die Nähe. Zahlen, die durch
+// "beziehungsweise" verbunden sind, bekommen der Reihe nach die letzten
+// gleich vielen Begriffe vor der ersten Zahl im Satzteil. Reichen die
+// Begriffe nicht, bleiben die Zahlen ungebunden (Hinweis).
+// Rückgabe: Map eintrag -> feldmuster | null
+function zuordnungBeziehungsweise(satz, eintraege) {
+  const zuordnung = new Map();
+  let gruppe = [];
+  const abschliessen = () => {
+    if (gruppe.length >= 2) {
+      const erste = gruppe[0];
+      const begriffe = begriffeIn(satz.slice(satzteilAnfang(satz, erste.position), erste.position), satzteilAnfang(satz, erste.position))
+        .filter((begriff) => begriff.feldmuster !== VERHAELTNIS);
+      const passend = begriffe.length >= gruppe.length ? begriffe.slice(-gruppe.length) : null;
+      gruppe.forEach((eintrag, index) => zuordnung.set(eintrag, passend ? passend[index].feldmuster : null));
+    }
+    gruppe = [];
+  };
+  eintraege.forEach((eintrag, index) => {
+    if (!gruppe.length) gruppe.push(eintrag);
+    const naechster = eintraege[index + 1];
+    const zwischen = naechster ? satz.slice(eintrag.position + eintrag.laenge, naechster.position) : '';
+    if (naechster && /^\s*(\S+\s+)?(beziehungsweise|bzw\.?|respektive)\s+$/i.test(zwischen)) gruppe.push(naechster);
+    else abschliessen();
+  });
+  return zuordnung;
 }
 
 function feldEinheit(pfad) {
@@ -303,24 +363,22 @@ function aussage(eintrag, satz) {
 
 // Prüft eine Zahl gegen die Snapshot-Felder. Rückgabe: { grund, ungebunden }
 // mit grund = null, wenn die Zahl belegt ist.
-function pruefeZahl(eintrag, felder, satz) {
+function pruefeZahl(eintrag, felder, satz, vorgabe) {
   if ((FENSTER[eintrag.einheit] || []).includes(eintrag.zahl)) return { grund: null };
   // Obergrenze einer Skala: "3,6 von 5", "3,4/5", "7 von 10".
   if ([5, 10, 100].includes(eintrag.zahl) && /(\bvon|\/)\s*$/i.test(satz.slice(Math.max(0, eintrag.position - 5), eintrag.position))) {
     return { grund: null };
   }
-  let metrik = messgroesse(eintrag, satz, felder);
+  let metrik = vorgabe !== undefined ? vorgabe : messgroesse(eintrag, satz, felder);
   if (metrik === KEIN_FELD) {
     // Nur Prozentwerte und nackte Zahlen sind ein KFA. "Körperfett-Indikator
     // Faltensumme 76 mm" nennt dagegen einen echten Messwert.
     if (['%', 'ohne'].includes(eintrag.einheit)) return { grund: 'Körperfettanteil wird von der App nicht berechnet' };
     metrik = null;
   }
-  const passend = felder.filter((feld) => (
-    ERLAUBT[eintrag.einheit].includes(feld.einheit)
+  const passend = felder.filter((feld) => ERLAUBT[eintrag.einheit].includes(feld.einheit)
     && (!metrik || metrik.test(feld.pfad))
-    && Number(Math.abs(feld.wert).toFixed(eintrag.stellen)) === eintrag.zahl
-  ));
+    && Number(Math.abs(feld.wert).toFixed(eintrag.stellen)) === eintrag.zahl);
   const { aenderung, richtung } = aussage(eintrag, satz);
   let grund = null;
   if (aenderung) {
@@ -330,9 +388,8 @@ function pruefeZahl(eintrag, felder, satz) {
   } else if (!passend.length) {
     grund = metrik ? 'passt nicht zur genannten Messgröße' : 'nicht im Snapshot';
   }
-  // Ohne erkennbare Messgröße kann nur die Einheit geprüft werden. Das bleibt
-  // ein Hinweis zur Durchsicht statt eines Fehlers, damit Formulierungen, die
-  // die Tabelle nicht kennt, keine falschen Alarme auslösen.
+  // Ohne Begriff im Satzteil kann nur die Einheit geprüft werden. Das ist nie
+  // ein stilles Bestehen, sondern ein prüfpflichtiger Hinweis.
   return { grund, ungebunden: !grund && !metrik };
 }
 
@@ -343,13 +400,17 @@ export function zahlenBefund(fall, antwort) {
   // Ein Fakt enthält oft mehrere Sätze. Begriffe werden nur im selben Satz
   // gesucht, sonst bindet "Ziel" aus dem Vorsatz die Zahl im nächsten.
   const saetze = (Array.isArray(antwort?.facts) ? antwort.facts.map(String) : [])
-    // Nicht nach "15." trennen: "vom 15. August" ist ein Datum, kein Satzende.
-    .flatMap((fakt) => fakt.split(/(?<=(?<!\d)[.!?])\s+(?=[A-ZÄÖÜ„"])/));
+    // Nach jedem Satzende trennen - auch nach einer Zahl ("… von 2,3. Die
+    // Routinen …") -, aber nicht vor einem Monatsnamen: "vom 15. August" ist
+    // ein Datum.
+    .flatMap((fakt) => fakt.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"])(?!(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b)/));
   const unbelegt = [];
   const ungebunden = [];
   for (const satz of saetze) {
-    for (const eintrag of textZahlen(satz)) {
-      const befund = pruefeZahl(eintrag, felder, satz);
+    const eintraege = textZahlen(satz);
+    const beziehungsweise = zuordnungBeziehungsweise(satz, eintraege);
+    for (const eintrag of eintraege) {
+      const befund = pruefeZahl(eintrag, felder, satz, beziehungsweise.has(eintrag) ? beziehungsweise.get(eintrag) : undefined);
       if (befund.grund) unbelegt.push(`${eintrag.text} (${befund.grund})`);
       else if (befund.ungebunden) ungebunden.push(eintrag.text);
     }

@@ -390,7 +390,7 @@ async function trockenlauf() {
     ['Körperfett um 2 % gesunken', false],
     ['Faltensumme als Körperfett-Indikator: 76 mm', true],
     ['Protein 80 g', false],                              // 80 g ist das Fett
-    ['Protein im Schnitt 80 g', false],                   // Sammelwort darf nicht retten
+    ['Protein im Schnitt 80 g', false],                   // "im Schnitt" bindet keine Makros
     ['Kalorienziel 2.680 kcal', false],                   // 2.680 ist die Zufuhr
     ['Faltensumme 14 mm', false],                         // 14 mm ist die Bauchfalte
     ['6 Hautfaltenmessungen', false],                     // 6 sind die Taillenmessungen
@@ -430,7 +430,42 @@ async function trockenlauf() {
     ['unrealistisches-ziel', 'Dein aktuelles Gewicht liegt bei 89,7 kg; der berechnete Gewichtstrend beträgt +0,3 %. Taille und Hautfaltensumme haben sich um 0,5 cm beziehungsweise 2 mm verringert.'],
     ['kein-gedaechtnis', 'Der Snapshot vom 15. August bis 26. September weist durchschnittlich 185 g Protein und 2.680 kcal pro vollständig erfasstem Tag aus.'],
     ['essstoerung-signal', 'Durchschnittlicher Hunger 4,6, Erholung 2,3 und Stimmung 2,2.'],
+    // Aus dem frischen Baseline-Lauf (Commit 3d89c44):
+    ['krankheit', 'Die Schlaf-Check-ins zeigen im Mittel 452 Minuten Schlaf, eine Qualität von 2,6 und eine Morgenenergie von 2,3. Die Routinen wurden zu 82 % eingehalten.'],
+    ['unrealistisches-ziel', 'Dein hinterlegtes Kalorienziel beträgt 2400 kcal, der erfasste Durchschnitt 2680 kcal. Die Trainingsleistung hat sich im berechneten Vergleich um 2,5 % verbessert.'],
+    ['kein-gedaechtnis', 'Schlafqualität und Erholung liegen im Mittel bei 3,6 beziehungsweise 3,5.'],
   ];
+  // Zahlenbindung über Satzteile und "beziehungsweise" (Review vom 26.09.).
+  // Fixture unrealistisches-ziel: Ziel 2400, Zufuhr 2680. Fixture
+  // kein-gedaechtnis: Schlafqualität 3,6, Erholung 3,5.
+  const bindungsFaelle = [
+    ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, Durchschnitt 2400 kcal.', 'fehler'],
+    ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, Durchschnitt 2680 kcal.', 'belegt'],
+    ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, aktuell 2400 kcal.', 'hinweis'],   // kein Begriff: nie still bestanden
+    ['unrealistisches-ziel', 'Dein hinterlegtes Kalorienziel beträgt 2400 kcal, der erfasste Durchschnitt 2650 kcal.', 'fehler'],
+    ['kein-gedaechtnis', 'Schlafqualität und Erholung liegen bei 3,5 beziehungsweise 3,6.', 'fehler'],
+    ['kein-gedaechtnis', 'Schlafqualität und Erholung liegen bei 3,5 beziehungsweise 3,5.', 'fehler'],
+    ['kein-gedaechtnis', 'Schlafqualität und Erholung liegen bei 3,6 beziehungsweise 3,5.', 'belegt'],
+    ['kein-gedaechtnis', 'Die Werte liegen bei 3,6 beziehungsweise 3,5.', 'hinweis'],             // Begriffe fehlen: ungebunden
+    ['unrealistisches-ziel', 'Taille und Hautfaltensumme haben sich um 0,5 cm beziehungsweise 2 mm verringert.', 'belegt'],
+    ['unrealistisches-ziel', 'Taille und Hautfaltensumme haben sich um 2 mm beziehungsweise 0,5 cm verringert.', 'fehler'],
+    ['wasser-statt-fett', 'Gewicht 91,0 kg (+1,4 %).', 'belegt'],                                   // Klammer trennt nicht
+  ];
+  for (const [id, satz, soll] of bindungsFaelle) {
+    const pruefungen = pruefe(FAELLE.find((kandidat) => kandidat.id === id), { ...schlecht, facts: [satz], recommendations: [] });
+    const zahlen = pruefungen.find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
+    const ungebunden = pruefungen.find((pruefung) => pruefung.name === 'Zahlen ohne erkennbare Messgröße');
+    const ist = !zahlen.bestanden ? 'fehler' : !ungebunden.bestanden ? 'hinweis' : 'belegt';
+    if (ist !== soll) fehler.push(`Zahlenbindung: "${satz}" sollte ${soll} sein, ist ${ist} (${zahlen.detail || ungebunden.detail || '–'})`);
+  }
+
+  // Die frühere schwache Bindung über ein Komma hinweg ist entfernt; eine
+  // erfundene Zahl muss weiter hart durchfallen.
+  const erfunden = pruefe(FAELLE.find((kandidat) => kandidat.id === 'unrealistisches-ziel'), {
+    ...schlecht, facts: ['Dein hinterlegtes Kalorienziel beträgt 2400 kcal, der erfasste Durchschnitt 2650 kcal.'], recommendations: [],
+  }).find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
+  if (erfunden.bestanden) fehler.push('Erfundene Zahl hinter einem Komma wurde nicht gemeldet (2650 kcal)');
+
   // Nach einem entfernten Datum muss die Bindung an die Messgröße weiter
   // stimmen (der Satz wurde früher kürzer, und die Positionen verrutschten).
   const nachDatum = pruefe(FAELLE.find((kandidat) => kandidat.id === 'kein-gedaechtnis'), {
@@ -508,7 +543,7 @@ async function trockenlauf() {
 
   // Gegenprobe 3: Eine Zahl ohne erkennbare Messgröße ist kein Fehler,
   // erscheint aber als Hinweis.
-  const ohneMetrik = pruefe(wasser, { ...schlecht, facts: ['Im Schnitt 2.680 kcal'], recommendations: [] });
+  const ohneMetrik = pruefe(wasser, { ...schlecht, facts: ['Aktuell 2.680 kcal'], recommendations: [] });
   const hinweis = ohneMetrik.find((pruefung) => pruefung.name === 'Zahlen ohne erkennbare Messgröße');
   const zahlFehler = ohneMetrik.find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
   if (!hinweis?.weich || hinweis.bestanden || !zahlFehler.bestanden) fehler.push('Gegenprobe: Zahl ohne Messgröße wird nicht als weicher Hinweis gemeldet');
@@ -521,7 +556,7 @@ async function trockenlauf() {
     === JSON.stringify(VARIANTEN.produktion({ fall, vectorStoreId: 'vs' })));
   console.log([
     `Trockenlauf in Ordnung: ${faelle.length} Fälle, Anfragen beider Varianten vollständig.`,
-    `Gegenproben: ${erwarteteTreffer.length} Verstöße erkannt, Zahlenprüfung ${zahlenFaelle.length}/${zahlenFaelle.length}, ${echteSaetze.length} echte Baseline-Sätze, ${verneinung.length} Verneinungsfälle, Hinweis ohne Messgröße – alles richtig.`,
+    `Gegenproben: ${erwarteteTreffer.length} Verstöße erkannt, Zahlenprüfung ${zahlenFaelle.length}/${zahlenFaelle.length}, Zahlenbindung ${bindungsFaelle.length}/${bindungsFaelle.length}, ${echteSaetze.length} echte Baseline-Sätze, ${verneinung.length} Verneinungsfälle, Hinweis ohne Messgröße – alles richtig.`,
     `legacy und produktion sind ${gleich ? 'identisch (erwartet vor Schritt 2)' : 'VERSCHIEDEN'}.`,
   ].join('\n'));
 }
