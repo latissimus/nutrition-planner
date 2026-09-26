@@ -43,7 +43,7 @@
 
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import * as produktion from '../../supabase/functions/capboy-coach/coachPrompt.ts';
@@ -138,11 +138,27 @@ function merkeAbbruch(fehler) {
 }
 function beendeBeiAbbruch() {
   if (!abbruch) return;
-  console.error([
+  const meldung = [
     `Lauf abgebrochen: ${abbruch.message}`,
     'Das liegt am OpenAI-Konto oder am Schlüssel, nicht am Prompt. Kein Bericht und kein Nachweis gespeichert.',
-  ].join('\n'));
+  ];
+  protokolliereAbbruch('konto', meldung);
+  console.error(meldung.join('\n'));
   process.exit(3);
+}
+// Hält fest, warum ein Lauf ohne Bericht endete, damit sich das ohne einen
+// Blick ins Terminal nachvollziehen lässt. OpenAI wiederholt einen falschen
+// Schlüssel (teils maskiert) in der Fehlermeldung; das wird geschwärzt.
+const schwaerzeSchluessel = (text) => String(text)
+  .replace(/(API key provided:\s*)[^\s.]+/gi, '$1[geschwärzt]')
+  .replace(/\bsk-[A-Za-z0-9_*\-]+/g, '[geschwärzt]');
+function protokolliereAbbruch(art, meldungen) {
+  const zeitpunkt = new Date().toISOString();
+  const ordner = new URL('./results/', import.meta.url);
+  mkdirSync(ordner, { recursive: true });
+  writeFileSync(new URL(`${zeitpunkt.replaceAll(':', '-').slice(0, 19)}-abgebrochen.json`, ordner), `${JSON.stringify({
+    zeitpunkt, art, aufruf: argumente, meldungen: meldungen.map(schwaerzeSchluessel), git: gitStand(),
+  }, null, 2)}\n`);
 }
 const vectorStoreId = gespeichert?.reproduktion?.vectorStoreId || process.env.COACH_VECTOR_STORE_ID || null;
 
@@ -188,6 +204,7 @@ if (vergleichsBasis) {
   const labels = await labelNachweis();
   if (!labels.gueltig) hindernisse.push(`Label-Regression fehlt oder ungültig: ${labels.gruende.join('; ')}\nZuerst: npm run eval:coach -- --labels scripts/coach-evals/labels/<datei>.json`);
   if (hindernisse.length) {
+    protokolliereAbbruch('vergleich', hindernisse);
     console.error(`Vergleich nicht möglich:\n- ${hindernisse.join('\n- ')}`);
     process.exit(1);
   }
@@ -757,6 +774,9 @@ async function trockenlauf() {
   if (!hinweis?.weich || hinweis.bestanden || !zahlFehler.bestanden) fehler.push('Gegenprobe: Zahl ohne Messgröße wird nicht als weicher Hinweis gemeldet');
 
   trockenlaufPruefer(fehler);
+  for (const probe of ['OpenAI 401: Incorrect API key provided: sk-proj-abc***xyz9. You can find your API key at …', 'Schlüssel sk-proj-A1b2_C3-d4 im Text']) {
+    if (/sk-proj|abc|A1b2/.test(schwaerzeSchluessel(probe))) fehler.push(`Abbruchprotokoll: Schlüssel nicht geschwärzt in „${probe.slice(0, 40)}…“`);
+  }
   // Konto- und Schlüsselfehler brechen ab, Ratenlimits und Zeitüberschreitungen nicht.
   for (const [meldung, soll] of [
     ['OpenAI 429: Your project has reached its configured enforced spend limit. Update your limit at https://platform.openai.com/settings/x/limits.', true],
