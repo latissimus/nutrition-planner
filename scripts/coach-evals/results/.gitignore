@@ -1,0 +1,4 @@
+# Eval-Ergebnisse bleiben lokal: sie enthalten vollständige Modellantworten
+# und entstehen bei jedem Lauf neu.
+*
+!.gitignore

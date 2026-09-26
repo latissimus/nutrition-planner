@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION, YPSI_FORMULA } from './knowledge.ts';
+import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,7 +20,7 @@ const admin = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 type Row = Record<string, any>;
-type Scope = 'coach' | 'sleep' | 'comp' | 'skinfold' | 'overall';
+
 
 const number = (value: unknown) => Number.isFinite(Number(value)) ? Number(value) : 0;
 const mean = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
@@ -70,6 +71,19 @@ async function waitForVectorStore(vectorStoreId: string) {
   return false;
 }
 
+// Status writes must not fail silently: the 'indexing' write once violated the
+// table's check constraint unnoticed, which dropped the new vector store id.
+// A failed write therefore aborts the request instead of continuing with a
+// status the database does not reflect.
+async function saveKnowledgeStatus(row: Row) {
+  const { error } = await admin.from('ai_knowledge_bases').upsert({
+    ...row,
+    source_manifest: KNOWLEDGE_SOURCES,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw new Error(`Knowledge status '${row.status}' could not be saved: ${error.message}`);
+}
+
 async function ensureKnowledgeBase() {
   const key = 'capboy-seminar-v1';
   const { data: current } = await admin.from('ai_knowledge_bases').select('*').eq('key', key).maybeSingle();
@@ -78,32 +92,24 @@ async function ensureKnowledgeBase() {
   }
 
   if (current?.content_hash === KNOWLEDGE_VERSION && current?.vector_store_id) {
+    // Only the OpenAI check may fall through to a fresh store. A failed status
+    // write must not be mistaken for an unusable store, or every such failure
+    // would create another vector store.
+    let reusable = false;
     try {
-      if (await waitForVectorStore(current.vector_store_id)) {
-        await admin.from('ai_knowledge_bases').upsert({
-          key,
-          vector_store_id: current.vector_store_id,
-          content_hash: KNOWLEDGE_VERSION,
-          status: 'ready',
-          source_manifest: KNOWLEDGE_SOURCES,
-          last_error: null,
-          updated_at: new Date().toISOString(),
-        });
-        return current.vector_store_id as string;
-      }
+      reusable = await waitForVectorStore(current.vector_store_id);
     } catch {
       // The previous store is not usable; create a fresh one below.
     }
+    if (reusable) {
+      await saveKnowledgeStatus({
+        key, vector_store_id: current.vector_store_id, content_hash: KNOWLEDGE_VERSION, status: 'ready', last_error: null,
+      });
+      return current.vector_store_id as string;
+    }
   }
 
-  await admin.from('ai_knowledge_bases').upsert({
-    key,
-    content_hash: KNOWLEDGE_VERSION,
-    status: 'pending',
-    source_manifest: KNOWLEDGE_SOURCES,
-    last_error: null,
-    updated_at: new Date().toISOString(),
-  });
+  await saveKnowledgeStatus({ key, content_hash: KNOWLEDGE_VERSION, status: 'pending', last_error: null });
 
   try {
     const prefix = `${KNOWLEDGE_VERSION.slice(0, 12)}-`;
@@ -128,36 +134,24 @@ async function ensureKnowledgeBase() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'CAPBOY Seminarwissen', file_ids: fileIds }),
     });
-    await admin.from('ai_knowledge_bases').upsert({
-      key,
-      vector_store_id: store.id,
-      content_hash: KNOWLEDGE_VERSION,
-      status: 'indexing',
-      source_manifest: KNOWLEDGE_SOURCES,
-      last_error: null,
-      updated_at: new Date().toISOString(),
+    await saveKnowledgeStatus({
+      key, vector_store_id: store.id, content_hash: KNOWLEDGE_VERSION, status: 'indexing', last_error: null,
     });
     const ready = await waitForVectorStore(store.id);
     if (!ready) throw new Error('Vector store indexing did not complete in time');
-    await admin.from('ai_knowledge_bases').upsert({
-      key,
-      vector_store_id: store.id,
-      content_hash: KNOWLEDGE_VERSION,
-      status: 'ready',
-      source_manifest: KNOWLEDGE_SOURCES,
-      last_error: null,
-      updated_at: new Date().toISOString(),
+    await saveKnowledgeStatus({
+      key, vector_store_id: store.id, content_hash: KNOWLEDGE_VERSION, status: 'ready', last_error: null,
     });
     return store.id as string;
   } catch (error) {
-    await admin.from('ai_knowledge_bases').upsert({
-      key,
-      content_hash: KNOWLEDGE_VERSION,
-      status: 'failed',
-      source_manifest: KNOWLEDGE_SOURCES,
-      last_error: String(error).slice(0, 1000),
-      updated_at: new Date().toISOString(),
-    });
+    // Report the original error; a failing 'failed' write must not mask it.
+    try {
+      await saveKnowledgeStatus({
+        key, content_hash: KNOWLEDGE_VERSION, status: 'failed', last_error: String(error).slice(0, 1000),
+      });
+    } catch (statusError) {
+      console.error('CAPBOY knowledge status write failed', statusError);
+    }
     throw error;
   }
 }
@@ -328,32 +322,6 @@ async function buildSnapshot(userId: string) {
   };
 }
 
-const resultSchema = {
-  type: 'object',
-  additionalProperties: false,
-  properties: {
-    title: { type: 'string' },
-    summary: { type: 'string' },
-    confidence: { type: 'string', enum: ['niedrig', 'mittel', 'hoch'] },
-    facts: { type: 'array', items: { type: 'string' } },
-    interpretations: { type: 'array', items: { type: 'string' } },
-    recommendations: {
-      type: 'array',
-      items: {
-        type: 'object', additionalProperties: false,
-        properties: {
-          action: { type: 'string' }, rationale: { type: 'string' }, timeframe: { type: 'string' },
-        },
-        required: ['action', 'rationale', 'timeframe'],
-      },
-    },
-    uncertainties: { type: 'array', items: { type: 'string' } },
-    followUpQuestions: { type: 'array', items: { type: 'string' } },
-    safetyNote: { type: 'string' },
-  },
-  required: ['title', 'summary', 'confidence', 'facts', 'interpretations', 'recommendations', 'uncertainties', 'followUpQuestions', 'safetyNote'],
-};
-
 const compResultSchema = {
   type: 'object',
   additionalProperties: false,
@@ -385,25 +353,6 @@ const compResultSchema = {
   },
   required: ['title', 'status', 'confidence', 'keyDevelopment', 'basis', 'uncertainty', 'nextSteps', 'sources'],
 };
-
-const scopeInstruction: Record<Scope, string> = {
-  coach: 'Beantworte die konkrete Frage, betrachte aber immer das Gesamtbild aus Körperkomposition, Training, Ernährung, Schlaf, Erholung und Routinen.',
-  overall: 'Erstelle eine bereichsübergreifende Gesamtanalyse und priorisiere höchstens drei nächste Schritte.',
-  sleep: 'Fokussiere Schlaf, beziehe Training, Ernährung, Erholung und Routinen aber ein, wenn die Daten einen Zusammenhang stützen.',
-  comp: 'Interpretiere die Körperkomposition aus mehreren Signalen. Gewicht allein ist nie ein Beweis für Muskel- oder Fettveränderung.',
-  skinfold: 'Priorisiere risikoarme nächste Schritte. Hautfalten erlauben keine Diagnose von Hormonen, Organen, Mängeln oder Krankheiten.',
-};
-
-function outputText(response: Row) {
-  const parts: string[] = [];
-  for (const item of response.output || []) {
-    if (item.type !== 'message') continue;
-    for (const content of item.content || []) {
-      if (content.type === 'output_text' && content.text) parts.push(content.text);
-    }
-  }
-  return parts.join('');
-}
 
 function webSources(response: Row) {
   const cited: Row[] = [];
@@ -503,47 +452,32 @@ Deno.serve(async (request) => {
     }
 
     const vectorStoreId = await ensureKnowledgeBase();
-    const sharedSafety = `Die App hat alle objektiven Werte bereits deterministisch berechnet. Rechne keine Trends, Summen, Ränge, Verhältnisse oder Korrelationen selbst neu aus und widersprich diesen Ergebnissen nicht. Nutze file_search ausschließlich, um die berechneten Ergebnisse verständlich einzuordnen und relevante Seminarpassagen zu finden. Seminarzusammenhänge sind Hypothesen und keine Diagnosen. Behaupte nie Kausalität, wenn nur ein Zusammenhang sichtbar ist. Stelle keine medizinischen Diagnosen. Leite aus Hautfalten keine Hormone, Organe, Krankheiten oder Nährstoffmängel als Tatsache ab. Erfinde keine Supplement-Dosis, keinen Grenzwert und keine Wechselwirkung. Ziele oder Pläne dürfen nur vorgeschlagen und nie automatisch verändert werden.`;
 
     const isCentralComp = scope === 'comp' && clientEvidence;
-    const system = isCentralComp
-      ? `Du erstellst die einzige sichtbare Gesamtbewertung auf der CAPBOY-COMP-Seite. ${sharedSafety}
+    const requestBody = isCentralComp ? {
+      model: COACH_MODEL,
+      instructions: `Du erstellst die einzige sichtbare Gesamtbewertung auf der CAPBOY-COMP-Seite. ${SHARED_SAFETY}
 
-Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.`
-      : `Du bist der persönliche CAPBOY Coach für Training, Ernährung, Schlaf, Muskelaufbau, Körperkomposition und gesundheitsorientierte Gewohnheiten. ${sharedSafety}
-
-Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu erinnern. Trenne klar zwischen gemessenen Fakten, plausiblen Interpretationen und Unsicherheiten. Einzelwerte nie überbewerten. Gib höchstens drei konkrete, überprüfbare Empfehlungen und nenne einen realistischen Zeitraum. Bei möglichen medizinischen Warnzeichen empfehle professionelle Abklärung. ${webResearch ? 'Der Nutzer hat ausdrücklich aktuelle Webrecherche aktiviert. Führe mindestens eine Websuche durch. Bevorzuge Primärquellen, systematische Übersichten, Fachgesellschaften und öffentliche Gesundheitsbehörden. Trenne externe Erkenntnisse sichtbar von den persönlichen CAPBOY-Daten und den Seminarunterlagen.' : 'Es ist keine Webrecherche erlaubt. Nutze nur den CAPBOY-Datensnapshot, die Seminar-Wissensbasis und dein allgemeines Modellwissen.'} Antworte auf Deutsch, knapp und konkret. ${scopeInstruction[scope]}`;
-    const prompt = isCentralComp
-      ? `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(clientEvidence)}`
-      : `${question || 'Erstelle jetzt die angeforderte Analyse.'}\n\nAktueller strukturierter CAPBOY-Datensnapshot:\n${JSON.stringify(snapshot)}`;
-
-    const tools: Row[] = [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: isCentralComp ? 8 : 6 }];
-    const include = ['file_search_call.results'];
-    if (webResearch) {
-      tools.push({ type: 'web_search', search_context_size: 'medium' });
-      include.push('web_search_call.action.sources');
-    }
+Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.`,
+      input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(clientEvidence)}` }],
+      reasoning: { effort: 'high' },
+      max_output_tokens: 6000,
+      tools: [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 8 }],
+      tool_choice: 'auto',
+      include: ['file_search_call.results'],
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'capboy_comp_assessment',
+          strict: true,
+          schema: compResultSchema,
+        },
+      },
+    } : coachRequestBody({ scope, question, snapshot, webResearch, vectorStoreId });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gpt-6-sol',
-        instructions: system,
-        input: [{ role: 'user', content: prompt }],
-        reasoning: { effort: isCentralComp ? 'high' : scope === 'coach' ? 'medium' : 'high' },
-        max_output_tokens: isCentralComp ? 6000 : 4000,
-        tools,
-        tool_choice: webResearch ? 'required' : 'auto',
-        include,
-        text: {
-          format: {
-            type: 'json_schema',
-            name: isCentralComp ? 'capboy_comp_assessment' : 'capboy_coach_result',
-            strict: true,
-            schema: isCentralComp ? compResultSchema : resultSchema,
-          },
-        },
-      }),
+      body: JSON.stringify(requestBody),
     });
     if (responsePayload.status === 'incomplete') {
       throw new Error(`OpenAI response incomplete: ${responsePayload.incomplete_details?.reason || 'unknown'}`);
@@ -562,7 +496,7 @@ Jede Anfrage ist eigenständig; behaupte nicht, dich an frühere Gespräche zu e
         user_id: userId,
         scope,
         result,
-        model: 'gpt-6-sol',
+        model: COACH_MODEL,
         data_from: snapshot.period.from,
         data_to: snapshot.period.to,
         input_fingerprint: inputFingerprint,

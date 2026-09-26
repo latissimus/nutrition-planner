@@ -12,6 +12,7 @@
     "test": "vitest run",
     "audit": "npm audit --audit-level=high",
     "check:migrations": "node scripts/check-migrations.mjs",
+    "eval:coach": "node --disable-warning=ExperimentalWarning scripts/coach-evals/run.mjs",
     "check:ypsi-formula": "node scripts/check-ypsi-formula-workbook.mjs",
     "check": "npm run check:migrations && npm run check:ypsi-formula && npm test && npm run build",
     "backup:supabase": "node scripts/backup-supabase.mjs",
