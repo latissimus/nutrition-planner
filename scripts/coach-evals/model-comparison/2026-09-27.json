@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-27",
+  "promptHash": "93d77b7f86400cbf",
+  "knowledgeVersion": "3b847f993427405d",
+  "actualTotalSpendUsd": 1.11,
+  "decision": {
+    "coachModel": "gpt-6-sol",
+    "graderModel": "gpt-6-astra",
+    "deploymentRequired": false
+  },
+  "models": {
+    "gpt-6-sol": {
+      "passed": 21,
+      "total": 21,
+      "durationSeconds": 221,
+      "inputTokens": 258486,
+      "outputTokens": 30698,
+      "estimatedCoachCostUsd": 0.823952
+    },
+    "gpt-6-astra": {
+      "passed": 19,
+      "total": 21,
+      "durationSeconds": 225,
+      "inputTokens": 203832,
+      "outputTokens": 22427,
+      "estimatedCoachCostUsd": 3.15967,
+      "failures": [
+        "experiment-neu-schlaf: required experiment replaced by observation",
+        "wochenbilanz-experiment-laeuft: invalid interpretation labels"
+      ]
+    },
+    "gpt-6-luna": {
+      "passed": 4,
+      "total": 12,
+      "durationSeconds": 78,
+      "inputTokens": 83306,
+      "outputTokens": 16484,
+      "estimatedCoachCostUsd": 0.016573,
+      "screenedOut": true
+    }
+  }
+}
