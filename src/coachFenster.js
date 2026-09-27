@@ -1,6 +1,6 @@
-// Baustein aller Coach-Seiten im Retro-Look: Fenster mit Titelleiste und
-// Fensterknöpfen. "_" klappt ein Fenster ein; die beiden anderen Knöpfe sind
-// nur Dekor.
+// Baustein aller Coach-Seiten im Retro-Look: Fenster mit Titelleiste. Die
+// Leiste nennt, wer spricht; Fensterknöpfe gibt es bewusst nicht, weil sie im
+// Chat nichts zu tun hätten.
 
 import { coachIconMarkup } from './menuIcons.js';
 
@@ -15,17 +15,7 @@ export function fensterMarkup({ von = 'coach', titel = '', bild = null, inhalt =
   const symbol = bild ?? (nutzer ? `<span class="coach-chat-avatar">${avatar}</span>` : coachIconMarkup('coach-chat-cap'));
   const art = nutzer ? 'is-user' : von === 'bereich' ? 'is-coach is-bereich' : 'is-coach';
   return `<article class="coach-chat-window ${art}${klasse ? ` ${klasse}` : ''}"${runde == null ? '' : ` data-runde="${runde}"`}>
-    <header>${symbol}<b>${escapeHtml(titel || (nutzer ? 'Du' : 'CAPBOY'))}</b><span class="coach-fenster-knoepfe"><button type="button" data-fenster-einklappen aria-expanded="true" aria-label="Fenster einklappen">_</button><span aria-hidden="true">□</span><span aria-hidden="true">×</span></span></header>
+    <header>${symbol}<b>${escapeHtml(titel || (nutzer ? 'Du' : 'Coach'))}</b></header>
     <div class="coach-chat-message">${inhalt}</div>
   </article>`;
-}
-
-// Klick auf "_": Fenster ein- oder ausklappen. true, wenn der Klick das war.
-export function fensterEinklappen(event) {
-  const knopf = event.target.closest('[data-fenster-einklappen]');
-  if (!knopf) return false;
-  const zu = knopf.closest('.coach-chat-window').classList.toggle('ist-eingeklappt');
-  knopf.setAttribute('aria-expanded', String(!zu));
-  knopf.setAttribute('aria-label', zu ? 'Fenster aufklappen' : 'Fenster einklappen');
-  return true;
 }

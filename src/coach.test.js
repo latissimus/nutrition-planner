@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fensterMarkup, resultMarkup, verlaufMarkup, willkommenMarkup } from './coach.js';
+import { fensterMarkup, resultMarkup, verlaufMarkup } from './coach.js';
 
 const baseResult = {
   title: 'CAPBOY COACH',
@@ -55,12 +55,12 @@ describe('Coach-Webquellen', () => {
 });
 
 describe('Coach-Chat: Retro-Fenster', () => {
-  it('zeigt CAPBOY und dich als Fenster mit Titelleiste und Einklapp-Knopf', () => {
+  it('zeigt den Coach und dich als Fenster mit Titelleiste, ohne Fensterknöpfe', () => {
     const coach = fensterMarkup({ inhalt: '<p>Hallo</p>', runde: 2 });
     expect(coach).toContain('coach-chat-window is-coach');
-    expect(coach).toContain('<b>CAPBOY</b>');
+    expect(coach).toContain('<b>Coach</b>');
     expect(coach).toContain('data-runde="2"');
-    expect(coach).toContain('data-fenster-einklappen aria-expanded="true"');
+    expect(coach).not.toMatch(/fenster-einklappen|coach-fenster-knoepfe|□|×/);
     const du = fensterMarkup({ von: 'user', avatar: '<span>FR</span>', inhalt: '<p>Frage</p>' });
     expect(du).toContain('coach-chat-window is-user');
     expect(du).toContain('<b>Du</b>');
@@ -89,12 +89,5 @@ describe('Coach-Chat: Retro-Fenster', () => {
     expect(html).toContain('<h4>Noch unsicher</h4>');
     expect(html).toContain('Datenlage: mittel');
     expect(resultMarkup(baseResult)).not.toContain('coach-mehr');
-  });
-
-  it('begrüßt knapp mit Vorschlägen', () => {
-    const html = willkommenMarkup();
-    expect(html).toContain('data-vorschlag=');
-    expect(html).not.toContain('Diagnosen');
-    expect(willkommenMarkup({ neu: true })).toContain('Neues Gespräch');
   });
 });

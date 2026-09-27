@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  auswertungAlsAenderung, gedaechtnisMarkup, gruppiereGespraeche, istNichtEingerichtet, massnahmeAusEmpfehlung, mitExperimentRueckfall,
+  auswertungAlsAenderung, gedaechtnisMarkup, gespraechRunden, gruppiereGespraeche, istNichtEingerichtet, massnahmeAusEmpfehlung, mitExperimentRueckfall,
   pruefeFakt, pruefeMassnahme, vergissLokalesGespraech,
 } from './coachMemory.js';
 import { resultMarkup, verlaufMarkup } from './coach.js';
@@ -134,6 +134,43 @@ describe('Coach-Gedächtnis: Gespräche', () => {
   });
 });
 
+describe('Coach-Gedächtnis: Gespräch fortsetzen', () => {
+  const ergebnis = { summary: 'Voll', recommendations: [{ kind: 'beobachtung', action: 'Eintragen', rationale: 'r', timeframe: 't' }] };
+
+  it('baut aus den gespeicherten Nachrichten die Runden mit vollständiger Antwort', () => {
+    const runden = gespraechRunden([
+      { role: 'assistant', content: 'Kurz 1', context: { result: ergebnis }, created_at: '2026-09-27T10:00:01Z' },
+      { role: 'user', content: 'Frage 1', created_at: '2026-09-27T10:00:00Z' },
+      { role: 'user', content: 'Frage 2', created_at: '2026-09-27T11:00:00Z' },
+      { role: 'assistant', content: 'Kurz 2', context: {}, created_at: '2026-09-27T11:00:01Z' },
+      { role: 'user', content: 'Frage ohne Antwort', created_at: '2026-09-27T12:00:00Z' },
+    ]);
+    expect(runden).toEqual([
+      { frage: 'Frage 1', result: ergebnis },
+      { frage: 'Frage 2', result: { summary: 'Kurz 2' } },   // älter: nur die Kurzfassung
+    ]);
+    expect(verlaufMarkup(runden)).toContain('data-empfehlung-merken="0"');
+  });
+
+  it('gibt der Wochenbilanz ihren Wochenvergleich und einen lesbaren Titel zurück', () => {
+    const comparison = [{ metric: 'gewicht', label: 'Gewicht (Wochenmittel)', unit: 'kg', previous: 86, current: 84.8, change: -1.2 }];
+    const [runde] = gespraechRunden([
+      { role: 'user', content: 'Wochenbilanz für 2026-W38', created_at: '2026-09-21T07:00:00Z' },
+      { role: 'assistant', content: 'Kurz', context: { result: ergebnis }, created_at: '2026-09-21T07:00:01Z' },
+    ], { week: '2026-W38', comparison });
+    expect(runde).toEqual({ frage: 'Wochenbilanz KW 38', result: ergebnis, weekly: { week: '2026-W38', comparison } });
+    expect(verlaufMarkup([runde])).toContain('Die Woche im Vergleich');
+  });
+
+  it('behält wie der Chat die letzten acht Runden', () => {
+    const nachrichten = Array.from({ length: 10 }, (_, index) => [
+      { role: 'user', content: `F${index}`, created_at: `2026-09-27T10:${String(index).padStart(2, '0')}:00Z` },
+      { role: 'assistant', content: `A${index}`, created_at: `2026-09-27T10:${String(index).padStart(2, '0')}:01Z` },
+    ]).flat();
+    expect(gespraechRunden(nachrichten).map((runde) => runde.frage)).toEqual(['F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9']);
+  });
+});
+
 describe('Coach-Gedächtnis: Seite', () => {
   it('sagt, wenn das Gedächtnis noch nicht eingerichtet ist', () => {
     expect(gedaechtnisMarkup({ eingerichtet: false })).toContain('noch nicht eingerichtet');
@@ -153,6 +190,7 @@ describe('Coach-Gedächtnis: Seite', () => {
     expect(html).toContain('data-fakt-bearbeiten="f1"');
     expect(html).toContain('data-massnahme-loeschen="m1"');
     expect(html).toContain('data-gespraech-loeschen="g1"');
+    expect(html).toContain('data-gespraech-fortsetzen="g1"');
     expect(html).toContain('Alle Gespräche löschen');
     expect(html).toContain('Bestätigt am 20.09.2026');
   });
@@ -217,7 +255,7 @@ describe('Coach-Seite: Gespräch und Maßnahmen', () => {
     expect(html).toContain('coach-chat-window is-user');
     expect(html).toContain('coach-chat-window is-coach');
     expect(html).toContain('&lt;script&gt;x&lt;/script&gt;');
-    expect(html).toContain('CAPBOY');
+    expect(html).toContain('<b>Coach</b>');
     expect(verlaufMarkup([])).toBe('');
   });
 });

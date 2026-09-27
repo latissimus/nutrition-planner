@@ -90,7 +90,7 @@ export function buildFollowThrough(rows: Row, now: Date) {
   if (judgeIntake && percentOfTarget! < LIMITS.intakeLowPercent) {
     // Either the entries are incomplete or the user eats far below the target.
     add('ernaehrung-weit-unter-ziel', 'daten', 'ernaehrung', { nutrition: { daysWithEntries, averageKcal, targetKcal: target, percentOfTarget } },
-      'Prüfe zwei Wochen lang, ob wirklich alles eingetragen ist – auch Getränke, Snacks, Öl und Soßen. Isst du tatsächlich so wenig, besprich dein Kalorienziel mit CAPBOY.');
+      'Prüfe zwei Wochen lang, ob wirklich alles eingetragen ist – auch Getränke, Snacks, Öl und Soßen. Isst du tatsächlich so wenig, besprich dein Kalorienziel mit dem Coach.');
   }
 
   // Weighing: at least three times a week.
@@ -113,7 +113,7 @@ export function buildFollowThrough(rows: Row, now: Date) {
   const trainingDays = trainingDates.filter((date) => date >= from && date <= to).length;
   if (!trainingDays) {
     add('training-daten', 'daten', 'training', { training: { trainingDays, lastTrainingDate: trainingDates.at(-1) || null } },
-      'Importiere deine Trainingsdaten aus LOGMAN, damit CAPBOY deine Leistung einbeziehen kann.');
+      'Importiere deine Trainingsdaten aus LOGMAN, damit der Coach deine Leistung einbeziehen kann.');
   }
 
   // Body measurements: skinfolds and waist every three to four weeks.

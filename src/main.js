@@ -786,9 +786,9 @@ function appDexShellZeichnen(route, view) {
         ${istCoach ? `
         <a class="app-dex-coach app-dex-coach-zurueck" href="#${route === 'coach-wissen' ? 'coach' : appLetzteDexRoute()}"
            aria-label="${route === 'coach-wissen' ? 'Zurück zum Coach' : 'Zurück'}">${seitenIconMarkup('ZURÜCK', 'app-dex-coach-icon app-dex-zurueck-icon')}</a>
-        <a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>` : `
+        <a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
-           aria-label="CAPBOY Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
+           aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>`}
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}

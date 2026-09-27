@@ -5,9 +5,10 @@ import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
-import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
+import { fensterMarkup } from './coachFenster.js';
 import { seitenIconMarkup } from './menuIcons.js';
 import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
+import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
 
 export { fensterMarkup };
 
@@ -133,16 +134,6 @@ export function verlaufMarkup(runden = [], avatar = '') {
     + fensterMarkup({ runde: index, inhalt: `${runde.weekly ? vergleichMarkup(runde.weekly) : ''}${resultMarkup(runde.result, { merken: true })}` })).join('');
 }
 
-const VORSCHLAEGE = ['Wie lief meine letzte Woche?', 'Warum bewegt sich mein Gewicht kaum?', 'Wie kann ich besser schlafen?'];
-
-export function willkommenMarkup({ neu = false } = {}) {
-  return fensterMarkup({
-    klasse: 'coach-welcome',
-    inhalt: `<p>${neu ? 'Neues Gespräch. Womit soll ich dir helfen?' : 'Hi, ich bin CAPBOY. Ich kenne deine Messwerte der letzten zwölf Wochen. Frag mich zu Training, Ernährung, Schlaf oder Körper.'}</p>
-      <div class="coach-vorschlaege">${VORSCHLAEGE.map((vorschlag) => `<button type="button" data-vorschlag="${escapeHtml(vorschlag)}">${escapeHtml(vorschlag)}</button>`).join('')}</div>`,
-  });
-}
-
 // Nach einer Weile wird aus "denkt nach" ein "denkt noch ein bisschen nach".
 const tipptMarkup = (text, spaeter) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}${wartetextMarkup(text, spaeter)}</p>` });
 const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
@@ -211,8 +202,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   // Zurück und Gedächtnis sitzen im App-Kopf (main.js); ein neues Gespräch
   // beginnt über das Plus-Menü der Eingabe.
   container.innerHTML = `<main class="coach-shell coach-chat">
-    <section class="coach-woche" data-coach-woche hidden></section>
     <section class="coach-answer" data-coach-answer aria-live="polite"></section>
+    <section class="coach-woche" data-coach-woche hidden></section>
     <form class="coach-form" data-coach-form>
       <div class="coach-form-innen">
         <div class="coach-compose-tools" data-coach-tools hidden>
@@ -223,8 +214,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         <div class="coach-attachment" data-coach-attachment hidden></div>
         <div class="coach-inputbar">
           <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch">${seitenIconMarkup('PLUS', 'coach-eingabe-icon')}</button>
-          <label class="sr-only" for="coach-question">Nachricht an CAPBOY</label>
-          <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an CAPBOY">${escapeHtml(pending.question || '')}</textarea>
+          <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
+          <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
           <button class="coach-send" type="submit" aria-label="Senden">${seitenIconMarkup('SENDEN', 'coach-eingabe-icon')}</button>
         </div>
       </div>
@@ -262,8 +253,21 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   field.addEventListener('blur', () => setTimeout(tastatur, 60));
   const nachUnten = (sanft = true) => requestAnimationFrame(() => container.scrollTo({ top: container.scrollHeight, behavior: sanft ? 'smooth' : 'auto' }));
 
+  // Startnachricht eines leeren Chats: was gerade offen ist. Die Punkte laden
+  // im Hintergrund und ersetzen dann nur die Startnachricht, wenn sie noch
+  // zu sehen ist.
+  const start = { punkte: null, fehler: false, neu: false };
+  const startErneuern = () => {
+    const fenster = answer.querySelector('.coach-welcome');
+    if (fenster && !runden.length) fenster.outerHTML = startMarkup(start);
+  };
+  ladeOffenePunkte(userId)
+    .then((punkte) => { start.punkte = punkte; })
+    .catch((error) => { start.fehler = true; console.warn('Offene Punkte nicht geladen:', error?.message); })
+    .finally(startErneuern);
+
   const zeichnen = (zusatz = '') => {
-    answer.innerHTML = (runden.length ? verlaufMarkup(runden, avatar) : willkommenMarkup()) + zusatz;
+    answer.innerHTML = (runden.length ? verlaufMarkup(runden, avatar) : startMarkup(start)) + zusatz;
   };
   const resizeField = () => {
     field.style.height = 'auto';
@@ -313,12 +317,12 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     runden = [];
     gespraechSchreiben(null);
     neuesGespraech.hidden = true;
-    answer.innerHTML = willkommenMarkup({ neu: true });
+    start.neu = true;
+    answer.innerHTML = startMarkup(start);
     field.focus();
   };
 
   answer.addEventListener('click', async (event) => {
-    if (fensterEinklappen(event)) return;
     const vorschlag = event.target.closest('[data-vorschlag]');
     if (vorschlag) {
       field.value = vorschlag.dataset.vorschlag;
@@ -335,7 +339,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         await uebernimmAuswertung(userId, auswertung);
         auswertungsKnopf.textContent = 'Ergebnis übernommen';
         toast(auswertung.decision === 'beibehalten'
-          ? 'Übernommen. Ein neues Prüfdatum setzt du unter „Was CAPBOY über mich weiß“.'
+          ? 'Übernommen. Ein neues Prüfdatum setzt du unter „Was der Coach über mich weiß“.'
           : auswertung.decision === 'anpassen'
             ? 'Übernommen. Der bisherige Versuch ist abgeschlossen; die angepasste Variante startest du als neues Experiment.'
             : 'Übernommen, das Experiment ist abgeschlossen.');
@@ -353,15 +357,15 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       await merkeEmpfehlung(userId, empfehlung);
       knopf.textContent = empfehlung.kind === 'experiment' ? 'Als Experiment gemerkt' : 'Als Maßnahme gemerkt';
       toast(empfehlung.kind === 'experiment' && empfehlung.reviewDate
-        ? 'Gemerkt. Am Prüfdatum wertet CAPBOY das Experiment aus.'
-        : 'Gemerkt. Prüfdatum und Ergebnis trägst du unter „Was CAPBOY über mich weiß“ ein.');
+        ? 'Gemerkt. Am Prüfdatum wertet der Coach das Experiment aus.'
+        : 'Gemerkt. Prüfdatum und Ergebnis trägst du unter „Was der Coach über mich weiß“ ein.');
     } catch (error) {
       knopf.disabled = false;
       toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht gemerkt werden.'));
     }
   });
 
-  // Wochen-Check-in (Schritt 7): CAPBOY stellt die Fragen im Chat. Die Bilanz
+  // Wochen-Check-in (Schritt 7): Der Coach stellt die Fragen im Chat. Die Bilanz
   // beginnt ein neues Gespräch, damit Rückfragen an sie anschließen.
   mountWochenbilanz(container.querySelector('[data-coach-woche]'), {
     userId,
@@ -373,7 +377,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         return answer.lastElementChild;
       }
       if (laden) {
-        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup('CAPBOY bilanziert deine Woche', 'CAPBOY bilanziert noch ein bisschen');
+        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup('Coach bilanziert deine Woche', 'Coach bilanziert noch ein bisschen');
       } else if (fehler) {
         zeichnen(fehlerMarkup('Keine Wochenbilanz erstellt. Deine Messwerte bleiben unverändert. Versuche es später erneut.'));
       } else {
@@ -402,8 +406,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     answer.innerHTML = verlaufMarkup(runden, avatar)
       + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang) })
       + (webResearch
-        ? tipptMarkup('CAPBOY recherchiert', 'CAPBOY recherchiert noch ein bisschen')
-        : tipptMarkup('CAPBOY denkt nach', 'CAPBOY denkt noch ein bisschen nach'));
+        ? tipptMarkup('Coach recherchiert', 'Coach recherchiert noch ein bisschen')
+        : tipptMarkup('Coach denkt nach', 'Coach denkt noch ein bisschen nach'));
     nachUnten();
     try {
       const response = await invokeCoach('coach', question, webResearch, gespraech?.id, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);

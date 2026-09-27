@@ -160,7 +160,7 @@ function compFactsMarkup(state) {
 function compAssessmentMarkup() {
   return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
     <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>prüft</em></span></header>
-    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>${wartetextMarkup('Gesamtbild wird ausgewertet', 'Gesamtbild braucht noch einen Moment')}</b><p>CAPBOY verbindet deine aktuellen Daten und Entwicklungen.</p></div>
+    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>${wartetextMarkup('Gesamtbild wird ausgewertet', 'Gesamtbild braucht noch einen Moment')}</b><p>Der Coach verbindet deine aktuellen Daten und Entwicklungen.</p></div>
   </section>`;
 }
 

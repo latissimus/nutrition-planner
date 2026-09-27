@@ -2,7 +2,7 @@
 //
 // Ist eine Woche (Montag bis Sonntag) abgeschlossen, bietet die Coach-Seite
 // den Check-in an: Wie gut wurden die laufenden Maßnahmen umgesetzt, und war
-// etwas besonders? Danach bilanziert CAPBOY die Woche gegen die Vorwoche. Den
+// etwas besonders? Danach bilanziert der Coach die Woche gegen die Vorwoche. Den
 // Vergleich rechnet die App (weekly.ts in der Edge Function), die KI ordnet
 // nur ein. Die Umsetzung schreibt der Nutzer selbst in seine Maßnahmen; die
 // Bilanz speichert die Edge Function (Tabelle coach_weekly_reviews).
@@ -10,6 +10,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { UMSETZUNG, istNichtEingerichtet } from './coachMemory.js';
+import { fensterMarkup } from './coachFenster.js';
 import { WEEKLY_NOTE_MAX, lastCompletedWeek } from '../supabase/functions/capboy-coach/weekly.ts';
 
 const escapeHtml = (value = '') => String(value)
@@ -74,13 +75,18 @@ function formularMarkup(massnahmen) {
   </form>`;
 }
 
-// Schmale Leiste über dem Chat, solange die Bilanz der Woche fehlt.
-export function wochenLeisteMarkup(woche) {
-  const kw = /^\d{4}-W\d{2}$/.test(String(woche?.week || '')) ? ` KW ${Number(woche.week.slice(6))}` : '';
-  return `<button class="coach-woche-leiste" type="button" data-woche-starten><span class="coach-woche-punkt" aria-hidden="true"></span><span>Wochenbilanz${kw} ist bereit</span><b>Starten ›</b></button>`;
+// Solange die Bilanz der Woche fehlt: eine Nachricht des Coachs als letzte
+// im Chat. "Später" blendet sie bis zum nächsten Öffnen aus.
+export function wochenHinweisMarkup(woche) {
+  const kw = /^\d{4}-W\d{2}$/.test(String(woche?.week || '')) ? `KW ${Number(woche.week.slice(6))}` : 'Woche';
+  return fensterMarkup({
+    klasse: 'coach-woche-hinweis',
+    inhalt: `<p>Die ${escapeHtml(kw)} ist vorbei. Wollen wir Bilanz ziehen? Ich vergleiche sie mit der Vorwoche.</p>
+      <div class="coach-vorschlaege"><button type="button" data-woche-starten>Wochenbilanz starten</button><button type="button" data-woche-hinweis-weg>Später</button></div>`,
+  });
 }
 
-// Die Fragen des Check-ins als Nachricht von CAPBOY im Chat.
+// Die Fragen des Check-ins als Nachricht des Coachs im Chat.
 export function wochenFrageMarkup({ woche, massnahmen = [] } = {}) {
   const kw = /^\d{4}-W\d{2}$/.test(String(woche?.week || '')) ? `KW ${Number(woche.week.slice(6))}` : 'Woche';
   return `<p>Die ${escapeHtml(kw)} ist vorbei. Zwei kurze Fragen, dann bilanziere ich sie gegen die Vorwoche${massnahmen.length ? ' und schaue auf deine Experimente' : ''}.</p>${formularMarkup(massnahmen)}`;
@@ -108,7 +114,7 @@ export async function istWochenbilanzFaellig(userId, heute = heuteUtc()) {
   return !error && !data?.length;
 }
 
-// Leiste auf der Coach-Seite. anfragen(body) ruft die Edge Function auf.
+// Hinweis auf der Coach-Seite. anfragen(body) ruft die Edge Function auf.
 // zeigen() gehört zur Chatseite: { frage } hängt die Fragen als Nachricht an
 // und gibt das Fenster zurück; { laden, text }, { fehler } und
 // { text, result, weekly, conversationId } zeigen den weiteren Verlauf.
@@ -121,7 +127,7 @@ export async function mountWochenbilanz(bereich, { userId, anfragen, zeigen }) {
       supabase.from('coach_interventions').select('id,action,adherence').eq('user_id', userId).eq('status', 'aktiv').order('start_date', { ascending: false }).limit(5),
     ]);
     if (gespeichert.error) throw gespeichert.error;
-    // Schon bilanziert: keine Leiste. Die Bilanz steht unter „Was CAPBOY über mich weiß“.
+    // Schon bilanziert: kein Hinweis. Die Bilanz steht unter „Was der Coach über mich weiß“.
     if (gespeichert.data) {
       bereich.hidden = true;
       return;
@@ -132,11 +138,11 @@ export async function mountWochenbilanz(bereich, { userId, anfragen, zeigen }) {
     bereich.hidden = true;
     return;
   }
-  const leisteZeigen = (sichtbar) => {
-    bereich.innerHTML = sichtbar ? wochenLeisteMarkup(woche) : '';
+  const hinweisZeigen = (sichtbar) => {
+    bereich.innerHTML = sichtbar ? wochenHinweisMarkup(woche) : '';
     bereich.hidden = !sichtbar;
   };
-  leisteZeigen(true);
+  hinweisZeigen(true);
 
   async function absenden(event) {
     event.preventDefault();
@@ -166,25 +172,29 @@ export async function mountWochenbilanz(bereich, { userId, anfragen, zeigen }) {
       if (antwort.weekly?.saved) {
         window.dispatchEvent(new CustomEvent('muscledex:wochenbilanz-erledigt', { detail: { week: antwort.weekly.week } }));
       } else {
-        leisteZeigen(true);
+        hinweisZeigen(true);
       }
       zeigen({ text, result: antwort.result, weekly: antwort.weekly, conversationId: antwort.memorySaved ? antwort.conversationId : null });
     } catch (error) {
       zeigen({ fehler: true });
-      leisteZeigen(true);
+      hinweisZeigen(true);
       toast(error?.message || 'Die Wochenbilanz konnte nicht erstellt werden.');
     }
   }
 
   bereich.addEventListener('click', (event) => {
+    if (event.target.closest('[data-woche-hinweis-weg]')) {
+      hinweisZeigen(false);
+      return;
+    }
     if (!event.target.closest('[data-woche-starten]')) return;
-    leisteZeigen(false);
+    hinweisZeigen(false);
     const fenster = zeigen({ frage: wochenFrageMarkup({ woche, massnahmen }) });
     if (!fenster) return;
     fenster.querySelector('[data-woche-form]')?.addEventListener('submit', absenden);
     fenster.querySelector('[data-woche-spaeter]')?.addEventListener('click', () => {
       fenster.remove();
-      leisteZeigen(true);
+      hinweisZeigen(true);
     });
   });
 }

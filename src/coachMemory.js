@@ -1,12 +1,12 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
-import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
+import { fensterMarkup } from './coachFenster.js';
 import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
 
-/* „Was CAPBOY über mich weiß“ – das Gedächtnis des Coachs (Schritt 5).
+/* „Was der Coach über mich weiß“ – sein Gedächtnis (Schritt 5).
    Drei Teile, alle nur für den Nutzer selbst sichtbar (RLS):
    - Über mich: feste Fakten, die der Nutzer selbst einträgt.
    - Maßnahmen: was ausprobiert wird, auf Wunsch aus einer Coach-Empfehlung.
@@ -111,6 +111,45 @@ export function vergissLokalesGespraech(conversationId = null, storage = session
   return true;
 }
 
+// Ein gespeichertes Gespräch als Runden des Chats: Frage und vollständige
+// Antwort (context.result). Ältere Antworten ohne gespeichertes Ergebnis
+// zeigen ihre Kurzfassung. Die Wochenbilanz bekommt ihren Wochenvergleich
+// zurück; ihre Frage heißt auf dem Server "Wochenbilanz für 2026-W38". Wie im
+// Chat bleiben die letzten acht Runden.
+const WOCHENFRAGE = /^Wochenbilanz für (\d{4})-W(\d{2})$/;
+export function gespraechRunden(nachrichten = [], bilanz = null) {
+  const runden = [];
+  let frage = null;
+  for (const nachricht of [...nachrichten].sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))) {
+    if (nachricht.role === 'user') { frage = nachricht; continue; }
+    if (nachricht.role !== 'assistant' || !frage) continue;
+    const woche = String(frage.content || '').match(WOCHENFRAGE);
+    const runde = {
+      frage: woche ? `Wochenbilanz KW ${Number(woche[2])}` : String(frage.content || ''),
+      result: nachricht.context?.result || { summary: String(nachricht.content || '') },
+    };
+    if (woche && bilanz?.comparison?.length) runde.weekly = { week: bilanz.week, comparison: bilanz.comparison };
+    runden.push(runde);
+    frage = null;
+  }
+  return runden.slice(-8);
+}
+
+// Holt ein gespeichertes Gespräch zurück in den Chat; die nächste Frage setzt
+// es fort. Die Coach-Ansicht wird neu aufgebaut, damit sie es liest (main.js).
+export async function setzeGespraechFort(userId, conversationId) {
+  const [nachrichten, bilanz] = await Promise.all([
+    supabase.from('ai_coach_messages').select('role,content,context,created_at').eq('user_id', userId).eq('conversation_id', conversationId).order('created_at', { ascending: true }),
+    supabase.from('coach_weekly_reviews').select('week,comparison').eq('user_id', userId).eq('conversation_id', conversationId).maybeSingle(),
+  ]);
+  if (nachrichten.error) throw nachrichten.error;
+  const runden = gespraechRunden(nachrichten.data || [], bilanz.error ? null : bilanz.data);
+  if (!runden.length) throw new Error('Das Gespräch enthält noch keine Antwort.');
+  sessionStorage.setItem(COACH_CONVERSATION_KEY, JSON.stringify({ id: conversationId, runden }));
+  window.dispatchEvent(new CustomEvent('muscledex:ansicht-neu-aufbauen', { detail: { route: 'coach' } }));
+  location.hash = 'coach';
+}
+
 // Eine Coach-Empfehlung als Maßnahme, ab heute. Ein Experiment bringt
 // Hypothese, Zielgröße, Richtung, Ausgangswert und Prüfdatum mit; ältere
 // Antworten nur Aktion und Begründung. Ein Prüfdatum vor heute wird verworfen.
@@ -163,7 +202,7 @@ function optionen(liste, gewaehlt) {
 function faktFormular(fakt = {}) {
   return `<form class="gedaechtnis-formular" data-fakt-formular${fakt.id ? ` data-id="${escapeHtml(fakt.id)}"` : ''}>
     <label>Kategorie<select name="category" required>${optionen(KATEGORIEN, fakt.category || 'einschraenkung')}</select></label>
-    <label>Was CAPBOY wissen soll<textarea name="fact" rows="2" maxlength="500" required placeholder="Zum Beispiel: Knieschmerzen links bei tiefen Kniebeugen">${escapeHtml(fakt.fact || '')}</textarea></label>
+    <label>Was der Coach wissen soll<textarea name="fact" rows="2" maxlength="500" required placeholder="Zum Beispiel: Knieschmerzen links bei tiefen Kniebeugen">${escapeHtml(fakt.fact || '')}</textarea></label>
     <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="submit">${fakt.id ? 'Änderung speichern' : 'Merken'}</button><button class="coach-knopf" type="button" data-abbrechen>Abbrechen</button></div>
   </form>`;
 }
@@ -225,9 +264,9 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
   const gespraechListe = gespraeche.map((gespraech) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(gespraech.id)}">
       <details>
         <summary><b>${escapeHtml(kuerzen(gespraech.verlauf.find((nachricht) => nachricht.role === 'user')?.content || 'Gespräch', 90))}</b><small>${datum(gespraech.beginn)} · ${gespraech.fragen} ${gespraech.fragen === 1 ? 'Frage' : 'Fragen'}</small></summary>
-        <ol class="gedaechtnis-verlauf">${gespraech.verlauf.map((nachricht) => `<li class="${nachricht.role === 'user' ? 'ist-frage' : 'ist-antwort'}"><small>${nachricht.role === 'user' ? 'Du' : 'CAPBOY'}</small><p>${escapeHtml(nachricht.content)}</p></li>`).join('')}</ol>
+        <ol class="gedaechtnis-verlauf">${gespraech.verlauf.map((nachricht) => `<li class="${nachricht.role === 'user' ? 'ist-frage' : 'ist-antwort'}"><small>${nachricht.role === 'user' ? 'Du' : 'Coach'}</small><p>${escapeHtml(nachricht.content)}</p></li>`).join('')}</ol>
       </details>
-      <div class="gedaechtnis-aktionen"><button class="coach-knopf" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
+      <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="button" data-gespraech-fortsetzen="${escapeHtml(gespraech.id)}">Fortsetzen</button><button class="coach-knopf" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
     </li>`).join('');
   const bilanzListe = (wochenbilanzen || []).map((bilanz) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(bilanz.id)}">
       <details>
@@ -239,13 +278,13 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
     </li>`).join('');
   const bereich = (titel, inhalt) => fensterMarkup({ von: 'bereich', titel, bild: '', klasse: 'gedaechtnis-bereich', inhalt });
   return [
-    bereich('Über mich', `<p class="gedaechtnis-hinweis">Feste Fakten, die CAPBOY bei jeder Antwort beachtet: Verletzungen, Ausstattung, Zeitplan, Vorlieben. Deine Messwerte kennt er ohnehin aus den Fachseiten.</p>
+    bereich('Über mich', `<p class="gedaechtnis-hinweis">Feste Fakten, die der Coach bei jeder Antwort beachtet: Verletzungen, Ausstattung, Zeitplan, Vorlieben. Deine Messwerte kennt er ohnehin aus den Fachseiten.</p>
       ${fakten.length ? `<ul class="gedaechtnis-liste">${faktListe}</ul>` : '<p class="gedaechtnis-leer">Noch nichts eingetragen.</p>'}
       ${bearbeiten === 'fakt:neu' ? faktFormular() : '<button class="coach-knopf" type="button" data-fakt-neu>+ Fakt hinzufügen</button>'}`),
-    bereich('Maßnahmen', `<p class="gedaechtnis-hinweis">Ist das Prüfdatum erreicht, bewertet CAPBOY die Maßnahme zuerst, bevor er etwas Neues im selben Bereich vorschlägt.</p>
+    bereich('Maßnahmen', `<p class="gedaechtnis-hinweis">Ist das Prüfdatum erreicht, bewertet der Coach die Maßnahme zuerst, bevor er etwas Neues im selben Bereich vorschlägt.</p>
       ${massnahmen.length ? `<ul class="gedaechtnis-liste">${massnahmenListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Maßnahme. Übernimm eine Empfehlung des Coachs oder lege selbst eine an.</p>'}
       ${bearbeiten === 'massnahme:neu' ? massnahmeFormular() : '<button class="coach-knopf" type="button" data-massnahme-neu>+ Maßnahme anlegen</button>'}`),
-    bereich('Gespräche', `<p class="gedaechtnis-hinweis">Der Coach sieht nur das laufende Gespräch.</p>
+    bereich('Gespräche', `<p class="gedaechtnis-hinweis">Der Coach sieht nur das laufende Gespräch. Mit „Fortsetzen“ holst du ein früheres zurück in den Chat.</p>
       ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="coach-knopf" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}`),
     wochenbilanzen ? bereich('Wochenbilanzen', `<p class="gedaechtnis-hinweis">Der Coach sieht davon nur den vorgeschlagenen Fokus der letzten Bilanz – in der Bilanz der folgenden Woche.</p>
       ${wochenbilanzen.length ? `<ul class="gedaechtnis-liste">${bilanzListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Wochenbilanz. Nach jeder abgeschlossenen Woche bietet die Coach-Seite den Check-in an.</p>'}`) : '',
@@ -348,9 +387,7 @@ export async function mountCoachMemoryPage(container, { userId }) {
   const formularWerte = (formular) => Object.fromEntries(new FormData(formular).entries());
   const leerZuNull = (wert) => (String(wert ?? '').trim() ? String(wert).trim() : null);
 
-  container.addEventListener('click', (event) => { fensterEinklappen(event); });
   inhalt.addEventListener('click', (event) => {
-    if (event.target.closest('[data-fenster-einklappen]')) return;
     const knopf = event.target.closest('button');
     if (!knopf) return;
     const { dataset } = knopf;
@@ -364,13 +401,21 @@ export async function mountCoachMemoryPage(container, { userId }) {
       return;
     }
     if (dataset.faktLoeschen) {
-      if (!confirm('Diesen Fakt löschen? CAPBOY weiß ihn danach nicht mehr.')) return;
+      if (!confirm('Diesen Fakt löschen? Der Coach weiß ihn danach nicht mehr.')) return;
       ausfuehren(() => ergebnis(supabase.from('coach_profile_memory').delete().eq('id', dataset.faktLoeschen).eq('user_id', userId)), 'Gelöscht.');
       return;
     }
     if (dataset.massnahmeLoeschen) {
       if (!confirm('Diese Maßnahme löschen?')) return;
       ausfuehren(() => ergebnis(supabase.from('coach_interventions').delete().eq('id', dataset.massnahmeLoeschen).eq('user_id', userId)), 'Gelöscht.');
+      return;
+    }
+    if (dataset.gespraechFortsetzen) {
+      knopf.disabled = true;
+      setzeGespraechFort(userId, dataset.gespraechFortsetzen).catch((error) => {
+        knopf.disabled = false;
+        toast(error?.message || 'Das Gespräch konnte nicht geladen werden.');
+      });
       return;
     }
     if (dataset.gespraechLoeschen) {

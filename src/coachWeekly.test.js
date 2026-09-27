@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  UMSTAENDE, checkinText, faelligeWoche, vergleichMarkup, wochenFrageMarkup, wochenLeisteMarkup, wochenTitel,
+  UMSTAENDE, checkinText, faelligeWoche, vergleichMarkup, wochenFrageMarkup, wochenHinweisMarkup, wochenTitel,
 } from './coachWeekly.js';
 import { gedaechtnisMarkup } from './coachMemory.js';
 import { WEEKLY_CIRCUMSTANCES } from '../supabase/functions/capboy-coach/weekly.ts';
@@ -28,11 +28,13 @@ describe('Wochen-Check-in: Woche', () => {
 describe('Wochen-Check-in im Chat', () => {
   const massnahmen = [{ id: 'm1', action: '<b>Früher essen</b>', adherence: 'teilweise' }];
 
-  it('lädt mit einer schmalen Leiste zum Check-in ein', () => {
-    const leiste = wochenLeisteMarkup(woche);
-    expect(leiste).toContain('Wochenbilanz KW 38 ist bereit');
-    expect(leiste).toContain('data-woche-starten');
-    expect(leiste).not.toContain('data-woche-form');
+  it('lädt als Nachricht des Coachs zum Check-in ein', () => {
+    const hinweis = wochenHinweisMarkup(woche);
+    expect(hinweis).toContain('coach-chat-window is-coach coach-woche-hinweis');
+    expect(hinweis).toContain('Die KW 38 ist vorbei. Wollen wir Bilanz ziehen?');
+    expect(hinweis).toContain('data-woche-starten');
+    expect(hinweis).toContain('data-woche-hinweis-weg');
+    expect(hinweis).not.toContain('data-woche-form');
   });
 
   it('stellt die Fragen als Nachricht: Umsetzung je Maßnahme, Umstände, Notiz', () => {
