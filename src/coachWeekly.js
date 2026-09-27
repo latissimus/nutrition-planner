@@ -63,24 +63,43 @@ export function vergleichMarkup(weekly) {
 function formularMarkup(massnahmen) {
   const optionen = (gewaehlt) => UMSETZUNG.map(([id, name]) => `<option value="${id}"${id === gewaehlt ? ' selected' : ''}>${escapeHtml(name)}</option>`).join('');
   return `<form class="coach-woche-form" data-woche-form>
-    ${massnahmen.length ? `<fieldset><legend>Wie gut hast du das diese Woche umgesetzt?</legend>
+    ${massnahmen.length ? `<fieldset><legend>Wie gut hast du das umgesetzt?</legend>
       ${massnahmen.map((massnahme) => `<label>${escapeHtml(massnahme.action)}<select data-massnahme="${escapeHtml(massnahme.id)}">${optionen(massnahme.adherence)}</select></label>`).join('')}
     </fieldset>` : ''}
     <fieldset><legend>War etwas besonders?</legend>
       <div class="coach-woche-chips">${UMSTAENDE.map(([id, name]) => `<label class="coach-woche-chip"><input type="checkbox" name="umstand" value="${id}"><span>${escapeHtml(name)}</span></label>`).join('')}</div>
     </fieldset>
     <label>Notiz (optional)<textarea name="notiz" rows="2" maxlength="${WEEKLY_NOTE_MAX}" placeholder="Zum Beispiel: ab Mittwoch erkältet"></textarea></label>
-    <button class="btn btn-primary" type="submit">Wochenbilanz erstellen</button>
+    <div class="coach-woche-knoepfe"><button class="coach-merken ist-wichtig" type="submit">Wochenbilanz erstellen</button><button class="coach-merken" type="button" data-woche-spaeter>Später</button></div>
   </form>`;
 }
 
-// Die Karte über der Frage: offen, als Formular oder schon erledigt.
-export function wochenKarteMarkup({ woche, bilanz = null, massnahmen = [], offen = false } = {}) {
-  const titel = escapeHtml(wochenTitel(woche));
-  if (bilanz) {
-    return `<div class="coach-woche-karte ist-erledigt"><div><small>WOCHENBILANZ</small><b>${titel}</b><p>Die Bilanz dieser Woche ist erstellt.</p></div><button class="btn" type="button" data-woche-ansehen>Ansehen</button></div>`;
-  }
-  return `<div class="coach-woche-karte"><div><small>WOCHEN-CHECK-IN</small><b>${titel}</b><p>Die Woche ist abgeschlossen. Zwei kurze Fragen, dann ordnet CAPBOY sie im Vergleich zur Vorwoche ein und wertet fällige Experimente aus.</p></div>${offen ? formularMarkup(massnahmen) : '<button class="btn btn-primary" type="button" data-woche-starten>Check-in starten</button>'}</div>`;
+// Schmale Leiste über dem Chat, solange die Bilanz der Woche fehlt.
+export function wochenLeisteMarkup(woche) {
+  const kw = /^\d{4}-W\d{2}$/.test(String(woche?.week || '')) ? ` KW ${Number(woche.week.slice(6))}` : '';
+  return `<button class="coach-woche-leiste" type="button" data-woche-starten><span class="coach-woche-punkt" aria-hidden="true"></span><span>Wochenbilanz${kw} ist bereit</span><b>Starten ›</b></button>`;
+}
+
+// Die Fragen des Check-ins als Nachricht von CAPBOY im Chat.
+export function wochenFrageMarkup({ woche, massnahmen = [] } = {}) {
+  const kw = /^\d{4}-W\d{2}$/.test(String(woche?.week || '')) ? `KW ${Number(woche.week.slice(6))}` : 'Woche';
+  return `<p>Die ${escapeHtml(kw)} ist vorbei. Zwei kurze Fragen, dann bilanziere ich sie gegen die Vorwoche${massnahmen.length ? ' und schaue auf deine Experimente' : ''}.</p>${formularMarkup(massnahmen)}`;
+}
+
+// Was der Nutzer angegeben hat, als seine Nachricht im Chat.
+export function checkinText({ woche, massnahmen = [], bericht = {} } = {}) {
+  const umsetzung = (bericht.interventions || []).map((eintrag) => {
+    const massnahme = massnahmen.find((kandidat) => kandidat.id === eintrag.id);
+    const stufe = UMSETZUNG.find(([id]) => id === eintrag.adherence)?.[1] || eintrag.adherence;
+    return massnahme ? `${massnahme.action}: ${stufe}` : '';
+  }).filter(Boolean);
+  const umstaende = (bericht.circumstances || []).map((id) => UMSTAENDE.find(([kandidat]) => kandidat === id)?.[1]).filter(Boolean);
+  return [
+    `Wochen-Check-in ${wochenTitel(woche)}`,
+    ...umsetzung.map((zeile) => `Umgesetzt – ${zeile}`),
+    `Besonders: ${umstaende.length ? umstaende.join(', ') : 'nichts'}`,
+    bericht.note ? `Notiz: ${bericht.note}` : '',
+  ].filter(Boolean).join('\n');
 }
 
 // Ohne Tabelle (Migration fehlt) oder bei einem Fehler: kein Hinweis.
@@ -89,81 +108,83 @@ export async function istWochenbilanzFaellig(userId, heute = heuteUtc()) {
   return !error && !data?.length;
 }
 
-// Karte auf der Coach-Seite. anfragen(body) ruft die Edge Function auf;
-// zeigen() zeigt Laden, Fehler oder die fertige Bilanz im Antwortbereich.
+// Leiste auf der Coach-Seite. anfragen(body) ruft die Edge Function auf.
+// zeigen() gehört zur Chatseite: { frage } hängt die Fragen als Nachricht an
+// und gibt das Fenster zurück; { laden, text }, { fehler } und
+// { text, result, weekly, conversationId } zeigen den weiteren Verlauf.
 export async function mountWochenbilanz(bereich, { userId, anfragen, zeigen }) {
   const woche = faelligeWoche();
-  let bilanz = null;
   let massnahmen = [];
   try {
     const [gespeichert, laufend] = await Promise.all([
-      supabase.from('coach_weekly_reviews').select('week,comparison,result,conversation_id').eq('user_id', userId).eq('week', woche.week).maybeSingle(),
+      supabase.from('coach_weekly_reviews').select('id').eq('user_id', userId).eq('week', woche.week).maybeSingle(),
       supabase.from('coach_interventions').select('id,action,adherence').eq('user_id', userId).eq('status', 'aktiv').order('start_date', { ascending: false }).limit(5),
     ]);
     if (gespeichert.error) throw gespeichert.error;
-    bilanz = gespeichert.data;
+    // Schon bilanziert: keine Leiste. Die Bilanz steht unter „Was CAPBOY über mich weiß“.
+    if (gespeichert.data) {
+      bereich.hidden = true;
+      return;
+    }
     massnahmen = laufend.error ? [] : laufend.data || [];
   } catch (error) {
     if (!istNichtEingerichtet(error)) console.warn('Wochen-Check-in nicht verfügbar:', error?.message);
     bereich.hidden = true;
     return;
   }
-  const zeichnen = (offen = false) => {
-    bereich.innerHTML = wochenKarteMarkup({ woche, bilanz, massnahmen, offen });
-    bereich.hidden = false;
+  const leisteZeigen = (sichtbar) => {
+    bereich.innerHTML = sichtbar ? wochenLeisteMarkup(woche) : '';
+    bereich.hidden = !sichtbar;
   };
-  zeichnen();
+  leisteZeigen(true);
 
-  bereich.addEventListener('click', (event) => {
-    if (event.target.closest('[data-woche-starten]')) {
-      zeichnen(true);
-      bereich.querySelector('select, input')?.focus();
-      return;
-    }
-    if (event.target.closest('[data-woche-ansehen]') && bilanz) {
-      zeigen({ result: bilanz.result, weekly: { ...woche, week: bilanz.week, comparison: bilanz.comparison, previousWeek: faelligeWoche(woche.from).week }, conversationId: bilanz.conversation_id });
-    }
-  });
-
-  bereich.addEventListener('submit', async (event) => {
+  async function absenden(event) {
     event.preventDefault();
     const formular = event.target;
-    const knopf = formular.querySelector('button[type="submit"]');
-    knopf.disabled = true;
-    knopf.textContent = 'CAPBOY bilanziert …';
-    zeigen({ laden: true });
+    const bericht = {
+      circumstances: [...formular.querySelectorAll('[name="umstand"]:checked')].map((feld) => feld.value),
+      note: String(formular.elements.notiz?.value || '').trim().slice(0, WEEKLY_NOTE_MAX),
+      // Historical snapshot for this week. The server resolves the action
+      // text from the authenticated user's active interventions.
+      interventions: [...formular.querySelectorAll('[data-massnahme]')].map((feld) => ({
+        id: feld.dataset.massnahme,
+        adherence: feld.value,
+      })),
+    };
+    const text = checkinText({ woche, massnahmen, bericht });
+    zeigen({ laden: true, text });
     try {
       // Die Umsetzung trägt der Nutzer selbst ein, nur geänderte Werte.
-      for (const auswahl of formular.querySelectorAll('[data-massnahme]')) {
-        const massnahme = massnahmen.find((eintrag) => eintrag.id === auswahl.dataset.massnahme);
-        if (!massnahme || massnahme.adherence === auswahl.value) continue;
-        const { error } = await supabase.from('coach_interventions').update({ adherence: auswahl.value }).eq('id', massnahme.id).eq('user_id', userId);
+      for (const eintrag of bericht.interventions) {
+        const massnahme = massnahmen.find((kandidat) => kandidat.id === eintrag.id);
+        if (!massnahme || massnahme.adherence === eintrag.adherence) continue;
+        const { error } = await supabase.from('coach_interventions').update({ adherence: eintrag.adherence }).eq('id', massnahme.id).eq('user_id', userId);
         if (error) throw error;
-        massnahme.adherence = auswahl.value;
+        massnahme.adherence = eintrag.adherence;
       }
-      const bericht = {
-        circumstances: [...formular.querySelectorAll('[name="umstand"]:checked')].map((feld) => feld.value),
-        note: String(formular.elements.notiz?.value || '').trim().slice(0, WEEKLY_NOTE_MAX),
-        // Historical snapshot for this week. The server resolves the action
-        // text from the authenticated user's active interventions.
-        interventions: [...formular.querySelectorAll('[data-massnahme]')].map((feld) => ({
-          id: feld.dataset.massnahme,
-          adherence: feld.value,
-        })),
-      };
       const antwort = await anfragen({ scope: 'coach', mode: 'weekly', weekly: bericht });
-      const gespraech = antwort.memorySaved ? antwort.conversationId : null;
       if (antwort.weekly?.saved) {
-        bilanz = { week: antwort.weekly.week, comparison: antwort.weekly.comparison, result: antwort.result, conversation_id: gespraech };
         window.dispatchEvent(new CustomEvent('muscledex:wochenbilanz-erledigt', { detail: { week: antwort.weekly.week } }));
+      } else {
+        leisteZeigen(true);
       }
-      zeichnen();
-      zeigen({ result: antwort.result, weekly: antwort.weekly, conversationId: gespraech });
+      zeigen({ text, result: antwort.result, weekly: antwort.weekly, conversationId: antwort.memorySaved ? antwort.conversationId : null });
     } catch (error) {
-      knopf.disabled = false;
-      knopf.textContent = 'Wochenbilanz erstellen';
       zeigen({ fehler: true });
+      leisteZeigen(true);
       toast(error?.message || 'Die Wochenbilanz konnte nicht erstellt werden.');
     }
+  }
+
+  bereich.addEventListener('click', (event) => {
+    if (!event.target.closest('[data-woche-starten]')) return;
+    leisteZeigen(false);
+    const fenster = zeigen({ frage: wochenFrageMarkup({ woche, massnahmen }) });
+    if (!fenster) return;
+    fenster.querySelector('[data-woche-form]')?.addEventListener('submit', absenden);
+    fenster.querySelector('[data-woche-spaeter]')?.addEventListener('click', () => {
+      fenster.remove();
+      leisteZeigen(true);
+    });
   });
 }

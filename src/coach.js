@@ -6,7 +6,7 @@ import { toast } from './toast.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
-import { mountWochenbilanz, vergleichMarkup, wochenTitel } from './coachWeekly.js';
+import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
 
 const CONTEXT_KEY = 'muscledex:coach-context';
 // Laufendes Gespräch dieses Tabs: ID vom Server und die bisherigen Runden.
@@ -38,10 +38,6 @@ function nutzerAvatarMarkup(profile, email = '') {
   const teile = quelle.split(/\s+/).filter(Boolean);
   const initialen = (teile.length > 1 ? `${teile[0][0]}${teile[1][0]}` : quelle.slice(0, 2)).toUpperCase();
   return `<span>${escapeHtml(initialen)}</span>`;
-}
-
-function ladeMarkup(text, detail) {
-  return `<div class="coach-loading" role="status"><img class="coach-hourglass" src="${hourglassUrl}" alt=""><b>${escapeHtml(text)}</b>${detail ? `<p>${escapeHtml(detail)}</p>` : ''}</div>`;
 }
 
 async function bildAnhang(file) {
@@ -83,36 +79,81 @@ function empfehlungMarkup(item, index, merken) {
   ].join('') : '';
   const pruefen = experiment && tagDatum(item.reviewDate) ? ` · prüfen am ${tagDatum(item.reviewDate)}` : '';
   const knopf = merken && art !== 'sicherheit'
-    ? `<button class="btn coach-merken" type="button" data-empfehlung-merken="${index}">${experiment ? 'Als Experiment merken' : 'Als Maßnahme merken'}</button>` : '';
-  return `<article${art ? ` class="ist-${art}"` : ''}>${art ? `<span class="coach-art">${ART[art]}${pruefen}</span>` : ''}<b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p>${details}<small>${escapeHtml(readableModelText(item.timeframe))}</small>${knopf}</article>`;
+    ? `<button class="coach-merken" type="button" data-empfehlung-merken="${index}">${experiment ? 'Als Experiment merken' : 'Als Maßnahme merken'}</button>` : '';
+  return `<article class="coach-schritt${art ? ` ist-${art}` : ''}">${art ? `<span class="coach-art">${ART[art]}${pruefen}</span>` : ''}<b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p>${details}<small>${escapeHtml(readableModelText(item.timeframe))}</small>${knopf}</article>`;
 }
 
 // Auswertungen fälliger Experimente (Schritt 6).
 function auswertungenMarkup(auswertungen = [], merken = false) {
   if (!auswertungen.length) return '';
-  return `<section class="coach-result-section is-action"><h3><span>Auswertung deiner Experimente</span><em>KI-Einordnung der App-Messung</em></h3><div class="coach-recommendations">${auswertungen.map((item, index) => `<article><span class="coach-art">${escapeHtml(bezeichnung(URTEILE, item.verdict))} · ${escapeHtml(bezeichnung(ENTSCHEIDUNGEN, item.decision))}</span><p>${escapeHtml(readableModelText(item.basis))}</p>${merken ? `<button class="btn coach-merken" type="button" data-auswertung-uebernehmen="${index}">Ergebnis übernehmen</button>` : ''}</article>`).join('')}</div></section>`;
+  return `<section class="coach-schritte"><h4>Auswertung deiner Experimente</h4>${auswertungen.map((item, index) => `<article class="coach-schritt"><span class="coach-art">${escapeHtml(bezeichnung(URTEILE, item.verdict))} · ${escapeHtml(bezeichnung(ENTSCHEIDUNGEN, item.decision))}</span><p>${escapeHtml(readableModelText(item.basis))}</p>${merken ? `<button class="coach-merken" type="button" data-auswertung-uebernehmen="${index}">Ergebnis übernehmen</button>` : ''}</article>`).join('')}</section>`;
 }
 
+const liste = (eintraege) => `<ul>${eintraege.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul>`;
+
+// Eine Antwort als Chatnachricht: zuerst die Antwort selbst, dann was zu tun
+// ist; Daten, Einordnung und Unsicherheiten stehen zugeklappt darunter.
 export function resultMarkup(result, { merken = false } = {}) {
   if (!result) return '';
   const facts = (result.facts || []).slice(0, 6);
   const interpretations = (result.interpretations || []).slice(0, 5);
+  const uncertainties = (result.uncertainties || []).slice(0, 5);
   const recommendations = (result.recommendations || []).slice(0, 3);
   const webSources = (result.webSources || []).flatMap((source) => {
     const url = safeExternalUrl(source?.url);
     return url ? [{ title: source?.title || new URL(url).hostname, url }] : [];
   }).slice(0, 8);
+  const mehr = [
+    facts.length ? `<h4>Daten</h4>${liste(facts)}` : '',
+    interpretations.length ? `<h4>Einordnung</h4>${liste(interpretations)}` : '',
+    uncertainties.length ? `<h4>Noch unsicher</h4>${liste(uncertainties)}` : '',
+  ].join('');
   return `<div class="coach-result">
-    <header><span><small>${escapeHtml(readableModelText(result.title || 'CAPBOY COACH'))}</small><b>${escapeHtml(readableModelText(result.summary || ''))}</b></span><span class="coach-result-meta">${coachIconMarkup('coach-cap-badge')}<em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></span></header>
-    ${facts.length ? `<section class="coach-result-section is-data"><h3><span>Berücksichtigte Daten</span><em>KI-Zusammenfassung deiner CAPBOY-Daten</em></h3><ul>${facts.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
-    ${interpretations.length ? `<section class="coach-result-section is-ai"><h3><span>Einordnung</span><em>KI-Interpretation</em></h3><ul>${interpretations.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
+    <p class="coach-antwort">${escapeHtml(readableModelText(result.summary || ''))}</p>
+    ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
     ${auswertungenMarkup((result.experimentReviews || []).slice(0, 5), merken)}
-    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item, index) => empfehlungMarkup(item, index, merken)).join('')}</div></section>` : ''}
-    ${result.uncertainties?.length ? `<details><summary>Unsicherheiten und fehlende Daten</summary><ul>${result.uncertainties.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></details>` : ''}
-    ${webSources.length ? `<details class="coach-web-sources" open><summary>Verwendete Webquellen</summary><ul>${webSources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`).join('')}</ul></details>` : ''}
+    ${recommendations.length ? `<section class="coach-schritte"><h4>Nächste Schritte</h4>${recommendations.map((item, index) => empfehlungMarkup(item, index, merken)).join('')}</section>` : ''}
+    ${mehr ? `<details class="coach-mehr"><summary>Daten &amp; Einordnung</summary>${mehr}</details>` : ''}
+    ${webSources.length ? `<details class="coach-mehr coach-web-sources"><summary>Verwendete Webquellen</summary><ul>${webSources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`).join('')}</ul></details>` : ''}
     ${result.webResearchRequested && !webSources.length ? '<small class="coach-web-status">Keine Webquelle verwendet</small>' : ''}
+    ${result.confidence ? `<small class="coach-datenlage">Datenlage: ${escapeHtml(result.confidence)}</small>` : ''}
   </div>`;
 }
+
+// Nachricht als Retro-Fenster. "_" klappt den Inhalt ein; die beiden anderen
+// Knöpfe sind nur Dekor.
+export function fensterMarkup({ von = 'coach', inhalt = '', avatar = '', runde = null, klasse = '' } = {}) {
+  const nutzer = von === 'user';
+  const bild = nutzer ? `<span class="coach-chat-avatar">${avatar}</span>` : coachIconMarkup('coach-chat-cap');
+  return `<article class="coach-chat-window is-${nutzer ? 'user' : 'coach'}${klasse ? ` ${klasse}` : ''}"${runde == null ? '' : ` data-runde="${runde}"`}>
+    <header>${bild}<b>${nutzer ? 'Du' : 'CAPBOY'}</b><span class="coach-fenster-knoepfe"><button type="button" data-fenster-einklappen aria-expanded="true" aria-label="Nachricht einklappen">_</button><span aria-hidden="true">□</span><span aria-hidden="true">×</span></span></header>
+    <div class="coach-chat-message">${inhalt}</div>
+  </article>`;
+}
+
+const nutzerText = (text, hatAnhang = false) => `<p>${escapeHtml(text)}</p>${hatAnhang ? '<small>Bild angehängt</small>' : ''}`;
+
+// Das Gespräch: jede Runde als Frage und Antwort. Die Wochenbilanz trägt
+// zusätzlich ihren Wochenvergleich.
+export function verlaufMarkup(runden = [], avatar = '') {
+  if (!runden.length) return '';
+  return runden.map((runde, index) => fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(runde.frage, runde.hatAnhang) })
+    + fensterMarkup({ runde: index, inhalt: `${runde.weekly ? vergleichMarkup(runde.weekly) : ''}${resultMarkup(runde.result, { merken: true })}` })).join('');
+}
+
+const VORSCHLAEGE = ['Wie lief meine letzte Woche?', 'Warum bewegt sich mein Gewicht kaum?', 'Wie kann ich besser schlafen?'];
+
+export function willkommenMarkup({ neu = false } = {}) {
+  return fensterMarkup({
+    klasse: 'coach-welcome',
+    inhalt: `<p>${neu ? 'Neues Gespräch. Womit soll ich dir helfen?' : 'Hi, ich bin CAPBOY. Ich kenne deine Messwerte der letzten zwölf Wochen. Frag mich zu Training, Ernährung, Schlaf oder Körper.'}</p>
+      <div class="coach-vorschlaege">${VORSCHLAEGE.map((vorschlag) => `<button type="button" data-vorschlag="${escapeHtml(vorschlag)}">${escapeHtml(vorschlag)}</button>`).join('')}</div>
+      <small>Ich schätze ein, ich stelle keine medizinischen Diagnosen.</small>`,
+  });
+}
+
+const tipptMarkup = (text) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status"><img src="${hourglassUrl}" alt="">${escapeHtml(text)}<span class="coach-thinking-dots" aria-hidden="true">...</span></p>` });
+const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
 
 async function invokeCoach(scope, question = '', webResearch = false, conversationId = null, attachments = []) {
   return rufeCoach({ scope, question, webResearch, ...(conversationId ? { conversationId } : {}), ...(attachments.length ? { attachments } : {}) });
@@ -152,15 +193,6 @@ function gespraechSchreiben(gespraech) {
   } catch {}
 }
 
-// Frühere Runden des laufenden Gesprächs, zusammengeklappt über der neuesten Antwort.
-export function verlaufMarkup(runden = [], avatar = '') {
-  if (!runden.length) return '';
-  return runden.map((runde) => `<div class="coach-round">
-    <article class="coach-chat-window is-user"><header><span class="coach-chat-avatar">${avatar}</span><b>Du</b></header><div class="coach-chat-message"><p>${escapeHtml(runde.frage)}</p>${runde.hatAnhang ? '<small>Bild angehängt</small>' : ''}</div></article>
-    <article class="coach-chat-window is-coach"><header>${coachIconMarkup('coach-chat-cap')}<b>CAPBOY</b></header><div class="coach-chat-message">${resultMarkup(runde.result, { merken: true })}</div></article>
-  </div>`).join('');
-}
-
 /* Die App legt verlassene Seiten zwischen und bricht dabei ihr Signal ab.
    Kommt der Nutzer zurück, arbeitet dieselbe Ansicht weiter. Antworten
    werden deshalb unabhängig vom Signal geschrieben: Ist die Ansicht gerade
@@ -173,50 +205,66 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   // Eine Frage von einer Fachseite beginnt immer ein neues Gespräch.
   if (pending.question) gespraechSchreiben(null);
   let gespraech = gespraechLesen();
-  let letzteAntwort = null;
+  // Die gerade sichtbaren Runden; "Merken" und "Ergebnis übernehmen" gehören
+  // zur Antwort, unter der sie stehen.
+  let runden = gespraech?.runden || [];
   let anhang = null;
   const { data: coachProfile } = await supabase.from('profiles').select('full_name,avatar_url').eq('id', userId).maybeSingle();
   const avatar = nutzerAvatarMarkup(coachProfile, (await supabase.auth.getUser()).data?.user?.email || '');
   container.classList.add('coach-page');
-  container.innerHTML = `<main class="coach-shell">
-    <header class="coach-hero">
-      <span class="coach-spark" aria-hidden="true">${coachIconMarkup('coach-hero-cap')}</span>
-      <div><small>PERSÖNLICHER COACH</small><h1>Frag CAPBOY</h1><p>Antworten aus deinem Gesamtbild – nicht aus einem einzelnen Messwert.</p></div>
-      <a class="som-info-knopf dex-sammlungskopf-zurueck coach-back" href="#${escapeHtml(backRoute)}" aria-label="Zurück">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>
+  container.innerHTML = `<main class="coach-shell coach-chat">
+    <header class="coach-kopf">
+      <a class="coach-kopf-knopf" href="#${escapeHtml(backRoute)}" aria-label="Zurück">${materialIconMarkup('arrow_back_ios')}</a>
+      <span class="coach-kopf-titel">${coachIconMarkup('coach-kopf-cap')}<b>CAPBOY</b><small>Coach</small></span>
+      <button class="coach-kopf-knopf" type="button" data-neues-gespraech aria-label="Neues Gespräch" title="Neues Gespräch"${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}</button>
+      <a class="coach-kopf-knopf" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${materialIconMarkup('menu_book')}</a>
     </header>
     <section class="coach-woche" data-coach-woche hidden></section>
-    <section class="coach-answer" data-coach-answer aria-live="polite">
-      <article class="coach-chat-window is-coach coach-welcome"><header>${coachIconMarkup('coach-chat-cap')}<b>CAPBOY</b></header><div class="coach-chat-message"><b>Eine Antwort, ein Gesamtbild.</b><p>Was möchtest du über deinen Fortschritt wissen?</p></div></article>
-    </section>
+    <section class="coach-answer" data-coach-answer aria-live="polite"></section>
     <form class="coach-form" data-coach-form>
-      <div class="coach-inputbar">
-        <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Anhänge und Optionen">+</button>
-        <label class="sr-only" for="coach-question">Deine Frage</label>
-        <textarea id="coach-question" rows="1" maxlength="2000" placeholder="Nachricht an CAPBOY">${escapeHtml(pending.question || '')}</textarea>
-        <button class="coach-send" type="submit" aria-label="Nachricht senden">${materialIconMarkup('arrow_forward_ios')}</button>
-      </div>
-      <div class="coach-compose-tools" data-coach-tools hidden>
-        <label class="coach-attachment-option">${materialIconMarkup('add_photo_alternate')}<b>Bild anhängen</b><input type="file" accept="image/*" data-coach-file></label>
-        <label class="coach-web-option"><input type="checkbox" data-coach-web><span><b>Webwissen</b><small>Aktuelle Quellen einbeziehen</small></span></label>
-      </div>
-      <div class="coach-attachment" data-coach-attachment hidden></div>
-      <div class="coach-gespraech-leiste">
-        <button class="btn" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}>Neues Gespräch</button>
-        <a class="coach-gedaechtnis-link" href="#coach-wissen">Was CAPBOY über mich weiß</a>
+      <div class="coach-form-innen">
+        <div class="coach-compose-tools" data-coach-tools hidden>
+          <label class="coach-werkzeug">${materialIconMarkup('add_photo_alternate')}<span>Bild anhängen</span><input type="file" accept="image/*" data-coach-file></label>
+          <label class="coach-werkzeug"><input type="checkbox" data-coach-web><span>Webwissen einbeziehen</span></label>
+        </div>
+        <div class="coach-attachment" data-coach-attachment hidden></div>
+        <div class="coach-inputbar">
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild oder Webwissen hinzufügen">+</button>
+          <label class="sr-only" for="coach-question">Nachricht an CAPBOY</label>
+          <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an CAPBOY">${escapeHtml(pending.question || '')}</textarea>
+          <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('play_arrow')}</button>
+        </div>
       </div>
     </form>
   </main>`;
   const answer = container.querySelector('[data-coach-answer]');
   const form = container.querySelector('[data-coach-form]');
   const field = form.querySelector('textarea');
-  const neuesGespraech = form.querySelector('[data-neues-gespraech]');
+  const neuesGespraech = container.querySelector('[data-neues-gespraech]');
   const tools = form.querySelector('[data-coach-tools]');
   const plus = form.querySelector('[data-coach-plus]');
   const fileInput = form.querySelector('[data-coach-file]');
+  const webOption = form.querySelector('[data-coach-web]');
   const attachmentBox = form.querySelector('[data-coach-attachment]');
+
+  // Die Eingabe sitzt fest am unteren Rand; der Verlauf bekommt unten so viel
+  // Platz, wie sie hoch ist, und rückt bei offener Tastatur mit nach oben.
+  new ResizeObserver(() => container.style.setProperty('--coach-eingabe-h', `${form.offsetHeight}px`)).observe(form);
+  const tastatur = () => {
+    const sicht = window.visualViewport;
+    if (!sicht || !container.isConnected) return;
+    container.style.setProperty('--coach-tastatur', `${Math.max(0, window.innerHeight - sicht.height - sicht.offsetTop)}px`);
+  };
+  window.visualViewport?.addEventListener('resize', tastatur);
+  window.visualViewport?.addEventListener('scroll', tastatur);
+  const nachUnten = (sanft = true) => requestAnimationFrame(() => container.scrollTo({ top: container.scrollHeight, behavior: sanft ? 'smooth' : 'auto' }));
+
+  const zeichnen = (zusatz = '') => {
+    answer.innerHTML = (runden.length ? verlaufMarkup(runden, avatar) : willkommenMarkup()) + zusatz;
+  };
   const resizeField = () => {
     field.style.height = 'auto';
-    field.style.height = `${Math.min(field.scrollHeight, 116)}px`;
+    field.style.height = `${Math.min(field.scrollHeight, 120)}px`;
   };
   field.addEventListener('input', resizeField);
   field.addEventListener('keydown', (event) => {
@@ -224,21 +272,21 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     event.preventDefault();
     form.requestSubmit();
   });
-  resizeField();
   const renderAttachment = () => {
     attachmentBox.hidden = !anhang;
     attachmentBox.innerHTML = anhang ? `<img src="${anhang.dataUrl}" alt=""><span>${escapeHtml(anhang.name)}</span><button type="button" data-remove-attachment aria-label="Anhang entfernen">×</button>` : '';
   };
-  plus.onclick = () => {
-    tools.hidden = !tools.hidden;
-    plus.setAttribute('aria-expanded', String(!tools.hidden));
+  const werkzeugeZeigen = (offen) => {
+    tools.hidden = !offen;
+    plus.setAttribute('aria-expanded', String(offen));
   };
+  plus.onclick = () => werkzeugeZeigen(tools.hidden);
+  webOption.onchange = () => plus.classList.toggle('hat-web', webOption.checked);
   fileInput.onchange = async () => {
     try {
       anhang = await bildAnhang(fileInput.files?.[0]);
       renderAttachment();
-      tools.hidden = true;
-      plus.setAttribute('aria-expanded', 'false');
+      werkzeugeZeigen(false);
     } catch (error) { toast(error?.message || 'Anhang konnte nicht geladen werden.'); }
     fileInput.value = '';
   };
@@ -247,22 +295,39 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     anhang = null;
     renderAttachment();
   };
-  if (gespraech?.runden.length) {
-    const letzte = gespraech.runden.at(-1);
-    letzteAntwort = letzte.result;
-    answer.innerHTML = verlaufMarkup(gespraech.runden, avatar);
-  }
+
+  zeichnen();
+  resizeField();
+  nachUnten(false);
+
   neuesGespraech.onclick = () => {
     gespraech = null;
-    letzteAntwort = null;
+    runden = [];
     gespraechSchreiben(null);
     neuesGespraech.hidden = true;
-    answer.innerHTML = `<article class="coach-chat-window is-coach coach-welcome"><header>${coachIconMarkup('coach-chat-cap')}<b>CAPBOY</b></header><div class="coach-chat-message"><b>Neues Gespräch.</b><p>Womit soll ich dir helfen?</p></div></article>`;
+    answer.innerHTML = willkommenMarkup({ neu: true });
     field.focus();
   };
+
   answer.addEventListener('click', async (event) => {
+    const einklappen = event.target.closest('[data-fenster-einklappen]');
+    if (einklappen) {
+      const fenster = einklappen.closest('.coach-chat-window');
+      const zu = fenster.classList.toggle('ist-eingeklappt');
+      einklappen.setAttribute('aria-expanded', String(!zu));
+      einklappen.setAttribute('aria-label', zu ? 'Nachricht aufklappen' : 'Nachricht einklappen');
+      return;
+    }
+    const vorschlag = event.target.closest('[data-vorschlag]');
+    if (vorschlag) {
+      field.value = vorschlag.dataset.vorschlag;
+      resizeField();
+      form.requestSubmit();
+      return;
+    }
+    const ergebnis = runden[Number(event.target.closest('[data-runde]')?.dataset.runde)]?.result;
     const auswertungsKnopf = event.target.closest('[data-auswertung-uebernehmen]');
-    const auswertung = auswertungsKnopf && letzteAntwort?.experimentReviews?.[Number(auswertungsKnopf.dataset.auswertungUebernehmen)];
+    const auswertung = auswertungsKnopf && ergebnis?.experimentReviews?.[Number(auswertungsKnopf.dataset.auswertungUebernehmen)];
     if (auswertung) {
       auswertungsKnopf.disabled = true;
       try {
@@ -280,7 +345,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       return;
     }
     const knopf = event.target.closest('[data-empfehlung-merken]');
-    const empfehlung = knopf && letzteAntwort?.recommendations?.[Number(knopf.dataset.empfehlungMerken)];
+    const empfehlung = knopf && ergebnis?.recommendations?.[Number(knopf.dataset.empfehlungMerken)];
     if (!empfehlung) return;
     knopf.disabled = true;
     try {
@@ -294,60 +359,74 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht gemerkt werden.'));
     }
   });
-  // Wochen-Check-in (Schritt 7): Die Bilanz beginnt ein neues Gespräch, damit
-  // Rückfragen an sie anschließen.
+
+  // Wochen-Check-in (Schritt 7): CAPBOY stellt die Fragen im Chat. Die Bilanz
+  // beginnt ein neues Gespräch, damit Rückfragen an sie anschließen.
   mountWochenbilanz(container.querySelector('[data-coach-woche]'), {
     userId,
     anfragen: rufeCoach,
-    zeigen: ({ laden, fehler, result, weekly, conversationId }) => {
+    zeigen: ({ frage, laden, fehler, text, result, weekly, conversationId }) => {
+      if (frage) {
+        answer.insertAdjacentHTML('beforeend', fensterMarkup({ klasse: 'coach-checkin', inhalt: frage }));
+        nachUnten();
+        return answer.lastElementChild;
+      }
       if (laden) {
-        answer.innerHTML = ladeMarkup('Wochenbilanz läuft', 'CAPBOY vergleicht die Woche mit der Vorwoche und wertet fällige Experimente aus.');
+        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup('CAPBOY bilanziert deine Woche');
       } else if (fehler) {
-        answer.innerHTML = '<div class="coach-welcome"><b>Keine Wochenbilanz erstellt.</b><p>Deine Messwerte bleiben unverändert. Versuche es später erneut.</p></div>';
+        zeichnen(fehlerMarkup('Keine Wochenbilanz erstellt. Deine Messwerte bleiben unverändert. Versuche es später erneut.'));
       } else {
-        letzteAntwort = result;
-        gespraech = conversationId ? { id: conversationId, runden: [{ frage: `Wochenbilanz ${wochenTitel(weekly)}`, result }] } : null;
+        runden = [{ frage: text, result, weekly }];
+        gespraech = conversationId ? { id: conversationId, runden } : null;
         gespraechSchreiben(gespraech);
         neuesGespraech.hidden = !gespraech;
-        answer.innerHTML = vergleichMarkup(weekly) + resultMarkup(result, { merken: true });
+        zeichnen();
       }
-      answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      nachUnten();
+      return null;
     },
   });
+
   form.onsubmit = async (event) => {
     event.preventDefault();
     const question = field.value.trim();
     if (question.length < 2) return;
-    const webResearch = Boolean(form.querySelector('[data-coach-web]')?.checked);
+    const webResearch = webOption.checked;
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    const aktuelleRunden = gespraech?.runden || [];
-    answer.innerHTML = verlaufMarkup(aktuelleRunden, avatar)
-      + `<article class="coach-chat-window is-user"><header><span class="coach-chat-avatar">${avatar}</span><b>Du</b></header><div class="coach-chat-message"><p>${escapeHtml(question)}</p>${anhang ? '<small>Bild angehängt</small>' : ''}</div></article>`
-      + `<article class="coach-chat-window is-coach is-loading"><header>${coachIconMarkup('coach-chat-cap')}<b>CAPBOY</b></header><div class="coach-chat-message">${ladeMarkup(webResearch ? 'Recherchiere' : 'Denke nach', webResearch ? 'Webwissen und dein Gesamtbild werden verbunden.' : 'Dein Gesamtbild wird ausgewertet.')}</div></article>`;
-    answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    const mitAnhang = Boolean(anhang);
+    field.value = '';
+    resizeField();
+    werkzeugeZeigen(false);
+    answer.innerHTML = verlaufMarkup(runden, avatar)
+      + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang) })
+      + tipptMarkup(webResearch ? 'CAPBOY recherchiert' : 'CAPBOY denkt nach');
+    nachUnten();
     try {
       const response = await invokeCoach('coach', question, webResearch, gespraech?.id, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);
-      letzteAntwort = response.result;
       // Nur wenn der Server die Runde gespeichert hat, gibt es ein
       // Gespräch, an das die nächste Frage anschließen kann.
-      const frueher = gespraech?.id === response.conversationId ? gespraech.runden : [];
+      const frueher = gespraech?.id === response.conversationId ? runden : [];
+      const runde = { frage: question, result: response.result, hatAnhang: mitAnhang };
       if (response.conversationId && response.memorySaved) {
-        gespraech = { id: response.conversationId, runden: [...frueher, { frage: question, result: response.result, hatAnhang: Boolean(anhang) }].slice(-8) };
+        runden = [...frueher, runde].slice(-8);
+        gespraech = { id: response.conversationId, runden };
         gespraechSchreiben(gespraech);
         neuesGespraech.hidden = false;
+      } else {
+        runden = [runde];
       }
-      const sichtbareRunden = response.memorySaved ? gespraech.runden : [{ frage: question, result: response.result, hatAnhang: Boolean(anhang) }];
-      answer.innerHTML = verlaufMarkup(sichtbareRunden, avatar);
-      field.value = '';
-      resizeField();
+      zeichnen();
       anhang = null;
       renderAttachment();
     } catch (error) {
-      answer.innerHTML = '<div class="coach-welcome"><b>Keine Antwort erstellt.</b><p>Deine bisherigen Messwerte bleiben unverändert. Versuche es später erneut.</p></div>';
+      field.value = question;
+      resizeField();
+      zeichnen(fehlerMarkup('Keine Antwort erstellt. Deine Frage steht wieder im Eingabefeld; versuche es gleich noch einmal.'));
       toast(error?.message || 'Coach konnte nicht antworten.');
     } finally {
       button.disabled = false;
+      nachUnten();
     }
   };
 }

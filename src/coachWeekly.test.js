@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { UMSTAENDE, faelligeWoche, vergleichMarkup, wochenKarteMarkup, wochenTitel } from './coachWeekly.js';
+import {
+  UMSTAENDE, checkinText, faelligeWoche, vergleichMarkup, wochenFrageMarkup, wochenLeisteMarkup, wochenTitel,
+} from './coachWeekly.js';
 import { gedaechtnisMarkup } from './coachMemory.js';
 import { WEEKLY_CIRCUMSTANCES } from '../supabase/functions/capboy-coach/weekly.ts';
 
@@ -23,30 +25,34 @@ describe('Wochen-Check-in: Woche', () => {
   });
 });
 
-describe('Wochen-Check-in: Karte', () => {
+describe('Wochen-Check-in im Chat', () => {
   const massnahmen = [{ id: 'm1', action: '<b>Früher essen</b>', adherence: 'teilweise' }];
 
-  it('lädt zum Check-in ein und öffnet das Formular erst auf Wunsch', () => {
-    const karte = wochenKarteMarkup({ woche, massnahmen });
-    expect(karte).toContain('KW 38');
-    expect(karte).toContain('data-woche-starten');
-    expect(karte).not.toContain('data-woche-form');
+  it('lädt mit einer schmalen Leiste zum Check-in ein', () => {
+    const leiste = wochenLeisteMarkup(woche);
+    expect(leiste).toContain('Wochenbilanz KW 38 ist bereit');
+    expect(leiste).toContain('data-woche-starten');
+    expect(leiste).not.toContain('data-woche-form');
   });
 
-  it('fragt Umsetzung je laufender Maßnahme und besondere Umstände ab', () => {
-    const formular = wochenKarteMarkup({ woche, massnahmen, offen: true });
-    expect(formular).toContain('data-woche-form');
-    expect(formular).toContain('&lt;b&gt;Früher essen&lt;/b&gt;');
-    expect(formular).toContain('<option value="teilweise" selected>');
-    for (const [id] of UMSTAENDE) expect(formular).toContain(`value="${id}"`);
-    expect(formular).toContain('maxlength="300"');
-    expect(wochenKarteMarkup({ woche, offen: true })).not.toContain('Wie gut hast du');
+  it('stellt die Fragen als Nachricht: Umsetzung je Maßnahme, Umstände, Notiz', () => {
+    const frage = wochenFrageMarkup({ woche, massnahmen });
+    expect(frage).toContain('Die KW 38 ist vorbei');
+    expect(frage).toContain('data-woche-form');
+    expect(frage).toContain('&lt;b&gt;Früher essen&lt;/b&gt;');
+    expect(frage).toContain('<option value="teilweise" selected>');
+    for (const [id] of UMSTAENDE) expect(frage).toContain(`value="${id}"`);
+    expect(frage).toContain('maxlength="300"');
+    expect(frage).toContain('data-woche-spaeter');
+    expect(wochenFrageMarkup({ woche })).not.toContain('Wie gut hast du');
   });
 
-  it('zeigt eine erstellte Bilanz statt des Check-ins', () => {
-    const karte = wochenKarteMarkup({ woche, bilanz: { week: '2026-W38' } });
-    expect(karte).toContain('data-woche-ansehen');
-    expect(karte).not.toContain('data-woche-starten');
+  it('fasst die Angaben als Nachricht des Nutzers zusammen', () => {
+    expect(checkinText({
+      woche, massnahmen,
+      bericht: { interventions: [{ id: 'm1', adherence: 'ueberwiegend' }, { id: 'fremd', adherence: 'voll' }], circumstances: ['krank', 'stress'], note: 'ab Mittwoch erkältet' },
+    })).toBe('Wochen-Check-in KW 38 · 14.09.–20.09.2026\nUmgesetzt – <b>Früher essen</b>: Überwiegend\nBesonders: Krank, Viel Stress\nNotiz: ab Mittwoch erkältet');
+    expect(checkinText({ woche, bericht: {} })).toBe('Wochen-Check-in KW 38 · 14.09.–20.09.2026\nBesonders: nichts');
   });
 });
 
