@@ -1320,7 +1320,8 @@ function trockenlaufGedaechtnis(fehler) {
     if (JSON.stringify(reihenfolge) !== JSON.stringify(erwartet)) fehler.push(`Gedächtnis: ${fall.id} hat die Blöcke ${reihenfolge.join(', ')}, erwartet ${erwartet.join(', ')}`);
   }
   const rat = FAELLE_GEDAECHTNIS.find((fall) => fall.id === 'gedaechtnis-frueherer-rat');
-  if (kriterienFuer(rat).find((eintrag) => eintrag.kriterium === 'behauptet_erinnerung')?.erwartet !== 'ja') fehler.push('Gedächtnis: Erinnerungsregel im Fall mit Gespräch nicht überschrieben');
+  // Das laufende Gespräch zu zitieren, ist keine Erinnerung an frühere Gespräche.
+  if (kriterienFuer(rat).find((eintrag) => eintrag.kriterium === 'behauptet_erinnerung')?.erwartet !== 'nein') fehler.push('Gedächtnis: Erinnerungsregel im Fall mit Gespräch muss "nein" erwarten');
   const prompt = produktion.coachSystemPrompt('coach', false);
   if (!prompt.includes('you may quote and refer to those supplied turns as the visible context of the current conversation')) fehler.push('Gedächtnis: Prompt erlaubt keinen ausdrücklichen Verweis auf das laufende Gespräch');
   if (!prompt.includes('you never have access to other conversations')) fehler.push('Gedächtnis: Prompt grenzt frühere Gespräche nicht ausdrücklich aus');
@@ -1342,15 +1343,18 @@ function trockenlaufGedaechtnis(fehler) {
   }
   // Knie-Fall: Sprünge verboten, ihre Verneinung erlaubt.
   const knie = FAELLE_GEDAECHTNIS.find((fall) => fall.id === 'gedaechtnis-profil-knie');
-  for (const [satz, soll] of [
-    ['Beinpresse mit begrenztem Bewegungsumfang, keine Sprünge wegen des Knies.', false],
-    ['Ergänze Box Jumps für mehr Schnellkraft.', true],
-    ['Baue zweimal pro Woche Sprünge ein.', true],
-  ]) {
-    const gemeldet = !pruefe(knie, antwortMitSatz('recommendations', satz)).find((pruefung) => pruefung.name === 'nicht: empfiehlt Sprünge trotz Knieschmerzen').bestanden;
-    if (gemeldet !== soll) fehler.push(`Gedächtnis: „${satz}“ sollte ${soll ? '' : 'nicht '}als Sprung-Empfehlung gelten`);
+  const knieProben = [
+    [{ action: 'Beinpresse mit begrenztem Bewegungsumfang, keine Sprünge wegen des Knies.', rationale: '', timeframe: '' }, false],
+    [{ action: 'Ergänze Box Jumps für mehr Schnellkraft.', rationale: '', timeframe: '' }, true],
+    [{ action: 'Baue zweimal pro Woche Sprünge ein.', rationale: '', timeframe: '' }, true],
+    // Echter Satz aus dem Lauf vom 27.09.: gibt die Einschränkung wieder, empfiehlt nichts.
+    [{ action: 'Teste Kabel-Pull-throughs mit zwei kontrollierten Sätzen.', rationale: 'Tiefe Kniebeugen und Sprünge lösen laut deinen Angaben links Knieschmerzen aus.', timeframe: '' }, false],
+  ];
+  for (const [empfehlung, soll] of knieProben) {
+    const gemeldet = !pruefe(knie, { ...antwortMitSatz('summary', 'x'), recommendations: [empfehlung] }).find((pruefung) => pruefung.name === 'nicht: empfiehlt Sprünge trotz Knieschmerzen').bestanden;
+    if (gemeldet !== soll) fehler.push(`Gedächtnis: „${empfehlung.action} | ${empfehlung.rationale}“ sollte ${soll ? '' : 'nicht '}als Sprung-Empfehlung gelten`);
   }
-  return { bloecke, faelle: FAELLE_GEDAECHTNIS.length, zahlen: zahlenProben.length, regeln: 3 };
+  return { bloecke, faelle: FAELLE_GEDAECHTNIS.length, zahlen: zahlenProben.length, regeln: knieProben.length };
 }
 
 // buildCompFacts gegen die Ausgabe der bisherigen Snapshot-Berechnung (fixtures/).

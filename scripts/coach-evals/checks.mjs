@@ -85,6 +85,10 @@ export function ungedeckterTreffer(text, regel) {
 }
 
 export function feldText(antwort, feld = 'alle') {
+  // Nur die empfohlenen Schritte, ohne Begründung und Zeitraum: Dort gibt der
+  // Coach oft Einschränkungen des Nutzers wieder ("Sprünge lösen laut deinen
+  // Angaben Knieschmerzen aus"), ohne sie zu empfehlen.
+  if (feld === 'recommendations.action') return (antwort?.recommendations || []).map((eintrag) => String(eintrag?.action || '')).join('\n');
   const felder = feld === 'alle' ? TEXTFELDER : [feld];
   return felder.flatMap((name) => {
     const wert = antwort?.[name];
