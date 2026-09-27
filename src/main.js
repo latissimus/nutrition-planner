@@ -244,6 +244,10 @@ let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
 let appDockEigene = [];
 let appDockGeladen = false;
 let appDockCoinStand = null;
+// Wochen-Check-in (Schritt 7): Punkt am Coach-Symbol, solange die Bilanz der
+// abgeschlossenen Woche fehlt. Einmal je Sitzung und Nutzer geprüft.
+let wochenbilanzHinweis = false;
+let wochenbilanzGeprueftFuer = null;
 let preferencesLadePromise = Promise.resolve();
 let preferencesLadeUserId = '';
 
@@ -773,8 +777,8 @@ function appDexShellZeichnen(route, view) {
     <div class="app-dex-header-inner">
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
-        <a class="app-dex-coach${istCoach ? ' aktiv' : ''}" href="#coach"
-           aria-label="CAPBOY Coach fragen"${istCoach ? ' aria-current="page"' : ''}>${coachIconMarkup('app-dex-coach-icon')}</a>
+        <a class="app-dex-coach${istCoach ? ' aktiv' : ''}${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
+           aria-label="CAPBOY Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}"${istCoach ? ' aria-current="page"' : ''}>${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
@@ -887,7 +891,29 @@ function appDexShellAktualisieren(route, view, signal) {
     setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
   }
   appDexShellDatenLaden(route, view, signal);
+  wochenbilanzHinweisLaden();
 }
+
+function wochenbilanzHinweisLaden() {
+  const userId = session?.user?.id;
+  if (!userId || wochenbilanzGeprueftFuer === userId) return;
+  wochenbilanzGeprueftFuer = userId;
+  import('./coachWeekly.js')
+    .then(({ istWochenbilanzFaellig }) => istWochenbilanzFaellig(userId))
+    .then((faellig) => {
+      if (!faellig || session?.user?.id !== userId) return;
+      wochenbilanzHinweis = true;
+      const view = app.querySelector(':scope > #view');
+      if (view && istAppHauptDex(aktiveRoute, view)) appDexShellZeichnen(aktiveRoute, view);
+    })
+    .catch((error) => console.warn('Wochen-Check-in konnte nicht geprüft werden:', error?.message));
+}
+
+window.addEventListener('muscledex:wochenbilanz-erledigt', () => {
+  wochenbilanzHinweis = false;
+  const view = app.querySelector(':scope > #view');
+  if (view && istAppHauptDex(aktiveRoute, view)) appDexShellZeichnen(aktiveRoute, view);
+});
 
 window.addEventListener('muscledex:coins-changed', async () => {
   const view = app.querySelector(':scope > #view');
@@ -2072,6 +2098,8 @@ if (!supabaseKonfiguriert) {
       appDockEigene = [];
       appDockGeladen = false;
       appDockCoinStand = null;
+      wochenbilanzHinweis = false;
+      wochenbilanzGeprueftFuer = null;
       setPreferenceUser('');
       preferencesLadeUserId = '';
       preferencesLadePromise = Promise.resolve();
@@ -2087,6 +2115,8 @@ if (!supabaseKonfiguriert) {
       appDockEigene = [];
       appDockGeladen = false;
       appDockCoinStand = null;
+      wochenbilanzHinweis = false;
+      wochenbilanzGeprueftFuer = null;
     }
     if (session?.user?.id) {
       const aktiveUserId = session.user.id;

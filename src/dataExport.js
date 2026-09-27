@@ -35,6 +35,7 @@ export const EXPORT_TABLES = [
   ['coach_ueber_mich', 'coach_profile_memory', 'user_id', ['id'], { optional: true }],
   ['coach_massnahmen', 'coach_interventions', 'user_id', ['id'], { optional: true }],
   ['coach_gespraeche', 'ai_coach_messages', 'user_id', ['created_at', 'id'], { optional: true }],
+  ['coach_wochenbilanzen', 'coach_weekly_reviews', 'user_id', ['week', 'id'], { optional: true }],
 ];
 
 const fehltNoch = (error) => ['42P01', '42703', 'PGRST204', 'PGRST205'].includes(error?.code)

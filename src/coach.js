@@ -5,6 +5,7 @@ import { toast } from './toast.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
+import { mountWochenbilanz, vergleichMarkup, wochenTitel } from './coachWeekly.js';
 
 const CONTEXT_KEY = 'muscledex:coach-context';
 // Laufendes Gespräch dieses Tabs: ID vom Server und die bisherigen Runden.
@@ -76,7 +77,10 @@ export function resultMarkup(result, { merken = false } = {}) {
 }
 
 async function invokeCoach(scope, question = '', webResearch = false, conversationId = null) {
-  const body = { scope, question, webResearch, ...(conversationId ? { conversationId } : {}) };
+  return rufeCoach({ scope, question, webResearch, ...(conversationId ? { conversationId } : {}) });
+}
+
+async function rufeCoach(body) {
   const { data, error } = await supabase.functions.invoke('capboy-coach', { body });
   if (error) {
     let message = error.message;
@@ -136,6 +140,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       <div><small>PERSÖNLICHER COACH</small><h1>Frag CAPBOY</h1><p>Antworten aus deinem Gesamtbild – nicht aus einem einzelnen Messwert.</p></div>
       <a class="som-info-knopf dex-sammlungskopf-zurueck coach-back" href="#${escapeHtml(backRoute)}" aria-label="Zurück">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>
     </header>
+    <section class="coach-woche" data-coach-woche hidden></section>
     <form class="coach-form" data-coach-form>
       <label for="coach-question">Deine Frage</label>
       <textarea id="coach-question" rows="3" maxlength="2000" placeholder="Zum Beispiel: Warum stagniert mein Fortschritt, obwohl ich regelmäßig trainiere?">${escapeHtml(pending.question || '')}</textarea>
@@ -202,6 +207,26 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       knopf.disabled = false;
       toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht gemerkt werden.'));
     }
+  });
+  // Wochen-Check-in (Schritt 7): Die Bilanz beginnt ein neues Gespräch, damit
+  // Rückfragen an sie anschließen.
+  mountWochenbilanz(container.querySelector('[data-coach-woche]'), {
+    userId,
+    anfragen: rufeCoach,
+    zeigen: ({ laden, fehler, result, weekly, conversationId }) => {
+      if (laden) {
+        answer.innerHTML = '<div class="coach-loading"><p class="coach-thinking-label" role="status">Bilanziere deine Woche<span class="coach-thinking-dots" aria-hidden="true">...</span></p><p>CAPBOY vergleicht die Woche mit der Vorwoche und wertet fällige Experimente aus.</p></div>';
+      } else if (fehler) {
+        answer.innerHTML = '<div class="coach-welcome"><b>Keine Wochenbilanz erstellt.</b><p>Deine Messwerte bleiben unverändert. Versuche es später erneut.</p></div>';
+      } else {
+        letzteAntwort = result;
+        gespraech = conversationId ? { id: conversationId, runden: [{ frage: `Wochenbilanz ${wochenTitel(weekly)}`, result }] } : null;
+        gespraechSchreiben(gespraech);
+        neuesGespraech.hidden = !gespraech;
+        answer.innerHTML = vergleichMarkup(weekly) + resultMarkup(result, { merken: true });
+      }
+      answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
   });
   form.onsubmit = async (event) => {
     event.preventDefault();

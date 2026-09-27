@@ -191,7 +191,8 @@ function massnahmeFormular(massnahme = {}) {
   </form>`;
 }
 
-export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [], eingerichtet = true, tag = heute(), bearbeiten = null } = {}) {
+// wochenbilanzen: null, solange die Tabelle des Wochen-Check-ins fehlt.
+export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [], wochenbilanzen = null, eingerichtet = true, tag = heute(), bearbeiten = null } = {}) {
   if (!eingerichtet) {
     return `<div class="coach-welcome"><b>Das Gedächtnis ist noch nicht eingerichtet.</b><p>Die Datenbank wird gerade erweitert. Bis dahin beantwortet CAPBOY jede Frage ohne Gedächtnis – deine Messwerte sieht er trotzdem.</p></div>`;
   }
@@ -228,6 +229,14 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
       </details>
       <div class="gedaechtnis-aktionen"><button class="btn" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
     </li>`).join('');
+  const bilanzListe = (wochenbilanzen || []).map((bilanz) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(bilanz.id)}">
+      <details>
+        <summary><b>KW ${Number(String(bilanz.week).slice(6))} · ${escapeHtml(String(bilanz.week).slice(0, 4))}</b><small>Erstellt am ${datum(String(bilanz.created_at || '').slice(0, 10))}</small></summary>
+        <p>${escapeHtml(bilanz.result?.summary || '')}</p>
+        ${(bilanz.result?.recommendations || []).length ? `<ul>${bilanz.result.recommendations.map((eintrag) => `<li>${escapeHtml(eintrag.action || '')}</li>`).join('')}</ul>` : ''}
+      </details>
+      <div class="gedaechtnis-aktionen"><button class="btn" type="button" data-wochenbilanz-loeschen="${escapeHtml(bilanz.id)}">Löschen</button></div>
+    </li>`).join('');
   return `
     <section class="coach-result-section gedaechtnis-bereich">
       <h3><span>Über mich</span><em>Nur was du selbst einträgst</em></h3>
@@ -244,7 +253,12 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
     <section class="coach-result-section gedaechtnis-bereich">
       <h3><span>Gespräche</span><em>Der Coach sieht nur das laufende</em></h3>
       ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="btn" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}
-    </section>`;
+    </section>
+    ${wochenbilanzen ? `<section class="coach-result-section gedaechtnis-bereich">
+      <h3><span>Wochenbilanzen</span><em>Aus deinen Wochen-Check-ins</em></h3>
+      <p class="gedaechtnis-hinweis">Der Coach sieht davon nur den vorgeschlagenen Fokus der letzten Bilanz – in der Bilanz der folgenden Woche.</p>
+      ${wochenbilanzen.length ? `<ul class="gedaechtnis-liste">${bilanzListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Wochenbilanz. Nach jeder abgeschlossenen Woche bietet die Coach-Seite den Check-in an.</p>'}
+    </section>` : ''}`;
 }
 
 // --------------------------------------------------------------------------
@@ -269,7 +283,19 @@ export async function ladeGedaechtnis(userId) {
     throw fehler;
   }
   const liste = [...(massnahmen.data || [])].sort((a, b) => Number(b.status === 'aktiv') - Number(a.status === 'aktiv') || String(b.start_date).localeCompare(String(a.start_date)));
-  return { eingerichtet: true, fakten: fakten.data || [], massnahmen: liste, gespraeche: gruppiereGespraeche(nachrichten.data || []) };
+  return { eingerichtet: true, fakten: fakten.data || [], massnahmen: liste, gespraeche: gruppiereGespraeche(nachrichten.data || []), wochenbilanzen: await ladeWochenbilanzen(userId) };
+}
+
+// Wochenbilanzen (Schritt 7). Fehlt deren Tabelle noch, bleibt der Rest der
+// Seite nutzbar; der Bereich erscheint dann nicht (null).
+async function ladeWochenbilanzen(userId) {
+  const { data, error } = await supabase.from('coach_weekly_reviews').select('id,week,result,created_at').eq('user_id', userId)
+    .order('week', { ascending: false }).limit(26);
+  if (error) {
+    if (!istNichtEingerichtet(error)) throw error;
+    return null;
+  }
+  return data || [];
 }
 
 export async function merkeEmpfehlung(userId, empfehlung) {
@@ -362,6 +388,11 @@ export async function mountCoachMemoryPage(container, { userId }) {
         await ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).eq('conversation_id', dataset.gespraechLoeschen));
         vergissLokalesGespraech(dataset.gespraechLoeschen);
       }, 'Gespräch gelöscht.');
+      return;
+    }
+    if (dataset.wochenbilanzLoeschen) {
+      if (!confirm('Diese Wochenbilanz löschen? Das Gespräch dazu bleibt unter „Gespräche“.')) return;
+      ausfuehren(() => ergebnis(supabase.from('coach_weekly_reviews').delete().eq('id', dataset.wochenbilanzLoeschen).eq('user_id', userId)), 'Wochenbilanz gelöscht.');
       return;
     }
     if ('gespraecheLoeschen' in dataset) {

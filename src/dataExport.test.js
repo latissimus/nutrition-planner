@@ -48,6 +48,7 @@ describe('vollstaendiger Datenexport', () => {
     expect(result.daten.coach_ueber_mich).toEqual([{ id: 'f1', category: 'verletzung', fact: 'Knie' }]);
     expect(result.daten.coach_massnahmen).toEqual([]);
     expect(result.daten.coach_gespraeche).toEqual([]);
+    expect(result.daten.coach_wochenbilanzen).toEqual([]);
   });
 
   it('bricht bei anderen Fehlern weiterhin ab, auch bei Gedächtnis-Tabellen', async () => {

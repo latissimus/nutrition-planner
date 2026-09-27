@@ -338,6 +338,28 @@ function snapshotFelder(wert, pfad = '', sammlung = []) {
   return sammlung;
 }
 
+// Wochen-Check-in (Schritt 7): Vorwoche, Woche und Veränderung je Messgröße
+// aus timeseries.weeklyCheckin, unter den Feldnamen des Wochenverlaufs. So binden
+// Begriffe und Einheiten wie dort ("Gewicht" an averageWeightKg), und die
+// Veränderung zählt als Veränderungsfeld mit Richtung.
+const WOCHEN_PFADE = {
+  gewicht: '.averageWeightKg', faltensumme: '.latestSkinfoldSumMm', taille: '.latestWaistCm', trainingstage: '.trainingDays',
+  kalorien: '.averageKcal', protein: '.averageProteinG', protokoll: '.completeDays', schlafdauer: '.averageDurationMinutes',
+  schlafqualitaet: '.averageQuality', morgenenergie: '.averageMorningEnergy', erholung: '.averageRecovery', hunger: '.averageHunger',
+};
+export function wochenFelder(block) {
+  const felder = [];
+  for (const eintrag of block?.comparison || []) {
+    const pfad = WOCHEN_PFADE[eintrag.metric];
+    if (!pfad) continue;
+    for (const [seite, wert] of [['previous', eintrag.previous], ['current', eintrag.current]]) {
+      if (typeof wert === 'number') felder.push({ pfad: `.wochenbilanz.${seite}${pfad}`, wert, einheit: feldEinheit(pfad), veraenderung: false });
+    }
+    if (typeof eintrag.change === 'number') felder.push({ pfad: `.wochenbilanz.change${pfad}`, wert: eintrag.change, einheit: feldEinheit(pfad), veraenderung: true });
+  }
+  return felder;
+}
+
 // Zahlen aus deutschem Fließtext mit Vorzeichen, Nachkommastellen und Einheit.
 // "2.700" ist 2700, "89,7" ist 89.7. Datumsangaben werden vorher entfernt.
 export function textZahlen(text) {
@@ -432,7 +454,7 @@ function skalenZitat(satz, eintrag, text) {
 // (Hinweise) aus dem Feld facts.
 export function zahlenBefund(fall, antwort) {
   // Mit Wochenverlauf zählen auch dessen Werte als geliefert.
-  const felder = snapshotFelder(fall.zeitreihe ? { ...fall.daten, timeseries: fall.zeitreihe } : fall.daten);
+  const felder = [...snapshotFelder(fall.zeitreihe ? { ...fall.daten, timeseries: fall.zeitreihe } : fall.daten), ...wochenFelder(fall.wochenbilanz)];
   // Ein Fakt enthält oft mehrere Sätze. Begriffe werden nur im selben Satz
   // gesucht, sonst bindet "Ziel" aus dem Vorsatz die Zahl im nächsten.
   const saetze = (Array.isArray(antwort?.facts) ? antwort.facts.map(String) : [])
@@ -443,7 +465,12 @@ export function zahlenBefund(fall, antwort) {
   // Mit Gedächtnis: Eine Zahl, die dort wörtlich mit derselben Einheit steht
   // (etwa ein früherer Rat "170 g Protein"), gilt als geliefert - als Zitat,
   // nicht als Messwert. Ohne Gedächtnis ändert sich nichts.
-  const gedaechtnisText = fall.gedaechtnis ? Object.values(fall.gedaechtnis).join('\n') : '';
+  // Ebenso, was der Nutzer im Wochen-Check-in selbst schreibt, und der
+  // Fokus der Vorwoche (nicht der Vergleich: der bindet oben an Messgrößen).
+  const gedaechtnisText = [
+    ...(fall.gedaechtnis ? Object.values(fall.gedaechtnis) : []),
+    ...(fall.wochenbilanz ? [JSON.stringify(fall.wochenbilanz.userReport || {}), JSON.stringify(fall.wochenbilanz.previousReview || {})] : []),
+  ].join('\n');
   const gedaechtnis = textZahlen(gedaechtnisText);
   const unbelegt = [];
   const ungebunden = [];
@@ -475,6 +502,20 @@ function faelligeExperimente(fall) {
     return new Map(JSON.parse(fall.gedaechtnis?.intervention_log || '[]').filter((eintrag) => eintrag.reviewDue).map((eintrag) => [eintrag.id, eintrag]));
   } catch {
     return new Map();
+  }
+}
+
+// Wochen-Check-in (Schritt 7), nach <weekly_review> im Prompt. Erwartungen
+// des Falls: keinNeuesExperiment (true) und nichtImBereich [Zielgrößen].
+function wochenPruefungen(fall, antwort, pruefung) {
+  const experimente = antwort.recommendations.filter((eintrag) => eintrag?.kind === 'experiment');
+  const liste = experimente.map((eintrag) => eintrag.targetMetric).join(', ');
+  pruefung('Wochenbilanz: höchstens ein neues Experiment', experimente.length <= 1, `${experimente.length} Experimente (${liste})`);
+  pruefung('Wochenbilanz: höchstens eine Rückfrage', (antwort.followUpQuestions || []).length <= 1, `${(antwort.followUpQuestions || []).length} Rückfragen`);
+  if (fall.erwartet.keinNeuesExperiment) pruefung('Wochenbilanz: kein neues Experiment', !experimente.length, `${experimente.length} Experimente (${liste})`);
+  if (fall.erwartet.nichtImBereich) {
+    const imBereich = experimente.filter((eintrag) => fall.erwartet.nichtImBereich.includes(eintrag.targetMetric));
+    pruefung(`Wochenbilanz: kein neues Experiment für ${fall.erwartet.nichtImBereich.join(', ')}`, !imBereich.length, imBereich.map((eintrag) => eintrag.targetMetric).join(', '));
   }
 }
 
@@ -604,6 +645,7 @@ export function pruefe(fall, antwort, { modellUrteile = null, prueferInformativ 
   // Schema. Ältere Antworten (etwa die Legacy-Baseline) werden wie bisher
   // bewertet.
   if ('experimentReviews' in (antwort || {})) experimentPruefungen(fall, antwort, pruefung);
+  if (fall.wochenbilanz && Array.isArray(antwort.recommendations)) wochenPruefungen(fall, antwort, pruefung);
 
   const erwartet = fall.erwartet;
   pruefung(

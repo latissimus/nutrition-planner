@@ -3,6 +3,7 @@ import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION } from './kno
 import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
+import { reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion } from './weekly.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -221,7 +222,7 @@ async function loadMemory(userId: string, conversationId: string, today: string,
   const failed = [messages, facts, interventions].find((result) => result.error);
   if (failed) {
     console.error('CAPBOY memory unavailable', failed.error);
-    return { blocks: {}, available: false };
+    return { blocks: {}, interventions: [], available: false };
   }
   return {
     blocks: {
@@ -229,6 +230,7 @@ async function loadMemory(userId: string, conversationId: string, today: string,
       profile_memory: profileBlock(facts.data || []),
       intervention_log: interventionBlock(interventions.data || [], today, timeseries),
     },
+    interventions: interventions.data || [],
     available: true,
   };
 }
@@ -243,6 +245,25 @@ async function saveTurn(userId: string, conversationId: string, question: string
     { user_id: userId, conversation_id: conversationId, role: 'assistant', content: assistantMemoryText(result) || '–', context: { result }, created_at: new Date(asked.getTime() + 1).toISOString() },
   ]);
   if (error) console.error('CAPBOY memory save failed', error);
+  return !error;
+}
+
+// Weekly check-in (step 7): the latest review before the reviewed week, for
+// its focus. Without the table (migration not applied) there is none.
+async function loadPreviousReview(userId: string, week: string) {
+  const { data, error } = await admin.from('coach_weekly_reviews').select('week,result').eq('user_id', userId)
+    .lt('week', week).order('week', { ascending: false }).limit(1).maybeSingle();
+  if (error) console.error('CAPBOY previous weekly review unavailable', error);
+  return error ? null : data;
+}
+
+// Stores the check-in with the app's comparison and the answer, one row per
+// week; a repeated check-in for the same week replaces it.
+async function saveWeeklyReview(userId: string, weekly: Row, report: Row, result: Row, conversationId: string | null) {
+  const { error } = await admin.from('coach_weekly_reviews').upsert({
+    user_id: userId, week: weekly.week, checkin: report, comparison: weekly.comparison, result, conversation_id: conversationId,
+  }, { onConflict: 'user_id,week' });
+  if (error) console.error('CAPBOY weekly review save failed', error);
   return !error;
 }
 
@@ -354,8 +375,10 @@ Deno.serve(async (request) => {
     const body = await request.json();
     const requestedScope = String(body?.scope || 'coach') as Scope;
     const scope: Scope = ['coach', 'sleep', 'comp', 'skinfold', 'overall'].includes(requestedScope) ? requestedScope : 'coach';
-    const question = String(body?.question || '').trim().slice(0, 2000);
-    if (scope === 'coach' && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
+    // A weekly check-in asks no question of its own; the app names the week.
+    const weeklyMode = scope === 'coach' && body?.mode === 'weekly';
+    const question = weeklyMode ? '' : String(body?.question || '').trim().slice(0, 2000);
+    if (scope === 'coach' && !weeklyMode && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
     const webResearch = scope === 'coach' && body?.webResearch === true;
 
     // Shared context: the same facts and time series for coach and COMP.
@@ -363,10 +386,18 @@ Deno.serve(async (request) => {
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
+    // Weekly check-in: the last completed week against the one before, with
+    // the user's report and the focus of the previous review.
+    const reviewed = weeklyMode ? reviewWeeks(timeseries) : null;
+    if (weeklyMode && !reviewed) return json({ error: 'Es gibt noch keine abgeschlossene Woche für eine Bilanz.' }, 400);
     // Only the free coach has memory. A conversation continues when the client
-    // sends its id; otherwise a new one begins.
-    const conversationId = scope === 'coach' ? (isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID()) : null;
+    // sends its id; otherwise a new one begins. A weekly check-in always
+    // begins one, so follow-up questions continue from the review.
+    const conversationId = scope === 'coach' ? (!weeklyMode && isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID()) : null;
     const memory = conversationId ? await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries) : null;
+    const weeklyReport = weeklyMode ? sanitizeWeeklyReport(body?.weekly, memory?.interventions || []) : null;
+    const weekly = reviewed ? weeklyBlock(timeseries, weeklyReport, await loadPreviousReview(userId, reviewed.current.week), memory?.interventions || []) : null;
+    const coachQuestion = weekly ? weeklyQuestion(weekly.week) : question;
     const clientEvidence = scope === 'comp' && body?.evidence && typeof body.evidence === 'object'
       ? body.evidence as Row : null;
     if (clientEvidence && JSON.stringify(clientEvidence).length > 120_000) return json({ error: 'Die COMP-Daten sind zu umfangreich.' }, 413);
@@ -409,7 +440,7 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
           schema: compResultSchema,
         },
       },
-    } : coachRequestBody({ scope, question, snapshot, timeseries, memory: memory?.blocks, webResearch, vectorStoreId });
+    } : coachRequestBody({ scope, question: coachQuestion, snapshot, timeseries, memory: memory?.blocks, weekly, webResearch, vectorStoreId });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -442,8 +473,13 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
       if (error) throw error;
     }
 
-    const memorySaved = conversationId && memory?.available ? await saveTurn(userId, conversationId, question, result) : false;
-    return json({ result, scope, period: snapshot.period, cached: false, ...(conversationId ? { conversationId, memoryAvailable: Boolean(memory?.available), memorySaved } : {}) });
+    const memorySaved = conversationId && memory?.available ? await saveTurn(userId, conversationId, coachQuestion, result) : false;
+    const weeklySaved = weekly ? await saveWeeklyReview(userId, weekly, weeklyReport!, result, memorySaved ? conversationId : null) : false;
+    return json({
+      result, scope, period: snapshot.period, cached: false,
+      ...(conversationId ? { conversationId, memoryAvailable: Boolean(memory?.available), memorySaved } : {}),
+      ...(weekly ? { weekly: { week: weekly.week, from: weekly.from, to: weekly.to, previousWeek: weekly.previousWeek, comparison: weekly.comparison, saved: weeklySaved } } : {}),
+    });
   } catch (error) {
     console.error('CAPBOY coach failed', error);
     return json({ error: 'Der Coach konnte die Daten gerade nicht auswerten.' }, 500);

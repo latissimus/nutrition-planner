@@ -62,13 +62,17 @@ import {
   FACT_COMPLETION_DAYS, FACT_LIMITS, FACT_WINDOW_DAYS, FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo,
 } from '../../supabase/functions/capboy-coach/context.ts';
 import { FAELLE } from './cases.mjs';
-import { FAELLE_ZEITREIHE } from './cases-zeitreihe.mjs';
+import { FAELLE_ZEITREIHE, normalerCheckin, normalerSchlaf, rohdaten } from './cases-zeitreihe.mjs';
 import { FAELLE_GEDAECHTNIS } from './cases-gedaechtnis.mjs';
 import { FAELLE_EXPERIMENTE } from './cases-experimente.mjs';
+import { FAELLE_WOCHENBILANZ } from './cases-wochenbilanz.mjs';
 import {
   MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock,
 } from '../../supabase/functions/capboy-coach/memory.ts';
 import { EXPERIMENT_METRIC_IDS, EXPERIMENT_METRICS, experimentMeasurement } from '../../supabase/functions/capboy-coach/experiments.ts';
+import {
+  WEEKLY_CIRCUMSTANCES, WEEKLY_NOTE_MAX, isoWeek, lastCompletedWeek, previousFocus, reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion,
+} from '../../supabase/functions/capboy-coach/weekly.ts';
 import { pruefe } from './checks.mjs';
 import { AKZEPTIERBAR, antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
@@ -87,7 +91,7 @@ const MODULE = { produktion, legacy };
 const VARIANTEN = Object.fromEntries(Object.entries(MODULE).map(([name, modul]) => [
   name,
   ({ fall, vectorStoreId }) => modul.coachRequestBody({
-    scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, memory: fall.gedaechtnis, webResearch: false, vectorStoreId,
+    scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, memory: fall.gedaechtnis, weekly: fall.wochenbilanz, webResearch: false, vectorStoreId,
   }),
 ]));
 
@@ -99,8 +103,9 @@ const faelleFingerabdruck = (faelle) => sha(JSON.stringify(faelle, (_, wert) => 
 // die Erwartungen ändern, die Daten nicht - sonst passen Antwort und Fall
 // nicht mehr zusammen.
 // Mit Wochenverlauf gehört er zu den Testdaten; ohne bleibt der Fingerabdruck wie bisher.
-const datenFingerabdruecke = (faelle) => Object.fromEntries(faelle.map((fall) => [fall.id, sha(fall.zeitreihe || fall.gedaechtnis
-  ? { daten: fall.daten, ...(fall.zeitreihe ? { zeitreihe: fall.zeitreihe } : {}), ...(fall.gedaechtnis ? { gedaechtnis: fall.gedaechtnis } : {}) }
+// Ebenso der Wochen-Check-in (Schritt 7).
+const datenFingerabdruecke = (faelle) => Object.fromEntries(faelle.map((fall) => [fall.id, sha(fall.zeitreihe || fall.gedaechtnis || fall.wochenbilanz
+  ? { daten: fall.daten, ...(fall.zeitreihe ? { zeitreihe: fall.zeitreihe } : {}), ...(fall.gedaechtnis ? { gedaechtnis: fall.gedaechtnis } : {}), ...(fall.wochenbilanz ? { wochenbilanz: fall.wochenbilanz } : {}) }
   : fall.daten)]));
 function gitStand() {
   try {
@@ -145,7 +150,7 @@ const vergleichsBasis = vergleichDatei ? JSON.parse(await readFile(vergleichDate
 const variante = gespeichert?.variante || wert('--variante', 'produktion');
 // Kalibrierung und Labels beziehen sich immer auf die Standardfälle (FAELLE);
 // der Lauf selbst auf den gewählten Fallsatz.
-const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE, gedaechtnis: FAELLE_GEDAECHTNIS, experimente: FAELLE_EXPERIMENTE };
+const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE, gedaechtnis: FAELLE_GEDAECHTNIS, experimente: FAELLE_EXPERIMENTE, wochenbilanz: FAELLE_WOCHENBILANZ };
 const akzeptiert = (wert('--akzeptiere', '') || '').split(',').map((name) => name.trim()).filter(Boolean);
 const unbekanntAkzeptiert = akzeptiert.filter((name) => !AKZEPTIERBAR[name]);
 if (unbekanntAkzeptiert.length) {
@@ -884,6 +889,7 @@ async function trockenlauf() {
   const gedaechtnisProben = trockenlaufGedaechtnis(fehler);
   const experimentProben = trockenlaufExperimente(fehler);
   const wissensProben = await trockenlaufWissensbasis(fehler);
+  const wochenProben = trockenlaufWochenbilanz(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
@@ -900,6 +906,7 @@ async function trockenlauf() {
     `Gedächtnis: ${gedaechtnisProben.bloecke} Blockproben, ${gedaechtnisProben.faelle} Fälle mit Gedächtnis, ${gedaechtnisProben.zahlen} Zahlen- und ${gedaechtnisProben.regeln} Regelproben – alles richtig; Standardfälle ohne Gedächtnis.`,
     `Experimente: ${experimentProben.messung} Messproben, ${experimentProben.pruefungen} Prüfproben, ${experimentProben.faelle} Fälle, ${experimentProben.gate} Gate-Proben zum Akzeptieren – alles richtig.`,
     `Wissensbasis: Code in sich stimmig (Stand ${KNOWLEDGE_VERSION.slice(0, 16)}, ${wissensProben.dokumente} Dokumente, Dateinamen wie in der Edge Function), ${wissensProben.vergleich} Vergleichs- und ${wissensProben.lesen} Leseproben – alles richtig.`,
+    `Wochen-Check-in: ${wochenProben.wochen} Wochenproben (App und Server gleich), ${wochenProben.block} Blockproben, ${wochenProben.pruefungen} Prüfproben, ${wochenProben.faelle} Fälle – alles richtig.`,
   ].join('\n'));
 }
 
@@ -1176,12 +1183,14 @@ function trockenlaufPrompt(fehler) {
   // Feste Blockschnittstelle des Coach-Plans. Spätere Schritte befüllen
   // weitere Blöcke, benennen aber keinen um. Die Liste steht hier bewusst
   // ein zweites Mal, damit eine Umbenennung in coachPrompt.ts auffällt.
+  // Die Schnittstelle bleibt auch mit Schritt 7 bei genau diesen acht
+  // Blöcken. Der Wochen-Check-in liegt optional in <timeseries>.
   const bloecke = ['comp_facts', 'timeseries', 'profile_memory', 'conversation', 'intervention_log', 'allowed_actions', 'limits', 'user_question'];
   regel(JSON.stringify(produktion.COACH_INPUT_BLOCKS) === JSON.stringify(bloecke), `Blockschnittstelle geändert: ${produktion.COACH_INPUT_BLOCKS.join(', ')}`);
   for (const block of bloecke) regel(prompt.includes(`- <${block}>:`), `beschreibt den Block <${block}> nicht`);
   // Jeder andere Tag im Prompt muss ein Abschnitt sein - kein Eingabeblock
   // unter fremdem Namen.
-  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'experiment_reviews', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
+  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'experiment_reviews', 'weekly_review', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
   const fremd = [...new Set([...prompt.matchAll(/<\/?([a-z_]+)>/g)].map((treffer) => treffer[1]))].filter((name) => !bloecke.includes(name) && !abschnitte.includes(name));
   regel(!fremd.length, `nennt unbekannte Blöcke: ${fremd.join(', ')}`);
   // Die Eingabe enthält nur bekannte Blöcke, in fester Reihenfolge, ohne leere.
@@ -1575,6 +1584,116 @@ function trockenlaufExperimente(fehler) {
     if (soll && !pruef.hinweise.some((hinweis) => hinweis.includes('akzeptiert'))) fehler.push(`Experimente/Gate: „${beschreibung}“ nennt die Akzeptanz nicht im Bericht`);
   }
   return { messung, pruefungen, faelle: FAELLE_EXPERIMENTE.length, gate };
+}
+
+// Wochen-Check-in (Schritt 7, weekly.ts): Die App-Karte nennt dieselbe Woche
+// wie der Server, der Block rechnet die Veränderungen, die Eingabe steht an
+// fester Stelle, und die Prüfungen erkennen Verstöße gegen <weekly_review>.
+function trockenlaufWochenbilanz(fehler) {
+  const gleich = (ist, soll, name) => {
+    if (JSON.stringify(ist) !== JSON.stringify(soll)) fehler.push(`Wochen-Check-in: ${name}: ${JSON.stringify(ist)} statt ${JSON.stringify(soll)}`);
+  };
+  // Woche: Die Karte rechnet lastCompletedWeek(heute), der Server nimmt die
+  // letzte abgeschlossene Woche seiner Zeitreihe. Beide müssen übereinstimmen.
+  const zeilen = FAELLE_WOCHENBILANZ.length ? rohdatenFuerWochen() : null;
+  let wochen = 0;
+  for (const heute of ['2026-09-26', '2026-09-27', '2026-09-28', '2026-01-01', '2027-01-04', '2026-03-29']) {
+    wochen += 1;
+    const jetzt = new Date(`${heute}T09:00:00Z`);
+    gleich(reviewWeeks(buildTimeseries(zeilen, jetzt))?.current.week, lastCompletedWeek(heute).week, `Woche am ${heute}`);
+  }
+  gleich(isoWeek('2026-01-01'), { week: '2026-W01', from: '2025-12-29', to: '2026-01-04' }, 'ISO-Woche am Jahreswechsel');
+  gleich(isoWeek('2027-01-03').week, '2026-W53', 'KW 53');
+
+  // Block am Fall der Krankheitswoche.
+  let block = 0;
+  const probe = (ist, soll, name) => { block += 1; gleich(ist, soll, name); };
+  const krank = FAELLE_WOCHENBILANZ.find((fall) => fall.id === 'wochenbilanz-krank').wochenbilanz;
+  const gewicht = krank.comparison.find((eintrag) => eintrag.metric === 'gewicht');
+  probe([krank.week, krank.from, krank.to, krank.previousWeek], ['2026-W38', '2026-09-14', '2026-09-20', '2026-W37'], 'Woche und Vorwoche');
+  probe([gewicht.previous, gewicht.current, gewicht.change], [86, 84.8, -1.2], 'Gewicht vorher, nachher, Veränderung');
+  probe(gewicht.text, 'Gewicht (Wochenmittel): 86 kg (2026-W37) → 84.8 kg (2026-W38), Veränderung -1.2 kg', 'Vergleichstext');
+  probe(krank.comparison.find((eintrag) => eintrag.metric === 'schlafqualitaet').text, 'Schlafqualität: 3 von 5 (2026-W37) → 2.3 von 5 (2026-W38), Veränderung -0.7', 'Vergleichstext Skala');
+  probe(krank.comparison.some((eintrag) => eintrag.metric === 'kraft'), false, 'Kraft hat keinen Wochenwert');
+  probe([krank.loggedIllnessDays, krank.userReport], [5, { circumstances: [WEEKLY_CIRCUMSTANCES.krank], note: 'Erkältung von Dienstag bis Samstag' }], 'Krankheitstage und Bericht');
+  probe(krank.notMeasuredThisWeek, ['Hautfaltensumme', 'Taillenumfang'], 'nicht gemessen');
+  const faellig = FAELLE_WOCHENBILANZ.find((fall) => fall.id === 'wochenbilanz-experiment-faellig').wochenbilanz;
+  probe(faellig.comparison.find((eintrag) => eintrag.metric === 'taille').text, 'Taillenumfang: kein Wert (2026-W37) → 89 cm (2026-W38)', 'ohne Vorwochenwert keine Veränderung');
+  const bekannteMassnahmen = [{ id: 'm1', action: 'Früher essen', status: 'aktiv' }, { id: 'm2', action: 'Nicht mehr aktiv', status: 'abgeschlossen' }];
+  probe(
+    sanitizeWeeklyReport({
+      circumstances: ['krank', 'erfunden', 'krank', 7], note: `  ${'x'.repeat(400)}  `,
+      interventions: [{ id: 'm1', action: 'Manipulierter Text', adherence: 'voll' }, { id: 'm2', adherence: 'voll' }, { id: 'fremd', adherence: 'voll' }, { id: 'm1', adherence: 'erfunden' }],
+    }, bekannteMassnahmen),
+    { circumstances: ['krank'], note: 'x'.repeat(WEEKLY_NOTE_MAX), interventions: [{ id: 'm1', action: 'Früher essen', adherence: 'voll' }] },
+    'Bericht und Maßnahmen-Snapshot bereinigt',
+  );
+  probe(previousFocus({ week: '2026-W37', result: { recommendations: [{ action: ' A ' }, { action: '' }, { action: 'B' }] } }), { week: '2026-W37', focus: ['A', 'B'] }, 'Fokus der Vorwoche');
+  probe(previousFocus({ week: '2026-W37', result: { recommendations: [] } }), null, 'Vorwoche ohne Fokus');
+  probe(weeklyBlock({ weeks: [{ week: '2026-W39', partial: true }] }, {}), null, 'ohne abgeschlossene Woche kein Block');
+  probe(weeklyQuestion('2026-W38'), 'Wochenbilanz für 2026-W38', 'Frage');
+
+  // Eingabe: Der Check-in steckt im bestehenden <timeseries>-Block; die
+  // achtteilige Schnittstelle bekommt keinen neuen Block.
+  const mitCheckin = produktion.coachUserPrompt('coach', 'F', {}, { weeks: [] }, { intervention_log: '[]' }, { week: 'x' });
+  probe(mitCheckin, '<comp_facts>\n{}\n</comp_facts>\n\n<timeseries>\n{"weeks":[],"weeklyCheckin":{"week":"x"}}\n</timeseries>\n\n<intervention_log>\n[]\n</intervention_log>\n\n<user_question>\nF\n</user_question>', 'Check-in im Zeitreihenblock');
+  probe(produktion.coachUserPrompt('coach', 'F', {}, { weeks: [] }, {}).includes('weeklyCheckin'), false, 'ohne Check-in kein Zusatz im Zeitreihenblock');
+  probe(mitCheckin.includes('<weekly_checkin>'), false, 'kein neuer Eingabeblock');
+
+  // Prüfungen (checks.mjs, wochenPruefungen).
+  let pruefungen = 0;
+  const fall = (id) => FAELLE_WOCHENBILANZ.find((kandidat) => kandidat.id === id);
+  const experiment = (werte = {}) => ({ kind: 'experiment', action: 'A', rationale: 'r', timeframe: '3 Wochen', hypothesis: 'Wenn …', baseline: 'Gewicht (Wochenmittel) 84,8 kg (2026-W38)', targetMetric: 'gewicht', expectedDirection: 'sinkt', reviewDate: '2026-10-17', ...werte });
+  const beobachtung = { kind: 'beobachtung', action: 'Weiter protokollieren', rationale: 'r', timeframe: '1 Woche', hypothesis: '', baseline: '', targetMetric: 'protokoll', expectedDirection: 'keine', reviewDate: '' };
+  const antwort = (werte = {}) => ({ ...antwortMitSatz('summary', 'x'), experimentReviews: [], recommendations: [beobachtung], followUpQuestions: [], ...werte });
+  const pruef = (id, a, name, soll) => {
+    pruefungen += 1;
+    const treffer = pruefe(fall(id), a).find((pruefung) => pruefung.name === name);
+    if (!treffer || treffer.bestanden !== soll) fehler.push(`Wochen-Check-in: „${name}“ bei ${id} sollte ${soll ? 'bestehen' : 'scheitern'} (${treffer ? treffer.detail : 'Prüfung fehlt'})`);
+  };
+  pruef('wochenbilanz-luecken', antwort(), 'Wochenbilanz: höchstens ein neues Experiment', true);
+  pruef('wochenbilanz-luecken', antwort({ recommendations: [experiment(), experiment({ targetMetric: 'protokoll', expectedDirection: 'steigt' })] }), 'Wochenbilanz: höchstens ein neues Experiment', false);
+  pruef('wochenbilanz-luecken', antwort({ followUpQuestions: ['a?', 'b?'] }), 'Wochenbilanz: höchstens eine Rückfrage', false);
+  pruef('wochenbilanz-krank', antwort(), 'Wochenbilanz: kein neues Experiment', true);
+  pruef('wochenbilanz-krank', antwort({ recommendations: [experiment()] }), 'Wochenbilanz: kein neues Experiment', false);
+  pruef('wochenbilanz-luecken', antwort({ recommendations: [experiment({ targetMetric: 'kalorien', expectedDirection: 'sinkt' })] }), 'Wochenbilanz: kein neues Experiment für kalorien, protein', false);
+  pruef('wochenbilanz-luecken', antwort({ recommendations: [experiment({ targetMetric: 'protokoll', expectedDirection: 'steigt' })] }), 'Wochenbilanz: kein neues Experiment für kalorien, protein', true);
+  pruef('wochenbilanz-experiment-laeuft', antwort({ recommendations: [experiment({ targetMetric: 'schlafdauer', expectedDirection: 'steigt' })] }), 'Wochenbilanz: kein neues Experiment für schlafdauer, schlafqualitaet, morgenenergie', false);
+  pruef('wochenbilanz-experiment-laeuft', antwort({ experimentReviews: [{ experimentId: 'exp-bildschirm', verdict: 'unklar', basis: '', decision: 'beibehalten' }] }), 'Genau die fälligen Experimente ausgewertet', false);
+  // Zahlen aus dem Wochenvergleich sind geliefert, andere nicht.
+  const fakt = (satz) => antwort({ facts: [satz] });
+  pruef('wochenbilanz-krank', fakt('Gewicht (Wochenmittel): 86 kg (2026-W37) → 84,8 kg (2026-W38), Veränderung −1,2 kg.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-krank', fakt('Das Gewicht ist gegenüber der Vorwoche um 1,2 kg gesunken.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-krank', fakt('Das Gewicht ist gegenüber der Vorwoche um 1,2 kg gestiegen.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  pruef('wochenbilanz-krank', fakt('Veränderung des Gewichts: −1,5 kg.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  pruef('wochenbilanz-krank', fakt('Kalorien (Ø vollständige Tage): Veränderung −792 kcal.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-krank', fakt('Morgenenergie: 3 von 5 in KW 37, 1,6 von 5 in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-krank', fakt('Trainingstage: 0 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-krank', fakt('Trainingstage: 2 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  // Ohne Wochen-Check-in keine Wochenprüfungen.
+  pruefungen += 1;
+  if (pruefe(FAELLE[0], antwort()).some((pruefung) => pruefung.name.startsWith('Wochenbilanz'))) fehler.push('Wochen-Check-in: Fälle ohne Check-in dürfen keine Wochenprüfungen bekommen');
+
+  // Fälle: eigene IDs, Frage wie in der App, bekannte Kriterien, Maßnahmen mit ID.
+  const andere = new Set([...FAELLE, ...FAELLE_ZEITREIHE, ...FAELLE_GEDAECHTNIS, ...FAELLE_EXPERIMENTE].map((kandidat) => kandidat.id));
+  for (const kandidat of FAELLE_WOCHENBILANZ) {
+    if (andere.has(kandidat.id)) fehler.push(`Wochen-Check-in: Fall-ID ${kandidat.id} gibt es schon`);
+    if (kandidat.frage !== weeklyQuestion(kandidat.wochenbilanz.week)) fehler.push(`Wochen-Check-in: ${kandidat.id} stellt nicht die Frage der App`);
+    for (const eintrag of kriterienFuer(kandidat)) if (!KRITERIEN[eintrag.kriterium]) fehler.push(`Wochen-Check-in: ${kandidat.id} nutzt unbekanntes Kriterium ${eintrag.kriterium}`);
+    for (const eintrag of JSON.parse(kandidat.gedaechtnis?.intervention_log || '[]')) {
+      if (typeof eintrag.id !== 'string' || !eintrag.id.trim()) fehler.push(`Wochen-Check-in: ${kandidat.id} enthält eine Maßnahme ohne ID`);
+    }
+  }
+  return { wochen, block, pruefungen, faelle: FAELLE_WOCHENBILANZ.length };
+}
+
+// Rohdaten mit Werten in jeder Woche, für den Wochenabgleich App/Server.
+function rohdatenFuerWochen() {
+  return rohdaten({
+    ziel: 'recomposition', kalorienziel: 2600,
+    gewicht: () => 82, ernaehrung: () => ({ kcal: 2500, protein: 160, vollstaendig: true }),
+    checkin: () => normalerCheckin(), schlaf: () => normalerSchlaf(), training: () => null,
+  });
 }
 
 // Wissensbasis-Nachweis (wissensbasis.mjs): Der Code ist in sich stimmig,

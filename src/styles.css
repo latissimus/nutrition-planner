@@ -14855,6 +14855,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-coach .material-svg,.app-dex-search .material-svg{width:25px;height:25px}
 .coach-cap-icon{display:block;line-height:0}.coach-cap-icon>svg{display:block;width:100%;height:100%;overflow:visible}.app-dex-coach-icon{width:29px;height:29px;filter:drop-shadow(0 1.5px 0 #000)}
 .app-dex-coach.aktiv,.app-dex-search.aktiv{outline:2px solid currentColor;outline-offset:1px}
+/* Wochen-Check-in fällig (Schritt 7): Punkt am Coach-Symbol. */
+.app-dex-coach{position:relative}
+.app-dex-coach.hat-hinweis::after{content:'';position:absolute;top:1px;right:1px;width:9px;height:9px;border:2px solid #fff;border-radius:50%;background:var(--brand-pink,#FF69AE)}
 
 .coach-spark{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:10px;background:var(--text,#111);color:var(--app-card,#fff);font-size:19px}
 .coach-spark .coach-hero-cap{width:31px;height:31px}
@@ -14913,6 +14916,33 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-merken{justify-self:start;margin-top:4px;padding:6px 10px!important;font-size:10px!important}
 .coach-art{justify-self:start;padding:4px 7px;border:1px solid currentColor;border-radius:999px;color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.05em}
 .coach-recommendations article>p em{color:var(--muted);font-style:normal;font-weight:700}
+/* Wochen-Check-in (Schritt 7): Karte über der Frage, Formular, Wochenvergleich. */
+.coach-woche[hidden]{display:none}
+.coach-woche-karte{display:grid;gap:10px;margin-bottom:12px;padding:14px;border:1.5px solid #111;border-radius:15px;background:var(--app-card)}
+.coach-woche-karte>div{display:grid;gap:4px}
+.coach-woche-karte small{color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.06em}
+.coach-woche-karte b{font:800 14px/1.25 var(--ui)}
+.coach-woche-karte p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.coach-woche-karte>.btn{justify-self:start;min-height:40px}
+.coach-woche-karte.ist-erledigt{grid-template-columns:minmax(0,1fr) auto;align-items:center;border-style:dashed}
+.coach-woche-form{display:grid;gap:12px}
+.coach-woche-form fieldset{display:grid;gap:8px;min-width:0;margin:0;padding:0;border:0}
+.coach-woche-form legend{margin-bottom:6px;padding:0;font:800 10px/1.3 var(--tech);letter-spacing:.05em}
+.coach-woche-form label{display:grid;gap:5px;font:600 12px/1.35 var(--ui)}
+.coach-woche-form select,.coach-woche-form textarea{box-sizing:border-box;width:100%;padding:9px 10px;border:1px solid var(--app-divider);border-radius:10px;background:var(--app-field);color:var(--text);font:500 13px/1.4 var(--ui)}
+.coach-woche-form textarea{resize:vertical}
+.coach-woche-form .btn{min-height:44px}
+.coach-woche-chips{display:flex;flex-wrap:wrap;gap:6px}
+.coach-woche-chip{display:inline-flex!important;align-items:center;gap:0!important;cursor:pointer}
+.coach-woche-chip input{position:absolute;opacity:0;pointer-events:none}
+.coach-woche-chip span{padding:7px 11px;border:1px solid var(--app-divider);border-radius:999px;background:var(--app-field);font:650 11px/1 var(--ui)}
+.coach-woche-chip input:checked+span{border-color:#111;background:#111;color:#fff}
+.coach-woche-chip input:focus-visible+span{outline:2px solid currentColor;outline-offset:2px}
+.coach-tabelle{overflow-x:auto}
+.coach-wochenvergleich table{width:100%;border-collapse:collapse;font-size:12px}
+.coach-wochenvergleich th,.coach-wochenvergleich td{padding:7px 6px;border-top:1px solid var(--app-divider);text-align:right;white-space:nowrap}
+.coach-wochenvergleich thead th{border-top:0;color:var(--muted);font:750 8px/1.2 var(--tech);text-transform:uppercase;letter-spacing:.05em}
+.coach-wochenvergleich th[scope="row"],.coach-wochenvergleich thead th:first-child{text-align:left;white-space:normal;font-weight:600}
 .gedaechtnis-inhalt{display:grid;gap:12px}
 .gedaechtnis-bereich{display:grid;gap:10px}
 .gedaechtnis-hinweis,.gedaechtnis-leer{margin:0;color:var(--muted);font:550 10px/1.45 var(--tech)}
