@@ -91,10 +91,10 @@ describe('Coach-Chat: Retro-Fenster', () => {
     expect(resultMarkup(baseResult)).not.toContain('coach-mehr');
   });
 
-  it('begrüßt mit Vorschlägen und ohne Diagnoseversprechen', () => {
+  it('begrüßt knapp mit Vorschlägen', () => {
     const html = willkommenMarkup();
     expect(html).toContain('data-vorschlag=');
-    expect(html).toContain('keine medizinischen Diagnosen');
+    expect(html).not.toContain('Diagnosen');
     expect(willkommenMarkup({ neu: true })).toContain('Neues Gespräch');
   });
 });

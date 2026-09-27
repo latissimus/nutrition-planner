@@ -1,12 +1,14 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
-import { coachIconMarkup } from './menuIcons.js';
 import hourglassUrl from './assets/hourglass-time.gif';
 import { toast } from './toast.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
+import { fensterEinklappen, fensterMarkup, kopfMarkup } from './coachFenster.js';
+
+export { fensterMarkup };
 
 const CONTEXT_KEY = 'muscledex:coach-context';
 // Laufendes Gespräch dieses Tabs: ID vom Server und die bisherigen Runden.
@@ -120,17 +122,6 @@ export function resultMarkup(result, { merken = false } = {}) {
   </div>`;
 }
 
-// Nachricht als Retro-Fenster. "_" klappt den Inhalt ein; die beiden anderen
-// Knöpfe sind nur Dekor.
-export function fensterMarkup({ von = 'coach', inhalt = '', avatar = '', runde = null, klasse = '' } = {}) {
-  const nutzer = von === 'user';
-  const bild = nutzer ? `<span class="coach-chat-avatar">${avatar}</span>` : coachIconMarkup('coach-chat-cap');
-  return `<article class="coach-chat-window is-${nutzer ? 'user' : 'coach'}${klasse ? ` ${klasse}` : ''}"${runde == null ? '' : ` data-runde="${runde}"`}>
-    <header>${bild}<b>${nutzer ? 'Du' : 'CAPBOY'}</b><span class="coach-fenster-knoepfe"><button type="button" data-fenster-einklappen aria-expanded="true" aria-label="Nachricht einklappen">_</button><span aria-hidden="true">□</span><span aria-hidden="true">×</span></span></header>
-    <div class="coach-chat-message">${inhalt}</div>
-  </article>`;
-}
-
 const nutzerText = (text, hatAnhang = false) => `<p>${escapeHtml(text)}</p>${hatAnhang ? '<small>Bild angehängt</small>' : ''}`;
 
 // Das Gespräch: jede Runde als Frage und Antwort. Die Wochenbilanz trägt
@@ -147,12 +138,11 @@ export function willkommenMarkup({ neu = false } = {}) {
   return fensterMarkup({
     klasse: 'coach-welcome',
     inhalt: `<p>${neu ? 'Neues Gespräch. Womit soll ich dir helfen?' : 'Hi, ich bin CAPBOY. Ich kenne deine Messwerte der letzten zwölf Wochen. Frag mich zu Training, Ernährung, Schlaf oder Körper.'}</p>
-      <div class="coach-vorschlaege">${VORSCHLAEGE.map((vorschlag) => `<button type="button" data-vorschlag="${escapeHtml(vorschlag)}">${escapeHtml(vorschlag)}</button>`).join('')}</div>
-      <small>Ich schätze ein, ich stelle keine medizinischen Diagnosen.</small>`,
+      <div class="coach-vorschlaege">${VORSCHLAEGE.map((vorschlag) => `<button type="button" data-vorschlag="${escapeHtml(vorschlag)}">${escapeHtml(vorschlag)}</button>`).join('')}</div>`,
   });
 }
 
-const tipptMarkup = (text) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status"><img src="${hourglassUrl}" alt="">${escapeHtml(text)}<span class="coach-thinking-dots" aria-hidden="true">...</span></p>` });
+const tipptMarkup = (text) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status"><img src="${hourglassUrl}" alt="">${escapeHtml(text)}</p>` });
 const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
 
 async function invokeCoach(scope, question = '', webResearch = false, conversationId = null, attachments = []) {
@@ -213,12 +203,11 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const avatar = nutzerAvatarMarkup(coachProfile, (await supabase.auth.getUser()).data?.user?.email || '');
   container.classList.add('coach-page');
   container.innerHTML = `<main class="coach-shell coach-chat">
-    <header class="coach-kopf">
-      <a class="coach-kopf-knopf" href="#${escapeHtml(backRoute)}" aria-label="Zurück">${materialIconMarkup('arrow_back_ios')}</a>
-      <span class="coach-kopf-titel">${coachIconMarkup('coach-kopf-cap')}<b>CAPBOY</b><small>Coach</small></span>
-      <button class="coach-kopf-knopf" type="button" data-neues-gespraech aria-label="Neues Gespräch" title="Neues Gespräch"${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}</button>
-      <a class="coach-kopf-knopf" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${materialIconMarkup('menu_book')}</a>
-    </header>
+    ${kopfMarkup({
+      zurueck: backRoute,
+      rechts: `<button class="coach-kopf-knopf" type="button" data-neues-gespraech aria-label="Neues Gespräch" title="Neues Gespräch"${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}</button>
+      <a class="coach-kopf-knopf" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${materialIconMarkup('menu_book')}</a>`,
+    })}
     <section class="coach-woche" data-coach-woche hidden></section>
     <section class="coach-answer" data-coach-answer aria-live="polite"></section>
     <form class="coach-form" data-coach-form>
@@ -248,15 +237,24 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const attachmentBox = form.querySelector('[data-coach-attachment]');
 
   // Die Eingabe sitzt fest am unteren Rand; der Verlauf bekommt unten so viel
-  // Platz, wie sie hoch ist, und rückt bei offener Tastatur mit nach oben.
+  // Platz, wie sie hoch ist. Öffnet sich die Tastatur, sitzt die Eingabe direkt
+  // darauf. iOS schiebt dabei die ganze Seite hoch; das wird zurückgenommen,
+  // damit die Kopfleiste stehen bleibt. Wo das nicht greift, folgt sie der
+  // verschobenen Ansicht (--coach-oben).
   new ResizeObserver(() => container.style.setProperty('--coach-eingabe-h', `${form.offsetHeight}px`)).observe(form);
   const tastatur = () => {
     const sicht = window.visualViewport;
     if (!sicht || !container.isConnected) return;
+    const offen = document.activeElement === field && sicht.height < window.innerHeight - 80;
+    if (offen && window.scrollY) window.scrollTo(0, 0);
     container.style.setProperty('--coach-tastatur', `${Math.max(0, window.innerHeight - sicht.height - sicht.offsetTop)}px`);
+    container.style.setProperty('--coach-oben', `${Math.max(0, sicht.offsetTop)}px`);
+    container.classList.toggle('tastatur-offen', offen);
   };
   window.visualViewport?.addEventListener('resize', tastatur);
   window.visualViewport?.addEventListener('scroll', tastatur);
+  field.addEventListener('focus', () => { setTimeout(tastatur, 60); setTimeout(() => nachUnten(false), 320); });
+  field.addEventListener('blur', () => setTimeout(tastatur, 60));
   const nachUnten = (sanft = true) => requestAnimationFrame(() => container.scrollTo({ top: container.scrollHeight, behavior: sanft ? 'smooth' : 'auto' }));
 
   const zeichnen = (zusatz = '') => {
@@ -310,14 +308,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   };
 
   answer.addEventListener('click', async (event) => {
-    const einklappen = event.target.closest('[data-fenster-einklappen]');
-    if (einklappen) {
-      const fenster = einklappen.closest('.coach-chat-window');
-      const zu = fenster.classList.toggle('ist-eingeklappt');
-      einklappen.setAttribute('aria-expanded', String(!zu));
-      einklappen.setAttribute('aria-label', zu ? 'Nachricht aufklappen' : 'Nachricht einklappen');
-      return;
-    }
+    if (fensterEinklappen(event)) return;
     const vorschlag = event.target.closest('[data-vorschlag]');
     if (vorschlag) {
       field.value = vorschlag.dataset.vorschlag;

@@ -1,7 +1,6 @@
 import { supabase } from './supabase.js';
-import { materialIconMarkup } from './categoryIcons.js';
-import { coachIconMarkup } from './menuIcons.js';
 import { toast } from './toast.js';
+import { fensterEinklappen, fensterMarkup, kopfMarkup } from './coachFenster.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
@@ -164,7 +163,7 @@ function faktFormular(fakt = {}) {
   return `<form class="gedaechtnis-formular" data-fakt-formular${fakt.id ? ` data-id="${escapeHtml(fakt.id)}"` : ''}>
     <label>Kategorie<select name="category" required>${optionen(KATEGORIEN, fakt.category || 'einschraenkung')}</select></label>
     <label>Was CAPBOY wissen soll<textarea name="fact" rows="2" maxlength="500" required placeholder="Zum Beispiel: Knieschmerzen links bei tiefen Kniebeugen">${escapeHtml(fakt.fact || '')}</textarea></label>
-    <div class="gedaechtnis-aktionen"><button class="btn btn-primary" type="submit">${fakt.id ? 'Änderung speichern' : 'Merken'}</button><button class="btn" type="button" data-abbrechen>Abbrechen</button></div>
+    <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="submit">${fakt.id ? 'Änderung speichern' : 'Merken'}</button><button class="coach-knopf" type="button" data-abbrechen>Abbrechen</button></div>
   </form>`;
 }
 
@@ -187,23 +186,23 @@ function massnahmeFormular(massnahme = {}) {
       <label>Umgesetzt<select name="adherence">${optionen(UMSETZUNG, massnahme.adherence)}</select></label>
     </div>
     <label>Ergebnis (optional)<textarea name="outcome" rows="2" maxlength="1000">${escapeHtml(massnahme.outcome || '')}</textarea></label>` : ''}
-    <div class="gedaechtnis-aktionen"><button class="btn btn-primary" type="submit">${massnahme.id ? 'Änderung speichern' : 'Maßnahme anlegen'}</button><button class="btn" type="button" data-abbrechen>Abbrechen</button></div>
+    <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="submit">${massnahme.id ? 'Änderung speichern' : 'Maßnahme anlegen'}</button><button class="coach-knopf" type="button" data-abbrechen>Abbrechen</button></div>
   </form>`;
 }
 
 // wochenbilanzen: null, solange die Tabelle des Wochen-Check-ins fehlt.
 export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [], wochenbilanzen = null, eingerichtet = true, tag = heute(), bearbeiten = null } = {}) {
   if (!eingerichtet) {
-    return `<div class="coach-welcome"><b>Das Gedächtnis ist noch nicht eingerichtet.</b><p>Die Datenbank wird gerade erweitert. Bis dahin beantwortet CAPBOY jede Frage ohne Gedächtnis – deine Messwerte sieht er trotzdem.</p></div>`;
+    return fensterMarkup({ inhalt: '<p>Das Gedächtnis ist noch nicht eingerichtet. Die Datenbank wird gerade erweitert. Bis dahin beantworte ich jede Frage ohne Gedächtnis – deine Messwerte sehe ich trotzdem.</p>' });
   }
   const faktListe = fakten.map((fakt) => (bearbeiten === `fakt:${fakt.id}` ? `<li>${faktFormular(fakt)}</li>` : `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(fakt.id)}">
       <span class="gedaechtnis-chip">${escapeHtml(bezeichnung(KATEGORIEN, fakt.category))}</span>
       <p>${escapeHtml(fakt.fact)}</p>
       <small>Bestätigt am ${datum(fakt.confirmed_on)}</small>
       <div class="gedaechtnis-aktionen">
-        <button class="btn" type="button" data-fakt-bestaetigen="${escapeHtml(fakt.id)}">Stimmt noch</button>
-        <button class="btn" type="button" data-fakt-bearbeiten="${escapeHtml(fakt.id)}">Bearbeiten</button>
-        <button class="btn" type="button" data-fakt-loeschen="${escapeHtml(fakt.id)}">Löschen</button>
+        <button class="coach-knopf" type="button" data-fakt-bestaetigen="${escapeHtml(fakt.id)}">Stimmt noch</button>
+        <button class="coach-knopf" type="button" data-fakt-bearbeiten="${escapeHtml(fakt.id)}">Bearbeiten</button>
+        <button class="coach-knopf" type="button" data-fakt-loeschen="${escapeHtml(fakt.id)}">Löschen</button>
       </div>
     </li>`)).join('');
   const massnahmenListe = massnahmen.map((massnahme) => {
@@ -217,8 +216,8 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
       ${massnahme.baseline_note ? `<p class="gedaechtnis-ergebnis">Ausgangswert: ${escapeHtml(massnahme.baseline_note)}</p>` : ''}
       ${massnahme.outcome ? `<p class="gedaechtnis-ergebnis">Ergebnis: ${escapeHtml(massnahme.outcome)}</p>` : ''}
       <div class="gedaechtnis-aktionen">
-        <button class="btn" type="button" data-massnahme-bearbeiten="${escapeHtml(massnahme.id)}">Bearbeiten</button>
-        <button class="btn" type="button" data-massnahme-loeschen="${escapeHtml(massnahme.id)}">Löschen</button>
+        <button class="coach-knopf" type="button" data-massnahme-bearbeiten="${escapeHtml(massnahme.id)}">Bearbeiten</button>
+        <button class="coach-knopf" type="button" data-massnahme-loeschen="${escapeHtml(massnahme.id)}">Löschen</button>
       </div>
     </li>`;
   }).join('');
@@ -227,7 +226,7 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
         <summary><b>${escapeHtml(kuerzen(gespraech.verlauf.find((nachricht) => nachricht.role === 'user')?.content || 'Gespräch', 90))}</b><small>${datum(gespraech.beginn)} · ${gespraech.fragen} ${gespraech.fragen === 1 ? 'Frage' : 'Fragen'}</small></summary>
         <ol class="gedaechtnis-verlauf">${gespraech.verlauf.map((nachricht) => `<li class="${nachricht.role === 'user' ? 'ist-frage' : 'ist-antwort'}"><small>${nachricht.role === 'user' ? 'Du' : 'CAPBOY'}</small><p>${escapeHtml(nachricht.content)}</p></li>`).join('')}</ol>
       </details>
-      <div class="gedaechtnis-aktionen"><button class="btn" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
+      <div class="gedaechtnis-aktionen"><button class="coach-knopf" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
     </li>`).join('');
   const bilanzListe = (wochenbilanzen || []).map((bilanz) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(bilanz.id)}">
       <details>
@@ -235,30 +234,21 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
         <p>${escapeHtml(bilanz.result?.summary || '')}</p>
         ${(bilanz.result?.recommendations || []).length ? `<ul>${bilanz.result.recommendations.map((eintrag) => `<li>${escapeHtml(eintrag.action || '')}</li>`).join('')}</ul>` : ''}
       </details>
-      <div class="gedaechtnis-aktionen"><button class="btn" type="button" data-wochenbilanz-loeschen="${escapeHtml(bilanz.id)}">Löschen</button></div>
+      <div class="gedaechtnis-aktionen"><button class="coach-knopf" type="button" data-wochenbilanz-loeschen="${escapeHtml(bilanz.id)}">Löschen</button></div>
     </li>`).join('');
-  return `
-    <section class="coach-result-section gedaechtnis-bereich">
-      <h3><span>Über mich</span><em>Nur was du selbst einträgst</em></h3>
-      <p class="gedaechtnis-hinweis">Feste Fakten, die CAPBOY bei jeder Antwort beachtet: Verletzungen, Ausstattung, Zeitplan, Vorlieben. Deine Messwerte kennt er ohnehin aus den Fachseiten.</p>
+  const bereich = (titel, inhalt) => fensterMarkup({ von: 'bereich', titel, bild: '', klasse: 'gedaechtnis-bereich', inhalt });
+  return [
+    bereich('Über mich', `<p class="gedaechtnis-hinweis">Feste Fakten, die CAPBOY bei jeder Antwort beachtet: Verletzungen, Ausstattung, Zeitplan, Vorlieben. Deine Messwerte kennt er ohnehin aus den Fachseiten.</p>
       ${fakten.length ? `<ul class="gedaechtnis-liste">${faktListe}</ul>` : '<p class="gedaechtnis-leer">Noch nichts eingetragen.</p>'}
-      ${bearbeiten === 'fakt:neu' ? faktFormular() : '<button class="btn" type="button" data-fakt-neu>+ Fakt hinzufügen</button>'}
-    </section>
-    <section class="coach-result-section gedaechtnis-bereich">
-      <h3><span>Maßnahmen</span><em>Was du gerade ausprobierst</em></h3>
-      <p class="gedaechtnis-hinweis">Ist das Prüfdatum erreicht, bewertet CAPBOY die Maßnahme zuerst, bevor er etwas Neues im selben Bereich vorschlägt.</p>
+      ${bearbeiten === 'fakt:neu' ? faktFormular() : '<button class="coach-knopf" type="button" data-fakt-neu>+ Fakt hinzufügen</button>'}`),
+    bereich('Maßnahmen', `<p class="gedaechtnis-hinweis">Ist das Prüfdatum erreicht, bewertet CAPBOY die Maßnahme zuerst, bevor er etwas Neues im selben Bereich vorschlägt.</p>
       ${massnahmen.length ? `<ul class="gedaechtnis-liste">${massnahmenListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Maßnahme. Übernimm eine Empfehlung des Coachs oder lege selbst eine an.</p>'}
-      ${bearbeiten === 'massnahme:neu' ? massnahmeFormular() : '<button class="btn" type="button" data-massnahme-neu>+ Maßnahme anlegen</button>'}
-    </section>
-    <section class="coach-result-section gedaechtnis-bereich">
-      <h3><span>Gespräche</span><em>Der Coach sieht nur das laufende</em></h3>
-      ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="btn" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}
-    </section>
-    ${wochenbilanzen ? `<section class="coach-result-section gedaechtnis-bereich">
-      <h3><span>Wochenbilanzen</span><em>Aus deinen Wochen-Check-ins</em></h3>
-      <p class="gedaechtnis-hinweis">Der Coach sieht davon nur den vorgeschlagenen Fokus der letzten Bilanz – in der Bilanz der folgenden Woche.</p>
-      ${wochenbilanzen.length ? `<ul class="gedaechtnis-liste">${bilanzListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Wochenbilanz. Nach jeder abgeschlossenen Woche bietet die Coach-Seite den Check-in an.</p>'}
-    </section>` : ''}`;
+      ${bearbeiten === 'massnahme:neu' ? massnahmeFormular() : '<button class="coach-knopf" type="button" data-massnahme-neu>+ Maßnahme anlegen</button>'}`),
+    bereich('Gespräche', `<p class="gedaechtnis-hinweis">Der Coach sieht nur das laufende Gespräch.</p>
+      ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="coach-knopf" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}`),
+    wochenbilanzen ? bereich('Wochenbilanzen', `<p class="gedaechtnis-hinweis">Der Coach sieht davon nur den vorgeschlagenen Fokus der letzten Bilanz – in der Bilanz der folgenden Woche.</p>
+      ${wochenbilanzen.length ? `<ul class="gedaechtnis-liste">${bilanzListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Wochenbilanz. Nach jeder abgeschlossenen Woche bietet die Coach-Seite den Check-in an.</p>'}`) : '',
+  ].join('');
 }
 
 // --------------------------------------------------------------------------
@@ -324,13 +314,12 @@ export async function uebernimmAuswertung(userId, auswertung) {
 // Ansicht geschrieben, damit sie nach einem Seitenwechsel aktuell ist.
 export async function mountCoachMemoryPage(container, { userId }) {
   container.classList.add('coach-page');
-  container.innerHTML = `<main class="coach-shell">
-    <header class="coach-hero">
-      <span class="coach-spark" aria-hidden="true">${coachIconMarkup('coach-hero-cap')}</span>
-      <div><small>COACH-GEDÄCHTNIS</small><h1>Was CAPBOY über mich weiß</h1><p>Nur was hier steht, weiß der Coach zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p></div>
-      <a class="som-info-knopf dex-sammlungskopf-zurueck coach-back" href="#coach" aria-label="Zurück zum Coach">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>
-    </header>
-    <div class="gedaechtnis-inhalt coach-result" data-gedaechtnis aria-live="polite"><div class="coach-loading"><p>Lade Gedächtnis …</p></div></div>
+  container.innerHTML = `<main class="coach-shell coach-chat coach-gedaechtnis-seite">
+    ${kopfMarkup({ zurueck: 'coach', zurueckLabel: 'Zurück zum Coach', titel: 'GEDÄCHTNIS' })}
+    <div class="gedaechtnis-inhalt">
+      ${fensterMarkup({ inhalt: '<p>Das weiß ich über dich – zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p>' })}
+      <div class="gedaechtnis-inhalt" data-gedaechtnis aria-live="polite">${fensterMarkup({ klasse: 'is-loading', inhalt: '<p>Lade Gedächtnis …</p>' })}</div>
+    </div>
   </main>`;
   const inhalt = container.querySelector('[data-gedaechtnis]');
   let stand = null;
@@ -342,7 +331,7 @@ export async function mountCoachMemoryPage(container, { userId }) {
       stand = await ladeGedaechtnis(userId);
       zeichnen();
     } catch (error) {
-      inhalt.innerHTML = '<div class="coach-welcome"><b>Das Gedächtnis konnte nicht geladen werden.</b><p>Versuche es später erneut.</p></div>';
+      inhalt.innerHTML = fensterMarkup({ klasse: 'is-fehler', inhalt: '<p>Das Gedächtnis konnte nicht geladen werden. Versuche es später erneut.</p>' });
       toast(error?.message || 'Gedächtnis konnte nicht geladen werden.');
     }
   };
@@ -359,7 +348,9 @@ export async function mountCoachMemoryPage(container, { userId }) {
   const formularWerte = (formular) => Object.fromEntries(new FormData(formular).entries());
   const leerZuNull = (wert) => (String(wert ?? '').trim() ? String(wert).trim() : null);
 
+  container.addEventListener('click', (event) => { fensterEinklappen(event); });
   inhalt.addEventListener('click', (event) => {
+    if (event.target.closest('[data-fenster-einklappen]')) return;
     const knopf = event.target.closest('button');
     if (!knopf) return;
     const { dataset } = knopf;
