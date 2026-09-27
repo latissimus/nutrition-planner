@@ -73,6 +73,7 @@ import {
   MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock,
 } from '../../supabase/functions/capboy-coach/memory.ts';
 import { EXPERIMENT_METRIC_IDS, EXPERIMENT_METRICS, experimentMeasurement } from '../../supabase/functions/capboy-coach/experiments.ts';
+import { buildFollowThrough, followThroughActions } from '../../supabase/functions/capboy-coach/followThrough.ts';
 import {
   WEEKLY_CIRCUMSTANCES, WEEKLY_NOTE_MAX, isoWeek, lastCompletedWeek, previousFocus, reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion,
 } from '../../supabase/functions/capboy-coach/weekly.ts';
@@ -906,6 +907,7 @@ async function trockenlauf() {
   const experimentProben = trockenlaufExperimente(fehler);
   const wissensProben = await trockenlaufWissensbasis(fehler);
   const wochenProben = trockenlaufWochenbilanz(fehler);
+  const offeneProben = trockenlaufOffenePunkte(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
@@ -923,7 +925,99 @@ async function trockenlauf() {
     `Experimente: ${experimentProben.messung} Messproben, ${experimentProben.pruefungen} Prüfproben, ${experimentProben.faelle} Fälle, ${experimentProben.gate} Gate-Proben zum Akzeptieren – alles richtig.`,
     `Wissensbasis: Code in sich stimmig (Stand ${KNOWLEDGE_VERSION.slice(0, 16)}, ${wissensProben.dokumente} Dokumente, Dateinamen wie in der Edge Function), ${wissensProben.vergleich} Vergleichs- und ${wissensProben.lesen} Leseproben – alles richtig.`,
     `Wochen-Check-in: ${wochenProben.wochen} Wochenproben (App und Server gleich), ${wochenProben.block} Blockproben, ${wochenProben.pruefungen} Prüfproben, ${wochenProben.faelle} Fälle – alles richtig.`,
+    `Offene Punkte: ${offeneProben.rechnung} Rechenproben, ${offeneProben.zahlen} Zahlenproben – alles richtig.`,
   ].join('\n'));
+}
+
+// Offene Punkte (followThrough.ts): was fehlt oder nicht umgesetzt wird. Die
+// Rechnung ist deterministisch; hier stehen die Ergebnisse von Hand
+// nachgerechnet. JETZT ist Samstag, der 26.09.2026; das Fenster reicht vom
+// 12.09. bis gestern (25.09.), heute zählt nicht.
+function trockenlaufOffenePunkte(fehler) {
+  let rechnung = 0;
+  const gleich = (ist, soll, was) => {
+    rechnung += 1;
+    if (JSON.stringify(ist) !== JSON.stringify(soll)) fehler.push(`Offene Punkte: ${was} ist ${JSON.stringify(ist)}, erwartet ${JSON.stringify(soll)}`);
+  };
+  const tag = (n) => new Date(JETZT.getTime() - n * 86_400_000).toISOString().slice(0, 10);
+  const tage = (anzahl, zeile) => Array.from({ length: anzahl }, (_, index) => zeile(tag(index + 1)));
+  const punkte = (zeilen) => buildFollowThrough(zeilen, JETZT);
+  const ohneText = (ergebnis) => ergebnis.checks.map(({ action, ...rest }) => rest);
+
+  const luecken = punkte({
+    settings: { custom_calorie_target: 2700, adaptive_target: null },
+    weights: [0, 2, 5, 9, 12].map((n) => ({ gemessen_am: tag(n), kg: 82 })),            // heute zählt nicht: 4 im Fenster
+    skinfolds: [{ gemessen_am: '2026-08-20', falten: {}, standardisiert: true }],      // vor 37 Tagen
+    waists: [{ gemessen_am: '2026-09-10', cm: 90 }],                                 // vor 16 Tagen
+    performance: [{ performed_on: '2026-09-20', exercise: 'Kniebeuge', category: 'legs', estimated_1rm: 100 }],
+    sleep: tage(12, (datum) => ({ sleep_date: datum, bedtime: '23:30', wake_time: '06:00', quality: 3 })),   // 390 min
+    checkins: [],
+    nutritionEntries: [{ log_date: tag(0), energy_kcal: 5000, protein_g: 300 }, ...tage(9, (datum) => ({ log_date: datum, energy_kcal: 1400, protein_g: 90 }))],
+    routines: [
+      { id: 'a', name: 'Kreatin', weekdays: [1, 2, 3, 4, 5, 6, 7], active: true, created_at: '2026-01-01T08:00:00Z' },
+      { id: 'b', name: 'Dehnen', weekdays: [1, 3, 5], active: true, created_at: '2026-09-20T08:00:00Z' },   // erst 3 geplante Tage
+      { id: 'c', name: 'Pausiert', weekdays: [1, 2, 3, 4, 5, 6, 7], active: false },
+    ],
+    completions: [1, 2, 3, 4, 5].map((n) => ({ routine_id: 'a', completed_on: tag(n) })),
+  });
+  gleich(luecken.window, { from: '2026-09-12', to: '2026-09-25', days: 14 }, 'Fenster');
+  gleich(ohneText(luecken), [
+    { id: 'ernaehrung-eintraege', kind: 'daten', area: 'ernaehrung', nutrition: { daysWithEntries: 9, windowDays: 14 } },
+    { id: 'ernaehrung-weit-unter-ziel', kind: 'daten', area: 'ernaehrung', nutrition: { daysWithEntries: 9, averageKcal: 1400, targetKcal: 2700, percentOfTarget: 52 } },
+    { id: 'gewicht-wiegen', kind: 'daten', area: 'gewicht', bodyComposition: { weightMeasurements: 4, measurementsPerWeek: 2 } },
+    { id: 'hautfalten-messung', kind: 'messung', area: 'hautfalten', bodyComposition: { latestSkinfoldDate: '2026-08-20', daysSinceLastSkinfold: 37 } },
+    { id: 'routinen', kind: 'umsetzung', area: 'routinen', routines: [{ name: 'Kreatin', plannedDays: 14, completedDays: 5 }] },
+    { id: 'schlaf-dauer', kind: 'verbesserung', area: 'schlaf', sleep: { checkins: 12, averageDurationMinutes: 390 } },
+  ], 'Lücken in allen Bereichen, wichtigste zuerst');
+  gleich(luecken.checks.find((punkt) => punkt.id === 'routinen').action.includes('„Kreatin“'), true, 'Routine im Aktionstext');
+  gleich(/adherence|quote/i.test(JSON.stringify(luecken)), false, 'keine Umsetzungsquote');
+  gleich(followThroughActions(luecken).map((aktion) => [aktion.id, aktion.category, aktion.source]).slice(0, 2),
+    [['umsetzung-ernaehrung-eintraege', 'ernaehrung', 'app'], ['umsetzung-ernaehrung-weit-unter-ziel', 'ernaehrung', 'app']], 'COMP-Aktionen');
+  gleich(followThroughActions(null), [], 'ohne Punkte keine Aktionen');
+
+  // Alles umgesetzt: keine Punkte. Danach je eine Abweichung.
+  const gut = (aenderung = {}) => ({
+    settings: { custom_calorie_target: 2700 },
+    weights: tage(14, (datum) => ({ gemessen_am: datum, kg: 82 })),                    // Proteinziel 82 × 1,8 = 148 g
+    skinfolds: [{ gemessen_am: tag(10), standardisiert: true }],
+    waists: [{ gemessen_am: tag(10), cm: 90 }],
+    performance: [{ performed_on: tag(3), exercise: 'Kniebeuge', category: 'legs', estimated_1rm: 100 }],
+    sleep: tage(14, (datum) => ({ sleep_date: datum, bedtime: '23:00', wake_time: '06:30', quality: 4 })),
+    checkins: [],
+    nutritionEntries: tage(14, (datum) => ({ log_date: datum, energy_kcal: 2600, protein_g: 160 })),
+    routines: [{ id: 'a', name: 'Kreatin', weekdays: [1, 2, 3, 4, 5, 6, 7], active: true }],
+    completions: tage(14, (datum) => ({ routine_id: 'a', completed_on: datum })),
+    ...aenderung,
+  });
+  gleich(punkte(gut()).checks, [], 'alles umgesetzt');
+  gleich(ohneText(punkte(gut({ nutritionEntries: tage(14, (datum) => ({ log_date: datum, energy_kcal: 2600, protein_g: 100 })) }))),
+    [{ id: 'protein-unter-ziel', kind: 'verbesserung', area: 'ernaehrung', nutrition: { daysWithEntries: 14, averageProteinG: 100, proteinTargetG: 148 } }], 'Protein unter Ziel');
+  gleich(ohneText(punkte(gut({ nutritionEntries: tage(14, (datum) => ({ log_date: datum, energy_kcal: 3200, protein_g: 160 })) }))),
+    [{ id: 'ernaehrung-ueber-ziel', kind: 'umsetzung', area: 'ernaehrung', nutrition: { daysWithEntries: 14, averageKcal: 3200, targetKcal: 2700, percentOfTarget: 119 } }], 'Kalorienziel überschritten');
+  gleich(punkte(gut({ nutritionEntries: tage(14, (datum) => ({ log_date: datum, energy_kcal: 1500, protein_g: 60 })) })).checks.map((punkt) => punkt.id),
+    ['ernaehrung-weit-unter-ziel'], 'weit unter Ziel: kein zusätzlicher Proteinpunkt');
+  gleich(ohneText(punkte(gut({ nutritionEntries: [] }))),
+    [{ id: 'ernaehrung-eintraege', kind: 'daten', area: 'ernaehrung', nutrition: { daysWithEntries: 0, windowDays: 14 } }], 'keine Einträge');
+  gleich(punkte(gut({ skinfolds: [{ gemessen_am: tag(10), standardisiert: false }] })).checks.map((punkt) => punkt.id), ['hautfalten-standard'], 'nicht standardisiert');
+  gleich(punkte(gut({ sleep: tage(14, (datum) => ({ sleep_date: datum, bedtime: '23:00', wake_time: '06:30', quality: 2 })) })).checks.map((punkt) => punkt.id), ['schlaf-qualitaet'], 'Schlafqualität');
+  gleich(ohneText(punkte(gut({ performance: [] }))), [{ id: 'training-daten', kind: 'daten', area: 'training', training: { trainingDays: 0, lastTrainingDate: null } }], 'keine Trainingsdaten');
+  gleich(ohneText(punkte(gut({ waists: [] }))), [{ id: 'taille-messung', kind: 'messung', area: 'taille', bodyComposition: { latestWaistDate: null, daysSinceLastWaist: null } }], 'noch nie Taille gemessen');
+
+  // Zahlen aus den offenen Punkten sind für den Zahlenprüfer belegt.
+  const reise = FAELLE_ZEITREIHE.find((fall) => fall.id === 'verlauf-reise-stillstand');
+  const luecke = FAELLE_WOCHENBILANZ.find((fall) => fall.id === 'wochenbilanz-luecken');
+  const zahlenProben = [
+    [reise, 'Eingetragen hast du in den letzten 14 Tagen im Schnitt 1307 kcal, das sind 57 % deines Kalorienziels von 2300 kcal.', true],
+    [reise, 'Eingetragen hast du im Schnitt 1307 kcal, das sind 60 % deines Kalorienziels.', false],
+    [reise, 'Eingetragen hast du im Schnitt 1350 kcal.', false],
+    [luecke, 'Einträge an 8 von 14 Tagen.', true],
+    [luecke, 'Einträge an 10 von 14 Tagen.', false],
+  ];
+  for (const [fall, satz, soll] of zahlenProben) {
+    const ergebnis = pruefe(fall, antwortMitSatz('facts', satz)).find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
+    if (ergebnis.bestanden !== soll) fehler.push(`Offene Punkte: „${satz}“ sollte ${soll ? 'bestehen' : 'auffallen'} (${ergebnis.detail})`);
+  }
+  return { rechnung, zahlen: zahlenProben.length };
 }
 
 // Minimale Antwort, die nur den zu prüfenden Satz enthält.
@@ -1206,9 +1300,12 @@ function trockenlaufPrompt(fehler) {
   for (const block of bloecke) regel(prompt.includes(`- <${block}>:`), `beschreibt den Block <${block}> nicht`);
   // Jeder andere Tag im Prompt muss ein Abschnitt sein - kein Eingabeblock
   // unter fremdem Namen.
-  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'experiment_reviews', 'weekly_review', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
+  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'experiment_reviews', 'weekly_review', 'follow_through', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
   const fremd = [...new Set([...prompt.matchAll(/<\/?([a-z_]+)>/g)].map((treffer) => treffer[1]))].filter((name) => !bloecke.includes(name) && !abschnitte.includes(name));
   regel(!fremd.length, `nennt unbekannte Blöcke: ${fremd.join(', ')}`);
+  // Offene Punkte (followThrough): nur aus dem Verlauf, Datenlücken zuerst schließen.
+  regel(prompt.includes('Take these points only from "followThrough" in <timeseries>'), 'Offene Punkte nicht an followThrough gebunden');
+  regel(prompt.includes('the first recommendation closes it: kind "beobachtung"'), 'Datenlücke wird nicht zuerst geschlossen');
   // Die Eingabe enthält nur bekannte Blöcke, in fester Reihenfolge, ohne leere.
   const probe = produktion.coachInput({ user_question: 'Frage', timeseries: '  ', comp_facts: '{}' });
   regel(probe === '<comp_facts>\n{}\n</comp_facts>\n\n<user_question>\nFrage\n</user_question>', 'coachInput hält Reihenfolge nicht ein oder sendet leere Blöcke');

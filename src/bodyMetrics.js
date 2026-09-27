@@ -11,7 +11,7 @@ import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
-import { buildCompEvidence, requestCompAssessment } from './compAssessment.js';
+import { buildCompEvidence, compCoachFrage, requestCompAssessment } from './compAssessment.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import { alterAmMessdatum, koerperfettAnteil, magermasse } from './ypsiFormel.js';
@@ -816,6 +816,7 @@ function compResultMarkup(result, cached = false) {
       ${basis.length ? `<section><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
       ${uncertainty.length ? `<section><h3>Was noch unsicher ist</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
       ${nextSteps.length ? `<section><h3>Nächste Schritte</h3><ol>${nextSteps.map((item) => `<li><b>${escapeHtml(item.action)}</b><span>${escapeHtml(item.rationale)}</span><small>${escapeHtml(item.timeframe)}</small></li>`).join('')}</ol></section>` : ''}
+      <button class="body-coach-entry comp-coach-entry" type="button" data-comp-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Mit Coach besprechen</b><small>Wie du die Schritte konkret angehst</small></span>${materialIconMarkup('chevron_right')}</button>
       ${sources.length ? `<details class="comp-assessment-sources"><summary>Verwendete Seminarquellen</summary><ul>${sources.map((source) => `<li><b>${escapeHtml(source.title || source.filename)}</b>${source.page ? `<span>Seite ${escapeHtml(source.page)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}
     </div>`;
 }
@@ -862,6 +863,10 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       ]);
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
       panel.innerHTML = compResultMarkup(response.result, response.cached === true);
+      panel.querySelector('[data-comp-coach]')?.addEventListener('click', async () => {
+        const { openCoachQuestion } = await import('./coach.js');
+        openCoachQuestion({ question: compCoachFrage(response.result), senden: true });
+      });
       const heroStatus = container.querySelector('[data-comp-hero-status]');
       const heroConfidence = container.querySelector('[data-comp-hero-confidence]');
       if (heroStatus) heroStatus.textContent = response.result?.status || response.result?.title || 'Gesamtbild aktualisiert';

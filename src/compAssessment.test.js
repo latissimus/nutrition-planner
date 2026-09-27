@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCompEvidence } from './compAssessment.js';
+import { buildCompEvidence, compCoachFrage } from './compAssessment.js';
 
 const baseState = () => ({
   weights: [
@@ -30,5 +30,28 @@ describe('zentrale COMP-Evidenz', () => {
     expect(evidence.safetyBoundaries.automaticGoalChangesAllowed).toBe(false);
     expect(evidence.safetyBoundaries.supplementDosagesFromModelAllowed).toBe(false);
     expect(evidence.allowedActions).toEqual([]);
+  });
+});
+
+describe('Mit Coach besprechen', () => {
+  it('nennt die nächsten Schritte der COMP-Bewertung wörtlich und fragt nach dem Vorgehen', () => {
+    const frage = compCoachFrage({ nextSteps: [
+      { action: 'Trag zwei Wochen lang an jedem Tag ein, was du isst.' },
+      { action: 'Wiege dich mindestens dreimal pro Woche.' },
+    ] });
+    expect(frage).toBe([
+      'Lass uns meine COMP-Gesamtbewertung besprechen.',
+      'Die nächsten Schritte daraus:',
+      '1. Trag zwei Wochen lang an jedem Tag ein, was du isst.',
+      '2. Wiege dich mindestens dreimal pro Woche.',
+      'Wie gehe ich das konkret an, was ist dabei am wichtigsten, und was fehlt oder läuft bei mir noch nicht rund?',
+    ].join('\n'));
+  });
+
+  it('bleibt ohne Schritte eine sinnvolle Frage und unter der Feldgrenze', () => {
+    expect(compCoachFrage({})).not.toContain('Die nächsten Schritte');
+    const lang = compCoachFrage({ nextSteps: Array(5).fill({ action: 'x'.repeat(1000) }) });
+    expect(lang.split('\n').filter((zeile) => /^\d\./.test(zeile))).toHaveLength(3);
+    expect(lang.length).toBeLessThan(2000);
   });
 });

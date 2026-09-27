@@ -14946,6 +14946,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .body-coach-entry>.coach-entry-cap,.sleep-coach-entry>.coach-entry-cap{width:27px;height:27px;filter:drop-shadow(0 1px 0 #000)}
 .body-coach-entry>.material-svg:last-child,.sleep-coach-entry>.material-svg:last-child{width:18px;height:18px}
 .body-coach-entry{margin:12px auto 0}
+.comp-coach-entry{margin-top:14px}
 .sleep-coach-entry{margin-top:12px;border-inline:0;border-bottom:0;border-radius:0;background:transparent}
 
 /* Eine zentrale COMP-Erzählung: vier Fakten, eine Bewertung, alles Weitere
@@ -15059,8 +15060,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    mit Titelleiste und Fensterknöpfen (CAPBOY violett links, du pink rechts),
    die Eingabe fest am unteren Rand. */
 /* Sanduhr (auch COMP-Seite), Ladehinweis und Seitenrand der Gedächtnis-Seite */
-/* Sanduhr (src/sanduhr.js): Pixel-SVG in der Textfarbe, animiert per SMIL. */
-.coach-hourglass{display:block;width:38px;height:50px}
+/* Sanduhr (src/sanduhr.js): Pixel-SVG in der Textfarbe, animiert per SMIL.
+   Quer gedreht ist sie breiter als ihr Rahmen; sie darf darüber hinaus. */
+.sanduhr{overflow:visible}
+.coach-hourglass{display:block;width:24px;height:32px}
 /* Wartetext: pulsiert sanft; nach 8 s geht er in den zweiten Text über. */
 .wartetext{display:inline-grid;animation:wartetext-puls 2.4s ease-in-out infinite}
 .wartetext>span{grid-area:1/1}

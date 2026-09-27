@@ -114,14 +114,14 @@ export function feldText(antwort, feld = 'alle') {
 // Einheit eines Snapshot-Felds, abgeleitet aus seinem Pfad.
 const FELD_EINHEITEN = [
   [/\.currentWeightKg$|\.averageWeightKg$|ChangeKg$|Estimated1rmKg\.\d+$/, 'kg'],
-  [/Percent$/, '%'],
+  [/Percent$|\.percentOfTarget$/, '%'],
   [/\.latestSkinfoldsMm\.|Mm$/, 'mm'],
   [/\.heightCm$|WaistCm$|ChangeCm$/, 'cm'],
   [/\.calorieTarget$|\.averageKcal$|\.targetKcal$|\.enteredKcal$|\.differenceKcal$|KcalOnPastDaysWithEntries$/, 'kcal'],
-  [/\.average(Protein|Carbs|Fat)G$|\.enteredProteinG$/, 'g'],
+  [/\.average(Protein|Carbs|Fat)G$|\.enteredProteinG$|\.proteinTargetG$/, 'g'],
   [/DurationMinutes$/, 'min'],
   [/\.age$/, 'jahre'],
-  [/Measurements$|\.checkins$|\.completeDays$|\.daysWithEntries$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$|\.entries$|\.pastDaysWith(out)?Entries$/, 'anzahl'],
+  [/Measurements$|\.checkins$|\.completeDays$|\.daysWithEntries$|\.windowDays$|\.measurementsPerWeek$|\.daysSince\w+$|\.plannedDays$|\.completedDays$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$|\.entries$|\.pastDaysWith(out)?Entries$/, 'anzahl'],
 ];
 // Die Differenz zum Kalorienziel (recentDays) trägt wie eine Veränderung ein Vorzeichen.
 const VERAENDERUNG = /TrendPercent$|ChangeKg$|ChangeMm$|ChangeCm$|ChangePercent$|[dD]ifferenceKcal(OnPastDaysWithEntries)?$/;
@@ -185,14 +185,14 @@ const MESSGROESSEN = [
   [/(haut)?falten ?summe|summe (der|aller) (haut)?falten/i, /\.latestSkinfoldSumMm$|\.skinfoldChangeMm$/],
   [/(haut)?falten ?messung|faltenmessung/i, /\.skinfoldMeasurements$/],
   [/taillen ?messung/i, /\.waistMeasurements$/],
-  [/wiegung|gewichts ?messung|wiege ?messung/i, /\.weightMeasurements$/],
+  [/wiegung|gewichts ?messung|wiege ?messung/i, /\.weightMeasurements$|\.measurementsPerWeek$/],
   [/\bmessung(en)?\b/i, /Measurements$/],
   [/taille|bauchumfang/i, /\.latestWaistCm$|\.waistChangeCm$/],
   [/(körper)?größe/i, /\.heightCm$/],
   [/\balter\b|jahre alt/i, /\.age$/],
   // Mit Wochenverlauf auch das Wochenmittel und die berechnete Veränderung.
   [/gewicht|wiegst|waage/i, /\.currentWeightKg$|\.weightTrendPercent$|\.averageWeightKg$|\.weightChangeKg$/],
-  [/(kalorien)?ziel|vorgabe|zielwert|\bsoll\b/i, /\.calorieTarget$|\.targetKcal$/],
+  [/(kalorien)?ziel|vorgabe|zielwert|\bsoll\b/i, /\.calorieTarget$|\.targetKcal$|\.percentOfTarget$|\.proteinTargetG$/],
   // Tageswerte der letzten Tage (recentDays): eingetragen, nicht unbedingt
   // gegessen. Seit dem 27.09.2026 sind auch die Mittel für Kalorien und Protein
   // Mittel über die Tage mit Einträgen ("Kalorien (Ø Tage mit Einträgen)").
@@ -204,7 +204,7 @@ const MESSGROESSEN = [
   // Schlafdauer. Makros und Skalen haben je mehrere Durchschnittsfelder;
   // dort würde "Protein im Schnitt 80 g" sonst durch das Fett belegt.
   [/\b(im )?(durch)?schnitt(lich\w*)?\b/i, /\.averageKcal$|\.averageDurationMinutes$|\.average(Entered|Difference)KcalOnPastDaysWithEntries$/],
-  [/protein|eiweiß/i, /\.averageProteinG$/],
+  [/protein|eiweiß/i, /\.averageProteinG$|\.proteinTargetG$/],
   [/kohlenhydrat|\bkh\b/i, /\.averageCarbsG$/],
   [/(?<![a-zäöü])fett(?![a-zäöü])/i, /\.averageFatG$/],
   // Auch "Vollständig protokollierte Ernährung: 34 Tage" und "vollständig protokolliert: 34 Tage".
@@ -227,8 +227,10 @@ const MESSGROESSEN = [
   [/reise|unterwegs/i, /\.travelDays$/],
   [/übungen/i, /\.comparableExercises$/],
   [/trainingswerte|importiert/i, /\.importedValues$/],
-  [/routine|treue|eingehalten|umsetzung|adhärenz|quote|erfüllung/i, /\.adherencePercent$|\.completionsLast30Days$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$/],
-  [/erledig|abgehakt|abschlüss/i, /\.completionsLast30Days$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$/],
+  [/routine|treue|eingehalten|umsetzung|adhärenz|quote|erfüllung/i, /\.adherencePercent$|\.completionsLast30Days$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.plannedDays$|\.completedDays$/],
+  [/erledig|abgehakt|abschlüss/i, /\.completionsLast30Days$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.completedDays$/],
+  // Offene Punkte (followThrough): geplante Tage einer Routine.
+  [/geplant\w*/i, /\.plannedDays$/],
   ...FALTEN.map((slug) => [new RegExp(`${FALTEN_WORT[slug]}(?![a-zäöü]*umfang)`, 'i'), new RegExp(`\\.latestSkinfoldsMm\\.${slug}$`)]),
 ];
 

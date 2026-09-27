@@ -165,8 +165,10 @@ async function rufeCoach(body) {
   return data;
 }
 
-export function openCoachQuestion({ scope = 'overall', question = '' } = {}) {
-  sessionStorage.setItem(CONTEXT_KEY, JSON.stringify({ scope, question }));
+// Öffnet den Coach mit einer Frage von einer Fachseite. Mit senden: true
+// schickt er sie gleich ab ("Mit Coach besprechen"), sonst steht sie im Feld.
+export function openCoachQuestion({ scope = 'overall', question = '', senden = false } = {}) {
+  sessionStorage.setItem(CONTEXT_KEY, JSON.stringify({ scope, question, senden }));
   location.hash = 'coach';
 }
 
@@ -428,4 +430,6 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       nachUnten();
     }
   };
+
+  if (pending.question && pending.senden) form.requestSubmit();
 }

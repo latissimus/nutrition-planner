@@ -4,6 +4,7 @@ import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } 
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
 import { reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion } from './weekly.ts';
+import { followThroughActions } from './followThrough.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -189,7 +190,7 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     userRows('bodycomp_checkins', userId, 'checkin_date', FETCH_LIMITS.checkins, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals'),
     pagedRows(() => admin.from('nutrition_log_entries').select('log_date,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }).order('id')),
     // All routines, paused ones included, so every completion has a name.
-    admin.from('routines').select('id,name,period,weekdays,active').eq('user_id', userId).order('position'),
+    admin.from('routines').select('id,name,period,weekdays,active,created_at').eq('user_id', userId).order('position'),
     pagedRows(() => admin.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', since).order('completed_on', { ascending: false }).order('routine_id')),
     admin.from('user_preferences').select('value').eq('user_id', userId).eq('key', 'comp:hautfalten-kontext-v1').maybeSingle(),
   ]);
@@ -208,13 +209,15 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
 // Memory of the free coach (step 5). If a table or column is missing (the
 // migration is not applied yet) or a query fails, the coach answers without
 // memory instead of failing, and the response says so.
+const INTERVENTION_COLUMNS = 'id,action,hypothesis,target_metric,target_metric_id,expected_direction,baseline_note,start_date,review_date,status,adherence,outcome,source,updated_at';
+
 async function loadMemory(userId: string, conversationId: string, today: string, timeseries: Row) {
   const [messages, facts, interventions] = await Promise.all([
     admin.from('ai_coach_messages').select('role,content,created_at').eq('user_id', userId).eq('conversation_id', conversationId)
       .order('created_at', { ascending: false }).limit(MEMORY_LIMITS.conversationMessages),
     admin.from('coach_profile_memory').select('category,fact,confirmed_on').eq('user_id', userId)
       .order('confirmed_on', { ascending: false }).limit(MEMORY_LIMITS.profileFacts),
-    admin.from('coach_interventions').select('id,action,hypothesis,target_metric,target_metric_id,expected_direction,baseline_note,start_date,review_date,status,adherence,outcome,source,updated_at').eq('user_id', userId)
+    admin.from('coach_interventions').select(INTERVENTION_COLUMNS).eq('user_id', userId)
       .order('start_date', { ascending: false }).limit(MEMORY_LIMITS.interventions * 4),
   ]);
   const failed = [messages, facts, interventions].find((result) => result.error);
@@ -244,6 +247,16 @@ async function saveTurn(userId: string, conversationId: string, question: string
   ]);
   if (error) console.error('CAPBOY memory save failed', error);
   return !error;
+}
+
+// Running experiments for the central COMP assessment, in the coach's form,
+// so COMP does not propose a change in a domain that already has one.
+// Without the table (migration not applied) there are none.
+async function loadRunningExperiments(userId: string, today: string, timeseries: Row) {
+  const { data, error } = await admin.from('coach_interventions').select(INTERVENTION_COLUMNS).eq('user_id', userId)
+    .eq('status', 'aktiv').order('start_date', { ascending: false }).limit(MEMORY_LIMITS.interventions);
+  if (error) console.error('CAPBOY running experiments unavailable', error);
+  return error ? '' : interventionBlock(data || [], today, timeseries);
 }
 
 // Weekly check-in (step 7): the latest review before the reviewed week, for
@@ -335,9 +348,17 @@ function validateSources(sources: Row[] = []) {
   }).filter((source, index, all) => all.findIndex((item) => item.filename === source.filename && item.page === source.page) === index).slice(0, 5);
 }
 
-function enforceCompSafety(result: Row, evidence: Row) {
+// Why an open point comes first, when the model left it out.
+const FOLLOW_THROUGH_REASONS: Record<string, string> = {
+  daten: 'Ohne diese Einträge lässt sich deine Entwicklung in diesem Bereich nicht sicher beurteilen.',
+  messung: 'Ohne aktuelle Messung bleibt offen, was hinter deiner Entwicklung steckt.',
+  umsetzung: 'Der Plan wird zurzeit nicht eingehalten; erst danach lässt sich seine Wirkung beurteilen.',
+  verbesserung: 'Dieser Wert liegt deutlich unter einem sinnvollen Ziel.',
+};
+
+function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null = null) {
   const allowed = new Map((evidence?.allowedActions || []).map((item: Row) => [item.id, item]));
-  const nextSteps = (result?.nextSteps || []).flatMap((step: Row) => {
+  const steps = (result?.nextSteps || []).flatMap((step: Row) => {
     const authoritative = allowed.get(step.actionId);
     if (!authoritative) return [];
     return [{
@@ -346,7 +367,20 @@ function enforceCompSafety(result: Row, evidence: Row) {
       rationale: String(step.rationale || '').slice(0, 500),
       timeframe: String(step.timeframe || '').slice(0, 120),
     }];
-  }).slice(0, 3);
+  });
+  // An open point always comes first: if the model named none, the most
+  // important one is put in front.
+  const [firstCheck] = followThrough?.checks || [];
+  const namesOpenPoint = steps.some((step: Row) => String(step.actionId).startsWith('umsetzung-'));
+  if (firstCheck && !namesOpenPoint && allowed.has(`umsetzung-${firstCheck.id}`)) {
+    steps.unshift({
+      actionId: `umsetzung-${firstCheck.id}`,
+      action: firstCheck.action,
+      rationale: FOLLOW_THROUGH_REASONS[firstCheck.kind] || '',
+      timeframe: 'die nächsten 14 Tage',
+    });
+  }
+  const nextSteps = steps.slice(0, 3);
   return {
     title: String(result?.title || 'Aktuelle Gesamtbewertung').slice(0, 120),
     status: String(result?.status || 'Gesamtbild noch unklar').slice(0, 72),
@@ -406,6 +440,16 @@ Deno.serve(async (request) => {
       ? body.evidence as Row : null;
     if (clientEvidence && JSON.stringify(clientEvidence).length > 120_000) return json({ error: 'Die COMP-Daten sind zu umfangreich.' }, 413);
     const isCentralComp = scope === 'comp' && clientEvidence;
+    // Central COMP: what is missing or not followed through comes before the
+    // skinfold catalogue, and COMP knows the running experiments.
+    const compEvidence = isCentralComp ? {
+      ...clientEvidence,
+      allowedActions: [
+        ...followThroughActions(timeseries.followThrough),
+        ...(Array.isArray(clientEvidence!.allowedActions) ? clientEvidence!.allowedActions : []),
+      ],
+    } : null;
+    const runningExperiments = isCentralComp ? await loadRunningExperiments(userId, now.toISOString().slice(0, 10), timeseries) : '';
 
     const canonicalSnapshot = { ...snapshot } as Row;
     delete canonicalSnapshot.generatedAt;
@@ -414,7 +458,7 @@ Deno.serve(async (request) => {
     // Only the central COMP assessment reads the time series; the cache keys
     // of the other scopes stay as they were.
     const inputFingerprint = await fingerprint(isCentralComp
-      ? { scope, snapshot: canonicalSnapshot, timeseries, evidence: canonicalEvidence }
+      ? { scope, snapshot: canonicalSnapshot, timeseries, evidence: canonicalEvidence, experiments: runningExperiments }
       : { scope, snapshot: canonicalSnapshot, evidence: canonicalEvidence });
 
     if (scope === 'comp' && body?.mode === 'ensure') {
@@ -429,8 +473,10 @@ Deno.serve(async (request) => {
       model: COACH_MODEL,
       instructions: `Du erstellst die einzige sichtbare Gesamtbewertung auf der CAPBOY-COMP-Seite. ${SHARED_SAFETY}
 
-Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.`,
-      input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nWöchentlicher Verlauf der letzten 12 Wochen (deterministisch, dieselbe Grundlage wie beim Coach; Veränderungen stehen in summary und werden nicht selbst berechnet):\n${JSON.stringify(timeseries)}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(clientEvidence)}` }],
+Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.
+
+Betrachte alle Bereiche zusammen: Körpermaße, Ernährung, Schlaf, Erholung, Routinen und Training. Im Verlauf steht unter followThrough, was in den letzten 14 Tagen fehlt oder nicht umgesetzt wird, nach Wichtigkeit sortiert; die App hat das berechnet. Nenne diese Punkte in keyDevelopment, basis oder uncertainty und sag klar, was fehlt und warum es zählt, ohne Vorwurf. Gibt es solche Punkte, ist der erste nächste Schritt einer davon (actionId beginnt mit „umsetzung-“), in der Regel der erste der Liste: Fehlende Daten und fällige Messungen gehen neuen Maßnahmen vor, weil sich ohne sie nichts sicher beurteilen lässt. Schlage keine neue Änderung in einem Bereich vor, in dem schon ein Experiment läuft; ist eines fällig (reviewDue), nenne das.`,
+      input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nWöchentlicher Verlauf der letzten 12 Wochen (deterministisch, dieselbe Grundlage wie beim Coach; Veränderungen stehen in summary und werden nicht selbst berechnet):\n${JSON.stringify(timeseries)}\n\nLaufende Experimente:\n${runningExperiments || 'keine'}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(compEvidence)}` }],
       reasoning: { effort: 'high' },
       max_output_tokens: 6000,
       tools: [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 8 }],
@@ -456,7 +502,7 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
     const raw = outputText(responsePayload);
     if (!raw) return json({ error: 'Die Coach-Antwort war leer.' }, 502);
     const parsed = JSON.parse(raw);
-    const result = isCentralComp ? enforceCompSafety(parsed, clientEvidence) : {
+    const result = isCentralComp ? enforceCompSafety(parsed, compEvidence!, timeseries.followThrough) : {
       ...parsed,
       webResearchRequested: webResearch,
       webSources: webResearch ? webSources(responsePayload) : [],

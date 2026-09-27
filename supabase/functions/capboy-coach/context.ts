@@ -5,6 +5,7 @@
 // scripts/coach-evals run exactly the same code.
 
 import { YPSI_FORMULA } from './knowledge.ts';
+import { buildFollowThrough, durationMinutes } from './followThrough.ts';
 
 type Row = Record<string, any>;
 
@@ -18,7 +19,7 @@ export type ContextRows = {
   sleep: Row[];               // sleep_date, bedtime, wake_time, quality, energy, awakenings, tags
   checkins: Row[];            // checkin_date, recovery, mood, hunger, illness, travel, unusual_meals
   nutritionEntries: Row[];    // log_date, energy_kcal, protein_g, carbs_g, fat_g
-  routines: Row[];            // all routines (active and paused), ordered by position
+  routines: Row[];            // all routines (active and paused), ordered by position; created_at
   completions: Row[];         // routine_id, completed_on (last FETCH_WINDOW_DAYS days)
   ruleContext: Row;           // user_preferences comp:hautfalten-kontext-v1
 };
@@ -49,16 +50,6 @@ export function dateDaysAgo(now: Date, days: number) {
   const date = new Date(now.getTime());
   date.setDate(date.getDate() - days);
   return date.toISOString().slice(0, 10);
-}
-
-function durationMinutes(bedtime: string, wakeTime: string) {
-  const toMinutes = (value: string) => {
-    const [hours, minutes] = String(value || '0:0').split(':').map(Number);
-    return (hours * 60) + minutes;
-  };
-  let duration = toMinutes(wakeTime) - toMinutes(bedtime);
-  if (duration <= 0) duration += 24 * 60;
-  return duration;
 }
 
 function foldTotal(row: Row | undefined) {
@@ -422,6 +413,8 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
       averageEnteredKcalOnPastDaysWithEntries: averageEnteredKcal,
       averageDifferenceKcalOnPastDaysWithEntries: averageEnteredKcal != null && target ? round(averageEnteredKcal - target, 0) : null,
     },
+    // What is missing or not followed through (followThrough.ts).
+    followThrough: buildFollowThrough(rows, now),
     summary: {
       weightChangeKg: weight.change, weightChangeFromWeek: weight.fromWeek, weightChangeToWeek: weight.toWeek,
       skinfoldChangeMm: folds.change, skinfoldChangeFromWeek: folds.fromWeek, skinfoldChangeToWeek: folds.toWeek,

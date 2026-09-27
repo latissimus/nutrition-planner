@@ -176,3 +176,14 @@ export async function requestCompAssessment(evidence) {
   if (data?.error) throw new Error(data.error);
   return data;
 }
+
+// "Mit Coach besprechen": COMP nennt die wichtigsten Schritte, der Coach
+// bespricht, wie man sie angeht. Die Frage nennt die Schritte wörtlich.
+export function compCoachFrage(result) {
+  const schritte = (result?.nextSteps || []).slice(0, 3).map((schritt, index) => `${index + 1}. ${String(schritt.action || '').slice(0, 400)}`);
+  return [
+    'Lass uns meine COMP-Gesamtbewertung besprechen.',
+    ...(schritte.length ? ['Die nächsten Schritte daraus:', ...schritte] : []),
+    'Wie gehe ich das konkret an, was ist dabei am wichtigsten, und was fehlt oder läuft bei mir noch nicht rund?',
+  ].join('\n');
+}
