@@ -370,6 +370,31 @@ export function wochenFelder(block) {
   return felder;
 }
 
+// Vom Server fertig berechnete Vorher-/Nachher-Werte fälliger Experimente.
+// Sie stehen im Maßnahmenblock, nicht nochmals im allgemeinen Snapshot.
+// Der Coach darf sie zitieren, ohne selbst zu rechnen.
+function experimentFelder(block) {
+  let eintraege;
+  try {
+    eintraege = JSON.parse(block || '[]');
+  } catch {
+    return [];
+  }
+  return eintraege.flatMap((eintrag) => {
+    const pfad = WOCHEN_PFADE[eintrag?.targetMetricId];
+    const messung = eintrag?.measurement;
+    if (!pfad || !messung) return [];
+    const basis = `.experiment.${eintrag.id || 'ohne-id'}`;
+    return [
+      ['previous', messung.previous, false],
+      ['current', messung.current, false],
+      ['change', messung.change, true],
+    ].flatMap(([name, wert, veraenderung]) => (typeof wert === 'number'
+      ? [{ pfad: `${basis}.${name}${pfad}`, wert, einheit: feldEinheit(pfad), veraenderung }]
+      : []));
+  });
+}
+
 // Zahlen aus deutschem Fließtext mit Vorzeichen, Nachkommastellen und Einheit.
 // "2.700" ist 2700, "89,7" ist 89.7. Datumsangaben werden vorher entfernt.
 export function textZahlen(text) {
@@ -478,7 +503,11 @@ function veraenderungsZitat(satz, eintrag, text) {
 // (Hinweise) aus dem Feld facts.
 export function zahlenBefund(fall, antwort) {
   // Mit Wochenverlauf zählen auch dessen Werte als geliefert.
-  const felder = [...snapshotFelder(fall.zeitreihe ? { ...fall.daten, timeseries: fall.zeitreihe } : fall.daten), ...wochenFelder(fall.wochenbilanz)];
+  const felder = [
+    ...snapshotFelder(fall.zeitreihe ? { ...fall.daten, timeseries: fall.zeitreihe } : fall.daten),
+    ...wochenFelder(fall.wochenbilanz),
+    ...experimentFelder(fall.gedaechtnis?.intervention_log),
+  ];
   // Ein Fakt enthält oft mehrere Sätze. Begriffe werden nur im selben Satz
   // gesucht, sonst bindet "Ziel" aus dem Vorsatz die Zahl im nächsten.
   const saetze = (Array.isArray(antwort?.facts) ? antwort.facts.map(String) : [])

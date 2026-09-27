@@ -1555,6 +1555,8 @@ function trockenlaufExperimente(fehler) {
   probe(wirksam, fakt('Schlafqualität: 2 von 5 → 4 von 5, Veränderung +2 auf der Skala 1–5.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 2 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   probe(ohneWirkung, fakt('Schlafqualität: 3 von 5 in 2026-W35 und 3 von 5 in 2026-W38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  probe(ohneWirkung, fakt('Veränderung der Schlafqualität: 0 Skalenpunkte.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  probe(ohneWirkung, fakt('Veränderung der Schlafqualität: 1 Skalenpunkt.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   const ohneWirkungAntwort = (veraenderung) => antwort({
     experimentReviews: [{ experimentId: 'exp-ohne-wirkung', verdict: 'nicht_wirksam', basis: `Schlafqualität: 3 von 5 (2026-W35) → 3 von 5 (2026-W38), Veränderung ${veraenderung}; Adhärenz: voll.`, decision: 'beenden' }],
     recommendations: [empfehlung({ baseline: 'Schlafqualität 3 von 5 (2026-W38)' })],
