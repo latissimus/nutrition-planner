@@ -380,6 +380,12 @@ Deno.serve(async (request) => {
     const question = weeklyMode ? '' : String(body?.question || '').trim().slice(0, 2000);
     if (scope === 'coach' && !weeklyMode && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
     const webResearch = scope === 'coach' && body?.webResearch === true;
+    const imageDataUrls = scope === 'coach' && Array.isArray(body?.attachments)
+      ? body.attachments.slice(0, 1).flatMap((attachment: Row) => {
+        const value = String(attachment?.dataUrl || '');
+        return /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value) && value.length <= 3_000_000 ? [value] : [];
+      })
+      : [];
 
     // Shared context: the same facts and time series for coach and COMP.
     const now = new Date();
@@ -440,7 +446,7 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
           schema: compResultSchema,
         },
       },
-    } : coachRequestBody({ scope, question: coachQuestion, snapshot, timeseries, memory: memory?.blocks, weekly, webResearch, vectorStoreId });
+    } : coachRequestBody({ scope, question: coachQuestion, snapshot, timeseries, memory: memory?.blocks, weekly, webResearch, vectorStoreId, imageDataUrls });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

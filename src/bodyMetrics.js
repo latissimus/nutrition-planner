@@ -7,6 +7,7 @@ import { BODY_EXPLANATIONS, confirmedTrendChange, evaluateBodyComp, goalWeightIn
 import { parseLogmanExport, performanceTrend } from './logmanImport.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { coachIconMarkup } from './menuIcons.js';
+import hourglassUrl from './assets/hourglass-time.gif';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
@@ -138,7 +139,6 @@ function bodyHeroMarkup(state) {
   </section>
   <div class="body-analysis-help" hidden>
     <p>Der Status verbindet die im Code berechneten Trends aus Gewicht, Faltensumme, Taille und Leistung. Das Sprachmodell erklärt diese Ergebnisse mit passenden Seminarstellen, berechnet sie aber nicht selbst.</p>
-    <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und <b>keine medizinische Diagnose</b>.</p>
   </div></div>`;
 }
 
@@ -160,22 +160,27 @@ function compFactsMarkup(state) {
 function compAssessmentMarkup() {
   return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
     <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>prüft</em></span></header>
-    <div class="comp-assessment-loading"><p class="coach-thinking-label" role="status">Denke nach<span class="coach-thinking-dots" aria-hidden="true">...</span></p><p>CAPBOY COACH prüft deine Daten und lädt die passende Gesamtbewertung.</p></div>
+    <div class="comp-assessment-loading" role="status"><img class="coach-hourglass" src="${hourglassUrl}" alt=""><b>Gesamtbild wird ausgewertet</b><p>CAPBOY verbindet deine aktuellen Daten und Entwicklungen.</p></div>
   </section>`;
 }
 
-function compDetailsMarkup(state) {
-  return `<details class="comp-details ${SPECIAL_DEX_CLASSES.content}">
-    <summary><span><b>Details</b><small>Messreihen, Hautfalten, Formeln und Quellen</small></span>${materialIconMarkup('chevron_right')}</summary>
-    <div class="comp-details-content">
-      ${weightMarkup(state)}
-      ${skinfoldMarkup(state)}
-      ${ypsiKfaMarkup(state)}
-      ${neurotransmitterMarkup()}
-      ${waistMarkup(state)}
-      ${logmanMarkup(state)}
-    </div>
+function compDetailCard(title, subtitle, content) {
+  return `<details class="comp-detail-card ${SPECIAL_DEX_CLASSES.content}">
+    <summary><span><b>${title}</b><small>${subtitle}</small></span>${materialIconMarkup('chevron_right')}</summary>
+    <div class="comp-detail-card-content">${content}</div>
   </details>`;
+}
+
+function compDetailsMarkup(state) {
+  return `<section class="comp-details-list" aria-label="COMP-Details">
+    <header><small>DETAILS</small><h2>Messwerte und Auswertungen</h2></header>
+    ${compDetailCard('Gewicht', 'Messreihe und geglätteter Verlauf', weightMarkup(state))}
+    ${compDetailCard('Hautfalten', 'Messungen, Prioritäten und Seminarwissen', skinfoldMarkup(state))}
+    ${compDetailCard('Körperfett-Schätzung', 'Formeln und Verlauf', ypsiKfaMarkup(state))}
+    ${compDetailCard('Neurotransmitter-Profil', 'Assessment und Strategien', neurotransmitterMarkup())}
+    ${compDetailCard('Taillenumfang', 'Messwerte und Verlauf', waistMarkup(state))}
+    ${compDetailCard('Leistung', 'Importierte LOGMAN-Entwicklung', logmanMarkup(state))}
+  </section>`;
 }
 
 function weightEntryMarkup() {
@@ -374,7 +379,6 @@ function faltenLegendeMarkup(state) {
     <summary><span>Hautfalten im Detail</span>${materialIconMarkup('chevron_right')}</summary>
     <p class="body-legende-intro">Tippe auf eine Falte, um die Interpretation aus deinen Unterlagen, die Messanleitung und mögliche Protokolle zu sehen.</p>
     <div class="falten-legende-liste">${rows}</div>
-    <p class="body-legende-disclaimer">Praxisorientierte Interpretation der Hautfaltenmessung. Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose.</p>
   </details>`;
 }
 
@@ -458,7 +462,7 @@ function ypsiPriorityReasonMarkup(plan) {
         ? 'SEMINAR-HYPOTHESE · NOCH ZU KLÄREN'
         : 'REGELBASIERTE SEMINAR-EINORDNUNG';
     const reason = active.status === 'bestaetigt'
-      ? 'Deine Angaben passen derzeit am ehesten zu diesem in den Seminarunterlagen beschriebenen Muster. Das ist kein Ursachenbeweis und keine medizinische Diagnose.'
+      ? 'Deine Angaben passen derzeit am ehesten zu diesem in den Seminarunterlagen beschriebenen Muster.'
       : active.status === 'offen'
         ? `${active.unansweredQuestionIds.length} ${active.unansweredQuestionIds.length === 1 ? 'Antwort fehlt' : 'Antworten fehlen'}, bevor die App diesen Zusammenhang sicher von den anderen Möglichkeiten trennen kann.`
         : 'Für diesen Verlaufsmarker ist keine einzelne Ursache aus den Faltenwerten ableitbar.';
@@ -501,7 +505,7 @@ function ypsiPriorityMarkup(state) {
     <header><span><small>HAUTFALTENMESSUNG</small><b>Regelbasierte Seminar-Auswertung</b></span><em>${datumKurz(plan.date)}</em></header>
     <div class="ypsi-top-fold"><small>PRIORITÄT 1</small><b>${escapeHtml(plan.topFold.label)}</b><span>${display(plan.topFold.value)} mm</span></div>
     ${ypsiPriorityComparisonMarkup(plan)}
-    <p class="ypsi-rule-note">Aus fest hinterlegten Regeln und deinen Kontextangaben abgeleitet – ohne Sprachmodell. Die Zuordnung beschreibt eine Seminar-Hypothese, keine Diagnose.</p>
+    <p class="ypsi-rule-note">Aus fest hinterlegten Regeln und deinen Kontextangaben abgeleitet – ohne Sprachmodell.</p>
     <details class="ypsi-plan-details"><summary><span>Seminar-Hypothese und Handlungsplan</span>${materialIconMarkup('chevron_right')}</summary><div>
       ${ypsiPriorityReasonMarkup(plan)}
       ${ypsiActionPlanMarkup(actionPlan, { phase: plan.activeProtocolGroup?.suggestedPhase || null })}
@@ -638,7 +642,6 @@ function faltenDetailMarkup(slug, state) {
       </section>` : ''}
 
       ${info.quelle ? `<p class="falten-detail-quelle">Quelle: ${escapeHtml(info.quelle)}</p>` : ''}
-      <p class="falten-detail-disclaimer">Angaben aus deinen Unterlagen zur Hautfaltenmessung. Keine klinisch validierten Diagnostiktests, keine medizinische Diagnose. Bei ernsthaften Beschwerden ärztlich abklären lassen.</p>
     </div>
   `;
 }
@@ -814,7 +817,6 @@ function compResultMarkup(result, cached = false) {
       ${uncertainty.length ? `<section><h3>Was noch unsicher ist</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
       ${nextSteps.length ? `<section><h3>Nächste Schritte</h3><ol>${nextSteps.map((item) => `<li><b>${escapeHtml(item.action)}</b><span>${escapeHtml(item.rationale)}</span><small>${escapeHtml(item.timeframe)}</small></li>`).join('')}</ol></section>` : ''}
       ${sources.length ? `<details class="comp-assessment-sources"><summary>Verwendete Seminarquellen</summary><ul>${sources.map((source) => `<li><b>${escapeHtml(source.title || source.filename)}</b>${source.page ? `<span>Seite ${escapeHtml(source.page)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}
-      <p class="comp-assessment-safety">Messwerte und Regeln werden im Code berechnet. Die KI erklärt und priorisiert; sie stellt keine Diagnose und verändert keine Ziele automatisch.</p>
     </div>`;
 }
 

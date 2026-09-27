@@ -312,7 +312,7 @@ export function coachUserPrompt(scope: Scope, question: string, snapshot: unknow
 // Request body of the free coach and of the non-central scopes. The central
 // COMP assessment builds its own body in index.ts.
 export function coachRequestBody({ scope, question, snapshot, timeseries, memory, weekly, webResearch, vectorStoreId }: {
-  scope: Scope; question: string; snapshot: unknown; timeseries?: unknown; memory?: CoachMemory; weekly?: unknown; webResearch: boolean; vectorStoreId: string | null;
+  scope: Scope; question: string; snapshot: unknown; timeseries?: unknown; memory?: CoachMemory; weekly?: unknown; webResearch: boolean; vectorStoreId: string | null; imageDataUrls?: string[];
 }) {
   const tools: Row[] = vectorStoreId
     ? [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 6 }]
@@ -322,10 +322,14 @@ export function coachRequestBody({ scope, question, snapshot, timeseries, memory
     tools.push({ type: 'web_search', search_context_size: 'medium' });
     include.push('web_search_call.action.sources');
   }
+  const prompt = coachUserPrompt(scope, question, snapshot, timeseries, memory, weekly);
+  const content = imageDataUrls?.length
+    ? [{ type: 'input_text', text: prompt }, ...imageDataUrls.map((imageUrl) => ({ type: 'input_image', image_url: imageUrl, detail: 'auto' }))]
+    : prompt;
   return {
     model: COACH_MODEL,
     instructions: coachSystemPrompt(scope, webResearch),
-    input: [{ role: 'user', content: coachUserPrompt(scope, question, snapshot, timeseries, memory, weekly) }],
+    input: [{ role: 'user', content }],
     reasoning: { effort: scope === 'coach' ? 'medium' : 'high' },
     max_output_tokens: 4000,
     tools,

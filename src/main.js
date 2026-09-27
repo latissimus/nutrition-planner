@@ -1185,11 +1185,10 @@ function openNeoDexInfoDialog(kind = 'food', customTitle = '', { inlineTarget = 
   const copy = body
     ? `<p>In <b>COMP</b> hältst du Gewicht, Taillenumfang und deine <b>Falten-Summe</b> fest.</p>
       <p>Entscheidend ist nicht ein einzelner Tageswert, sondern der <b>geglättete Verlauf</b>. Ergänzende Daten aus Training und Erholung helfen, Veränderungen sinnvoll einzuordnen.</p>
-      <p>Die Auswertung zeigt beobachtete Trends, keine exakte Körperfettmessung und keine medizinische Diagnose.</p>`
+      <p>Die Auswertung verbindet diese Daten zu einem verständlichen Gesamtbild.</p>`
     : sleep
     ? `<p>Im <b>SCHLAF</b> planst du deinen Schlafrhythmus und hältst morgens <b>Schlafdauer</b>, <b>Qualität</b> und <b>Energie</b> fest.</p>
-      <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden erst aus mehreren vergleichbaren Check-ins abgeleitet.</p>
-      <p>Die Auswertung zeigt beobachtete Zusammenhänge und ersetzt keine medizinische Diagnose.</p>`
+      <p>Abendroutinen und Erinnerungen helfen dir, deinen Plan im Alltag umzusetzen. Persönliche Trends werden aus mehreren vergleichbaren Check-ins abgeleitet.</p>`
     : meal
     ? `<p>Auf der Seite <b>TRACKER</b> planst und protokollierst du <b>Mahlzeiten</b>, <b>Supplements</b> und deine Flüssigkeitszufuhr über den Tag.</p>
       <p>Die Zeitfenster geben deinem Tagesplan Struktur. Zu jeder Mahlzeit kannst du Hinweise hinterlegen und Erinnerungen gezielt aktivieren.</p>

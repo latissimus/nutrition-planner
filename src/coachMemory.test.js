@@ -212,11 +212,12 @@ describe('Coach-Seite: Gespräch und Maßnahmen', () => {
     expect(resultMarkup({ ...ergebnis, experimentReviews: [] })).not.toContain('Auswertung deiner Experimente');
   });
 
-  it('zeigt frühere Runden escaped und zusammengeklappt', () => {
+  it('zeigt frühere Runden escaped als Chatfenster', () => {
     const html = verlaufMarkup([{ frage: '<script>x</script>', result: { summary: 'Antwort' } }]);
-    expect(html).toContain('<details class="coach-verlauf">');
+    expect(html).toContain('coach-chat-window is-user');
+    expect(html).toContain('coach-chat-window is-coach');
     expect(html).toContain('&lt;script&gt;x&lt;/script&gt;');
-    expect(html).toContain('1 Frage');
+    expect(html).toContain('CAPBOY');
     expect(verlaufMarkup([])).toBe('');
   });
 });

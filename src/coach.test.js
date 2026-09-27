@@ -45,11 +45,11 @@ describe('Coach-Webquellen', () => {
     });
     expect(html).not.toContain('javascript:');
     expect(html).not.toContain('Verwendete Webquellen');
-    expect(html).toContain('keine verwendbare externe Quelle');
+    expect(html).toContain('Keine Webquelle verwendet');
   });
 
-  it('kennzeichnet Antworten ohne Internetrecherche transparent', () => {
+  it('blendet ohne angeforderte Webrecherche unnötige Statuszeilen aus', () => {
     const html = resultMarkup(baseResult);
-    expect(html).toContain('Es wurde keine Internetrecherche durchgeführt.');
+    expect(html).not.toContain('Webquelle');
   });
 });
