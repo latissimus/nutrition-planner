@@ -12,7 +12,7 @@ review_method: visual-original-pdf
 
 Die Messanweisungen werden als praktische Standardisierung dokumentiert. Die
 hormonellen Zuordnungen und Supplementprotokolle bleiben Seminar-Hypothesen
-beziehungsweise gesperrte Erfahrungswerte.
+beziehungsweise als solche gekennzeichnete Erfahrungswerte.
 
 ## PDF-Seite 1
 
@@ -174,7 +174,7 @@ beziehungsweise gesperrte Erfahrungswerte.
 
 **Begründung:** Die Priorisierung und Dosierung beruhen auf unvalidierten Hautfaltenzuordnungen.
 
-**Verwendungsgrenze:** Protokolle und Dosierungen sind vollständig gesperrt.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen unverändert als Seminarwissen dokumentiert, aber nicht personalisiert oder verändert werden.
 
 ## PDF-Seite 10
 
@@ -192,7 +192,7 @@ beziehungsweise gesperrte Erfahrungswerte.
 
 **Begründung:** Die Messstellen liefern keine ausreichende Indikation für Produkte oder Mengen.
 
-**Verwendungsgrenze:** Protokolle und Dosierungen sind vollständig gesperrt.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen unverändert als Seminarwissen dokumentiert, aber nicht personalisiert oder verändert werden.
 
 ## PDF-Seite 11
 
@@ -210,7 +210,7 @@ beziehungsweise gesperrte Erfahrungswerte.
 
 **Begründung:** Der allgemeine Lebensstilhinweis rechtfertigt nicht die hautfaltenbasierten Produktkombinationen.
 
-**Verwendungsgrenze:** Lebensstil im Gesamtbild betrachten; Protokolle und Dosierungen nicht übernehmen.
+**Verwendungsgrenze:** Lebensstil im Gesamtbild betrachten; Protokolle und Dosierungen dürfen als Seminarwissen dokumentiert, aber nicht automatisch übernommen werden.
 
 ## PDF-Seite 12
 
@@ -228,7 +228,7 @@ beziehungsweise gesperrte Erfahrungswerte.
 
 **Begründung:** Die Kombinationen werden ohne medizinische Indikation aus Hautfalten abgeleitet.
 
-**Verwendungsgrenze:** Protokolle und Dosierungen sind vollständig gesperrt.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen unverändert als Seminarwissen dokumentiert, aber nicht personalisiert oder verändert werden.
 
 ## PDF-Seite 13
 
@@ -246,7 +246,7 @@ beziehungsweise gesperrte Erfahrungswerte.
 
 **Begründung:** Hautfalten und subjektive Symptome sind keine sichere Indikation für die Präparate.
 
-**Verwendungsgrenze:** Protokolle und Dosierungen sind vollständig gesperrt.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen unverändert als Seminarwissen dokumentiert, aber nicht personalisiert oder verändert werden.
 
 ## PDF-Seite 14
 
@@ -264,7 +264,7 @@ beziehungsweise gesperrte Erfahrungswerte.
 
 **Begründung:** Die Schlaf- und Hormonzuordnung über eine Hautfalte ist nicht validiert.
 
-**Verwendungsgrenze:** Protokolle und Dosierungen sind vollständig gesperrt; Schlafprobleme anhand tatsächlicher Schlafdaten und Beschwerden bewerten.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen unverändert als Seminarwissen dokumentiert werden; Schlafprobleme anhand tatsächlicher Schlafdaten und Beschwerden bewerten und keine persönliche Einnahmeanweisung daraus ableiten.
 
 ## PDF-Seite 15
 

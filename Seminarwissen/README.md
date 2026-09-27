@@ -52,8 +52,13 @@ Erlaubt sind `keine`, `diagnostik`, `hormone`, `supplement`, `dosierung`,
 `ernaehrung`, `training`, `schlaf`, `krankheit` und `medikament`.
 
 Wissenseinheiten mit Sicherheitsmarker dürfen die programmatischen Grenzen des
-Coachs nicht überschreiben. Insbesondere werden daraus keine Diagnosen,
-Dosierungen, Medikamentenempfehlungen oder automatischen Zieländerungen.
+Coachs nicht überschreiben. Konkrete Seminar-Dosierungen, Produkte und
+Protokolle dürfen jedoch mit unverändertem Wert und klarer Kennzeichnung als
+`Seminarwissen · Erfahrungswert` wiedergegeben und eingeordnet werden. Dabei
+müssen Quelldatei und PDF-Seite genannt werden. Der Coach darf daraus keine
+Diagnose ableiten, fehlende Werte ergänzen, mehrere Protokolle kombinieren,
+verschreibungspflichtige oder leistungssteigernde Substanzen empfehlen oder
+Ziele automatisch ändern.
 
 ## Normalisierung
 

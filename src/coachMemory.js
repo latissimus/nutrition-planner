@@ -3,6 +3,8 @@ import { materialIconMarkup } from './categoryIcons.js';
 import { coachIconMarkup } from './menuIcons.js';
 import { toast } from './toast.js';
 
+const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
+
 /* „Was CAPBOY über mich weiß“ – das Gedächtnis des Coachs (Schritt 5).
    Drei Teile, alle nur für den Nutzer selbst sichtbar (RLS):
    - Über mich: feste Fakten, die der Nutzer selbst einträgt.
@@ -77,6 +79,24 @@ export function gruppiereGespraeche(nachrichten = []) {
     const verlauf = [...gespraech.nachrichten].sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
     return { id: gespraech.id, zuletzt: gespraech.zuletzt, beginn: verlauf[0]?.created_at, verlauf, fragen: verlauf.filter((nachricht) => nachricht.role === 'user').length };
   });
+}
+
+// Löscht die lokale Kopie nur dann, wenn genau dieses Gespräch betroffen ist.
+// Ohne ID werden – passend zu „Alle Gespräche löschen“ – alle lokalen
+// Gesprächsdaten dieses Tabs entfernt.
+export function vergissLokalesGespraech(conversationId = null, storage = sessionStorage) {
+  if (!conversationId) {
+    storage.removeItem(COACH_CONVERSATION_KEY);
+    return true;
+  }
+  try {
+    const lokal = JSON.parse(storage.getItem(COACH_CONVERSATION_KEY) || 'null');
+    if (lokal?.id !== conversationId) return false;
+  } catch {
+    // Eine beschädigte lokale Kopie ist ebenfalls nicht mehr verwendbar.
+  }
+  storage.removeItem(COACH_CONVERSATION_KEY);
+  return true;
 }
 
 // Eine Coach-Empfehlung als Maßnahme: Aktion und Begründung übernehmen, ab
@@ -280,12 +300,18 @@ export async function mountCoachMemoryPage(container, { userId }) {
     }
     if (dataset.gespraechLoeschen) {
       if (!confirm('Dieses Gespräch löschen?')) return;
-      ausfuehren(() => ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).eq('conversation_id', dataset.gespraechLoeschen)), 'Gespräch gelöscht.');
+      ausfuehren(async () => {
+        await ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).eq('conversation_id', dataset.gespraechLoeschen));
+        vergissLokalesGespraech(dataset.gespraechLoeschen);
+      }, 'Gespräch gelöscht.');
       return;
     }
     if ('gespraecheLoeschen' in dataset) {
       if (!confirm('Alle gespeicherten Gespräche löschen?')) return;
-      ausfuehren(() => ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).not('conversation_id', 'is', null)), 'Alle Gespräche gelöscht.');
+      ausfuehren(async () => {
+        await ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).not('conversation_id', 'is', null));
+        vergissLokalesGespraech();
+      }, 'Alle Gespräche gelöscht.');
     }
   });
 

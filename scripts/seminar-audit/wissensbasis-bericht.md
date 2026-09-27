@@ -26,10 +26,13 @@ Die kontrollierte Fassung:
 
 - gibt solche Inhalte ausdrücklich als Seminar-Hypothese oder Erfahrungswert
   wieder,
-- übernimmt keine konkreten Supplementdosierungen in normalisierte Aussagen,
+- bewahrt konkrete Supplementdosierungen im Original und erlaubt ihre
+  unveränderte Wiedergabe als klar gekennzeichnetes Seminarwissen,
 - kennzeichnet Diagnose-, Hormon-, Krankheits-, Medikamenten- und
   Dosierungsrisiken,
-- sperrt die alten Supplementprotokolle für Coach-Empfehlungen,
+- verhindert, dass Seminarprotokolle als wissenschaftlich gesicherte Evidenz,
+  Diagnose oder frei veränderte beziehungsweise kombinierte Empfehlung
+  ausgegeben werden,
 - trennt brauchbare Messstandardisierung von unbelegten physiologischen
   Deutungen.
 

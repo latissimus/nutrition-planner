@@ -11,8 +11,11 @@ review_method: visual-original-pdf
 # YPSI Advanced Supplementation
 
 Die Unterlage enthält zahlreiche konkrete Dosierungen, Produktnamen,
-Krankheitsbezüge und Wirkversprechen. Sie dient nur als historischer
-Seminarkontext. Keine Dosierung oder Kombination ist für den Coach freigegeben.
+Krankheitsbezüge und Wirkversprechen. Sie dürfen vollständig und unverändert
+als `Seminarwissen · Erfahrungswert` mit Dateiname und PDF-Seite dokumentiert
+und erklärt werden. Sie sind dadurch keine wissenschaftlich gesicherte Wirkung
+und keine persönliche Einnahmeanweisung. Der Coach ergänzt keine fehlenden
+Werte und kombiniert keine getrennten Protokolle.
 
 ## PDF-Seite 1
 

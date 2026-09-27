@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   gedaechtnisMarkup, gruppiereGespraeche, istNichtEingerichtet, massnahmeAusEmpfehlung, pruefeFakt, pruefeMassnahme,
+  vergissLokalesGespraech,
 } from './coachMemory.js';
 import { resultMarkup, verlaufMarkup } from './coach.js';
 
@@ -63,6 +64,15 @@ describe('Coach-Gedächtnis: Gespräche', () => {
     expect(gespraeche.map((gespraech) => gespraech.id)).toEqual(['b', 'a']);
     expect(gespraeche[0].verlauf.map((nachricht) => nachricht.content)).toEqual(['Frage 2', 'Antwort 2']);
     expect(gespraeche[0].fragen).toBe(1);
+  });
+
+  it('entfernt beim Löschen auch die passende lokale Gesprächskopie', () => {
+    const speicher = new Map([['muscledex:coach-gespraech', JSON.stringify({ id: 'g1', runden: [] })]]);
+    const storage = { getItem: (key) => speicher.get(key) || null, removeItem: (key) => speicher.delete(key) };
+    expect(vergissLokalesGespraech('anderes', storage)).toBe(false);
+    expect(speicher.has('muscledex:coach-gespraech')).toBe(true);
+    expect(vergissLokalesGespraech('g1', storage)).toBe(true);
+    expect(speicher.has('muscledex:coach-gespraech')).toBe(false);
   });
 });
 

@@ -12,7 +12,9 @@ review_method: visual-original-pdf
 
 Die Tabellen dokumentieren das seminarinterne Biosignature-Modell. Die
 Zuordnungen zu Hormonen, Organen, Mängeln und Supplementprotokollen sind nicht
-als Diagnostik validiert. Dosierungsprotokolle sind vollständig gesperrt.
+als Diagnostik validiert. Dosierungsprotokolle dürfen unverändert als
+`Seminarwissen · Erfahrungswert` dokumentiert werden, sind aber keine Diagnose
+oder persönliche Einnahmeanweisung.
 
 ## PDF-Seite 1
 
@@ -174,7 +176,7 @@ als Diagnostik validiert. Dosierungsprotokolle sind vollständig gesperrt.
 
 **Begründung:** Die Kombinationen und Dosierungen werden aus einer unvalidierten Hautfalten- und Symptomzuordnung abgeleitet.
 
-**Verwendungsgrenze:** Sämtliche konkreten Produkte, Kombinationen und Dosierungen dieser Seite sind für Coach-Empfehlungen gesperrt.
+**Verwendungsgrenze:** Konkrete Produkte, Kombinationen und Dosierungen dürfen vollständig und unverändert mit Quelle dokumentiert werden, aber nicht als persönliche Einnahmeanweisung erscheinen.
 
 ## PDF-Seite 10
 
@@ -228,7 +230,7 @@ als Diagnostik validiert. Dosierungsprotokolle sind vollständig gesperrt.
 
 **Begründung:** Die Protokolle beruhen auf nicht validierten Zuordnungen und enthalten konkrete Dosierungsanweisungen.
 
-**Verwendungsgrenze:** Die Protokolle und Dosierungen sind vollständig gesperrt und dürfen nicht vom Coach empfohlen werden.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen vollständig und unverändert als Seminarwissen dokumentiert, aber nicht als persönliche Einnahmeanweisung formuliert werden.
 
 ## PDF-Seite 13
 
@@ -246,7 +248,7 @@ als Diagnostik validiert. Dosierungsprotokolle sind vollständig gesperrt.
 
 **Begründung:** Hautfalten und subjektive Symptome sind keine ausreichende Indikation für die aufgeführten Präparate und Mengen.
 
-**Verwendungsgrenze:** Die Protokolle und Dosierungen sind vollständig gesperrt.
+**Verwendungsgrenze:** Protokolle und Dosierungen dürfen vollständig und unverändert als Seminarwissen dokumentiert, aber nicht personalisiert oder verändert werden.
 
 ## PDF-Seite 14
 
@@ -264,4 +266,4 @@ als Diagnostik validiert. Dosierungsprotokolle sind vollständig gesperrt.
 
 **Begründung:** Eine Hautfalte ist keine ausreichende Indikation für die aufgeführten Produkte und Dosierungen.
 
-**Verwendungsgrenze:** Das Protokoll und seine Dosierungen sind vollständig gesperrt.
+**Verwendungsgrenze:** Das Protokoll und seine Dosierungen dürfen vollständig und unverändert als Seminarwissen dokumentiert, aber nicht personalisiert oder verändert werden.

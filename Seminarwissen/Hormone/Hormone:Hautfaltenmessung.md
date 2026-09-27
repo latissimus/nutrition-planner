@@ -12,7 +12,8 @@ review_method: visual-original-pdf
 
 Die Unterlage kombiniert allgemeine Hormonbegriffe mit weitreichenden
 Hautfalten-, Symptom- und Supplementzuordnungen. Sie ist keine diagnostische
-Quelle. Medizinische Aussagen und konkrete Protokolle bleiben gesperrt.
+Quelle. Medizinische Aussagen und konkrete Protokolle dürfen als Seminarwissen
+dokumentiert werden, sind aber keine Diagnose oder persönliche Einnahmeanweisung.
 
 ## PDF-Seite 1
 
@@ -120,7 +121,7 @@ Quelle. Medizinische Aussagen und konkrete Protokolle bleiben gesperrt.
 
 **Begründung:** Das Stufenmodell und die behaupteten Diagnosen sind nicht als medizinische Diagnostik validiert.
 
-**Verwendungsgrenze:** Keine „Nebennierenermüdung“, Candida- oder Leaky-Gut-Diagnose stellen; Protokolle und Dosierungen sind gesperrt.
+**Verwendungsgrenze:** Keine „Nebennierenermüdung“, Candida- oder Leaky-Gut-Diagnose stellen; Protokolle und Dosierungen nur unverändert als Seminarwissen dokumentieren, nicht personalisieren.
 
 ## PDF-Seite 7
 
@@ -300,7 +301,7 @@ Quelle. Medizinische Aussagen und konkrete Protokolle bleiben gesperrt.
 
 **Begründung:** Die individuellen Voraussetzungen, Wechselwirkungen und Dosierungsrisiken werden nicht ausreichend geprüft.
 
-**Verwendungsgrenze:** Protokoll und Dosierungen sind gesperrt; Schlafmittel- und Melatoninfragen sicher und individuell abklären.
+**Verwendungsgrenze:** Protokoll und Dosierungen dürfen unverändert als Seminarwissen dokumentiert werden; Schlafmittel- und Melatoninfragen vor einer persönlichen Anwendung sicher und individuell abklären.
 
 ## PDF-Seite 17
 

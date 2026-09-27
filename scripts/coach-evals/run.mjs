@@ -1321,6 +1321,10 @@ function trockenlaufGedaechtnis(fehler) {
   }
   const rat = FAELLE_GEDAECHTNIS.find((fall) => fall.id === 'gedaechtnis-frueherer-rat');
   if (kriterienFuer(rat).find((eintrag) => eintrag.kriterium === 'behauptet_erinnerung')?.erwartet !== 'ja') fehler.push('Gedächtnis: Erinnerungsregel im Fall mit Gespräch nicht überschrieben');
+  const prompt = produktion.coachSystemPrompt('coach', false);
+  if (!prompt.includes('you may quote and refer to those supplied turns as the visible context of the current conversation')) fehler.push('Gedächtnis: Prompt erlaubt keinen ausdrücklichen Verweis auf das laufende Gespräch');
+  if (!prompt.includes('you never have access to other conversations')) fehler.push('Gedächtnis: Prompt grenzt frühere Gespräche nicht ausdrücklich aus');
+  if (!prompt.includes('The app supplies the blocks; you only read them')) fehler.push('Gedächtnis: Prompt behauptet nicht klar genug, dass nur die App speichert');
   for (const fall of [...FAELLE, ...FAELLE_ZEITREIHE]) {
     if (/^<(profile_memory|conversation|intervention_log)>$/m.test(VARIANTEN.produktion({ fall, vectorStoreId: 'vs' }).input[0].content)) fehler.push(`Gedächtnis: ${fall.id} bekommt Gedächtnisblöcke`);
   }

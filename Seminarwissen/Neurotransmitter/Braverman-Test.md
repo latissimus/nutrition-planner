@@ -12,7 +12,9 @@ review_method: visual-original-pdf
 
 Der Fragebogen wird als historische Seminarquelle dokumentiert. Seine
 Persönlichkeits-, Mangel- und Dosierungszuordnungen sind nicht diagnostisch
-validiert und dürfen keine Behandlung oder Supplementierung auslösen.
+validiert. Die historischen Empfehlungen und Dosierungen dürfen vollständig
+und unverändert als `Seminarwissen · Erfahrungswert` mit Quelle dokumentiert
+und erklärt werden, lösen aber keine Diagnose oder persönliche Einnahmeanweisung aus.
 
 ## PDF-Seite 1
 

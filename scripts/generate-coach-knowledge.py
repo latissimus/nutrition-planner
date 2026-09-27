@@ -37,6 +37,27 @@ for path in sorted((ROOT / "Seminarunterlagen").rglob("*.pdf")):
     documents.append({"title": path.stem, "filename": safe_name, "content": document})
     sources.append({"title": path.stem, "filename": safe_name, "original": rel, "pages": len(reader.pages), "kind": "pdf"})
 
+# Upload the reviewed classification layer next to the verbatim PDF text. The
+# PDF extraction preserves exact wording and doses; these documents identify
+# hypotheses, experience-based guidance and safety markers.
+manifest = json.loads((ROOT / "Seminarwissen/manifest.json").read_text(encoding="utf-8"))
+for entry in manifest["documents"]:
+    if entry.get("status") != "reviewed":
+        continue
+    path = ROOT / "Seminarwissen" / entry["output"]
+    document = path.read_text(encoding="utf-8")
+    safe_name = "Kontrolliert - " + entry["output"].replace("/", " - ") + ".txt"
+    title = f"Kontrolliertes Seminarwissen: {path.stem}"
+    parts.append(document)
+    documents.append({"title": title, "filename": safe_name, "content": document})
+    sources.append({
+        "title": title,
+        "filename": safe_name,
+        "original": f"Seminarwissen/{entry['output']}",
+        "pages": entry["pages"],
+        "kind": "controlled",
+    })
+
 for filename, title in [
     ("src/data/hautfalten-faktoren.json", "Strukturierte Hautfalten-Gegenprüfungen"),
     ("src/data/hautfalten.json", "Strukturierte Hautfalten-Erklärungen"),
