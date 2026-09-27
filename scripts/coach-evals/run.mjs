@@ -65,7 +65,7 @@ import {
   FACT_COMPLETION_DAYS, FACT_LIMITS, FACT_WINDOW_DAYS, FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo,
 } from '../../supabase/functions/capboy-coach/context.ts';
 import { FAELLE } from './cases.mjs';
-import { FAELLE_ZEITREIHE, normalerCheckin, normalerSchlaf, rohdaten } from './cases-zeitreihe.mjs';
+import { FAELLE_ZEITREIHE, JETZT, normalerCheckin, normalerSchlaf, rohdaten } from './cases-zeitreihe.mjs';
 import { FAELLE_GEDAECHTNIS } from './cases-gedaechtnis.mjs';
 import { FAELLE_EXPERIMENTE } from './cases-experimente.mjs';
 import { FAELLE_WOCHENBILANZ } from './cases-wochenbilanz.mjs';
@@ -1294,11 +1294,6 @@ function trockenlaufZeitreihe(fehler) {
       { log_date: '2026-09-21', energy_kcal: 1000, protein_g: 70 },
       { log_date: '2026-09-21', energy_kcal: 500, protein_g: 30 },
     ],
-    dayStatus: [
-      { log_date: '2026-09-23', complete: true, excluded: true },   // ausgeschlossen
-      { log_date: '2026-09-22', complete: false, excluded: false }, // unvollständig
-      { log_date: '2026-09-21', complete: true, excluded: false },
-    ],
   };
   const verlauf = buildTimeseries(zeilen, jetzt);
   const [erste, , kw30] = verlauf.weeks;
@@ -1308,8 +1303,8 @@ function trockenlaufZeitreihe(fehler) {
   gleich([erste.week, kw38.week, kw39.week], ['2026-W28', '2026-W38', '2026-W39'], 'Kalenderwochen');
   gleich([kw39.from, kw39.to, kw39.partial, kw38.to, kw38.partial], ['2026-09-21', '2026-09-26', true, '2026-09-20', false], 'angebrochene Woche');
   gleich([kw39.bodyComposition.weightMeasurements, kw39.bodyComposition.averageWeightKg, kw38.bodyComposition.averageWeightKg, erste.bodyComposition.weightMeasurements], [2, 80.5, 82, 0], 'Wochengewicht (Zukunft und Vorwoche ausgelassen)');
-  gleich([kw30.bodyComposition.averageWeightKg, kw30.nutrition.completeDays, kw30.nutrition.averageKcal], [null, 0, null], 'leere Woche');
-  gleich([kw39.nutrition.completeDays, kw39.nutrition.averageKcal, kw39.nutrition.averageProteinG], [1, 1500, 100], 'nur vollständige, nicht ausgeschlossene Tage');
+  gleich([kw30.bodyComposition.averageWeightKg, kw30.nutrition.daysWithEntries, kw30.nutrition.averageKcal], [null, 0, null], 'leere Woche');
+  gleich([kw39.nutrition.daysWithEntries, kw39.nutrition.averageKcal, kw39.nutrition.averageProteinG], [3, 1000, 70], 'alle Tage mit Einträgen, Einträge je Tag summiert');
   gleich([kw39.bodyComposition.latestSkinfoldSumMm, erste.bodyComposition.latestSkinfoldQuality, erste.bodyComposition.latestSkinfoldStandardized], [85, 'mittel', false], 'Hautfalten je Woche');
   gleich([kw39.training.trainingDays, kw39.sleep.averageDurationMinutes], [2, 480], 'Trainingstage und Schlafdauer');
   gleich([kw38.recovery.illnessDays, kw38.recovery.travelDays, kw38.recovery.checkins, kw38.recovery.averageRecovery], [1, 1, 2, 2], 'Erholung (0 zählt wie in den Fakten nicht zum Mittel)');
@@ -1348,6 +1343,24 @@ function trockenlaufZeitreihe(fehler) {
   for (const fall of FAELLE) {
     if (VARIANTEN.produktion({ fall, vectorStoreId: 'vs' }).input[0].content.includes('<timeseries>')) fehler.push(`Verlauf: Standardfall ${fall.id} bekommt einen Verlauf`);
   }
+
+  // Ernährung zählt an jedem Tag mit Einträgen (einen Haken "Tag vollständig
+  // protokolliert" gibt es nicht mehr). Ein Tag ohne Einträge (19.09.) fehlt
+  // in den Zählungen und Mitteln; die Tagesliste zeigt ihn als leer.
+  const mitLuecke = rohdaten({
+    ziel: 'recomposition', kalorienziel: 2700,
+    gewicht: () => 82, ernaehrung: (n) => (n === 7 ? null : { kcal: 2400, protein: 150 }),
+    checkin: () => normalerCheckin(), schlaf: () => normalerSchlaf(), training: () => null,
+  });
+  const mitLueckeFakten = buildCompFacts(mitLuecke, JETZT);
+  const mitLueckeVerlauf = buildTimeseries(mitLuecke, JETZT);
+  gleich([mitLueckeFakten.nutrition.daysWithEntries, mitLueckeFakten.nutrition.averageKcal, mitLueckeVerlauf.weeks.at(-2).nutrition.daysWithEntries, mitLueckeVerlauf.weeks.at(-2).nutrition.averageKcal, mitLueckeVerlauf.summary.weeksWithNutritionEntries],
+    [42, 2400, 6, 2400, 12], 'Tage mit Einträgen');
+  const tage = mitLueckeVerlauf.recentDays;
+  gleich([tage.targetKcal, tage.pastDaysWithEntries, tage.pastDaysWithoutEntries, tage.averageEnteredKcalOnPastDaysWithEntries, tage.averageDifferenceKcalOnPastDaysWithEntries],
+    [2700, 10, 1, 2400, -300], 'Tagesliste');
+  gleich(tage.days.find((tag) => tag.date === '2026-09-19'), { date: '2026-09-19', today: false, entries: 0, enteredKcal: null, enteredProteinG: null, differenceKcal: null }, 'Tag ohne Einträge');
+  gleich(/complete/i.test(JSON.stringify([mitLueckeFakten, mitLueckeVerlauf])), false, 'kein Rest der Vollständig-Markierung');
 
   // Zahlenabgleich gegen Wochenwerte (Fall mit Reise: Wochenmittel 93,9 … 90,6 kg,
   // Veränderung -3,3 kg, Reisetage 5, Trainingstage 3).
@@ -1490,7 +1503,7 @@ function trockenlaufExperimente(fehler) {
   const woche = (label, from, to, werte, partial = false) => ({
     week: label, from, to, partial,
     bodyComposition: { averageWeightKg: werte.kg ?? null, latestSkinfoldSumMm: werte.mm ?? null },
-    sleep: { averageQuality: werte.q ?? null }, nutrition: { completeDays: werte.tage ?? 0 },
+    sleep: { averageQuality: werte.q ?? null }, nutrition: { daysWithEntries: werte.tage ?? 0 },
   });
   const verlauf = {
     weeks: [
@@ -1714,7 +1727,7 @@ function trockenlaufWochenbilanz(fehler) {
   pruef('wochenbilanz-krank', fakt('Gewicht (Wochenmittel): 86 kg (2026-W37) → 84,8 kg (2026-W38); Veränderung: −1,5 kg.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 3 Tage (2026-W37) → 0 Tage (2026-W38); Veränderung: −3 Tage.'), 'Zahlen ohne erkennbare Messgröße', true);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 3 Tage (2026-W37) → 0 Tage (2026-W38); Veränderung: +3 Tage.'), 'Fakten enthalten nur gelieferte Zahlen', false);
-  pruef('wochenbilanz-krank', fakt('Kalorien (Ø vollständige Tage): Veränderung −792 kcal.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-krank', fakt('Kalorien (Ø Tage mit Einträgen): Veränderung −679 kcal.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Morgenenergie: 3 von 5 in KW 37, 1,6 von 5 in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 0 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 2 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', false);
@@ -1743,7 +1756,7 @@ function trockenlaufWochenbilanz(fehler) {
 function rohdatenFuerWochen() {
   return rohdaten({
     ziel: 'recomposition', kalorienziel: 2600,
-    gewicht: () => 82, ernaehrung: () => ({ kcal: 2500, protein: 160, vollstaendig: true }),
+    gewicht: () => 82, ernaehrung: () => ({ kcal: 2500, protein: 160 }),
     checkin: () => normalerCheckin(), schlaf: () => normalerSchlaf(), training: () => null,
   });
 }
@@ -1883,7 +1896,6 @@ async function trockenlaufFixture(fehler) {
     sleep: neueste('sleep_logs', 'sleep_date', FETCH_LIMITS.sleep),
     checkins: neueste('bodycomp_checkins', 'checkin_date', FETCH_LIMITS.checkins),
     nutritionEntries: sortiert(tabellen.nutrition_log_entries.filter((zeile) => zeile.log_date >= seit), ['log_date', false], ['id', true]),
-    dayStatus: sortiert(tabellen.nutrition_day_status.filter((zeile) => zeile.log_date >= seit), ['log_date', false]),
     routines: sortiert(tabellen.routines, ['position', true]),
     completions: sortiert(tabellen.routine_completions.filter((zeile) => zeile.completed_on >= seit), ['completed_on', false], ['routine_id', true]),
     ruleContext: tabellen.user_preferences.value,

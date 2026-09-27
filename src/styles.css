@@ -15059,10 +15059,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    mit Titelleiste und Fensterknöpfen (CAPBOY violett links, du pink rechts),
    die Eingabe fest am unteren Rand. */
 /* Sanduhr (auch COMP-Seite), Ladehinweis und Seitenrand der Gedächtnis-Seite */
-.coach-hourglass{display:block;width:50px;height:50px;object-fit:contain;image-rendering:pixelated;animation:coach-hourglass-flip 1.35s steps(2,end) infinite}
-@keyframes coach-hourglass-flip{50%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
-:root[data-theme="dark"] .coach-hourglass{filter:invert(1)}
-@media(prefers-reduced-motion:reduce){.coach-hourglass,.coach-tippt img{animation-duration:2.7s}}
+/* Sanduhr (src/sanduhr.js): Pixel-SVG in der Textfarbe, animiert per SMIL. */
+.coach-hourglass{display:block;width:38px;height:50px}
+/* Wartetext: pulsiert sanft; nach 8 s geht er in den zweiten Text über. */
+.wartetext{display:inline-grid;animation:wartetext-puls 2.4s ease-in-out infinite}
+.wartetext>span{grid-area:1/1}
+.wartetext>span:first-child{animation:wartetext-aus .6s ease 8s forwards}
+.wartetext>span:last-child{opacity:0;animation:wartetext-ein .6s ease 8.4s forwards}
+@keyframes wartetext-puls{50%{opacity:.4}}
+@keyframes wartetext-aus{to{opacity:0}}
+@keyframes wartetext-ein{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.wartetext{animation:none}.wartetext>span{animation-duration:.01s!important}}
 .coach-loading{gap:7px;padding:10px}.coach-loading b{font:800 13px/1.2 var(--tech)}.coach-loading p{color:inherit;font:600 9px/1.4 var(--tech);opacity:.82}
 .coach-shell{width:100%;max-width:none;padding-inline:12px;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 @media(max-width:520px){.coach-shell{padding-inline:10px}}
@@ -15120,7 +15127,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-vorschlaege{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .coach-vorschlaege button{padding:7px 10px;border:1.5px solid var(--coach-rand);border-radius:999px;background:#fff;color:#111;font:700 11px/1.2 var(--tech);text-align:left;box-shadow:0 2px 0 var(--coach-schatten);cursor:pointer}
 .coach-tippt{display:flex;align-items:center;gap:8px;margin:0;font:700 12px/1.2 var(--tech)}
-.coach-tippt img{width:22px;height:22px;image-rendering:pixelated;filter:invert(1);animation:coach-hourglass-flip 1.35s steps(2,end) infinite}
+.coach-tippt .sanduhr{flex:none;width:17px;height:22px}
 .coach-chat-window.coach-welcome{display:block;padding:0;border-style:solid}
 .coach-chat-window .coach-chat-message :is(p,li,small):not(.coach-safety){color:inherit}
 .coach-chat-window.is-fehler{background:#fff;color:#111}

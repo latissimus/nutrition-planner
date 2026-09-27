@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
+import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
@@ -317,7 +318,7 @@ export async function mountCoachMemoryPage(container, { userId }) {
   container.innerHTML = `<main class="coach-shell coach-chat coach-gedaechtnis-seite">
     <div class="gedaechtnis-inhalt">
       ${fensterMarkup({ inhalt: '<p>Das weiß ich über dich – zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p>' })}
-      <div class="gedaechtnis-inhalt" data-gedaechtnis aria-live="polite">${fensterMarkup({ klasse: 'is-loading', inhalt: '<p>Lade Gedächtnis …</p>' })}</div>
+      <div class="gedaechtnis-inhalt" data-gedaechtnis aria-live="polite">${fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}${wartetextMarkup('Lade Gedächtnis', 'Lade noch ein bisschen')}</p>` })}</div>
     </div>
   </main>`;
   const inhalt = container.querySelector('[data-gedaechtnis]');

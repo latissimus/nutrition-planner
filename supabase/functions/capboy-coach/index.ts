@@ -178,7 +178,7 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
   const since = dateDaysAgo(now, FETCH_WINDOW_DAYS);
   const [
     nutritionSettings, weights, skinfolds, waists, performance, sleep, checkins,
-    nutritionEntries, dayStatus, routines, completions, preferences,
+    nutritionEntries, routines, completions, preferences,
   ] = await Promise.all([
     admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,bodycomp_thresholds').eq('user_id', userId).maybeSingle(),
     userRows('weights', userId, 'gemessen_am', FETCH_LIMITS.weights, 'gemessen_am,kg'),
@@ -188,19 +188,17 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     userRows('sleep_logs', userId, 'sleep_date', FETCH_LIMITS.sleep, 'sleep_date,bedtime,wake_time,quality,energy,awakenings,tags'),
     userRows('bodycomp_checkins', userId, 'checkin_date', FETCH_LIMITS.checkins, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals'),
     pagedRows(() => admin.from('nutrition_log_entries').select('log_date,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }).order('id')),
-    admin.from('nutrition_day_status').select('log_date,complete,excluded').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }),
     // All routines, paused ones included, so every completion has a name.
     admin.from('routines').select('id,name,period,weekdays,active').eq('user_id', userId).order('position'),
     pagedRows(() => admin.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', since).order('completed_on', { ascending: false }).order('routine_id')),
     admin.from('user_preferences').select('value').eq('user_id', userId).eq('key', 'comp:hautfalten-kontext-v1').maybeSingle(),
   ]);
-  const failures = [nutritionSettings, dayStatus, routines, preferences].filter((result) => result.error);
+  const failures = [nutritionSettings, routines, preferences].filter((result) => result.error);
   if (failures.length) throw failures[0].error;
   return {
     settings: nutritionSettings.data || null,
     weights, skinfolds, waists, performance, sleep, checkins,
     nutritionEntries,
-    dayStatus: dayStatus.data || [],
     routines: routines.data || [],
     completions,
     ruleContext: preferences.data?.value || {},

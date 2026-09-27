@@ -1,6 +1,5 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
-import hourglassUrl from './assets/hourglass-time.gif';
 import { toast } from './toast.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
@@ -8,6 +7,7 @@ import {
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
 import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
 import { seitenIconMarkup } from './menuIcons.js';
+import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 
 export { fensterMarkup };
 
@@ -143,7 +143,8 @@ export function willkommenMarkup({ neu = false } = {}) {
   });
 }
 
-const tipptMarkup = (text) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status"><img src="${hourglassUrl}" alt="">${escapeHtml(text)}</p>` });
+// Nach einer Weile wird aus "denkt nach" ein "denkt noch ein bisschen nach".
+const tipptMarkup = (text, spaeter) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}${wartetextMarkup(text, spaeter)}</p>` });
 const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
 
 async function invokeCoach(scope, question = '', webResearch = false, conversationId = null, attachments = []) {
@@ -368,7 +369,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         return answer.lastElementChild;
       }
       if (laden) {
-        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup('CAPBOY bilanziert deine Woche');
+        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup('CAPBOY bilanziert deine Woche', 'CAPBOY bilanziert noch ein bisschen');
       } else if (fehler) {
         zeichnen(fehlerMarkup('Keine Wochenbilanz erstellt. Deine Messwerte bleiben unverändert. Versuche es später erneut.'));
       } else {
@@ -396,7 +397,9 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     werkzeugeZeigen(false);
     answer.innerHTML = verlaufMarkup(runden, avatar)
       + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang) })
-      + tipptMarkup(webResearch ? 'CAPBOY recherchiert' : 'CAPBOY denkt nach');
+      + (webResearch
+        ? tipptMarkup('CAPBOY recherchiert', 'CAPBOY recherchiert noch ein bisschen')
+        : tipptMarkup('CAPBOY denkt nach', 'CAPBOY denkt noch ein bisschen nach'));
     nachUnten();
     try {
       const response = await invokeCoach('coach', question, webResearch, gespraech?.id, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);

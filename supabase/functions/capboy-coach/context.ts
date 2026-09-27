@@ -18,7 +18,6 @@ export type ContextRows = {
   sleep: Row[];               // sleep_date, bedtime, wake_time, quality, energy, awakenings, tags
   checkins: Row[];            // checkin_date, recovery, mood, hunger, illness, travel, unusual_meals
   nutritionEntries: Row[];    // log_date, energy_kcal, protein_g, carbs_g, fat_g
-  dayStatus: Row[];           // log_date, complete, excluded
   routines: Row[];            // all routines (active and paused), ordered by position
   completions: Row[];         // routine_id, completed_on (last FETCH_WINDOW_DAYS days)
   ruleContext: Row;           // user_preferences comp:hautfalten-kontext-v1
@@ -37,6 +36,7 @@ export const FACT_LIMITS = { weights: 90, skinfolds: 12, waists: 20, performance
 export const FETCH_LIMITS = { weights: 400, skinfolds: 40, waists: 60, performance: 1000, sleep: 120, checkins: 120 };
 // Days shown one by one with entered calories next to the target.
 export const RECENT_DAYS = 12;
+
 // At most this many exercises appear in the time series (most weeks with data first).
 const MAX_EXERCISES = 15;
 
@@ -101,7 +101,6 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
   const sleep = rows.sleep.slice(0, FACT_LIMITS.sleep);
   const checkins = rows.checkins.slice(0, FACT_LIMITS.checkins);
   const nutritionEntries = rows.nutritionEntries.filter((row) => String(row.log_date) >= since42);
-  const dayStatus = rows.dayStatus.filter((row) => String(row.log_date) >= since42);
   const routines = rows.routines.filter((routine) => routine.active === true);
   const completions = rows.completions.filter((row) => String(row.completed_on) >= since30);
 
@@ -114,8 +113,9 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
     current.fat += number(row.fat_g);
     nutritionByDay.set(row.log_date, current);
   }
-  const completeDates = new Set(dayStatus.filter((row) => row.complete && !row.excluded).map((row) => row.log_date));
-  const nutritionDays = [...nutritionByDay.entries()].filter(([date]) => completeDates.has(date)).map(([, values]) => values);
+  // Every day with entries counts. The former "day completely logged" mark
+  // is gone from the app and plays no role.
+  const nutritionDays = [...nutritionByDay.values()];
   const sleepDurations = sleep.map((row) => durationMinutes(row.bedtime, row.wake_time));
   const latestWeight = weights[0] ? number(weights[0].kg) : null;
   const latestFold = foldTotal(skinfolds[0]);
@@ -188,7 +188,7 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
       illnessDays: checkins.filter((row) => row.illness).length,
     },
     nutrition: {
-      completeDays: nutritionDays.length,
+      daysWithEntries: nutritionDays.length,
       averageKcal: round(mean(nutritionDays.map((day) => day.kcal)), 0),
       averageProteinG: round(mean(nutritionDays.map((day) => day.protein)), 0),
       averageCarbsG: round(mean(nutritionDays.map((day) => day.carbs)), 0),
@@ -252,7 +252,6 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
   const sleep = byWeek(rows.sleep, 'sleep_date');
   const checkins = byWeek(rows.checkins, 'checkin_date');
   const entries = byWeek(rows.nutritionEntries, 'log_date');
-  const status = byWeek(rows.dayStatus, 'log_date');
   const completions = byWeek(rows.completions, 'completed_on');
 
   const series = mondays.map((monday) => {
@@ -262,10 +261,8 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
     const weekWaists = waists.get(monday)!;
     const weekSleep = sleep.get(monday)!;
     const weekCheckins = checkins.get(monday)!;
-    const completeDates = new Set(status.get(monday)!.filter((row) => row.complete && !row.excluded).map((row) => row.log_date));
     const days = new Map<string, { kcal: number; protein: number }>();
     for (const row of entries.get(monday)!) {
-      if (!completeDates.has(row.log_date)) continue;
       const current = days.get(row.log_date) || { kcal: 0, protein: 0 };
       current.kcal += number(row.energy_kcal);
       current.protein += number(row.protein_g);
@@ -289,7 +286,7 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
         latestWaistCm: latestWaist ? round(number(latestWaist.cm)) : null,
       },
       nutrition: {
-        completeDays: days.size,
+        daysWithEntries: days.size,
         averageKcal: round(mean([...days.values()].map((day) => day.kcal)), 0),
         averageProteinG: round(mean([...days.values()].map((day) => day.protein)), 0),
       },
@@ -388,8 +385,7 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
 
   // The last RECENT_DAYS days, one by one: what was entered (not necessarily
   // everything eaten) next to the current daily calorie target, with the
-  // difference computed here. Independent of the "complete day" marks, which
-  // the app no longer sets. The target is today's setting (custom target
+  // difference computed here. The target is today's setting (custom target
   // first, as in the app); earlier settings are not stored.
   const target = number(rows.settings?.custom_calorie_target) || number(rows.settings?.adaptive_target) || null;
   const recentDates = Array.from({ length: RECENT_DAYS }, (_, index) => plusDays(today, index - RECENT_DAYS + 1));
@@ -431,7 +427,7 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
       skinfoldChangeMm: folds.change, skinfoldChangeFromWeek: folds.fromWeek, skinfoldChangeToWeek: folds.toWeek,
       waistChangeCm: waist.change, waistChangeFromWeek: waist.fromWeek, waistChangeToWeek: waist.toWeek,
       weeksWithWeight: series.filter((week) => week.bodyComposition.weightMeasurements > 0).length,
-      weeksWithCompleteNutrition: series.filter((week) => week.nutrition.completeDays > 0).length,
+      weeksWithNutritionEntries: series.filter((week) => week.nutrition.daysWithEntries > 0).length,
     },
     weeks: series,
     events,

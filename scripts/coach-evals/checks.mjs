@@ -121,7 +121,7 @@ const FELD_EINHEITEN = [
   [/\.average(Protein|Carbs|Fat)G$|\.enteredProteinG$/, 'g'],
   [/DurationMinutes$/, 'min'],
   [/\.age$/, 'jahre'],
-  [/Measurements$|\.checkins$|\.completeDays$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$|\.entries$|\.pastDaysWith(out)?Entries$/, 'anzahl'],
+  [/Measurements$|\.checkins$|\.completeDays$|\.daysWithEntries$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$|\.entries$|\.pastDaysWith(out)?Entries$/, 'anzahl'],
 ];
 // Die Differenz zum Kalorienziel (recentDays) trägt wie eine Veränderung ein Vorzeichen.
 const VERAENDERUNG = /TrendPercent$|ChangeKg$|ChangeMm$|ChangeCm$|ChangePercent$|[dD]ifferenceKcal(OnPastDaysWithEntries)?$/;
@@ -193,8 +193,10 @@ const MESSGROESSEN = [
   // Mit Wochenverlauf auch das Wochenmittel und die berechnete Veränderung.
   [/gewicht|wiegst|waage/i, /\.currentWeightKg$|\.weightTrendPercent$|\.averageWeightKg$|\.weightChangeKg$/],
   [/(kalorien)?ziel|vorgabe|zielwert|\bsoll\b/i, /\.calorieTarget$|\.targetKcal$/],
-  // Tageswerte der letzten Tage (recentDays): eingetragen, nicht unbedingt gegessen.
-  [/eingetragen\w*|einträge\w*/i, /\.enteredKcal$|\.enteredProteinG$|\.averageEnteredKcalOnPastDaysWithEntries$|\.entries$|\.pastDaysWith(out)?Entries$/],
+  // Tageswerte der letzten Tage (recentDays): eingetragen, nicht unbedingt
+  // gegessen. Seit dem 27.09.2026 sind auch die Mittel für Kalorien und Protein
+  // Mittel über die Tage mit Einträgen ("Kalorien (Ø Tage mit Einträgen)").
+  [/eingetragen\w*|einträge\w*/i, /\.enteredKcal$|\.enteredProteinG$|\.averageEnteredKcalOnPastDaysWithEntries$|\.entries$|\.pastDaysWith(out)?Entries$|\.daysWithEntries$|\.averageKcal$|\.averageProteinG$/],
   [/differenz|abweichung/i, /[dD]ifferenceKcal(OnPastDaysWithEntries)?$/],
   // Zufuhr-Begriffe binden nur die Kalorien; Makros haben eigene Begriffe.
   [/(kalorien|energie)?zufuhr|(kalorien|energie)?aufnahme|kalorien(?!ziel)|gegessen|aufgenommen|\bisst\b/i, /\.averageKcal$/],
@@ -206,7 +208,8 @@ const MESSGROESSEN = [
   [/kohlenhydrat|\bkh\b/i, /\.averageCarbsG$/],
   [/(?<![a-zäöü])fett(?![a-zäöü])/i, /\.averageFatG$/],
   // Auch "Vollständig protokollierte Ernährung: 34 Tage" und "vollständig protokolliert: 34 Tage".
-  [/(vollständig|protokolliert|erfasst)\w*( \w+)? (ernährungs)?tag(e|en)?\b|ernährungstag|protokollierte ernährung|vollständig protokolliert(?=\s*:)/i, /\.completeDays$/],
+  // completeDays steht nur noch in älteren Läufen (vor dem 27.09.2026).
+  [/(vollständig|protokolliert|erfasst)\w*( \w+)? (ernährungs)?tag(e|en)?\b|ernährungstag|protokollierte ernährung|vollständig protokolliert(?=\s*:)/i, /\.completeDays$|\.daysWithEntries$/],
   [/schlafdauer|geschlafen|schlaf(?! ?qualität)/i, /\.averageDurationMinutes$|\.sleep\.checkins$/],
   [/schlaf ?qualität|qualität/i, /\.averageQuality$/],
   // "Energie" allein ist die Morgenenergie; "Energieaufnahme" gehört zur Zufuhr.
@@ -358,7 +361,7 @@ function snapshotFelder(wert, pfad = '', sammlung = []) {
 // Veränderung zählt als Veränderungsfeld mit Richtung.
 const WOCHEN_PFADE = {
   gewicht: '.averageWeightKg', faltensumme: '.latestSkinfoldSumMm', taille: '.latestWaistCm', trainingstage: '.trainingDays',
-  kalorien: '.averageKcal', protein: '.averageProteinG', protokoll: '.completeDays', schlafdauer: '.averageDurationMinutes',
+  kalorien: '.averageKcal', protein: '.averageProteinG', protokoll: '.daysWithEntries', schlafdauer: '.averageDurationMinutes',
   schlafqualitaet: '.averageQuality', morgenenergie: '.averageMorningEnergy', erholung: '.averageRecovery', hunger: '.averageHunger',
 };
 export function wochenFelder(block) {

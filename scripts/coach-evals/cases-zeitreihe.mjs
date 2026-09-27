@@ -34,7 +34,7 @@ const UEBUNGEN = [['Kniebeuge', 'legs'], ['Bankdrücken', 'push'], ['Klimmzug', 
 export function rohdaten({ ziel, kalorienziel, gewicht, ernaehrung, checkin, schlaf, training, faltenMessungen = [], taillenMessungen = [] }) {
   const zeilen = {
     settings: { goal: ziel, custom_calorie_target: kalorienziel, adaptive_target: null, height_cm: 180, birth_date: '1990-03-15', calculation_basis: 'male', bodycomp_thresholds: null },
-    weights: [], skinfolds: [], waists: [], performance: [], sleep: [], checkins: [], nutritionEntries: [], dayStatus: [],
+    weights: [], skinfolds: [], waists: [], performance: [], sleep: [], checkins: [], nutritionEntries: [],
     routines: [{ id: 'r1', name: 'Kreatin', period: 'daily', weekdays: [0, 1, 2, 3, 4, 5, 6], active: true }],
     // Kreatin gleichmäßig über alle zwölf Wochen (jeden Tag außer einem pro
     // Woche), damit der Verlauf keinen scheinbaren Einnahmebeginn zeigt.
@@ -46,10 +46,7 @@ export function rohdaten({ ziel, kalorienziel, gewicht, ernaehrung, checkin, sch
     const kg = gewicht(n);
     if (kg != null) zeilen.weights.push({ gemessen_am: datum, kg });
     const essen = ernaehrung(n);
-    if (essen) {
-      zeilen.nutritionEntries.push({ log_date: datum, energy_kcal: essen.kcal, protein_g: essen.protein, carbs_g: 250, fat_g: 80 });
-      zeilen.dayStatus.push({ log_date: datum, complete: essen.vollstaendig, excluded: false });
-    }
+    if (essen) zeilen.nutritionEntries.push({ log_date: datum, energy_kcal: essen.kcal, protein_g: essen.protein, carbs_g: 250, fat_g: 80 });
     const eintrag = checkin(n);
     if (eintrag) zeilen.checkins.push({ checkin_date: datum, unusual_meals: false, illness: false, travel: false, ...eintrag });
     const nacht = schlaf(n);
@@ -81,8 +78,8 @@ export const FAELLE_ZEITREIHE = [
       // Bis vor zwei Wochen gleichmäßig von 94,0 auf 90,6 kg, seitdem um 90,6 kg.
       gewicht: (n) => (n % 7 === 3 ? null : n >= 14 ? Math.round((90.6 + (n - 14) * 0.05) * 10) / 10 : [90.6, 90.7, 90.5][n % 3]),
       ernaehrung: (n) => (n >= 14
-        ? { kcal: 2250, protein: 170, vollstaendig: n % 7 !== 6 }
-        : { kcal: [1, 9, 12].includes(n) ? 2350 : 900, protein: 150, vollstaendig: [1, 9, 12].includes(n) }),
+        ? { kcal: 2250, protein: 170 }
+        : { kcal: [1, 9, 12].includes(n) ? 2350 : 900, protein: 150 }),
       checkin: (n) => ({ ...normalerCheckin(), travel: n >= 8 && n <= 12, unusual_meals: n >= 8 && n <= 11 }),
       schlaf: (n) => ({ ...normalerSchlaf(), quality: n >= 8 && n <= 12 ? 2 : 3 }),
       training: (n) => ([1, 3, 5].includes(n % 7) && !(n >= 8 && n <= 12) ? 100 : null),
@@ -109,7 +106,7 @@ export const FAELLE_ZEITREIHE = [
       ziel: 'recomposition',
       kalorienziel: 2600,
       gewicht: (n) => (n % 7 === 2 || n % 7 === 5 ? null : [82.0, 82.1, 81.9][n % 3]),
-      ernaehrung: (n) => ({ kcal: 2580, protein: 175, vollstaendig: n % 7 !== 6 }),
+      ernaehrung: (n) => ({ kcal: 2580, protein: 175 }),
       checkin: () => normalerCheckin(),
       schlaf: () => normalerSchlaf(),
       training: (n) => ([0, 2, 4, 6].includes(n % 7) ? Math.round((100 + (83 - n) * 0.1) * 10) / 10 : null),
@@ -138,7 +135,7 @@ export const FAELLE_ZEITREIHE = [
       kalorienziel: 2400,
       // Lange um 86 kg, in der Krankheitswoche auf gut 84,7 kg, zuletzt 85,3 kg.
       gewicht: (n) => (n % 7 === 4 ? null : n <= 5 ? 85.3 : n <= 12 ? [84.8, 84.6, 84.9][n % 3] : Math.round((86 + (n - 13) * 0.01) * 10) / 10),
-      ernaehrung: (n) => ({ kcal: n >= 7 && n <= 11 ? 1400 : 2350, protein: n >= 7 && n <= 11 ? 90 : 160, vollstaendig: n % 7 !== 6 }),
+      ernaehrung: (n) => ({ kcal: n >= 7 && n <= 11 ? 1400 : 2350, protein: n >= 7 && n <= 11 ? 90 : 160 }),
       checkin: (n) => (n >= 7 && n <= 11 ? { recovery: 1, mood: 2, hunger: 1, illness: true } : normalerCheckin()),
       schlaf: (n) => (n >= 7 && n <= 11 ? { bedtime: '21:30', wake_time: '08:00', quality: 2, energy: 1 } : normalerSchlaf()),
       training: (n) => ([1, 3, 5].includes(n % 7) && !(n >= 6 && n <= 12) ? 110 : null),

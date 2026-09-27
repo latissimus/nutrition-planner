@@ -41,7 +41,7 @@ const normal = (werte = {}) => rohdaten({
   ziel: 'recomposition',
   kalorienziel: 2600,
   gewicht: (n) => (n % 7 === 3 ? null : [82.0, 82.1, 81.9][n % 3]),
-  ernaehrung: (n) => ({ kcal: 2550, protein: 170, vollstaendig: n % 7 !== 6 }),
+  ernaehrung: (n) => ({ kcal: 2550, protein: 170 }),
   checkin: () => normalerCheckin(),
   schlaf: () => normalerSchlaf(),
   training: (n) => ([1, 3, 5].includes(n % 7) ? 100 : null),
@@ -99,10 +99,10 @@ export const FAELLE_WOCHENBILANZ = [
   fall({
     id: 'wochenbilanz-luecken',
     titel: 'Wochenbilanz mit lückenhafter Protokollierung',
-    // KW 38 (n = 6 bis 12): nur ein vollständiger Ernährungstag, eine Wiegung.
+    // KW 38 (n = 6 bis 12): nur ein Tag mit Ernährungseinträgen, eine Wiegung.
     zeilen: normal({
       gewicht: (n) => (n >= 6 && n <= 12 ? (n === 8 ? 82.0 : null) : n % 7 === 3 ? null : [82.0, 82.1, 81.9][n % 3]),
-      ernaehrung: (n) => ({ kcal: 2550, protein: 170, vollstaendig: n >= 6 && n <= 12 ? n === 9 : n % 7 !== 6 }),
+      ernaehrung: (n) => (n >= 6 && n <= 12 && n !== 9 ? null : { kcal: 2550, protein: 170 }),
     }),
     erwartet: {
       semantisch: [

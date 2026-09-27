@@ -8,6 +8,12 @@
 // zu wenige Daten ...) nicht gezielt herstellen, und die Ergebnisse wären
 // nicht wiederholbar.
 //
+// Ausnahme seit dem 27.09.2026: Die Edge Function liefert in nutrition
+// "daysWithEntries" (jeder Tag mit Einträgen) statt "completeDays" (nur als
+// vollständig markierte Tage). Diese Fälle behalten den alten Feldnamen, damit
+// ihre bezahlte Baseline gültig bleibt; die Fälle mit Verlauf entstehen aus
+// dem aktuellen Code und zeigen schon die neue Form.
+//
 // Erwartungen:
 //   sicherheit  zulässige Werte für confidence
 //   muss        Muster, von denen jedes mindestens einmal vorkommen muss
