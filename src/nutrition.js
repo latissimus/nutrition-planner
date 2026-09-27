@@ -92,8 +92,6 @@ async function ladeKalibrierung(userId, date) {
   let weightQuery = supabase.from('weights').select('gemessen_am,kg').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(90);
   let historyQuery = supabase.from('nutrition_log_entries').select('log_date,energy_kcal').eq('user_id', userId)
     .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
-  let dayStatusQuery = supabase.from('nutrition_day_status').select('*').eq('user_id', userId)
-    .gte('log_date', shiftedDate(date, -34)).lte('log_date', date);
   let skinfoldQuery = supabase.from('skinfolds').select('gemessen_am,falten,standardisiert').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(12);
   let waistQuery = supabase.from('waist_measurements').select('gemessen_am,cm,standardisiert').eq('user_id', userId).order('gemessen_am', { ascending: false }).limit(12);
   let performanceQuery = supabase.from('logman_performance').select('performed_on,exercise,category,estimated_1rm').eq('user_id', userId).order('performed_on', { ascending: false }).limit(300);
@@ -101,29 +99,28 @@ async function ladeKalibrierung(userId, date) {
   let checkinQuery = supabase.from('bodycomp_checkins').select('checkin_date,recovery').eq('user_id', userId).order('checkin_date', { ascending: false }).limit(42);
   if (signal) {
     weightQuery = weightQuery.abortSignal(signal);
-    historyQuery = historyQuery.abortSignal(signal); dayStatusQuery = dayStatusQuery.abortSignal(signal);
+    historyQuery = historyQuery.abortSignal(signal);
     skinfoldQuery = skinfoldQuery.abortSignal(signal); waistQuery = waistQuery.abortSignal(signal);
     performanceQuery = performanceQuery.abortSignal(signal); sleepQuery = sleepQuery.abortSignal(signal); checkinQuery = checkinQuery.abortSignal(signal);
   }
-  const [weight, history, dayStatus, skinfolds, waists, performance, sleep, checkins] = await Promise.all([
-    weightQuery, historyQuery, dayStatusQuery,
+  const [weight, history, skinfolds, waists, performance, sleep, checkins] = await Promise.all([
+    weightQuery, historyQuery,
     skinfoldQuery, waistQuery, performanceQuery, sleepQuery, checkinQuery,
   ]);
-  const error = weight.error || history.error || dayStatus.error
+  const error = weight.error || history.error
     || skinfolds.error || waists.error || performance.error || sleep.error || checkins.error;
   if (error) throw error;
   const kcalByDate = new Map();
   (history.data || []).forEach((entry) => kcalByDate.set(entry.log_date, (kcalByDate.get(entry.log_date) || 0) + number(entry.energy_kcal)));
-  const statusByDate = new Map((dayStatus.data || []).map((item) => [item.log_date, item]));
+  // Nur abgeschlossene Tage: Der gewählte Tag selbst ist meist noch nicht
+  // fertig eingetragen und würde den Schnitt drücken.
   const historyDays = [];
-  for (let cursor = shiftedDate(date, -34); cursor <= date; cursor = shiftedDate(cursor, 1)) {
-    const status = statusByDate.get(cursor) || {};
-    historyDays.push({ date: cursor, kcal: kcalByDate.get(cursor) || 0, complete: status.complete === true, excluded: status.excluded, exclude_reason: status.exclude_reason || '' });
+  for (let cursor = shiftedDate(date, -34); cursor < date; cursor = shiftedDate(cursor, 1)) {
+    historyDays.push({ date: cursor, kcal: kcalByDate.get(cursor) || 0 });
   }
   const weights = (weight.data || []).map((item) => ({ date: item.gemessen_am, kg: number(item.kg) })).reverse();
   return {
     weights, historyDays,
-    dayStatus: statusByDate.get(date) || { complete: false, excluded: false, exclude_reason: '' },
     /* Alle fuenf Reihen werden absteigend geholt, damit das Limit die
        AELTESTEN Werte abschneidet statt der aktuellen, und hier wieder
        chronologisch gedreht. Zuvor haette z. B. die Schlafreihe ab dem
@@ -217,7 +214,7 @@ function summaryMarkup(state, date) {
   <div class="som-kurzhilfe nutrition-calibration-help" id="nutrition-calibration-help" data-nutrition-calibration-help hidden>
     <p>Auf der Seite <b>TRACKER</b> planst und protokollierst du Mahlzeiten, Supplements und deine Flüssigkeitszufuhr. Die Zeitfenster strukturieren deinen Tag; Hinweise und Erinnerungen stellst du gezielt pro Mahlzeit ein.</p>
     <p>Über den zentralen Hinzufügen-Button erfasst du Lebensmittel, Supplements und weitere Einträge oder passt deine Planung an.</p>
-    <p>Die <b>Kalorien-Kalibrierung</b> verknüpft deine vollständig protokollierten Ernährungstage mit deinem geglätteten Gewichtstrend. Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden dabei nicht überbewertet.</p>
+    <p>Die <b>Kalorien-Kalibrierung</b> verknüpft die Kalorien, die du einträgst, mit deinem geglätteten Gewichtstrend. Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden dabei nicht überbewertet.</p>
     <p>Aussagekräftig wird die Entwicklung erst über mehrere vergleichbare Wochen. Nach mindestens <b>21 Tagen</b> kann CAPBOY einschätzen, ob dein bisheriges Kalorienziel zu deinem tatsächlichen Verlauf passt.</p>
     <p>Ein Vorschlag verändert dein Ziel <b>niemals automatisch</b>. Du entscheidest selbst, ob du ihn übernimmst.</p>
     <p><b>Aktueller Stand:</b> ${escapeHtml(adaptiveStatusText(adaptive.result))}</p>
@@ -259,7 +256,7 @@ function adaptiveStatusText(result) {
   if (result.eligible && result.suggestedTarget) return `Vorschlag: ${decimal(result.suggestedTarget)} kcal`;
   if (!result.spanDays && result.reason) return 'Noch keine ausreichenden Daten';
   if (result.spanDays && result.spanDays < 21) return `Noch ${21 - result.spanDays} Tage bis zur ersten Auswertung`;
-  if (result.spanDays && number(result.completeness) < 80) return 'Mehr vollständig protokollierte Tage benötigt';
+  if (result.spanDays && number(result.coverage) < 80) return 'Mehr Tage mit Ernährungseinträgen benötigt';
   if (result.weightTrend && number(result.weightTrend.measurementsPerWeek) < 3) return 'Mehr regelmäßige Gewichtsmessungen benötigt';
   return 'Verknüpft Ernährung und geglätteten Gewichtstrend';
 }
@@ -267,7 +264,7 @@ function adaptiveStatusText(result) {
 function adaptiveOverlayMarkup(model) {
   const { evidence, result, rejectedRecently, target } = model;
   const details = result.observedMaintenance
-    ? `<div class="nutrition-adaptive-values"><span><small>BISHERIGES KALORIENZIEL</small><b>${decimal(target)} kcal</b></span><span><small>DURCHSCHNITTLICH PROTOKOLLIERT</small><b>${decimal(result.averageCalories)} kcal</b></span><span><small>BEOBACHTETER ERHALTUNGSBEDARF</small><b>${decimal(result.observedMaintenance)} kcal</b></span><span><small>ZEITRAUM</small><b>${result.spanDays} Tage</b></span><span><small>ERNÄHRUNGSTAGE</small><b>${result.nutritionDaysCount}</b></span><span><small>WIEGUNGEN</small><b>${result.weightMeasurements}</b></span><span><small>GEWICHTSTREND</small><b>${result.weightTrend.weeklyKg > 0 ? '+' : ''}${decimal(result.weightTrend.weeklyKg, 2)} kg/Woche</b></span><span><small>VERTRAUENSSTUFE</small><b>${result.confidence}</b></span><span><small>VORGESCHLAGENE ÄNDERUNG</small><b>${result.suggestedChange > 0 ? '+' : ''}${result.suggestedChange} kcal</b></span><span><small>NÄCHSTE BEWERTUNG</small><b>${result.nextReview ? dateFromKey(result.nextReview).toLocaleDateString('de-DE') : 'nach weiteren Daten'}</b></span></div>`
+    ? `<div class="nutrition-adaptive-values"><span><small>BISHERIGES KALORIENZIEL</small><b>${decimal(target)} kcal</b></span><span><small>DURCHSCHNITTLICH EINGETRAGEN</small><b>${decimal(result.averageCalories)} kcal</b></span><span><small>BEOBACHTETER ERHALTUNGSBEDARF</small><b>${decimal(result.observedMaintenance)} kcal</b></span><span><small>ZEITRAUM</small><b>${result.spanDays} Tage</b></span><span><small>TAGE MIT EINTRÄGEN</small><b>${result.nutritionDaysCount}</b></span><span><small>WIEGUNGEN</small><b>${result.weightMeasurements}</b></span><span><small>GEWICHTSTREND</small><b>${result.weightTrend.weeklyKg > 0 ? '+' : ''}${decimal(result.weightTrend.weeklyKg, 2)} kg/Woche</b></span><span><small>VERTRAUENSSTUFE</small><b>${result.confidence}</b></span><span><small>VORGESCHLAGENE ÄNDERUNG</small><b>${result.suggestedChange > 0 ? '+' : ''}${result.suggestedChange} kcal</b></span><span><small>NÄCHSTE BEWERTUNG</small><b>${result.nextReview ? dateFromKey(result.nextReview).toLocaleDateString('de-DE') : 'nach weiteren Daten'}</b></span></div>`
     : '';
   const action = result.eligible && result.suggestedTarget && !rejectedRecently
     ? `<div class="nutrition-adaptive-actions"><button class="btn btn-primary" type="button" data-accept-adaptive="${result.suggestedTarget}">Vorschlag von ${decimal(result.suggestedTarget)} kcal übernehmen</button><button class="btn" type="button" data-reject-adaptive="${result.suggestedTarget}">Ablehnen</button><button class="btn" type="button" data-later-adaptive>Später entscheiden</button></div>` : '';
@@ -275,7 +272,7 @@ function adaptiveOverlayMarkup(model) {
     <div class="nutrition-knowledge-card">
       <h3>WAS MACHT CAPBOY?</h3>
       <ol>
-        <li><i>1</i><p><b>Du protokollierst vollständig.</b><span>Mindestens 21 Tage zeigen, was du im Alltag wirklich isst.</span></p></li>
+        <li><i>1</i><p><b>Du trägst ein, was du isst.</b><span>Mindestens 21 Tage zeigen, was du im Alltag wirklich isst.</span></p></li>
         <li><i>2</i><p><b>Der Gewichtstrend wird geglättet.</b><span>Einzelne Ausschläge durch Wasser, Salz oder Glykogen werden nicht überbewertet.</span></p></li>
         <li><i>3</i><p><b>Du entscheidest.</b><span>Ein Vorschlag verändert dein Ziel niemals ohne deine Bestätigung.</span></p></li>
       </ol>
@@ -860,7 +857,6 @@ export async function mountNutrition(container, { userId, signal }) {
   let state = {
     settings: {}, entries: [], ownProducts: [], latestWeight: 0,
     weights: [], historyDays: [], skinfolds: [], waists: [], performance: [], sleep: [], bodyCheckins: [],
-    dayStatus: { complete: false, excluded: false, exclude_reason: '' },
   };
   const deleteEntryById = async (id) => {
     const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);

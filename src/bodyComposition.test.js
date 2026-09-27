@@ -29,12 +29,30 @@ describe('evidenzbasierte Kalorienberechnung', () => {
 });
 
 describe('adaptive Kalorienkalibrierung', () => {
-  const nutrition = dates(28, (date) => ({ date, kcal: 2300, complete: true }));
+  const nutrition = dates(28, (date) => ({ date, kcal: 2300 }));
   const weights = dates(28, (date, index) => ({ date, kg: 90 - index * 0.02 }));
 
-  it('wartet mindestens 21 Tage und 80 Prozent vollständige Tage ab', () => {
+  it('wartet mindestens 21 Tage ab und braucht an 80 Prozent der Tage Einträge', () => {
     expect(adaptiveEnergyEstimate({ nutritionDays: nutrition.slice(0, 20), weights }).eligible).toBe(false);
-    expect(adaptiveEnergyEstimate({ nutritionDays: nutrition.map((d, i) => ({ ...d, complete: i < 20 })), weights }).eligible).toBe(false);
+    // Erst seit 18 Tagen Einträge: Die leeren Tage davor zählen nicht als Zeitraum.
+    const spaetStart = adaptiveEnergyEstimate({ nutritionDays: nutrition.map((d, i) => ({ ...d, kcal: i < 10 ? 0 : 2300 })), weights });
+    expect([spaetStart.eligible, spaetStart.spanDays]).toEqual([false, 18]);
+    // An 20 von 28 Tagen Einträge (71 %).
+    const luecken = adaptiveEnergyEstimate({ nutritionDays: nutrition.map((d, i) => ({ ...d, kcal: i < 20 ? 2300 : 0 })), weights });
+    expect([luecken.eligible, luecken.coverage]).toEqual([false, 71.4]);
+    expect(luecken.reason).toContain('einträge');
+  });
+
+  it('kennt keinen Haken "vollständig protokolliert" mehr', () => {
+    const ohneHaken = adaptiveEnergyEstimate({ nutritionDays: nutrition.map((d) => ({ ...d, complete: false })), weights, currentTarget: 2300 });
+    expect(ohneHaken.eligible).toBe(true);
+    expect(ohneHaken.reason).not.toMatch(/vollständig|protokolliert/);
+  });
+
+  it('meldet die Abdeckung in Prozent, auch wenn Wiegungen fehlen', () => {
+    const wenigWiegungen = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights: weights.filter((_, i) => i % 7 === 0) });
+    expect([wenigWiegungen.eligible, wenigWiegungen.coverage]).toEqual([false, 100]);
+    expect(wenigWiegungen.reason).toContain('Wiegungen');
   });
 
   it('schätzt den Bedarf aus Zufuhr und robustem Gewichtstrend und begrenzt Änderungen', () => {
@@ -52,12 +70,12 @@ describe('adaptive Kalorienkalibrierung', () => {
     expect(result.reason).toContain('allein');
   });
 
-  it('ignoriert ausdrücklich ausgeschlossene Sondertage und sperrt häufigere Anpassungen als wöchentlich', () => {
-    const withTrip = nutrition.map((day, index) => index < 4 ? { ...day, excluded: true, complete: false } : day);
-    const eligible = adaptiveEnergyEstimate({ nutritionDays: withTrip, weights, currentTarget: 2300 });
+  it('rechnet nur mit Tagen mit Einträgen und sperrt häufigere Anpassungen als wöchentlich', () => {
+    const withGaps = nutrition.map((day, index) => (index >= 10 && index < 14 ? { ...day, kcal: 0 } : day));
+    const eligible = adaptiveEnergyEstimate({ nutritionDays: withGaps, weights, currentTarget: 2300 });
     expect(eligible.eligible).toBe(true);
-    expect(eligible.excludedDays).toBe(4);
-    const locked = adaptiveEnergyEstimate({ nutritionDays: withTrip, weights, currentTarget: 2300, lastAdjustmentDate: '2026-01-25T12:00:00Z' });
+    expect([eligible.nutritionDaysCount, eligible.averageCalories, eligible.coverage]).toEqual([24, 2300, 85.7]);
+    const locked = adaptiveEnergyEstimate({ nutritionDays: withGaps, weights, currentTarget: 2300, lastAdjustmentDate: '2026-01-25T12:00:00Z' });
     expect(locked.eligible).toBe(false);
     expect(locked.reason).toContain('Woche');
   });

@@ -27,7 +27,7 @@ export const BODY_EXPLANATIONS = Object.freeze({
   waist: 'Der Taillenumfang ergänzt die Hautfaltenmessung. Er kann Veränderungen im Bauchbereich zeigen, wird aber ebenfalls durch Messposition, Verdauung und Atmung beeinflusst.',
   performance: 'Steigende Kraft kann durch Muskelaufbau, bessere Technik oder neuronale Anpassungen entstehen. CAPBOY verwendet die LOGMAN-Leistung deshalb nur gemeinsam mit Körper- und Erholungswerten.',
   recovery: 'Schlaf und Erholung beweisen keinen Muskelaufbau. Sie zeigen, ob die Voraussetzungen für Training, Regeneration und eine kontrollierte Diät wahrscheinlich ausreichend sind.',
-  initialCalories: 'Dieser Wert ist zunächst eine Schätzung aus Alter, Größe, Gewicht und Aktivität. Er ist kein gemessener Stoffwechselwert. Mit ausreichend protokollierten Ernährungs- und Gewichtsdaten kann CAPBOY die Schätzung später vorsichtig an deinen tatsächlichen Verlauf anpassen.',
+  initialCalories: 'Dieser Wert ist zunächst eine Schätzung aus Alter, Größe, Gewicht und Aktivität. Er ist kein gemessener Stoffwechselwert. Mit ausreichend eingetragenen Ernährungs- und Gewichtsdaten kann CAPBOY die Schätzung später vorsichtig an deinen tatsächlichen Verlauf anpassen.',
 });
 
 export function ageOnDate(birthDate, reference = new Date()) {
@@ -169,32 +169,33 @@ export function confirmedTrendChange(rows = [], valueOf = (row) => row.value, th
   return rounded(values[2] - values[0], 1);
 }
 
+// Ernährung zählt an jedem Tag mit Einträgen; einen Haken "Tag vollständig
+// protokolliert" gibt es nicht mehr. Der Zeitraum reicht vom ersten Tag mit
+// Einträgen (höchstens 28 Tage zurück) bis zum letzten übergebenen Tag, und an
+// mindestens 80 % seiner Tage muss etwas eingetragen sein.
 export function adaptiveEnergyEstimate({ nutritionDays = [], weights = [], currentTarget = 0, goal = 'maintain', combinedEvidence = false, lastAdjustmentDate = null }) {
   const candidates = nutritionDays
-    .map((day) => ({ date: day.date || day.log_date, kcal: numeric(day.kcal), complete: day.complete === true, excluded: Boolean(day.excluded || day.exclude_reason) }))
+    .map((day) => ({ date: day.date || day.log_date, kcal: numeric(day.kcal) }))
     .filter((day) => day.date)
     .sort((a, b) => a.date.localeCompare(b.date));
-  if (!candidates.length || !weights.length) return { eligible: false, confidence: 'niedrig', reason: 'Noch keine ausreichenden Ernährungs- und Gewichtsdaten.' };
-  const end = candidates.at(-1).date;
-  const endDay = dayNumber(end);
-  const window = candidates.filter((day) => endDay - dayNumber(day.date) <= 27);
-  const startDay = Math.min(...window.map((day) => dayNumber(day.date)));
+  const endDay = candidates.length ? dayNumber(candidates.at(-1).date) : 0;
+  const logged = candidates.filter((day) => day.kcal > 0 && endDay - dayNumber(day.date) <= 27);
+  if (!logged.length || !weights.length) return { eligible: false, confidence: 'niedrig', reason: 'Noch keine ausreichenden Ernährungs- und Gewichtsdaten.' };
+  const startDay = dayNumber(logged[0].date);
   const spanDays = endDay - startDay + 1;
-  const excludedDays = window.filter((day) => day.excluded).length;
-  const eligibleDays = Math.max(1, spanDays - excludedDays);
-  const complete = window.filter((day) => day.complete && !day.excluded && day.kcal > 0);
-  const completeness = complete.length / eligibleDays;
-  if (spanDays < 21) return { eligible: false, confidence: 'niedrig', spanDays, completeness, reason: 'Eine adaptive Schätzung beginnt frühestens nach 21 Tagen.' };
-  if (completeness < 0.8) return { eligible: false, confidence: 'niedrig', spanDays, completeness, reason: 'Mindestens 80 % der Tage müssen als vollständig protokolliert bestätigt sein.' };
+  // In Prozent, in jedem Ergebnis gleich (die Statuszeile vergleicht mit 80).
+  const coverage = rounded((logged.length / spanDays) * 100, 1);
+  if (spanDays < 21) return { eligible: false, confidence: 'niedrig', spanDays, coverage, reason: 'Eine adaptive Schätzung beginnt frühestens nach 21 Tagen mit Einträgen.' };
+  if (coverage < 80) return { eligible: false, confidence: 'niedrig', spanDays, coverage, reason: 'An mindestens 80 % der Tage braucht es Ernährungseinträge.' };
   const weightWindow = weights.filter((row) => {
     const date = row.date || row.datum || row.gemessen_am;
     return date && dayNumber(date) >= startDay && dayNumber(date) <= endDay;
   });
   const trend = weightTrendSummary(weightWindow);
-  if (trend.measurementsPerWeek < 3) return { eligible: false, confidence: 'niedrig', spanDays, completeness, reason: 'Für eine Anpassung sind mindestens drei Wiegungen pro Woche erforderlich.', weightTrend: trend };
+  if (trend.measurementsPerWeek < 3) return { eligible: false, confidence: 'niedrig', spanDays, coverage, reason: 'Für eine Anpassung sind mindestens drei Wiegungen pro Woche erforderlich.', weightTrend: trend };
   const model = regression(movingWeightAverage(weightWindow, 7));
   if (!model) return { eligible: false, confidence: 'niedrig', reason: 'Der Gewichtstrend ist noch nicht belastbar.' };
-  const averageCalories = complete.reduce((sum, day) => sum + day.kcal, 0) / complete.length;
+  const averageCalories = logged.reduce((sum, day) => sum + day.kcal, 0) / logged.length;
   const observedMaintenance = averageCalories - 7700 * model.slopePerDay;
   const difference = observedMaintenance - Number(currentTarget || observedMaintenance);
   const limitedChange = Math.max(-100, Math.min(100, difference));
@@ -210,9 +211,8 @@ export function adaptiveEnergyEstimate({ nutritionDays = [], weights = [], curre
     automatic: false,
     confidence: trend.confidence,
     spanDays,
-    completeness: rounded(completeness * 100),
-    nutritionDaysCount: complete.length,
-    excludedDays,
+    coverage,
+    nutritionDaysCount: logged.length,
     weightMeasurements: weightWindow.length,
     measurementsPerWeek: trend.measurementsPerWeek,
     averageCalories: Math.round(averageCalories),
@@ -225,7 +225,7 @@ export function adaptiveEnergyEstimate({ nutritionDays = [], weights = [], curre
       ? 'Im BodyComp-Modus löst der Gewichtstrend allein keine Kalorienänderung aus. Körpermaße, Leistung und Erholung müssen den Vorschlag stützen.'
       : reviewBlocked
         ? `Die letzte Anpassung ist noch keine Woche her. Die nächste Bewertung ist am ${new Date(`${nextReview}T12:00:00`).toLocaleDateString('de-DE')}.`
-      : 'Vorsichtige Kalibrierung aus vollständig protokollierter Energiezufuhr und geglättetem Gewichtstrend.',
+      : 'Vorsichtige Kalibrierung aus eingetragener Energiezufuhr und geglättetem Gewichtstrend.',
   };
 }
 
