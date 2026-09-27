@@ -417,6 +417,13 @@ function pruefeZahl(eintrag, felder, satz, vorgabe) {
   return { grund, ungebunden: !grund && !metrik };
 }
 
+function skalenZitat(satz, eintrag, text) {
+  const skala = satz.slice(eintrag.position).match(/^(\d+(?:[.,]\d+)?)\s+von\s+(\d+)(?![\d.,]\d)/);
+  if (!skala || !text) return false;
+  const wert = skala[1].replace(/[.,]/, '[.,]');
+  return new RegExp(`(?<![\\d.,])${wert}\\s+von\\s+${skala[2]}(?![\\d.,]\\d)`).test(text);
+}
+
 // Liefert unbelegte Zahlen (Fehler) und Zahlen ohne erkennbare Messgröße
 // (Hinweise) aus dem Feld facts.
 export function zahlenBefund(fall, antwort) {
@@ -432,7 +439,8 @@ export function zahlenBefund(fall, antwort) {
   // Mit Gedächtnis: Eine Zahl, die dort wörtlich mit derselben Einheit steht
   // (etwa ein früherer Rat "170 g Protein"), gilt als geliefert - als Zitat,
   // nicht als Messwert. Ohne Gedächtnis ändert sich nichts.
-  const gedaechtnis = fall.gedaechtnis ? textZahlen(Object.values(fall.gedaechtnis).join('\n')) : [];
+  const gedaechtnisText = fall.gedaechtnis ? Object.values(fall.gedaechtnis).join('\n') : '';
+  const gedaechtnis = textZahlen(gedaechtnisText);
   const unbelegt = [];
   const ungebunden = [];
   for (const satz of saetze) {
@@ -443,6 +451,10 @@ export function zahlenBefund(fall, antwort) {
       // Messung eines Experiments), nie eine nackte Zahl.
       if (gedaechtnis.some((zitat) => zitat.zahl === eintrag.zahl && zitat.einheit === eintrag.einheit
         && (eintrag.einheit !== 'ohne' || (eintrag.vorzeichen !== 0 && zitat.vorzeichen === eintrag.vorzeichen)))) continue;
+      // Ein Skalenwert wie "2 von 5", der genau so im Gedächtnis steht (etwa
+      // als notierter Ausgangswert eines Experiments). Eine nackte Zahl
+      // ("zuletzt 5") bleibt ungedeckt.
+      if (eintrag.einheit === 'ohne' && skalenZitat(satz, eintrag, gedaechtnisText)) continue;
       const befund = pruefeZahl(eintrag, felder, satz, beziehungsweise.has(eintrag) ? beziehungsweise.get(eintrag) : undefined);
       if (befund.grund) unbelegt.push(`${eintrag.text} (${befund.grund})`);
       else if (befund.ungebunden) ungebunden.push(eintrag.text);
@@ -450,6 +462,8 @@ export function zahlenBefund(fall, antwort) {
   }
   return { unbelegt: [...new Set(unbelegt)], ungebunden: [...new Set(ungebunden)] };
 }
+
+const zeigeId = (id) => (id === undefined || id === null || id === '' ? `(ohne ID: ${JSON.stringify(id ?? null)})` : id);
 
 // Fällige Experimente aus dem Gedächtnisblock des Falls (id -> Eintrag).
 function faelligeExperimente(fall) {
@@ -524,7 +538,7 @@ function experimentPruefungen(fall, antwort, pruefung) {
   const fehlend = [...faellig.keys()].filter((id) => !ids.includes(id));
   const doppelt = ids.filter((id, index) => ids.indexOf(id) !== index);
   pruefung('Genau die fälligen Experimente ausgewertet', !fremd.length && !fehlend.length && !doppelt.length,
-    [fremd.length ? `nicht fällig oder unbekannt: ${fremd.join(', ')}` : '', fehlend.length ? `fehlt: ${fehlend.join(', ')}` : '', doppelt.length ? `doppelt: ${doppelt.join(', ')}` : ''].filter(Boolean).join('; '));
+    [fremd.length ? `nicht fällig oder unbekannt: ${fremd.map(zeigeId).join(', ')}` : '', fehlend.length ? `fehlt: ${fehlend.map(zeigeId).join(', ')}` : '', doppelt.length ? `doppelt: ${doppelt.map(zeigeId).join(', ')}` : ''].filter(Boolean).join('; '));
 
   // Erwartungen des Falls: Urteil je Experiment, neues Experiment mit Zielgröße.
   for (const [id, erlaubt] of Object.entries(fall.erwartet.auswertung || {})) {

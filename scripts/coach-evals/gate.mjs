@@ -154,6 +154,12 @@ export function vergleicheMitBaseline({ baseline, neu, labelNachweis, faelle, ak
     if (akzeptierteFelder.includes(feld) && jetzt[feld] != null) hinweise.push(`${name} bewusst geändert und akzeptiert (${feld})`);
     else gruende.push(`${name} unterscheidet sich von der Baseline (${feld})`);
   }
+  // Ein neuer Wissensstand zählt nur, wenn er am Vector Store nachgewiesen
+  // wurde (wissensbasis.mjs), nicht schon, weil der Code ihn nennt.
+  const wissenGeaendert = AKZEPTIERBAR.wissensstand.some((feld) => JSON.stringify(alt[feld] ?? null) !== JSON.stringify(jetzt[feld] ?? null));
+  if (wissenGeaendert && akzeptiert.includes('wissensstand') && !jetzt.wissensbasis?.nachgewiesen) {
+    gruende.push('Neuer Wissensstand akzeptiert, aber nicht am Vector Store nachgewiesen (wissensbasis)');
+  }
   if (JSON.stringify(alt.tatsaechlicheModelle || []) !== JSON.stringify(jetzt.tatsaechlicheModelle || [])) {
     hinweise.push(`ausgelieferter Modellstand: Baseline ${(alt.tatsaechlicheModelle || []).join(', ') || '–'}, jetzt ${(jetzt.tatsaechlicheModelle || []).join(', ') || '–'}`);
   }

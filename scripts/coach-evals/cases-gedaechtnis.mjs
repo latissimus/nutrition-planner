@@ -84,6 +84,9 @@ export const FAELLE_GEDAECHTNIS = [
     gedaechtnis: {
       intervention_log: interventionBlock([
         {
+          // Wie in der App hat jede Maßnahme eine ID (seit Schritt 6 nennt der
+          // Coach sie in experimentReviews).
+          id: 'mass-mahlzeit',
           action: 'Letzte größere Mahlzeit spätestens drei Stunden vor dem Schlafen',
           hypothesis: 'Wenn ich früher esse, schlafe ich ruhiger, weil spätes Essen in den Check-ins mit schlechtem Schlaf zusammenfällt.',
           target_metric: 'Schlafqualität und Morgenenergie',

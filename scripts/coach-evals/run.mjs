@@ -46,7 +46,9 @@
 //
 // Exit-Codes: 0 bestanden, 1 nicht bestanden, 2 Prüfer nicht vertrauenswürdig,
 // 3 abgebrochen wegen Konto oder Schlüssel (Budget, Kontingent, ungültiger
-// Schlüssel, Modell nicht verfügbar) - dann ohne Bericht.
+// Schlüssel, Modell nicht verfügbar) - dann ohne Bericht, 4 abgebrochen, weil
+// der Vector Store nicht nachweislich den Wissensstand des Codes enthält
+// (wissensbasis.mjs) - vor jedem bezahlten Aufruf, ohne Bericht.
 
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
@@ -70,6 +72,9 @@ import { EXPERIMENT_METRIC_IDS, EXPERIMENT_METRICS, experimentMeasurement } from
 import { pruefe } from './checks.mjs';
 import { AKZEPTIERBAR, antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
+import {
+  TRENNER, dateiPraefix, erwarteteWissensbasis, leseWissensbasis, nachweisZeile, pruefeWissensbasis, sha256 as sha256Voll, vergleicheWissensbasis,
+} from './wissensbasis.mjs';
 import {
   KRITERIEN, MIN_KALIBRIER_DURCHLAEUFE, PRUEFER_EINSTELLUNGEN, antwortText, kalibrierungGueltig, kriterienFingerabdruck,
   kriterienFuer, pruefAnfrage, pruefeSemantisch, prueferFingerabdruck, prueferVertrauen, verarbeiteUrteile,
@@ -250,6 +255,34 @@ if (!apiKey && (!gespeichert || mitPruefer)) {
   process.exit(1);
 }
 if (!vectorStoreId && !gespeichert) console.warn('Achtung: COACH_VECTOR_STORE_ID fehlt – der Coach läuft ohne Seminarwissen.');
+
+// Vor den bezahlten Anfragen: Enthält der Vector Store nachweislich den
+// Wissensstand des Codes? Sonst liefe der Coach mit anderem Wissen, als der
+// Bericht ausweist. Liest den Inhalt aus dem Store zurück; kostet keine Tokens.
+let wissensbasis = null;
+if (vectorStoreId && !gespeichert) {
+  console.log(`Prüfe Wissensbasis ${vectorStoreId} gegen den Code-Wissensstand ${KNOWLEDGE_VERSION.slice(0, 16)} …`);
+  try {
+    wissensbasis = await pruefeWissensbasis(vectorStoreId, { apiKey });
+  } catch (fehler) {
+    // Schlüssel oder Budget: wie bei jedem anderen Kontofehler (Exit 3). Ein
+    // 404 heißt hier "Store nicht gefunden" und gehört zu Exit 4.
+    if (!/^OpenAI 404:/.test(fehler.message)) merkeAbbruch(fehler);
+    beendeBeiAbbruch();
+    wissensbasis = { nachgewiesen: false, gruende: [`nicht prüfbar: ${fehler.message}`] };
+  }
+  if (!wissensbasis.nachgewiesen) {
+    const meldung = [
+      `Lauf abgebrochen: Der Vector Store ${vectorStoreId} enthält nicht nachweislich den Code-Wissensstand ${KNOWLEDGE_VERSION.slice(0, 16)}.`,
+      ...wissensbasis.gruende.map((grund) => `- ${grund}`),
+      'Es wurde nichts Kostenpflichtiges aufgerufen. Passenden Store anlegen und nachweisen: npm run coach:wissensbasis',
+    ];
+    protokolliereAbbruch('wissensbasis', meldung);
+    console.error(meldung.join('\n'));
+    process.exit(4);
+  }
+  console.log(`Wissensbasis nachgewiesen: ${nachweisZeile(wissensbasis)}`);
+}
 
 // Welche Seminarquellen die Dateisuche tatsächlich geliefert hat.
 function dateisuche(payload) {
@@ -498,7 +531,12 @@ const kopf = gespeichert ? {
     datenVerifiziert: true,
     seminarwissen: Boolean(vectorStoreId),
     vectorStoreId,
-    wissensstand: KNOWLEDGE_VERSION.slice(0, 16),
+    // Nur ein am Store nachgewiesener Stand; ohne Store gibt es keinen.
+    wissensstand: wissensbasis?.stand ?? null,
+    wissensbasis: wissensbasis && {
+      nachgewiesen: wissensbasis.nachgewiesen, stand: wissensbasis.stand, methode: wissensbasis.methode, storeHash: wissensbasis.storeHash,
+      storeHashOhneLeerraum: wissensbasis.storeHashOhneLeerraum, codeHashOhneLeerraum: wissensbasis.codeHashOhneLeerraum, dateien: wissensbasis.dateien,
+    },
     git: gitStand(),
     node: process.version,
   },
@@ -520,7 +558,7 @@ const zeilen = [
   `- Modell: angefragt ${r.angefragtesModell}, geantwortet ${r.tatsaechlicheModelle.join(', ') || '–'}`,
   `- Einstellungen: reasoning ${r.einstellungen.reasoning?.effort}, max ${r.einstellungen.max_output_tokens} Tokens, Werkzeuge ${r.einstellungen.werkzeuge.join(', ') || 'keine'}`,
   `- Prompt ${r.promptHash} · Schema ${r.schemaHash} · Fälle ${r.faelleHash}`,
-  `- Seminarwissen: ${r.seminarwissen ? `ja (${r.vectorStoreId}, Stand ${r.wissensstand})` : '**NEIN**'}`,
+  `- Seminarwissen: ${r.seminarwissen ? `ja (${r.vectorStoreId}, Stand ${r.wissensstand ?? '–'}; ${r.wissensbasis?.nachgewiesen ? `am Store nachgewiesen: ${r.wissensbasis.methode}` : '**nicht am Store nachgewiesen**'})` : '**NEIN**'}`,
   `- Modell-Prüfer: ${kopf.pruefer ? `angefragt ${kopf.pruefer.modell}, geantwortet ${kopf.pruefer.tatsaechlicheModelle.join(', ') || '–'} (reasoning ${kopf.pruefer.reasoning}, Fingerabdruck ${kopf.pruefer.fingerabdruck}${kopf.pruefer.neuGeholt ? '' : ', gespeicherte Urteile'})` : 'nicht eingesetzt – semantische Regeln rein per Regex'}`,
   ...(kopf.pruefer ? [
     `- Kalibrierung: ${kopf.pruefer.kalibrierung ? `${kopf.pruefer.kalibrierung.durchlaeufe} Durchläufe am ${kopf.pruefer.kalibrierung.zeitpunkt}, Modell ${kopf.pruefer.kalibrierung.modelle.join(', ')}` : 'keine gültige'} · Prüfer-Tokens ${kopf.pruefer.tokens}`,
@@ -838,6 +876,7 @@ async function trockenlauf() {
   const fixtureProbe = await trockenlaufFixture(fehler);
   const gedaechtnisProben = trockenlaufGedaechtnis(fehler);
   const experimentProben = trockenlaufExperimente(fehler);
+  const wissensProben = await trockenlaufWissensbasis(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
@@ -853,6 +892,7 @@ async function trockenlauf() {
     `Fixture: buildCompFacts gleicht der bisherigen Snapshot-Ausgabe (${fixtureProbe.werte} Werte, Referenz aus ${fixtureProbe.commit}); alle alten Grenzen überschritten.`,
     `Gedächtnis: ${gedaechtnisProben.bloecke} Blockproben, ${gedaechtnisProben.faelle} Fälle mit Gedächtnis, ${gedaechtnisProben.zahlen} Zahlen- und ${gedaechtnisProben.regeln} Regelproben – alles richtig; Standardfälle ohne Gedächtnis.`,
     `Experimente: ${experimentProben.messung} Messproben, ${experimentProben.pruefungen} Prüfproben, ${experimentProben.faelle} Fälle, ${experimentProben.gate} Gate-Proben zum Akzeptieren – alles richtig.`,
+    `Wissensbasis: Code in sich stimmig (Stand ${KNOWLEDGE_VERSION.slice(0, 16)}, ${wissensProben.dokumente} Dokumente, Dateinamen wie in der Edge Function), ${wissensProben.vergleich} Vergleichs- und ${wissensProben.lesen} Leseproben – alles richtig.`,
   ].join('\n'));
 }
 
@@ -1471,6 +1511,15 @@ function trockenlaufExperimente(fehler) {
   probe(wirksam, antwort({ recommendations: [empfehlung({ baseline: 'Schlafqualität 4,7 von 5' })] }), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', false);
   // "5" steht ohne Vorzeichen im Gedächtnis ("von 5"), ist aber kein Wert der Schlafqualität.
   probe(wirksam, antwort({ recommendations: [empfehlung({ baseline: 'Schlafqualität zuletzt 5' })] }), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', false);
+  // Ein notierter Ausgangswert "2 von 5" steht so im Gedächtnis und darf
+  // zitiert werden, auch wenn die Messung anderes zeigt (Lauf vom 27.09.2026).
+  const ohneWirkung = FAELLE_EXPERIMENTE.find((fall) => fall.id === 'experiment-ohne-wirkung');
+  const fakt = (satz) => ({ ...antwort(), facts: [satz] });
+  probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 2 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  probe(ohneWirkung, fakt('Schlafqualität: 3 von 5 in 2026-W35 und 3 von 5 in 2026-W38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 4 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 2,5 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  probe(ohneWirkung, fakt('Schlafqualität zuletzt 2.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   const neu = FAELLE_EXPERIMENTE.find((fall) => fall.id === 'experiment-neu-schlaf');
   probe(neu, antwort({ experimentReviews: [] }), 'neues Experiment mit Zielgröße schlafdauer oder schlafqualitaet oder morgenenergie', true);
   probe(neu, antwort({ experimentReviews: [], recommendations: [empfehlung({ targetMetric: 'gewicht' })] }), 'neues Experiment mit Zielgröße schlafdauer oder schlafqualitaet oder morgenenergie', false);
@@ -1479,6 +1528,13 @@ function trockenlaufExperimente(fehler) {
   if (pruefe(FAELLE[0], antwortMitSatz('summary', 'x')).some((pruefung) => pruefung.name.startsWith('Experiment'))) fehler.push('Experimente: alte Antworten dürfen keine Experiment-Prüfungen bekommen');
 
   // Fälle: IDs eindeutig, fällige Experimente mit Messung, Standardfälle ohne.
+  // Jede Maßnahme trägt wie in der App eine ID; ohne sie kann der Coach eine
+  // fällige Maßnahme nicht benennen (gedaechtnis-massnahme-faellig, 27.09.2026).
+  for (const fall of [...FAELLE_GEDAECHTNIS, ...FAELLE_EXPERIMENTE]) {
+    for (const eintrag of JSON.parse(fall.gedaechtnis?.intervention_log || '[]')) {
+      if (typeof eintrag.id !== 'string' || !eintrag.id.trim()) fehler.push(`Experimente: ${fall.id} enthält eine Maßnahme ohne ID`);
+    }
+  }
   const alleIds = new Set([...FAELLE, ...FAELLE_ZEITREIHE, ...FAELLE_GEDAECHTNIS].map((fall) => fall.id));
   for (const fall of FAELLE_EXPERIMENTE) {
     if (alleIds.has(fall.id)) fehler.push(`Experimente: Fall-ID ${fall.id} gibt es schon`);
@@ -1497,7 +1553,9 @@ function trockenlaufExperimente(fehler) {
   for (const [beschreibung, werte, liste, soll] of [
     ['neues Schema ohne Akzeptanz', { schemaHash: 'neu' }, [], false],
     ['neues Schema akzeptiert', { schemaHash: 'neu' }, ['schema'], true],
-    ['neue Wissensbasis akzeptiert', { wissensstand: 'neu', vectorStoreId: 'vs_neu' }, ['wissensstand'], true],
+    ['neue Wissensbasis akzeptiert', { wissensstand: 'neu', vectorStoreId: 'vs_neu', wissensbasis: { nachgewiesen: true } }, ['wissensstand'], true],
+    ['neue Wissensbasis akzeptiert, aber nicht am Store nachgewiesen', { wissensstand: 'neu', vectorStoreId: 'vs_neu' }, ['wissensstand'], false],
+    ['neuer Store akzeptiert, Nachweis gescheitert', { vectorStoreId: 'vs_neu', wissensbasis: { nachgewiesen: false } }, ['wissensstand'], false],
     ['neue Wissensbasis nur Schema akzeptiert', { wissensstand: 'neu', vectorStoreId: 'vs_neu' }, ['schema'], false],
     ['akzeptierte Wissensbasis, aber ohne Vector Store', { wissensstand: 'neu', vectorStoreId: null }, ['wissensstand'], false],
   ]) {
@@ -1507,6 +1565,114 @@ function trockenlaufExperimente(fehler) {
     if (soll && !pruef.hinweise.some((hinweis) => hinweis.includes('akzeptiert'))) fehler.push(`Experimente/Gate: „${beschreibung}“ nennt die Akzeptanz nicht im Bericht`);
   }
   return { messung, pruefungen, faelle: FAELLE_EXPERIMENTE.length, gate };
+}
+
+// Wissensbasis-Nachweis (wissensbasis.mjs): Der Code ist in sich stimmig,
+// die Dateinamen folgen der Edge Function, jede Abweichung im Store wird
+// erkannt, und das Lesen kommt mit beiden Antwortformen der API zurecht. Die
+// API ist dabei eine Attrappe; es geht nichts nach außen.
+async function trockenlaufWissensbasis(fehler) {
+  const code = erwarteteWissensbasis();
+  if (sha256Voll(code.dateien.map((datei) => datei.inhalt).join(TRENNER)) !== KNOWLEDGE_VERSION) fehler.push('Wissensbasis: KNOWLEDGE_VERSION passt nicht zu den Dokumenten in knowledge.ts');
+  const quelle = await readFile(new URL('../../supabase/functions/capboy-coach/index.ts', import.meta.url), 'utf8');
+  if (!quelle.includes('const prefix = `${KNOWLEDGE_VERSION.slice(0, 12)}-`;') || !quelle.includes('const filename = `${prefix}${document.filename}`;')) {
+    fehler.push('Wissensbasis: Die Edge Function benennt die Dateien anders – dateiPraefix() in wissensbasis.mjs angleichen');
+  }
+
+  // Vergleich an einem kleinen Stand aus drei Dokumenten.
+  const dokumente = [
+    { filename: 'a.txt', content: 'Erstes Dokument\nmit zwei Zeilen' },
+    { filename: 'b.txt', content: 'Zweites – mit Umlauten äöü' },
+    { filename: 'c.txt', content: 'Drittes' },
+  ];
+  const version = sha256Voll(dokumente.map((dokument) => dokument.content).join(TRENNER));
+  const erwartet = erwarteteWissensbasis(dokumente, version);
+  const genau = () => erwartet.dateien.map((datei, index) => ({
+    id: `file-${index}`, dateiname: datei.dateiname, bytes: datei.bytes, status: 'completed', inhalt: datei.inhalt, methode: 'roh',
+  }));
+  const nur = (index, aenderung) => genau().map((datei, position) => (position === index ? { ...datei, ...aenderung(datei) } : datei));
+  const vergleich = [
+    ['bytegenauer Store', genau(), 'completed', true],
+    ['geparster Text mit anderem Leerraum', genau().map((datei) => ({ ...datei, inhalt: datei.inhalt.replace('\n', '  \n '), methode: 'geparst' })), 'completed', true],
+    ['geänderter Inhalt bei gleicher Länge', nur(1, (datei) => ({ inhalt: datei.inhalt.replace('Zweites', 'Zweitez') })), 'completed', false],
+    ['anderer Leerraum im Rohinhalt', nur(0, (datei) => ({ inhalt: datei.inhalt.replace('\n', ' ') })), 'completed', false],
+    ['geparst gleich bis auf Leerraum, aber andere Bytezahl', nur(0, (datei) => ({ bytes: datei.bytes + 1, inhalt: datei.inhalt.replace('\n', ' '), methode: 'geparst' })), 'completed', false],
+    ['Dateien des alten Stands', genau().map((datei) => ({ ...datei, dateiname: datei.dateiname.replace(dateiPraefix(version), '257ee6112bf9-') })), 'completed', false],
+    ['eine Datei fehlt', genau().slice(0, 2), 'completed', false],
+    ['fremde Datei zusätzlich', [...genau(), { id: 'file-x', dateiname: 'fremd.txt', bytes: 3, status: 'completed', inhalt: 'abc', methode: 'roh' }], 'completed', false],
+    ['Datei doppelt', [...genau(), genau()[0]], 'completed', false],
+    ['Inhalt nicht lesbar', nur(2, () => ({ inhalt: null, methode: null })), 'completed', false],
+    ['Datei nicht fertig verarbeitet', nur(0, () => ({ status: 'in_progress' })), 'completed', false],
+    ['Store noch in Arbeit', genau(), 'in_progress', false],
+    ['Store abgelaufen', genau(), 'expired', false],
+  ];
+  for (const [beschreibung, dateien, status, soll] of vergleich) {
+    const ergebnis = vergleicheWissensbasis(erwartet, { store: { id: 'vs_probe', status }, dateien });
+    if (ergebnis.nachgewiesen !== soll) fehler.push(`Wissensbasis: „${beschreibung}“ sollte ${soll ? 'nachgewiesen' : 'abgelehnt'} werden (${ergebnis.gruende.join('; ')})`);
+    if (ergebnis.stand !== (soll ? version.slice(0, 16) : null)) fehler.push(`Wissensbasis: „${beschreibung}“ trägt den falschen Stand ${ergebnis.stand}`);
+  }
+  const exakt = vergleicheWissensbasis(erwartet, { store: { id: 'vs_probe', status: 'completed' }, dateien: genau() });
+  if (exakt.storeHash !== version.slice(0, 16)) fehler.push('Wissensbasis: Der Hash über den Store-Inhalt entspricht nicht dem Generator');
+  if (vergleicheWissensbasis(code, { store: { id: 'vs_probe', status: 'completed' }, dateien: code.dateien.map((datei, index) => ({ id: `f${index}`, ...datei, status: 'completed', methode: 'roh' })) }).storeHash !== KNOWLEDGE_VERSION.slice(0, 16)) {
+    fehler.push('Wissensbasis: Der Hash über den echten Code-Stand stimmt nicht mit KNOWLEDGE_VERSION überein');
+  }
+
+  // Lesen über eine API-Attrappe: Dateiliste über zwei Seiten; Rohinhalt
+  // erlaubt oder verboten; Store-Text in beiden dokumentierten Formen.
+  const attrappe = ({ roh, form = 'data', seiten = 2, abgeschnitten = false, schluesselFalsch = false, zaehler = { total: 3, completed: 3 } }) => async (url, init = {}) => {
+    const pfad = url.replace('https://api.openai.com/v1', '');
+    const mitHeader = init.headers?.['OpenAI-Beta'] === 'assistants=v2';
+    const antwort = (daten, status = 200) => new Response(typeof daten === 'string' ? daten : JSON.stringify(daten), { status });
+    if (schluesselFalsch) return antwort({ error: { message: 'Incorrect API key provided: sk-test***.' } }, 401);
+    if (pfad === '/vector_stores/vs_probe') return antwort({ id: 'vs_probe', status: 'completed', name: 'CAPBOY Seminarwissen', metadata: {}, file_counts: zaehler });
+    // Ohne Beta-Header kam die Liste am 27.09.2026 leer zurück.
+    if (pfad.startsWith('/vector_stores/vs_probe/files?') && !mitHeader) return antwort({ data: [], has_more: false });
+    if (pfad === '/vector_stores/vs_probe/files?limit=100') return antwort({ data: [{ id: 'file-0', status: 'completed' }, { id: 'file-1', status: 'completed' }], has_more: true, last_id: 'file-1' });
+    if (pfad === '/vector_stores/vs_probe/files?limit=100&after=file-1') return antwort({ data: [{ id: 'file-2', status: 'completed' }], has_more: false });
+    const datei = pfad.match(/file-(\d)/)?.[1];
+    const soll = erwartet.dateien[Number(datei)];
+    if (pfad === `/files/file-${datei}`) return antwort({ id: `file-${datei}`, filename: soll.dateiname, bytes: soll.bytes, purpose: 'assistants' });
+    if (pfad === `/files/file-${datei}/content`) return roh ? antwort(soll.inhalt) : antwort({ error: { message: 'Not allowed to download files of purpose: assistants' } }, 400);
+    if (pfad.startsWith(`/vector_stores/vs_probe/files/file-${datei}/content`)) {
+      const mitte = Math.ceil(soll.inhalt.length / 2);
+      if (form === 'content') return antwort({ file_id: `file-${datei}`, filename: soll.dateiname, content: [{ type: 'text', text: soll.inhalt }] });
+      if (seiten === 1) return antwort({ object: 'vector_store.file_content.page', data: [{ type: 'text', text: soll.inhalt }], has_more: false, next_page: null });
+      return pfad.endsWith('?page=p2')
+        ? antwort({ object: 'vector_store.file_content.page', data: [{ type: 'text', text: soll.inhalt.slice(mitte) }], has_more: false, next_page: null })
+        : antwort({ object: 'vector_store.file_content.page', data: [{ type: 'text', text: soll.inhalt.slice(0, mitte) }], has_more: true, next_page: abgeschnitten ? null : 'p2' });
+    }
+    return antwort({ error: { message: `unbekannt: ${pfad}` } }, 404);
+  };
+  const lesen = [
+    ['Rohinhalt erlaubt', { roh: true }, true, 'roh'],
+    ['Rohinhalt verboten, Store-Text über zwei Seiten', { roh: false }, true, 'geparst'],
+    ['Rohinhalt verboten, Store-Text auf einer Seite', { roh: false, seiten: 1 }, true, 'geparst'],
+    ['Rohinhalt verboten, Store-Text in der content-Form', { roh: false, form: 'content' }, true, 'geparst'],
+    ['Store-Text meldet weitere Seiten ohne Verweis', { roh: false, abgeschnitten: true }, false, null],
+    ['Store meldet mehr Dateien, als die Liste enthält', { roh: true, zaehler: { total: 4, completed: 4 } }, false, 'roh'],
+    ['Store meldet eine fehlgeschlagene Datei', { roh: true, zaehler: { total: 3, completed: 2, failed: 1 } }, false, 'roh'],
+  ];
+  for (const [beschreibung, einstellung, soll, methode] of lesen) {
+    try {
+      const gelesen = await leseWissensbasis('vs_probe', { apiKey: 'test', fetchImpl: attrappe(einstellung), warten: async () => {} });
+      const ergebnis = vergleicheWissensbasis(erwartet, gelesen);
+      if (ergebnis.nachgewiesen !== soll) fehler.push(`Wissensbasis lesen: „${beschreibung}“ sollte ${soll ? 'nachgewiesen' : 'abgelehnt'} werden (${ergebnis.gruende.join('; ')})`);
+      if (methode && gelesen.dateien.some((datei) => datei.methode !== methode)) fehler.push(`Wissensbasis lesen: „${beschreibung}“ nutzt nicht ${methode}`);
+      if (gelesen.dateien.length !== 3) fehler.push(`Wissensbasis lesen: „${beschreibung}“ liest ${gelesen.dateien.length} statt 3 Dateien (zweite Seite der Liste?)`);
+    } catch (fehlerMeldung) {
+      fehler.push(`Wissensbasis lesen: „${beschreibung}“ scheitert: ${fehlerMeldung.message}`);
+    }
+  }
+  // Ein Schlüsselfehler darf nicht als "nicht nachgewiesen" enden, sondern
+  // muss als Kontofehler hochkommen (run.mjs: Exit 3).
+  let kontoFehler = null;
+  try {
+    await leseWissensbasis('vs_probe', { apiKey: 'test', fetchImpl: attrappe({ roh: true, schluesselFalsch: true }), warten: async () => {} });
+  } catch (meldung) {
+    kontoFehler = meldung;
+  }
+  if (!kontoFehler || !istAbbruchFehler(kontoFehler)) fehler.push('Wissensbasis lesen: Ein Schlüsselfehler kommt nicht als Kontofehler hoch');
+  return { dokumente: code.dateien.length, vergleich: vergleich.length + 2, lesen: lesen.length + 1 };
 }
 
 // buildCompFacts gegen die Ausgabe der bisherigen Snapshot-Berechnung (fixtures/).

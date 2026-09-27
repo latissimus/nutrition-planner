@@ -1,0 +1,204 @@
+{
+  "zeitpunkt": "2026-09-27T08:28:07.980Z",
+  "nachgewiesen": true,
+  "gruende": [],
+  "vectorStoreId": "vs_6ab8d1ff37d88191a61c1dfcd8c702a9",
+  "codeStand": "3b847f993427405d",
+  "stand": "3b847f993427405d",
+  "methode": "Inhalt aus dem Store, bytegenau",
+  "storeHash": "3b847f993427405d",
+  "storeHashOhneLeerraum": "894a8e10a62eb40c",
+  "codeHashOhneLeerraum": "894a8e10a62eb40c",
+  "dateien": {
+    "erwartet": 21,
+    "imStore": 21,
+    "bytegenau": 21,
+    "gleichBisAufLeerraum": 0
+  },
+  "neuAngelegt": false,
+  "store": {
+    "id": "vs_6ab8d1ff37d88191a61c1dfcd8c702a9",
+    "status": "completed",
+    "name": "CAPBOY Seminarwissen",
+    "metadata": {
+      "knowledge_version": "3b847f993427405dc76a2c65eac6f9dcdc03d252c4c6825d1fac16464323a178"
+    },
+    "fileCounts": {
+      "in_progress": 0,
+      "completed": 21,
+      "failed": 0,
+      "cancelled": 0,
+      "total": 21
+    }
+  },
+  "gelesen": [
+    {
+      "id": "file-2Eowk7aavGMfX11dYu6ZTH",
+      "dateiname": "3b847f993427-Kontrolliert - Neurotransmitter - Neurotransmitter.md.txt",
+      "bytes": 7023,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "33d8098a2baf3eed"
+    },
+    {
+      "id": "file-3A8BFTda9ReojwAaebbi7w",
+      "dateiname": "3b847f993427-Kontrolliert - Ernährung - Funktionelle Ernährung.md.txt",
+      "bytes": 8500,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "7a032df3147bdb6a"
+    },
+    {
+      "id": "file-8BJkJwxJ4Sw5Ypi3Ek1phu",
+      "dateiname": "3b847f993427-hautfalten.json.txt",
+      "bytes": 40427,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "3e3e363a09628fb0"
+    },
+    {
+      "id": "file-8bFnA9DRp9ZwYXXT8qZ2gb",
+      "dateiname": "3b847f993427-ypsi-protokolle.json.txt",
+      "bytes": 32703,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "344a6fbd83c9483d"
+    },
+    {
+      "id": "file-8mnVBntQdu7LhhP6FRFANH",
+      "dateiname": "3b847f993427-Kontrolliert - Hautfalten - Hautfalten Notizen.md.txt",
+      "bytes": 11657,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "2ceed46d2afb811d"
+    },
+    {
+      "id": "file-8pq8V2xYAqozGkciK1GkNW",
+      "dateiname": "3b847f993427-Neurotransmitter - Braverman-Test.pdf.txt",
+      "bytes": 37410,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "a397f9b235a7d383"
+    },
+    {
+      "id": "file-8tZXeDU3tRdBU8BV4BEp2G",
+      "dateiname": "3b847f993427-Neurotransmitter - Neurotransmitter.pdf.txt",
+      "bytes": 2981,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "e1cb39cd96f88cd0"
+    },
+    {
+      "id": "file-8vHT3ymMLK5a7xqoWVbhy5",
+      "dateiname": "3b847f993427-Kontrolliert - Hautfalten - Was deine Hautfalten ueber dich aussagen.md.txt",
+      "bytes": 15389,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "269bed2a54f83542"
+    },
+    {
+      "id": "file-BY3HV6HprhvZZaWD2ywphg",
+      "dateiname": "3b847f993427-Kontrolliert - Ernährung - Makro:Mikronährstoffe.md.txt",
+      "bytes": 8440,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "ce3d663b46e1c000"
+    },
+    {
+      "id": "file-DgT322dk2YmP8QEReRxDUP",
+      "dateiname": "3b847f993427-Kontrolliert - Hormone - Hormone:Hautfaltenmessung.md.txt",
+      "bytes": 17210,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "ed069598dd6926af"
+    },
+    {
+      "id": "file-Dikaamsnw1kP4F2WCtGF45",
+      "dateiname": "3b847f993427-Kontrolliert - Supplements - Supplements.md.txt",
+      "bytes": 15995,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "1a6a9d438ca850a1"
+    },
+    {
+      "id": "file-KBynYC5zJM6eAhgyWSSCHp",
+      "dateiname": "3b847f993427-Hautfalten - Was deine Hautfalten ueber dich aussagen.pdf.txt",
+      "bytes": 4695,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "cfcf7cec72b069d1"
+    },
+    {
+      "id": "file-KPY2rxqJ6hYzXwBMdhAomb",
+      "dateiname": "3b847f993427-Supplements - Supplements.pdf.txt",
+      "bytes": 21899,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "15d3c512fd8afdc9"
+    },
+    {
+      "id": "file-MEBCzwg1yHnPaReoDzBRta",
+      "dateiname": "3b847f993427-Hautfalten - Hautfalten Notizen.pdf.txt",
+      "bytes": 11955,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "c49d061b7683cbec"
+    },
+    {
+      "id": "file-MVUJVqdw8CqjA4ypUJSqFP",
+      "dateiname": "3b847f993427-Hormone - Hormone:Hautfaltenmessung.pdf.txt",
+      "bytes": 16923,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "f8011f00d8c55ed9"
+    },
+    {
+      "id": "file-NkwEQxnEwSYwc8qXKbD3Zz",
+      "dateiname": "3b847f993427-Kontrolliert - Neurotransmitter - Braverman-Test.md.txt",
+      "bytes": 3965,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "6ae25570e7c9678e"
+    },
+    {
+      "id": "file-PS1cNkNtf9Dc3qJYQds9WB",
+      "dateiname": "3b847f993427-Ernährung - Makro:Mikronährstoffe.pdf.txt",
+      "bytes": 10362,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "b02038a0726fbaab"
+    },
+    {
+      "id": "file-PfVXz4V29RiEhS8JeZXChy",
+      "dateiname": "3b847f993427-Kontrolliert - Hautfalten - Körperfett-Assessment.md.txt",
+      "bytes": 13329,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "f0c91a09e9d9e5dd"
+    },
+    {
+      "id": "file-SWPzfWmoAUFUEuAXqkwScS",
+      "dateiname": "3b847f993427-Ernährung - Funktionelle Ernährung.pdf.txt",
+      "bytes": 9738,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "9a6cf3262b633d43"
+    },
+    {
+      "id": "file-Ub9YWEYe4f7mJcCRgABv41",
+      "dateiname": "3b847f993427-Hautfalten - Körperfett-Assessment.pdf.txt",
+      "bytes": 17557,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "5cd768f56ec2e4dc"
+    },
+    {
+      "id": "file-YPgZsDKFnjvqbKa4cvaTdt",
+      "dateiname": "3b847f993427-hautfalten-faktoren.json.txt",
+      "bytes": 52237,
+      "status": "completed",
+      "methode": "geparst",
+      "inhaltSha256": "c777dd262f29169b"
+    }
+  ]
+}
