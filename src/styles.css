@@ -15170,7 +15170,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Eingabe, fest am unteren Rand */
 /* Eingabe wie das Menüband: schwebende Box mit 16 px Radius und 2 px Rand,
    Symbole ohne eigene Umrandung, darunter die Seitenfarbe. */
-.coach-page.tastatur-offen .coach-shell.coach-chat .coach-form{padding-bottom:6px}
+/* Offene Tastatur: kein eigener Rand unter der Box, und die Box rückt 4 px in
+   den durchsichtigen Rand, den iOS um seine Leiste über der Tastatur lässt. */
+.coach-page.tastatur-offen .coach-shell.coach-chat .coach-form{bottom:calc(var(--coach-tastatur,0px) - 4px);padding-bottom:0;background:none}
 .coach-shell.coach-chat .coach-form{position:fixed;z-index:20;right:0;bottom:var(--coach-tastatur,0px);left:0;display:block;margin:0;padding:10px 7px var(--app-dex-dock-bottom);border:0;border-radius:0;background:linear-gradient(180deg,transparent 0,var(--coach-grund) 12px);box-shadow:none}
 .coach-form-innen{display:grid;gap:7px;width:min(100%,580px);margin:0 auto}
 .coach-inputbar{box-sizing:border-box;display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;gap:4px;min-height:72px;padding:5px;border:2px solid var(--coach-rand);border-radius:16px;background:var(--coach-violett)}
