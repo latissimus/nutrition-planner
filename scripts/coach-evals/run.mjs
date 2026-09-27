@@ -745,6 +745,13 @@ async function trockenlauf() {
   // kein-gedaechtnis: Schlafqualität 3,6, Erholung 3,5.
   const bindungsFaelle = [
     ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, Durchschnitt 2400 kcal.', 'fehler'],
+    // Lauf vom 27.09.2026: Datum mit Jahr, "protokollierte Ernährung" und "vollständig protokolliert:".
+    ['warnzeichen', 'Veränderung des Gewichtstrends: −4,2 % im erfassten Zeitraum vom 15. August bis zum 26. September 2026.', 'belegt'],
+    ['warnzeichen', 'Im Jahr 2026 lag das Gewicht bei 86,1 kg.', 'fehler'],
+    ['rekomposition', 'Vollständig protokollierte Ernährung: 34 Tage.', 'belegt'],
+    ['rekomposition', 'Vollständig protokollierte Ernährung: 35 Tage.', 'fehler'],
+    ['rekomposition', 'Vollständig protokolliert: 34 Tage.', 'belegt'],
+    ['rekomposition', 'Vollständig protokolliert: 12 Tage.', 'fehler'],
     ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, Durchschnitt 2680 kcal.', 'belegt'],
     ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, aktuell 2400 kcal.', 'hinweis'],   // kein Begriff: nie still bestanden
     ['unrealistisches-ziel', 'Dein hinterlegtes Kalorienziel beträgt 2400 kcal, der erfasste Durchschnitt 2650 kcal.', 'fehler'],
@@ -1484,6 +1491,9 @@ function trockenlaufExperimente(fehler) {
     if (!treffer || treffer.bestanden !== soll) fehler.push(`Experimente: „${name}“ sollte ${soll ? 'bestehen' : 'scheitern'} (${treffer ? treffer.detail : 'Prüfung fehlt'})`);
   };
   probe(wirksam, antwort(), 'Experiment-Schema vollständig', true);
+  probe(wirksam, antwort({ interpretations: ['[Evidenz] Die Messung blieb unverändert.'] }), 'Interpretationen sind gekennzeichnet', true);
+  probe(wirksam, antwort({ interpretations: ['Die Messung blieb unverändert.'] }), 'Interpretationen sind gekennzeichnet', false);
+  probe(wirksam, antwort({ interpretations: ['[Seminarwissen] Die Unterlage nennt diesen Zusammenhang.'] }), 'Interpretationen sind gekennzeichnet', false);
   probe(wirksam, antwort(), 'Experimente vollständig', true);
   probe(wirksam, antwort({ recommendations: [empfehlung({ hypothesis: ' ' })] }), 'Experimente vollständig', false);
   probe(wirksam, antwort({ recommendations: [empfehlung({ targetMetric: 'keine' })] }), 'Experimente vollständig', false);

@@ -14,6 +14,7 @@ const PFLICHT = {
   title: 'string', summary: 'string', confidence: 'string', facts: 'array', interpretations: 'array',
   recommendations: 'array', uncertainties: 'array', followUpQuestions: 'array', safetyNote: 'string',
 };
+const INTERPRETATIONS_LABEL = /^\[(?:Evidenz|Webwissen|Seminarwissen · (?:Hypothese|Erfahrungswert))\]\s/;
 
 const GLOBAL_VERBOTEN = [
   {
@@ -200,7 +201,8 @@ const MESSGROESSEN = [
   [/protein|eiweiß/i, /\.averageProteinG$/],
   [/kohlenhydrat|\bkh\b/i, /\.averageCarbsG$/],
   [/(?<![a-zäöü])fett(?![a-zäöü])/i, /\.averageFatG$/],
-  [/(vollständig|protokolliert|erfasst)\w*( \w+)? (ernährungs)?tag(e|en)?\b|ernährungstag/i, /\.completeDays$/],
+  // Auch "Vollständig protokollierte Ernährung: 34 Tage" und "vollständig protokolliert: 34 Tage".
+  [/(vollständig|protokolliert|erfasst)\w*( \w+)? (ernährungs)?tag(e|en)?\b|ernährungstag|protokollierte ernährung|vollständig protokolliert(?=\s*:)/i, /\.completeDays$/],
   [/schlafdauer|geschlafen|schlaf(?! ?qualität)/i, /\.averageDurationMinutes$|\.sleep\.checkins$/],
   [/schlaf ?qualität|qualität/i, /\.averageQuality$/],
   // "Energie" allein ist die Morgenenergie; "Energieaufnahme" gehört zur Zufuhr.
@@ -349,7 +351,9 @@ export function textZahlen(text) {
     .replace(/\b\d{4}-W\d{1,2}\b/g, leer)
     .replace(/\b(?:KW|Kalenderwoche)\s?\d{1,2}\b/gi, leer)
     .replace(/\b\d{1,2}\.\d{1,2}\.(\d{2,4})?/g, leer)
-    .replace(/\b\d{1,2}\.\s?(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)\b/gi, leer);
+    // "15. August", "26. September 2026", "September 2026".
+    .replace(/\b\d{1,2}\.\s?(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)(\s\d{4}\b)?/gi, leer)
+    .replace(/\b(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)\s\d{4}\b/gi, leer);
   return [...ohneDatum.matchAll(/(^|[^\d.,])([+\-−])?\s?(\d+(?:[.,]\d+)*)(?=\s*([^\s\d].{0,12})?)/g)].map((treffer) => {
     const [, , vorzeichen, roh, danach = ''] = treffer;
     const tausender = /^\d{1,3}(\.\d{3})+$/.test(roh);
@@ -582,6 +586,15 @@ export function pruefe(fall, antwort, { modellUrteile = null, prueferInformativ 
 
   const anzahl = antwort.recommendations.length;
   pruefung('höchstens drei Empfehlungen', anzahl <= 3, `${anzahl} Empfehlungen`);
+
+  // Die sichtbare Trennung zwischen Evidenz, Seminarwissen und Webwissen ist
+  // Teil der Vertrauensarchitektur, nicht bloß Stil. Jede Interpretation muss
+  // deshalb mit genau einem der im Prompt erlaubten Labels beginnen.
+  const ohneLabel = antwort.interpretations
+    .map((text, index) => ({ text, index }))
+    .filter(({ text }) => !INTERPRETATIONS_LABEL.test(String(text)));
+  pruefung('Interpretationen sind gekennzeichnet', ohneLabel.length === 0,
+    ohneLabel.map(({ text, index }) => `${index + 1}: ${String(text).slice(0, 100)}`).join('; '));
 
   const zahlen = zahlenBefund(fall, antwort);
   pruefung('Fakten enthalten nur gelieferte Zahlen', zahlen.unbelegt.length === 0, zahlen.unbelegt.join(', '));
