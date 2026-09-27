@@ -14568,12 +14568,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-tab.ist-gedrueckt{transform:translateY(1.5px)}
 .app-dex-tab.ist-gedrueckt>.app-dex-tab-punkte{opacity:1}
 
-/* ---------- Darkmode-Tapeten nach LOGMAN-Vorbild ---------------------- */
-/* Im Retromodus traegt jede Seite ihre gezeichnete Tapete (Pizza, Hantel...).
-   Im Darkmode war die Flaeche dagegen leer. Dort liegen jetzt dieselben
-   ruhigen Raster wie im LOGMAN: die kleinen Dreiecke und die organischen
-   Tropfen, dazu als drittes Quadrate im Mass der Dreiecke, damit sich nicht
-   ueberall dasselbe wiederholt.
+/* ---------- Ruhige Seiten-Tapeten nach LOGMAN-Vorbild ----------------- */
+/* Die Musterressourcen werden von Dark- und Retromodus gemeinsam benutzt.
+   Ihre Zuordnung bleibt pro Seite identisch; nur die Druckfarbe wechselt auf
+   hellen Retro-Flaechen zu einer dunklen Variante.
 
    Angebracht an #view: im Darkmode traegt es eine DECKENDE Grundfarbe
    (gemessen rgb(16,26,43)) und verdeckt damit alles, was auf #app liegt.
@@ -14582,7 +14580,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
    Die Deckkraft steckt in der SVG selbst (fill-/stroke-opacity), wie im
    LOGMAN; wie sie abgestimmt ist, steht unten bei den Mustern. */
-:root[data-theme="dark"]{
+:root{
   /* background-position:center bei allen Mustern. Ohne das beginnt die
      Kachelung am linken Bildrand, und der Rest der Bildschirmbreite, der
      keine ganze Kachel mehr ergibt, bleibt komplett rechts liegen - beim
@@ -15332,3 +15330,131 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet [role="group"]>label{border:1.5px solid currentColor!important;background:transparent!important;box-shadow:none!important}
 :root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet [role="group"]>label:has(input:checked){border-color:var(--text,#111)!important;background:var(--text,#111)!important;color:var(--app-card,#fff)!important}
 :root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet .body-reset-mini{border:1.5px solid currentColor!important;background:transparent!important;color:inherit!important}
+
+/* ============================================================
+   COMP · abschliessende Vereinheitlichung
+   ============================================================ */
+/* Der kleine Kicker wiederholt nur die direkt folgende Ueberschrift. Eine
+   einzige klare Bezeichnung macht den Einstieg in die Detailsektion ruhiger. */
+.comp-details-list>header>small{display:none}
+.comp-details-list>header{padding-top:11px}
+
+/* Alte COMP-Bausteine brachten im Darkmode noch eine zweite Graustufe fuer
+   einzelne Werte und Untergruppen mit. Innerhalb der neuen Detailkarten ist
+   die Karte selbst bereits die Flaeche; Werte, Vergleiche und Listen liegen
+   deshalb direkt darauf. Echte Eingaben und Aktionsknoepfe bleiben abgesetzt. */
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(
+  .body-latest-value,.ypsi-priority-block,.ypsi-top-fold,
+  .ypsi-priority-comparison>span,.ypsi-secondary-relations>span,
+  .ypsi-observed-priorities>div>span,.ypsi-detail-values>span,
+  .neurotransmitter-other-scores span,.braverman-result-focus,
+  .falten-legende-liste,.falten-legende-item
+){
+  background:transparent!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+}
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-priority-block{
+  margin:14px 0 0!important;
+  padding:13px 0 0!important;
+  border:0!important;
+  border-top:1px solid var(--app-divider,#ddd)!important;
+  border-radius:0!important;
+}
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-priority-block>.ypsi-top-fold{
+  padding-top:0!important;
+  border-top:0!important;
+}
+
+/* Exakt eine Linie zwischen benachbarten Eintraegen. Die alten Listen hatten
+   teils zugleich einen Aussenrahmen, eine Zeilenlinie und eine zweite Linie
+   auf dem inneren div. */
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .falten-legende-liste{
+  border:0!important;
+  border-radius:0!important;
+}
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .falten-legende-item{
+  border:0!important;
+  border-bottom:1px solid var(--app-divider,#ddd)!important;
+}
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .falten-legende-item:last-child{
+  border-bottom:0!important;
+}
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-skinfold-history dl>div{
+  border:0!important;
+  border-top:1px solid var(--app-divider,#ddd)!important;
+}
+:root[data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-skinfold-history dl>div>div{
+  border:0!important;
+}
+
+/* ============================================================
+   RETROMODE · dieselben ruhigen Tapeten wie im Darkmode
+   ============================================================ */
+/* Auf hellen Retro-Flaechen braucht dieselbe Geometrie dunkle Druckfarbe.
+   Dunkle Seiten verwenden weiter die bereits abgestimmten weissen Varianten. */
+:root[data-theme="retro"]{
+  --muster-bildroehre-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%230A1330' fill-opacity='.055'/%3E%3C/svg%3E");
+  --muster-ziegel-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%230A1330' stroke-opacity='.05' fill='none'/%3E%3C/svg%3E");
+  --muster-rechteckwelle-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%230A1330' stroke-opacity='.055' fill='none'/%3E%3C/svg%3E");
+  --muster-millimeter-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%230A1330' stroke-opacity='.085' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-punktraster-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%230A1330' fill-opacity='.045'/%3E%3C/svg%3E");
+  --muster-gitter-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%230A1330' stroke-opacity='.06' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-dithering-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cg fill='%230A1330' fill-opacity='.08'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-quadrat-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%230A1330' fill-opacity='.035'/%3E%3C/svg%3E");
+}
+
+/* Die alten grossen Illustrationen werden im Retromodus ebenso ersetzt wie
+   bereits im Darkmode. So gibt es pro Seite nur noch eine Tapete. */
+:root[data-theme="retro"][data-seite] .dex-fixkopf.dex-tapete-datei .kategorie-scrollinhalt::before,
+:root[data-theme="retro"][data-seite] :is(
+  .special-dex-page,.body-log-dex-page,.routine-dex-page,.shopping-dex-page,
+  .sleep-dex-page,.sleep-log-dex-page,.meal-log-dex-page,.coin-dex-page,
+  .neo-dex-page,.food-dex-page,.training-dex-page
+)::before{
+  background:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  opacity:0!important;
+}
+
+:root[data-theme="retro"][data-seite] :is(
+  .meal-log-dex-page,.body-log-dex-page,.routine-dex-page,.shopping-dex-page,
+  .sleep-dex-page,.sleep-log-dex-page,.coin-dex-page,.neo-dex-page,
+  .food-dex-page,.training-dex-page,.profil-fixkopf-view
+){
+  background-repeat:repeat!important;
+  background-position:center!important;
+  background-attachment:fixed!important;
+}
+
+:root[data-theme="retro"][data-seite="reminders"] .meal-log-dex-page{background-image:var(--muster-gitter-retro)!important}
+:root[data-theme="retro"][data-seite="body"] .body-log-dex-page,
+:root[data-theme="retro"][data-seite="coach"] #view{background-image:var(--muster-millimeter-retro)!important}
+:root[data-theme="retro"][data-seite="habits"] .routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
+:root[data-theme="retro"][data-seite="sleep"] :is(.sleep-dex-page,.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
+:root[data-theme="retro"][data-seite="search"] #view{background-image:var(--muster-bildroehre-retro)!important}
+:root[data-theme="retro"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-quadrat-retro)!important}
+:root[data-theme="retro"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-dithering-dunkel)!important}
+:root[data-theme="retro"][data-seite="profile"] :is(#view,.profil-fixkopf-view){background-image:var(--muster-dithering-retro)!important;background-repeat:repeat!important;background-position:center!important;background-attachment:fixed!important}
+:root[data-theme="retro"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-punktraster-retro)!important}
+:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-page{background-image:var(--muster-ziegel-retro)!important}
+:root[data-theme="retro"][data-seite="training"] :is(.neo-dex-page,.food-dex-page,.training-dex-page){background-image:var(--muster-dreieck-dunkel)!important}
+:root[data-theme="retro"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-rechteckwelle-retro)!important}
+:root[data-theme="retro"][data-seite="coins"] .coin-dex-page{background-image:var(--muster-tetris-dunkel)!important}
+
+/* Einige historisch sehr spezifische Seitenregeln setzen spaeter noch einmal
+   die komplette background-Kurzform. Die Wiederholung mit der Shell und der
+   konkreten Seitenklasse sorgt dafuer, dass dabei nur die Tapete, nicht aber
+   die jeweilige Seitenfarbe verloren geht. */
+:root:root[data-theme="retro"][data-seite="reminders"] #view.meal-log-dex-page.meal-log-dex-page{background-image:var(--muster-gitter-retro)!important}
+:root:root[data-theme="retro"][data-seite="body"] #view.body-log-dex-page.body-log-dex-page{background-image:var(--muster-millimeter-retro)!important}
+:root:root[data-theme="retro"][data-seite="habits"] #view.routine-dex-page.routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
+:root:root[data-theme="retro"][data-seite="sleep"] #view:is(.sleep-dex-page.sleep-dex-page,.sleep-log-dex-page.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
+:root:root[data-theme="retro"][data-seite="food-log"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-quadrat-retro)!important}
+:root:root[data-theme="retro"][data-seite="essen"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-dithering-dunkel)!important}
+:root:root[data-theme="retro"][data-seite="supps"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-punktraster-retro)!important}
+:root:root[data-theme="retro"][data-seite="shopping"] #view.shopping-dex-page.shopping-dex-page{background-image:var(--muster-ziegel-retro)!important}
+:root:root[data-theme="retro"][data-seite="training"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page,.training-dex-page.training-dex-page){background-image:var(--muster-dreieck-dunkel)!important}
+:root:root[data-theme="retro"][data-seite="stress"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-rechteckwelle-retro)!important}
+:root:root[data-theme="retro"][data-seite="coins"] #view.coin-dex-page.coin-dex-page{background-image:var(--muster-tetris-dunkel)!important}
