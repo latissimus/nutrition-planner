@@ -126,6 +126,10 @@ function recoveryTrend(sleep, checkins) {
 
 function infoDetails(title, text) { return `<details class="body-info"><summary>${title}<span aria-hidden="true">?</span></summary><p>${text}</p></details>`; }
 
+// "mittel" + "e" ergäbe "mittele": die Stufen ausgeschrieben.
+const DATENSICHERHEIT = { niedrig: 'niedrige', mittel: 'mittlere', hoch: 'hohe' };
+const datensicherheit = (stufe) => `${DATENSICHERHEIT[stufe] || DATENSICHERHEIT.niedrig} Datensicherheit`;
+
 function bodyHeroMarkup(state) {
   const evidence = buildCompEvidence(state, getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {});
   const facts = evidence.objectiveFacts;
@@ -134,7 +138,7 @@ function bodyHeroMarkup(state) {
   const progress = available * 25;
   return `<div class="body-v2-stack ${SPECIAL_DEX_CLASSES.content} ${SPECIAL_DEX_CLASSES.stack}"><section class="body-v2-hero body-comp-hero ${SPECIAL_DEX_CLASSES.hero}" style="--body-progress:${progress}%">
     <div class="body-v2-ring"><span><b>${available}/4</b><small>SIGNALE</small></span></div>
-    <div class="body-v2-hero-value"><small>AKTUELLER GESAMTSTATUS</small><div><strong data-comp-hero-status>${escapeHtml(evidence.deterministicAssessment.message)}</strong></div><span data-comp-hero-confidence>${escapeHtml(evidence.deterministicAssessment.confidence)}e Datensicherheit · KI-Einordnung wird geladen</span></div>
+    <div class="body-v2-hero-value"><small>AKTUELLER GESAMTSTATUS</small><div><strong data-comp-hero-status>${escapeHtml(evidence.deterministicAssessment.message)}</strong></div><span data-comp-hero-confidence>${escapeHtml(datensicherheit(evidence.deterministicAssessment.confidence))}</span></div>
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="COMP-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
@@ -870,7 +874,8 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       const heroStatus = container.querySelector('[data-comp-hero-status]');
       const heroConfidence = container.querySelector('[data-comp-hero-confidence]');
       if (heroStatus) heroStatus.textContent = response.result?.status || response.result?.title || 'Gesamtbild aktualisiert';
-      if (heroConfidence) heroConfidence.textContent = `${response.result?.confidence || 'niedrig'}e Datensicherheit · ${response.cached ? 'unveränderte Daten' : 'neu ausgewertet'}`;
+      // "Unverändert" oder "neu bewertet" steht im Kopf der KI-Karte.
+      if (heroConfidence) heroConfidence.textContent = datensicherheit(response.result?.confidence);
     } catch (error) {
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
       panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>nicht verfügbar</em></span></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;

@@ -14951,15 +14951,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Eine zentrale COMP-Erzählung: vier Fakten, eine Bewertung, alles Weitere
    bewusst in einem einzigen Details-Bereich. */
+/* Die KI-Überschrift enthält oft ein langes Wort ("Körperzusammensetzung"):
+   kleiner und mit Silbentrennung, bis zu drei Zeilen. Alle Heroes sind
+   gleich hoch (118 px), deshalb passt sich der Text an und nicht die Box. */
 :root[data-seite="body"] .body-comp-hero .body-v2-hero-value strong{
   display:-webkit-box!important;
   overflow:hidden!important;
-  font:850 clamp(20px,6vw,28px)/1.02 "Work Sans",var(--ui),sans-serif!important;
-  letter-spacing:-.045em!important;
+  font:850 15px/1.05 "Work Sans",var(--ui),sans-serif!important;
+  letter-spacing:-.02em!important;
   white-space:normal!important;
+  -webkit-hyphens:auto;
+  hyphens:auto;
+  overflow-wrap:break-word;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
+  -webkit-line-clamp:3;
 }
+:root[data-seite="body"] .body-comp-hero .body-v2-hero-value [data-comp-hero-confidence]{font-size:9px!important}
 .comp-facts{
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -15245,7 +15252,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* COMP details: no enclosing mega-card; every section is its own card. */
 .comp-details-list{display:grid;gap:10px}
-.comp-details-list>header{display:grid;gap:5px;padding:5px 2px 2px}.comp-details-list>header small{font:800 8px/1 var(--tech);letter-spacing:.08em}.comp-details-list>header h2{margin:0;font:850 20px/1 "Work Sans",var(--ui),sans-serif;letter-spacing:-.035em}
+.comp-details-list>header{display:grid;gap:5px;padding:14px 30px 2px}.comp-details-list>header small{font:800 8px/1 var(--tech);letter-spacing:.08em}.comp-details-list>header h2{margin:0;font:850 20px/1 "Work Sans",var(--ui),sans-serif;letter-spacing:-.035em}
 .comp-detail-card{box-sizing:border-box;overflow:hidden;border:1.5px solid #111;border-radius:15px;background:var(--app-card,#fff);color:var(--text,#111)}
 .comp-detail-card>summary{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:10px;min-height:62px;padding:12px 15px;cursor:pointer;list-style:none}.comp-detail-card>summary::-webkit-details-marker{display:none}.comp-detail-card>summary>span{display:grid;gap:4px}.comp-detail-card>summary b{font:820 15px/1.1 "Work Sans",var(--ui),sans-serif}.comp-detail-card>summary small{color:var(--muted);font:600 9px/1.3 var(--tech)}.comp-detail-card>summary>.material-svg{width:20px;height:20px;transition:transform .18s ease}.comp-detail-card[open]>summary>.material-svg{transform:rotate(90deg)}
 .comp-detail-card-content{border-top:1px solid var(--app-divider)}
@@ -15253,3 +15260,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .comp-detail-card-content .body-v2-card>header,:root[data-seite="body"] .comp-detail-card-content .body-v2-overview>summary{display:none!important}
 
 :root[data-theme="dark"] .comp-detail-card{border-color:var(--dm-border,#737b8c);background:var(--dm-card,#191c21);color:var(--dm-text,#f4f4f4)}
+/* COMP-Details im Stil der KI-Karte: eine Karte, Schrift in der Kartenfarbe,
+   Abschnitte durch feine Linien getrennt, keine Kästen in der Karte. Die
+   Inhalte stammen aus der früheren Körperseite und bringen deren pinke
+   Kartenoptik mit. Deren Regeln sind sehr spezifisch; daher der lange
+   Selektor. Diagramme, Eingabefelder und Hauptknöpfe bleiben, wie sie sind. */
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-v2-card,.body-v2-overview,.body-v2-card-body){border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-v2-card-body{padding:14px 16px 16px!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(p,li,span,b,strong,small,em,label,summary,h2,h3,h4,dt,dd,th,td,div){color:inherit!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.mini-title,.section-title){margin:0!important;color:inherit!important;font:820 12px/1.15 "Work Sans",var(--ui),sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-goal-status,.ypsi-top-fold,.ypsi-rule-note,.ypsi-priority-reason,.ypsi-open-questions,.body-neutral-note,.braverman-result-focus,.body-chart-empty,.falten-protokoll-item,.ypsi-plan-details){padding:12px 0 0!important;border:0!important;border-top:1px solid var(--app-divider,#ddd)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-metric-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 16px!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-metric-grid>*{padding:8px 0!important;border:0!important;border-bottom:1px solid var(--app-divider,#ddd)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(ol,ul){border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+/* Trennlinien durchgezogen und fein wie in der KI-Karte, nicht gestrichelt
+   oder pink; nur an den Stellen, die schon eine Linie haben. */
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-chart-block,.body-inner-details,.mess-einst,.ypsi-priority-block){border-top:1px solid var(--app-divider,#ddd)!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-inner-details li{border-bottom:1px solid var(--app-divider,#ddd)!important}
+/* Faltenvergleich, beobachtete Prioritäten, Neurotransmitter-Werte und
+   Protokollköpfe ohne farbige Kacheln. */
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*,.falten-protokoll-item>header){border:0!important;border-bottom:1px solid var(--app-divider,#ddd)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-reset-mini{border:1.5px solid currentColor!important;background:transparent!important;color:inherit!important}
+/* Im Dark Mode: weiße Nummern der nächsten Schritte, Kreis als Ring. */
+:root[data-theme="dark"] .comp-assessment-body ol li::before{background:transparent!important;color:#fff!important;box-shadow:inset 0 0 0 1.5px #fff}
