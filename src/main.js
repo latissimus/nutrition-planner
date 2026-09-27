@@ -288,6 +288,10 @@ function ansichtenVerwerfen(bereich) {
   }));
 // Farb- und Icon-Wechsel wirken seitenuebergreifend – hier faellt weiterhin alles.
 window.addEventListener('muscledex:appearance-changed', () => ansichtsCache.clear());
+// Eine Seite, die mit neuem Auftrag geöffnet wird, muss neu aufgebaut werden:
+// "Mit Coach besprechen" übergibt dem Coach eine Frage. Aus dem Cache käme
+// die alte Coach-Ansicht, und die Frage würde nie gelesen.
+window.addEventListener('muscledex:ansicht-neu-aufbauen', (event) => ansichtsCache.delete(event.detail?.route));
 /* Frueher wurde bei jeder Rueckkehr in den Vordergrund der komplette Cache
    verworfen. Am Handy passiert das staendig (Nachricht lesen, Kamera, Anruf),
    und der Rueckweg kostete danach wieder ~200 ms statt ~25 ms.

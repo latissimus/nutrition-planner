@@ -169,6 +169,8 @@ async function rufeCoach(body) {
 // schickt er sie gleich ab ("Mit Coach besprechen"), sonst steht sie im Feld.
 export function openCoachQuestion({ scope = 'overall', question = '', senden = false } = {}) {
   sessionStorage.setItem(CONTEXT_KEY, JSON.stringify({ scope, question, senden }));
+  // Eine gemerkte Coach-Ansicht würde die Frage nie lesen (main.js).
+  window.dispatchEvent(new CustomEvent('muscledex:ansicht-neu-aufbauen', { detail: { route: 'coach' } }));
   location.hash = 'coach';
 }
 
