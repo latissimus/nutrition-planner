@@ -71,6 +71,20 @@ export function gedaechtnisIconMarkup(className = 'app-dex-gedaechtnis-icon') {
   return `<span class="${className} icon-originalfarben" aria-hidden="true">${gedaechtnisSvg}</span>`;
 }
 
+// Weitere Symbole aus SeitenIcons nach Dateiname (ohne .svg), etwa PLUS,
+// SENDEN oder ZURÜCK. Einmal aufbereitet und dann wiederverwendet.
+const seitenIcons = new Map();
+export function seitenIconMarkup(name, className = 'seiten-icon') {
+  const schluessel = String(name).normalize('NFC');
+  if (!seitenIcons.has(schluessel)) {
+    const eintrag = Object.entries(modules).find(([path]) => path.normalize('NFC').endsWith(`/${schluessel}.svg`));
+    const kennung = schluessel.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+    seitenIcons.set(schluessel, eintrag ? prefixInterneIds(eintrag[1], `mdxm-${kennung}-`) : '');
+  }
+  const svg = seitenIcons.get(schluessel);
+  return svg ? `<span class="${className} icon-originalfarben" aria-hidden="true">${svg}</span>` : '';
+}
+
 export function coachIconMarkup(className = 'coach-cap-icon') {
   if (!coachSvg) return '';
   return `<span class="${className} coach-cap-icon icon-originalfarben" aria-hidden="true">${coachSvg}</span>`;

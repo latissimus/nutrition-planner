@@ -7,6 +7,7 @@ import {
 } from './coachMemory.js';
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
 import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
+import { seitenIconMarkup } from './menuIcons.js';
 
 export { fensterMarkup };
 
@@ -216,10 +217,10 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
         <div class="coach-inputbar">
-          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch">+</button>
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch">${seitenIconMarkup('PLUS', 'coach-eingabe-icon')}</button>
           <label class="sr-only" for="coach-question">Nachricht an CAPBOY</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an CAPBOY">${escapeHtml(pending.question || '')}</textarea>
-          <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('play_arrow')}</button>
+          <button class="coach-send" type="submit" aria-label="Senden">${seitenIconMarkup('SENDEN', 'coach-eingabe-icon')}</button>
         </div>
       </div>
     </form>

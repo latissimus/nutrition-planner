@@ -41,7 +41,9 @@ import {
   collectionGridMarkup, collectionIconMarkup, deleteCollection, getCollection, loadCollections, openCollectionEditor,
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
-import { coachIconMarkup, gedaechtnisIconMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup } from './menuIcons.js';
+import {
+  coachIconMarkup, gedaechtnisIconMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup, seitenIconMarkup,
+} from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
@@ -778,8 +780,8 @@ function appDexShellZeichnen(route, view) {
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
         ${istCoach ? `
-        <a class="app-dex-coach-zurueck coach-kopf-knopf" href="#${route === 'coach-wissen' ? 'coach' : appLetzteDexRoute()}"
-           aria-label="${route === 'coach-wissen' ? 'Zurück zum Coach' : 'Zurück'}">${materialIconMarkup('arrow_back_ios')}</a>
+        <a class="app-dex-coach-zurueck" href="#${route === 'coach-wissen' ? 'coach' : appLetzteDexRoute()}"
+           aria-label="${route === 'coach-wissen' ? 'Zurück zum Coach' : 'Zurück'}">${seitenIconMarkup('ZURÜCK', 'app-dex-zurueck-icon')}</a>
         ${route === 'coach' ? `<a class="app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${gedaechtnisIconMarkup()}</a>` : ''}` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="CAPBOY Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
