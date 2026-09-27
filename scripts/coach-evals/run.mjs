@@ -1220,6 +1220,8 @@ function trockenlaufPrompt(fehler) {
   for (const feld of ['action', 'rationale', 'timeframe']) regel(feld in schema.properties.recommendations.items.properties, `Schema: Empfehlungsfeld ${feld} fehlt`);
   regel(JSON.stringify(schema.properties.recommendations.items.properties.targetMetric.enum) === JSON.stringify([...EXPERIMENT_METRIC_IDS, 'keine']), 'Schema: Zielgrößen weichen von experiments.ts ab');
   for (const id of EXPERIMENT_METRIC_IDS) regel(prompt.includes(id), `Prompt nennt die Zielgröße ${id} nicht`);
+  regel(prompt.includes('Incomplete logging counts as a confounder only when the target metric depends on the missing logs'), 'Experimentregel grenzt unvollständige Protokollierung nicht auf die Zielgröße ein');
+  regel(prompt.includes('Missing data in an unrelated domain never changes the verdict'), 'Experimentregel lässt fachfremde Datenlücken als Störgröße zu');
   // confidence muss genau die Werte des Schemas definieren.
   for (const stufe of produktion.resultSchema.properties.confidence.enum) regel(prompt.includes(`- "${stufe}":`), `definiert confidence "${stufe}" nicht`);
   // Kein Unterrichten auf die Testfälle: keine Fallfrage und keine
