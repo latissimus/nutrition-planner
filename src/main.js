@@ -780,9 +780,11 @@ function appDexShellZeichnen(route, view) {
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
         ${istCoach ? `
-        <a class="app-dex-coach-zurueck" href="#${route === 'coach-wissen' ? 'coach' : appLetzteDexRoute()}"
-           aria-label="${route === 'coach-wissen' ? 'Zurück zum Coach' : 'Zurück'}">${seitenIconMarkup('ZURÜCK', 'app-dex-zurueck-icon')}</a>
-        ${route === 'coach' ? `<a class="app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${gedaechtnisIconMarkup()}</a>` : ''}` : `
+        <a class="app-dex-coach app-dex-coach-zurueck" href="#${route === 'coach-wissen' ? 'coach' : appLetzteDexRoute()}"
+           aria-label="${route === 'coach-wissen' ? 'Zurück zum Coach' : 'Zurück'}">${seitenIconMarkup('ZURÜCK', 'app-dex-coach-icon app-dex-zurueck-icon')}</a>
+        ${route === 'coach'
+          ? `<a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>`
+          : '<span class="app-dex-search app-dex-platzhalter" aria-hidden="true"></span>'}` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="CAPBOY Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"

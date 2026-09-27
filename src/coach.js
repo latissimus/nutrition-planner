@@ -279,6 +279,10 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     plus.setAttribute('aria-expanded', String(offen));
   };
   plus.onclick = () => werkzeugeZeigen(tools.hidden);
+  // Ein Tipp irgendwo in den Chat schließt das Plus-Menü wieder.
+  container.addEventListener('click', (event) => {
+    if (!tools.hidden && !event.target.closest('[data-coach-form]')) werkzeugeZeigen(false);
+  });
   webOption.onchange = () => plus.classList.toggle('hat-web', webOption.checked);
   fileInput.onchange = async () => {
     try {

@@ -15070,18 +15070,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root{--muster-millimeter-hell:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 11.5H44M0 22.5H44M0 33.5H44M11.5 0V44M22.5 0V44M33.5 0V44' stroke='%23432C5E' stroke-opacity='.06' fill='none'/%3E%3Cpath d='M0 .5H44M.5 0V44' stroke='%23432C5E' stroke-opacity='.16' fill='none'/%3E%3C/svg%3E")}
 .coach-chat{--coach-violett:#432C5E;--coach-violett-hell:#6A53B8;--coach-lavendel:#C9BCF7;--coach-pink:var(--brand-pink,#FF69AE);--coach-rand:#111;--coach-schatten:#111;--coach-grund:#EFEBF7;--coach-muster:var(--muster-millimeter-hell)}
 /* Coach-Seiten: Der App-Kopf trägt das Violett der Eingabeleiste und zeigt
-   Zurück und Gedächtnis statt Coach und Suche (main.js). Der Seitengrund ist
-   zartes Lavendel mit Millimeterraster; dahinter, etwa rund um die
-   iOS-Leiste über der Tastatur, liegt ebenfalls das Violett der Eingabe. */
-:root[data-seite="coach"]:not([data-theme="dark"]),:root[data-seite="coach"]:not([data-theme="dark"]) body{background:#432C5E!important}
+   Zurück und Gedächtnis statt Coach und Suche, mit deren Klassen und damit an
+   derselben Stelle (main.js). Der Seitengrund ist zartes Lavendel mit
+   Millimeterraster; dahinter, etwa rund um die iOS-Leiste über der Tastatur,
+   liegt dasselbe Lavendel wie unter der Eingabe. */
+:root[data-seite="coach"]:not([data-theme="dark"]),:root[data-seite="coach"]:not([data-theme="dark"]) body{background:#EFEBF7!important}
 :root[data-seite="coach"][data-theme="dark"],:root[data-seite="coach"][data-theme="dark"] body{background:#101A2B!important}
 :root[data-seite="coach"]:not([data-theme="dark"]) #view{background-color:#EFEBF7!important;background-image:var(--muster-millimeter-hell)!important;background-repeat:repeat!important;background-attachment:fixed!important}
 :root[data-seite="coach"] .app-dex-header{--dex-ink:#fff;color:#fff;border-bottom-color:#111;transform:translateY(var(--coach-oben,0px))}
 :root[data-seite="coach"]:not([data-theme="dark"]) .app-dex-header{background-color:#432C5E!important}
 :root[data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
-.app-dex-coach-zurueck,.app-dex-gedaechtnis{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:50%;text-decoration:none}
-:is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon){display:block;width:30px;height:30px;line-height:0;filter:drop-shadow(0 1.5px 0 #000)}
+:is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon){display:block;line-height:0}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon)>svg{display:block;width:100%;height:100%}
+.app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #000)}
+.app-dex-platzhalter{visibility:hidden}
 .coach-shell.coach-chat{display:flex;flex-direction:column;gap:10px;width:min(100%,640px);min-height:100%;padding:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 12px) 12px calc(var(--coach-eingabe-h,72px) + var(--coach-tastatur,0px) + 18px)}
 .coach-shell.coach-chat.coach-gedaechtnis-seite{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
 .coach-kopf-knopf{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;padding:0;border:2px solid #111;border-radius:6px;background:#C9BCF7;color:#1d1533;text-decoration:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);cursor:pointer}
@@ -15175,10 +15177,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-inputbar textarea{box-sizing:border-box;width:100%;min-height:46px;max-height:120px;margin:0;padding:10px 11px;border:2px solid var(--coach-rand);border-radius:10px;resize:none;background:#fff;color:#111;font:600 16px/1.3 var(--tech);box-shadow:inset 0 2px 0 rgba(0,0,0,.12)}
 .coach-inputbar textarea::placeholder{color:#6b6480}
 .coach-plus,.coach-send{position:relative;display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:11px;background:none;box-shadow:none;cursor:pointer}
-.coach-eingabe-icon{display:block;width:34px;height:34px;line-height:0;filter:drop-shadow(0 2px 0 #000)}
+.coach-eingabe-icon{position:relative;display:block;width:26px;height:26px;line-height:0;filter:drop-shadow(0 2px 0 #000)}
 .coach-eingabe-icon>svg{display:block;width:100%;height:100%}
-.coach-plus[aria-expanded="true"]{background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 1.5px #fff}
-.coach-plus.hat-web::after{content:'';position:absolute;top:-4px;right:-4px;width:9px;height:9px;border:1.5px solid #111;border-radius:50%;background:#FFD400}
+.coach-plus.hat-web .coach-eingabe-icon::after{content:'';position:absolute;top:-4px;right:-5px;width:9px;height:9px;border:1.5px solid #111;border-radius:50%;background:#FFD400}
 .coach-send:disabled{opacity:.5;cursor:default}
 .coach-compose-tools{display:flex;flex-wrap:wrap;gap:7px}
 .coach-compose-tools[hidden]{display:none}
@@ -15205,7 +15206,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken.ist-wichtig,.coach-knopf.ist-wichtig){background:var(--coach-pink)!important;color:#111!important;-webkit-text-fill-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-kopf-knopf,.coach-merken) :is(.material-svg,svg,svg *){fill:currentColor!important;color:inherit!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-inputbar :is(button.coach-plus,button.coach-send){background:none!important;border:0!important;box-shadow:none!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-inputbar button.coach-plus[aria-expanded="true"]{background:rgba(255,255,255,.2)!important;box-shadow:inset 0 0 0 1.5px #fff!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-vorschlaege button,.coach-woche-chip span,.coach-werkzeug){background:#edf0f6!important;color:#111!important;-webkit-text-fill-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug :is(span,.material-svg,svg,svg *){color:#111!important;-webkit-text-fill-color:#111!important;fill:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug:has(input[type="checkbox"]:checked){background:#FFD400!important}
