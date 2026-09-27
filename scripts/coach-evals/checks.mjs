@@ -117,13 +117,14 @@ const FELD_EINHEITEN = [
   [/Percent$/, '%'],
   [/\.latestSkinfoldsMm\.|Mm$/, 'mm'],
   [/\.heightCm$|WaistCm$|ChangeCm$/, 'cm'],
-  [/\.calorieTarget$|\.averageKcal$/, 'kcal'],
-  [/\.average(Protein|Carbs|Fat)G$/, 'g'],
+  [/\.calorieTarget$|\.averageKcal$|\.targetKcal$|\.enteredKcal$|\.differenceKcal$|KcalOnPastDaysWithEntries$/, 'kcal'],
+  [/\.average(Protein|Carbs|Fat)G$|\.enteredProteinG$/, 'g'],
   [/DurationMinutes$/, 'min'],
   [/\.age$/, 'jahre'],
-  [/Measurements$|\.checkins$|\.completeDays$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$/, 'anzahl'],
+  [/Measurements$|\.checkins$|\.completeDays$|\.illnessDays$|\.importedValues$|\.comparableExercises$|\.completionsLast30Days$|\.trainingDays$|\.travelDays$|\.weeksWith\w+$|\.routines\.completions$|\.weeklyCompletions\.\d+$|\.totalCompletions$|\.sessions$|\.entries$|\.pastDaysWith(out)?Entries$/, 'anzahl'],
 ];
-const VERAENDERUNG = /TrendPercent$|ChangeKg$|ChangeMm$|ChangeCm$|ChangePercent$/;
+// Die Differenz zum Kalorienziel (recentDays) trägt wie eine Veränderung ein Vorzeichen.
+const VERAENDERUNG = /TrendPercent$|ChangeKg$|ChangeMm$|ChangeCm$|ChangePercent$|[dD]ifferenceKcal(OnPastDaysWithEntries)?$/;
 
 // Einheit im Text, direkt hinter der Zahl.
 const TEXT_EINHEITEN = [
@@ -191,13 +192,16 @@ const MESSGROESSEN = [
   [/\balter\b|jahre alt/i, /\.age$/],
   // Mit Wochenverlauf auch das Wochenmittel und die berechnete Veränderung.
   [/gewicht|wiegst|waage/i, /\.currentWeightKg$|\.weightTrendPercent$|\.averageWeightKg$|\.weightChangeKg$/],
-  [/(kalorien)?ziel|vorgabe|zielwert/i, /\.calorieTarget$/],
+  [/(kalorien)?ziel|vorgabe|zielwert|\bsoll\b/i, /\.calorieTarget$|\.targetKcal$/],
+  // Tageswerte der letzten Tage (recentDays): eingetragen, nicht unbedingt gegessen.
+  [/eingetragen\w*|einträge\w*/i, /\.enteredKcal$|\.enteredProteinG$|\.averageEnteredKcalOnPastDaysWithEntries$|\.entries$|\.pastDaysWith(out)?Entries$/],
+  [/differenz|abweichung/i, /[dD]ifferenceKcal(OnPastDaysWithEntries)?$/],
   // Zufuhr-Begriffe binden nur die Kalorien; Makros haben eigene Begriffe.
   [/(kalorien|energie)?zufuhr|(kalorien|energie)?aufnahme|kalorien(?!ziel)|gegessen|aufgenommen|\bisst\b/i, /\.averageKcal$/],
   // "Durchschnitt" bindet nur dort, wo es eindeutig ist: Kalorien und
   // Schlafdauer. Makros und Skalen haben je mehrere Durchschnittsfelder;
   // dort würde "Protein im Schnitt 80 g" sonst durch das Fett belegt.
-  [/\b(im )?(durch)?schnitt(lich\w*)?\b/i, /\.averageKcal$|\.averageDurationMinutes$/],
+  [/\b(im )?(durch)?schnitt(lich\w*)?\b/i, /\.averageKcal$|\.averageDurationMinutes$|\.average(Entered|Difference)KcalOnPastDaysWithEntries$/],
   [/protein|eiweiß/i, /\.averageProteinG$/],
   [/kohlenhydrat|\bkh\b/i, /\.averageCarbsG$/],
   [/(?<![a-zäöü])fett(?![a-zäöü])/i, /\.averageFatG$/],

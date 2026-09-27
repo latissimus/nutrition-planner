@@ -1377,7 +1377,23 @@ function trockenlaufZeitreihe(fehler) {
     [`${routine.name} wurde in der Woche ab ${woche.from.split('-').reverse().join('.')} ${erledigt}-mal erledigt`, true],
     [`${routine.name} wurde in der letzten Woche 99-mal erledigt`, false],
   ];
-  const alleProben = [...zahlenProben.map((probe) => [reise, ...probe]), ...zahlenProbenRekomposition.map((probe) => [rekomposition, ...probe])];
+  // Tageswerte der letzten zwölf Tage (recentDays), Fall Krankheit: Ziel
+  // 2400 kcal, am 15.09. eingetragen 1400 kcal (Differenz -1000 kcal), im
+  // Schnitt der vergangenen Tage 1918 kcal (Differenz -482 kcal) an 11 Tagen.
+  const krank = FAELLE_ZEITREIHE.find((fall) => fall.id === 'verlauf-krankheit');
+  const zahlenProbenTage = [
+    ['Am 15.09. eingetragen: 1400 kcal, Ziel 2400 kcal, Differenz −1000 kcal.', true],
+    ['Eingetragen im Schnitt: 1918 kcal an 11 Tagen mit Einträgen.', true],
+    ['Differenz zum Soll im Schnitt: −482 kcal.', true],
+    ['Eingetragen im Schnitt: 1950 kcal.', false],
+    ['Differenz zum Soll im Schnitt: −600 kcal.', false],
+    ['Einträge an 12 Tagen.', false],
+  ];
+  const alleProben = [
+    ...zahlenProben.map((probe) => [reise, ...probe]),
+    ...zahlenProbenRekomposition.map((probe) => [rekomposition, ...probe]),
+    ...zahlenProbenTage.map((probe) => [krank, ...probe]),
+  ];
   for (const [probeFall, satz, soll] of alleProben) {
     const ergebnis = pruefe(probeFall, { ...antwortMitSatz('facts', satz) }).find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
     if (ergebnis.bestanden !== soll) fehler.push(`Verlauf: „${satz}“ sollte ${soll ? 'bestehen' : 'auffallen'} (${ergebnis.detail})`);

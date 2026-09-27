@@ -35,6 +35,8 @@ export const FETCH_WINDOW_DAYS = TIMESERIES_WEEKS * 7;
 export const FACT_LIMITS = { weights: 90, skinfolds: 12, waists: 20, performance: 300, sleep: 42, checkins: 42 };
 // Each at most one request (PostgREST caps a request at 1000 rows).
 export const FETCH_LIMITS = { weights: 400, skinfolds: 40, waists: 60, performance: 1000, sleep: 120, checkins: 120 };
+// Days shown one by one with entered calories next to the target.
+export const RECENT_DAYS = 12;
 // At most this many exercises appear in the time series (most weeks with data first).
 const MAX_EXERCISES = 15;
 
@@ -384,8 +386,46 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
     ].filter(Boolean) as { date: string; type: string }[])
     .sort((a, b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type));
 
+  // The last RECENT_DAYS days, one by one: what was entered (not necessarily
+  // everything eaten) next to the current daily calorie target, with the
+  // difference computed here. Independent of the "complete day" marks, which
+  // the app no longer sets. The target is today's setting (custom target
+  // first, as in the app); earlier settings are not stored.
+  const target = number(rows.settings?.custom_calorie_target) || number(rows.settings?.adaptive_target) || null;
+  const recentDates = Array.from({ length: RECENT_DAYS }, (_, index) => plusDays(today, index - RECENT_DAYS + 1));
+  const recentEntries = new Map(recentDates.map((date) => [date, { kcal: 0, protein: 0, entries: 0 }]));
+  for (const row of rows.nutritionEntries) {
+    const day = recentEntries.get(String(row.log_date).slice(0, 10));
+    if (!day) continue;
+    day.kcal += number(row.energy_kcal);
+    day.protein += number(row.protein_g);
+    day.entries += 1;
+  }
+  const recentList = recentDates.map((date) => {
+    const day = recentEntries.get(date)!;
+    const enteredKcal = day.entries ? round(day.kcal, 0) : null;
+    return {
+      date,
+      today: date === today,
+      entries: day.entries,
+      enteredKcal,
+      enteredProteinG: day.entries ? round(day.protein, 0) : null,
+      differenceKcal: enteredKcal != null && target ? round(enteredKcal - target, 0) : null,
+    };
+  });
+  const loggedPastDays = recentList.filter((day) => day.entries && !day.today);
+  const averageEnteredKcal = round(mean(loggedPastDays.map((day) => day.enteredKcal!)), 0);
+
   return {
     window: { from: first, to: today, weeks },
+    recentDays: {
+      targetKcal: target,
+      days: recentList,
+      pastDaysWithEntries: loggedPastDays.length,
+      pastDaysWithoutEntries: recentList.filter((day) => !day.entries && !day.today).length,
+      averageEnteredKcalOnPastDaysWithEntries: averageEnteredKcal,
+      averageDifferenceKcalOnPastDaysWithEntries: averageEnteredKcal != null && target ? round(averageEnteredKcal - target, 0) : null,
+    },
     summary: {
       weightChangeKg: weight.change, weightChangeFromWeek: weight.fromWeek, weightChangeToWeek: weight.toWeek,
       skinfoldChangeMm: folds.change, skinfoldChangeFromWeek: folds.fromWeek, skinfoldChangeToWeek: folds.toWeek,
