@@ -1552,8 +1552,15 @@ function trockenlaufExperimente(fehler) {
   // zitiert werden, auch wenn die Messung anderes zeigt (Lauf vom 27.09.2026).
   const ohneWirkung = FAELLE_EXPERIMENTE.find((fall) => fall.id === 'experiment-ohne-wirkung');
   const fakt = (satz) => ({ ...antwort(), facts: [satz] });
+  probe(wirksam, fakt('Schlafqualität: 2 von 5 → 4 von 5, Veränderung +2 auf der Skala 1–5.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 2 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   probe(ohneWirkung, fakt('Schlafqualität: 3 von 5 in 2026-W35 und 3 von 5 in 2026-W38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  const ohneWirkungAntwort = (veraenderung) => antwort({
+    experimentReviews: [{ experimentId: 'exp-ohne-wirkung', verdict: 'nicht_wirksam', basis: `Schlafqualität: 3 von 5 (2026-W35) → 3 von 5 (2026-W38), Veränderung ${veraenderung}; Adhärenz: voll.`, decision: 'beenden' }],
+    recommendations: [empfehlung({ baseline: 'Schlafqualität 3 von 5 (2026-W38)' })],
+  });
+  probe(ohneWirkung, ohneWirkungAntwort(0), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', true);
+  probe(ohneWirkung, ohneWirkungAntwort(1), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', false);
   probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 4 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   probe(ohneWirkung, fakt('Ursprüngliche Notiz zum Ausgangswert der Schlafqualität: 2,5 von 5.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   probe(ohneWirkung, fakt('Schlafqualität zuletzt 2.'), 'Fakten enthalten nur gelieferte Zahlen', false);

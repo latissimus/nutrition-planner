@@ -384,6 +384,10 @@ export function textZahlen(text) {
     .replace(/\b(?:KW|Kalenderwoche)\s?\d{1,2}\b/gi, leer)
     // Uhrzeiten ("ab 22 Uhr", "22:30 Uhr") sind keine Messwerte.
     .replace(/\b\d{1,2}(?:[:.]\d{2})?\s?Uhr\b/g, leer)
+    // Explizit benannte Skalenbereiche ("auf der Skala 1–5") beschreiben
+    // nur das Messinstrument. Einzelne Skalenwerte wie "4 von 5" bleiben
+    // davon unberührt und werden weiterhin gegen die Daten geprüft.
+    .replace(/\bskala\s+\d+(?:[.,]\d+)?\s*[–-]\s*\d+(?:[.,]\d+)?\b/gi, leer)
     .replace(/\b\d{1,2}\.\d{1,2}\.(\d{2,4})?/g, leer)
     // "15. August", "26. September 2026", "September 2026".
     .replace(/\b\d{1,2}\.\s?(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)(\s\d{4}\b)?/gi, leer)
@@ -462,6 +466,14 @@ function skalenZitat(satz, eintrag, text) {
   return new RegExp(`(?<![\\d.,])${wert}\\s+von\\s+${skala[2]}(?![\\d.,]\\d)`).test(text);
 }
 
+function veraenderungsZitat(satz, eintrag, text) {
+  if (!text || eintrag.einheit !== 'ohne') return false;
+  const davor = satz.slice(Math.max(0, eintrag.position - 18), eintrag.position);
+  if (!/veränderung\s*:?\s*$/i.test(davor)) return false;
+  const wert = String(eintrag.zahl).replace('.', '[.,]');
+  return new RegExp(`veränderung\\s*:?\\s*[+−-]?\\s*${wert}(?![\\d.,])`, 'i').test(text);
+}
+
 // Liefert unbelegte Zahlen (Fehler) und Zahlen ohne erkennbare Messgröße
 // (Hinweise) aus dem Feld facts.
 export function zahlenBefund(fall, antwort) {
@@ -498,6 +510,10 @@ export function zahlenBefund(fall, antwort) {
       // als notierter Ausgangswert eines Experiments). Eine nackte Zahl
       // ("zuletzt 5") bleibt ungedeckt.
       if (eintrag.einheit === 'ohne' && skalenZitat(satz, eintrag, gedaechtnisText)) continue;
+      // Auch eine vom Server fertig berechnete unveränderte Differenz wird
+      // ohne Vorzeichen ausgegeben ("Veränderung 0"). Sie ist nur dann
+      // belegt, wenn genau dieser Veränderungswert im gelieferten Block steht.
+      if (veraenderungsZitat(satz, eintrag, gedaechtnisText)) continue;
       const befund = pruefeZahl(eintrag, felder, satz, beziehungsweise.has(eintrag) ? beziehungsweise.get(eintrag) : undefined);
       if (befund.grund) unbelegt.push(`${eintrag.text} (${befund.grund})`);
       else if (befund.ungebunden) ungebunden.push(eintrag.text);
