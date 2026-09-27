@@ -14603,7 +14603,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --muster-ziegel-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%23EDF0F6' stroke-opacity='.035' fill='none'/%3E%3C/svg%3E");
   --muster-rechteckwelle-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%23EDF0F6' stroke-opacity='.045' fill='none'/%3E%3C/svg%3E");
   --muster-kreuzchen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.065'%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='8' y='5' width='1' height='1'/%3E%3Crect x='6' y='6' width='2' height='2'/%3E%3Crect x='5' y='8' width='1' height='1'/%3E%3Crect x='8' y='8' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
-  --muster-tetris-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='30' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.018'%3E%3Crect x='8' y='9' width='5' height='5'/%3E%3Crect x='14' y='9' width='5' height='5'/%3E%3Crect x='20' y='9' width='5' height='5'/%3E%3Crect x='14' y='15' width='5' height='5'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-tetris-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='30' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.032'%3E%3Crect x='8' y='9' width='5' height='5'/%3E%3Crect x='14' y='9' width='5' height='5'/%3E%3Crect x='20' y='9' width='5' height='5'/%3E%3Crect x='14' y='15' width='5' height='5'/%3E%3C/g%3E%3C/svg%3E");
   --muster-millimeter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%23EDF0F6' stroke-opacity='.082' stroke-width='1' fill='none'/%3E%3C/svg%3E");
   --muster-punktraster-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%23EDF0F6' fill-opacity='.038'/%3E%3C/svg%3E");
   --muster-gitter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%23EDF0F6' stroke-opacity='.06' stroke-width='1' fill='none'/%3E%3C/svg%3E");
@@ -15244,7 +15244,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:400px){.coach-shell.coach-chat{padding-inline:8px}.coach-chat-window.is-coach{max-width:96%}.coach-chat-window.is-user{max-width:88%}}
 
 /* COMP details: no enclosing mega-card; every section is its own card. */
-.comp-details-list{display:grid;gap:10px}
+.comp-details-list{display:grid;gap:5px}
+.comp-details-list>.comp-detail-card+.comp-detail-card{margin-top:0!important}
 .comp-details-list>header{display:grid;gap:5px;padding:14px 30px 2px}.comp-details-list>header small{font:800 8px/1 var(--tech);letter-spacing:.08em}.comp-details-list>header h2{margin:0;font:850 20px/1 "Work Sans",var(--ui),sans-serif;letter-spacing:-.035em}
 .comp-detail-card{box-sizing:border-box;overflow:hidden;border:1.5px solid #111;border-radius:15px;background:var(--app-card,#fff);color:var(--text,#111)}
 .comp-detail-card>summary{display:grid;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:10px;min-height:62px;padding:12px 15px;cursor:pointer;list-style:none}.comp-detail-card>summary::-webkit-details-marker{display:none}.comp-detail-card>summary>span{display:grid;gap:4px}.comp-detail-card>summary b{font:820 15px/1.1 "Work Sans",var(--ui),sans-serif}.comp-detail-card>summary small{color:var(--muted);font:600 9px/1.3 var(--tech)}.comp-detail-card>summary>.material-svg{width:20px;height:20px;transition:transform .18s ease}.comp-detail-card[open]>summary>.material-svg{transform:rotate(90deg)}
@@ -15284,6 +15285,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .comp-optional li b{font:780 10.5px/1.35 var(--ui)}
 .comp-optional li span{font:520 10.5px/1.45 var(--tech)}
 .comp-optional li em{color:var(--muted);font:600 9px/1.3 var(--tech);font-style:normal}
+.comp-optional-doses{display:grid;gap:5px;margin-top:4px}
+.comp-optional-doses>span{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:7px 0;border-top:1px solid var(--app-divider,#ddd)}
+.comp-optional-doses>span b{font:760 10px/1.3 var(--ui)}
+.comp-optional-doses>span strong{font:800 9px/1.3 var(--tech);text-align:right}
+.comp-optional-doses>span small{grid-column:1/-1;color:var(--muted);font:600 8px/1.3 var(--tech);letter-spacing:0;text-transform:none}
 
 /* Aufklappmenüs in den Detailkarten: alle Überschriften gleich groß und
    bündig mit dem übrigen Inhalt. */

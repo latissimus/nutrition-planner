@@ -298,6 +298,14 @@ const compResultSchema = {
         required: ['actionId', 'action', 'rationale', 'timeframe'],
       },
     },
+    optionalInsights: {
+      type: 'array', maxItems: 2,
+      items: {
+        type: 'object', additionalProperties: false,
+        properties: { guidanceId: { type: 'string' }, summary: { type: 'string' } },
+        required: ['guidanceId', 'summary'],
+      },
+    },
     sources: {
       type: 'array', maxItems: 5,
       items: {
@@ -307,7 +315,7 @@ const compResultSchema = {
       },
     },
   },
-  required: ['title', 'status', 'confidence', 'keyDevelopment', 'basis', 'uncertainty', 'nextSteps', 'sources'],
+  required: ['title', 'status', 'confidence', 'keyDevelopment', 'basis', 'uncertainty', 'nextSteps', 'optionalInsights', 'sources'],
 };
 
 function webSources(response: Row) {
@@ -356,6 +364,17 @@ const FOLLOW_THROUGH_REASONS: Record<string, string> = {
   verbesserung: 'Dieser Wert liegt deutlich unter einem sinnvollen Ziel.',
 };
 
+function safeOptionalSummary(value: unknown, fallback: unknown) {
+  const summary = String(value || '').slice(0, 600);
+  // Dosierungen stammen ausschliesslich aus den autoritativen Regeldaten
+  // darunter. Nennt das Modell trotzdem eine Dosis, wird seine Formulierung
+  // vollstaendig verworfen statt nur teilweise bereinigt.
+  if (/\b\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?\s*(?:mg|µg|mcg|g|ml|i\.?e\.?|iu)\b/i.test(summary)) {
+    return String(fallback || 'Diese Seminar-Auswertung ergänzt das Gesamtbild als optionale Orientierung.').slice(0, 600);
+  }
+  return summary || String(fallback || 'Diese Seminar-Auswertung ergänzt das Gesamtbild als optionale Orientierung.').slice(0, 600);
+}
+
 function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null = null) {
   const allowed = new Map((evidence?.allowedActions || []).map((item: Row) => [item.id, item]));
   const steps = (result?.nextSteps || []).flatMap((step: Row) => {
@@ -381,6 +400,21 @@ function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null
     });
   }
   const nextSteps = steps.slice(0, 3);
+  const modelSummaries = new Map((result?.optionalInsights || []).map((item: Row) => [String(item.guidanceId || ''), String(item.summary || '').slice(0, 600)]));
+  const optionalInsights = (evidence?.optionalSeminarGuidance || []).slice(0, 2).map((item: Row) => ({
+    guidanceId: String(item.id || ''),
+    bereich: String(item.bereich || '').slice(0, 160),
+    titel: String(item.titel || '').slice(0, 160),
+    summary: safeOptionalSummary(modelSummaries.get(String(item.id || '')), item.zusammenhang),
+    punkte: (item.punkte || []).map(String).slice(0, 5),
+    dosierungen: (item.dosierungen || []).slice(0, 16).map((dose: Row) => ({
+      name: String(dose.name || '').slice(0, 160),
+      dosierung: String(dose.dosierung || '').slice(0, 240),
+      protokoll: String(dose.protokoll || '').slice(0, 200),
+      optional: dose.optional === true,
+    })),
+    karte: String(item.karte || '').slice(0, 120),
+  })).filter((item: Row) => item.guidanceId && (item.punkte.length || item.dosierungen.length));
   return {
     title: String(result?.title || 'Aktuelle Gesamtbewertung').slice(0, 120),
     status: String(result?.status || 'Gesamtbild noch unklar').slice(0, 72),
@@ -389,6 +423,7 @@ function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null
     basis: (result?.basis || []).map(String).slice(0, 4),
     uncertainty: (result?.uncertainty || []).map(String).slice(0, 3),
     nextSteps,
+    optionalInsights,
     sources: validateSources(result?.sources || []),
   };
 }
@@ -475,7 +510,9 @@ Deno.serve(async (request) => {
 
 Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.
 
-Betrachte alle Bereiche zusammen: Körpermaße, Ernährung, Schlaf, Erholung, Routinen und Training. Im Verlauf steht unter followThrough, was in den letzten 14 Tagen fehlt oder nicht umgesetzt wird, nach Wichtigkeit sortiert; die App hat das berechnet. Nenne diese Punkte in keyDevelopment, basis oder uncertainty und sag klar, was fehlt und warum es zählt, ohne Vorwurf. Gibt es solche Punkte, ist der erste nächste Schritt einer davon (actionId beginnt mit „umsetzung-“), in der Regel der erste der Liste: Fehlende Daten und fällige Messungen gehen neuen Maßnahmen vor, weil sich ohne sie nichts sicher beurteilen lässt. Schlage keine neue Änderung in einem Bereich vor, in dem schon ein Experiment läuft; ist eines fällig (reviewDue), nenne das.`,
+Betrachte alle Bereiche zusammen: Körpermaße, Ernährung, Schlaf, Erholung, Routinen und Training. Im Verlauf steht unter followThrough, was in den letzten 14 Tagen fehlt oder nicht umgesetzt wird, nach Wichtigkeit sortiert; die App hat das berechnet. Nenne diese Punkte in keyDevelopment, basis oder uncertainty und sag klar, was fehlt und warum es zählt, ohne Vorwurf. Gibt es solche Punkte, ist der erste nächste Schritt einer davon (actionId beginnt mit „umsetzung-“), in der Regel der erste der Liste: Fehlende Daten und fällige Messungen gehen neuen Maßnahmen vor, weil sich ohne sie nichts sicher beurteilen lässt. Schlage keine neue Änderung in einem Bereich vor, in dem schon ein Experiment läuft; ist eines fällig (reviewDue), nenne das.
+
+optionalSeminarGuidance enthält bereits regelbasiert ausgewählte Hinweise aus Hautfaltenmessung und Neurotransmitter-Test. Erstelle für jeden vorhandenen Eintrag genau ein optionalInsight mit derselben guidanceId und einer kurzen verständlichen Zusammenfassung, warum er im Gesamtbild relevant sein könnte. Diese Hinweise bleiben getrennt von nextSteps. Wiederhole keine Dosierung und erfinde keine: Namen und exakte Seminar-Dosierungen setzt der Server anschließend unverändert ein.`,
       input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nWöchentlicher Verlauf der letzten 12 Wochen (deterministisch, dieselbe Grundlage wie beim Coach; Veränderungen stehen in summary und werden nicht selbst berechnet):\n${JSON.stringify(timeseries)}\n\nLaufende Experimente:\n${runningExperiments || 'keine'}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(compEvidence)}` }],
       reasoning: { effort: 'high' },
       max_output_tokens: 6000,

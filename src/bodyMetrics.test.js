@@ -97,7 +97,7 @@ describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
       { text: 'Phase 1 ist dein aktueller Supplement-Schritt. Prüfe die aufgeführten Produkte.', source: 'seminar' },
       { text: 'Aus dieser Messung ergibt sich aktuell kein Supplement-Schritt.', source: 'app' },
     ] },
-    protocols: [{ name: 'YPSI Quadrizeps/Beinbizeps – Phase 1', supplemente: [{ slug: 'magnesium' }], optionale_supplemente: [] }],
+    protocols: [{ name: 'YPSI Quadrizeps/Beinbizeps – Phase 1', supplemente: [{ slug: 'magnesium', dosierung: '300 mg abends' }], optionale_supplemente: [] }],
   };
   const neurotransmitter = {
     complete: true,
@@ -107,15 +107,18 @@ describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
       seminarTraining: { intensitaet: 'niedrig bis moderat', volumen: 'niedrig bis moderat' },
       seminarSupplements: ['Taurin', 'Inositol', 'B-Vitamine', 'Glycin', 'L-Theanin'],
       seminarNote: 'Gewöhnliche GABA-Supplements erhöhen GABA nicht.',
+      supplements: [{ name: 'Taurin', dose: '500–1.000 mg', notiz: 'laut Dosierungstafel' }],
     } },
   };
 
-  it('übernimmt Supplemente des Hautfalten-Plans ohne Dosierung und ohne App- oder Verweissätze', () => {
+  it('übernimmt die exakten Seminar-Dosierungen des Hautfalten-Plans und keine App- oder Verweissätze', () => {
     const [falten] = compOptionaleSchritte({ actionPlan, faltenLabel: 'Beinbizeps' });
     expect(falten.bereich).toBe('Hautfalten · Beinbizeps');
-    expect(falten.punkte[0]).toMatch(/^Quadrizeps\/Beinbizeps – Phase 1: /);
     expect(falten.punkte).toContain('B-Vitamine nur unter Berücksichtigung der Gesamtzufuhr ergänzen.');
     expect(falten.punkte.join(' ')).not.toMatch(/Phase 1 ist dein|kein Supplement-Schritt/);
+    expect(falten.dosierungen).toEqual([expect.objectContaining({
+      name: 'Magnesium', dosierung: '300 mg abends', protokoll: 'Quadrizeps/Beinbizeps – Phase 1', optional: false,
+    })]);
     expect(falten.karte).toBe('Hautfalten');
   });
 
@@ -127,6 +130,7 @@ describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
       'Supplemente: Taurin, Inositol, B-Vitamine, Glycin',
       'Gewöhnliche GABA-Supplements erhöhen GABA nicht.',
     ]);
+    expect(nt.dosierungen).toEqual([expect.objectContaining({ name: 'Taurin', dosierung: '500–1.000 mg', optional: true })]);
     expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, relevant: [] } })).toEqual([]);
     expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, complete: false } })).toEqual([]);
     expect(compOptionaleSchritte({})).toEqual([]);

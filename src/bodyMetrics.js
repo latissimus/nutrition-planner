@@ -809,22 +809,39 @@ function bodyCompMarkup(state) {
   </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
 }
 
-// Optionale Schritte unter der KI-Bewertung: die Supplement-Hinweise des
-// Hautfalten-Plans und die Empfehlungen des Neurotransmitter-Tests. Sie
-// kommen aus den Seminar-Auswertungen der App, nicht von der KI, und ohne
-// Dosierungen; die stehen mit allen Details weiter in den jeweiligen Karten.
+// Optionale Schritte unter der KI-Bewertung: Die Auswahl samt Dosierungen
+// kommt deterministisch aus den Seminar-Auswertungen. Die zentrale KI darf
+// spaeter nur die Bedeutung zusammenfassen; Namen und Dosen bleiben dadurch
+// unveraendert und koennen nicht halluziniert werden.
 export function compOptionaleSchritte({ actionPlan = null, faltenLabel = '', neurotransmitter = null } = {}) {
   const schritte = [];
   // Der Satz "Phase n ist dein aktueller Supplement-Schritt ..." verweist auf
   // die Produkte der Karte; hier nennt die Protokollzeile sie selbst.
   const supplemente = (actionPlan?.categories?.supplements || [])
     .filter((item) => item.source !== 'app' && !/^Phase \d/.test(item.text)).map((item) => item.text);
-  const protokolle = (actionPlan?.protocols || []).map((protocol) => {
-    const namen = [...(protocol.supplemente || []), ...(protocol.optionale_supplemente || [])].map((item) => supplementName(item.slug));
-    return `${String(protocol.name || '').replace(/^YPSI\s+/i, '')}${namen.length ? `: ${namen.join(', ')}` : ''}`;
-  });
-  if (supplemente.length || protokolle.length) {
-    schritte.push({ bereich: `Hautfalten${faltenLabel ? ` · ${faltenLabel}` : ''}`, titel: 'Supplemente laut Seminar', punkte: [...protokolle, ...supplemente].slice(0, 3), karte: 'Hautfalten' });
+  const dosierungen = (actionPlan?.protocols || []).flatMap((protocol, protocolIndex) => (
+    [
+      ...(protocol.supplemente || []).map((item) => ({ ...item, optional: false })),
+      ...(protocol.optionale_supplemente || []).map((item) => ({ ...item, optional: true })),
+    ].map((item, itemIndex) => ({
+      id: `hautfalten-${protocolIndex + 1}-${itemIndex + 1}`,
+      protokoll: String(protocol.name || '').replace(/^YPSI\s+/i, ''),
+      name: supplementName(item.slug),
+      dosierung: item.dosierung || '',
+      optional: item.optional,
+      hinweis: item.notiz || '',
+    }))
+  ));
+  if (supplemente.length || dosierungen.length) {
+    schritte.push({
+      id: 'hautfalten',
+      bereich: `Hautfalten${faltenLabel ? ` · ${faltenLabel}` : ''}`,
+      titel: 'Supplemente laut Seminar',
+      zusammenhang: actionPlan?.summary || '',
+      punkte: supplemente.slice(0, 3),
+      dosierungen,
+      karte: 'Hautfalten',
+    });
   }
   const fokus = neurotransmitter?.complete && neurotransmitter.relevant?.length ? neurotransmitter.focus : null;
   if (fokus) {
@@ -837,7 +854,23 @@ export function compOptionaleSchritte({ actionPlan = null, faltenLabel = '', neu
       r.seminarSupplements?.length ? `Supplemente: ${r.seminarSupplements.slice(0, 4).join(', ')}` : '',
       r.seminarNote || '',
     ].filter(Boolean);
-    if (punkte.length) schritte.push({ bereich: `Neurotransmitter · ${fokus.area?.label || fokus.key} (${fokus.severity?.label || ''})`.replace(' ()', ''), titel: 'Empfehlungen laut Seminar', punkte, karte: 'Neurotransmitter-Profil' });
+    const dosierungen = (r.supplements || []).filter((item) => item.name && item.dose).map((item, index) => ({
+      id: `neurotransmitter-${index + 1}`,
+      protokoll: fokus.area?.label || fokus.key,
+      name: item.name,
+      dosierung: item.dose,
+      optional: true,
+      hinweis: item.notiz || '',
+    }));
+    if (punkte.length || dosierungen.length) schritte.push({
+      id: 'neurotransmitter',
+      bereich: `Neurotransmitter · ${fokus.area?.label || fokus.key} (${fokus.severity?.label || ''})`.replace(' ()', ''),
+      titel: 'Empfehlungen laut Seminar',
+      zusammenhang: `Der Testschwerpunkt liegt bei ${fokus.area?.label || fokus.key}.`,
+      punkte,
+      dosierungen,
+      karte: 'Neurotransmitter-Profil',
+    });
   }
   return schritte;
 }
@@ -862,9 +895,10 @@ function optionaleSchritteFuer(state) {
 
 function compOptionalMarkup(schritte = []) {
   if (!schritte.length) return '';
+  const kiZusammenfassung = schritte.some((schritt) => schritt.summary);
   return `<section class="comp-optional"><h3>Optional</h3>
-    <p>Aus deinen Seminar-Auswertungen, nicht von der KI und nicht unabhängig geprüft. Supplemente nur nach fachlicher Prüfung.</p>
-    <ul>${schritte.map((schritt) => `<li><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b>${schritt.punkte.map((punkt) => `<span>${escapeHtml(punkt)}</span>`).join('')}<em>Details und Dosierungen in der Karte „${escapeHtml(schritt.karte)}“</em></li>`).join('')}</ul>
+    <p>${kiZusammenfassung ? 'Die KI fasst den Zusammenhang zusammen. ' : ''}Auswahl und Dosierungen werden unverändert aus dem Seminarwissen übernommen.</p>
+    <ul>${schritte.map((schritt) => `<li><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b>${schritt.summary ? `<span>${escapeHtml(schritt.summary)}</span>` : ''}${(schritt.punkte || []).map((punkt) => `<span>${escapeHtml(punkt)}</span>`).join('')}${schritt.dosierungen?.length ? `<div class="comp-optional-doses">${schritt.dosierungen.map((item) => `<span><b>${escapeHtml(item.name)}${item.optional ? ' · optional' : ''}</b><strong>${escapeHtml(item.dosierung || 'Keine Dosierung hinterlegt')}</strong>${item.protokoll ? `<small>${escapeHtml(item.protokoll)}</small>` : ''}</span>`).join('')}</div>` : ''}<em>Seminarwissen · Details in „${escapeHtml(schritt.karte)}“</em></li>`).join('')}</ul>
   </section>`;
 }
 
@@ -921,12 +955,13 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const sequence = ++assessmentSequence;
     try {
       const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
+      const optionaleSchritte = optionaleSchritteFuer(state);
       const [response] = await Promise.all([
-        requestCompAssessment(buildCompEvidence(state, context)),
+        requestCompAssessment(buildCompEvidence(state, context, optionaleSchritte)),
         new Promise((resolve) => setTimeout(resolve, 3000)),
       ]);
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      panel.innerHTML = compResultMarkup(response.result, response.cached === true, optionaleSchritteFuer(state));
+      panel.innerHTML = compResultMarkup(response.result, response.cached === true, response.result?.optionalInsights || optionaleSchritte);
       panel.querySelector('[data-comp-coach]')?.addEventListener('click', async () => {
         const { openCoachQuestion } = await import('./coach.js');
         openCoachQuestion({ question: compCoachFrage(response.result), senden: true });

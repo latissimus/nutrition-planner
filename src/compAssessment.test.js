@@ -21,7 +21,8 @@ const baseState = () => ({
 
 describe('zentrale COMP-Evidenz', () => {
   it('liefert ausschließlich berechnete Fakten und feste Sicherheitsgrenzen', () => {
-    const evidence = buildCompEvidence(baseState(), {});
+    const optional = [{ id: 'hautfalten', dosierungen: [{ name: 'Magnesium', dosierung: '300 mg' }] }];
+    const evidence = buildCompEvidence(baseState(), {}, optional);
     expect(evidence.calculationVersion).toBe('comp-central-v1');
     expect(evidence.objectiveFacts.weight.currentKg).toBe(89);
     expect(evidence.objectiveFacts.waist.confirmedChangeCm).toBe(-1);
@@ -30,6 +31,7 @@ describe('zentrale COMP-Evidenz', () => {
     expect(evidence.safetyBoundaries.automaticGoalChangesAllowed).toBe(false);
     expect(evidence.safetyBoundaries.supplementDosagesFromModelAllowed).toBe(false);
     expect(evidence.allowedActions).toEqual([]);
+    expect(evidence.optionalSeminarGuidance).toBe(optional);
   });
 });
 

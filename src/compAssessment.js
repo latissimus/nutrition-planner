@@ -43,7 +43,7 @@ function allowedActions(plan) {
   )).slice(0, 18);
 }
 
-export function buildCompEvidence(state, context = {}) {
+export function buildCompEvidence(state, context = {}, optionalSeminarGuidance = []) {
   const completeSkinfolds = state.skinfolds.filter((row) => completeFolds(row.falten));
   const latestSkinfold = completeSkinfolds.at(-1) || null;
   const previousSkinfold = completeSkinfolds.at(-2) || null;
@@ -150,6 +150,11 @@ export function buildCompEvidence(state, context = {}) {
       summary: actionPlan?.summary || null,
       unansweredQuestionIds: actionPlan?.unansweredQuestionIds || [],
     },
+    // Diese Empfehlungen wurden bereits deterministisch aus den lokalen
+    // Seminarregeln abgeleitet. Das Modell darf nur den Zusammenhang kurz
+    // erklaeren; Namen und Dosierungen werden serverseitig unveraendert aus
+    // diesem Block in die Antwort eingesetzt.
+    optionalSeminarGuidance,
     allowedActions: allowedActions(actionPlan),
     safetyBoundaries: {
       diagnosesAllowed: false,
