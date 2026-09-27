@@ -14899,6 +14899,37 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-web-option{display:grid!important;grid-template-columns:22px minmax(0,1fr);align-items:start;gap:9px;padding:10px;border:1px solid var(--app-divider);border-radius:10px;background:var(--app-field);cursor:pointer;letter-spacing:0!important}.coach-web-option input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--text)}.coach-web-option span{display:grid;gap:3px}.coach-web-option b{font:750 11px/1.25 var(--ui)}.coach-web-option small{color:var(--muted);font:550 9px/1.4 var(--tech)}
 .coach-scope-note{color:var(--muted);font:600 9px/1.45 var(--tech);text-align:center}
 .coach-answer{display:grid;gap:10px;margin-top:14px}
+/* Coach-Gedächtnis (Schritt 5): laufendes Gespräch, Maßnahme merken und die
+   Seite „Was CAPBOY über mich weiß“. Nutzt die Flächen der Coach-Seite. */
+.coach-gespraech-leiste{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.coach-gespraech-leiste .btn[hidden]{display:none}.coach-gespraech-leiste .btn{min-height:0;padding:7px 12px;font-size:11px}
+.coach-gedaechtnis-link{color:var(--text);font:700 10px/1.3 var(--tech);text-decoration:underline;text-underline-offset:3px}
+.coach-verlauf{padding:10px 12px;border:1px dashed var(--app-divider);border-radius:11px;background:var(--app-card)}
+.coach-verlauf summary{cursor:pointer;color:var(--muted);font:700 10px/1.4 var(--tech)}
+.coach-verlauf ol{display:grid;gap:10px;margin:10px 0 0;padding:0;list-style:none}
+.coach-verlauf li{display:grid;gap:3px;padding-top:10px;border-top:1px solid var(--app-divider)}
+.coach-verlauf small,.gedaechtnis-verlauf small{color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.06em}
+.coach-verlauf p,.gedaechtnis-verlauf p{margin:0;font-size:12px;line-height:1.45}
+.coach-merken{justify-self:start;margin-top:4px;padding:6px 10px!important;font-size:10px!important}
+.gedaechtnis-inhalt{display:grid;gap:12px}
+.gedaechtnis-bereich{display:grid;gap:10px}
+.gedaechtnis-hinweis,.gedaechtnis-leer{margin:0;color:var(--muted);font:550 10px/1.45 var(--tech)}
+.gedaechtnis-liste{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.gedaechtnis-eintrag{display:grid;gap:5px;padding:11px;border-radius:10px;background:var(--app-field)}
+.gedaechtnis-eintrag p{margin:0;font-size:12px;line-height:1.45}
+.gedaechtnis-eintrag>small{color:var(--muted);font:550 9px/1.4 var(--tech)}
+.gedaechtnis-eintrag summary{display:grid;gap:3px;cursor:pointer}.gedaechtnis-eintrag summary b{font-size:12px}.gedaechtnis-eintrag summary small{color:var(--muted);font:550 9px/1.4 var(--tech)}
+.gedaechtnis-ergebnis{color:var(--muted)}
+.gedaechtnis-chip{justify-self:start;padding:4px 7px;border:1px solid currentColor;border-radius:999px;color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.05em}
+.gedaechtnis-aktionen{display:flex;flex-wrap:wrap;gap:6px}.gedaechtnis-aktionen .btn{padding:6px 10px;font-size:10px}
+.gedaechtnis-formular{display:grid;gap:8px;padding:11px;border:1px solid var(--app-divider);border-radius:10px;background:var(--app-card)}
+.gedaechtnis-formular label{display:grid;gap:4px;font:700 10px/1.3 var(--tech)}
+.gedaechtnis-formular :is(input,select,textarea){width:100%;box-sizing:border-box;padding:8px;border:1px solid var(--app-divider);border-radius:8px;background:var(--app-field);color:var(--text);font-family:var(--ui);font-weight:500;letter-spacing:0;text-transform:none}
+.gedaechtnis-formular textarea{font-size:13px;line-height:1.45}
+.gedaechtnis-zeile{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.gedaechtnis-zeile label,.gedaechtnis-formular :is(input,select,textarea){min-width:0;max-width:100%}
+.gedaechtnis-bereich>.btn{justify-self:start;min-height:0;padding:8px 12px;font-size:11px}
+.gedaechtnis-verlauf{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.gedaechtnis-verlauf li{display:grid;gap:3px;padding:8px;border-radius:8px;background:var(--app-card)}
 .coach-web-sources ul{padding-left:0!important;list-style:none}.coach-web-sources a{display:block;color:inherit;font:650 10.5px/1.4 var(--ui);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}.coach-web-sources a:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:2px}
 :root[data-seite="coach"] .app-dex-dock{display:none!important}
 

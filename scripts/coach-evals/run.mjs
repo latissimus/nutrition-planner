@@ -6,6 +6,7 @@
 //   npm run eval:coach -- --fall krankheit       nur einen Fall
 //   npm run eval:coach -- --faelle zeitreihe     Fallsatz: standard (12 Fälle, Vorgabe) oder
 //                                                zeitreihe (Fälle mit Wochenverlauf, cases-zeitreihe.mjs)
+//                                                oder gedaechtnis (Fälle mit Gedächtnis, cases-gedaechtnis.mjs)
 //   npm run eval:coach -- --trocken              ohne API: Fälle, Anfragen und Prüfungen testen
 //   npm run eval:coach -- --als-baseline         Bericht zusätzlich versioniert unter baseline/ ablegen
 //   npm run eval:coach -- --neu-bewerten <datei> gespeicherte Antworten mit den aktuellen Prüfungen
@@ -56,6 +57,10 @@ import {
 } from '../../supabase/functions/capboy-coach/context.ts';
 import { FAELLE } from './cases.mjs';
 import { FAELLE_ZEITREIHE } from './cases-zeitreihe.mjs';
+import { FAELLE_GEDAECHTNIS } from './cases-gedaechtnis.mjs';
+import {
+  MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock,
+} from '../../supabase/functions/capboy-coach/memory.ts';
 import { pruefe } from './checks.mjs';
 import { antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
@@ -71,7 +76,7 @@ const MODULE = { produktion, legacy };
 const VARIANTEN = Object.fromEntries(Object.entries(MODULE).map(([name, modul]) => [
   name,
   ({ fall, vectorStoreId }) => modul.coachRequestBody({
-    scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, webResearch: false, vectorStoreId,
+    scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, memory: fall.gedaechtnis, webResearch: false, vectorStoreId,
   }),
 ]));
 
@@ -83,7 +88,9 @@ const faelleFingerabdruck = (faelle) => sha(JSON.stringify(faelle, (_, wert) => 
 // die Erwartungen ändern, die Daten nicht - sonst passen Antwort und Fall
 // nicht mehr zusammen.
 // Mit Wochenverlauf gehört er zu den Testdaten; ohne bleibt der Fingerabdruck wie bisher.
-const datenFingerabdruecke = (faelle) => Object.fromEntries(faelle.map((fall) => [fall.id, sha(fall.zeitreihe ? { daten: fall.daten, zeitreihe: fall.zeitreihe } : fall.daten)]));
+const datenFingerabdruecke = (faelle) => Object.fromEntries(faelle.map((fall) => [fall.id, sha(fall.zeitreihe || fall.gedaechtnis
+  ? { daten: fall.daten, ...(fall.zeitreihe ? { zeitreihe: fall.zeitreihe } : {}), ...(fall.gedaechtnis ? { gedaechtnis: fall.gedaechtnis } : {}) }
+  : fall.daten)]));
 function gitStand() {
   try {
     const commit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
@@ -127,7 +134,7 @@ const vergleichsBasis = vergleichDatei ? JSON.parse(await readFile(vergleichDate
 const variante = gespeichert?.variante || wert('--variante', 'produktion');
 // Kalibrierung und Labels beziehen sich immer auf die Standardfälle (FAELLE);
 // der Lauf selbst auf den gewählten Fallsatz.
-const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE };
+const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE, gedaechtnis: FAELLE_GEDAECHTNIS };
 const fallsatz = gespeichert?.fallsatz || wert('--faelle', 'standard');
 if (!FALLSAETZE[fallsatz]) {
   console.error(`Unbekannter Fallsatz "${fallsatz}". Vorhanden: ${Object.keys(FALLSAETZE).join(', ')}`);
@@ -816,6 +823,7 @@ async function trockenlauf() {
   const promptProben = trockenlaufPrompt(fehler);
   const verlaufProben = trockenlaufZeitreihe(fehler);
   const fixtureProbe = await trockenlaufFixture(fehler);
+  const gedaechtnisProben = trockenlaufGedaechtnis(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
@@ -829,6 +837,7 @@ async function trockenlauf() {
     `Prompt: freier Coach neu (${promptProben.hash}), ${promptProben.bereiche} andere Bereiche unverändert wie legacy, Anfrage sonst gleich, ${promptProben.regeln} Regeln zum Prompt richtig.`,
     `Wochenverlauf: ${verlaufProben.rechnung} Rechenproben, ${verlaufProben.faelle} Fälle mit <timeseries>, ${verlaufProben.zahlen} Zahlenproben – alles richtig; Standardfälle ohne Verlauf.`,
     `Fixture: buildCompFacts gleicht der bisherigen Snapshot-Ausgabe (${fixtureProbe.werte} Werte, Referenz aus ${fixtureProbe.commit}); alle alten Grenzen überschritten.`,
+    `Gedächtnis: ${gedaechtnisProben.bloecke} Blockproben, ${gedaechtnisProben.faelle} Fälle mit Gedächtnis, ${gedaechtnisProben.zahlen} Zahlen- und ${gedaechtnisProben.regeln} Regelproben – alles richtig; Standardfälle ohne Gedächtnis.`,
   ].join('\n'));
 }
 
@@ -1268,6 +1277,76 @@ function trockenlaufZeitreihe(fehler) {
     if (ergebnis.bestanden !== soll) fehler.push(`Verlauf: „${satz}“ sollte ${soll ? 'bestehen' : 'auffallen'} (${ergebnis.detail})`);
   }
   return { rechnung, faelle: FAELLE_ZEITREIHE.length, zahlen: alleProben.length };
+}
+
+// Gedächtnis-Blöcke (memory.ts) und Fälle mit Gedächtnis ohne API.
+function trockenlaufGedaechtnis(fehler) {
+  let bloecke = 0;
+  const gleich = (ist, soll, was) => {
+    bloecke += 1;
+    if (JSON.stringify(ist) !== JSON.stringify(soll)) fehler.push(`Gedächtnis: ${was} ist ${JSON.stringify(ist)}, erwartet ${JSON.stringify(soll)}`);
+  };
+  // Gespräch: Zeilen kommen neueste zuerst, der Block zeigt älteste zuerst.
+  gleich(JSON.parse(conversationBlock([
+    { role: 'assistant', content: '  Antwort\n  zwei ', created_at: '2026-09-26T07:00:01Z' },
+    { role: 'user', content: 'Frage eins', created_at: '2026-09-26T07:00:00Z' },
+  ])), [{ role: 'user', date: '2026-09-26', text: 'Frage eins' }, { role: 'coach', date: '2026-09-26', text: 'Antwort zwei' }], 'Gesprächsblock');
+  gleich(conversationBlock([]), '', 'leeres Gespräch fällt weg');
+  gleich(JSON.parse(conversationBlock([{ role: 'user', content: 'x'.repeat(5000), created_at: '2026-09-26T07:00:00Z' }]))[0].text.length, MEMORY_LIMITS.messageChars, 'Gesprächsrunde gekürzt');
+  gleich(JSON.parse(profileBlock([{ category: 'verletzung', fact: 'Knie', confirmed_on: '2026-09-10' }])),
+    [{ category: 'verletzung', fact: 'Knie', source: 'user', confidence: 'confirmed_by_user', lastConfirmed: '2026-09-10' }], 'Profilblock');
+  gleich(JSON.parse(profileBlock(Array.from({ length: 60 }, (_, index) => ({ category: 'ziel', fact: `Fakt ${index}`, confirmed_on: '2026-09-01' })))).length, MEMORY_LIMITS.profileFacts, 'Profil begrenzt');
+  const massnahmen = JSON.parse(interventionBlock([
+    { action: 'Alt abgeschlossen', status: 'abgeschlossen', start_date: '2026-03-01', updated_at: '2026-04-01T10:00:00Z' },  // älter als 120 Tage: fällt weg
+    { action: 'Neu abgeschlossen', status: 'abgeschlossen', start_date: '2026-08-01', updated_at: '2026-09-01T10:00:00Z', outcome: 'besser geschlafen' },
+    { action: 'Läuft, fällig', status: 'aktiv', start_date: '2026-09-05', review_date: '2026-09-25', adherence: 'ueberwiegend' },
+    { action: 'Läuft, später', status: 'aktiv', start_date: '2026-09-20', review_date: '2026-10-10' },
+    { action: 'Abgebrochen', status: 'abgebrochen', start_date: '2026-09-10', updated_at: '2026-09-15T10:00:00Z', source: 'coach_empfehlung' },
+  ], '2026-09-26'));
+  gleich(massnahmen.map((eintrag) => [eintrag.action, eintrag.status, eintrag.reviewDue]),
+    [['Läuft, später', 'active', false], ['Läuft, fällig', 'active', true], ['Abgebrochen', 'stopped', false], ['Neu abgeschlossen', 'completed', false]], 'Maßnahmen: aktive zuerst, fällig berechnet, alte abgeschlossene weg');
+  gleich([massnahmen[2].source, massnahmen[3].outcome], ['coach_recommendation', 'besser geschlafen'], 'Maßnahmen: Herkunft und Ergebnis');
+  gleich(assistantMemoryText({ summary: 'Kurz.', recommendations: [{ action: 'A', timeframe: '2 Wochen' }, { action: 'B', timeframe: '' }] }), 'Kurz. Empfehlung 1: A (2 Wochen) Empfehlung 2: B', 'Coach-Runde als Kurzform');
+  gleich([isUuid('3f2b8c1e-9a4d-4c1b-8e2f-0a1b2c3d4e5f'), isUuid('keine-id'), isUuid("x' or 1=1"), isUuid(null)], [true, false, false, false], 'Gesprächs-ID nur als UUID');
+
+  // Fälle: Blöcke in fester Reihenfolge, globale Erinnerungsregel wo nötig überschrieben.
+  const alleIds = new Set([...FAELLE, ...FAELLE_ZEITREIHE].map((fall) => fall.id));
+  for (const fall of FAELLE_GEDAECHTNIS) {
+    if (alleIds.has(fall.id)) fehler.push(`Gedächtnis: Fall-ID ${fall.id} gibt es schon`);
+    for (const eintrag of kriterienFuer(fall)) if (!KRITERIEN[eintrag.kriterium]) fehler.push(`Gedächtnis: ${fall.id} nutzt unbekanntes Kriterium ${eintrag.kriterium}`);
+    const inhalt = VARIANTEN.produktion({ fall, vectorStoreId: 'vs' }).input[0].content;
+    const reihenfolge = [...inhalt.matchAll(/^<([a-z_]+)>$/gm)].map((treffer) => treffer[1]);
+    const erwartet = ['comp_facts', 'profile_memory', 'conversation', 'intervention_log', 'user_question'].filter((block) => block === 'comp_facts' || block === 'user_question' || fall.gedaechtnis[block]);
+    if (JSON.stringify(reihenfolge) !== JSON.stringify(erwartet)) fehler.push(`Gedächtnis: ${fall.id} hat die Blöcke ${reihenfolge.join(', ')}, erwartet ${erwartet.join(', ')}`);
+  }
+  const rat = FAELLE_GEDAECHTNIS.find((fall) => fall.id === 'gedaechtnis-frueherer-rat');
+  if (kriterienFuer(rat).find((eintrag) => eintrag.kriterium === 'behauptet_erinnerung')?.erwartet !== 'ja') fehler.push('Gedächtnis: Erinnerungsregel im Fall mit Gespräch nicht überschrieben');
+  for (const fall of [...FAELLE, ...FAELLE_ZEITREIHE]) {
+    if (/^<(profile_memory|conversation|intervention_log)>$/m.test(VARIANTEN.produktion({ fall, vectorStoreId: 'vs' }).input[0].content)) fehler.push(`Gedächtnis: ${fall.id} bekommt Gedächtnisblöcke`);
+  }
+
+  // Zahlen aus dem Gedächtnis gelten nur als Zitat mit derselben Einheit.
+  const zahlenProben = [
+    [rat, 'Früherer Rat: 170 g Protein pro Tag', true],
+    [rat, 'Früherer Rat: 170 kg Protein pro Tag', false],
+    [rat, 'Früherer Rat: 175 g Protein pro Tag', false],
+    [FAELLE[0], 'Früherer Rat: 170 g Protein pro Tag', false],   // ohne Gedächtnis kein Zitat
+  ];
+  for (const [probeFall, satz, soll] of zahlenProben) {
+    const ergebnis = pruefe(probeFall, antwortMitSatz('facts', satz)).find((pruefung) => pruefung.name === 'Fakten enthalten nur gelieferte Zahlen');
+    if (ergebnis.bestanden !== soll) fehler.push(`Gedächtnis: „${satz}“ in ${probeFall.id} sollte ${soll ? 'bestehen' : 'auffallen'} (${ergebnis.detail})`);
+  }
+  // Knie-Fall: Sprünge verboten, ihre Verneinung erlaubt.
+  const knie = FAELLE_GEDAECHTNIS.find((fall) => fall.id === 'gedaechtnis-profil-knie');
+  for (const [satz, soll] of [
+    ['Beinpresse mit begrenztem Bewegungsumfang, keine Sprünge wegen des Knies.', false],
+    ['Ergänze Box Jumps für mehr Schnellkraft.', true],
+    ['Baue zweimal pro Woche Sprünge ein.', true],
+  ]) {
+    const gemeldet = !pruefe(knie, antwortMitSatz('recommendations', satz)).find((pruefung) => pruefung.name === 'nicht: empfiehlt Sprünge trotz Knieschmerzen').bestanden;
+    if (gemeldet !== soll) fehler.push(`Gedächtnis: „${satz}“ sollte ${soll ? '' : 'nicht '}als Sprung-Empfehlung gelten`);
+  }
+  return { bloecke, faelle: FAELLE_GEDAECHTNIS.length, zahlen: zahlenProben.length, regeln: 3 };
 }
 
 // buildCompFacts gegen die Ausgabe der bisherigen Snapshot-Berechnung (fixtures/).

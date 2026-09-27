@@ -29,7 +29,16 @@ export const EXPORT_TABLES = [
   ['ernaehrungs_produkte', 'nutrition_products', 'user_id', ['id']],
   ['kalorien_protokoll', 'nutrition_log_entries', 'user_id', ['log_date', 'created_at']],
   ['ernaehrungs_tagesqualitaet', 'nutrition_day_status', 'user_id', ['log_date']],
+  // Coach-Gedächtnis. Solange die zugehörige Migration nicht eingespielt ist,
+  // fehlen Tabellen oder Spalten; der Export lässt sie dann leer, statt
+  // abzubrechen. Jeder andere Fehler bricht weiterhin ab.
+  ['coach_ueber_mich', 'coach_profile_memory', 'user_id', ['id'], { optional: true }],
+  ['coach_massnahmen', 'coach_interventions', 'user_id', ['id'], { optional: true }],
+  ['coach_gespraeche', 'ai_coach_messages', 'user_id', ['created_at', 'id'], { optional: true }],
 ];
+
+const fehltNoch = (error) => ['42P01', '42703', 'PGRST204', 'PGRST205'].includes(error?.code)
+  || /does not exist|schema cache/i.test(String(error?.message || ''));
 
 async function loadAllRows(table, userColumn, orderColumns, userId, signal, pageSize = EXPORT_PAGE_SIZE) {
   const rows = [];
@@ -39,7 +48,7 @@ async function loadAllRows(table, userColumn, orderColumns, userId, signal, page
     query = query.range(from, from + pageSize - 1);
     if (signal) query = query.abortSignal(signal);
     const { data, error } = await query;
-    if (error) throw new Error(`${table}: ${error.message || 'Daten konnten nicht geladen werden.'}`);
+    if (error) throw Object.assign(new Error(`${table}: ${error.message || 'Daten konnten nicht geladen werden.'}`), { code: error.code });
     rows.push(...(data || []));
     if (!data || data.length < pageSize) break;
   }
@@ -72,9 +81,14 @@ export async function createFullDataExport({ session, profile, theme, signal, on
   if (!userId) throw new Error('Du bist nicht angemeldet.');
   const daten = {};
   for (let index = 0; index < EXPORT_TABLES.length; index += 1) {
-    const [key, table, userColumn, orderColumns] = EXPORT_TABLES[index];
+    const [key, table, userColumn, orderColumns, { optional = false } = {}] = EXPORT_TABLES[index];
     onProgress?.({ current: index + 1, total: EXPORT_TABLES.length + 1, key });
-    daten[key] = await loadAllRows(table, userColumn, orderColumns, userId, signal);
+    try {
+      daten[key] = await loadAllRows(table, userColumn, orderColumns, userId, signal);
+    } catch (error) {
+      if (!optional || !fehltNoch(error)) throw error;
+      daten[key] = [];
+    }
   }
   onProgress?.({ current: EXPORT_TABLES.length + 1, total: EXPORT_TABLES.length + 1, key: 'freigaben' });
   daten.freigaben = await loadShares(userId, signal);

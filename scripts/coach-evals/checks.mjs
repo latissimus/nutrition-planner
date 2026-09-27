@@ -421,12 +421,17 @@ export function zahlenBefund(fall, antwort) {
     // Routinen …") -, aber nicht vor einem Monatsnamen: "vom 15. August" ist
     // ein Datum.
     .flatMap((fakt) => fakt.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"])(?!(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b)/));
+  // Mit Gedächtnis: Eine Zahl, die dort wörtlich mit derselben Einheit steht
+  // (etwa ein früherer Rat "170 g Protein"), gilt als geliefert - als Zitat,
+  // nicht als Messwert. Ohne Gedächtnis ändert sich nichts.
+  const gedaechtnis = fall.gedaechtnis ? textZahlen(Object.values(fall.gedaechtnis).join('\n')) : [];
   const unbelegt = [];
   const ungebunden = [];
   for (const satz of saetze) {
     const eintraege = textZahlen(satz);
     const beziehungsweise = zuordnungBeziehungsweise(satz, eintraege);
     for (const eintrag of eintraege) {
+      if (gedaechtnis.some((zitat) => zitat.zahl === eintrag.zahl && zitat.einheit === eintrag.einheit && eintrag.einheit !== 'ohne')) continue;
       const befund = pruefeZahl(eintrag, felder, satz, beziehungsweise.has(eintrag) ? beziehungsweise.get(eintrag) : undefined);
       if (befund.grund) unbelegt.push(`${eintrag.text} (${befund.grund})`);
       else if (befund.ungebunden) ungebunden.push(eintrag.text);

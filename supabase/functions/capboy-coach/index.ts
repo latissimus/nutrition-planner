@@ -2,6 +2,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION } from './knowledge.ts';
 import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
+import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -205,6 +206,46 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
   };
 }
 
+// Memory of the free coach (step 5). If a table or column is missing (the
+// migration is not applied yet) or a query fails, the coach answers without
+// memory instead of failing, and the response says so.
+async function loadMemory(userId: string, conversationId: string, today: string) {
+  const [messages, facts, interventions] = await Promise.all([
+    admin.from('ai_coach_messages').select('role,content,created_at').eq('user_id', userId).eq('conversation_id', conversationId)
+      .order('created_at', { ascending: false }).limit(MEMORY_LIMITS.conversationMessages),
+    admin.from('coach_profile_memory').select('category,fact,confirmed_on').eq('user_id', userId)
+      .order('confirmed_on', { ascending: false }).limit(MEMORY_LIMITS.profileFacts),
+    admin.from('coach_interventions').select('action,hypothesis,target_metric,start_date,review_date,status,adherence,outcome,source,updated_at').eq('user_id', userId)
+      .order('start_date', { ascending: false }).limit(MEMORY_LIMITS.interventions * 4),
+  ]);
+  const failed = [messages, facts, interventions].find((result) => result.error);
+  if (failed) {
+    console.error('CAPBOY memory unavailable', failed.error);
+    return { blocks: {}, available: false };
+  }
+  return {
+    blocks: {
+      conversation: conversationBlock(messages.data || []),
+      profile_memory: profileBlock(facts.data || []),
+      intervention_log: interventionBlock(interventions.data || [], today),
+    },
+    available: true,
+  };
+}
+
+// Stores question and answer as one turn of the conversation. The answer keeps
+// its full JSON in context (for the memory page); content is the short form
+// the coach sees in later turns. Explicit timestamps keep the order.
+async function saveTurn(userId: string, conversationId: string, question: string, result: Row) {
+  const asked = new Date();
+  const { error } = await admin.from('ai_coach_messages').insert([
+    { user_id: userId, conversation_id: conversationId, role: 'user', content: question, context: {}, created_at: asked.toISOString() },
+    { user_id: userId, conversation_id: conversationId, role: 'assistant', content: assistantMemoryText(result) || '–', context: { result }, created_at: new Date(asked.getTime() + 1).toISOString() },
+  ]);
+  if (error) console.error('CAPBOY memory save failed', error);
+  return !error;
+}
+
 const compResultSchema = {
   type: 'object',
   additionalProperties: false,
@@ -322,6 +363,10 @@ Deno.serve(async (request) => {
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
+    // Only the free coach has memory. A conversation continues when the client
+    // sends its id; otherwise a new one begins.
+    const conversationId = scope === 'coach' ? (isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID()) : null;
+    const memory = conversationId ? await loadMemory(userId, conversationId, now.toISOString().slice(0, 10)) : null;
     const clientEvidence = scope === 'comp' && body?.evidence && typeof body.evidence === 'object'
       ? body.evidence as Row : null;
     if (clientEvidence && JSON.stringify(clientEvidence).length > 120_000) return json({ error: 'Die COMP-Daten sind zu umfangreich.' }, 413);
@@ -364,7 +409,7 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
           schema: compResultSchema,
         },
       },
-    } : coachRequestBody({ scope, question, snapshot, timeseries, webResearch, vectorStoreId });
+    } : coachRequestBody({ scope, question, snapshot, timeseries, memory: memory?.blocks, webResearch, vectorStoreId });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -397,7 +442,8 @@ Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vi
       if (error) throw error;
     }
 
-    return json({ result, scope, period: snapshot.period, cached: false });
+    const memorySaved = conversationId && memory?.available ? await saveTurn(userId, conversationId, question, result) : false;
+    return json({ result, scope, period: snapshot.period, cached: false, ...(conversationId ? { conversationId, memoryAvailable: Boolean(memory?.available), memorySaved } : {}) });
   } catch (error) {
     console.error('CAPBOY coach failed', error);
     return json({ error: 'Der Coach konnte die Daten gerade nicht auswerten.' }, 500);

@@ -1,0 +1,325 @@
+import { supabase } from './supabase.js';
+import { materialIconMarkup } from './categoryIcons.js';
+import { coachIconMarkup } from './menuIcons.js';
+import { toast } from './toast.js';
+
+/* „Was CAPBOY über mich weiß“ – das Gedächtnis des Coachs (Schritt 5).
+   Drei Teile, alle nur für den Nutzer selbst sichtbar (RLS):
+   - Über mich: feste Fakten, die der Nutzer selbst einträgt.
+   - Maßnahmen: was ausprobiert wird, auf Wunsch aus einer Coach-Empfehlung.
+   - Gespräche: Fragen und Antworten; der Coach sieht nur das laufende.
+   Die KI schreibt hier nichts selbst. Alles ist bearbeit- und löschbar. */
+
+export const KATEGORIEN = [
+  ['ziel', 'Ziel'],
+  ['verletzung', 'Verletzung'],
+  ['einschraenkung', 'Einschränkung'],
+  ['ausstattung', 'Ausstattung'],
+  ['zeitplan', 'Zeitplan'],
+  ['vorliebe', 'Vorliebe'],
+  ['belastung', 'Belastung'],
+  ['medizinisch', 'Medizinischer Hinweis'],
+];
+export const STATUS = [['aktiv', 'Läuft'], ['abgeschlossen', 'Abgeschlossen'], ['abgebrochen', 'Abgebrochen']];
+export const UMSETZUNG = [['unbekannt', 'Unbekannt'], ['kaum', 'Kaum'], ['teilweise', 'Teilweise'], ['ueberwiegend', 'Überwiegend'], ['voll', 'Voll']];
+
+const escapeHtml = (value = '') => String(value ?? '')
+  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+const heute = () => new Date().toLocaleDateString('sv-SE');
+const datum = (wert) => (typeof wert === 'string' && /^\d{4}-\d{2}-\d{2}/.test(wert) ? wert.slice(0, 10).split('-').reverse().join('.') : '');
+const bezeichnung = (liste, wert) => liste.find(([id]) => id === wert)?.[1] || wert || '';
+const kuerzen = (text, grenze) => {
+  const sauber = String(text ?? '').replace(/\s+/g, ' ').trim();
+  return sauber.length > grenze ? `${sauber.slice(0, grenze - 1)}…` : sauber;
+};
+
+// Fehlt eine Tabelle oder Spalte, ist die Datenbank-Migration noch nicht
+// eingespielt. Die Seite sagt das dann, statt einen Fehler zu zeigen.
+export function istNichtEingerichtet(error) {
+  if (!error) return false;
+  return ['42P01', '42703', 'PGRST204', 'PGRST205'].includes(error.code)
+    || /does not exist|schema cache|could not find/i.test(String(error.message || ''));
+}
+
+export function pruefeFakt({ category, fact }) {
+  if (!KATEGORIEN.some(([id]) => id === category)) return 'Bitte eine Kategorie wählen.';
+  const text = String(fact || '').trim();
+  if (text.length < 2) return 'Bitte einen Fakt eintragen.';
+  if (text.length > 500) return 'Höchstens 500 Zeichen.';
+  return null;
+}
+
+export function pruefeMassnahme({ action, hypothesis, target_metric: ziel, start_date: start, review_date: pruefung, status, adherence, outcome }) {
+  const text = String(action || '').trim();
+  if (text.length < 2) return 'Bitte die Maßnahme beschreiben.';
+  if (text.length > 500) return 'Die Maßnahme darf höchstens 500 Zeichen haben.';
+  if (String(hypothesis || '').length > 1000 || String(outcome || '').length > 1000) return 'Annahme und Ergebnis höchstens je 1000 Zeichen.';
+  if (String(ziel || '').length > 300) return 'Die Zielgröße darf höchstens 300 Zeichen haben.';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(start || ''))) return 'Bitte ein Startdatum wählen.';
+  if (pruefung && !/^\d{4}-\d{2}-\d{2}$/.test(pruefung)) return 'Das Prüfdatum ist ungültig.';
+  if (pruefung && pruefung < start) return 'Das Prüfdatum darf nicht vor dem Start liegen.';
+  if (status && !STATUS.some(([id]) => id === status)) return 'Unbekannter Status.';
+  if (adherence && !UMSETZUNG.some(([id]) => id === adherence)) return 'Unbekannte Umsetzung.';
+  return null;
+}
+
+// Nachrichten (neueste zuerst) zu Gesprächen, das neueste Gespräch zuerst.
+export function gruppiereGespraeche(nachrichten = []) {
+  const gespraeche = new Map();
+  for (const nachricht of nachrichten) {
+    if (!nachricht.conversation_id) continue;
+    const eintrag = gespraeche.get(nachricht.conversation_id) || { id: nachricht.conversation_id, zuletzt: nachricht.created_at, nachrichten: [] };
+    eintrag.nachrichten.push(nachricht);
+    gespraeche.set(nachricht.conversation_id, eintrag);
+  }
+  return [...gespraeche.values()].map((gespraech) => {
+    const verlauf = [...gespraech.nachrichten].sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+    return { id: gespraech.id, zuletzt: gespraech.zuletzt, beginn: verlauf[0]?.created_at, verlauf, fragen: verlauf.filter((nachricht) => nachricht.role === 'user').length };
+  });
+}
+
+// Eine Coach-Empfehlung als Maßnahme: Aktion und Begründung übernehmen, ab
+// heute. Das Prüfdatum legt der Nutzer selbst fest.
+export function massnahmeAusEmpfehlung(empfehlung, tag = heute()) {
+  return {
+    action: kuerzen(empfehlung?.action, 500),
+    hypothesis: empfehlung?.rationale ? kuerzen(empfehlung.rationale, 1000) : null,
+    target_metric: null,
+    start_date: tag,
+    review_date: null,
+    status: 'aktiv',
+    adherence: 'unbekannt',
+    outcome: null,
+    source: 'coach_empfehlung',
+  };
+}
+
+function optionen(liste, gewaehlt) {
+  return liste.map(([id, name]) => `<option value="${id}"${id === gewaehlt ? ' selected' : ''}>${escapeHtml(name)}</option>`).join('');
+}
+
+function faktFormular(fakt = {}) {
+  return `<form class="gedaechtnis-formular" data-fakt-formular${fakt.id ? ` data-id="${escapeHtml(fakt.id)}"` : ''}>
+    <label>Kategorie<select name="category" required>${optionen(KATEGORIEN, fakt.category || 'einschraenkung')}</select></label>
+    <label>Was CAPBOY wissen soll<textarea name="fact" rows="2" maxlength="500" required placeholder="Zum Beispiel: Knieschmerzen links bei tiefen Kniebeugen">${escapeHtml(fakt.fact || '')}</textarea></label>
+    <div class="gedaechtnis-aktionen"><button class="btn btn-primary" type="submit">${fakt.id ? 'Änderung speichern' : 'Merken'}</button><button class="btn" type="button" data-abbrechen>Abbrechen</button></div>
+  </form>`;
+}
+
+function massnahmeFormular(massnahme = {}) {
+  return `<form class="gedaechtnis-formular" data-massnahme-formular${massnahme.id ? ` data-id="${escapeHtml(massnahme.id)}"` : ''}>
+    <label>Maßnahme<textarea name="action" rows="2" maxlength="500" required placeholder="Zum Beispiel: Letzte Mahlzeit drei Stunden vor dem Schlafen">${escapeHtml(massnahme.action || '')}</textarea></label>
+    <label>Annahme (optional)<textarea name="hypothesis" rows="2" maxlength="1000" placeholder="Wenn …, dann …, weil …">${escapeHtml(massnahme.hypothesis || '')}</textarea></label>
+    <label>Woran du es misst (optional)<input name="target_metric" maxlength="300" value="${escapeHtml(massnahme.target_metric || '')}" placeholder="Zum Beispiel: Schlafqualität"></label>
+    <div class="gedaechtnis-zeile">
+      <label>Start<input type="date" name="start_date" required value="${escapeHtml(massnahme.start_date || heute())}"></label>
+      <label>Prüfen am<input type="date" name="review_date" value="${escapeHtml(massnahme.review_date || '')}"></label>
+    </div>
+    ${massnahme.id ? `<div class="gedaechtnis-zeile">
+      <label>Status<select name="status">${optionen(STATUS, massnahme.status)}</select></label>
+      <label>Umgesetzt<select name="adherence">${optionen(UMSETZUNG, massnahme.adherence)}</select></label>
+    </div>
+    <label>Ergebnis (optional)<textarea name="outcome" rows="2" maxlength="1000">${escapeHtml(massnahme.outcome || '')}</textarea></label>` : ''}
+    <div class="gedaechtnis-aktionen"><button class="btn btn-primary" type="submit">${massnahme.id ? 'Änderung speichern' : 'Maßnahme anlegen'}</button><button class="btn" type="button" data-abbrechen>Abbrechen</button></div>
+  </form>`;
+}
+
+export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [], eingerichtet = true, tag = heute(), bearbeiten = null } = {}) {
+  if (!eingerichtet) {
+    return `<div class="coach-welcome"><b>Das Gedächtnis ist noch nicht eingerichtet.</b><p>Die Datenbank wird gerade erweitert. Bis dahin beantwortet CAPBOY jede Frage ohne Gedächtnis – deine Messwerte sieht er trotzdem.</p></div>`;
+  }
+  const faktListe = fakten.map((fakt) => (bearbeiten === `fakt:${fakt.id}` ? `<li>${faktFormular(fakt)}</li>` : `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(fakt.id)}">
+      <span class="gedaechtnis-chip">${escapeHtml(bezeichnung(KATEGORIEN, fakt.category))}</span>
+      <p>${escapeHtml(fakt.fact)}</p>
+      <small>Bestätigt am ${datum(fakt.confirmed_on)}</small>
+      <div class="gedaechtnis-aktionen">
+        <button class="btn" type="button" data-fakt-bestaetigen="${escapeHtml(fakt.id)}">Stimmt noch</button>
+        <button class="btn" type="button" data-fakt-bearbeiten="${escapeHtml(fakt.id)}">Bearbeiten</button>
+        <button class="btn" type="button" data-fakt-loeschen="${escapeHtml(fakt.id)}">Löschen</button>
+      </div>
+    </li>`)).join('');
+  const massnahmenListe = massnahmen.map((massnahme) => {
+    if (bearbeiten === `massnahme:${massnahme.id}`) return `<li>${massnahmeFormular(massnahme)}</li>`;
+    const faellig = massnahme.status === 'aktiv' && massnahme.review_date && massnahme.review_date <= tag;
+    return `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(massnahme.id)}">
+      <span class="gedaechtnis-chip">${escapeHtml(bezeichnung(STATUS, massnahme.status))}${faellig ? ' · Prüfung fällig' : ''}</span>
+      <p><b>${escapeHtml(massnahme.action)}</b></p>
+      ${massnahme.hypothesis ? `<p>${escapeHtml(massnahme.hypothesis)}</p>` : ''}
+      <small>Seit ${datum(massnahme.start_date)}${massnahme.review_date ? ` · prüfen am ${datum(massnahme.review_date)}` : ' · kein Prüfdatum'}${massnahme.target_metric ? ` · misst: ${escapeHtml(massnahme.target_metric)}` : ''} · umgesetzt: ${escapeHtml(bezeichnung(UMSETZUNG, massnahme.adherence))}${massnahme.source === 'coach_empfehlung' ? ' · aus einer Coach-Empfehlung' : ''}</small>
+      ${massnahme.outcome ? `<p class="gedaechtnis-ergebnis">Ergebnis: ${escapeHtml(massnahme.outcome)}</p>` : ''}
+      <div class="gedaechtnis-aktionen">
+        <button class="btn" type="button" data-massnahme-bearbeiten="${escapeHtml(massnahme.id)}">Bearbeiten</button>
+        <button class="btn" type="button" data-massnahme-loeschen="${escapeHtml(massnahme.id)}">Löschen</button>
+      </div>
+    </li>`;
+  }).join('');
+  const gespraechListe = gespraeche.map((gespraech) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(gespraech.id)}">
+      <details>
+        <summary><b>${escapeHtml(kuerzen(gespraech.verlauf.find((nachricht) => nachricht.role === 'user')?.content || 'Gespräch', 90))}</b><small>${datum(gespraech.beginn)} · ${gespraech.fragen} ${gespraech.fragen === 1 ? 'Frage' : 'Fragen'}</small></summary>
+        <ol class="gedaechtnis-verlauf">${gespraech.verlauf.map((nachricht) => `<li class="${nachricht.role === 'user' ? 'ist-frage' : 'ist-antwort'}"><small>${nachricht.role === 'user' ? 'Du' : 'CAPBOY'}</small><p>${escapeHtml(nachricht.content)}</p></li>`).join('')}</ol>
+      </details>
+      <div class="gedaechtnis-aktionen"><button class="btn" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
+    </li>`).join('');
+  return `
+    <section class="coach-result-section gedaechtnis-bereich">
+      <h3><span>Über mich</span><em>Nur was du selbst einträgst</em></h3>
+      <p class="gedaechtnis-hinweis">Feste Fakten, die CAPBOY bei jeder Antwort beachtet: Verletzungen, Ausstattung, Zeitplan, Vorlieben. Deine Messwerte kennt er ohnehin aus den Fachseiten.</p>
+      ${fakten.length ? `<ul class="gedaechtnis-liste">${faktListe}</ul>` : '<p class="gedaechtnis-leer">Noch nichts eingetragen.</p>'}
+      ${bearbeiten === 'fakt:neu' ? faktFormular() : '<button class="btn" type="button" data-fakt-neu>+ Fakt hinzufügen</button>'}
+    </section>
+    <section class="coach-result-section gedaechtnis-bereich">
+      <h3><span>Maßnahmen</span><em>Was du gerade ausprobierst</em></h3>
+      <p class="gedaechtnis-hinweis">Ist das Prüfdatum erreicht, bewertet CAPBOY die Maßnahme zuerst, bevor er etwas Neues im selben Bereich vorschlägt.</p>
+      ${massnahmen.length ? `<ul class="gedaechtnis-liste">${massnahmenListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Maßnahme. Übernimm eine Empfehlung des Coachs oder lege selbst eine an.</p>'}
+      ${bearbeiten === 'massnahme:neu' ? massnahmeFormular() : '<button class="btn" type="button" data-massnahme-neu>+ Maßnahme anlegen</button>'}
+    </section>
+    <section class="coach-result-section gedaechtnis-bereich">
+      <h3><span>Gespräche</span><em>Der Coach sieht nur das laufende</em></h3>
+      ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="btn" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}
+    </section>`;
+}
+
+// --------------------------------------------------------------------------
+// Datenbank
+// --------------------------------------------------------------------------
+
+async function ergebnis(anfrage) {
+  const { data, error } = await anfrage;
+  if (error) throw error;
+  return data;
+}
+
+export async function ladeGedaechtnis(userId) {
+  const [fakten, massnahmen, nachrichten] = await Promise.all([
+    supabase.from('coach_profile_memory').select('id,category,fact,confirmed_on,created_at').eq('user_id', userId).order('confirmed_on', { ascending: false }),
+    supabase.from('coach_interventions').select('*').eq('user_id', userId).order('start_date', { ascending: false }),
+    supabase.from('ai_coach_messages').select('id,conversation_id,role,content,created_at').eq('user_id', userId).not('conversation_id', 'is', null).order('created_at', { ascending: false }).limit(300),
+  ]);
+  const fehler = [fakten, massnahmen, nachrichten].find((antwort) => antwort.error)?.error;
+  if (fehler) {
+    if (istNichtEingerichtet(fehler)) return { eingerichtet: false, fakten: [], massnahmen: [], gespraeche: [] };
+    throw fehler;
+  }
+  const liste = [...(massnahmen.data || [])].sort((a, b) => Number(b.status === 'aktiv') - Number(a.status === 'aktiv') || String(b.start_date).localeCompare(String(a.start_date)));
+  return { eingerichtet: true, fakten: fakten.data || [], massnahmen: liste, gespraeche: gruppiereGespraeche(nachrichten.data || []) };
+}
+
+export async function merkeEmpfehlung(userId, empfehlung) {
+  const eintrag = massnahmeAusEmpfehlung(empfehlung);
+  const fehler = pruefeMassnahme(eintrag);
+  if (fehler) throw new Error(fehler);
+  return ergebnis(supabase.from('coach_interventions').insert({ ...eintrag, user_id: userId }).select('id').single());
+}
+
+// --------------------------------------------------------------------------
+// Seite
+// --------------------------------------------------------------------------
+
+// Wie die Coach-Seite: Die Liste wird auch in eine zwischengespeicherte
+// Ansicht geschrieben, damit sie nach einem Seitenwechsel aktuell ist.
+export async function mountCoachMemoryPage(container, { userId }) {
+  container.classList.add('coach-page');
+  container.innerHTML = `<main class="coach-shell">
+    <header class="coach-hero">
+      <span class="coach-spark" aria-hidden="true">${coachIconMarkup('coach-hero-cap')}</span>
+      <div><small>COACH-GEDÄCHTNIS</small><h1>Was CAPBOY über mich weiß</h1><p>Nur was hier steht, weiß der Coach zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p></div>
+      <a class="som-info-knopf dex-sammlungskopf-zurueck coach-back" href="#coach" aria-label="Zurück zum Coach">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>
+    </header>
+    <div class="gedaechtnis-inhalt coach-result" data-gedaechtnis aria-live="polite"><div class="coach-loading"><p>Lade Gedächtnis …</p></div></div>
+  </main>`;
+  const inhalt = container.querySelector('[data-gedaechtnis]');
+  let stand = null;
+  let bearbeiten = null;
+
+  const zeichnen = () => { inhalt.innerHTML = gedaechtnisMarkup({ ...stand, bearbeiten }); };
+  const neuLaden = async () => {
+    try {
+      stand = await ladeGedaechtnis(userId);
+      zeichnen();
+    } catch (error) {
+      inhalt.innerHTML = '<div class="coach-welcome"><b>Das Gedächtnis konnte nicht geladen werden.</b><p>Versuche es später erneut.</p></div>';
+      toast(error?.message || 'Gedächtnis konnte nicht geladen werden.');
+    }
+  };
+  const ausfuehren = async (aktion, erfolg) => {
+    try {
+      await aktion();
+      bearbeiten = null;
+      if (erfolg) toast(erfolg);
+      await neuLaden();
+    } catch (error) {
+      toast(error?.message || 'Das hat nicht geklappt.');
+    }
+  };
+  const formularWerte = (formular) => Object.fromEntries(new FormData(formular).entries());
+  const leerZuNull = (wert) => (String(wert ?? '').trim() ? String(wert).trim() : null);
+
+  inhalt.addEventListener('click', (event) => {
+    const knopf = event.target.closest('button');
+    if (!knopf) return;
+    const { dataset } = knopf;
+    if ('faktNeu' in dataset) { bearbeiten = 'fakt:neu'; zeichnen(); return; }
+    if ('massnahmeNeu' in dataset) { bearbeiten = 'massnahme:neu'; zeichnen(); return; }
+    if ('abbrechen' in dataset) { bearbeiten = null; zeichnen(); return; }
+    if (dataset.faktBearbeiten) { bearbeiten = `fakt:${dataset.faktBearbeiten}`; zeichnen(); return; }
+    if (dataset.massnahmeBearbeiten) { bearbeiten = `massnahme:${dataset.massnahmeBearbeiten}`; zeichnen(); return; }
+    if (dataset.faktBestaetigen) {
+      ausfuehren(() => ergebnis(supabase.from('coach_profile_memory').update({ confirmed_on: heute() }).eq('id', dataset.faktBestaetigen).eq('user_id', userId)), 'Als aktuell bestätigt.');
+      return;
+    }
+    if (dataset.faktLoeschen) {
+      if (!confirm('Diesen Fakt löschen? CAPBOY weiß ihn danach nicht mehr.')) return;
+      ausfuehren(() => ergebnis(supabase.from('coach_profile_memory').delete().eq('id', dataset.faktLoeschen).eq('user_id', userId)), 'Gelöscht.');
+      return;
+    }
+    if (dataset.massnahmeLoeschen) {
+      if (!confirm('Diese Maßnahme löschen?')) return;
+      ausfuehren(() => ergebnis(supabase.from('coach_interventions').delete().eq('id', dataset.massnahmeLoeschen).eq('user_id', userId)), 'Gelöscht.');
+      return;
+    }
+    if (dataset.gespraechLoeschen) {
+      if (!confirm('Dieses Gespräch löschen?')) return;
+      ausfuehren(() => ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).eq('conversation_id', dataset.gespraechLoeschen)), 'Gespräch gelöscht.');
+      return;
+    }
+    if ('gespraecheLoeschen' in dataset) {
+      if (!confirm('Alle gespeicherten Gespräche löschen?')) return;
+      ausfuehren(() => ergebnis(supabase.from('ai_coach_messages').delete().eq('user_id', userId).not('conversation_id', 'is', null)), 'Alle Gespräche gelöscht.');
+    }
+  });
+
+  inhalt.addEventListener('submit', (event) => {
+    const formular = event.target;
+    event.preventDefault();
+    const id = formular.dataset.id || null;
+    const werte = formularWerte(formular);
+    if ('faktFormular' in formular.dataset) {
+      const fakt = { category: werte.category, fact: String(werte.fact || '').trim() };
+      const fehler = pruefeFakt(fakt);
+      if (fehler) { toast(fehler); return; }
+      // Wer einen Fakt ändert, bestätigt ihn damit auch.
+      ausfuehren(() => ergebnis(id
+        ? supabase.from('coach_profile_memory').update({ ...fakt, confirmed_on: heute() }).eq('id', id).eq('user_id', userId)
+        : supabase.from('coach_profile_memory').insert({ ...fakt, user_id: userId })), 'Gemerkt.');
+      return;
+    }
+    if ('massnahmeFormular' in formular.dataset) {
+      const massnahme = {
+        action: String(werte.action || '').trim(),
+        hypothesis: leerZuNull(werte.hypothesis),
+        target_metric: leerZuNull(werte.target_metric),
+        start_date: werte.start_date,
+        review_date: leerZuNull(werte.review_date),
+        ...(id ? { status: werte.status, adherence: werte.adherence, outcome: leerZuNull(werte.outcome) } : {}),
+      };
+      const fehler = pruefeMassnahme(massnahme);
+      if (fehler) { toast(fehler); return; }
+      ausfuehren(() => ergebnis(id
+        ? supabase.from('coach_interventions').update(massnahme).eq('id', id).eq('user_id', userId)
+        : supabase.from('coach_interventions').insert({ ...massnahme, user_id: userId })), 'Gespeichert.');
+    }
+  });
+
+  await neuLaden();
+}

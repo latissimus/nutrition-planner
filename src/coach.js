@@ -2,8 +2,11 @@ import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { coachIconMarkup } from './menuIcons.js';
 import { toast } from './toast.js';
+import { istNichtEingerichtet, merkeEmpfehlung } from './coachMemory.js';
 
 const CONTEXT_KEY = 'muscledex:coach-context';
+// Laufendes Gespräch dieses Tabs: ID vom Server und die bisherigen Runden.
+const GESPRAECH_KEY = 'muscledex:coach-gespraech';
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -19,7 +22,7 @@ function safeExternalUrl(value = '') {
   }
 }
 
-export function resultMarkup(result) {
+export function resultMarkup(result, { merken = false } = {}) {
   if (!result) return '';
   const facts = (result.facts || []).slice(0, 6);
   const interpretations = (result.interpretations || []).slice(0, 5);
@@ -32,7 +35,7 @@ export function resultMarkup(result) {
     <header><span><small>${escapeHtml(readableModelText(result.title || 'CAPBOY COACH'))}</small><b>${escapeHtml(readableModelText(result.summary || ''))}</b></span><span class="coach-result-meta">${coachIconMarkup('coach-cap-badge')}<em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></span></header>
     ${facts.length ? `<section class="coach-result-section is-data"><h3><span>Berücksichtigte Daten</span><em>KI-Zusammenfassung deiner CAPBOY-Daten</em></h3><ul>${facts.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
     ${interpretations.length ? `<section class="coach-result-section is-ai"><h3><span>Einordnung</span><em>KI-Interpretation</em></h3><ul>${interpretations.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
-    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item) => `<article><b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p><small>${escapeHtml(readableModelText(item.timeframe))}</small></article>`).join('')}</div></section>` : ''}
+    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item, index) => `<article><b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p><small>${escapeHtml(readableModelText(item.timeframe))}</small>${merken ? `<button class="btn coach-merken" type="button" data-empfehlung-merken="${index}">Als Maßnahme merken</button>` : ''}</article>`).join('')}</div></section>` : ''}
     ${result.uncertainties?.length ? `<details><summary>Unsicherheiten und fehlende Daten</summary><ul>${result.uncertainties.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></details>` : ''}
     ${webSources.length ? `<details class="coach-web-sources" open><summary>Verwendete Webquellen</summary><ul>${webSources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`).join('')}</ul></details>` : ''}
     ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
@@ -40,8 +43,9 @@ export function resultMarkup(result) {
   </div>`;
 }
 
-async function invokeCoach(scope, question = '', webResearch = false) {
-  const { data, error } = await supabase.functions.invoke('capboy-coach', { body: { scope, question, webResearch } });
+async function invokeCoach(scope, question = '', webResearch = false, conversationId = null) {
+  const body = { scope, question, webResearch, ...(conversationId ? { conversationId } : {}) };
+  const { data, error } = await supabase.functions.invoke('capboy-coach', { body });
   if (error) {
     let message = error.message;
     try {
@@ -59,10 +63,40 @@ export function openCoachQuestion({ scope = 'overall', question = '' } = {}) {
   location.hash = 'coach';
 }
 
-export async function mountCoachPage(container, { userId, signal, backRoute = 'body' }) {
+function gespraechLesen() {
+  try {
+    const gespraech = JSON.parse(sessionStorage.getItem(GESPRAECH_KEY) || 'null');
+    return gespraech?.id && Array.isArray(gespraech.runden) ? gespraech : null;
+  } catch {
+    return null;
+  }
+}
+function gespraechSchreiben(gespraech) {
+  try {
+    if (gespraech) sessionStorage.setItem(GESPRAECH_KEY, JSON.stringify(gespraech));
+    else sessionStorage.removeItem(GESPRAECH_KEY);
+  } catch {}
+}
+
+// Frühere Runden des laufenden Gesprächs, zusammengeklappt über der neuesten Antwort.
+export function verlaufMarkup(runden = []) {
+  if (!runden.length) return '';
+  return `<details class="coach-verlauf"><summary>Bisher in diesem Gespräch (${runden.length} ${runden.length === 1 ? 'Frage' : 'Fragen'})</summary><ol>${runden.map((runde) => `<li><small>Du</small><p>${escapeHtml(runde.frage)}</p><small>CAPBOY</small><p>${escapeHtml(readableModelText(runde.result?.summary || ''))}</p></li>`).join('')}</ol></details>`;
+}
+
+/* Die App legt verlassene Seiten zwischen und bricht dabei ihr Signal ab.
+   Kommt der Nutzer zurück, arbeitet dieselbe Ansicht weiter. Antworten
+   werden deshalb unabhängig vom Signal geschrieben: Ist die Ansicht gerade
+   abgelegt, erscheint die Antwort beim Zurückkehren. Mit dem Signal-Abbruch
+   gingen Antworten nach einem Seitenwechsel stillschweigend verloren. */
+export async function mountCoachPage(container, { userId, backRoute = 'body' }) {
   let pending = {};
   try { pending = JSON.parse(sessionStorage.getItem(CONTEXT_KEY) || '{}'); } catch {}
   sessionStorage.removeItem(CONTEXT_KEY);
+  // Eine Frage von einer Fachseite beginnt immer ein neues Gespräch.
+  if (pending.question) gespraechSchreiben(null);
+  let gespraech = gespraechLesen();
+  let letzteAntwort = null;
   container.classList.add('coach-page');
   container.innerHTML = `<main class="coach-shell">
     <header class="coach-hero">
@@ -76,6 +110,10 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
       <label class="coach-web-option"><input type="checkbox" data-coach-web><span><b>Aktuelles Webwissen recherchieren</b><small>Für aktuelle Studien, Leitlinien oder externes Wissen. Die verwendeten Quellen werden verlinkt.</small></span></label>
       <button class="btn btn-primary" type="submit">Coach fragen</button>
       <small class="coach-scope-note">Betrachtet immer COMP, Training, Ernährung, Schlaf, Erholung und Routinen gemeinsam. Webrecherche ist optional.</small>
+      <div class="coach-gespraech-leiste">
+        <button class="btn" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}>Neues Gespräch</button>
+        <a class="coach-gedaechtnis-link" href="#coach-wissen">Was CAPBOY über mich weiß</a>
+      </div>
     </form>
     <section class="coach-answer" data-coach-answer aria-live="polite">
       <div class="coach-welcome"><b>Eine Antwort, ein Gesamtbild.</b><p>Stelle deine Frage. CAPBOY trennt die verwendeten Daten, die KI-Einordnung und vorgeschlagene nächste Schritte sichtbar voneinander.</p></div>
@@ -85,6 +123,34 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
   const answer = container.querySelector('[data-coach-answer]');
   const form = container.querySelector('[data-coach-form]');
   const field = form.querySelector('textarea');
+  const neuesGespraech = form.querySelector('[data-neues-gespraech]');
+  if (gespraech?.runden.length) {
+    const letzte = gespraech.runden.at(-1);
+    letzteAntwort = letzte.result;
+    answer.innerHTML = verlaufMarkup(gespraech.runden.slice(0, -1)) + resultMarkup(letzte.result, { merken: true });
+  }
+  neuesGespraech.onclick = () => {
+    gespraech = null;
+    letzteAntwort = null;
+    gespraechSchreiben(null);
+    neuesGespraech.hidden = true;
+    answer.innerHTML = '<div class="coach-welcome"><b>Neues Gespräch.</b><p>CAPBOY beginnt ohne die bisherigen Fragen. Deine Messwerte und was unter „Was CAPBOY über mich weiß“ steht, kennt er weiterhin.</p></div>';
+    field.focus();
+  };
+  answer.addEventListener('click', async (event) => {
+    const knopf = event.target.closest('[data-empfehlung-merken]');
+    const empfehlung = knopf && letzteAntwort?.recommendations?.[Number(knopf.dataset.empfehlungMerken)];
+    if (!empfehlung) return;
+    knopf.disabled = true;
+    try {
+      await merkeEmpfehlung(userId, empfehlung);
+      knopf.textContent = 'Als Maßnahme gemerkt';
+      toast('Gemerkt. Prüfdatum und Ergebnis trägst du unter „Was CAPBOY über mich weiß“ ein.');
+    } catch (error) {
+      knopf.disabled = false;
+      toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht gemerkt werden.'));
+    }
+  });
   form.onsubmit = async (event) => {
     event.preventDefault();
     const question = field.value.trim();
@@ -96,9 +162,17 @@ export async function mountCoachPage(container, { userId, signal, backRoute = 'b
     answer.innerHTML = `<div class="coach-loading"><p class="coach-thinking-label" role="status">Denke nach<span class="coach-thinking-dots" aria-hidden="true">...</span></p><p>${webResearch ? 'CAPBOY COACH recherchiert aktuelles Wissen und verbindet es mit deinem Gesamtbild.' : 'CAPBOY COACH verbindet die relevanten Bereiche und trennt Daten von Einordnung.'}</p></div>`;
     answer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     try {
-      const response = await invokeCoach('coach', question, webResearch);
-      if (signal?.aborted) return;
-      answer.innerHTML = resultMarkup(response.result);
+      const response = await invokeCoach('coach', question, webResearch, gespraech?.id);
+      letzteAntwort = response.result;
+      // Nur wenn der Server die Runde gespeichert hat, gibt es ein
+      // Gespräch, an das die nächste Frage anschließen kann.
+      const frueher = gespraech?.id === response.conversationId ? gespraech.runden : [];
+      if (response.conversationId && response.memorySaved) {
+        gespraech = { id: response.conversationId, runden: [...frueher, { frage: question, result: response.result }].slice(-8) };
+        gespraechSchreiben(gespraech);
+        neuesGespraech.hidden = false;
+      }
+      answer.innerHTML = verlaufMarkup(response.memorySaved ? frueher : []) + resultMarkup(response.result, { merken: true });
       field.value = '';
     } catch (error) {
       answer.innerHTML = '<div class="coach-welcome"><b>Keine Antwort erstellt.</b><p>Deine bisherigen Messwerte bleiben unverändert. Versuche es später erneut.</p></div>';

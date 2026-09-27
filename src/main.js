@@ -54,6 +54,7 @@ const routinesModule = () => import('./routines.js');
 const sleepModule = () => import('./sleep.js');
 const knowledgeSearchModule = () => import('./knowledgeSearch.js');
 const coachModule = () => import('./coach.js');
+const coachMemoryModule = () => import('./coachMemory.js');
 
 function dexModulVorbereiten(route = '') {
   const loader = ({
@@ -673,7 +674,7 @@ function appLetzteDexRoute() {
 }
 
 function istAppHauptDex(route, view) {
-  if (route === 'profile' || route === 'search' || route === 'coach') return true;
+  if (route === 'profile' || route === 'search' || route === 'coach' || route === 'coach-wissen') return true;
   if (APP_DEX_ROUTES.has(route)) return true;
   return route.startsWith('collection/') && Boolean(view?.dataset.appDockRoute);
 }
@@ -752,7 +753,7 @@ function appDexShellZeichnen(route, view) {
   const istProfil = route === 'profile';
   const istCoins = route === 'coins';
   const istSuche = route === 'search';
-  const istCoach = route === 'coach';
+  const istCoach = route === 'coach' || route === 'coach-wissen';
   const istNebenansicht = istProfil || istSuche || istCoach;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
   app.classList.add('dex-app-shell');
@@ -882,7 +883,7 @@ function appDexShellAktualisieren(route, view, signal) {
   // Während eines schnellen Durchblätterns zählt nur der zuletzt erreichte
   // Dex. Lokal ist er sofort gespeichert; die Serverkopie folgt gesammelt,
   // sobald die Navigation fünf Sekunden ruht.
-  if (route !== 'profile' && route !== 'search' && route !== 'coach') {
+  if (route !== 'profile' && route !== 'search' && route !== 'coach' && route !== 'coach-wissen') {
     setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
   }
   appDexShellDatenLaden(route, view, signal);
@@ -1435,7 +1436,7 @@ async function renderRoute() {
     history.replaceState(history.state, '', `#${angefragt}`);
   }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  const istBekannteRoute = ['profile', 'coins', 'search', 'coach'].includes(angefragt)
+  const istBekannteRoute = ['profile', 'coins', 'search', 'coach', 'coach-wissen'].includes(angefragt)
     || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/');
   let route = istBekannteRoute ? angefragt : appDexFallbackRoute();
@@ -1511,6 +1512,13 @@ async function renderRoute() {
     view.dataset.appDockRoute = appLetzteDexRoute();
     const { mountCoachPage } = await coachModule();
     await mountCoachPage(view, { userId: session.user.id, signal, backRoute: appLetzteDexRoute() });
+  } else if (route === 'coach-wissen') {
+    // Gleiche Schale und Optik wie die Coach-Seite.
+    setSeite('coach');
+    applyPageLook('body', categoryColor('body'), 'wallpaper-comp');
+    view.dataset.appDockRoute = appLetzteDexRoute();
+    const { mountCoachMemoryPage } = await coachMemoryModule();
+    await mountCoachMemoryPage(view, { userId: session.user.id, signal });
   } else if (route === 'profile') {
     setSeite('profile');
     applyPageLook('profile', categoryColor('profile'), 'drops');

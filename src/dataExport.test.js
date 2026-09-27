@@ -40,6 +40,22 @@ describe('vollstaendiger Datenexport', () => {
     expect(result.konto.email).toBe('test@example.com');
   });
 
+  it('exportiert das Coach-Gedächtnis und übersteht eine noch fehlende Migration', async () => {
+    handlers.set('shared_spaces', () => ({ data: [], error: null }));
+    handlers.set('coach_profile_memory', () => ({ data: [{ id: 'f1', category: 'verletzung', fact: 'Knie' }], error: null }));
+    handlers.set('coach_interventions', () => ({ data: null, error: { code: 'PGRST205', message: "Could not find the table 'public.coach_interventions' in the schema cache" } }));
+    const result = await createFullDataExport({ session: { user: { id: 'user' } } });
+    expect(result.daten.coach_ueber_mich).toEqual([{ id: 'f1', category: 'verletzung', fact: 'Knie' }]);
+    expect(result.daten.coach_massnahmen).toEqual([]);
+    expect(result.daten.coach_gespraeche).toEqual([]);
+  });
+
+  it('bricht bei anderen Fehlern weiterhin ab, auch bei Gedächtnis-Tabellen', async () => {
+    handlers.set('shared_spaces', () => ({ data: [], error: null }));
+    handlers.set('coach_interventions', () => ({ data: null, error: { code: '42501', message: 'permission denied' } }));
+    await expect(createFullDataExport({ session: { user: { id: 'user' } } })).rejects.toThrow('coach_interventions: permission denied');
+  });
+
   it('exportiert weder Push-Abos noch geheime Anmeldedaten', async () => {
     handlers.set('shared_spaces', () => ({ data: [], error: null }));
     const result = await createFullDataExport({ session: { user: { id: 'user' } } });
