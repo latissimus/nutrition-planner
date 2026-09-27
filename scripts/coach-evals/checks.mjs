@@ -382,6 +382,8 @@ export function textZahlen(text) {
     // Kalenderwochen ("2026-W38", "KW 38", "Kalenderwoche 38") sind Zeitangaben.
     .replace(/\b\d{4}-W\d{1,2}\b/g, leer)
     .replace(/\b(?:KW|Kalenderwoche)\s?\d{1,2}\b/gi, leer)
+    // Uhrzeiten ("ab 22 Uhr", "22:30 Uhr") sind keine Messwerte.
+    .replace(/\b\d{1,2}(?:[:.]\d{2})?\s?Uhr\b/g, leer)
     .replace(/\b\d{1,2}\.\d{1,2}\.(\d{2,4})?/g, leer)
     // "15. August", "26. September 2026", "September 2026".
     .replace(/\b\d{1,2}\.\s?(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)(\s\d{4}\b)?/gi, leer)

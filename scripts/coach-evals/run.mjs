@@ -1682,6 +1682,10 @@ function trockenlaufWochenbilanz(fehler) {
   pruef('wochenbilanz-krank', fakt('Morgenenergie: 3 von 5 in KW 37, 1,6 von 5 in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 0 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 2 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  // Uhrzeit aus dem Namen einer Maßnahme (Lauf vom 27.09.2026).
+  pruef('wochenbilanz-experiment-laeuft', fakt('Laufender Bildschirm-Verzicht ab 22 Uhr: teilweise eingehalten.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-experiment-laeuft', fakt('Bildschirmzeit bis 22:30 Uhr, Schlafdauer 375 min.'), 'Fakten enthalten nur gelieferte Zahlen', true);
+  pruef('wochenbilanz-experiment-laeuft', fakt('Schlafdauer: 22 min weniger.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   // Ohne Wochen-Check-in keine Wochenprüfungen.
   pruefungen += 1;
   if (pruefe(FAELLE[0], antwort()).some((pruefung) => pruefung.name.startsWith('Wochenbilanz'))) fehler.push('Wochen-Check-in: Fälle ohne Check-in dürfen keine Wochenprüfungen bekommen');
