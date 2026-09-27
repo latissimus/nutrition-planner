@@ -750,6 +750,13 @@ async function trockenlauf() {
   // kein-gedaechtnis: Schlafqualität 3,6, Erholung 3,5.
   const bindungsFaelle = [
     ['unrealistisches-ziel', 'Kalorienziel 2400 kcal, Durchschnitt 2400 kcal.', 'fehler'],
+    // Lauf vom 27.09.2026 (Schritt 7): Veränderung im eigenen Satzteil ohne Messgröße, "1 Messung".
+    ['hautfalte-hormon', 'Hautfaltensumme: 76 mm; erfasste Veränderung: −2 mm.', 'belegt'],
+    ['hautfalte-hormon', 'Hautfaltensumme: 76 mm; erfasste Veränderung: −3 mm.', 'fehler'],
+    ['hautfalte-hormon', 'Hautfaltensumme: 76 mm; erfasste Veränderung: +2 mm.', 'fehler'],
+    ['hautfalte-hormon', 'Die Messung ist standardisiert; Veränderung: −2 mm.', 'hinweis'],
+    ['hautfalte-hormon', 'Taillenumfang: 88 cm. Veränderung: −0,5 cm.', 'hinweis'],   // nie über das Satzende
+    ['zu-wenige-daten', 'Gewicht: 90,2 kg bei 1 Messung.', 'belegt'],
     // Lauf vom 27.09.2026: Datum mit Jahr, "protokollierte Ernährung" und "vollständig protokolliert:".
     ['warnzeichen', 'Veränderung des Gewichtstrends: −4,2 % im erfassten Zeitraum vom 15. August bis zum 26. September 2026.', 'belegt'],
     ['warnzeichen', 'Im Jahr 2026 lag das Gewicht bei 86,1 kg.', 'fehler'],
@@ -1666,6 +1673,11 @@ function trockenlaufWochenbilanz(fehler) {
   pruef('wochenbilanz-krank', fakt('Das Gewicht ist gegenüber der Vorwoche um 1,2 kg gesunken.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Das Gewicht ist gegenüber der Vorwoche um 1,2 kg gestiegen.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   pruef('wochenbilanz-krank', fakt('Veränderung des Gewichts: −1,5 kg.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  // So schreibt der Coach den Vergleich meist ab: die Veränderung im eigenen Satzteil.
+  pruef('wochenbilanz-krank', fakt('Gewicht (Wochenmittel): 86 kg (2026-W37) → 84,8 kg (2026-W38); Veränderung: −1,2 kg.'), 'Zahlen ohne erkennbare Messgröße', true);
+  pruef('wochenbilanz-krank', fakt('Gewicht (Wochenmittel): 86 kg (2026-W37) → 84,8 kg (2026-W38); Veränderung: −1,5 kg.'), 'Fakten enthalten nur gelieferte Zahlen', false);
+  pruef('wochenbilanz-krank', fakt('Trainingstage: 3 Tage (2026-W37) → 0 Tage (2026-W38); Veränderung: −3 Tage.'), 'Zahlen ohne erkennbare Messgröße', true);
+  pruef('wochenbilanz-krank', fakt('Trainingstage: 3 Tage (2026-W37) → 0 Tage (2026-W38); Veränderung: +3 Tage.'), 'Fakten enthalten nur gelieferte Zahlen', false);
   pruef('wochenbilanz-krank', fakt('Kalorien (Ø vollständige Tage): Veränderung −792 kcal.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Morgenenergie: 3 von 5 in KW 37, 1,6 von 5 in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);
   pruef('wochenbilanz-krank', fakt('Trainingstage: 0 Tage in KW 38.'), 'Fakten enthalten nur gelieferte Zahlen', true);

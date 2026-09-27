@@ -185,7 +185,7 @@ const MESSGROESSEN = [
   [/(haut)?falten ?messung|faltenmessung/i, /\.skinfoldMeasurements$/],
   [/taillen ?messung/i, /\.waistMeasurements$/],
   [/wiegung|gewichts ?messung|wiege ?messung/i, /\.weightMeasurements$/],
-  [/\bmessungen\b/i, /Measurements$/],
+  [/\bmessung(en)?\b/i, /Measurements$/],
   [/taille|bauchumfang/i, /\.latestWaistCm$|\.waistChangeCm$/],
   [/(körper)?größe/i, /\.heightCm$/],
   [/\balter\b|jahre alt/i, /\.age$/],
@@ -288,9 +288,19 @@ function messgroesse(eintrag, satz, felder) {
       || (begriff.index >= teilAnfang && begriff.ende <= eintrag.position))
     .map((begriff) => ({ ...begriff, rang: begriff.index >= ende ? begriff.index - ende : 1000 + (eintrag.position - begriff.ende) }))
     .sort((links, rechts) => links.rang - rechts.rang);
-  const tauglich = kandidaten.find(({ feldmuster }) => feldmuster === KEIN_FELD
-    || felder.some((feld) => feldmuster.test(feld.pfad) && ERLAUBT[eintrag.einheit].includes(feld.einheit)));
-  return tauglich?.feldmuster || null;
+  const passt = ({ feldmuster }) => feldmuster === KEIN_FELD
+    || felder.some((feld) => feldmuster.test(feld.pfad) && ERLAUBT[eintrag.einheit].includes(feld.einheit));
+  const tauglich = kandidaten.find(passt);
+  if (tauglich) return tauglich.feldmuster;
+  // "Hautfaltensumme: 76 mm; Veränderung: −2 mm": Ein Satzteil, der nur eine
+  // Veränderung nennt und keine Messgröße, gehört zur Messgröße des
+  // Satzteils unmittelbar davor (dessen letzter passender Begriff). Weiter
+  // zurück wird nie gebunden.
+  if (teilAnfang > 0 && /veränder/i.test(satz.slice(teilAnfang, eintrag.position)) && !begriffeIn(satz.slice(teilAnfang, teilEnde)).length) {
+    const vorherAnfang = satzteilAnfang(satz, teilAnfang - 1);
+    return begriffeIn(satz.slice(vorherAnfang, teilAnfang - 1), vorherAnfang).reverse().find(passt)?.feldmuster || null;
+  }
+  return null;
 }
 
 // "Schlafqualität und Erholung liegen bei 3,6 beziehungsweise 3,5": Hier
