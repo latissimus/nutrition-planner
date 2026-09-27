@@ -3,6 +3,8 @@
 // Function and the evals in scripts/coach-evals run the same code. Every block
 // is bounded in size; an empty block is left out entirely (coachInput).
 
+import { experimentMeasurement } from './experiments.ts';
+
 type Row = Record<string, any>;
 
 export const MEMORY_LIMITS = {
@@ -44,18 +46,25 @@ export function profileBlock(rows: Row[]) {
   return facts.length ? JSON.stringify(facts) : '';
 }
 
-// Active experiments and those closed recently. reviewDue is computed here so
-// the model does not compare dates itself.
-export function interventionBlock(rows: Row[], today: string) {
+// Active experiments and those closed recently. reviewDue and the measurement
+// of the target metric (experiments.ts) are computed here, so the model
+// neither compares dates nor calculates values. The id lets an experiment
+// review in the answer point to exactly one entry.
+export function interventionBlock(rows: Row[], today: string, timeseries?: Row | null) {
   const oldestClosed = new Date(Date.parse(`${today}T00:00:00Z`) - MEMORY_LIMITS.closedInterventionDays * 86_400_000).toISOString().slice(0, 10);
   const items = [...rows]
     .sort((a, b) => Number(b.status === 'aktiv') - Number(a.status === 'aktiv') || String(b.start_date).localeCompare(String(a.start_date)))
     .filter((row) => row.status === 'aktiv' || (day(row.updated_at) || day(row.start_date) || '') >= oldestClosed)
     .slice(0, MEMORY_LIMITS.interventions)
     .map((row) => ({
+      id: row.id ?? null,
       action: cut(row.action),
       hypothesis: row.hypothesis ? cut(row.hypothesis) : null,
       targetMetric: row.target_metric ? cut(row.target_metric, 300) : null,
+      targetMetricId: row.target_metric_id || null,
+      expectedDirection: row.expected_direction || null,
+      baselineNote: row.baseline_note ? cut(row.baseline_note) : null,
+      measurement: row.target_metric_id ? experimentMeasurement(row.target_metric_id, day(row.start_date), timeseries) : null,
       startDate: day(row.start_date),
       reviewDate: day(row.review_date),
       reviewDue: row.status === 'aktiv' && Boolean(row.review_date) && day(row.review_date)! <= today,

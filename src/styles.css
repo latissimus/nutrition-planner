@@ -14911,6 +14911,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-verlauf small,.gedaechtnis-verlauf small{color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.06em}
 .coach-verlauf p,.gedaechtnis-verlauf p{margin:0;font-size:12px;line-height:1.45}
 .coach-merken{justify-self:start;margin-top:4px;padding:6px 10px!important;font-size:10px!important}
+.coach-art{justify-self:start;padding:4px 7px;border:1px solid currentColor;border-radius:999px;color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.05em}
+.coach-recommendations article>p em{color:var(--muted);font-style:normal;font-weight:700}
 .gedaechtnis-inhalt{display:grid;gap:12px}
 .gedaechtnis-bereich{display:grid;gap:10px}
 .gedaechtnis-hinweis,.gedaechtnis-leer{margin:0;color:var(--muted);font:550 10px/1.45 var(--tech)}

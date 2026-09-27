@@ -2,7 +2,9 @@ import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { coachIconMarkup } from './menuIcons.js';
 import { toast } from './toast.js';
-import { istNichtEingerichtet, merkeEmpfehlung } from './coachMemory.js';
+import {
+  ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
+} from './coachMemory.js';
 
 const CONTEXT_KEY = 'muscledex:coach-context';
 // Laufendes Gespräch dieses Tabs: ID vom Server und die bisherigen Runden.
@@ -22,6 +24,35 @@ function safeExternalUrl(value = '') {
   }
 }
 
+const bezeichnung = (liste, wert) => liste.find(([id]) => id === wert)?.[1] || wert || '';
+const tagDatum = (wert) => (/^\d{4}-\d{2}-\d{2}$/.test(String(wert || '')) ? wert.split('-').reverse().join('.') : '');
+const ART = { experiment: 'Experiment', sicherheit: 'Sicherheit', beobachtung: 'Beobachten' };
+
+// Eine Empfehlung; seit Schritt 6 mit Art und bei Experimenten mit
+// Hypothese, Ausgangswert, Zielgröße und Prüfdatum. Ältere Antworten ohne
+// diese Felder erscheinen wie bisher.
+function empfehlungMarkup(item, index, merken) {
+  const art = ART[item.kind] ? item.kind : null;
+  const experiment = art === 'experiment';
+  const ziel = item.targetMetric && item.targetMetric !== 'keine' ? bezeichnung(ZIELGROESSEN, item.targetMetric) : '';
+  const richtung = item.expectedDirection && item.expectedDirection !== 'keine' ? bezeichnung(RICHTUNGEN, item.expectedDirection) : '';
+  const details = experiment ? [
+    item.hypothesis ? `<p><em>Hypothese:</em> ${escapeHtml(readableModelText(item.hypothesis))}</p>` : '',
+    item.baseline ? `<p><em>Ausgangswert:</em> ${escapeHtml(readableModelText(item.baseline))}</p>` : '',
+    ziel ? `<p><em>Zielgröße:</em> ${escapeHtml(ziel)}${richtung ? ` – ${escapeHtml(richtung)}` : ''}</p>` : '',
+  ].join('') : '';
+  const pruefen = experiment && tagDatum(item.reviewDate) ? ` · prüfen am ${tagDatum(item.reviewDate)}` : '';
+  const knopf = merken && art !== 'sicherheit'
+    ? `<button class="btn coach-merken" type="button" data-empfehlung-merken="${index}">${experiment ? 'Als Experiment merken' : 'Als Maßnahme merken'}</button>` : '';
+  return `<article${art ? ` class="ist-${art}"` : ''}>${art ? `<span class="coach-art">${ART[art]}${pruefen}</span>` : ''}<b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p>${details}<small>${escapeHtml(readableModelText(item.timeframe))}</small>${knopf}</article>`;
+}
+
+// Auswertungen fälliger Experimente (Schritt 6).
+function auswertungenMarkup(auswertungen = [], merken = false) {
+  if (!auswertungen.length) return '';
+  return `<section class="coach-result-section is-action"><h3><span>Auswertung deiner Experimente</span><em>KI-Einordnung der App-Messung</em></h3><div class="coach-recommendations">${auswertungen.map((item, index) => `<article><span class="coach-art">${escapeHtml(bezeichnung(URTEILE, item.verdict))} · ${escapeHtml(bezeichnung(ENTSCHEIDUNGEN, item.decision))}</span><p>${escapeHtml(readableModelText(item.basis))}</p>${merken ? `<button class="btn coach-merken" type="button" data-auswertung-uebernehmen="${index}">Ergebnis übernehmen</button>` : ''}</article>`).join('')}</div></section>`;
+}
+
 export function resultMarkup(result, { merken = false } = {}) {
   if (!result) return '';
   const facts = (result.facts || []).slice(0, 6);
@@ -35,7 +66,8 @@ export function resultMarkup(result, { merken = false } = {}) {
     <header><span><small>${escapeHtml(readableModelText(result.title || 'CAPBOY COACH'))}</small><b>${escapeHtml(readableModelText(result.summary || ''))}</b></span><span class="coach-result-meta">${coachIconMarkup('coach-cap-badge')}<em class="coach-confidence">${escapeHtml(result.confidence || 'niedrig')} sicher</em></span></header>
     ${facts.length ? `<section class="coach-result-section is-data"><h3><span>Berücksichtigte Daten</span><em>KI-Zusammenfassung deiner CAPBOY-Daten</em></h3><ul>${facts.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
     ${interpretations.length ? `<section class="coach-result-section is-ai"><h3><span>Einordnung</span><em>KI-Interpretation</em></h3><ul>${interpretations.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></section>` : ''}
-    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item, index) => `<article><b>${escapeHtml(readableModelText(item.action))}</b><p>${escapeHtml(readableModelText(item.rationale))}</p><small>${escapeHtml(readableModelText(item.timeframe))}</small>${merken ? `<button class="btn coach-merken" type="button" data-empfehlung-merken="${index}">Als Maßnahme merken</button>` : ''}</article>`).join('')}</div></section>` : ''}
+    ${auswertungenMarkup((result.experimentReviews || []).slice(0, 5), merken)}
+    ${recommendations.length ? `<section class="coach-result-section is-action"><h3><span>Nächste Schritte</span><em>KI-Vorschlag</em></h3><div class="coach-recommendations">${recommendations.map((item, index) => empfehlungMarkup(item, index, merken)).join('')}</div></section>` : ''}
     ${result.uncertainties?.length ? `<details><summary>Unsicherheiten und fehlende Daten</summary><ul>${result.uncertainties.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul></details>` : ''}
     ${webSources.length ? `<details class="coach-web-sources" open><summary>Verwendete Webquellen</summary><ul>${webSources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`).join('')}</ul></details>` : ''}
     ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
@@ -138,14 +170,34 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     field.focus();
   };
   answer.addEventListener('click', async (event) => {
+    const auswertungsKnopf = event.target.closest('[data-auswertung-uebernehmen]');
+    const auswertung = auswertungsKnopf && letzteAntwort?.experimentReviews?.[Number(auswertungsKnopf.dataset.auswertungUebernehmen)];
+    if (auswertung) {
+      auswertungsKnopf.disabled = true;
+      try {
+        await uebernimmAuswertung(userId, auswertung);
+        auswertungsKnopf.textContent = 'Ergebnis übernommen';
+        toast(auswertung.decision === 'beibehalten'
+          ? 'Übernommen. Ein neues Prüfdatum setzt du unter „Was CAPBOY über mich weiß“.'
+          : auswertung.decision === 'anpassen'
+            ? 'Übernommen. Der bisherige Versuch ist abgeschlossen; die angepasste Variante startest du als neues Experiment.'
+            : 'Übernommen, das Experiment ist abgeschlossen.');
+      } catch (error) {
+        auswertungsKnopf.disabled = false;
+        toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht übernommen werden.'));
+      }
+      return;
+    }
     const knopf = event.target.closest('[data-empfehlung-merken]');
     const empfehlung = knopf && letzteAntwort?.recommendations?.[Number(knopf.dataset.empfehlungMerken)];
     if (!empfehlung) return;
     knopf.disabled = true;
     try {
       await merkeEmpfehlung(userId, empfehlung);
-      knopf.textContent = 'Als Maßnahme gemerkt';
-      toast('Gemerkt. Prüfdatum und Ergebnis trägst du unter „Was CAPBOY über mich weiß“ ein.');
+      knopf.textContent = empfehlung.kind === 'experiment' ? 'Als Experiment gemerkt' : 'Als Maßnahme gemerkt';
+      toast(empfehlung.kind === 'experiment' && empfehlung.reviewDate
+        ? 'Gemerkt. Am Prüfdatum wertet CAPBOY das Experiment aus.'
+        : 'Gemerkt. Prüfdatum und Ergebnis trägst du unter „Was CAPBOY über mich weiß“ ein.');
     } catch (error) {
       knopf.disabled = false;
       toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht gemerkt werden.'));

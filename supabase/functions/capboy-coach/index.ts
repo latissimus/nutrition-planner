@@ -209,13 +209,13 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
 // Memory of the free coach (step 5). If a table or column is missing (the
 // migration is not applied yet) or a query fails, the coach answers without
 // memory instead of failing, and the response says so.
-async function loadMemory(userId: string, conversationId: string, today: string) {
+async function loadMemory(userId: string, conversationId: string, today: string, timeseries: Row) {
   const [messages, facts, interventions] = await Promise.all([
     admin.from('ai_coach_messages').select('role,content,created_at').eq('user_id', userId).eq('conversation_id', conversationId)
       .order('created_at', { ascending: false }).limit(MEMORY_LIMITS.conversationMessages),
     admin.from('coach_profile_memory').select('category,fact,confirmed_on').eq('user_id', userId)
       .order('confirmed_on', { ascending: false }).limit(MEMORY_LIMITS.profileFacts),
-    admin.from('coach_interventions').select('action,hypothesis,target_metric,start_date,review_date,status,adherence,outcome,source,updated_at').eq('user_id', userId)
+    admin.from('coach_interventions').select('id,action,hypothesis,target_metric,target_metric_id,expected_direction,baseline_note,start_date,review_date,status,adherence,outcome,source,updated_at').eq('user_id', userId)
       .order('start_date', { ascending: false }).limit(MEMORY_LIMITS.interventions * 4),
   ]);
   const failed = [messages, facts, interventions].find((result) => result.error);
@@ -227,7 +227,7 @@ async function loadMemory(userId: string, conversationId: string, today: string)
     blocks: {
       conversation: conversationBlock(messages.data || []),
       profile_memory: profileBlock(facts.data || []),
-      intervention_log: interventionBlock(interventions.data || [], today),
+      intervention_log: interventionBlock(interventions.data || [], today, timeseries),
     },
     available: true,
   };
@@ -366,7 +366,7 @@ Deno.serve(async (request) => {
     // Only the free coach has memory. A conversation continues when the client
     // sends its id; otherwise a new one begins.
     const conversationId = scope === 'coach' ? (isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID()) : null;
-    const memory = conversationId ? await loadMemory(userId, conversationId, now.toISOString().slice(0, 10)) : null;
+    const memory = conversationId ? await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries) : null;
     const clientEvidence = scope === 'comp' && body?.evidence && typeof body.evidence === 'object'
       ? body.evidence as Row : null;
     if (clientEvidence && JSON.stringify(clientEvidence).length > 120_000) return json({ error: 'Die COMP-Daten sind zu umfangreich.' }, 413);

@@ -7,6 +7,7 @@
 // "hinweis" verlangen einen Blick von Hand.
 
 import { kriterienFuer } from './pruefer.mjs';
+import { EXPERIMENT_DIRECTIONS, EXPERIMENT_METRIC_IDS } from '../../supabase/functions/capboy-coach/experiments.ts';
 
 const TEXTFELDER = ['title', 'summary', 'facts', 'interpretations', 'recommendations', 'uncertainties', 'followUpQuestions', 'safetyNote'];
 const PFLICHT = {
@@ -344,6 +345,9 @@ export function textZahlen(text) {
   const leer = (treffer) => ' '.repeat(treffer.length);
   const ohneDatum = String(text)
     .replace(/\b\d{4}-\d{2}-\d{2}\b/g, leer)
+    // Kalenderwochen ("2026-W38", "KW 38", "Kalenderwoche 38") sind Zeitangaben.
+    .replace(/\b\d{4}-W\d{1,2}\b/g, leer)
+    .replace(/\b(?:KW|Kalenderwoche)\s?\d{1,2}\b/gi, leer)
     .replace(/\b\d{1,2}\.\d{1,2}\.(\d{2,4})?/g, leer)
     .replace(/\b\d{1,2}\.\s?(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)\b/gi, leer);
   return [...ohneDatum.matchAll(/(^|[^\d.,])([+\-−])?\s?(\d+(?:[.,]\d+)*)(?=\s*([^\s\d].{0,12})?)/g)].map((treffer) => {
@@ -435,13 +439,106 @@ export function zahlenBefund(fall, antwort) {
     const eintraege = textZahlen(satz);
     const beziehungsweise = zuordnungBeziehungsweise(satz, eintraege);
     for (const eintrag of eintraege) {
-      if (gedaechtnis.some((zitat) => zitat.zahl === eintrag.zahl && zitat.einheit === eintrag.einheit && eintrag.einheit !== 'ohne')) continue;
+      // Ohne Einheit nur mit Vorzeichen (eine Veränderung wie "+2" aus der
+      // Messung eines Experiments), nie eine nackte Zahl.
+      if (gedaechtnis.some((zitat) => zitat.zahl === eintrag.zahl && zitat.einheit === eintrag.einheit
+        && (eintrag.einheit !== 'ohne' || (eintrag.vorzeichen !== 0 && zitat.vorzeichen === eintrag.vorzeichen)))) continue;
       const befund = pruefeZahl(eintrag, felder, satz, beziehungsweise.has(eintrag) ? beziehungsweise.get(eintrag) : undefined);
       if (befund.grund) unbelegt.push(`${eintrag.text} (${befund.grund})`);
       else if (befund.ungebunden) ungebunden.push(eintrag.text);
     }
   }
   return { unbelegt: [...new Set(unbelegt)], ungebunden: [...new Set(ungebunden)] };
+}
+
+// Fällige Experimente aus dem Gedächtnisblock des Falls (id -> Eintrag).
+function faelligeExperimente(fall) {
+  try {
+    return new Map(JSON.parse(fall.gedaechtnis?.intervention_log || '[]').filter((eintrag) => eintrag.reviewDue).map((eintrag) => [eintrag.id, eintrag]));
+  } catch {
+    return new Map();
+  }
+}
+
+const tagesDatum = (wert) => (typeof wert === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(wert) && !Number.isNaN(Date.parse(`${wert}T00:00:00Z`)) ? wert : null);
+const plusTage = (datum, tage) => new Date(Date.parse(`${datum}T00:00:00Z`) + tage * 86_400_000).toISOString().slice(0, 10);
+
+function experimentPruefungen(fall, antwort, pruefung) {
+  const empfehlungen = antwort.recommendations;
+  const auswertungen = Array.isArray(antwort.experimentReviews) ? antwort.experimentReviews : null;
+  const aufbau = [];
+  if (!auswertungen) aufbau.push('experimentReviews ist keine Liste');
+  empfehlungen.forEach((eintrag, index) => {
+    if (!['experiment', 'sicherheit', 'beobachtung'].includes(eintrag?.kind)) aufbau.push(`Empfehlung ${index + 1}: kind`);
+    if (![...EXPERIMENT_METRIC_IDS, 'keine'].includes(eintrag?.targetMetric)) aufbau.push(`Empfehlung ${index + 1}: targetMetric`);
+    if (![...EXPERIMENT_DIRECTIONS, 'keine'].includes(eintrag?.expectedDirection)) aufbau.push(`Empfehlung ${index + 1}: expectedDirection`);
+    for (const feld of ['hypothesis', 'baseline', 'reviewDate']) if (typeof eintrag?.[feld] !== 'string') aufbau.push(`Empfehlung ${index + 1}: ${feld}`);
+  });
+  (auswertungen || []).forEach((eintrag, index) => {
+    if (!['wirksam', 'nicht_wirksam', 'unklar'].includes(eintrag?.verdict)) aufbau.push(`Auswertung ${index + 1}: verdict`);
+    if (!['beibehalten', 'anpassen', 'beenden'].includes(eintrag?.decision)) aufbau.push(`Auswertung ${index + 1}: decision`);
+  });
+  pruefung('Experiment-Schema vollständig', aufbau.length === 0, aufbau.join(', '));
+  if (aufbau.length) return;
+
+  // Ein Experiment braucht alle Felder und die im Prompt zugesicherte
+  // Mindestlaufzeit. Falten, Taille und Kraft sollen nach 21 bis 28 Tagen
+  // geprüft werden; alle anderen Zielgrößen frühestens nach 14 Tagen.
+  const heute = String(fall.daten?.generatedAt || '').slice(0, 10);
+  const maengel = empfehlungen.flatMap((eintrag, index) => {
+    if (eintrag.kind !== 'experiment') return [];
+    const fehlt = [];
+    if (!eintrag.hypothesis.trim()) fehlt.push('Hypothese');
+    if (!eintrag.baseline.trim()) fehlt.push('Ausgangswert');
+    if (eintrag.targetMetric === 'keine') fehlt.push('Zielgröße');
+    if (eintrag.expectedDirection === 'keine') fehlt.push('Richtung');
+    const datum = tagesDatum(eintrag.reviewDate);
+    if (!datum) fehlt.push(`Prüfdatum "${eintrag.reviewDate}"`);
+    else if (heute) {
+      const langsam = ['faltensumme', 'taille', 'kraft'].includes(eintrag.targetMetric);
+      const fruehestens = plusTage(heute, langsam ? 21 : 14);
+      const spaetestens = plusTage(heute, langsam ? 28 : 120);
+      if (datum < fruehestens || datum > spaetestens) fehlt.push(`Prüfdatum ${datum} außerhalb ${fruehestens} bis ${spaetestens}`);
+    }
+    return fehlt.length ? [`Empfehlung ${index + 1}: ${fehlt.join(', ')}`] : [];
+  });
+  pruefung('Experimente vollständig', maengel.length === 0, maengel.join('; '));
+  const ohneExperimentfelder = (eintrag) => !eintrag.hypothesis.trim() && !eintrag.baseline.trim() && !eintrag.reviewDate
+    && eintrag.expectedDirection === 'keine';
+  const sicherheit = empfehlungen.flatMap((eintrag, index) => (eintrag.kind === 'sicherheit'
+    && (!ohneExperimentfelder(eintrag) || eintrag.targetMetric !== 'keine') ? [`Empfehlung ${index + 1}`] : []));
+  pruefung('Sicherheitsschritte ohne Experimentfelder', sicherheit.length === 0, sicherheit.join(', '));
+  const beobachtung = empfehlungen.flatMap((eintrag, index) => (eintrag.kind === 'beobachtung'
+    && !ohneExperimentfelder(eintrag) ? [`Empfehlung ${index + 1}`] : []));
+  pruefung('Beobachtungen ohne Experimentfelder', beobachtung.length === 0, beobachtung.join(', '));
+
+  // Zahlen in Ausgangswerten und Auswertungen: wie bei den Fakten.
+  const zitate = [...empfehlungen.map((eintrag) => eintrag.baseline), ...auswertungen.map((eintrag) => eintrag.basis)].filter((text) => String(text).trim());
+  const zahlen = zahlenBefund(fall, { facts: zitate });
+  pruefung('Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', zahlen.unbelegt.length === 0, zahlen.unbelegt.join(', '));
+
+  // Genau die fälligen Experimente auswerten, keine erfundenen IDs.
+  const faellig = faelligeExperimente(fall);
+  const ids = auswertungen.map((eintrag) => eintrag.experimentId);
+  const fremd = ids.filter((id) => !faellig.has(id));
+  const fehlend = [...faellig.keys()].filter((id) => !ids.includes(id));
+  const doppelt = ids.filter((id, index) => ids.indexOf(id) !== index);
+  pruefung('Genau die fälligen Experimente ausgewertet', !fremd.length && !fehlend.length && !doppelt.length,
+    [fremd.length ? `nicht fällig oder unbekannt: ${fremd.join(', ')}` : '', fehlend.length ? `fehlt: ${fehlend.join(', ')}` : '', doppelt.length ? `doppelt: ${doppelt.join(', ')}` : ''].filter(Boolean).join('; '));
+
+  // Erwartungen des Falls: Urteil je Experiment, neues Experiment mit Zielgröße.
+  for (const [id, erlaubt] of Object.entries(fall.erwartet.auswertung || {})) {
+    const urteil = auswertungen.find((eintrag) => eintrag.experimentId === id)?.verdict;
+    pruefung(`Auswertung ${id}: ${erlaubt.join(' oder ')}`, erlaubt.includes(urteil), `Urteil ${urteil ?? 'fehlt'}`);
+  }
+  const anzupassen = (auswertungen || []).filter((eintrag) => eintrag.decision === 'anpassen');
+  const angepassteExperimente = anzupassen.length ? empfehlungen.filter((eintrag) => eintrag.kind === 'experiment') : [];
+  pruefung('Anpassung wird als neues Experiment beschrieben', !anzupassen.length || angepassteExperimente.length === anzupassen.length,
+    `${anzupassen.length} Anpassungen, ${angepassteExperimente.length} neue Experimente`);
+  if (fall.erwartet.neuesExperiment) {
+    const passend = empfehlungen.some((eintrag) => eintrag.kind === 'experiment' && fall.erwartet.neuesExperiment.includes(eintrag.targetMetric));
+    pruefung(`neues Experiment mit Zielgröße ${fall.erwartet.neuesExperiment.join(' oder ')}`, passend, empfehlungen.map((eintrag) => `${eintrag.kind}/${eintrag.targetMetric}`).join(', '));
+  }
 }
 
 // modellUrteile: Urteile des Modell-Prüfers (pruefer.mjs). Ohne sie bleibt die
@@ -475,6 +572,11 @@ export function pruefe(fall, antwort, { modellUrteile = null, prueferInformativ 
   const zahlen = zahlenBefund(fall, antwort);
   pruefung('Fakten enthalten nur gelieferte Zahlen', zahlen.unbelegt.length === 0, zahlen.unbelegt.join(', '));
   pruefung('Zahlen ohne erkennbare Messgröße', zahlen.ungebunden.length === 0, zahlen.ungebunden.join(', '), true);
+
+  // Seit Schritt 6: Antworten mit experimentReviews haben das Experiment-
+  // Schema. Ältere Antworten (etwa die Legacy-Baseline) werden wie bisher
+  // bewertet.
+  if ('experimentReviews' in (antwort || {})) experimentPruefungen(fall, antwort, pruefung);
 
   const erwartet = fall.erwartet;
   pruefung(

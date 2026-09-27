@@ -125,7 +125,12 @@ function ungebundeneZahlen(laeufe, faelle) {
   }, 0);
 }
 
-export function vergleicheMitBaseline({ baseline, neu, labelNachweis, faelle }) {
+// Abweichungen, die ein Schritt bewusst mit sich bringt, können ausdrücklich
+// akzeptiert werden (--akzeptiere). Sie erscheinen dann als Hinweis statt als
+// Grund; alle übrigen Bedingungen gelten unverändert.
+export const AKZEPTIERBAR = { schema: ['schemaHash'], wissensstand: ['wissensstand', 'vectorStoreId'] };
+
+export function vergleicheMitBaseline({ baseline, neu, labelNachweis, faelle, akzeptiert = [] }) {
   const gruende = [];
   const zahl = (datei) => datei.laeufe.filter((lauf) => lauf.bestanden).length;
 
@@ -142,10 +147,13 @@ export function vergleicheMitBaseline({ baseline, neu, labelNachweis, faelle }) 
   if (!baseline.pruefer?.vertrauenswuerdig) gruende.push('Baseline wurde nicht mit vertrauenswürdigem Prüfer bewertet');
   const alt = baseline.reproduktion || {};
   const jetzt = neu.reproduktion || {};
-  for (const [feld, name] of [['angefragtesModell', 'Coach-Modell'], ['einstellungen', 'Einstellungen'], ['schemaHash', 'Antwortschema'], ['vectorStoreId', 'Seminarwissen'], ['wissensstand', 'Wissensstand']]) {
-    if (JSON.stringify(alt[feld] ?? null) !== JSON.stringify(jetzt[feld] ?? null)) gruende.push(`${name} unterscheidet sich von der Baseline (${feld})`);
-  }
   const hinweise = [];
+  const akzeptierteFelder = akzeptiert.flatMap((name) => AKZEPTIERBAR[name] || []);
+  for (const [feld, name] of [['angefragtesModell', 'Coach-Modell'], ['einstellungen', 'Einstellungen'], ['schemaHash', 'Antwortschema'], ['vectorStoreId', 'Seminarwissen'], ['wissensstand', 'Wissensstand']]) {
+    if (JSON.stringify(alt[feld] ?? null) === JSON.stringify(jetzt[feld] ?? null)) continue;
+    if (akzeptierteFelder.includes(feld) && jetzt[feld] != null) hinweise.push(`${name} bewusst geändert und akzeptiert (${feld})`);
+    else gruende.push(`${name} unterscheidet sich von der Baseline (${feld})`);
+  }
   if (JSON.stringify(alt.tatsaechlicheModelle || []) !== JSON.stringify(jetzt.tatsaechlicheModelle || [])) {
     hinweise.push(`ausgelieferter Modellstand: Baseline ${(alt.tatsaechlicheModelle || []).join(', ') || '–'}, jetzt ${(jetzt.tatsaechlicheModelle || []).join(', ') || '–'}`);
   }

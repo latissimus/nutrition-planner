@@ -2,6 +2,7 @@ import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { coachIconMarkup } from './menuIcons.js';
 import { toast } from './toast.js';
+import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
 
@@ -24,6 +25,14 @@ export const KATEGORIEN = [
 ];
 export const STATUS = [['aktiv', 'Läuft'], ['abgeschlossen', 'Abgeschlossen'], ['abgebrochen', 'Abgebrochen']];
 export const UMSETZUNG = [['unbekannt', 'Unbekannt'], ['kaum', 'Kaum'], ['teilweise', 'Teilweise'], ['ueberwiegend', 'Überwiegend'], ['voll', 'Voll']];
+// Experimente (Schritt 6): Zielgrößen aus derselben Liste, aus der die Edge
+// Function die Messung berechnet.
+export const ZIELGROESSEN = Object.entries(EXPERIMENT_METRICS).map(([id, metrik]) => [id, metrik.label]);
+export const RICHTUNGEN = [['steigt', 'steigt'], ['sinkt', 'sinkt'], ['stabil', 'bleibt stabil']];
+export const URTEILE = [['wirksam', 'wirksam'], ['nicht_wirksam', 'nicht wirksam'], ['unklar', 'unklar']];
+export const ENTSCHEIDUNGEN = [['beibehalten', 'beibehalten'], ['anpassen', 'anpassen'], ['beenden', 'beenden']];
+// Spalten aus der Migration von Schritt 6.
+const EXPERIMENT_FELDER = ['target_metric_id', 'expected_direction', 'baseline_note'];
 
 const escapeHtml = (value = '') => String(value ?? '')
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
@@ -52,7 +61,7 @@ export function pruefeFakt({ category, fact }) {
   return null;
 }
 
-export function pruefeMassnahme({ action, hypothesis, target_metric: ziel, start_date: start, review_date: pruefung, status, adherence, outcome }) {
+export function pruefeMassnahme({ action, hypothesis, target_metric: ziel, start_date: start, review_date: pruefung, status, adherence, outcome, target_metric_id: zielId, expected_direction: richtung, baseline_note: ausgangswert }) {
   const text = String(action || '').trim();
   if (text.length < 2) return 'Bitte die Maßnahme beschreiben.';
   if (text.length > 500) return 'Die Maßnahme darf höchstens 500 Zeichen haben.';
@@ -63,6 +72,9 @@ export function pruefeMassnahme({ action, hypothesis, target_metric: ziel, start
   if (pruefung && pruefung < start) return 'Das Prüfdatum darf nicht vor dem Start liegen.';
   if (status && !STATUS.some(([id]) => id === status)) return 'Unbekannter Status.';
   if (adherence && !UMSETZUNG.some(([id]) => id === adherence)) return 'Unbekannte Umsetzung.';
+  if (zielId && !ZIELGROESSEN.some(([id]) => id === zielId)) return 'Unbekannte Zielgröße.';
+  if (richtung && !RICHTUNGEN.some(([id]) => id === richtung)) return 'Unbekannte Richtung.';
+  if (String(ausgangswert || '').length > 500) return 'Der Ausgangswert darf höchstens 500 Zeichen haben.';
   return null;
 }
 
@@ -99,20 +111,49 @@ export function vergissLokalesGespraech(conversationId = null, storage = session
   return true;
 }
 
-// Eine Coach-Empfehlung als Maßnahme: Aktion und Begründung übernehmen, ab
-// heute. Das Prüfdatum legt der Nutzer selbst fest.
+// Eine Coach-Empfehlung als Maßnahme, ab heute. Ein Experiment bringt
+// Hypothese, Zielgröße, Richtung, Ausgangswert und Prüfdatum mit; ältere
+// Antworten nur Aktion und Begründung. Ein Prüfdatum vor heute wird verworfen.
 export function massnahmeAusEmpfehlung(empfehlung, tag = heute()) {
+  const zielId = ZIELGROESSEN.some(([id]) => id === empfehlung?.targetMetric) ? empfehlung.targetMetric : null;
+  const richtung = RICHTUNGEN.some(([id]) => id === empfehlung?.expectedDirection) ? empfehlung.expectedDirection : null;
+  const pruefung = /^\d{4}-\d{2}-\d{2}$/.test(String(empfehlung?.reviewDate || '')) && empfehlung.reviewDate >= tag ? empfehlung.reviewDate : null;
+  const annahme = String(empfehlung?.hypothesis || '').trim() || String(empfehlung?.rationale || '').trim();
   return {
     action: kuerzen(empfehlung?.action, 500),
-    hypothesis: empfehlung?.rationale ? kuerzen(empfehlung.rationale, 1000) : null,
-    target_metric: null,
+    hypothesis: annahme ? kuerzen(annahme, 1000) : null,
+    target_metric: zielId ? bezeichnung(ZIELGROESSEN, zielId) : null,
     start_date: tag,
-    review_date: null,
+    review_date: pruefung,
     status: 'aktiv',
     adherence: 'unbekannt',
     outcome: null,
     source: 'coach_empfehlung',
+    target_metric_id: zielId,
+    expected_direction: zielId ? richtung : null,
+    baseline_note: String(empfehlung?.baseline || '').trim() ? kuerzen(empfehlung.baseline, 500) : null,
   };
+}
+
+// Übernahme einer Auswertung des Coachs: Das Ergebnis wird festgehalten.
+// Beibehalten läuft ohne Prüfdatum weiter; Anpassen und Beenden schließen den
+// bisherigen Versuchsaufbau ab.
+export function auswertungAlsAenderung(auswertung, tag = heute()) {
+  const text = `Auswertung vom ${datum(tag)}: ${bezeichnung(URTEILE, auswertung?.verdict)}, ${bezeichnung(ENTSCHEIDUNGEN, auswertung?.decision)}. ${String(auswertung?.basis || '').trim()}`;
+  // „Anpassen“ beendet den bisherigen Versuchsaufbau. Die geänderte
+  // Variante braucht als neues Experiment einen neuen Startwert und Termin;
+  // sonst würden zwei verschiedene Bedingungen in einer Maßnahme vermischt.
+  return ['anpassen', 'beenden'].includes(auswertung?.decision)
+    ? { outcome: kuerzen(text, 1000), status: 'abgeschlossen' }
+    : { outcome: kuerzen(text, 1000), status: 'aktiv', review_date: null };
+}
+
+// Solange die Migration von Schritt 6 fehlt, fehlen deren Spalten. Dann wird
+// ohne sie gespeichert statt gar nicht. Jeder andere Fehler bleibt ein Fehler.
+export async function mitExperimentRueckfall(schreiben, eintrag) {
+  const erster = await schreiben(eintrag);
+  if (!erster?.error || !istNichtEingerichtet(erster.error) || !EXPERIMENT_FELDER.some((feld) => feld in eintrag)) return erster;
+  return schreiben(Object.fromEntries(Object.entries(eintrag).filter(([feld]) => !EXPERIMENT_FELDER.includes(feld))));
 }
 
 function optionen(liste, gewaehlt) {
@@ -131,7 +172,12 @@ function massnahmeFormular(massnahme = {}) {
   return `<form class="gedaechtnis-formular" data-massnahme-formular${massnahme.id ? ` data-id="${escapeHtml(massnahme.id)}"` : ''}>
     <label>Maßnahme<textarea name="action" rows="2" maxlength="500" required placeholder="Zum Beispiel: Letzte Mahlzeit drei Stunden vor dem Schlafen">${escapeHtml(massnahme.action || '')}</textarea></label>
     <label>Annahme (optional)<textarea name="hypothesis" rows="2" maxlength="1000" placeholder="Wenn …, dann …, weil …">${escapeHtml(massnahme.hypothesis || '')}</textarea></label>
-    <label>Woran du es misst (optional)<input name="target_metric" maxlength="300" value="${escapeHtml(massnahme.target_metric || '')}" placeholder="Zum Beispiel: Schlafqualität"></label>
+    <div class="gedaechtnis-zeile">
+      <label>Zielgröße (optional)<select name="target_metric_id"><option value="">keine</option>${optionen(ZIELGROESSEN, massnahme.target_metric_id)}</select></label>
+      <label>Erwartung<select name="expected_direction"><option value="">–</option>${optionen(RICHTUNGEN, massnahme.expected_direction)}</select></label>
+    </div>
+    <label>Ausgangswert (optional)<input name="baseline_note" maxlength="500" value="${escapeHtml(massnahme.baseline_note || '')}" placeholder="Zum Beispiel: Schlafqualität 2,8 von 5"></label>
+    <input type="hidden" name="target_metric" value="${escapeHtml(massnahme.target_metric || '')}">
     <div class="gedaechtnis-zeile">
       <label>Start<input type="date" name="start_date" required value="${escapeHtml(massnahme.start_date || heute())}"></label>
       <label>Prüfen am<input type="date" name="review_date" value="${escapeHtml(massnahme.review_date || '')}"></label>
@@ -166,7 +212,8 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
       <span class="gedaechtnis-chip">${escapeHtml(bezeichnung(STATUS, massnahme.status))}${faellig ? ' · Prüfung fällig' : ''}</span>
       <p><b>${escapeHtml(massnahme.action)}</b></p>
       ${massnahme.hypothesis ? `<p>${escapeHtml(massnahme.hypothesis)}</p>` : ''}
-      <small>Seit ${datum(massnahme.start_date)}${massnahme.review_date ? ` · prüfen am ${datum(massnahme.review_date)}` : ' · kein Prüfdatum'}${massnahme.target_metric ? ` · misst: ${escapeHtml(massnahme.target_metric)}` : ''} · umgesetzt: ${escapeHtml(bezeichnung(UMSETZUNG, massnahme.adherence))}${massnahme.source === 'coach_empfehlung' ? ' · aus einer Coach-Empfehlung' : ''}</small>
+      <small>Seit ${datum(massnahme.start_date)}${massnahme.review_date ? ` · prüfen am ${datum(massnahme.review_date)}` : ' · kein Prüfdatum'}${massnahme.target_metric_id ? ` · Zielgröße: ${escapeHtml(bezeichnung(ZIELGROESSEN, massnahme.target_metric_id))}${massnahme.expected_direction ? ` (${escapeHtml(bezeichnung(RICHTUNGEN, massnahme.expected_direction))})` : ''}` : massnahme.target_metric ? ` · misst: ${escapeHtml(massnahme.target_metric)}` : ''} · umgesetzt: ${escapeHtml(bezeichnung(UMSETZUNG, massnahme.adherence))}${massnahme.source === 'coach_empfehlung' ? ' · aus einer Coach-Empfehlung' : ''}</small>
+      ${massnahme.baseline_note ? `<p class="gedaechtnis-ergebnis">Ausgangswert: ${escapeHtml(massnahme.baseline_note)}</p>` : ''}
       ${massnahme.outcome ? `<p class="gedaechtnis-ergebnis">Ergebnis: ${escapeHtml(massnahme.outcome)}</p>` : ''}
       <div class="gedaechtnis-aktionen">
         <button class="btn" type="button" data-massnahme-bearbeiten="${escapeHtml(massnahme.id)}">Bearbeiten</button>
@@ -229,7 +276,18 @@ export async function merkeEmpfehlung(userId, empfehlung) {
   const eintrag = massnahmeAusEmpfehlung(empfehlung);
   const fehler = pruefeMassnahme(eintrag);
   if (fehler) throw new Error(fehler);
-  return ergebnis(supabase.from('coach_interventions').insert({ ...eintrag, user_id: userId }).select('id').single());
+  return ergebnis(mitExperimentRueckfall((zeile) => supabase.from('coach_interventions').insert({ ...zeile, user_id: userId }).select('id').single(), eintrag));
+}
+
+export async function uebernimmAuswertung(userId, auswertung) {
+  // Die Kennung stammt aus der Antwort der KI; eine erfundene wäre für die
+  // Datenbank ungültig und soll dieselbe verständliche Meldung ergeben.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(auswertung?.experimentId || ''))) {
+    throw new Error('Dieses Experiment ist nicht mehr gespeichert.');
+  }
+  const daten = await ergebnis(supabase.from('coach_interventions').update(auswertungAlsAenderung(auswertung))
+    .eq('id', auswertung?.experimentId).eq('user_id', userId).select('id'));
+  if (!daten?.length) throw new Error('Dieses Experiment ist nicht mehr gespeichert.');
 }
 
 // --------------------------------------------------------------------------
@@ -334,16 +392,20 @@ export async function mountCoachMemoryPage(container, { userId }) {
       const massnahme = {
         action: String(werte.action || '').trim(),
         hypothesis: leerZuNull(werte.hypothesis),
-        target_metric: leerZuNull(werte.target_metric),
+        // Ohne gewählte Zielgröße bleibt ein früherer freier Text erhalten.
+        target_metric: werte.target_metric_id ? bezeichnung(ZIELGROESSEN, werte.target_metric_id) : leerZuNull(werte.target_metric),
+        target_metric_id: leerZuNull(werte.target_metric_id),
+        expected_direction: werte.target_metric_id ? leerZuNull(werte.expected_direction) : null,
+        baseline_note: leerZuNull(werte.baseline_note),
         start_date: werte.start_date,
         review_date: leerZuNull(werte.review_date),
         ...(id ? { status: werte.status, adherence: werte.adherence, outcome: leerZuNull(werte.outcome) } : {}),
       };
       const fehler = pruefeMassnahme(massnahme);
       if (fehler) { toast(fehler); return; }
-      ausfuehren(() => ergebnis(id
-        ? supabase.from('coach_interventions').update(massnahme).eq('id', id).eq('user_id', userId)
-        : supabase.from('coach_interventions').insert({ ...massnahme, user_id: userId })), 'Gespeichert.');
+      ausfuehren(() => ergebnis(mitExperimentRueckfall((zeile) => (id
+        ? supabase.from('coach_interventions').update(zeile).eq('id', id).eq('user_id', userId)
+        : supabase.from('coach_interventions').insert({ ...zeile, user_id: userId })), massnahme)), 'Gespeichert.');
     }
   });
 

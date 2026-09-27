@@ -31,7 +31,7 @@ const falten = (summe) => ({
 const UEBUNGEN = [['Kniebeuge', 'legs'], ['Bankdrücken', 'push'], ['Klimmzug', 'pull']];
 
 // Rohdaten über 84 Tage, neueste zuerst, gekürzt wie beim Abruf in der Edge Function.
-function rohdaten({ ziel, kalorienziel, gewicht, ernaehrung, checkin, schlaf, training, faltenMessungen = [], taillenMessungen = [] }) {
+export function rohdaten({ ziel, kalorienziel, gewicht, ernaehrung, checkin, schlaf, training, faltenMessungen = [], taillenMessungen = [] }) {
   const zeilen = {
     settings: { goal: ziel, custom_calorie_target: kalorienziel, adaptive_target: null, height_cm: 180, birth_date: '1990-03-15', calculation_basis: 'male', bodycomp_thresholds: null },
     weights: [], skinfolds: [], waists: [], performance: [], sleep: [], checkins: [], nutritionEntries: [], dayStatus: [],
@@ -67,8 +67,8 @@ function fall({ zeilen, ...rest }) {
   return { ...rest, daten: buildCompFacts(zeilen, JETZT), zeitreihe: buildTimeseries(zeilen, JETZT) };
 }
 
-const normalerSchlaf = () => ({ bedtime: '23:00', wake_time: '06:45', quality: 3, energy: 3 });
-const normalerCheckin = () => ({ recovery: 3, mood: 3, hunger: 3 });
+export const normalerSchlaf = () => ({ bedtime: '23:00', wake_time: '06:45', quality: 3, energy: 3 });
+export const normalerCheckin = () => ({ recovery: 3, mood: 3, hunger: 3 });
 
 export const FAELLE_ZEITREIHE = [
   fall({

@@ -6,7 +6,8 @@
 //   npm run eval:coach -- --fall krankheit       nur einen Fall
 //   npm run eval:coach -- --faelle zeitreihe     Fallsatz: standard (12 Fälle, Vorgabe) oder
 //                                                zeitreihe (Fälle mit Wochenverlauf, cases-zeitreihe.mjs)
-//                                                oder gedaechtnis (Fälle mit Gedächtnis, cases-gedaechtnis.mjs)
+//                                                gedaechtnis (Fälle mit Gedächtnis, cases-gedaechtnis.mjs) oder
+//                                                experimente (Experimente und Auswertung, cases-experimente.mjs)
 //   npm run eval:coach -- --trocken              ohne API: Fälle, Anfragen und Prüfungen testen
 //   npm run eval:coach -- --als-baseline         Bericht zusätzlich versioniert unter baseline/ ablegen
 //   npm run eval:coach -- --neu-bewerten <datei> gespeicherte Antworten mit den aktuellen Prüfungen
@@ -27,6 +28,9 @@
 //                                                (braucht --mit-pruefer oder --neu-bewerten und eine
 //                                                bestandene Label-Regression; Exit-Code 0 nur bei
 //                                                bestandenem Gate)
+//   npm run eval:coach -- --akzeptiere schema,wissensstand
+//                                                beim Vergleich bewusst geänderte Teile zulassen
+//                                                (erscheinen im Bericht als Hinweis)
 //
 // Das Skript schickt exakt die Anfrage, die auch die Edge Function schickt:
 // Prompt, Schema, Modell und Werkzeuge kommen aus
@@ -58,11 +62,13 @@ import {
 import { FAELLE } from './cases.mjs';
 import { FAELLE_ZEITREIHE } from './cases-zeitreihe.mjs';
 import { FAELLE_GEDAECHTNIS } from './cases-gedaechtnis.mjs';
+import { FAELLE_EXPERIMENTE } from './cases-experimente.mjs';
 import {
   MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock,
 } from '../../supabase/functions/capboy-coach/memory.ts';
+import { EXPERIMENT_METRIC_IDS, EXPERIMENT_METRICS, experimentMeasurement } from '../../supabase/functions/capboy-coach/experiments.ts';
 import { pruefe } from './checks.mjs';
-import { antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
+import { AKZEPTIERBAR, antwortHash, pruefeLabelStruktur, vergleicheLabels, vergleicheMitBaseline } from './gate.mjs';
 import { KALIBRIERUNG } from './kalibrierung.mjs';
 import {
   KRITERIEN, MIN_KALIBRIER_DURCHLAEUFE, PRUEFER_EINSTELLUNGEN, antwortText, kalibrierungGueltig, kriterienFingerabdruck,
@@ -134,7 +140,13 @@ const vergleichsBasis = vergleichDatei ? JSON.parse(await readFile(vergleichDate
 const variante = gespeichert?.variante || wert('--variante', 'produktion');
 // Kalibrierung und Labels beziehen sich immer auf die Standardfälle (FAELLE);
 // der Lauf selbst auf den gewählten Fallsatz.
-const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE, gedaechtnis: FAELLE_GEDAECHTNIS };
+const FALLSAETZE = { standard: FAELLE, zeitreihe: FAELLE_ZEITREIHE, gedaechtnis: FAELLE_GEDAECHTNIS, experimente: FAELLE_EXPERIMENTE };
+const akzeptiert = (wert('--akzeptiere', '') || '').split(',').map((name) => name.trim()).filter(Boolean);
+const unbekanntAkzeptiert = akzeptiert.filter((name) => !AKZEPTIERBAR[name]);
+if (unbekanntAkzeptiert.length) {
+  console.error(`Unbekannt in --akzeptiere: ${unbekanntAkzeptiert.join(', ')}. Möglich: ${Object.keys(AKZEPTIERBAR).join(', ')}`);
+  process.exit(1);
+}
 const fallsatz = gespeichert?.fallsatz || wert('--faelle', 'standard');
 if (!FALLSAETZE[fallsatz]) {
   console.error(`Unbekannter Fallsatz "${fallsatz}". Vorhanden: ${Object.keys(FALLSAETZE).join(', ')}`);
@@ -223,7 +235,8 @@ if (vergleichsBasis) {
   if (!mitPruefer && !gespeichert) hindernisse.push('Der Vergleich braucht Prüferurteile: --mit-pruefer');
   if (nurFall) hindernisse.push('Der Vergleich gilt nur für alle Fälle, nicht mit --fall');
   if (durchlaeufe !== vergleichsBasis.durchlaeufe) hindernisse.push(`Die Baseline hat ${vergleichsBasis.durchlaeufe} Durchläufe je Fall, dieser Lauf ${durchlaeufe}`);
-  if (!gespeichert && vectorStoreId !== (vergleichsBasis.reproduktion?.vectorStoreId ?? null)) hindernisse.push(`Seminarwissen passt nicht zur Baseline: Baseline ${vergleichsBasis.reproduktion?.vectorStoreId || 'ohne'}, dieser Lauf ${vectorStoreId || 'ohne'} – COACH_VECTOR_STORE_ID setzen`);
+  if (!gespeichert && akzeptiert.includes('wissensstand') && vergleichsBasis.reproduktion?.vectorStoreId && !vectorStoreId) hindernisse.push('Die Baseline lief mit Seminarwissen, dieser Lauf ohne – COACH_VECTOR_STORE_ID auf den neuen Vector Store setzen');
+  if (!gespeichert && !akzeptiert.includes('wissensstand') && vectorStoreId !== (vergleichsBasis.reproduktion?.vectorStoreId ?? null)) hindernisse.push(`Seminarwissen passt nicht zur Baseline: Baseline ${vergleichsBasis.reproduktion?.vectorStoreId || 'ohne'}, dieser Lauf ${vectorStoreId || 'ohne'} – COACH_VECTOR_STORE_ID setzen`);
   const labels = await labelNachweis();
   if (!labels.gueltig) hindernisse.push(`Label-Regression fehlt oder ungültig: ${labels.gruende.join('; ')}\nZuerst: npm run eval:coach -- --labels scripts/coach-evals/labels/<datei>.json`);
   if (hindernisse.length) {
@@ -528,10 +541,10 @@ const zeilen = [
 ];
 
 const vergleich = vergleichsBasis
-  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis(), faelle: LAUF_FAELLE })
+  ? vergleicheMitBaseline({ baseline: vergleichsBasis, neu: { ...kopf, laeufe }, labelNachweis: await labelNachweis(), faelle: LAUF_FAELLE, akzeptiert })
   : null;
 if (vergleich) {
-  kopf.vergleich = { baseline: vergleichDatei, ...vergleich };
+  kopf.vergleich = { baseline: vergleichDatei, akzeptiert, ...vergleich };
   zeilen.push(
     '',
     `## Vergleichs-Gate gegen ${vergleichDatei}: ${vergleich.bestanden ? '**BESTANDEN**' : '**NICHT BESTANDEN**'}`,
@@ -824,6 +837,7 @@ async function trockenlauf() {
   const verlaufProben = trockenlaufZeitreihe(fehler);
   const fixtureProbe = await trockenlaufFixture(fehler);
   const gedaechtnisProben = trockenlaufGedaechtnis(fehler);
+  const experimentProben = trockenlaufExperimente(fehler);
 
   if (fehler.length) {
     console.error(`Trockenlauf fehlgeschlagen:\n- ${fehler.join('\n- ')}`);
@@ -838,6 +852,7 @@ async function trockenlauf() {
     `Wochenverlauf: ${verlaufProben.rechnung} Rechenproben, ${verlaufProben.faelle} Fälle mit <timeseries>, ${verlaufProben.zahlen} Zahlenproben – alles richtig; Standardfälle ohne Verlauf.`,
     `Fixture: buildCompFacts gleicht der bisherigen Snapshot-Ausgabe (${fixtureProbe.werte} Werte, Referenz aus ${fixtureProbe.commit}); alle alten Grenzen überschritten.`,
     `Gedächtnis: ${gedaechtnisProben.bloecke} Blockproben, ${gedaechtnisProben.faelle} Fälle mit Gedächtnis, ${gedaechtnisProben.zahlen} Zahlen- und ${gedaechtnisProben.regeln} Regelproben – alles richtig; Standardfälle ohne Gedächtnis.`,
+    `Experimente: ${experimentProben.messung} Messproben, ${experimentProben.pruefungen} Prüfproben, ${experimentProben.faelle} Fälle, ${experimentProben.gate} Gate-Proben zum Akzeptieren – alles richtig.`,
   ].join('\n'));
 }
 
@@ -1100,8 +1115,11 @@ function trockenlaufPrompt(fehler) {
   for (const webResearch of [false, true]) {
     const neu = anfrage(produktion, 'coach', webResearch);
     const alt = anfrage(legacy, 'coach', webResearch);
-    const ohne = ({ instructions, input, ...rest }) => rest;
-    regel(JSON.stringify(ohne(neu)) === JSON.stringify(ohne(alt)), `freier Coach${webResearch ? ' mit Websuche' : ''}: Modell, Einstellungen, Werkzeuge oder Schema weichen ab`);
+    // Seit Schritt 6 hat der freie Coach ein eigenes Antwortschema; alles
+    // andere an der Anfrage bleibt wie im eingefrorenen Stand.
+    const ohne = ({ instructions, input, text, ...rest }) => ({ ...rest, text: { format: { ...text.format, schema: null } } });
+    regel(JSON.stringify(ohne(neu)) === JSON.stringify(ohne(alt)), `freier Coach${webResearch ? ' mit Websuche' : ''}: Modell, Einstellungen oder Werkzeuge weichen ab`);
+    regel(neu.text.format.schema === produktion.coachResultSchema, 'freier Coach nutzt nicht das Experiment-Schema');
     regel(neu.instructions !== alt.instructions, 'freier Coach hat noch den alten Prompt');
     regel(neu.instructions.includes(webResearch ? 'Web search is enabled' : 'Web search is not available'), `Websuche ${webResearch ? 'an' : 'aus'} nicht im Prompt abgebildet`);
     const inhalt = neu.input[0].content;
@@ -1116,7 +1134,7 @@ function trockenlaufPrompt(fehler) {
   for (const block of bloecke) regel(prompt.includes(`- <${block}>:`), `beschreibt den Block <${block}> nicht`);
   // Jeder andere Tag im Prompt muss ein Abschnitt sein - kein Eingabeblock
   // unter fremdem Namen.
-  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
+  const abschnitte = ['role_and_mission', 'input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'next_steps', 'experiment_reviews', 'safety_constraints', 'tone_of_voice', 'output_rules', 'final_check'];
   const fremd = [...new Set([...prompt.matchAll(/<\/?([a-z_]+)>/g)].map((treffer) => treffer[1]))].filter((name) => !bloecke.includes(name) && !abschnitte.includes(name));
   regel(!fremd.length, `nennt unbekannte Blöcke: ${fremd.join(', ')}`);
   // Die Eingabe enthält nur bekannte Blöcke, in fester Reihenfolge, ohne leere.
@@ -1125,6 +1143,20 @@ function trockenlaufPrompt(fehler) {
   let abgelehnt = false;
   try { produktion.coachInput({ capboy_data: '{}' }); } catch { abgelehnt = true; }
   regel(abgelehnt, 'coachInput nimmt unbekannte Blöcke an');
+  // Experiment-Schema: strikt (jedes Feld Pflicht, keine Zusatzfelder), die
+  // Grundfelder wie bisher, Zielgrößen exakt die der Messung (experiments.ts).
+  const schema = produktion.coachResultSchema;
+  const strikt = (objekt, pfad) => {
+    regel(objekt.additionalProperties === false, `Schema ${pfad}: Zusatzfelder erlaubt`);
+    regel(JSON.stringify([...objekt.required].sort()) === JSON.stringify(Object.keys(objekt.properties).sort()), `Schema ${pfad}: nicht jedes Feld ist Pflicht`);
+  };
+  strikt(schema, 'Antwort');
+  strikt(schema.properties.recommendations.items, 'Empfehlung');
+  strikt(schema.properties.experimentReviews.items, 'Auswertung');
+  for (const feld of Object.keys(produktion.resultSchema.properties)) regel(feld in schema.properties, `Schema: Grundfeld ${feld} fehlt`);
+  for (const feld of ['action', 'rationale', 'timeframe']) regel(feld in schema.properties.recommendations.items.properties, `Schema: Empfehlungsfeld ${feld} fehlt`);
+  regel(JSON.stringify(schema.properties.recommendations.items.properties.targetMetric.enum) === JSON.stringify([...EXPERIMENT_METRIC_IDS, 'keine']), 'Schema: Zielgrößen weichen von experiments.ts ab');
+  for (const id of EXPERIMENT_METRIC_IDS) regel(prompt.includes(id), `Prompt nennt die Zielgröße ${id} nicht`);
   // confidence muss genau die Werte des Schemas definieren.
   for (const stufe of produktion.resultSchema.properties.confidence.enum) regel(prompt.includes(`- "${stufe}":`), `definiert confidence "${stufe}" nicht`);
   // Kein Unterrichten auf die Testfälle: keine Fallfrage und keine
@@ -1355,6 +1387,126 @@ function trockenlaufGedaechtnis(fehler) {
     if (gemeldet !== soll) fehler.push(`Gedächtnis: „${empfehlung.action} | ${empfehlung.rationale}“ sollte ${soll ? '' : 'nicht '}als Sprung-Empfehlung gelten`);
   }
   return { bloecke, faelle: FAELLE_GEDAECHTNIS.length, zahlen: zahlenProben.length, regeln: knieProben.length };
+}
+
+// Experimente (Schritt 6) ohne API: Messung, Prüfungen, Fälle, Gate.
+function trockenlaufExperimente(fehler) {
+  let messung = 0;
+  const gleich = (ist, soll, was) => {
+    messung += 1;
+    if (JSON.stringify(ist) !== JSON.stringify(soll)) fehler.push(`Experimente: ${was} ist ${JSON.stringify(ist)}, erwartet ${JSON.stringify(soll)}`);
+  };
+  // Kleiner Verlauf zum Nachrechnen: KW 36 bis 39, KW 39 läuft noch.
+  const woche = (label, from, to, werte, partial = false) => ({
+    week: label, from, to, partial,
+    bodyComposition: { averageWeightKg: werte.kg ?? null, latestSkinfoldSumMm: werte.mm ?? null },
+    sleep: { averageQuality: werte.q ?? null }, nutrition: { completeDays: werte.tage ?? 0 },
+  });
+  const verlauf = {
+    weeks: [
+      woche('2026-W36', '2026-08-31', '2026-09-06', { kg: 90, q: 2, mm: 80, tage: 6 }),
+      woche('2026-W37', '2026-09-07', '2026-09-13', { kg: 89.5, q: 3, tage: 5 }),
+      woche('2026-W38', '2026-09-14', '2026-09-20', { kg: 89, q: 4, tage: 6 }),
+      woche('2026-W39', '2026-09-21', '2026-09-26', { kg: 70, q: 5, mm: 75, tage: 2 }, true),
+    ],
+    training: { exercises: [
+      { weeklyBestEstimated1rmKg: [100, null, 110, 200] },  // KW 39 läuft noch: zählt nicht
+      { weeklyBestEstimated1rmKg: [50, 55, null, null] },
+      { weeklyBestEstimated1rmKg: [null, 80, 90, null] },   // nichts vor dem Start: fällt weg
+    ] },
+  };
+  const m = (metrik, start) => experimentMeasurement(metrik, start, verlauf);
+  const kurz = (ergebnis) => ergebnis && [ergebnis.baselineWeek, ergebnis.baselineValue, ergebnis.currentWeek, ergebnis.currentValue, ergebnis.change, ergebnis.reason];
+  gleich(kurz(m('gewicht', '2026-09-08')), ['2026-W36', 90, '2026-W38', 89, -1, null], 'Gewicht: Vorwoche gegen letzte abgeschlossene Woche, Startwoche ausgelassen');
+  gleich(kurz(m('schlafqualitaet', '2026-09-08')), ['2026-W36', 2, '2026-W38', 4, 2, null], 'Schlafqualität');
+  gleich(kurz(m('faltensumme', '2026-09-08')), [null, null, null, null, null, 'no_completed_week_with_value_after_start'], 'Faltensumme nur in der laufenden Woche: nicht messbar');
+  gleich(kurz(m('gewicht', '2026-08-31')), [null, null, null, null, null, 'no_value_before_start'], 'Start in der ersten Woche: kein Ausgangswert');
+  gleich(kurz(m('gewicht', '2026-01-01')), [null, null, null, null, null, 'start_before_timeseries'], 'Start vor dem Verlauf');
+  gleich(kurz(m('protokoll', '2026-09-08')), ['2026-W36', 6, '2026-W38', 6, 0, null], 'Anzahl ohne laufende Woche');
+  const kraft = m('kraft', '2026-09-08');
+  gleich([kraft.change, kraft.comparableExercises], [10, 1], 'Kraft: nur Übungen mit Wert vor und nach dem Start');
+  gleich(m('unbekannt', '2026-09-08'), null, 'unbekannte Zielgröße');
+  gleich(m('gewicht', '2026-09-08').text, 'Gewicht (Wochenmittel): 90 kg (2026-W36) → 89 kg (2026-W38), Veränderung -1 kg', 'Messtext');
+  gleich(m('schlafqualitaet', '2026-09-08').text, 'Schlafqualität: 2 von 5 (2026-W36) → 4 von 5 (2026-W38), Veränderung +2', 'Messtext Skala');
+  gleich(Object.keys(EXPERIMENT_METRICS).every((id) => EXPERIMENT_METRICS[id].label && EXPERIMENT_METRICS[id].unit), true, 'jede Zielgröße hat Bezeichnung und Einheit');
+  // Der Maßnahmen-Block trägt Messung und ID.
+  const block = JSON.parse(interventionBlock([{ id: 'x1', action: 'Test', status: 'aktiv', start_date: '2026-09-08', review_date: '2026-09-20', target_metric_id: 'gewicht', expected_direction: 'sinkt' }], '2026-09-26', verlauf))[0];
+  gleich([block.id, block.targetMetricId, block.expectedDirection, block.reviewDue, block.measurement.change], ['x1', 'gewicht', 'sinkt', true, -1], 'Maßnahmen-Block mit Messung');
+
+  // Prüfungen am Fall "experiment-wirksam".
+  let pruefungen = 0;
+  const wirksam = FAELLE_EXPERIMENTE.find((fall) => fall.id === 'experiment-wirksam');
+  const empfehlung = (werte = {}) => ({ kind: 'experiment', action: 'Abendessen bis 19 Uhr', rationale: 'weil', timeframe: '3 Wochen', hypothesis: 'Wenn …, dann …, weil …', baseline: 'Schlafqualität 4 von 5 (2026-W38)', targetMetric: 'schlafqualitaet', expectedDirection: 'steigt', reviewDate: '2026-10-17', ...werte });
+  const antwort = (werte = {}) => ({ ...antwortMitSatz('summary', 'x'), experimentReviews: [{ experimentId: 'exp-abendessen', verdict: 'wirksam', basis: 'Schlafqualität: 2 von 5 (2026-W35) → 4 von 5 (2026-W38), Veränderung +2; Umsetzung überwiegend', decision: 'beibehalten' }], recommendations: [empfehlung()], ...werte });
+  const probe = (fall, a, name, soll) => {
+    pruefungen += 1;
+    const treffer = pruefe(fall, a).find((pruefung) => pruefung.name === name);
+    if (!treffer || treffer.bestanden !== soll) fehler.push(`Experimente: „${name}“ sollte ${soll ? 'bestehen' : 'scheitern'} (${treffer ? treffer.detail : 'Prüfung fehlt'})`);
+  };
+  probe(wirksam, antwort(), 'Experiment-Schema vollständig', true);
+  probe(wirksam, antwort(), 'Experimente vollständig', true);
+  probe(wirksam, antwort({ recommendations: [empfehlung({ hypothesis: ' ' })] }), 'Experimente vollständig', false);
+  probe(wirksam, antwort({ recommendations: [empfehlung({ targetMetric: 'keine' })] }), 'Experimente vollständig', false);
+  probe(wirksam, antwort({ recommendations: [empfehlung({ reviewDate: '2026-09-20' })] }), 'Experimente vollständig', false);   // vor generatedAt
+  probe(wirksam, antwort({ recommendations: [empfehlung({ reviewDate: '2026-10-03' })] }), 'Experimente vollständig', false);   // nur 7 statt mindestens 14 Tage
+  probe(wirksam, antwort({ recommendations: [empfehlung({ reviewDate: '17.10.2026' })] }), 'Experimente vollständig', false);
+  probe(wirksam, antwort({ recommendations: [empfehlung({ reviewDate: '2027-06-01' })] }), 'Experimente vollständig', false);   // über 120 Tage
+  probe(wirksam, antwort({ recommendations: [empfehlung({ targetMetric: 'bauchgefuehl' })] }), 'Experiment-Schema vollständig', false);
+  const sicherheit = empfehlung({ kind: 'sicherheit', hypothesis: '', baseline: '', targetMetric: 'keine', expectedDirection: 'keine', reviewDate: '' });
+  probe(wirksam, antwort({ recommendations: [sicherheit] }), 'Sicherheitsschritte ohne Experimentfelder', true);
+  probe(wirksam, antwort({ recommendations: [{ ...sicherheit, baseline: 'Schlafqualität 4 von 5' }] }), 'Sicherheitsschritte ohne Experimentfelder', false);
+  const beobachten = empfehlung({ kind: 'beobachtung', hypothesis: '', baseline: '', targetMetric: 'schlafqualitaet', expectedDirection: 'keine', reviewDate: '' });
+  probe(wirksam, antwort({ recommendations: [beobachten] }), 'Beobachtungen ohne Experimentfelder', true);
+  probe(wirksam, antwort({ recommendations: [{ ...beobachten, reviewDate: '2026-10-17' }] }), 'Beobachtungen ohne Experimentfelder', false);
+  probe(wirksam, antwort(), 'Genau die fälligen Experimente ausgewertet', true);
+  probe(wirksam, antwort({ experimentReviews: [] }), 'Genau die fälligen Experimente ausgewertet', false);
+  probe(wirksam, antwort({ experimentReviews: [{ experimentId: 'erfunden', verdict: 'wirksam', basis: '', decision: 'beenden' }] }), 'Genau die fälligen Experimente ausgewertet', false);
+  probe(wirksam, antwort({ experimentReviews: [antwort().experimentReviews[0], { experimentId: 'erfunden', verdict: 'wirksam', basis: '', decision: 'beenden' }] }), 'Genau die fälligen Experimente ausgewertet', false);   // zusätzlich erfundene ID
+  probe(wirksam, antwort({ experimentReviews: [antwort().experimentReviews[0], antwort().experimentReviews[0]] }), 'Genau die fälligen Experimente ausgewertet', false);   // doppelt
+  probe(wirksam, antwort(), 'Auswertung exp-abendessen: wirksam', true);
+  probe(wirksam, antwort({ experimentReviews: [{ experimentId: 'exp-abendessen', verdict: 'unklar', basis: '', decision: 'beibehalten' }] }), 'Auswertung exp-abendessen: wirksam', false);
+  probe(wirksam, antwort({ experimentReviews: [{ experimentId: 'exp-abendessen', verdict: 'wirksam', basis: 'Schlafqualität: 2 von 5 (2026-W35) → 4 von 5 (2026-W38), Veränderung +2; Umsetzung überwiegend', decision: 'anpassen' }], recommendations: [] }), 'Anpassung wird als neues Experiment beschrieben', false);
+  probe(wirksam, antwort(), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', true);
+  probe(wirksam, antwort({ experimentReviews: [{ experimentId: 'exp-abendessen', verdict: 'wirksam', basis: 'Schlafqualität in KW 35 bei 2 von 5, in KW 38 bei 4 von 5, Veränderung +3', decision: 'beibehalten' }] }), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', false);   // falsche Veränderung
+  probe(wirksam, antwort({ recommendations: [empfehlung({ baseline: 'Schlafqualität 4,7 von 5' })] }), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', false);
+  // "5" steht ohne Vorzeichen im Gedächtnis ("von 5"), ist aber kein Wert der Schlafqualität.
+  probe(wirksam, antwort({ recommendations: [empfehlung({ baseline: 'Schlafqualität zuletzt 5' })] }), 'Ausgangswerte und Auswertungen enthalten nur gelieferte Zahlen', false);
+  const neu = FAELLE_EXPERIMENTE.find((fall) => fall.id === 'experiment-neu-schlaf');
+  probe(neu, antwort({ experimentReviews: [] }), 'neues Experiment mit Zielgröße schlafdauer oder schlafqualitaet oder morgenenergie', true);
+  probe(neu, antwort({ experimentReviews: [], recommendations: [empfehlung({ targetMetric: 'gewicht' })] }), 'neues Experiment mit Zielgröße schlafdauer oder schlafqualitaet oder morgenenergie', false);
+  // Alte Antworten ohne experimentReviews: keine Experiment-Prüfungen.
+  pruefungen += 1;
+  if (pruefe(FAELLE[0], antwortMitSatz('summary', 'x')).some((pruefung) => pruefung.name.startsWith('Experiment'))) fehler.push('Experimente: alte Antworten dürfen keine Experiment-Prüfungen bekommen');
+
+  // Fälle: IDs eindeutig, fällige Experimente mit Messung, Standardfälle ohne.
+  const alleIds = new Set([...FAELLE, ...FAELLE_ZEITREIHE, ...FAELLE_GEDAECHTNIS].map((fall) => fall.id));
+  for (const fall of FAELLE_EXPERIMENTE) {
+    if (alleIds.has(fall.id)) fehler.push(`Experimente: Fall-ID ${fall.id} gibt es schon`);
+    for (const eintrag of kriterienFuer(fall)) if (!KRITERIEN[eintrag.kriterium]) fehler.push(`Experimente: ${fall.id} nutzt unbekanntes Kriterium ${eintrag.kriterium}`);
+    for (const id of Object.keys(fall.erwartet.auswertung || {})) {
+      const eintrag = JSON.parse(fall.gedaechtnis.intervention_log || '[]').find((kandidat) => kandidat.id === id);
+      if (!eintrag?.reviewDue || eintrag.measurement?.change == null) fehler.push(`Experimente: ${fall.id} erwartet eine Auswertung für ${id}, das nicht fällig oder nicht messbar ist`);
+    }
+  }
+
+  // Gate: bewusst geänderte Teile nur mit --akzeptiere.
+  let gate = 0;
+  const basis = { reproduktion: { faelleHash: 'f', datenVerifiziert: true, datenHashes: {}, schemaHash: 'alt', wissensstand: 'alt', vectorStoreId: 'vs_alt' }, pruefer: { fingerabdruck: 'p', vertrauenswuerdig: true }, laeufe: [] };
+  const neuStand = (werte) => ({ ...basis, reproduktion: { ...basis.reproduktion, ...werte } });
+  const ergebnis = (werte, liste) => vergleicheMitBaseline({ baseline: basis, neu: neuStand(werte), labelNachweis: { gueltig: true, gruende: [] }, faelle: [], akzeptiert: liste });
+  for (const [beschreibung, werte, liste, soll] of [
+    ['neues Schema ohne Akzeptanz', { schemaHash: 'neu' }, [], false],
+    ['neues Schema akzeptiert', { schemaHash: 'neu' }, ['schema'], true],
+    ['neue Wissensbasis akzeptiert', { wissensstand: 'neu', vectorStoreId: 'vs_neu' }, ['wissensstand'], true],
+    ['neue Wissensbasis nur Schema akzeptiert', { wissensstand: 'neu', vectorStoreId: 'vs_neu' }, ['schema'], false],
+    ['akzeptierte Wissensbasis, aber ohne Vector Store', { wissensstand: 'neu', vectorStoreId: null }, ['wissensstand'], false],
+  ]) {
+    gate += 1;
+    const pruef = ergebnis(werte, liste);
+    if (pruef.bestanden !== soll) fehler.push(`Experimente/Gate: „${beschreibung}“ sollte ${soll ? 'bestehen' : 'scheitern'} (${pruef.gruende.join('; ')})`);
+    if (soll && !pruef.hinweise.some((hinweis) => hinweis.includes('akzeptiert'))) fehler.push(`Experimente/Gate: „${beschreibung}“ nennt die Akzeptanz nicht im Bericht`);
+  }
+  return { messung, pruefungen, faelle: FAELLE_EXPERIMENTE.length, gate };
 }
 
 // buildCompFacts gegen die Ausgabe der bisherigen Snapshot-Berechnung (fixtures/).
