@@ -7938,6 +7938,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="profile"] .themeseg{
   display:grid;
   grid-template-columns:1fr 1fr;
+  box-shadow:none;
 }
 :root[data-seite="profile"] .themebtn{
   min-height:44px;
@@ -15275,3 +15276,53 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-reset-mini{border:1.5px solid currentColor!important;background:transparent!important;color:inherit!important}
 /* Im Dark Mode: weiße Nummern der nächsten Schritte, Kreis als Ring. */
 :root[data-theme="dark"] .comp-assessment-body ol li::before{background:transparent!important;color:#fff!important;box-shadow:inset 0 0 0 1.5px #fff}
+/* Optionale Schritte in der KI-Karte: aus den Seminar-Auswertungen der App. */
+.comp-optional>p{color:var(--muted)}
+.comp-assessment-body .comp-optional ul{gap:12px;padding:0;list-style:none}
+.comp-optional li{display:grid;gap:3px}
+.comp-optional li small{color:var(--muted);font:750 8px/1.2 var(--tech);letter-spacing:.06em;text-transform:uppercase}
+.comp-optional li b{font:780 10.5px/1.35 var(--ui)}
+.comp-optional li span{font:520 10.5px/1.45 var(--tech)}
+.comp-optional li em{color:var(--muted);font:600 9px/1.3 var(--tech);font-style:normal}
+
+/* Aufklappmenüs in den Detailkarten: alle Überschriften gleich groß und
+   bündig mit dem übrigen Inhalt. */
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-inner-details,.body-info,.ypsi-plan-details)>summary{padding:12px 0!important;font:820 13px/1.25 "Work Sans",var(--ui),sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-inner-details,.ypsi-plan-details)>summary>span:first-child{font:inherit!important}
+/* Der Seminar-Handlungsplan bleibt als kompaktes Detail: kleine Kategorien,
+   schlichte Listen. Die wichtigsten Schritte daraus stehen in der KI-Karte. */
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-plan-details>div{padding:0!important;margin:0!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-priority-comparison>*{padding:8px 0!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories{display:grid!important;gap:12px!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories article{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories h4{display:flex;align-items:center;gap:6px;margin:0 0 5px!important;font:800 9px/1.2 var(--tech)!important;letter-spacing:.06em!important;text-transform:uppercase!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories h4 .material-svg,:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories h4 .material-svg svg{flex:none;width:14px!important;height:14px!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-guided-plan h3{margin:0!important;font:820 13px/1.25 "Work Sans",var(--ui),sans-serif!important;letter-spacing:0!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories ol{display:grid;gap:6px;margin:0;padding:0}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories ol>li{grid-template-columns:18px minmax(0,1fr)!important;column-gap:8px!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories ol>li::before{width:16px!important;height:16px!important;min-width:0!important;border:0!important;background:transparent!important;color:inherit!important;box-shadow:inset 0 0 0 1px currentColor!important;font:800 8px/16px var(--tech)!important;text-align:center}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories li{border:0!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories li>span{font:520 11px/1.45 var(--tech)!important}
+:root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .ypsi-action-categories li>:is(small,a){display:block;margin-top:2px;font:700 8px/1.2 var(--tech)!important;opacity:.7}
+
+/* Overlays unter Hautfalten und Neurotransmitter (Falten-Details,
+   Kontextfragen, Neurotransmitter-Test) im Stil der KI-Karte: Kopf ohne
+   Tönung, Abschnitte durch feine Linien statt Kästen, Schrift in der
+   Kartenfarbe, Balken und Auswahl schwarz statt pink. */
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet>.falten-detail-header{background:inherit!important;border-bottom:1px solid var(--app-divider,#ddd)!important;color:inherit!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet .body-inner-details{border-top:1px solid var(--app-divider,#ddd)!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet .body-inner-details>summary{padding:12px 0!important;font:820 13px/1.25 "Work Sans",var(--ui),sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet .body-inner-details>summary>span:first-child{font:inherit!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet :is(small,em,strong,b,span,p,li,label,legend,h2,h3,h4,section,aside,div,header,details,summary){color:inherit!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet :is(.falten-detail-status,.skinfold-context-priority,.braverman-result-focus,.braverman-warning,.body-neutral-note,.falten-detail-section,.neurotransmitter-strategy,.ypsi-background,.braverman-dose-list){padding:14px 0 0!important;border:0!important;border-top:1px solid var(--app-divider,#ddd)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet :is(.falten-detail-body,.braverman-test-body)>:first-child{padding-top:0!important;border-top:0!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet :is(p:not([class]),.body-neutral-note){margin:0;font:520 11.5px/1.5 var(--tech)!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet fieldset{margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet fieldset>legend{float:left;width:100%;margin:0 0 8px!important;padding:14px 0 0!important;border-top:1px solid var(--app-divider,#ddd)!important;background:transparent!important;font:820 13px/1.25 "Work Sans",var(--ui),sans-serif!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet fieldset>legend+*{clear:both}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet .falten-detail-tags>span{border:1px solid currentColor!important;background:transparent!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet [data-tone]>i{background:color-mix(in srgb,currentColor 14%,transparent)!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet [data-tone]>i>em{background:currentColor!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet [role="group"]>label{border:1.5px solid currentColor!important;background:transparent!important;box-shadow:none!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet [role="group"]>label:has(input:checked){border-color:var(--text,#111)!important;background:var(--text,#111)!important;color:var(--app-card,#fff)!important}
+:root[data-seite] .kategorie-sheet-backdrop.falten-detail-overlay .kategorie-sheet.falten-detail-sheet .body-reset-mini{border:1.5px solid currentColor!important;background:transparent!important;color:inherit!important}

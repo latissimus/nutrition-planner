@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
+import { compOptionaleSchritte, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
 import { FALTEN, summe } from './measurements.js';
 import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
@@ -87,5 +87,48 @@ describe('Hautfaltenverlauf', () => {
     expect(markup).toContain('ist-unvollstaendig');
     expect(markup).toContain('Knie');
     expect(markup).toContain('1 fehlt');
+  });
+});
+
+describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
+  const actionPlan = {
+    categories: { supplements: [
+      { text: 'B-Vitamine nur unter Berücksichtigung der Gesamtzufuhr ergänzen.', source: 'seminar' },
+      { text: 'Phase 1 ist dein aktueller Supplement-Schritt. Prüfe die aufgeführten Produkte.', source: 'seminar' },
+      { text: 'Aus dieser Messung ergibt sich aktuell kein Supplement-Schritt.', source: 'app' },
+    ] },
+    protocols: [{ name: 'YPSI Quadrizeps/Beinbizeps – Phase 1', supplemente: [{ slug: 'magnesium' }], optionale_supplemente: [] }],
+  };
+  const neurotransmitter = {
+    complete: true,
+    relevant: [{}],
+    focus: { key: 'gaba', area: { label: 'GABA' }, severity: { label: 'deutlich' }, recommendations: {
+      seminarFoods: [], seminarLifestyle: [], bravermanLifestyle: [],
+      seminarTraining: { intensitaet: 'niedrig bis moderat', volumen: 'niedrig bis moderat' },
+      seminarSupplements: ['Taurin', 'Inositol', 'B-Vitamine', 'Glycin', 'L-Theanin'],
+      seminarNote: 'Gewöhnliche GABA-Supplements erhöhen GABA nicht.',
+    } },
+  };
+
+  it('übernimmt Supplemente des Hautfalten-Plans ohne Dosierung und ohne App- oder Verweissätze', () => {
+    const [falten] = compOptionaleSchritte({ actionPlan, faltenLabel: 'Beinbizeps' });
+    expect(falten.bereich).toBe('Hautfalten · Beinbizeps');
+    expect(falten.punkte[0]).toMatch(/^Quadrizeps\/Beinbizeps – Phase 1: /);
+    expect(falten.punkte).toContain('B-Vitamine nur unter Berücksichtigung der Gesamtzufuhr ergänzen.');
+    expect(falten.punkte.join(' ')).not.toMatch(/Phase 1 ist dein|kein Supplement-Schritt/);
+    expect(falten.karte).toBe('Hautfalten');
+  });
+
+  it('übernimmt den Schwerpunkt des Neurotransmitter-Tests nur, wenn er auffällig ist', () => {
+    const [nt] = compOptionaleSchritte({ neurotransmitter });
+    expect(nt.bereich).toBe('Neurotransmitter · GABA (deutlich)');
+    expect(nt.punkte).toEqual([
+      'Training: Intensität niedrig bis moderat, Volumen niedrig bis moderat',
+      'Supplemente: Taurin, Inositol, B-Vitamine, Glycin',
+      'Gewöhnliche GABA-Supplements erhöhen GABA nicht.',
+    ]);
+    expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, relevant: [] } })).toEqual([]);
+    expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, complete: false } })).toEqual([]);
+    expect(compOptionaleSchritte({})).toEqual([]);
   });
 });

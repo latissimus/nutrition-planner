@@ -809,7 +809,66 @@ function bodyCompMarkup(state) {
   </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
 }
 
-function compResultMarkup(result, cached = false) {
+// Optionale Schritte unter der KI-Bewertung: die Supplement-Hinweise des
+// Hautfalten-Plans und die Empfehlungen des Neurotransmitter-Tests. Sie
+// kommen aus den Seminar-Auswertungen der App, nicht von der KI, und ohne
+// Dosierungen; die stehen mit allen Details weiter in den jeweiligen Karten.
+export function compOptionaleSchritte({ actionPlan = null, faltenLabel = '', neurotransmitter = null } = {}) {
+  const schritte = [];
+  // Der Satz "Phase n ist dein aktueller Supplement-Schritt ..." verweist auf
+  // die Produkte der Karte; hier nennt die Protokollzeile sie selbst.
+  const supplemente = (actionPlan?.categories?.supplements || [])
+    .filter((item) => item.source !== 'app' && !/^Phase \d/.test(item.text)).map((item) => item.text);
+  const protokolle = (actionPlan?.protocols || []).map((protocol) => {
+    const namen = [...(protocol.supplemente || []), ...(protocol.optionale_supplemente || [])].map((item) => supplementName(item.slug));
+    return `${String(protocol.name || '').replace(/^YPSI\s+/i, '')}${namen.length ? `: ${namen.join(', ')}` : ''}`;
+  });
+  if (supplemente.length || protokolle.length) {
+    schritte.push({ bereich: `Hautfalten${faltenLabel ? ` · ${faltenLabel}` : ''}`, titel: 'Supplemente laut Seminar', punkte: [...protokolle, ...supplemente].slice(0, 3), karte: 'Hautfalten' });
+  }
+  const fokus = neurotransmitter?.complete && neurotransmitter.relevant?.length ? neurotransmitter.focus : null;
+  if (fokus) {
+    const r = fokus.recommendations || {};
+    const training = r.seminarTraining ? [r.seminarTraining.intensitaet && `Intensität ${r.seminarTraining.intensitaet}`, r.seminarTraining.volumen && `Volumen ${r.seminarTraining.volumen}`].filter(Boolean).join(', ') : '';
+    const punkte = [
+      r.seminarFoods?.length ? `Lebensmittel: ${r.seminarFoods.slice(0, 4).join(', ')}` : '',
+      [...(r.seminarLifestyle || []), ...(r.bravermanLifestyle || [])].length ? `Alltag: ${[...(r.seminarLifestyle || []), ...(r.bravermanLifestyle || [])].slice(0, 2).join('; ')}` : '',
+      training ? `Training: ${training}` : '',
+      r.seminarSupplements?.length ? `Supplemente: ${r.seminarSupplements.slice(0, 4).join(', ')}` : '',
+      r.seminarNote || '',
+    ].filter(Boolean);
+    if (punkte.length) schritte.push({ bereich: `Neurotransmitter · ${fokus.area?.label || fokus.key} (${fokus.severity?.label || ''})`.replace(' ()', ''), titel: 'Empfehlungen laut Seminar', punkte, karte: 'Neurotransmitter-Profil' });
+  }
+  return schritte;
+}
+
+// Aus dem Seitenzustand: aktueller Hautfalten-Plan und Neurotransmitter-Test.
+// Ein Fehler hier darf die KI-Karte nie verhindern.
+function optionaleSchritteFuer(state) {
+  try {
+    const context = skinfoldAnalysisContext(state);
+    const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, context);
+    const test = bravermanState();
+    return compOptionaleSchritte({
+      actionPlan: plan ? buildSkinfoldActionPlan(plan, context) : null,
+      faltenLabel: plan?.topFold?.label || '',
+      neurotransmitter: bravermanComplete(test.answers) ? buildNeurotransmitterCoachPlan(test.answers) : null,
+    });
+  } catch (error) {
+    console.warn('Optionale Schritte nicht berechnet:', error);
+    return [];
+  }
+}
+
+function compOptionalMarkup(schritte = []) {
+  if (!schritte.length) return '';
+  return `<section class="comp-optional"><h3>Optional</h3>
+    <p>Aus deinen Seminar-Auswertungen, nicht von der KI und nicht unabhängig geprüft. Supplemente nur nach fachlicher Prüfung.</p>
+    <ul>${schritte.map((schritt) => `<li><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b>${schritt.punkte.map((punkt) => `<span>${escapeHtml(punkt)}</span>`).join('')}<em>Details und Dosierungen in der Karte „${escapeHtml(schritt.karte)}“</em></li>`).join('')}</ul>
+  </section>`;
+}
+
+function compResultMarkup(result, cached = false, optionaleSchritte = []) {
   const basis = (result?.basis || []).slice(0, 4);
   const uncertainty = (result?.uncertainty || []).slice(0, 3);
   const nextSteps = (result?.nextSteps || []).slice(0, 3);
@@ -820,6 +879,7 @@ function compResultMarkup(result, cached = false) {
       ${basis.length ? `<section><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
       ${uncertainty.length ? `<section><h3>Was noch unsicher ist</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}
       ${nextSteps.length ? `<section><h3>Nächste Schritte</h3><ol>${nextSteps.map((item) => `<li><b>${escapeHtml(item.action)}</b><span>${escapeHtml(item.rationale)}</span><small>${escapeHtml(item.timeframe)}</small></li>`).join('')}</ol></section>` : ''}
+      ${compOptionalMarkup(optionaleSchritte)}
       <button class="body-coach-entry comp-coach-entry" type="button" data-comp-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Mit Coach besprechen</b><small>Wie du die Schritte konkret angehst</small></span>${materialIconMarkup('chevron_right')}</button>
       ${sources.length ? `<details class="comp-assessment-sources"><summary>Verwendete Seminarquellen</summary><ul>${sources.map((source) => `<li><b>${escapeHtml(source.title || source.filename)}</b>${source.page ? `<span>Seite ${escapeHtml(source.page)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}
     </div>`;
@@ -866,7 +926,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
         new Promise((resolve) => setTimeout(resolve, 3000)),
       ]);
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      panel.innerHTML = compResultMarkup(response.result, response.cached === true);
+      panel.innerHTML = compResultMarkup(response.result, response.cached === true, optionaleSchritteFuer(state));
       panel.querySelector('[data-comp-coach]')?.addEventListener('click', async () => {
         const { openCoachQuestion } = await import('./coach.js');
         openCoachQuestion({ question: compCoachFrage(response.result), senden: true });
