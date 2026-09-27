@@ -6,7 +6,7 @@ import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
-import { fensterEinklappen, fensterMarkup, kopfMarkup } from './coachFenster.js';
+import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
 
 export { fensterMarkup };
 
@@ -202,12 +202,9 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const { data: coachProfile } = await supabase.from('profiles').select('full_name,avatar_url').eq('id', userId).maybeSingle();
   const avatar = nutzerAvatarMarkup(coachProfile, (await supabase.auth.getUser()).data?.user?.email || '');
   container.classList.add('coach-page');
+  // Zurück und Gedächtnis sitzen im App-Kopf (main.js); ein neues Gespräch
+  // beginnt über das Plus-Menü der Eingabe.
   container.innerHTML = `<main class="coach-shell coach-chat">
-    ${kopfMarkup({
-      zurueck: backRoute,
-      rechts: `<button class="coach-kopf-knopf" type="button" data-neues-gespraech aria-label="Neues Gespräch" title="Neues Gespräch"${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}</button>
-      <a class="coach-kopf-knopf" href="#coach-wissen" aria-label="Was CAPBOY über mich weiß" title="Was CAPBOY über mich weiß">${materialIconMarkup('menu_book')}</a>`,
-    })}
     <section class="coach-woche" data-coach-woche hidden></section>
     <section class="coach-answer" data-coach-answer aria-live="polite"></section>
     <form class="coach-form" data-coach-form>
@@ -215,10 +212,11 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         <div class="coach-compose-tools" data-coach-tools hidden>
           <label class="coach-werkzeug">${materialIconMarkup('add_photo_alternate')}<span>Bild anhängen</span><input type="file" accept="image/*" data-coach-file></label>
           <label class="coach-werkzeug"><input type="checkbox" data-coach-web><span>Webwissen einbeziehen</span></label>
+          <button class="coach-werkzeug" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}<span>Neues Gespräch</span></button>
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
         <div class="coach-inputbar">
-          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild oder Webwissen hinzufügen">+</button>
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch">+</button>
           <label class="sr-only" for="coach-question">Nachricht an CAPBOY</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an CAPBOY">${escapeHtml(pending.question || '')}</textarea>
           <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('play_arrow')}</button>
@@ -229,7 +227,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const answer = container.querySelector('[data-coach-answer]');
   const form = container.querySelector('[data-coach-form]');
   const field = form.querySelector('textarea');
-  const neuesGespraech = container.querySelector('[data-neues-gespraech]');
+  const neuesGespraech = form.querySelector('[data-neues-gespraech]');
   const tools = form.querySelector('[data-coach-tools]');
   const plus = form.querySelector('[data-coach-plus]');
   const fileInput = form.querySelector('[data-coach-file]');
@@ -239,7 +237,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   // Die Eingabe sitzt fest am unteren Rand; der Verlauf bekommt unten so viel
   // Platz, wie sie hoch ist. Öffnet sich die Tastatur, sitzt die Eingabe direkt
   // darauf. iOS schiebt dabei die ganze Seite hoch; das wird zurückgenommen,
-  // damit die Kopfleiste stehen bleibt. Wo das nicht greift, folgt sie der
+  // damit der App-Kopf stehen bleibt. Wo das nicht greift, folgt er der
   // verschobenen Ansicht (--coach-oben).
   new ResizeObserver(() => container.style.setProperty('--coach-eingabe-h', `${form.offsetHeight}px`)).observe(form);
   const tastatur = () => {
@@ -248,7 +246,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     const offen = document.activeElement === field && sicht.height < window.innerHeight - 80;
     if (offen && window.scrollY) window.scrollTo(0, 0);
     container.style.setProperty('--coach-tastatur', `${Math.max(0, window.innerHeight - sicht.height - sicht.offsetTop)}px`);
-    container.style.setProperty('--coach-oben', `${Math.max(0, sicht.offsetTop)}px`);
+    // Auf der Wurzel, damit auch der App-Kopf der verschobenen Ansicht folgt.
+    document.documentElement.style.setProperty('--coach-oben', `${Math.max(0, sicht.offsetTop)}px`);
     container.classList.toggle('tastatur-offen', offen);
   };
   window.visualViewport?.addEventListener('resize', tastatur);
@@ -299,6 +298,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   nachUnten(false);
 
   neuesGespraech.onclick = () => {
+    werkzeugeZeigen(false);
     gespraech = null;
     runden = [];
     gespraechSchreiben(null);

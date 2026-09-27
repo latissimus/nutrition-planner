@@ -15069,19 +15069,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 :root{--muster-millimeter-hell:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 11.5H44M0 22.5H44M0 33.5H44M11.5 0V44M22.5 0V44M33.5 0V44' stroke='%23432C5E' stroke-opacity='.06' fill='none'/%3E%3Cpath d='M0 .5H44M.5 0V44' stroke='%23432C5E' stroke-opacity='.16' fill='none'/%3E%3C/svg%3E")}
 .coach-chat{--coach-violett:#432C5E;--coach-violett-hell:#6A53B8;--coach-lavendel:#C9BCF7;--coach-pink:var(--brand-pink,#FF69AE);--coach-rand:#111;--coach-schatten:#111;--coach-grund:#EFEBF7;--coach-muster:var(--muster-millimeter-hell)}
-/* Auf Coach-Seiten ersetzt die Kopfleiste des Coachs den App-Kopf. Grund:
-   zartes Lavendel mit Millimeterraster, passend zum Violett der Fenster. */
-:root[data-seite="coach"] .app-dex-header{display:none!important}
-:root[data-seite="coach"]:not([data-theme="dark"]) #view,:root[data-seite="coach"]:not([data-theme="dark"]) body{background-color:#EFEBF7!important;background-image:var(--muster-millimeter-hell)!important;background-repeat:repeat!important;background-attachment:fixed!important}
-.coach-shell.coach-chat{display:flex;flex-direction:column;gap:10px;width:min(100%,640px);min-height:100%;padding:calc(env(safe-area-inset-top) + 68px) 12px calc(var(--coach-eingabe-h,72px) + var(--coach-tastatur,0px) + 18px)}
+/* Coach-Seiten: Der App-Kopf trägt das Violett der Eingabeleiste und zeigt
+   Zurück und Gedächtnis statt Coach und Suche (main.js). Der Seitengrund ist
+   zartes Lavendel mit Millimeterraster; dahinter, etwa rund um die
+   iOS-Leiste über der Tastatur, liegt ebenfalls das Violett der Eingabe. */
+:root[data-seite="coach"]:not([data-theme="dark"]),:root[data-seite="coach"]:not([data-theme="dark"]) body{background:#432C5E!important}
+:root[data-seite="coach"][data-theme="dark"],:root[data-seite="coach"][data-theme="dark"] body{background:#101A2B!important}
+:root[data-seite="coach"]:not([data-theme="dark"]) #view{background-color:#EFEBF7!important;background-image:var(--muster-millimeter-hell)!important;background-repeat:repeat!important;background-attachment:fixed!important}
+:root[data-seite="coach"] .app-dex-header{--dex-ink:#fff;color:#fff;border-bottom-color:#111;transform:translateY(var(--coach-oben,0px))}
+:root[data-seite="coach"]:not([data-theme="dark"]) .app-dex-header{background-color:#432C5E!important}
+:root[data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
+.app-dex-coach-zurueck{flex-basis:32px;width:32px;height:32px}
+.app-dex-gedaechtnis{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:50%;text-decoration:none}
+.app-dex-gedaechtnis-icon{display:block;width:30px;height:30px;line-height:0;filter:drop-shadow(0 1.5px 0 #000)}
+.app-dex-gedaechtnis-icon>svg{display:block;width:100%;height:100%}
+.coach-shell.coach-chat{display:flex;flex-direction:column;gap:10px;width:min(100%,640px);min-height:100%;padding:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 12px) 12px calc(var(--coach-eingabe-h,72px) + var(--coach-tastatur,0px) + 18px)}
 .coach-shell.coach-chat.coach-gedaechtnis-seite{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
-.coach-kopf-band{position:fixed;z-index:21;top:0;right:0;left:0;padding:calc(env(safe-area-inset-top) + 8px) 12px 10px;background-color:var(--coach-grund);background-image:var(--coach-muster);background-attachment:fixed;transform:translateY(var(--coach-oben,0px))}
-.coach-kopf{display:flex;align-items:center;gap:6px;box-sizing:border-box;width:min(100%,616px);min-height:40px;margin:0 auto;padding:4px;border:2px solid var(--coach-rand);border-radius:10px;background:var(--coach-violett);color:#fff;box-shadow:0 4px 0 var(--coach-schatten)}
-.coach-kopf-titel{display:flex;flex:1;align-items:center;gap:7px;min-width:0;padding-left:2px}
-.coach-kopf-titel b{font:800 13px/1 var(--tech);letter-spacing:.06em}
-.coach-kopf-titel small{padding:3px 5px;border:1px solid rgba(255,255,255,.55);border-radius:4px;font:700 8px/1 var(--tech);letter-spacing:.08em;text-transform:uppercase;opacity:.85}
-.coach-kopf-cap{width:22px;height:22px;flex:0 0 22px}
-.coach-kopf-knopf{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;padding:0;border:2px solid var(--coach-rand);border-radius:6px;background:var(--coach-lavendel);color:#1d1533;text-decoration:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);cursor:pointer}
+.coach-kopf-knopf{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;padding:0;border:2px solid #111;border-radius:6px;background:#C9BCF7;color:#1d1533;text-decoration:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);cursor:pointer}
 .coach-kopf-knopf[hidden]{display:none}
 .coach-kopf-knopf .material-svg,.coach-kopf-knopf svg{width:16px;height:16px;fill:currentColor}
 .coach-woche[hidden]{display:none}
@@ -15179,6 +15183,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-compose-tools{display:flex;flex-wrap:wrap;gap:7px}
 .coach-compose-tools[hidden]{display:none}
 .coach-werkzeug{position:relative;display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:2px solid var(--coach-rand);border-radius:8px;background:#fff;color:#111;font:700 11px/1 var(--tech);cursor:pointer}
+.coach-werkzeug[hidden]{display:none}
 .coach-werkzeug input{position:absolute;opacity:0;pointer-events:none}
 .coach-werkzeug .material-svg,.coach-werkzeug svg{width:17px;height:17px;fill:currentColor}
 .coach-werkzeug:has(input[type="checkbox"]:checked){background:#FFD400}
@@ -15203,7 +15208,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug :is(span,.material-svg,svg,svg *){color:#111!important;-webkit-text-fill-color:#111!important;fill:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug:has(input[type="checkbox"]:checked){background:#FFD400!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-woche-chip input:checked+span{background:var(--coach-pink)!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-woche-leiste b{color:var(--coach-pink)!important;-webkit-text-fill-color:var(--coach-pink)!important}
+:root[data-theme="dark"][data-seite="coach"] #view .coach-woche button.coach-woche-leiste b{color:var(--coach-pink)!important;-webkit-text-fill-color:var(--coach-pink)!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-chat-window.is-user>header :is(b,span){color:#111!important;-webkit-text-fill-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-safety{color:#111!important;-webkit-text-fill-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea,.coach-woche-form select,.gedaechtnis-formular :is(input,select,textarea)){background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;caret-color:#111!important}

@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
-import { fensterEinklappen, fensterMarkup, kopfMarkup } from './coachFenster.js';
+import { fensterEinklappen, fensterMarkup } from './coachFenster.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
@@ -315,7 +315,6 @@ export async function uebernimmAuswertung(userId, auswertung) {
 export async function mountCoachMemoryPage(container, { userId }) {
   container.classList.add('coach-page');
   container.innerHTML = `<main class="coach-shell coach-chat coach-gedaechtnis-seite">
-    ${kopfMarkup({ zurueck: 'coach', zurueckLabel: 'Zurück zum Coach', titel: 'GEDÄCHTNIS' })}
     <div class="gedaechtnis-inhalt">
       ${fensterMarkup({ inhalt: '<p>Das weiß ich über dich – zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p>' })}
       <div class="gedaechtnis-inhalt" data-gedaechtnis aria-live="polite">${fensterMarkup({ klasse: 'is-loading', inhalt: '<p>Lade Gedächtnis …</p>' })}</div>

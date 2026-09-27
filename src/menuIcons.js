@@ -47,6 +47,9 @@ const searchEntry = Object.entries(modules).find(([path]) => path.endsWith('/SUC
 const searchSvg = searchEntry ? prefixInterneIds(searchEntry[1], 'mdxm-search-') : '';
 const coachEntry = Object.entries(modules).find(([path]) => path.endsWith('/COACH.svg'));
 const coachSvg = coachEntry ? prefixInterneIds(coachEntry[1], 'mdxm-coach-') : '';
+// Umlaut im Dateinamen: macOS und Git können ihn verschieden zerlegt ablegen.
+const gedaechtnisEntry = Object.entries(modules).find(([path]) => path.normalize('NFC').endsWith('/GEDÄCHTNIS.svg'.normalize('NFC')));
+const gedaechtnisSvg = gedaechtnisEntry ? prefixInterneIds(gedaechtnisEntry[1], 'mdxm-gedaechtnis-') : '';
 
 export function menuIconMarkup(route, className = 'app-dex-tab-icon') {
   const svg = svgByRoute.get(route);
@@ -61,6 +64,11 @@ export function hasMenuIcon(route) {
 export function searchIconMarkup(className = 'app-dex-search-icon') {
   if (!searchSvg) return '';
   return `<span class="${className} icon-originalfarben" aria-hidden="true">${searchSvg}</span>`;
+}
+
+export function gedaechtnisIconMarkup(className = 'app-dex-gedaechtnis-icon') {
+  if (!gedaechtnisSvg) return '';
+  return `<span class="${className} icon-originalfarben" aria-hidden="true">${gedaechtnisSvg}</span>`;
 }
 
 export function coachIconMarkup(className = 'coach-cap-icon') {
