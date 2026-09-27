@@ -3,6 +3,9 @@
 //   OPENAI_API_KEY=… COACH_VECTOR_STORE_ID=vs_… npm run eval:coach
 //   npm run eval:coach -- --variante legacy      eingefrorener Stand vor Schritt 2
 //   npm run eval:coach -- --durchlaeufe 3        jeden Fall dreimal (Konstanz)
+//   COACH_EVAL_MODEL=gpt-6-astra npm run eval:coach
+//                                                nur im Eval ein anderes Coach-Modell testen;
+//                                                das Produktionsmodell bleibt unverändert
 //   npm run eval:coach -- --fall krankheit       nur einen Fall
 //   npm run eval:coach -- --faelle zeitreihe     Fallsatz: standard (12 Fälle, Vorgabe) oder
 //                                                zeitreihe (Fälle mit Wochenverlauf, cases-zeitreihe.mjs)
@@ -88,11 +91,15 @@ import {
 // produktion: der Prompt, den die Edge Function gerade verwendet.
 // legacy:     der eingefrorene Stand vor Schritt 2, als feste Vergleichsbasis.
 const MODULE = { produktion, legacy };
+const evalModel = process.env.COACH_EVAL_MODEL?.trim() || null;
 const VARIANTEN = Object.fromEntries(Object.entries(MODULE).map(([name, modul]) => [
   name,
-  ({ fall, vectorStoreId }) => modul.coachRequestBody({
-    scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, memory: fall.gedaechtnis, weekly: fall.wochenbilanz, webResearch: false, vectorStoreId,
-  }),
+  ({ fall, vectorStoreId }) => {
+    const body = modul.coachRequestBody({
+      scope: 'coach', question: fall.frage, snapshot: fall.daten, timeseries: fall.zeitreihe, memory: fall.gedaechtnis, weekly: fall.wochenbilanz, webResearch: false, vectorStoreId,
+    });
+    return evalModel ? { ...body, model: evalModel } : body;
+  },
 ]));
 
 const sha = (wert) => createHash('sha256').update(typeof wert === 'string' ? wert : JSON.stringify(wert)).digest('hex').slice(0, 16);
@@ -634,6 +641,8 @@ async function trockenlauf() {
   for (const fall of faelle) {
     for (const [name, baue] of Object.entries(VARIANTEN)) {
       const body = baue({ fall, vectorStoreId: 'vs_trocken' });
+      const erwartetesModell = evalModel || MODULE[name].COACH_MODEL;
+      if (body.model !== erwartetesModell) fehler.push(`${fall.id}/${name}: Modell ${body.model} statt ${erwartetesModell}`);
       if (!body.input?.[0]?.content?.includes(fall.frage)) fehler.push(`${fall.id}/${name}: Frage fehlt in der Anfrage`);
       if (!body.input[0].content.includes(JSON.stringify(fall.daten))) fehler.push(`${fall.id}/${name}: Snapshot fehlt in der Anfrage`);
     }
