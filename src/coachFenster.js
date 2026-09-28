@@ -8,7 +8,7 @@ export const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 
-// von: 'coach' (violett, links), 'user' (pink, rechts) oder 'bereich'
+// von: 'coach' (violett, links), 'user' (blau, rechts) oder 'bereich'
 // (violett, volle Breite, etwa ein Abschnitt der Gedächtnis-Seite).
 export function fensterMarkup({ von = 'coach', titel = '', bild = null, inhalt = '', avatar = '', runde = null, klasse = '' } = {}) {
   const nutzer = von === 'user';

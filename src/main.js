@@ -764,6 +764,8 @@ function appDexShellZeichnen(route, view) {
   const istCoins = route === 'coins';
   const istSuche = route === 'search';
   const istCoach = route === 'coach' || route === 'coach-wissen';
+  const coachZurueckRoute = route === 'coach-wissen' ? 'coach' : appLetzteDexRoute();
+  const coachZurueckTitel = route === 'coach-wissen' ? 'COACH' : appDockTitel(coachZurueckRoute);
   const istNebenansicht = istProfil || istSuche || istCoach;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
   app.classList.add('dex-app-shell');
@@ -781,11 +783,11 @@ function appDexShellZeichnen(route, view) {
       || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
   header.innerHTML = `
     <div class="app-dex-header-inner">
-      <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
+      ${istCoach ? `<a class="app-dex-coach-zurueck" href="#${coachZurueckRoute}"
+        aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}">${seitenIconMarkup('ZURÜCK', 'app-dex-zurueck-icon')}<span>${escapeHtml(coachZurueckTitel)}</span></a>`
+        : `<span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>`}
       <div class="app-dex-header-actions">
         ${istCoach ? `
-        <a class="app-dex-coach app-dex-coach-zurueck" href="#${route === 'coach-wissen' ? 'coach' : appLetzteDexRoute()}"
-           aria-label="${route === 'coach-wissen' ? 'Zurück zum Coach' : 'Zurück'}">${seitenIconMarkup('ZURÜCK', 'app-dex-coach-icon app-dex-zurueck-icon')}</a>
         <a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
