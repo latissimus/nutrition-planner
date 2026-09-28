@@ -14903,7 +14903,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-verlauf summary{cursor:pointer;color:var(--muted);font:700 10px/1.4 var(--tech)}
 .coach-verlauf ol{display:grid;gap:10px;margin:10px 0 0;padding:0;list-style:none}
 .coach-verlauf li{display:grid;gap:3px;padding-top:10px;border-top:1px solid var(--app-divider)}
-.coach-verlauf small,.gedaechtnis-verlauf small{color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.06em}
+.coach-verlauf small,.gedaechtnis-verlauf small{color:var(--muted);font:750 11px/1.2 var(--tech);text-transform:uppercase;letter-spacing:.06em}
 .coach-verlauf p,.gedaechtnis-verlauf p{margin:0;font-size:12px;line-height:1.45}
 .coach-merken{justify-self:start;margin-top:4px;padding:6px 10px!important;font-size:10px!important}
 .coach-art{justify-self:start;padding:4px 7px;border:1px solid currentColor;border-radius:999px;color:var(--muted);font:750 8px/1 var(--tech);text-transform:uppercase;letter-spacing:.05em}
@@ -15119,7 +15119,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-fenster-knoepfe{display:flex;align-items:center;gap:3px;margin-left:7px}
 .coach-fenster-knoepfe i{display:grid;place-items:center;width:16px;height:16px;border:1.5px solid #1A1028;border-radius:1px;background:#7457C2;color:#2B1748;font:900 13px/1 Arial,sans-serif;font-style:normal}
 .coach-chat-cap{display:none;width:36px;height:36px}
-.coach-chat-avatar{display:none;place-items:center;width:36px;height:36px;overflow:hidden;border:2px solid #111;border-radius:50%;background:#fff;color:#111;font:800 8px/1 var(--tech)}
+.coach-chat-avatar{display:none;place-items:center;width:36px;height:36px;overflow:hidden;border:2px solid #111;border-radius:50%;background:#fff;color:#111;font:800 11px/1 var(--tech)}
 .coach-chat-avatar img{width:100%;height:100%;object-fit:cover}
 /* Lesbarkeit: Fließtext in der App-Schrift, 15–16 px; die Schreibmaschinen-
    schrift bleibt für Titel, Kennzeichnungen und Zeitangaben (Retro). */
@@ -15141,14 +15141,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Antwort im Fenster */
 .coach-chat-window .coach-result{display:grid;gap:13px}
 .coach-antwort{margin:0;font:600 16px/1.45 var(--ui)}
-.coach-chat-window .coach-result h4{margin:0;font:800 10px/1.2 var(--tech);letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.coach-chat-window .coach-result h4{margin:0;font:800 11px/1.2 var(--tech);letter-spacing:.08em;text-transform:uppercase;opacity:.85}
 .coach-schritte{display:grid;gap:8px}
 .coach-schritt{display:grid;gap:6px;padding:11px 12px;border:1.5px solid var(--coach-rand);border-radius:7px;background:rgba(255,255,255,.14)}
 .coach-schritt b{font:700 15px/1.35 var(--ui)}
 .coach-schritt p{margin:0;font:500 14px/1.45 var(--ui)}
 .coach-schritt p em{font-style:normal;font-weight:800}
 .coach-schritt small{font:650 11.5px/1.35 var(--tech);opacity:.86}
-.coach-chat-window .coach-art{justify-self:start;padding:3px 6px;border:1px solid currentColor;border-radius:4px;color:inherit;font:800 9px/1 var(--tech);letter-spacing:.06em;text-transform:uppercase}
+.coach-chat-window .coach-art{justify-self:start;padding:4px 7px;border:1px solid currentColor;border-radius:4px;color:inherit;font:800 11px/1 var(--tech);letter-spacing:.06em;text-transform:uppercase}
 .coach-merken,.coach-knopf{justify-self:start;margin-top:2px;padding:9px 12px;border:2px solid var(--coach-rand);border-radius:5px;background:#fff;color:#111;font:800 11.5px/1 var(--tech);box-shadow:none;cursor:pointer}
 .coach-merken.ist-wichtig,.coach-knopf.ist-wichtig{background:var(--coach-violett);color:#fff}
 .coach-merken:disabled,.coach-knopf:disabled{opacity:.7;cursor:default}
@@ -15163,13 +15163,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-datenlage{justify-self:end}
 /* Wochenvergleich und Check-in im Fenster */
 .coach-chat-window .coach-wochenvergleich{padding:0;border:0;background:transparent}
-.coach-chat-window .coach-wochenvergleich h3{font:800 9px/1.2 var(--tech);letter-spacing:.08em;text-transform:uppercase}
+.coach-chat-window .coach-wochenvergleich h3{font:800 11px/1.2 var(--tech);letter-spacing:.08em;text-transform:uppercase}
 .coach-chat-window .coach-wochenvergleich h3>em{display:none}
 .coach-chat-window .coach-result+.coach-result{margin-top:11px}
 .coach-tabelle{overflow-x:auto}
 .coach-wochenvergleich table{width:100%;border-collapse:collapse;font:500 12.5px/1.3 var(--tech)}
 .coach-wochenvergleich th,.coach-wochenvergleich td{padding:6px 5px;border-top:1px solid rgba(255,255,255,.35);text-align:right;white-space:nowrap}
-.coach-wochenvergleich thead th{border-top:0;font:800 8px/1.2 var(--tech);letter-spacing:.05em;text-transform:uppercase;opacity:.85}
+.coach-wochenvergleich thead th{border-top:0;font:800 11px/1.2 var(--tech);letter-spacing:.05em;text-transform:uppercase;opacity:.85}
 .coach-wochenvergleich th[scope="row"],.coach-wochenvergleich thead th:first-child{text-align:left;white-space:normal;font-weight:600}
 .coach-woche-form{display:grid;gap:12px;margin-top:10px}
 .coach-woche-form fieldset{display:grid;gap:8px;min-width:0;margin:0;padding:0;border:0}
@@ -15259,14 +15259,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-gedaechtnis-seite .gedaechtnis-eintrag{display:grid;gap:6px;padding:9px 10px;border:1.5px solid var(--coach-rand);border-radius:7px;background:rgba(255,255,255,.14);color:inherit}
 .coach-gedaechtnis-seite .gedaechtnis-eintrag :is(p,small,b,summary,li){color:inherit}
 .coach-gedaechtnis-seite .gedaechtnis-eintrag p{margin:0;font:500 14.5px/1.45 var(--ui)}
-.coach-gedaechtnis-seite .gedaechtnis-eintrag>small,.coach-gedaechtnis-seite .gedaechtnis-eintrag summary small{font:600 10.5px/1.4 var(--tech);opacity:.85}
+.coach-gedaechtnis-seite .gedaechtnis-eintrag>small,.coach-gedaechtnis-seite .gedaechtnis-eintrag summary small{font:600 11px/1.4 var(--tech);opacity:.85}
 .coach-gedaechtnis-seite .gedaechtnis-eintrag summary b{font:700 15px/1.35 var(--ui)}
-.coach-gedaechtnis-seite .gedaechtnis-chip{justify-self:start;padding:3px 6px;border:1px solid currentColor;border-radius:4px;color:inherit;font:800 8px/1 var(--tech);letter-spacing:.06em;text-transform:uppercase}
+.coach-gedaechtnis-seite .gedaechtnis-chip{justify-self:start;padding:4px 7px;border:1px solid currentColor;border-radius:4px;color:inherit;font:800 11px/1 var(--tech);letter-spacing:.06em;text-transform:uppercase}
 .coach-gedaechtnis-seite .gedaechtnis-ergebnis{opacity:.9}
 .coach-gedaechtnis-seite .gedaechtnis-aktionen{display:flex;flex-wrap:wrap;gap:6px}
 .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.12)}
 .coach-gedaechtnis-seite .gedaechtnis-formular{display:grid;gap:9px;padding:10px;border:1.5px solid var(--coach-rand);border-radius:7px;background:rgba(0,0,0,.14);color:inherit}
-.coach-gedaechtnis-seite .gedaechtnis-formular label{color:inherit;font:700 10.5px/1.3 var(--tech)}
+.coach-gedaechtnis-seite .gedaechtnis-formular label{color:inherit;font:700 11px/1.3 var(--tech)}
 .coach-gedaechtnis-seite .gedaechtnis-formular :is(input,select,textarea){box-sizing:border-box;width:100%;padding:8px 9px;border:2px solid var(--coach-rand);border-radius:6px;background:#fff;color:#111;font:600 16px/1.3 var(--tech)}
 .coach-gedaechtnis-seite .gedaechtnis-zeile{gap:12px}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]{display:block;min-width:0;min-height:42px;-webkit-appearance:none;appearance:none;font-family:var(--ui);text-align:left}
@@ -15481,7 +15481,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFFFF!important;color:#0A1330!important}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #0A1330)}
-:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{display:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{display:block;background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:#0A1330;background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea{border-color:#0A1330;background:#FFFFFF;color:#0A1330;box-shadow:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea::placeholder{color:#526078}
@@ -15489,13 +15489,32 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Weichzeichner, und jede Kontur einheitlich 2 px im selben Dunkelblau.
    Trennlinien innerhalb einer Antwort ebenfalls dunkel statt weiß. */
 :root[data-theme="retro"][data-seite="coach"] .coach-chat{--coach-rand:#0A1330}
-:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-schritt,.coach-art,.coach-safety,.coach-woche-chip span,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-attachment,.coach-attachment button,.coach-chat-avatar,.coach-woche-form :is(select,textarea),.gedaechtnis-eintrag,.gedaechtnis-formular,.gedaechtnis-formular :is(input,select,textarea)){border-width:2px!important;border-style:solid!important;border-color:#0A1330!important}
+:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-art,.coach-safety,.coach-woche-chip span,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-attachment,.coach-attachment button,.coach-chat-avatar,.coach-woche-form :is(select,textarea),.gedaechtnis-formular :is(input,select,textarea)){border-width:2px!important;border-style:solid!important;border-color:#0A1330!important}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat-window .coach-mehr{border-top:2px solid #0A1330}
 :root[data-theme="retro"][data-seite="coach"] .coach-wochenvergleich :is(th,td){border-top-color:rgba(10,19,48,.3)}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window{border-width:2px}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header{border-bottom-width:2px}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-fenster-knoepfe i{border:2px solid #0A1330}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border:2px solid #0A1330}
+
+/* Knöpfe: gut treffbar (40 px) und in einer Schrift; Hauptaktion überall pink. */
+:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf){min-height:40px;padding:9px 14px;border-radius:6px;font:750 13.5px/1.2 var(--ui);font-size:13.5px!important;letter-spacing:0}
+:root[data-theme="retro"][data-seite="coach"] :is(.coach-merken,.coach-knopf){background:#FFFFFF;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] :is(.coach-merken,.coach-knopf).ist-wichtig,:root[data-theme="retro"][data-seite="coach"] .coach-woche-chip input:checked+span{background:#FF277F;color:#FFFFFF}
+
+/* Antwort: Schritte als Abschnitte mit Trennlinie statt Kästen im Kasten. */
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte{gap:0}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{padding:12px 0!important;border:0!important;border-top:2px solid #0A1330!important;border-radius:0!important;background:transparent!important}
+
+/* Eigene Nachrichten und die Warte-Anzeige so breit wie ihr Text. */
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window:is(.is-user,.is-loading){width:fit-content;max-width:min(calc(100% - 46px),520px)}
+
+/* Gedächtnis-Seite wie der Chat: weiße Karten mit dunkelblauer Kontur, Titel
+   als Kopfzeile ohne Fensterknöpfe, Einträge durch Linien getrennt. */
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window{border:2px solid #0A1330;border-radius:14px;background:#FFFFFF;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header{min-height:0;padding:12px 16px 10px;border-bottom:2px solid #0A1330;border-radius:12px 12px 0 0;background:transparent;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header b{font:820 15px/1.2 "Work Sans",var(--ui),sans-serif;letter-spacing:0}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header :is(.coach-fenster-knoepfe,.coach-chat-cap){display:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-message{padding:14px 16px 16px}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag,.gedaechtnis-formular){padding:12px 0 0!important;border:0!important;border-top:2px solid #0A1330!important;border-radius:0!important;background:transparent!important;color:inherit}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf li{padding:4px 0 4px 10px;border:0;border-left:2px solid #0A1330;border-radius:0;background:transparent}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf small{color:inherit;opacity:.75}
 :root[data-theme="retro"][data-seite="habits"] .routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
 :root[data-theme="retro"][data-seite="sleep"] :is(.sleep-dex-page,.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
 :root[data-theme="retro"][data-seite="search"] #view{background-image:var(--muster-bildroehre-retro)!important}
