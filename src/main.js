@@ -783,11 +783,11 @@ function appDexShellZeichnen(route, view) {
       || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
   header.innerHTML = `
     <div class="app-dex-header-inner">
-      ${istCoach ? `<a class="app-dex-coach-zurueck" href="#${coachZurueckRoute}"
-        aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}">${seitenIconMarkup('ZURÜCK', 'app-dex-zurueck-icon')}<span>${escapeHtml(coachZurueckTitel)}</span></a>`
-        : `<span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>`}
+      <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
         ${istCoach ? `
+        <a class="app-dex-coach-zurueck" href="#${coachZurueckRoute}"
+           aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}" title="Zurück zu ${escapeHtml(coachZurueckTitel)}">${seitenIconMarkup('ZURÜCK', 'app-dex-zurueck-icon')}</a>
         <a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
