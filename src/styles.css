@@ -15190,7 +15190,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    den durchsichtigen Rand, den iOS um seine Leiste über der Tastatur lässt. */
 .coach-page.tastatur-offen .coach-shell.coach-chat .coach-form{bottom:calc(var(--coach-tastatur,0px) - 4px);padding-bottom:0}
 .coach-shell.coach-chat .coach-form{position:fixed;z-index:20;right:0;bottom:var(--coach-tastatur,0px);left:0;display:block;overflow:hidden;margin:0;padding:8px 7px var(--app-dex-dock-bottom);border:0;border-radius:0;background:transparent;box-shadow:none}
-.coach-shell.coach-chat .coach-form::before{content:"";position:absolute;z-index:0;top:8px;right:0;left:0;height:12px;background:linear-gradient(180deg,var(--coach-grund) 0,color-mix(in srgb,var(--coach-grund) 70%,transparent) 45%,transparent 100%);pointer-events:none}
 .coach-shell.coach-chat .coach-form::after{content:"";position:absolute;z-index:0;right:0;bottom:0;left:0;height:calc(var(--app-dex-dock-bottom) + 9px);background:var(--coach-grund);pointer-events:none}
 .coach-form-innen{position:relative;z-index:1;display:grid;gap:7px;width:min(100%,580px);margin:0 auto}
 .coach-inputbar{box-sizing:border-box;display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;gap:4px;min-height:72px;padding:5px;border:2px solid rgba(255,255,255,.72);border-radius:16px;background:rgba(67,44,94,.52);-webkit-backdrop-filter:blur(6.65px) saturate(1.25);backdrop-filter:blur(6.65px) saturate(1.25)}
@@ -15237,8 +15236,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* RETRO-Chat: dieselbe ruhige Flächen- und Konturenlogik wie COMP. Die Bilder
    markieren den Absender, deshalb entfallen Titelleiste und Fensterknöpfe. */
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window{width:min(calc(100% - 46px),520px);overflow:visible;border:2px solid #0A1330;border-radius:14px;background:#FFFCF5;color:#0A1330;box-shadow:none}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{background:color-mix(in srgb,#FF277F 9%,#FFFCF5)}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window{width:min(calc(100% - 46px),520px);overflow:visible;border:2px solid #0A1330;border-radius:14px;background:#FFFFFF;color:#0A1330;box-shadow:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{background:color-mix(in srgb,#FF277F 9%,#FFFFFF)}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{margin-left:42px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{margin-right:42px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header{position:static;display:block;min-height:0;height:0;padding:0;overflow:visible;border:0;background:transparent}
@@ -15248,8 +15247,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user>header>.coach-chat-avatar{right:-44px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-message{padding:16px 17px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-avatar{border-color:#0A1330}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button{border-color:#0A1330;background:#FFFCF5;color:#0A1330}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button:first-child{background:#FF277F;color:#FFFCF5}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button{border-color:#0A1330;background:#FFFFFF;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button:first-child{background:#FF277F;color:#FFFFFF}
 /* Gedächtnis-Seite: jeder Bereich ein Fenster in voller Breite */
 .coach-gedaechtnis-seite .gedaechtnis-inhalt{display:flex;flex-direction:column;gap:12px}
 .coach-chat-window.is-bereich{display:block;align-self:stretch;max-width:none;margin-inline:0;overflow:hidden}
@@ -15472,19 +15471,33 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 :root[data-theme="retro"][data-seite="reminders"] .meal-log-dex-page{background-image:var(--muster-gitter-retro)!important}
 :root[data-theme="retro"][data-seite="body"] .body-log-dex-page{background-image:var(--muster-millimeter-retro)!important}
-:root[data-theme="retro"][data-seite="coach"],:root[data-theme="retro"][data-seite="coach"] body{--dex-seitenfarbe:#94DEFF;background:#94DEFF!important}
+/* Retro-Chat: das Pixel-Symbolbild (Blue_icons, als WebP verkleinert) füllt
+   den Bildschirm. Es liegt auf body, der selbst nicht scrollt; so bleibt es
+   auch in iOS stehen, wo background-attachment:fixed nicht greift. */
+:root[data-theme="retro"][data-seite="coach"]{--dex-seitenfarbe:#94DEFF;background:#1E86EC!important}
+:root[data-theme="retro"][data-seite="coach"] body{--dex-seitenfarbe:#94DEFF;background:#1E86EC url("./assets/coach-hintergrund.webp") center/cover no-repeat fixed!important}
 :root[data-theme="retro"][data-seite="coach"] :is(#app,#view){background-color:transparent!important}
-:root[data-theme="retro"][data-seite="coach"] #view{background-image:var(--muster-millimeter-retro)!important;background-repeat:repeat!important;background-position:center top!important;background-attachment:fixed!important;-webkit-mask-image:none!important;mask-image:none!important}
+:root[data-theme="retro"][data-seite="coach"] #view{background-image:none!important;background-repeat:repeat!important;background-position:center top!important;background-attachment:fixed!important;-webkit-mask-image:none!important;mask-image:none!important}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header{--dex-ink:#0A1330;--brand-outline:#0A1330;background:#94DEFF!important;border-color:#0A1330!important;color:#0A1330!important;transform:translateY(var(--coach-oben,0px))}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
-:root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFCF5!important;color:#0A1330!important}
-:root[data-theme="retro"][data-seite="coach"] .app-dex-coach-zurueck{border-color:#0A1330;background:#FFFCF5;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFFFF!important;color:#0A1330!important}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-coach-zurueck{border-color:#0A1330;background:#FFFFFF;color:#0A1330}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #0A1330)}
-:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::before{background:linear-gradient(180deg,transparent 0,color-mix(in srgb,#94DEFF 76%,transparent) 100%)}
-:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{background:#94DEFF}
-:root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:#0A1330;background:color-mix(in srgb,#94DEFF 82%,transparent);-webkit-backdrop-filter:blur(6.65px) saturate(1.25);backdrop-filter:blur(6.65px) saturate(1.25)}
-:root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea{border-color:#0A1330;background:#FFFCF5;color:#0A1330;box-shadow:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{display:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:#0A1330;background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea{border-color:#0A1330;background:#FFFFFF;color:#0A1330;box-shadow:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea::placeholder{color:#526078}
+/* Hoher Kontrast wie „Kontrast erhöhen“ am Mac: deckende Flächen, keine
+   Weichzeichner, und jede Kontur einheitlich 2 px im selben Dunkelblau.
+   Trennlinien innerhalb einer Antwort ebenfalls dunkel statt weiß. */
+:root[data-theme="retro"][data-seite="coach"] .coach-chat{--coach-rand:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-schritt,.coach-art,.coach-safety,.coach-woche-chip span,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-attachment,.coach-attachment button,.coach-chat-avatar,.coach-woche-form :is(select,textarea),.gedaechtnis-eintrag,.gedaechtnis-formular,.gedaechtnis-formular :is(input,select,textarea)){border-width:2px!important;border-style:solid!important;border-color:#0A1330!important}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat-window .coach-mehr{border-top:2px solid #0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-wochenvergleich :is(th,td){border-top-color:rgba(10,19,48,.3)}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window{border-width:2px}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header{border-bottom-width:2px}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-fenster-knoepfe i{border:2px solid #0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border:2px solid #0A1330}
 :root[data-theme="retro"][data-seite="habits"] .routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
 :root[data-theme="retro"][data-seite="sleep"] :is(.sleep-dex-page,.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
 :root[data-theme="retro"][data-seite="search"] #view{background-image:var(--muster-bildroehre-retro)!important}
