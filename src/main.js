@@ -792,7 +792,7 @@ function appDexShellZeichnen(route, view) {
         : `<span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>`}
       <div class="app-dex-header-actions">
         ${istCoach ? `
-        <a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>` : `
+        <a class="app-dex-gedaechtnis app-dex-gedaechtnis-chip" href="#coach-wissen" aria-label="Gedächtnis: Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-gedaechtnis-icon')}<span>Gedächtnis</span></a>` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
