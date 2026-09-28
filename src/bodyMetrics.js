@@ -893,12 +893,12 @@ function optionaleSchritteFuer(state) {
   }
 }
 
-function compOptionalMarkup(schritte = []) {
+export function compOptionalMarkup(schritte = []) {
   if (!schritte.length) return '';
   const kiZusammenfassung = schritte.some((schritt) => schritt.summary);
   return `<section class="comp-optional"><h3>Optional</h3>
     <p>${kiZusammenfassung ? 'Die KI fasst den Zusammenhang zusammen. ' : ''}Auswahl und Dosierungen werden unverändert aus dem Seminarwissen übernommen.</p>
-    <ul>${schritte.map((schritt) => `<li><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b>${schritt.summary ? `<span>${escapeHtml(schritt.summary)}</span>` : ''}${(schritt.punkte || []).map((punkt) => `<span>${escapeHtml(punkt)}</span>`).join('')}${schritt.dosierungen?.length ? `<div class="comp-optional-doses">${schritt.dosierungen.map((item) => `<span><b>${escapeHtml(item.name)}${item.optional ? ' · optional' : ''}</b><strong>${escapeHtml(item.dosierung || 'Keine Dosierung hinterlegt')}</strong>${item.protokoll ? `<small>${escapeHtml(item.protokoll)}</small>` : ''}</span>`).join('')}</div>` : ''}<em>Seminarwissen · Details in „${escapeHtml(schritt.karte)}“</em></li>`).join('')}</ul>
+    <div class="comp-optional-list">${schritte.map((schritt) => `<details class="comp-optional-card"><summary><span><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b></span>${materialIconMarkup('chevron_right')}</summary><div class="comp-optional-content">${schritt.summary ? `<p>${escapeHtml(schritt.summary)}</p>` : ''}${(schritt.punkte || []).length ? `<ul>${schritt.punkte.map((punkt) => `<li>${escapeHtml(punkt)}</li>`).join('')}</ul>` : ''}${schritt.dosierungen?.length ? `<div class="comp-optional-doses">${schritt.dosierungen.map((item) => `<span><b>${escapeHtml(item.name)}${item.optional ? ' · optional' : ''}</b><strong>${escapeHtml(item.dosierung || 'Keine Dosierung hinterlegt')}</strong>${item.protokoll ? `<small>${escapeHtml(item.protokoll)}</small>` : ''}</span>`).join('')}</div>` : ''}<em>Seminarwissen · Details in „${escapeHtml(schritt.karte)}“</em></div></details>`).join('')}</div>
   </section>`;
 }
 

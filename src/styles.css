@@ -15071,7 +15071,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:520px){.coach-shell{padding-inline:10px}}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 :root{--muster-millimeter-hell:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 11.5H44M0 22.5H44M0 33.5H44M11.5 0V44M22.5 0V44M33.5 0V44' stroke='%23432C5E' stroke-opacity='.06' fill='none'/%3E%3Cpath d='M0 .5H44M.5 0V44' stroke='%23432C5E' stroke-opacity='.16' fill='none'/%3E%3C/svg%3E")}
-.coach-chat{--coach-violett:#432C5E;--coach-violett-hell:#6A53B8;--coach-lavendel:#C9BCF7;--coach-pink:var(--brand-pink,#FF69AE);--coach-rand:#111;--coach-schatten:#111;--coach-grund:#EFEBF7;--coach-muster:var(--muster-millimeter-hell)}
+.coach-chat{--coach-violett:#432C5E;--coach-violett-hell:#6A53B8;--coach-nutzer:#173766;--coach-nutzer-kopf:#0A2450;--coach-lavendel:#C9BCF7;--coach-pink:var(--brand-pink,#FF69AE);--coach-rand:#111;--coach-schatten:#111;--coach-grund:#EFEBF7;--coach-muster:var(--muster-millimeter-hell)}
 /* Coach-Seiten: Der App-Kopf trägt das Violett der Eingabeleiste und zeigt
    Zurück und Gedächtnis statt Coach und Suche, mit deren Klassen und damit an
    derselben Stelle (main.js). Der Seitengrund ist zartes Lavendel mit
@@ -15086,6 +15086,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon){display:block;line-height:0}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon)>svg{display:block;width:100%;height:100%}
 .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #000)}
+.app-dex-coach-zurueck{width:44px;height:44px;flex-basis:44px;border-radius:10px}
+.app-dex-coach-zurueck .app-dex-zurueck-icon{width:32px;height:32px}
+.app-dex-coach-zurueck:active{transform:translateY(1.5px)}
+.app-dex-coach-zurueck:focus-visible{outline:2px solid currentColor;outline-offset:1px}
 /* Auf der Gedächtnis-Seite selbst: harter Schatten wie beim CAPCOIN-Symbol
    auf seiner Seite (Retro dunkel, Dark weiß), ohne Rahmen und Hinterlegung. */
 .app-dex-gedaechtnis[aria-current="page"] .app-dex-gedaechtnis-icon{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
@@ -15100,9 +15104,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-shell.coach-chat .coach-answer{display:flex;flex-direction:column;gap:12px;margin:4px 0 0}
 .coach-chat-window{box-sizing:border-box;max-width:min(92%,560px);overflow:hidden;border:2px solid var(--coach-rand);border-radius:9px;box-shadow:0 4px 0 var(--coach-schatten)}
 .coach-chat-window.is-coach{align-self:flex-start;background:var(--coach-violett-hell);color:#fff}
-.coach-chat-window.is-user{align-self:flex-end;max-width:min(84%,470px);background:#fff;color:#111}
+.coach-chat-window.is-user{align-self:flex-end;max-width:min(92%,560px);background:var(--coach-nutzer);color:#fff}
 .coach-chat-window>header{display:flex;align-items:center;gap:7px;min-height:30px;padding:3px 4px 3px 7px;border-bottom:2px solid var(--coach-rand);background:var(--coach-violett);color:#fff}
-.coach-chat-window.is-user>header{background:var(--coach-pink);color:#111}
+.coach-chat-window.is-user>header{background:var(--coach-nutzer-kopf);color:#fff;box-shadow:inset 4px 0 0 var(--coach-pink)}
 .coach-chat-window>header b{flex:1;font:800 13px/1 var(--ui);letter-spacing:.01em}
 .coach-chat-cap{width:20px;height:20px;flex:0 0 20px}
 .coach-chat-avatar{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;overflow:hidden;border:1.5px solid #111;border-radius:50%;background:#fff;color:#111;font:800 7px/1 var(--tech)}
@@ -15114,10 +15118,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-offen{display:grid;gap:5px;margin:8px 0 0;padding-left:18px}
 .coach-offen li{font:500 14.5px/1.4 var(--ui)}
 .coach-chat-message>p{margin:0;white-space:pre-wrap}
-.coach-chat-message>small{display:block;margin-top:8px;font:700 10.5px/1.3 var(--tech);opacity:.8}
+.coach-chat-message>small{display:block;margin-top:8px;font:700 11.5px/1.35 var(--tech);opacity:.84}
 .coach-welcome .coach-chat-message>small{margin-top:10px}
 .coach-vorschlaege{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.coach-vorschlaege button{padding:8px 12px;border:1.5px solid var(--coach-rand);border-radius:999px;background:#fff;color:#111;font:700 13.5px/1.2 var(--ui);text-align:left;box-shadow:0 2px 0 var(--coach-schatten);cursor:pointer}
+.coach-vorschlaege button{padding:9px 12px;border:1.5px solid var(--coach-rand);border-radius:7px;background:#fff;color:#111;font:750 13.5px/1.2 var(--ui);text-align:left;box-shadow:0 2px 0 var(--coach-schatten);cursor:pointer}
+.coach-vorschlaege button:first-child{background:var(--coach-nutzer);color:#fff}
 .coach-tippt{display:flex;align-items:center;gap:9px;margin:0;font:700 13px/1.2 var(--tech)}
 .coach-tippt .sanduhr{flex:none;width:17px;height:22px}
 .coach-chat-window.coach-welcome{display:block;padding:0;border-style:solid}
@@ -15132,10 +15137,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-schritt b{font:700 15px/1.35 var(--ui)}
 .coach-schritt p{margin:0;font:500 14px/1.45 var(--ui)}
 .coach-schritt p em{font-style:normal;font-weight:800}
-.coach-schritt small{font:600 10.5px/1.3 var(--tech);opacity:.85}
+.coach-schritt small{font:650 11.5px/1.35 var(--tech);opacity:.86}
 .coach-chat-window .coach-art{justify-self:start;padding:3px 6px;border:1px solid currentColor;border-radius:4px;color:inherit;font:800 9px/1 var(--tech);letter-spacing:.06em;text-transform:uppercase}
-.coach-merken,.coach-knopf{justify-self:start;margin-top:2px;padding:8px 12px;border:2px solid var(--coach-rand);border-radius:6px;background:var(--coach-lavendel);color:#111;font:800 11.5px/1 var(--tech);box-shadow:0 2px 0 var(--coach-schatten);cursor:pointer}
-.coach-merken.ist-wichtig,.coach-knopf.ist-wichtig{background:var(--coach-pink)}
+.coach-merken,.coach-knopf{justify-self:start;margin-top:2px;padding:9px 12px;border:2px solid var(--coach-rand);border-radius:7px;background:#fff;color:#111;font:800 11.5px/1 var(--tech);box-shadow:0 2px 0 var(--coach-schatten);cursor:pointer}
+.coach-merken.ist-wichtig,.coach-knopf.ist-wichtig{background:var(--coach-nutzer);color:#fff}
 .coach-merken:disabled,.coach-knopf:disabled{opacity:.7;cursor:default}
 .coach-safety{margin:0;padding:8px 10px;border:1.5px solid var(--coach-rand);border-radius:7px;background:#FFD400;color:#111;font:700 14px/1.4 var(--ui)}
 .coach-chat-window .coach-mehr{padding:9px 0 0;border:0;border-top:1.5px dashed rgba(255,255,255,.5);border-radius:0}
@@ -15144,7 +15149,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-mehr ul{display:grid;gap:5px;margin:6px 0 0;padding-left:16px}
 .coach-mehr li{font:500 14px/1.45 var(--ui)}
 .coach-mehr a{color:inherit;text-decoration:underline}
-.coach-web-status,.coach-datenlage{font:700 10px/1.2 var(--tech);opacity:.8}
+.coach-web-status,.coach-datenlage{font:700 11.5px/1.3 var(--tech);opacity:.82}
 .coach-datenlage{justify-self:end}
 /* Wochenvergleich und Check-in im Fenster */
 .coach-chat-window .coach-wochenvergleich{padding:0;border:0;background:transparent}
@@ -15165,8 +15170,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-woche-chips{display:flex;flex-wrap:wrap;gap:6px}
 .coach-woche-chip{display:inline-flex!important;align-items:center;cursor:pointer}
 .coach-woche-chip input{position:absolute;opacity:0;pointer-events:none}
-.coach-woche-chip span{padding:8px 12px;border:1.5px solid var(--coach-rand);border-radius:999px;background:#fff;color:#111;font:700 13.5px/1 var(--ui)}
-.coach-woche-chip input:checked+span{background:var(--coach-pink)}
+.coach-woche-chip span{padding:8px 12px;border:1.5px solid var(--coach-rand);border-radius:7px;background:#fff;color:#111;font:700 13.5px/1 var(--ui)}
+.coach-woche-chip input:checked+span{background:var(--coach-nutzer);color:#fff}
 .coach-woche-chip input:focus-visible+span{outline:2px solid #fff;outline-offset:2px}
 .coach-woche-knoepfe{display:flex;flex-wrap:wrap;gap:8px}
 /* Eingabe, fest am unteren Rand */
@@ -15199,20 +15204,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-attachment span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .coach-attachment button{width:28px;height:28px;padding:0;border:2px solid var(--coach-rand);border-radius:6px;background:var(--coach-lavendel);color:#111;font:800 15px/1 var(--tech)}
 /* Dark Mode: gleiche Formen, dunklere Flächen */
-:root[data-theme="dark"] .coach-chat{--coach-violett:#241a3d;--coach-violett-hell:#3b2f6b;--coach-rand:#000;--coach-schatten:#000;--coach-grund:#101A2B;--coach-muster:var(--muster-millimeter-dunkel)}
-:root[data-theme="dark"] .coach-chat-window.is-user,:root[data-theme="dark"] .coach-chat-window.is-fehler{background:#242830;color:var(--dm-text,#f4f4f4)}
+:root[data-theme="dark"] .coach-chat{--coach-violett:#241a3d;--coach-violett-hell:#3b2f6b;--coach-nutzer:#18365f;--coach-nutzer-kopf:#10284d;--coach-rand:#000;--coach-schatten:#000;--coach-grund:#101A2B;--coach-muster:var(--muster-millimeter-dunkel)}
+:root[data-theme="dark"] .coach-chat-window.is-fehler{background:#242830;color:var(--dm-text,#f4f4f4)}
 :root[data-theme="dark"] .coach-shell.coach-chat .coach-form{background:#101A2B;border-top-color:#000}
 /* Die allgemeinen Dark-Mode-Regeln färben jeden Knopf und Text mit !important
    um; die Retro-Knöpfe des Chats behalten ihre Farben. */
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken,.coach-knopf,.coach-kopf-knopf,.coach-attachment button){background:var(--coach-lavendel)!important;color:#1d1533!important;-webkit-text-fill-color:#1d1533!important}
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken.ist-wichtig,.coach-knopf.ist-wichtig){background:var(--coach-pink)!important;color:#111!important;-webkit-text-fill-color:#111!important}
+:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken,.coach-knopf,.coach-kopf-knopf,.coach-attachment button){background:#edf0f6!important;color:#111!important;-webkit-text-fill-color:#111!important}
+:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken.ist-wichtig,.coach-knopf.ist-wichtig){background:var(--coach-nutzer)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-kopf-knopf,.coach-merken) :is(.material-svg,svg,svg *){fill:currentColor!important;color:inherit!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-inputbar :is(button.coach-plus,button.coach-send){background:none!important;border:0!important;box-shadow:none!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-vorschlaege button,.coach-woche-chip span,.coach-werkzeug){background:#edf0f6!important;color:#111!important;-webkit-text-fill-color:#111!important}
+:root[data-theme="dark"][data-seite="coach"] #view .coach-vorschlaege button:first-child,
+:root[data-theme="dark"][data-seite="coach"] #view .coach-woche-chip input:checked+span{background:var(--coach-nutzer)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug :is(span,.material-svg,svg,svg *){color:#111!important;-webkit-text-fill-color:#111!important;fill:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug:has(input[type="checkbox"]:checked){background:#FFD400!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-woche-chip input:checked+span{background:var(--coach-pink)!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-chat-window.is-user>header :is(b,span){color:#111!important;-webkit-text-fill-color:#111!important}
+:root[data-theme="dark"][data-seite="coach"] #view .coach-chat-window.is-user>header :is(b,span){color:#fff!important;-webkit-text-fill-color:#fff!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-safety{color:#111!important;-webkit-text-fill-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea,.coach-woche-form select,.gedaechtnis-formular :is(input,select,textarea)){background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;caret-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea)::placeholder{color:#6b6480!important;-webkit-text-fill-color:#6b6480!important}
@@ -15239,7 +15245,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]{padding-inline:7px}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]::-webkit-date-and-time-value{text-align:left}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]::-webkit-calendar-picker-indicator{width:14px;margin-left:2px;padding:0}
-@media(max-width:400px){.coach-shell.coach-chat{padding-inline:8px}.coach-chat-window.is-coach{max-width:96%}.coach-chat-window.is-user{max-width:88%}}
+@media(max-width:400px){.coach-shell.coach-chat{padding-inline:8px}.coach-chat-window:is(.is-coach,.is-user){max-width:96%}}
 
 /* COMP details: no enclosing mega-card; every section is its own card. */
 .comp-details-list{display:grid;gap:5px}
@@ -15277,12 +15283,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .comp-assessment-body ol li::before{background:transparent!important;color:#fff!important;box-shadow:inset 0 0 0 1.5px #fff}
 /* Optionale Schritte in der KI-Karte: aus den Seminar-Auswertungen der App. */
 .comp-optional>p{color:var(--muted)}
-.comp-assessment-body .comp-optional ul{gap:12px;padding:0;list-style:none}
-.comp-optional li{display:grid;gap:3px}
-.comp-optional li small{color:var(--muted);font:750 8px/1.2 var(--tech);letter-spacing:.06em;text-transform:uppercase}
-.comp-optional li b{font:780 10.5px/1.35 var(--ui)}
-.comp-optional li span{font:520 10.5px/1.45 var(--tech)}
-.comp-optional li em{color:var(--muted);font:600 9px/1.3 var(--tech);font-style:normal}
+.comp-optional-list{display:grid;gap:7px;margin-top:9px}
+.comp-optional-card{overflow:hidden;border:1px solid var(--app-divider,#ddd);border-radius:9px;background:transparent}
+.comp-optional-card>summary{display:grid;grid-template-columns:minmax(0,1fr) 18px;align-items:center;gap:8px;min-height:48px;padding:8px 10px;cursor:pointer;list-style:none}
+.comp-optional-card>summary::-webkit-details-marker{display:none}
+.comp-optional-card>summary>span{display:grid;gap:3px}
+.comp-optional-card>summary small{color:var(--muted);font:750 8px/1.2 var(--tech);letter-spacing:.06em;text-transform:uppercase}
+.comp-optional-card>summary b{font:780 11px/1.3 var(--ui)}
+.comp-optional-card>summary>.material-svg{width:18px;height:18px;transition:transform .18s ease}
+.comp-optional-card[open]>summary>.material-svg{transform:rotate(90deg)}
+.comp-optional-content{display:grid;gap:8px;padding:10px;border-top:1px solid var(--app-divider,#ddd)}
+.comp-optional-content>p{margin:0;font:520 10.5px/1.45 var(--tech)}
+.comp-assessment-body .comp-optional-content>ul{display:grid;gap:5px;margin:0;padding-left:16px;list-style:disc}
+.comp-optional-content>ul li{font:520 10.5px/1.45 var(--tech)}
+.comp-optional-content>em{color:var(--muted);font:600 9px/1.3 var(--tech);font-style:normal}
 .comp-optional-doses{display:grid;gap:5px;margin-top:4px}
 .comp-optional-doses>span{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:7px 0;border-top:1px solid var(--app-divider,#ddd)}
 .comp-optional-doses>span b{font:760 10px/1.3 var(--ui)}

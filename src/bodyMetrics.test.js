@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compOptionaleSchritte, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
+import { compOptionaleSchritte, compOptionalMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
 import { FALTEN, summe } from './measurements.js';
 import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
@@ -134,5 +134,20 @@ describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
     expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, relevant: [] } })).toEqual([]);
     expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, complete: false } })).toEqual([]);
     expect(compOptionaleSchritte({})).toEqual([]);
+  });
+
+  it('zeigt Hautfalten und Neurotransmitter als getrennte kompakte Aufklapper', () => {
+    const schritte = [
+      ...compOptionaleSchritte({ actionPlan, faltenLabel: 'Beinbizeps' }),
+      ...compOptionaleSchritte({ neurotransmitter }),
+    ];
+    const markup = compOptionalMarkup(schritte);
+
+    expect(markup.match(/<details class="comp-optional-card">/g)).toHaveLength(2);
+    expect(markup).toContain('Hautfalten · Beinbizeps');
+    expect(markup).toContain('Neurotransmitter · GABA (deutlich)');
+    expect(markup).toContain('300 mg abends');
+    expect(markup).toContain('500–1.000 mg');
+    expect(markup).not.toContain('<ul><li><small>');
   });
 });
