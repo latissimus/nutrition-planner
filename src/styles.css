@@ -15085,7 +15085,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    liegt dasselbe Lavendel wie unter der Eingabe. */
 :root[data-seite="coach"]:not([data-theme="dark"]),:root[data-seite="coach"]:not([data-theme="dark"]) body{background:#080B16!important}
 :root[data-seite="coach"][data-theme="dark"],:root[data-seite="coach"][data-theme="dark"] body{background:#101A2B!important}
-:root[data-seite="coach"] #view{background-color:#080B16!important;background-image:linear-gradient(180deg,#02030A 0,#060916 18vh,rgba(8,13,27,.9) 33vh,rgba(8,13,27,.42) 54vh,rgba(8,13,27,.12) 70vh),var(--muster-millimeter-dunkel)!important;background-repeat:repeat!important;background-position:center!important;background-attachment:fixed!important}
+:root[data-seite="coach"] #view{background-color:#080B16!important;background-image:linear-gradient(rgba(8,11,22,.3),rgba(8,11,22,.3)),var(--muster-millimeter-dunkel)!important;background-repeat:repeat!important;background-position:center!important;background-attachment:fixed!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,rgba(0,0,0,.12) 64px,#000 148px,#000 100%);mask-image:linear-gradient(180deg,transparent 0,rgba(0,0,0,.12) 64px,#000 148px,#000 100%)}
 :root[data-seite="coach"] .app-dex-header{--dex-ink:#fff;color:#fff;border-bottom-color:#111;transform:translateY(var(--coach-oben,0px))}
 :root[data-seite="coach"]:not([data-theme="dark"]) .app-dex-header{background-color:#432C5E!important}
 :root[data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
@@ -15457,7 +15457,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 :root[data-theme="retro"][data-seite="reminders"] .meal-log-dex-page{background-image:var(--muster-gitter-retro)!important}
 :root[data-theme="retro"][data-seite="body"] .body-log-dex-page{background-image:var(--muster-millimeter-retro)!important}
-:root[data-theme="retro"][data-seite="coach"] #view{background-color:#080B16!important;background-image:linear-gradient(180deg,#02030A 0,#060916 18vh,rgba(8,13,27,.9) 33vh,rgba(8,13,27,.42) 54vh,rgba(8,13,27,.12) 70vh),var(--muster-millimeter-dunkel)!important}
+:root[data-theme="retro"][data-seite="coach"] #view{background-color:#080B16!important;background-image:linear-gradient(rgba(8,11,22,.3),rgba(8,11,22,.3)),var(--muster-millimeter-dunkel)!important}
 :root[data-theme="retro"][data-seite="habits"] .routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
 :root[data-theme="retro"][data-seite="sleep"] :is(.sleep-dex-page,.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
 :root[data-theme="retro"][data-seite="search"] #view{background-image:var(--muster-bildroehre-retro)!important}
