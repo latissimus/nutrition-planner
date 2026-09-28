@@ -15235,9 +15235,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea,.coach-woche-form select,.gedaechtnis-formular :is(input,select,textarea)){background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;caret-color:#111!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea)::placeholder{color:#6b6480!important;-webkit-text-fill-color:#6b6480!important}
 
-/* RETRO-Chat: dieselbe helle Kartenlogik wie COMP. Die Bilder markieren den
-   Absender, deshalb entfallen Titelleiste und dekorative Fensterknöpfe. */
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window{width:min(calc(100% - 46px),520px);overflow:visible;border:2px solid #111;border-radius:15px;background:color-mix(in srgb,#FF277F 9%,#fff);color:#111;box-shadow:0 3.5px 0 #000}
+/* RETRO-Chat: dieselbe ruhige Flächen- und Konturenlogik wie COMP. Die Bilder
+   markieren den Absender, deshalb entfallen Titelleiste und Fensterknöpfe. */
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window{width:min(calc(100% - 46px),520px);overflow:visible;border:2px solid #0A1330;border-radius:14px;background:#FFFCF5;color:#0A1330;box-shadow:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{background:color-mix(in srgb,#FF277F 9%,#FFFCF5)}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{margin-left:42px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{margin-right:42px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header{position:static;display:block;min-height:0;height:0;padding:0;overflow:visible;border:0;background:transparent}
@@ -15246,6 +15247,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach>header>.coach-chat-cap{left:-44px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user>header>.coach-chat-avatar{right:-44px}
 :root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-message{padding:16px 17px}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-avatar{border-color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button{border-color:#0A1330;background:#FFFCF5;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button:first-child{background:#FF277F;color:#FFFCF5}
 /* Gedächtnis-Seite: jeder Bereich ein Fenster in voller Breite */
 .coach-gedaechtnis-seite .gedaechtnis-inhalt{display:flex;flex-direction:column;gap:12px}
 .coach-chat-window.is-bereich{display:block;align-self:stretch;max-width:none;margin-inline:0;overflow:hidden}
@@ -15468,8 +15472,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 :root[data-theme="retro"][data-seite="reminders"] .meal-log-dex-page{background-image:var(--muster-gitter-retro)!important}
 :root[data-theme="retro"][data-seite="body"] .body-log-dex-page{background-image:var(--muster-millimeter-retro)!important}
-:root[data-theme="retro"][data-seite="coach"],:root[data-theme="retro"][data-seite="coach"] body{background-color:#94DEFF!important}
-:root[data-theme="retro"][data-seite="coach"] #view{background-color:#94DEFF!important;background-image:linear-gradient(rgba(148,222,255,.62),rgba(148,222,255,.62)),var(--muster-millimeter-retro)!important}
+:root[data-theme="retro"][data-seite="coach"],:root[data-theme="retro"][data-seite="coach"] body{--dex-seitenfarbe:#94DEFF;background:#94DEFF!important}
+:root[data-theme="retro"][data-seite="coach"] :is(#app,#view){background-color:transparent!important}
+:root[data-theme="retro"][data-seite="coach"] #view{background-image:var(--muster-millimeter-retro)!important;background-repeat:repeat!important;background-position:center top!important;background-attachment:fixed!important;-webkit-mask-image:none!important;mask-image:none!important}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-header{--dex-ink:#0A1330;--brand-outline:#0A1330;background:#94DEFF!important;border-color:#0A1330!important;color:#0A1330!important;transform:translateY(var(--coach-oben,0px))}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFCF5!important;color:#0A1330!important}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-coach-zurueck{border-color:#0A1330;background:#FFFCF5;color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #0A1330)}
+:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::before{background:linear-gradient(180deg,transparent 0,color-mix(in srgb,#94DEFF 76%,transparent) 100%)}
+:root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{background:#94DEFF}
+:root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:#0A1330;background:color-mix(in srgb,#94DEFF 82%,transparent);-webkit-backdrop-filter:blur(6.65px) saturate(1.25);backdrop-filter:blur(6.65px) saturate(1.25)}
+:root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea{border-color:#0A1330;background:#FFFCF5;color:#0A1330;box-shadow:none}
+:root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea::placeholder{color:#526078}
 :root[data-theme="retro"][data-seite="habits"] .routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
 :root[data-theme="retro"][data-seite="sleep"] :is(.sleep-dex-page,.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
 :root[data-theme="retro"][data-seite="search"] #view{background-image:var(--muster-bildroehre-retro)!important}
