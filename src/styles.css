@@ -15554,3 +15554,152 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root:root[data-theme="retro"][data-seite="training"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page,.training-dex-page.training-dex-page){background-image:var(--muster-dreieck-dunkel)!important}
 :root:root[data-theme="retro"][data-seite="stress"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-rechteckwelle-retro)!important}
 :root:root[data-theme="retro"][data-seite="coins"] #view.coin-dex-page.coin-dex-page{background-image:var(--muster-tetris-dunkel)!important}
+
+/* Die kompakte Struktur ist immer im DOM, damit ein Theme-Wechsel keinen
+   alten Renderzustand behalten kann. Ausserhalb von Retro bleibt die bisherige
+   ausfuehrliche Darstellung sichtbar. */
+.comp-detail-explain,.comp-assessment-why,.comp-next-steps{display:none}
+.comp-optional-group{display:none}
+
+/* ============================================================
+   RETRO · COMP wie macOS „Kontrast erhoehen“
+   ============================================================ */
+/* Eine starke Aussenkontur kennzeichnet die Karten. Innenlinien sind nur
+   dort sichtbar, wo sie tatsaechlich zwei bedienbare oder inhaltlich
+   getrennte Bereiche markieren. Dark bleibt von diesem Block unberuehrt. */
+:root[data-theme="retro"][data-seite="body"] .body-v2-hero{
+  grid-template-columns:82px minmax(0,1fr) 44px!important;
+  border:2px solid #0A1330!important;
+  box-shadow:none!important;
+}
+:root[data-theme="retro"][data-seite="body"] .body-analysis-info{
+  box-sizing:border-box;
+  width:44px!important;
+  height:44px!important;
+  min-height:44px!important;
+  border:2px solid #0A1330!important;
+  box-shadow:none!important;
+}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-facts article,.comp-central-assessment,.comp-detail-card){
+  border:2px solid #0A1330!important;
+  box-shadow:none!important;
+}
+:root[data-theme="retro"][data-seite="body"] .comp-details-list{gap:8px}
+:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content{border-top:2px solid #0A1330!important}
+
+/* Der Kartentitel sagt bereits, welche Messung gemeint ist. Die historische
+   zweite Ueberschrift in der geoeffneten Karte war nur eine Wiederholung. */
+:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-v2-card-body>.mini-title{display:none!important}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why,.comp-next-steps){display:block}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain-wide,.comp-reason-wide,.comp-next-wide,.comp-optional-wide){display:none!important}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group{display:block}
+
+/* Kennzahlen bilden eine kompakte Gruppe ohne Liniengitter. Diagramm,
+   Untermenues und Handlungsplan bekommen jeweils hoechstens eine Trennlinie. */
+:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-metric-grid>*{
+  border-bottom:0!important;
+}
+:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-goal-status,.ypsi-top-fold,.ypsi-rule-note,.ypsi-priority-reason,.ypsi-open-questions,.body-neutral-note,.braverman-result-focus,.body-chart-empty,.falten-protokoll-item){
+  border-top:0!important;
+}
+:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-inner-details li,
+:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*,.falten-protokoll-item>header){
+  border-bottom-color:rgba(10,19,48,.2)!important;
+}
+
+/* Erklaerungen bleiben direkt erreichbar, konkurrieren aber nicht mehr mit
+   Messwert, Verlauf und naechstem Schritt. */
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why){
+  margin:0;
+  border:0;
+  border-bottom:1px solid rgba(10,19,48,.28);
+}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 20px;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  padding:0;
+  cursor:pointer;
+  list-style:none;
+  font:800 12px/1.2 "Work Sans",var(--ui),sans-serif!important;
+}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary::-webkit-details-marker{display:none}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary>.material-svg{
+  width:18px;
+  height:18px;
+  transition:transform .18s ease;
+}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)[open]>summary>.material-svg{transform:rotate(90deg)}
+:root[data-theme="retro"][data-seite="body"] .comp-detail-explain>.body-explain{
+  margin:0 0 12px!important;
+  color:#35405A!important;
+  font:520 12px/1.48 "Work Sans",var(--ui),sans-serif!important;
+}
+:root[data-theme="retro"][data-seite="body"] .comp-assessment-why>div{display:grid;gap:12px;padding:0 0 14px}
+:root[data-theme="retro"][data-seite="body"] .comp-assessment-why section{display:grid;gap:6px;padding:0;border:0}
+:root[data-theme="retro"][data-seite="body"] .comp-assessment-why h3{font-size:11px}
+:root[data-theme="retro"][data-seite="body"] .comp-assessment-why ul{margin:0}
+
+/* Der wichtigste Schritt bleibt offen. Weitere Schritte und der ausdrücklich
+   optionale Seminarteil folgen als kompakte, gut treffbare Aufklapper. */
+:root[data-theme="retro"][data-seite="body"] .comp-next-more{
+  grid-column:1/-1;
+  margin-top:11px;
+  border-top:1px solid rgba(10,19,48,.28);
+}
+:root[data-theme="retro"][data-seite="body"] .comp-next-more>summary,
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 20px;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  cursor:pointer;
+  list-style:none;
+  font:800 12px/1.2 "Work Sans",var(--ui),sans-serif;
+}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-next-more,.comp-optional-group)>summary::-webkit-details-marker{display:none}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-next-more,.comp-optional-group)>summary>.material-svg{
+  width:18px;
+  height:18px;
+  transition:transform .18s ease;
+}
+:root[data-theme="retro"][data-seite="body"] :is(.comp-next-more,.comp-optional-group)[open]>summary>.material-svg{transform:rotate(90deg)}
+:root[data-theme="retro"][data-seite="body"] .comp-next-more>ol{
+  padding-top:8px;
+  counter-reset:comp-step 1;
+}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group{
+  padding:0!important;
+  border:0!important;
+  border-bottom:1px solid rgba(10,19,48,.28)!important;
+}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary{min-height:52px}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary>span{display:grid;gap:3px}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary small{
+  color:#526078;
+  font:650 9px/1.2 var(--tech);
+}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group>div{padding:0 0 13px}
+:root[data-theme="retro"][data-seite="body"] .comp-optional-group>div>p{margin:0 0 10px;color:#35405A;font-family:"Work Sans",var(--ui),sans-serif}
+
+/* In der Faltenliste reicht fuer den Ueberblick Name plus Wert. Die genaue
+   Position und Interpretation stehen weiterhin nach dem Antippen bereit. */
+:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .falten-item-head>small{display:none!important}
+:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .falten-legende-item{min-height:50px!important}
+:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(.body-legende-intro,.ypsi-rule-note){display:none!important}
+
+/* Kleine Hauptaktionen muessen auch mit dem Daumen sicher erreichbar sein. */
+:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf,.gedaechtnis-bereich>.btn,.gedaechtnis-aktionen .btn){
+  min-height:44px!important;
+}
+:root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-chip{height:44px}
+
+@media(max-width:370px){
+  :root[data-theme="retro"][data-seite="body"] .body-v2-hero{
+    grid-template-columns:68px minmax(0,1fr) 44px!important;
+    gap:10px!important;
+  }
+}
