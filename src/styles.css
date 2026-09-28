@@ -15077,7 +15077,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media(max-width:520px){.coach-shell{padding-inline:10px}}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 :root{--muster-millimeter-hell:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 11.5H44M0 22.5H44M0 33.5H44M11.5 0V44M22.5 0V44M33.5 0V44' stroke='%23432C5E' stroke-opacity='.06' fill='none'/%3E%3Cpath d='M0 .5H44M.5 0V44' stroke='%23432C5E' stroke-opacity='.16' fill='none'/%3E%3C/svg%3E")}
-.coach-chat{--coach-violett:#432C5E;--coach-violett-hell:#6A53B8;--coach-nutzer:#FFF8E7;--coach-nutzer-kopf:#E9DFC8;--coach-nutzer-text:#17131D;--coach-lavendel:#C9BCF7;--coach-pink:var(--brand-pink,#FF69AE);--coach-rand:#111;--coach-schatten:#111;--coach-grund:#080B16;--coach-muster:var(--muster-millimeter-dunkel)}
+.coach-chat{--coach-violett:#30204F;--coach-violett-hell:#6F55BC;--coach-nutzer:#6F55BC;--coach-nutzer-kopf:#30204F;--coach-nutzer-text:#fff;--coach-lavendel:#C9BCF7;--coach-pink:var(--brand-pink,#FF69AE);--coach-rand:#100B19;--coach-schatten:#111;--coach-grund:#080B16;--coach-muster:var(--muster-millimeter-dunkel)}
 /* Coach-Seiten: Der App-Kopf trägt das Violett der Eingabeleiste und zeigt
    Zurück und Gedächtnis statt Coach und Suche, mit deren Klassen und damit an
    derselben Stelle (main.js). Der Seitengrund ist zartes Lavendel mit
@@ -15109,18 +15109,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-woche{display:flex;flex-direction:column;margin-top:0}
 .coach-woche[hidden]{display:none}
 .coach-shell.coach-chat .coach-answer{display:flex;flex-direction:column;gap:18px;margin:0}
-.coach-chat-window{box-sizing:border-box;position:relative;max-width:min(calc(100% - 46px),560px);overflow:visible;border:2px solid var(--coach-rand);border-radius:5px;background:var(--coach-violett-hell);box-shadow:none}
-.coach-chat-window.is-coach{align-self:flex-start;margin-left:42px;color:#fff}
-.coach-chat-window.is-user{align-self:flex-end;margin-right:42px;background:var(--coach-nutzer);color:var(--coach-nutzer-text)}
-.coach-chat-window>header{position:relative;display:flex;align-items:center;min-height:28px;padding:3px 8px;border-bottom:2px solid var(--coach-rand);border-radius:3px 3px 0 0;background:var(--coach-violett);color:#fff}
-.coach-chat-window.is-user>header{border-left:4px solid var(--coach-pink);background:var(--coach-nutzer-kopf);color:var(--coach-nutzer-text)}
+.coach-chat-window{box-sizing:border-box;position:relative;width:min(88%,520px);max-width:none;overflow:hidden;border:3px solid var(--coach-rand);border-radius:7px;background:var(--coach-violett-hell);color:#fff;box-shadow:none}
+.coach-chat-window.is-coach{align-self:flex-start;margin:0}
+.coach-chat-window.is-user{align-self:flex-end;margin:0;background:var(--coach-nutzer);color:#fff}
+.coach-chat-window>header{display:flex;align-items:center;min-height:27px;padding:2px 4px 2px 8px;border-bottom:3px solid var(--coach-rand);border-radius:3px 3px 0 0;background:var(--coach-violett);color:#fff}
+.coach-chat-window.is-user>header{border-left:0;background:var(--coach-nutzer-kopf);color:#fff}
 .coach-chat-window>header b{flex:1;font:800 13px/1 var(--ui);letter-spacing:.01em}
-.coach-chat-cap{width:36px;height:36px;flex:0 0 36px}
-.coach-chat-avatar{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;overflow:hidden;border:2px solid var(--coach-rand);border-radius:50%;background:#fff;color:#111;font:800 8px/1 var(--tech)}
-.coach-chat-avatar img{width:100%;height:100%;object-fit:cover}
-.coach-chat-window:not(.is-bereich)>header>:is(.coach-chat-cap,.coach-chat-avatar){position:absolute;top:-2px;z-index:2}
-.coach-chat-window.is-coach:not(.is-bereich)>header>.coach-chat-cap{left:-43px}
-.coach-chat-window.is-user>header>.coach-chat-avatar{right:-43px}
+.coach-fenster-knoepfe{display:flex;align-items:center;gap:3px;margin-left:7px}
+.coach-fenster-knoepfe i{display:grid;place-items:center;width:16px;height:16px;border:1.5px solid #1A1028;border-radius:1px;background:#7457C2;color:#2B1748;font:900 13px/1 Arial,sans-serif;font-style:normal}
 /* Lesbarkeit: Fließtext in der App-Schrift, 15–16 px; die Schreibmaschinen-
    schrift bleibt für Titel, Kennzeichnungen und Zeitangaben (Retro). */
 .coach-chat-message{padding:12px 14px 14px;font:500 15.5px/1.5 var(--ui)}
@@ -15216,7 +15212,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-attachment span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .coach-attachment button{width:28px;height:28px;padding:0;border:2px solid var(--coach-rand);border-radius:6px;background:var(--coach-lavendel);color:#111;font:800 15px/1 var(--tech)}
 /* Dark Mode: gleiche Formen, dunklere Flächen */
-:root[data-theme="dark"] .coach-chat{--coach-violett:#241a3d;--coach-violett-hell:#3b2f6b;--coach-nutzer:#252A32;--coach-nutzer-kopf:#343A44;--coach-nutzer-text:#F4F5F7;--coach-rand:#000;--coach-schatten:#000;--coach-grund:#101A2B;--coach-muster:var(--muster-millimeter-dunkel)}
+:root[data-theme="dark"] .coach-chat{--coach-violett:#30204F;--coach-violett-hell:#6F55BC;--coach-nutzer:#6F55BC;--coach-nutzer-kopf:#30204F;--coach-nutzer-text:#fff;--coach-rand:#08050D;--coach-schatten:#000;--coach-grund:#101A2B;--coach-muster:var(--muster-millimeter-dunkel)}
 :root[data-theme="dark"] .coach-chat-window.is-fehler{background:#242830;color:var(--dm-text,#f4f4f4)}
 :root[data-theme="dark"] .coach-shell.coach-chat .coach-form{background:transparent}
 :root[data-theme="dark"] .coach-inputbar{border-color:var(--dm-ink,#697486);background:rgba(30,33,42,.27)}
@@ -15258,7 +15254,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]{padding-inline:7px}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]::-webkit-date-and-time-value{text-align:left}
 .coach-gedaechtnis-seite .gedaechtnis-formular input[type="date"]::-webkit-calendar-picker-indicator{width:14px;margin-left:2px;padding:0}
-@media(max-width:400px){.coach-shell.coach-chat{padding-inline:8px}.coach-chat-window{max-width:calc(100% - 42px)}.coach-chat-window.is-coach{margin-left:38px}.coach-chat-window.is-user{margin-right:38px}.coach-chat-window.is-coach:not(.is-bereich)>header>.coach-chat-cap{left:-39px}.coach-chat-window.is-user>header>.coach-chat-avatar{right:-39px}}
+@media(max-width:400px){.coach-shell.coach-chat{padding-inline:8px}.coach-chat-window{width:92%}}
 
 /* COMP details: no enclosing mega-card; every section is its own card. */
 .comp-details-list{display:grid;gap:5px}

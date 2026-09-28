@@ -55,12 +55,13 @@ describe('Coach-Webquellen', () => {
 });
 
 describe('Coach-Chat: Retro-Fenster', () => {
-  it('zeigt den Coach und dich als Fenster mit Titelleiste, ohne Fensterknöpfe', () => {
+  it('zeigt den Coach und dich als Referenz-Fenster mit dekorativen Fensterknöpfen', () => {
     const coach = fensterMarkup({ inhalt: '<p>Hallo</p>', runde: 2 });
     expect(coach).toContain('coach-chat-window is-coach');
     expect(coach).toContain('<b>Coach</b>');
     expect(coach).toContain('data-runde="2"');
-    expect(coach).not.toMatch(/fenster-einklappen|coach-fenster-knoepfe|□|×/);
+    expect(coach).toContain('coach-fenster-knoepfe');
+    expect(coach).toMatch(/□|×/);
     const du = fensterMarkup({ von: 'user', avatar: '<span>FR</span>', inhalt: '<p>Frage</p>' });
     expect(du).toContain('coach-chat-window is-user');
     expect(du).toContain('<b>Du</b>');
