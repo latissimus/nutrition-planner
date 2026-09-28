@@ -42,7 +42,7 @@ import {
 } from './collections.js';
 import { prepareSpecialDexPage } from './specialDex.js';
 import {
-  coachIconMarkup, gedaechtnisIconMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup, seitenIconMarkup,
+  coachIconMarkup, gedaechtnisIconMarkup, hasMenuIcon, menuIconMarkup, searchIconMarkup,
 } from './menuIcons.js';
 
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
@@ -781,22 +781,26 @@ function appDexShellZeichnen(route, view) {
     ? '#101A2B'
     : (getComputedStyle(document.documentElement).getPropertyValue('--dex-seitenfarbe').trim()
       || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+  /* Coach-Seiten: ein konzentrierter Bildschirm. Zurück steht wie in iOS oben
+     links, als schlanker Pfeil direkt vor dem Logo; Pfeil und Logo sind eine
+     Tippfläche. Rechts bleibt nur das Gedächtnis; CAPCOIN und Profilbild
+     entfallen hier. */
   header.innerHTML = `
     <div class="app-dex-header-inner">
-      <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
+      ${istCoach ? `<a class="app-dex-brand app-dex-brand-zurueck" href="#${coachZurueckRoute}"
+         aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}" title="Zurück zu ${escapeHtml(coachZurueckTitel)}">${materialIconMarkup('arrow_back_ios', 'app-dex-zurueck-pfeil')}${capboyMarkup()}</a>`
+        : `<span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>`}
       <div class="app-dex-header-actions">
         ${istCoach ? `
-        <a class="app-dex-coach-zurueck" href="#${coachZurueckRoute}"
-           aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}" title="Zurück zu ${escapeHtml(coachZurueckTitel)}">${seitenIconMarkup('ZURÜCK', 'app-dex-zurueck-icon')}</a>
         <a class="app-dex-search app-dex-gedaechtnis" href="#coach-wissen" aria-label="Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-search-icon app-dex-gedaechtnis-icon')}</a>` : `
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>`}
-        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
+        ${!istCoach && coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         <span class="app-dex-sync save-dot" role="status"></span>
-        <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
-           aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>
+        ${istCoach ? '' : `<a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
+           aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>`}
       </div>
     </div>`;
 

@@ -15092,11 +15092,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon){display:block;line-height:0}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon)>svg{display:block;width:100%;height:100%}
 .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #000)}
-.app-dex-coach-zurueck{box-sizing:border-box;display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;padding:0;border:2px solid currentColor;border-radius:5px;background:color-mix(in srgb,currentColor 10%,transparent);color:inherit;text-decoration:none}
-.app-dex-coach-zurueck .app-dex-zurueck-icon{display:block;width:23px;height:23px;line-height:0;filter:none}
-.app-dex-coach-zurueck .app-dex-zurueck-icon>svg{display:block;width:100%;height:100%}
-.app-dex-coach-zurueck:active{transform:translateY(1px);background:color-mix(in srgb,currentColor 17%,transparent)}
-.app-dex-coach-zurueck:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+/* Coach-Seiten: Zurück als schlanker Pfeil direkt vor dem Logo (main.js). */
+.app-dex-brand-zurueck{gap:1px;margin-left:-6px;padding:6px 8px 6px 2px;border-radius:8px;color:inherit;text-decoration:none}
+.app-dex-brand-zurueck:active{transform:translateY(1px)}
+.app-dex-brand-zurueck:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.app-dex-zurueck-pfeil{flex:none;display:block;width:22px;height:22px;line-height:0}
+.app-dex-zurueck-pfeil svg{display:block;width:100%;height:100%;fill:currentColor}
 /* Auf der Gedächtnis-Seite selbst: harter Schatten wie beim CAPCOIN-Symbol
    auf seiner Seite (Retro dunkel, Dark weiß), ohne Rahmen und Hinterlegung. */
 .app-dex-gedaechtnis[aria-current="page"] .app-dex-gedaechtnis-icon{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
@@ -15471,17 +15472,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 :root[data-theme="retro"][data-seite="reminders"] .meal-log-dex-page{background-image:var(--muster-gitter-retro)!important}
 :root[data-theme="retro"][data-seite="body"] .body-log-dex-page{background-image:var(--muster-millimeter-retro)!important}
-/* Retro-Chat: das Pixel-Symbolbild (Blue_icons, als WebP verkleinert) füllt
-   den Bildschirm. Es liegt auf body, der selbst nicht scrollt; so bleibt es
-   auch in iOS stehen, wo background-attachment:fixed nicht greift. */
-:root[data-theme="retro"][data-seite="coach"]{--dex-seitenfarbe:#94DEFF;background:#1E86EC!important}
-:root[data-theme="retro"][data-seite="coach"] body{--dex-seitenfarbe:#94DEFF;background:#1E86EC url("./assets/coach-hintergrund.webp") center/cover no-repeat fixed!important}
+/* Retro-Chat: Hellblau wie Kopf und Eingabeleiste, darauf die Tapete von
+   MIND (Rechteckwelle). */
+:root[data-theme="retro"][data-seite="coach"],:root[data-theme="retro"][data-seite="coach"] body{--dex-seitenfarbe:#94DEFF;background:#94DEFF!important}
 :root[data-theme="retro"][data-seite="coach"] :is(#app,#view){background-color:transparent!important}
-:root[data-theme="retro"][data-seite="coach"] #view{background-image:none!important;background-repeat:repeat!important;background-position:center top!important;background-attachment:fixed!important;-webkit-mask-image:none!important;mask-image:none!important}
+:root[data-theme="retro"][data-seite="coach"] #view{background-image:var(--muster-rechteckwelle-retro)!important;background-repeat:repeat!important;background-position:center top!important;background-attachment:fixed!important;-webkit-mask-image:none!important;mask-image:none!important}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header{--dex-ink:#0A1330;--brand-outline:#0A1330;background:#94DEFF!important;border-color:#0A1330!important;color:#0A1330!important;transform:translateY(var(--coach-oben,0px))}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFFFF!important;color:#0A1330!important}
-:root[data-theme="retro"][data-seite="coach"] .app-dex-coach-zurueck{border-color:#0A1330;background:#FFFFFF;color:#0A1330}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #0A1330)}
 :root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{display:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:#0A1330;background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}

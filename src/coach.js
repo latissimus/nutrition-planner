@@ -7,7 +7,7 @@ import {
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
 import { fensterMarkup } from './coachFenster.js';
 import { seitenIconMarkup } from './menuIcons.js';
-import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
+import { sanduhrMarkup } from './sanduhr.js';
 import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
 
 export { fensterMarkup };
@@ -134,8 +134,23 @@ export function verlaufMarkup(runden = [], avatar = '') {
     + fensterMarkup({ runde: index, inhalt: `${runde.weekly ? vergleichMarkup(runde.weekly) : ''}${resultMarkup(runde.result, { merken: true })}` })).join('');
 }
 
-// Nach einer Weile wird aus "denkt nach" ein "denkt noch ein bisschen nach".
-const tipptMarkup = (text, spaeter) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}${wartetextMarkup(text, spaeter)}</p>` });
+const tipptMarkup = (text) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}<span data-coach-ladestatus>${escapeHtml(text)}</span></p>` });
+const LADEPHASEN = {
+  coach: ['Coach ordnet deine Daten', 'Coach prüft das Seminarwissen', 'Coach formuliert die Antwort'],
+  web: ['Coach ordnet deine Daten', 'Coach prüft das Seminarwissen', 'Coach recherchiert im Web', 'Coach gleicht die Quellen ab', 'Coach formuliert die Antwort'],
+  woche: ['Coach ordnet deine Woche', 'Coach vergleicht deine Entwicklungen', 'Coach prüft laufende Experimente', 'Coach formuliert die Bilanz'],
+};
+function ladephasenStarten(container, phasen) {
+  const status = container.querySelector('[data-coach-ladestatus]');
+  if (!status || phasen.length < 2) return () => {};
+  let index = 0;
+  const timer = window.setInterval(() => {
+    index = Math.min(index + 1, phasen.length - 1);
+    status.textContent = phasen[index];
+    if (index === phasen.length - 1) window.clearInterval(timer);
+  }, 3200);
+  return () => window.clearInterval(timer);
+}
 const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
 
 async function invokeCoach(scope, question = '', webResearch = false, conversationId = null, attachments = []) {
@@ -208,7 +223,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       <div class="coach-form-innen">
         <div class="coach-compose-tools" data-coach-tools hidden>
           <label class="coach-werkzeug">${materialIconMarkup('add_photo_alternate')}<span>Bild anhängen</span><input type="file" accept="image/*" data-coach-file></label>
-          <label class="coach-werkzeug"><input type="checkbox" data-coach-web><span>Webwissen einbeziehen</span></label>
+          <label class="coach-werkzeug"><input type="checkbox" data-coach-web checked><span>Webwissen einbeziehen</span></label>
           <button class="coach-werkzeug" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}<span>Neues Gespräch</span></button>
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
@@ -230,6 +245,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const fileInput = form.querySelector('[data-coach-file]');
   const webOption = form.querySelector('[data-coach-web]');
   const attachmentBox = form.querySelector('[data-coach-attachment]');
+  plus.classList.add('hat-web');
 
   // Die Eingabe sitzt fest am unteren Rand; der Verlauf bekommt unten so viel
   // Platz, wie sie hoch ist. Öffnet sich die Tastatur, sitzt die Eingabe direkt
@@ -377,7 +393,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         return answer.lastElementChild;
       }
       if (laden) {
-        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup('Coach bilanziert deine Woche', 'Coach bilanziert noch ein bisschen');
+        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup(LADEPHASEN.woche[0]);
+        ladephasenStarten(answer, LADEPHASEN.woche);
       } else if (fehler) {
         zeichnen(fehlerMarkup('Keine Wochenbilanz erstellt. Deine Messwerte bleiben unverändert. Versuche es später erneut.'));
       } else {
@@ -405,9 +422,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     werkzeugeZeigen(false);
     answer.innerHTML = verlaufMarkup(runden, avatar)
       + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang) })
-      + (webResearch
-        ? tipptMarkup('Coach recherchiert', 'Coach recherchiert noch ein bisschen')
-        : tipptMarkup('Coach denkt nach', 'Coach denkt noch ein bisschen nach'));
+      + tipptMarkup((webResearch ? LADEPHASEN.web : LADEPHASEN.coach)[0]);
+    const ladephasenStoppen = ladephasenStarten(answer, webResearch ? LADEPHASEN.web : LADEPHASEN.coach);
     nachUnten();
     try {
       const response = await invokeCoach('coach', question, webResearch, gespraech?.id, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);
@@ -432,6 +448,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       zeichnen(fehlerMarkup('Keine Antwort erstellt. Deine Frage steht wieder im Eingabefeld; versuche es gleich noch einmal.'));
       toast(error?.message || 'Coach konnte nicht antworten.');
     } finally {
+      ladephasenStoppen();
       button.disabled = false;
       nachUnten();
     }
