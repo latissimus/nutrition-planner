@@ -155,6 +155,8 @@ const supplementsForMeal = (meal, reminders) => {
 };
 
 const einheitLabel = (value) => ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' })[value] || value;
+// Kurzform für die kompakte Supplement-Zeile im Tracker (Dosis rechtsbündig).
+const einheitKurz = (value) => ({ Kapsel: 'Kps.', Tablette: 'Tbl.' })[value] || value;
 
 function nextDrinkSlot(reminder, now) {
   const start = minutesFromTime(reminder.time);
@@ -547,7 +549,8 @@ function summaryFor(reminder) {
     const einheit = String(reminder.metadata?.einheit || '').trim();
     const hinweis = hinweisLabel(reminder.metadata?.hinweis);
     const teile = [dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit), hinweis].filter(Boolean);
-    return { time, detail: teile.join(' · ') };
+    const menge = dosis && einheit ? `${dosis} ${einheitKurz(einheit)}` : dosis || einheitKurz(einheit);
+    return { time, detail: teile.join(' · '), menge, hinweis };
   }
   return { time, detail: String(reminder.metadata?.notiz || '').trim() };
 }
@@ -635,6 +638,21 @@ function reminderRowMarkup(reminder, completion) {
   const dimmed = completion?.completed_at ? ' ist-erledigt' : '';
   const inaktiv = reminder.active ? '' : ' ist-inaktiv';
   const commonAttrs = `data-reminder-key="${key}" data-type="${reminder.type}"${['meal', 'supplement'].includes(reminder.type) ? ` data-meal-slot="${reminder.type === 'supplement' ? supplementSlotForReminder(reminder) : mealSlotForReminder(reminder)}"` : ''}`;
+  // Supplements als eine Zeile wie in den Einstellungen am Mac: Name links,
+  // Dosis rechts, Einnahmehinweis klein darunter. Die Art „Supplement“ ergibt
+  // sich aus dem Zusammenhang und steht nicht mehr in jeder Zeile.
+  if (reminder.type === 'supplement') {
+    return `<div class="rem-row rem-row-kompakt${dimmed}${inaktiv}" ${commonAttrs}>
+    <div class="rem-row-head">
+      <span class="rem-row-titel">
+        <b>${escapeHtml(reminder.label)}</b>
+        ${zusammenfassung.hinweis ? `<small class="rem-row-hinweis">${escapeHtml(zusammenfassung.hinweis)}</small>` : ''}
+        ${badge}
+      </span>
+      ${zusammenfassung.menge ? `<span class="rem-row-menge">${escapeHtml(zusammenfassung.menge)}</span>` : ''}
+    </div>
+  </div>`;
+  }
   const head = `
     <span class="rem-row-emoji" aria-hidden="true">${reminderIconMarkup(reminderIconValue(reminder))}</span>
     <span class="rem-row-titel">
