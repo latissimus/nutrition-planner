@@ -15992,38 +15992,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 
 /* ============================================================
-   TRACKER · Versuch „neutrale Flächen wie am Mac“ (Retro)
-   Die Seitenfarbe bleibt in Kopf, Menüband und Hero. Der Inhalt liegt
-   auf ruhigem Hellgrau ohne Tapete, Karten und Bedienelemente sind weiß
-   mit schwarzer Kontur. Farbig gefüllt bleiben nur die Hauptaktion und
-   eingeschaltete Schalter. Trennlinien in Listen fein und durchgezogen.
+   TRACKER · Kleine Felder und Trennlinien (Retro)
+   Seitenfarbe, Tapete und Kartenfarben bleiben wie gestaltet. Kleine
+   Felder (Uhrzeit, Kalorienziel, Makros) sind weiß mit Kontur wie ein
+   Mac-Bedienelement; zwischen zwei Zeilen steht genau eine feine Linie.
    ============================================================ */
-:root:root[data-theme="retro"][data-seite="reminders"] #app #view.meal-log-dex-page.meal-log-dex-page{
-  background-color:#F2F2F7!important;
-  background-image:none!important;
-}
-:root[data-theme="retro"][data-seite="reminders"] #app #view .nutrition-coin-hero{
-  background:#FFEDE3!important;
-}
-:root[data-theme="retro"][data-seite="reminders"] #app #view :is(
-  .coin-verdienst,.coin-verdienst>summary,.coin-verdienst-inhalt,
-  .mahl-zeitblock,.mahl-zeitblock>header,.mahl-slot-kopf,.mahl-timeline,
-  .nutrition-overview-target,.rem-row,.rem-row-head,.rem-row-body,
-  .rem-row-zeit,.nutrition-overview-macros>span
-){
+:root[data-theme="retro"][data-seite="reminders"] #app #view :is(.rem-row-zeit,.nutrition-overview-target,.nutrition-overview-macros>span){
+  border:var(--kontur) solid var(--kontur-farbe)!important;
   background:#FFFFFF!important;
   background-color:#FFFFFF!important;
 }
-/* Kopf einer Karte und Liste darunter: eine feine Linie statt Tönung. */
-:root[data-theme="retro"][data-seite="reminders"] #app #view :is(.mahl-slot-kopf,.mahl-zeitblock>header){
-  border-bottom:1px solid rgba(0,0,0,.12)!important;
-}
-/* Die Zeilen tragen oben eine gestrichelte Linie; es bleibt eine einzige
-   feine durchgezogene Linie zwischen zwei Zeilen. */
 :root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row{border-top:0!important;border-bottom:0!important}
-:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row+.rem-row{border-top:1px solid rgba(0,0,0,.12)!important}
-:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row[open] .rem-row-head{border-bottom:1px solid rgba(0,0,0,.12)!important}
-/* Kleine Felder wie Uhrzeit und Tagesziel: weiß mit Kontur statt getönt. */
-:root[data-theme="retro"][data-seite="reminders"] #app #view :is(.rem-row-zeit,.nutrition-overview-target,.nutrition-overview-macros>span){
+:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row+.rem-row{border-top:1px solid color-mix(in srgb,#49251E 16%,transparent)!important}
+:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row[open] .rem-row-head{border-bottom:1px solid color-mix(in srgb,#49251E 16%,transparent)!important}
+
+/* SCHLAF · Kacheln in den Karten (Check-in-Werte, Planvergleich,
+   7-Tage-Werte, Hinweis unter „Beobachtete Muster“) tragen die Kontur;
+   ihre Fläche bleibt. */
+:root[data-theme="retro"][data-seite="sleep"] #app #view :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights div>p){
   border:var(--kontur) solid var(--kontur-farbe)!important;
 }
