@@ -393,7 +393,7 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('zeichnet alle Konturen in einer Stärke und einer Farbe', () => {
-    expect(css).toContain('--kontur:1.75px;');
+    expect(css).toContain('--kontur:1px;');
     expect(css).toContain('--kontur-farbe:#000000;');
     expect(css).toContain('--bw:var(--kontur);');
     // Konturen stehen nicht mehr als feste 1,5-, 2- oder 3-px-Werte in den
