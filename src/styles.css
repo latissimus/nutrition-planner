@@ -15704,107 +15704,236 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   }
 }
 
-/* RETRO · COMP Schlusskorrektur: mehr Mac-Fenster, weniger Liniengitter.
-   Die KI-Karte zeigt wieder alle Schritte offen; Detailkarten konzentrieren
-   sich auf Messwert und Verlauf statt auf erklaerende Zwischenzeilen. */
-:root[data-theme="retro"][data-seite="body"]{
-  --comp-retro-ink:#101522;
-  --comp-retro-divider:rgba(16,21,34,.18);
+/* ============================================================
+   MAC-KONTRAST · COMP, Coach-Chat und Gedächtnis
+   Vorbild ist macOS mit „Kontrast erhöhen“ (Notizen, Einstellungen,
+   Finder): eine Schrift, fünf Größen, Bedienelemente als Kapseln und
+   Kreise mit durchgehender Kontur, Karten ohne Zwischenlinien. Feine
+   Linien bleiben nur zwischen Zeilen derselben Liste.
+
+   Schriftskala (Figtree, Ziffern wie überall in der App):
+     Titel 20 · Überschrift 17 · Text 15 · Nebentext 13 · Label 11
+
+   Schrift, Abstände und Linien gelten in beiden Themes; Konturen und
+   Flächen setzt dieser Block nur im Retro-Theme. Die ID #view hebt die
+   Regeln über die älteren, sehr spezifischen Regeln weiter oben.
+   ============================================================ */
+:root:is([data-seite="body"],[data-seite="coach"]){
+  --mac-titel:800 20px/1.2 var(--ui);
+  --mac-ueberschrift:600 17px/1.35 var(--ui);
+  --mac-text:500 15px/1.45 var(--ui);
+  --mac-neben:500 13px/1.4 var(--ui);
+  --mac-label:700 11px/1.2 var(--ui);
+  --mac-farbe-neben:var(--muted);
+  --mac-linie:rgba(237,240,246,.16);
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-facts article,.comp-central-assessment,.comp-detail-card){
-  border-color:var(--comp-retro-ink)!important;
-  border-width:1.5px!important;
-  border-radius:17px!important;
+:root[data-theme="retro"]:is([data-seite="body"],[data-seite="coach"]){
+  --mac-kontur:#0A1330;
+  --mac-farbe-neben:#4A5570;
+  --mac-linie:rgba(10,19,48,.16);
+  --mac-auswahl:#DCE1EA;
 }
-:root[data-theme="retro"][data-seite="body"] :is(.body-v2-hero,.body-analysis-info){
-  border-color:var(--comp-retro-ink)!important;
-  border-width:1.5px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-central-assessment>header{
-  border-bottom:1px solid var(--comp-retro-divider)!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body{
-  gap:0!important;
-  padding:0 16px 16px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body>section{
-  padding:15px 0!important;
-  border-bottom:0!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body>section+section,
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body>.comp-optional-group,
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body>.comp-coach-entry{
-  border-top:1px solid var(--comp-retro-divider)!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-next-steps{
-  display:grid!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-next-steps h3{
-  margin-bottom:2px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body ol{
-  gap:12px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body ol li{
-  grid-template-columns:24px minmax(0,1fr)!important;
-  gap:3px 9px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body ol li::before{
-  width:22px!important;
-  height:22px!important;
-  border-radius:999px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body h3,
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card>summary b{
-  font:850 18px/1.15 "Work Sans",var(--ui),sans-serif!important;
-  letter-spacing:0!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body p,
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-body li span,
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(p,li,dd,td){
-  font-size:14px!important;
-  line-height:1.42!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content{
-  border-top:1px solid var(--comp-retro-ink)!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-v2-card-body{
-  padding:16px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .comp-detail-explain{
-  display:none!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-metric-grid{
-  gap:10px 18px!important;
-  padding-bottom:12px!important;
-  border-bottom:1px solid var(--comp-retro-divider)!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-metric-grid>*{
-  padding:0!important;
-  border:0!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(.body-chart-block,.body-inner-details,.body-info,.mess-einst,.ypsi-priority-block,.ypsi-plan-details){
-  border-top:1px solid var(--comp-retro-divider)!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(.body-inner-details,.body-info,.ypsi-plan-details)>summary{
-  min-height:50px!important;
-  padding:12px 0!important;
-  border:0!important;
-  font:850 17px/1.2 "Work Sans",var(--ui),sans-serif!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-inner-details li,
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*,.falten-protokoll-item>header){
-  border-bottom:0!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(.body-goal-status,.ypsi-top-fold,.ypsi-priority-reason,.ypsi-open-questions,.body-neutral-note,.braverman-result-focus,.body-chart-empty,.falten-protokoll-item,.ypsi-plan-details){
-  border-top:0!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-chart-empty{
-  padding:18px 0!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-chart-empty b{
-  font-size:18px!important;
-}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-chart-empty span{
-  font-size:14px!important;
-}
+
+/* ---------- COMP · Kopf und Kennzahlen ---------- */
+:root[data-seite="body"] #view .body-comp-hero .body-v2-hero-value>small{font:var(--mac-label)!important;font-style:normal!important;letter-spacing:.06em!important}
+:root[data-seite="body"] #view .body-comp-hero .body-v2-hero-value strong{font:800 15px/1.12 var(--ui)!important;letter-spacing:-.01em!important}
+:root[data-seite="body"] #view .body-comp-hero [data-comp-hero-confidence]{font:600 11px/1.2 var(--ui)!important;letter-spacing:0!important}
+:root[data-seite="body"] #view .body-comp-hero .body-v2-ring b{font:800 17px/1 var(--ui)!important}
+:root[data-seite="body"] #view .body-comp-hero .body-v2-ring small{font:700 11px/1 var(--ui)!important;letter-spacing:.02em!important}
+:root[data-seite="body"] #view .body-analysis-help p{font:var(--mac-text)!important}
+:root[data-seite="body"] #view .comp-facts{gap:10px!important}
+:root[data-seite="body"] #view .comp-facts article{min-height:0!important;padding:14px 16px!important;border-radius:18px!important}
+:root[data-seite="body"] #view .comp-facts small{font:var(--mac-label)!important;letter-spacing:.06em!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-facts b{margin-top:8px!important;font:800 20px/1.1 var(--ui)!important;letter-spacing:-.01em!important}
+:root[data-seite="body"] #view .comp-facts span{margin-top:6px!important;font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+
+/* ---------- COMP · KI-Karte ---------- */
+/* Keine Linien mehr zwischen Kopf, Entwicklung, Schritten und Zeilen:
+   Abstand und kleine Abschnittslabels gliedern die Karte. Schritte:
+   Handlung groß, Begründung kleiner und gedämpft, Zeitraum darunter. */
+:root[data-seite="body"] #view .comp-central-assessment{border-radius:18px!important}
+:root[data-seite="body"] #view .comp-central-assessment>header{padding:18px 18px 0!important;border-bottom:0!important}
+:root[data-seite="body"] #view .comp-central-assessment>header small{font:var(--mac-label)!important;letter-spacing:.06em!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-central-assessment>header h2{font:var(--mac-titel)!important;letter-spacing:-.01em!important}
+:root[data-seite="body"] #view .comp-central-assessment>header em{padding:6px 11px!important;border:1.5px solid currentColor!important;border-radius:999px!important;font:600 13px/1 var(--ui)!important}
+:root[data-seite="body"] #view .comp-assessment-loading>b{font:var(--mac-ueberschrift)!important}
+:root[data-seite="body"] #view :is(.comp-assessment-loading,.comp-assessment-error) p{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-assessment-error button{min-height:44px!important;padding:0 18px!important;border-radius:999px!important;font:600 15px/1.2 var(--ui)!important}
+:root[data-seite="body"] #view .comp-assessment-body{display:grid!important;gap:22px!important;padding:18px!important}
+:root[data-seite="body"] #view .comp-assessment-body>*{margin:0!important;padding:0!important;border:0!important}
+/* Ohne display: Welche Variante (kompakt oder ausführlich) sichtbar ist,
+   entscheiden die Theme-Regeln weiter oben. */
+:root[data-seite="body"] #view .comp-assessment-body>section{gap:8px!important}
+:root[data-seite="body"] #view .comp-assessment-body h3{margin:0!important;font:var(--mac-label)!important;letter-spacing:.06em!important;text-transform:uppercase!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-assessment-body p,
+:root[data-seite="body"] #view .comp-assessment-body ul>li{font:var(--mac-text)!important;letter-spacing:0!important}
+:root[data-seite="body"] #view .comp-assessment-body ul{display:grid!important;gap:6px!important;margin:0!important;padding-left:18px!important}
+:root[data-seite="body"] #view .comp-assessment-body ol{display:grid!important;gap:18px!important}
+:root[data-seite="body"] #view .comp-assessment-body ol>li{grid-template-columns:28px minmax(0,1fr)!important;gap:4px 12px!important}
+:root[data-seite="body"] #view .comp-assessment-body ol>li::before{width:26px!important;height:26px!important;font:700 13px/1 var(--ui)!important}
+:root[data-seite="body"] #view .comp-assessment-body ol>li>b{font:var(--mac-ueberschrift)!important;letter-spacing:0!important}
+:root[data-seite="body"] #view .comp-assessment-body ol>li>span{font:var(--mac-text)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-assessment-body ol>li>small{margin-top:2px!important;font:600 13px/1.3 var(--ui)!important;letter-spacing:0!important;text-transform:none!important;color:var(--mac-farbe-neben)!important}
+:root[data-theme="retro"][data-seite="body"] #view .comp-next-steps{display:grid!important}
+/* Aufklapper und „Mit Coach besprechen“ als schlichte Zeilen. */
+:root[data-seite="body"] #view .comp-assessment-body :is(.comp-assessment-why,.comp-optional-group)>summary{display:grid!important;grid-template-columns:minmax(0,1fr) 20px!important;align-items:center!important;gap:10px!important;min-height:44px!important;padding:0!important;font:600 15px/1.3 var(--ui)!important;letter-spacing:0!important;list-style:none!important}
+:root[data-seite="body"] #view .comp-assessment-why>div{display:grid!important;gap:16px!important;padding:6px 0 0!important}
+:root[data-seite="body"] #view .comp-assessment-why section{display:grid!important;gap:8px!important;padding:0!important;border:0!important}
+:root[data-seite="body"] #view .comp-optional-group>summary>span{display:grid!important;gap:2px!important}
+:root[data-seite="body"] #view .comp-optional-group>summary b{font:600 15px/1.3 var(--ui)!important}
+:root[data-seite="body"] #view .comp-optional-group>summary small{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-optional-group>div{padding:6px 0 0!important}
+:root[data-seite="body"] #view :is(.comp-optional-group>div>p,.comp-optional>p){margin:0 0 4px!important;font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-coach-entry{grid-template-columns:30px minmax(0,1fr) 20px!important;gap:12px!important;min-height:52px!important;padding:0!important;border:0!important;background:transparent!important}
+:root[data-seite="body"] #view .comp-coach-entry b{font:600 15px/1.3 var(--ui)!important}
+:root[data-seite="body"] #view .comp-coach-entry small{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-assessment-sources summary{font:600 13px/1.3 var(--ui)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view :is(.comp-assessment-sources li,.comp-assessment-safety){font:var(--mac-neben)!important}
+/* Optionale Seminarhinweise: Zeilen einer Liste statt Kästen. */
+:root[data-seite="body"] #view .comp-optional-list{gap:0!important;margin-top:4px!important}
+:root[data-seite="body"] #view .comp-optional-card{border:0!important;border-radius:0!important;background:transparent!important}
+:root[data-seite="body"] #view .comp-optional-card+.comp-optional-card{border-top:1px solid var(--mac-linie)!important}
+:root[data-seite="body"] #view .comp-optional-card>summary{min-height:52px!important;padding:8px 0!important}
+:root[data-seite="body"] #view .comp-optional-card>summary small{font:var(--mac-label)!important;letter-spacing:.06em!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-optional-card>summary b{font:600 15px/1.3 var(--ui)!important}
+:root[data-seite="body"] #view .comp-optional-content{gap:10px!important;padding:0 0 14px!important;border-top:0!important}
+:root[data-seite="body"] #view :is(.comp-optional-content>p,.comp-optional-content>ul li){font:var(--mac-text)!important}
+:root[data-seite="body"] #view .comp-optional-content>em{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-optional-doses>span{padding:8px 0!important;border-top:1px solid var(--mac-linie)!important}
+:root[data-seite="body"] #view .comp-optional-doses>span b{font:600 15px/1.3 var(--ui)!important}
+:root[data-seite="body"] #view .comp-optional-doses>span strong{font:700 15px/1.3 var(--ui)!important}
+:root[data-seite="body"] #view .comp-optional-doses>span small{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+
+/* ---------- COMP · Messwerte und Auswertungen ---------- */
+:root[data-seite="body"] #view .comp-details-list{gap:10px!important}
+:root[data-seite="body"] #view .comp-details-list>header h2{font:var(--mac-titel)!important;letter-spacing:-.01em!important}
+:root[data-seite="body"] #view .comp-detail-card{border-radius:18px!important}
+:root[data-seite="body"] #view .comp-detail-card>summary{min-height:64px!important;padding:14px 18px!important}
+:root[data-seite="body"] #view .comp-detail-card>summary>span{gap:3px!important}
+:root[data-seite="body"] #view .comp-detail-card>summary b{font:700 17px/1.25 var(--ui)!important;letter-spacing:0!important}
+:root[data-seite="body"] #view .comp-detail-card>summary small{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content{border-top:0!important}
+:root[data-theme="retro"][data-seite="body"] #view .comp-detail-card-content .comp-detail-explain{display:none!important}
+
+/* Geöffnete Detailkarten: dieselbe Schrift und Skala. Kennzahlen, Verlauf,
+   Messwert und Handlungsplan trennt der Abstand; feine Linien nur noch
+   zwischen direkt aufeinanderfolgenden Aufklappern und in echten Listen. */
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .body-v2-card-body{padding:2px 18px 18px!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :not(svg,svg *){font-family:var(--ui)!important;font-style:normal!important;letter-spacing:0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(p,li,.body-neutral-note,.neurotransmitter-note,.falten-detail-hinweis){font-size:15px!important;font-weight:500!important;line-height:1.45!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-metric-grid>span>small,.body-chart-block>header>b,.body-latest-value>small,.ypsi-priority-block>header>span>small,.ypsi-top-fold>small,.ypsi-priority-reason>small,.ypsi-secondary-relations>small,.ypsi-guided-plan>header>small,.ypsi-action-categories h4,.ypsi-action-categories h4>span,.ypsi-action-categories li>:is(small,a),.braverman-result-focus>small,.neurotransmitter-other-scores>small){font:var(--mac-label)!important;letter-spacing:.06em!important;text-transform:uppercase!important;color:var(--mac-farbe-neben)!important;opacity:1!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-chart-block>header>small,.body-goal-status>span,.body-chart-legend,.body-latest-value>span,.kurve-leer,.kurve-leer>span,.ypsi-priority-block>header>em,.ypsi-top-fold>span,.ypsi-priority-comparison>span>small,.ypsi-factor-list>span,.ypsi-open-questions>span>small,.falten-protokoll-item>header>small,.ypsi-observed-priorities>div>span>em,.falten-item-head>small,.falten-item-value>small,dt,.braverman-result-focus>div>em,.neurotransmitter-other-scores>div>span>em,.ypsi-action-categories li>span,.body-chart-empty>span,.body-explain){font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .braverman-result-focus>span{font:var(--mac-text)!important;color:var(--mac-farbe-neben)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-metric-grid>span>b,.ypsi-priority-comparison>span>b){font:700 17px/1.25 var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-latest-value>strong,.ypsi-top-fold>b,.braverman-result-focus>div>b){font:800 20px/1.15 var(--ui)!important;letter-spacing:-.01em!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .body-latest-value>strong>b{font:700 13px/1 var(--ui)!important;text-transform:none!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-block>header>span>b,.body-chart-empty>b){font:700 17px/1.25 var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-goal-status>b,.ypsi-priority-reason>div>b,.ypsi-open-questions>span>b,.ypsi-guided-plan>header>h3,.ypsi-observed-priorities>h3,.falten-protokoll-item>header>b,.body-weight-history li>b,.body-skinfold-history-head>b,dd,.falten-item-value>b){font:700 15px/1.35 var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.falten-protokoll-item li>span>b,.ypsi-observed-priorities>div>span>b,.falten-item-head>b,.neurotransmitter-other-scores>div>span>b){font:600 15px/1.35 var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-weight-history li>time,.body-skinfold-history-head>time,.switchline>span,.mess-zeile>span){font:var(--mac-text)!important;text-transform:none!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.falten-protokoll-item li>strong,.body-chart-legend b){font:700 13px/1.4 var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-inner-details,.body-info,.ypsi-plan-details)>summary{min-height:48px!important;padding:12px 0!important;border:0!important;font:600 15px/1.3 var(--ui)!important;text-transform:none!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-inner-details,.ypsi-plan-details)>summary>span:first-child{font:inherit!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .body-info>summary>span{font:700 13px/1 var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-metric-grid,.body-chart-block,.body-inner-details,.body-info,.mess-einst,.ypsi-priority-block,.ypsi-plan-details,.ypsi-secondary-relations,.ypsi-observed-priorities,.body-goal-status,.ypsi-top-fold,.ypsi-priority-reason,.ypsi-open-questions,.body-neutral-note,.braverman-result-focus,.body-chart-empty,.falten-protokoll-item,.body-latest-value,header){border-top:0!important;border-bottom:0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*){border-bottom:0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-inner-details,.body-info,.ypsi-plan-details,.ypsi-priority-block:has(>.ypsi-plan-details:last-child))+:is(.body-inner-details,.body-info,.ypsi-plan-details){border-top:1px solid var(--mac-linie)!important}
+/* Handlungsplan: Nummern gut lesbar, im Label-Maß. */
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .ypsi-action-categories ol>li{grid-template-columns:20px minmax(0,1fr)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .ypsi-action-categories ol>li::before{width:20px!important;height:20px!important;font:700 11px/20px var(--ui)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-inner-details li,.falten-legende-item,.body-skinfold-history dl>div){border-color:var(--mac-linie)!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .body-metric-grid{gap:14px 18px!important;padding:4px 0 0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .body-metric-grid>*{gap:4px!important;padding:0!important;border:0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-chart-block,.ypsi-priority-block){margin-top:24px!important;padding-top:0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .body-chart-empty{padding:18px 0!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content :is(.body-reset-mini,.neurotransmitter-open){display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:44px!important;padding:0 18px!important;border-radius:999px!important;font:600 15px/1.2 var(--ui)!important;text-transform:none!important;box-shadow:none!important}
+:root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content .ypsi-open-questions>button{min-height:34px!important;padding:0 14px!important;border-radius:999px!important;font:700 13px/1 var(--ui)!important}
+
+/* COMP · Konturen im Retro-Theme: überall dasselbe 2-px-Dunkelblau. */
+:root[data-theme="retro"][data-seite="body"] #view :is(.comp-facts article,.comp-central-assessment,.comp-detail-card){border:2px solid var(--mac-kontur)!important;box-shadow:none!important}
+:root[data-theme="retro"][data-seite="body"] #view :is(.body-v2-hero,.body-analysis-info){border-width:2px!important;border-color:var(--mac-kontur)!important}
+:root[data-theme="retro"][data-seite="body"] #view .comp-central-assessment>header em{border-color:var(--mac-kontur)!important;color:var(--mac-kontur)!important}
+:root[data-theme="retro"][data-seite="body"] #view .comp-assessment-body ol>li::before{background:var(--mac-kontur)!important;color:#FFFFFF!important}
+:root[data-theme="retro"][data-seite="body"] #view .comp-detail-card-content .body-reset-mini{border:2px solid var(--mac-kontur)!important;color:var(--mac-kontur)!important}
+
+/* ---------- Coach-Seiten · Kopf ---------- */
+/* Zurück als Kreisknopf wie in Notizen, Gedächtnis als Kapsel; die
+   aktuelle Seite zeigt eine weiche Auswahlfläche statt eines Schattens. */
+:root[data-seite="coach"] #app .app-dex-brand-zurueck{gap:10px!important;margin-left:0!important;padding:0!important}
+:root[data-seite="coach"] #app .app-dex-zurueck-pfeil{box-sizing:border-box;display:grid!important;place-items:center;width:40px!important;height:40px!important;border:2px solid currentColor;border-radius:50%}
+/* Der Pfeil-Umriss liegt links im Symbolfeld; 3 px nach rechts mittig. */
+:root[data-seite="coach"] #app .app-dex-zurueck-pfeil svg{width:16px!important;height:16px!important;transform:translateX(3px)}
+:root[data-seite="coach"] #app .app-dex-gedaechtnis-chip{height:40px!important;gap:8px!important;padding:0 16px 0 12px!important;border-radius:999px!important;box-shadow:none!important}
+:root[data-seite="coach"] #app .app-dex-gedaechtnis-chip>span{font:700 13px/1 var(--ui)!important}
+:root[data-seite="coach"] #app .app-dex-gedaechtnis-chip .app-dex-gedaechtnis-icon{filter:none!important}
+:root[data-theme="retro"][data-seite="coach"] #app :is(.app-dex-zurueck-pfeil,.app-dex-gedaechtnis-chip){border-color:#0A1330!important;background:#FFFFFF!important;color:#0A1330!important}
+:root[data-theme="retro"][data-seite="coach"] #app .app-dex-gedaechtnis-chip[aria-current="page"]{background:var(--mac-auswahl)!important}
+:root[data-theme="dark"][data-seite="coach"] #app .app-dex-gedaechtnis-chip[aria-current="page"]{background:rgba(237,240,246,.16)!important}
+
+/* ---------- Coach-Chat ---------- */
+:root[data-seite="coach"] #view .coach-chat-message{font:var(--mac-text)!important;letter-spacing:0!important}
+:root[data-seite="coach"] #view :is(.coach-offen li,.coach-mehr li,.coach-schritt p,.coach-woche-form label){font:var(--mac-text)!important}
+:root[data-seite="coach"] #view .coach-antwort{font:var(--mac-ueberschrift)!important}
+:root[data-seite="coach"] #view .coach-result{gap:16px!important}
+:root[data-seite="coach"] #view :is(.coach-result h4,.coach-mehr h4,.coach-wochenvergleich h3,.coach-wochenvergleich thead th){font:var(--mac-label)!important;letter-spacing:.06em!important;text-transform:uppercase!important;opacity:1!important}
+:root[data-seite="coach"] #view .coach-schritte{gap:22px!important}
+:root[data-seite="coach"] #view .coach-schritt{gap:8px!important}
+:root[data-seite="coach"] #view .coach-schritt b{font:var(--mac-ueberschrift)!important}
+:root[data-seite="coach"] #view :is(.coach-schritt small,.coach-web-status,.coach-datenlage,.coach-chat-message>small){font:600 13px/1.35 var(--ui)!important;letter-spacing:0!important}
+:root[data-seite="coach"] #view .coach-art{padding:4px 9px!important;border-radius:999px!important;font:var(--mac-label)!important;letter-spacing:.06em!important}
+:root[data-seite="coach"] #view .coach-safety{padding:12px 14px!important;border-radius:14px!important;font:600 15px/1.45 var(--ui)!important}
+:root[data-seite="coach"] #view .coach-mehr summary{padding:12px 0!important;font:600 15px/1.3 var(--ui)!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-seite="coach"] #view .coach-web-sources a{font:var(--mac-neben)!important}
+:root[data-seite="coach"] #view .coach-tippt{font:600 15px/1.2 var(--ui)!important}
+:root[data-seite="coach"] #view .coach-wochenvergleich table{font:var(--mac-neben)!important}
+:root[data-seite="coach"] #view .coach-woche-form legend{font:600 15px/1.35 var(--ui)!important;letter-spacing:0!important}
+:root[data-seite="coach"] #view .coach-attachment{font:var(--mac-neben)!important}
+/* Knöpfe als Kapseln, alle in einer Größe und Schrift. */
+:root[data-seite="coach"] #view .coach-vorschlaege{gap:8px!important}
+:root[data-seite="coach"] #view :is(.coach-vorschlaege button,.coach-merken,.coach-knopf,.coach-werkzeug){display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:44px!important;padding:0 18px!important;border-radius:999px!important;font:600 15px/1.2 var(--ui)!important;letter-spacing:0!important;text-align:center!important}
+:root[data-seite="coach"] #view .coach-woche-chip span{display:inline-flex!important;align-items:center!important;min-height:40px!important;padding:0 16px!important;border-radius:999px!important;font:600 15px/1 var(--ui)!important}
+:root[data-seite="coach"] #view :is(.coach-woche-form :is(select,textarea),.gedaechtnis-formular :is(input,select,textarea)){border-radius:12px!important;font:500 16px/1.35 var(--ui)!important}
+/* Eingabe: Kapsel in der App-Schrift (16 px, damit iOS nicht zoomt). */
+:root[data-seite="coach"] #view .coach-inputbar textarea{min-height:44px!important;padding:11px 16px!important;border-radius:22px!important;font:500 16px/1.35 var(--ui)!important;word-spacing:normal!important}
+
+/* Chat · Retro: Fenster wie Mac-Tafeln, Schritte ohne Linien, Plus und
+   Senden als Kreisknöpfe mit Kontur. */
+:root[data-theme="retro"][data-seite="coach"] #view .coach-chat-window{border-radius:18px!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{padding:0!important;border:0!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-chat-window .coach-mehr{padding:0!important;border-top:1px solid var(--mac-linie)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-chat-window .coach-mehr+.coach-mehr{border-top:1px solid var(--mac-linie)!important}
+:root[data-theme="retro"][data-seite="coach"] #view :is(.coach-result h4,.coach-mehr h4,.coach-schritt p,.coach-schritt small,.coach-web-status,.coach-datenlage,.coach-chat-message>small){color:var(--mac-farbe-neben)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-art{border:1.5px solid var(--mac-kontur)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-safety{border:2px solid var(--mac-kontur)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-inputbar textarea::placeholder{color:var(--mac-farbe-neben)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-inputbar :is(.coach-plus,.coach-send){justify-self:center;width:44px!important;height:44px!important;border:2px solid var(--mac-kontur)!important;border-radius:50%!important;background:#FFFFFF!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-inputbar :is(.coach-plus,.coach-send) .coach-eingabe-icon{width:22px!important;height:22px!important;filter:none!important}
+
+/* ---------- Gedächtnis ---------- */
+/* Seitentitel statt einer Karte „Coach“; Bereiche wie Gruppen in den
+   Einstellungen: Titel, kurze Beschreibung, Zeilen mit feinen Linien. */
+:root[data-seite="coach"] #view .gedaechtnis-kopf{display:grid;gap:6px;padding:4px 6px 2px}
+:root[data-seite="coach"] #view .gedaechtnis-kopf h1{margin:0;font:var(--mac-titel)!important;letter-spacing:-.01em}
+:root[data-seite="coach"] #view .gedaechtnis-kopf p{margin:0;font:var(--mac-text)!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-inhalt{gap:14px!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-window.is-bereich{width:auto!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-window>header b{font:700 17px/1.25 var(--ui)!important;letter-spacing:0!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-hinweis,.gedaechtnis-leer,.gedaechtnis-eintrag>small,.gedaechtnis-eintrag summary small){font:var(--mac-neben)!important;opacity:1!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-eintrag summary small{display:block;margin-top:3px}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag p,.gedaechtnis-verlauf p){font:var(--mac-text)!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-eintrag summary b{font:600 15px/1.35 var(--ui)!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-eintrag p b{font-weight:600!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-chip,.gedaechtnis-verlauf small){font:var(--mac-label)!important;letter-spacing:.06em!important;text-transform:uppercase!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-chip{padding:4px 9px!important;border-radius:999px!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-formular label{font:600 13px/1.3 var(--ui)!important}
+:root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-aktionen{gap:8px!important}
+
+:root[data-theme="retro"][data-seite="coach"] #view .gedaechtnis-kopf{color:#0A1330}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-window>header{padding:18px 18px 0!important;border-bottom:0!important;border-radius:16px 16px 0 0!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-message{padding:8px 18px 18px!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-hinweis,.gedaechtnis-leer,.gedaechtnis-eintrag>small,.gedaechtnis-eintrag summary small,.gedaechtnis-verlauf small,.gedaechtnis-formular label){color:var(--mac-farbe-neben)!important;opacity:1!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-liste{gap:0!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag,.gedaechtnis-formular){padding:14px 0!important;border:0!important;border-radius:0!important;background:transparent!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-liste>li:not(:first-child){border-top:1px solid var(--mac-linie)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border-left:2px solid rgba(10,19,48,.28)!important}
+:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-chip{border:1.5px solid var(--mac-kontur)!important}

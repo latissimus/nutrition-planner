@@ -356,7 +356,7 @@ export async function mountCoachMemoryPage(container, { userId }) {
   container.classList.add('coach-page');
   container.innerHTML = `<main class="coach-shell coach-chat coach-gedaechtnis-seite">
     <div class="gedaechtnis-inhalt">
-      ${fensterMarkup({ inhalt: '<p>Das weiß ich über dich – zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p>' })}
+      <header class="gedaechtnis-kopf"><h1>Was der Coach über dich weiß</h1><p>Zusätzlich zu deinen Messwerten. Du kannst alles ändern oder löschen.</p></header>
       <div class="gedaechtnis-inhalt" data-gedaechtnis aria-live="polite">${fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}${wartetextMarkup('Lade Gedächtnis', 'Lade noch ein bisschen')}</p>` })}</div>
     </div>
   </main>`;
