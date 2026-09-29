@@ -26,7 +26,8 @@ describe('CAPBOY Design-System', () => {
     expect(css).toContain(':root[data-seite="auth"] .auth-marquee{');
     expect(css).toContain('background:#fff!important;\n  color:#111!important;');
     expect(css).toContain(':root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]){');
-    expect(css).toContain('box-shadow:0 4px 0 #111!important;');
+    // Seit „Kontrast erhöhen“ trägt auch die Anmeldekarte keinen Schlagschatten mehr.
+    expect(css).toContain(':root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]){\n  box-shadow:none!important;');
     expect(css).toContain('background:#432C5E!important;\n  color:#FFD400!important;');
   });
 
@@ -189,7 +190,7 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("sleep: '#0E1D47'");
     expect(categoryIcons).toContain("sleep: '#FFFCF3'");
     expect(designSystem).toContain(':root[data-seite="sleep"]{\n  --sleep-paper:#fff;\n  --cap-card:#fff;');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #FFFCF3');
+    expect(designSystem).toContain('--cap-card-border:var(--kontur) solid var(--kontur-farbe)');
     expect(designSystem).toContain('.sleep-tonight{border-color:#FFFCF3!important;color:#FFFCF3!important}');
     expect(designSystem).toContain(':root[data-seite="sleep"] .app-dex-brand .brand{\n  --brand-outline:#0A1330;\n  --sil-filter:brightness(0) invert(1);');
     expect(designSystem).toContain(':root[data-seite="sleep"] .sleep-chart polyline{\n  stroke:#0E1D47!important;');
@@ -208,7 +209,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('background:#E36887!important;');
     expect(designSystem).toContain('color:#FFE08C!important;');
     expect(designSystem).toContain('.dex-sammlungskopf-text :is(span,small)');
-    expect(designSystem).toContain('.dex-detail-popup{\n  border-color:#000!important;\n  background:var(--stress-card)!important;');
+    expect(designSystem).toContain('.dex-detail-popup{\n  border-color:var(--kontur-farbe)!important;\n  background:var(--stress-card)!important;');
   });
 
   it('verwendet für CAPCOINS leuchtendes Gelb und dunkles Violett', () => {
@@ -216,7 +217,7 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("coins: '#FFD400'");
     expect(main).toContain("title: 'CAPCOINS'");
     expect(designSystem).toContain(':root[data-seite="coins"]{--coin-readable:#432C5E;--cap-card:#fff;');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #000;');
+    expect(designSystem).toContain('--cap-card-border:var(--kontur) solid var(--kontur-farbe);');
     expect(designSystem).toContain('background:#432C5E!important;color:#FFD400!important');
     expect(designSystem).toContain('--cap-tint:color-mix(in srgb,#FFD400 9%,#432C5E);');
     expect(designSystem).toContain(':root[data-seite="coins"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}');
@@ -247,7 +248,7 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("body: '#94DEFF'");
     expect(categoryIcons).toContain("body: '#FF277F'");
     expect(designSystem).toContain(':root[data-seite="body"]{');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid var(--dex-ink,#FF277F)');
+    expect(designSystem).toContain('--cap-card-border:var(--kontur) solid var(--kontur-farbe)');
     expect(designSystem).toContain('color:var(--dex-accent-ink,#94DEFF)!important;');
     const heroStart = css.indexOf(':root[data-seite="body"] .body-v2-hero-value>small{');
     const heroEnd = css.indexOf('}', heroStart);
@@ -261,7 +262,7 @@ describe('CAPBOY Design-System', () => {
     expect(categoryIcons).toContain("reminders: '#FFEDE3'");
     expect(categoryIcons).toContain("reminders: '#49251E'");
     expect(designSystem).toContain(':root[data-seite="reminders"]{');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #49251E;');
+    expect(designSystem).toContain('--cap-card-border:var(--kontur) solid var(--kontur-farbe);');
     expect(designSystem).toContain('background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;');
     expect(designSystem).toContain('.nutrition-calibration-info :is(.material-svg,svg,svg *){\n  color:#fff!important;');
     expect(designSystem).toContain('.mahl-mini-switch input:checked+.mahl-mini-switch-track::after{\n  background:#fff!important;');
@@ -275,10 +276,10 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('--text:#203C3D;\n  --ink:#203C3D;');
     expect(designSystem).toContain('border-color:#000!important;');
     expect(designSystem).toContain('filter:drop-shadow(2px 2px 0 #000)!important;');
-    expect(designSystem).toContain('filter:drop-shadow(0 3.5px 0 #000)!important;');
+    expect(designSystem).not.toContain('filter:drop-shadow(0 3.5px 0 #000)!important;');
     expect(designSystem).toContain('stroke:#000!important;');
     expect(designSystem).toContain('background:#fff!important;color:#203C3D!important;');
-    expect(designSystem).toContain('.dex-detail-popup{border-color:#000!important;background:#fff!important;color:#203C3D!important}');
+    expect(designSystem).toContain('.dex-detail-popup{border-color:var(--kontur-farbe)!important;background:#fff!important;color:#203C3D!important}');
     expect(designSystem).toContain('background:#203C3D!important;color:#F9DBBA!important;');
     expect(designSystem).toContain('color:#F9DBBA!important;fill:currentColor!important;');
   });
@@ -309,7 +310,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain('--routine-panel:#FFF8ED;');
     expect(designSystem).toContain('background:var(--routine-panel)!important;color:#3F236F!important}');
     expect(designSystem).toContain('--cap-card:#fff;');
-    expect(designSystem).toContain('--cap-card-border:1.5px solid #FFF8ED;');
+    expect(designSystem).toContain('--cap-card-border:var(--kontur) solid var(--kontur-farbe);');
     expect(designSystem).toContain('background:#FFF8ED!important}');
     expect(designSystem).toContain('background:#3F236F!important;color:#FFF8ED!important;');
     expect(designSystem).toContain(':is(.routine-days,.routine-duration) button{');
@@ -328,7 +329,7 @@ describe('CAPBOY Design-System', () => {
     expect(designSystem).toContain(':is(.special-dex-sheet,.kategorie-sheet){');
     expect(designSystem).toContain('background:#fff!important;\n  color:#111!important;');
     expect(designSystem).toContain('background:transparent!important;\n  color:#111!important;');
-    expect(designSystem).toContain('border-color:#000!important;\n  background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-ink)!important;');
+    expect(designSystem).toContain('border-color:var(--kontur-farbe)!important;\n  background:var(--dex-seitenfarbe)!important;\n  color:var(--dex-ink)!important;');
   });
 
   it('bindet die festen COMP- sowie getauschten ROUTINEN- und MIND-Tapeten ein', () => {
@@ -380,5 +381,43 @@ describe('CAPBOY Design-System', () => {
     expect(css).toContain('.app-dex-tab>.app-dex-tab-punkte');
     expect(main).toContain('app-dex-tab-punkte');
     expect(main).toContain("view.querySelector('.kategorie-plus')?.click()");
+  });
+
+  /* „Kontrast erhöhen“ wie am Mac: genau zwei Schriften, eine Konturstärke
+     und -farbe für die ganze App, Schlagschatten nur in Kopf und Menüband. */
+  it('verwendet nur Work Sans und JetBrains Mono', () => {
+    expect(css).not.toMatch(/figtree/i);
+    expect(main).not.toMatch(/figtree/i);
+    expect(css).toContain('--ui:"CAPBOY Ziffern","Work Sans"');
+    expect(css).toContain('--tech:"JetBrains Mono"');
+  });
+
+  it('zeichnet alle Konturen in einer Stärke und einer Farbe', () => {
+    expect(css).toContain('--kontur:1.75px;');
+    expect(css).toContain('--kontur-farbe:#000000;');
+    expect(css).toContain('--bw:var(--kontur);');
+    // Konturen stehen nicht mehr als feste 1,5-, 2- oder 3-px-Werte in den
+    // Rahmenangaben; 1 px bleibt für feine Trennlinien, 3 px links/rechts für
+    // Akzentbalken.
+    const feste = css.match(/\bborder(?:-top|-bottom)?\s*:\s*(?:1\.5|2|3)px\s+solid/g) || [];
+    expect(feste).toEqual([]);
+  });
+
+  it('setzt harte Schlagschatten nur in Kopfzeile und Menüband', () => {
+    const kopfUndMenue = /app-dex-(header|brand|coach|search|gedaechtnis|zurueck|dock|tab|menu)|nav-av|coin-kopf|\.brand/;
+    const hart = [];
+    for (const [, selektor, inhalt] of css.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
+      if (kopfUndMenue.test(selektor.split('}').at(-1))) continue;
+      for (const [, wert] of inhalt.matchAll(/box-shadow\s*:\s*([^;{}]*)/g)) {
+        const roh = wert.replace('!important', '').trim();
+        if (/^(none|var\()/.test(roh)) continue;
+        for (const teil of roh.split(/,(?![^(]*\))/)) {
+          if (/inset/.test(teil)) continue;
+          const l = teil.match(/-?(?:\d*\.)?\d+(?:px)?(?=\s|$)/g) || [];
+          if (l.length >= 2 && (l.length < 3 || parseFloat(l[2]) === 0) && (parseFloat(l[0]) || parseFloat(l[1]))) hart.push(`${selektor.trim().slice(-60)} → ${teil.trim()}`);
+        }
+      }
+    }
+    expect(hart).toEqual([]);
   });
 });

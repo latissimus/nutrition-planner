@@ -15953,9 +15953,77 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border-left:var(--kontur) solid rgba(0,0,0,.28)!important}
 :root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-chip{border-color:var(--kontur-farbe)!important}
 
+
 /* ============================================================
    SCHALTER · Kontur wie am Mac (Retro)
-   Bahn und Knopf tragen die App-Kontur; der Knopf hat keinen Schatten.
+   Alle Schalter teilen sich eine Größe. Bahn und Knopf tragen die
+   App-Kontur. Die Bahn wächst dafür um 2 px, und der Knopf berechnet sich
+   aus ihrer Innenhöhe: gleich groß wie vorher (21 px weiße Fläche) und
+   immer genau mittig, auch wenn der Browser die Kontur rundet.
+   :is(#app,body) hebt die Regeln über die seitenspezifischen Größen.
    ============================================================ */
-:root[data-theme="retro"] :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track){box-sizing:border-box!important;border:var(--kontur) solid var(--kontur-farbe)!important;box-shadow:none!important}
-:root[data-theme="retro"] :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track)::after{box-sizing:border-box!important;border:var(--kontur) solid var(--kontur-farbe)!important;box-shadow:none!important}
+:root[data-theme="retro"] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track){
+  --schalter-b:52px;
+  --schalter-h:32px;
+  --schalter-luft:1.5px;
+  box-sizing:border-box!important;
+  flex:0 0 var(--schalter-b)!important;
+  width:var(--schalter-b)!important;
+  min-width:var(--schalter-b)!important;
+  height:var(--schalter-h)!important;
+  min-height:var(--schalter-h)!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  box-shadow:none!important;
+}
+:root[data-theme="retro"] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track)::after{
+  top:50%!important;
+  left:var(--schalter-luft)!important;
+  box-sizing:border-box!important;
+  width:calc(var(--schalter-h) - 2 * var(--kontur) - 2 * var(--schalter-luft))!important;
+  min-width:0!important;
+  height:calc(var(--schalter-h) - 2 * var(--kontur) - 2 * var(--schalter-luft))!important;
+  min-height:0!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  box-shadow:none!important;
+  transform:translateY(-50%)!important;
+}
+:root[data-theme="retro"] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track)::after{
+  transform:translate(calc(var(--schalter-b) - var(--schalter-h)),-50%)!important;
+}
+
+/* ============================================================
+   TRACKER · Versuch „neutrale Flächen wie am Mac“ (Retro)
+   Die Seitenfarbe bleibt in Kopf, Menüband und Hero. Der Inhalt liegt
+   auf ruhigem Hellgrau ohne Tapete, Karten und Bedienelemente sind weiß
+   mit schwarzer Kontur. Farbig gefüllt bleiben nur die Hauptaktion und
+   eingeschaltete Schalter. Trennlinien in Listen fein und durchgezogen.
+   ============================================================ */
+:root:root[data-theme="retro"][data-seite="reminders"] #app #view.meal-log-dex-page.meal-log-dex-page{
+  background-color:#F2F2F7!important;
+  background-image:none!important;
+}
+:root[data-theme="retro"][data-seite="reminders"] #app #view .nutrition-coin-hero{
+  background:#FFEDE3!important;
+}
+:root[data-theme="retro"][data-seite="reminders"] #app #view :is(
+  .coin-verdienst,.coin-verdienst>summary,.coin-verdienst-inhalt,
+  .mahl-zeitblock,.mahl-zeitblock>header,.mahl-slot-kopf,.mahl-timeline,
+  .nutrition-overview-target,.rem-row,.rem-row-head,.rem-row-body,
+  .rem-row-zeit,.nutrition-overview-macros>span
+){
+  background:#FFFFFF!important;
+  background-color:#FFFFFF!important;
+}
+/* Kopf einer Karte und Liste darunter: eine feine Linie statt Tönung. */
+:root[data-theme="retro"][data-seite="reminders"] #app #view :is(.mahl-slot-kopf,.mahl-zeitblock>header){
+  border-bottom:1px solid rgba(0,0,0,.12)!important;
+}
+/* Die Zeilen tragen oben eine gestrichelte Linie; es bleibt eine einzige
+   feine durchgezogene Linie zwischen zwei Zeilen. */
+:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row{border-top:0!important;border-bottom:0!important}
+:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row+.rem-row{border-top:1px solid rgba(0,0,0,.12)!important}
+:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row[open] .rem-row-head{border-bottom:1px solid rgba(0,0,0,.12)!important}
+/* Kleine Felder wie Uhrzeit und Tagesziel: weiß mit Kontur statt getönt. */
+:root[data-theme="retro"][data-seite="reminders"] #app #view :is(.rem-row-zeit,.nutrition-overview-target,.nutrition-overview-macros>span){
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+}
