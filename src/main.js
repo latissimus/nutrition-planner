@@ -1,19 +1,8 @@
 import './styles.css';
 import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
-// Figtree (SIL Open Font License). Ausgewaehlt im direkten Vergleich mit einem
-// vergroesserten Ausschnitt aus Inspirationen/IMG_5112: Tuckiis Schrift hat ein
-// doppelstoeckiges "a" mit Schwaenzchen, einen GERADEN "y"-Abstrich, runde
-// i-Punkte und einen kurzen "r"-Arm. Figtree trifft genau diese Merkmale.
-// Plus Jakarta Sans, vorher hier, hat einen gehakten "y" und eine engere
-// Laufweite und lag damit sichtbar daneben.
-import '@fontsource/figtree/latin-400.css';
-import '@fontsource/figtree/latin-500.css';
-import '@fontsource/figtree/latin-600.css';
-import '@fontsource/figtree/latin-700.css';
-import '@fontsource/figtree/latin-800.css';
-// Dex typography is bundled locally via styles.css: Work Sans for the UI,
-// JetBrains Mono (OFL 1.1) for technical values and metadata.
+// Genau zwei Schriften, lokal über styles.css eingebunden: Work Sans für
+// Text und Bedienung, JetBrains Mono (OFL 1.1) für Ziffern und Messwerte.
 import { supabase, supabaseKonfiguriert } from './supabase.js';
 import { signIn, signUp, resetPassword, updatePassword, loadProfile } from './auth.js';
 import { getTheme, applyTheme, setTheme, huelleEinfaerben } from './theme.js';
@@ -193,7 +182,6 @@ const appLogoSchriftBereit = document.fonts
 const appSchriftenBereit = document.fonts
   ? Promise.race([
       Promise.all([
-        document.fonts.load('800 16px Figtree'),
         document.fonts.load('900 16px "Work Sans"'),
         document.fonts.load('italic 700 16px "Work Sans"'),
         document.fonts.load('800 16px "JetBrains Mono"'),

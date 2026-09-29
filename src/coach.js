@@ -1,12 +1,14 @@
 import { supabase } from './supabase.js';
 import { materialIconMarkup } from './categoryIcons.js';
+// Das Plus direkt aus der Datei: Unter der Kennung "add" liefert die
+// Symbolsammlung zuerst Add.svg (Plus im Kästchen).
+import plusSvg from '../MUSCLEDEX-ICONS/add_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg?raw';
 import { toast } from './toast.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
 import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
 import { fensterMarkup } from './coachFenster.js';
-import { seitenIconMarkup } from './menuIcons.js';
 import { sanduhrMarkup } from './sanduhr.js';
 import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
 
@@ -228,10 +230,10 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
         <div class="coach-inputbar">
-          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch">${seitenIconMarkup('PLUS', 'coach-eingabe-icon')}</button>
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
           <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
-          <button class="coach-send" type="submit" aria-label="Senden">${seitenIconMarkup('SENDEN', 'coach-eingabe-icon')}</button>
+          <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('arrow_forward_ios', 'coach-eingabe-icon')}</button>
         </div>
       </div>
     </form>
