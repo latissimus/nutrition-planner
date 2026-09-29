@@ -16012,3 +16012,130 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="sleep"] #app #view :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights div>p){
   border:var(--kontur) solid var(--kontur-farbe)!important;
 }
+
+/* ============================================================
+   VORSCHLAG 2 · Kapseln und weiche Auswahl wie am Mac (Retro)
+   Zusammengehörige Bedienelemente teilen sich eine hell gefüllte Kapsel
+   mit Kontur und feinen Trennstrichen („‹ | ›“ in Finder und Notizen).
+   Ausgewählt ist, was eine weiche Fläche trägt – kein Rahmen, kein
+   Schatten. Außerhalb von Retro bleibt die Kapsel ohne eigene Gestalt.
+   ============================================================ */
+.app-dex-kapsel{display:contents}
+:root[data-theme="retro"]{--trennstrich:color-mix(in srgb,var(--kontur-farbe) 30%,transparent)}
+
+/* Kopf: Coach, Suche und CAPCOINS in einer Kapsel. */
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel{
+  display:inline-flex;
+  align-items:stretch;
+  height:40px;
+  overflow:hidden;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:999px;
+  background:#FFFFFF;
+}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand){
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:42px!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0 8px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#111!important;
+}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>*+*{border-left:1px solid var(--trennstrich)!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 10px 0 8px!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:#111!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-coach-icon,.app-dex-search-icon,.coin-kopf-symbol){width:24px!important;height:24px!important;flex-basis:24px!important;filter:none!important;transform:none!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-search-icon,.app-dex-coach-icon)>svg{width:100%!important;height:100%!important}
+/* Aktive Seite (Suche, CAPCOINS): weiche Fläche statt Schatten. */
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-search.aktiv,.coin-kopfstand.aktiv){background:#E4E6EA!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.app-dex-coach.hat-hinweis::after{top:6px!important;right:6px!important}
+
+/* Menüband: aktive Seite als weiche Fläche in der Schriftfarbe des Bandes. */
+:root[data-theme="retro"][data-seite] #app .app-dex-dock .app-dex-tab.aktiv{
+  background:color-mix(in srgb,currentColor 16%,transparent)!important;
+  box-shadow:none!important;
+}
+:root[data-theme="retro"][data-seite] #app .app-dex-dock .app-dex-tab.aktiv>span{filter:none!important}
+
+/* ROUTINEN: Play und Anhang in einer Kapsel, hell statt lila gefüllt. */
+:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>:is(.routine-start,.routine-attach){
+  justify-self:stretch!important;
+  width:auto!important;
+  min-width:0!important;
+  height:34px!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:999px!important;
+  background:#FFFFFF!important;
+  box-shadow:none!important;
+  color:inherit!important;
+}
+:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>:is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){
+  color:inherit!important;
+  fill:currentColor!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>.routine-start:has(+.routine-attach){
+  margin-right:-4px!important;
+  border-right:1px solid var(--trennstrich)!important;
+  border-radius:999px 0 0 999px!important;
+}
+:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>.routine-start+.routine-attach{
+  margin-left:-4px!important;
+  border-left:0!important;
+  border-radius:0 999px 999px 0!important;
+}
+
+/* ROUTINEN: Tage und Angaben als einzelne helle Kapseln mit Kontur. Eine
+   gemeinsame Kapsel passt nicht in die Zeile (sieben Tage oder
+   „8 Übungen · 15 min · Täglich“); einzelne Kapseln dürfen umbrechen. */
+:root[data-theme="retro"][data-seite] #app #view .routine-meta{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:4px!important;
+}
+:root[data-theme="retro"][data-seite] #app #view .routine-meta>small{
+  margin:0!important;
+  padding:2px 7px!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:999px!important;
+  background:#FFFFFF!important;
+  box-shadow:none!important;
+  color:inherit!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+
+/* TRACKER: „‹ Heute ›“ als eine Kapsel. */
+:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day{
+  display:grid!important;
+  grid-template-columns:44px minmax(0,1fr) 44px!important;
+  align-items:stretch!important;
+  gap:0!important;
+  min-height:46px;
+  padding:0!important;
+  overflow:hidden;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:999px!important;
+  background:#FFFFFF!important;
+}
+:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button{
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:first-child{border-right:1px solid var(--trennstrich)!important}
+:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:last-child{border-left:1px solid var(--trennstrich)!important}
+:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:disabled{opacity:.35}
+:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>div{display:grid;place-content:center;text-align:center}

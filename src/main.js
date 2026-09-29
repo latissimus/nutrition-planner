@@ -781,11 +781,13 @@ function appDexShellZeichnen(route, view) {
       <div class="app-dex-header-actions">
         ${istCoach ? `
         <a class="app-dex-gedaechtnis app-dex-gedaechtnis-chip" href="#coach-wissen" aria-label="Gedächtnis: Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-gedaechtnis-icon')}<span>Gedächtnis</span></a>` : `
+        <span class="app-dex-kapsel">
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
-           aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>`}
-        ${!istCoach && coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
+           aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
+        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
+        </span>`}
         <span class="app-dex-sync save-dot" role="status"></span>
         ${istCoach ? '' : `<a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
            aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>`}
