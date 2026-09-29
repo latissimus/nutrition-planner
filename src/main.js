@@ -769,18 +769,18 @@ function appDexShellZeichnen(route, view) {
     ? '#101A2B'
     : (getComputedStyle(document.documentElement).getPropertyValue('--dex-seitenfarbe').trim()
       || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
-  /* Coach-Seiten: ein konzentrierter Bildschirm. Zurück steht wie in iOS oben
-     links, als schlanker Pfeil direkt vor dem Logo; Pfeil und Logo sind eine
-     Tippfläche. Rechts bleibt nur das Gedächtnis; CAPCOIN und Profilbild
-     entfallen hier. */
+  /* Überall derselbe Kopf: Logo links, rechts eine Kapsel und das Profilbild.
+     Auf den Coach-Seiten trägt die Kapsel Zurück und Gedächtnis statt Coach,
+     Suche und CAPCOINS. */
   header.innerHTML = `
     <div class="app-dex-header-inner">
-      ${istCoach ? `<a class="app-dex-brand app-dex-brand-zurueck" href="#${coachZurueckRoute}"
-         aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}" title="Zurück zu ${escapeHtml(coachZurueckTitel)}">${materialIconMarkup('arrow_back_ios', 'app-dex-zurueck-pfeil')}${capboyMarkup()}</a>`
-        : `<span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>`}
+      <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
         ${istCoach ? `
-        <a class="app-dex-gedaechtnis app-dex-gedaechtnis-chip" href="#coach-wissen" aria-label="Gedächtnis: Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-gedaechtnis-icon')}<span>Gedächtnis</span></a>` : `
+        <span class="app-dex-kapsel ist-coach">
+        <a class="app-dex-zurueck" href="#${coachZurueckRoute}" aria-label="Zurück zu ${escapeHtml(coachZurueckTitel)}" title="Zurück zu ${escapeHtml(coachZurueckTitel)}">${materialIconMarkup('arrow_back_ios', 'app-dex-zurueck-pfeil')}</a>
+        <a class="app-dex-gedaechtnis" href="#coach-wissen" aria-label="Gedächtnis: Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-gedaechtnis-icon')}<span>Gedächtnis</span></a>
+        </span>` : `
         <span class="app-dex-kapsel">
         <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
            aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
@@ -789,8 +789,8 @@ function appDexShellZeichnen(route, view) {
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         </span>`}
         <span class="app-dex-sync save-dot" role="status"></span>
-        ${istCoach ? '' : `<a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
-           aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>`}
+        <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
+           aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>
       </div>
     </div>`;
 

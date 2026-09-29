@@ -15095,29 +15095,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:brightness(0) invert(1)}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon){display:block;line-height:0}
 :is(.app-dex-zurueck-icon,.app-dex-gedaechtnis-icon)>svg{display:block;width:100%;height:100%}
-.app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #000)}
-/* Coach-Seiten: Zurück als schlanker Pfeil direkt vor dem Logo (main.js). */
-.app-dex-brand-zurueck{gap:1px;margin-left:-6px;padding:6px 8px 6px 2px;border-radius:8px;color:inherit;text-decoration:none}
-.app-dex-brand-zurueck:active{transform:translateY(1px)}
-.app-dex-brand-zurueck:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-.app-dex-zurueck-pfeil{flex:none;display:block;width:22px;height:22px;line-height:0}
-.app-dex-zurueck-pfeil svg{display:block;width:100%;height:100%;fill:currentColor}
-/* Auf der Gedächtnis-Seite selbst: harter Schatten wie beim CAPCOIN-Symbol
-   auf seiner Seite (Retro dunkel, Dark weiß), ohne Rahmen und Hinterlegung. */
-.app-dex-gedaechtnis[aria-current="page"] .app-dex-gedaechtnis-icon{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
-:root[data-theme="dark"][data-seite] .app-dex-gedaechtnis[aria-current="page"] .app-dex-gedaechtnis-icon{filter:drop-shadow(2.5px 2.5px 0 #FFFFFF)!important}
-/* Gedächtnis im Kopf der Coach-Seiten: Diskette und Wort in einem Knopf,
-   damit die Diskette nicht als „Speichern“ gelesen wird. */
-.app-dex-gedaechtnis-chip{box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 11px 0 8px;border:var(--kontur) solid currentColor;border-radius:6px;background:transparent;color:inherit;text-decoration:none;white-space:nowrap}
-.app-dex-gedaechtnis-chip>span{font:750 13px/1 var(--ui)}
-.app-dex-gedaechtnis-chip .app-dex-gedaechtnis-icon{flex:none;width:20px;height:20px}
-.app-dex-gedaechtnis-chip:active{transform:translateY(1px)}
-.app-dex-gedaechtnis-chip:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-:root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-chip{border-color:#0A1330;background:#FFFFFF;color:#0A1330}
-/* Auf der Gedächtnisseite selbst: harter Schatten am ganzen Knopf, wie beim
-   CAPCOIN-Symbol auf seiner Seite (Retro dunkel, Dark weiß). */
-.app-dex-gedaechtnis-chip[aria-current="page"]{box-shadow:2.5px 2.5px 0 #0A1330}
-:root[data-theme="dark"] .app-dex-gedaechtnis-chip[aria-current="page"]{box-shadow:2.5px 2.5px 0 #FFFFFF}
+/* Coach-Seiten: Zurück und Gedächtnis teilen sich im Kopf eine Kapsel
+   (main.js), in allen Themes. Das Wort „Gedächtnis“ steht neben der
+   Diskette, damit sie nicht als „Speichern“ gelesen wird. */
+.app-dex-kapsel.ist-coach{display:inline-flex;align-items:stretch;height:40px;overflow:hidden;border:var(--kontur) solid currentColor;border-radius:999px}
+.app-dex-kapsel.ist-coach>a{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:42px;padding:0 12px 0 10px;color:inherit;text-decoration:none;white-space:nowrap}
+.app-dex-kapsel.ist-coach>a+a{border-left:1px solid color-mix(in srgb,currentColor 30%,transparent)}
+.app-dex-kapsel.ist-coach>a:focus-visible{outline:2px solid currentColor;outline-offset:-4px}
+.app-dex-kapsel.ist-coach>a[aria-current="page"]{background:color-mix(in srgb,currentColor 14%,transparent)}
+.app-dex-kapsel.ist-coach .app-dex-gedaechtnis-icon{flex:none;width:22px;height:22px}
+.app-dex-kapsel.ist-coach .app-dex-gedaechtnis>span{font:750 13px/1 "Work Sans",sans-serif}
+/* Unter 370 px passen Logo, Kapsel und Profilbild nur ohne das Wort; der
+   Screenreader liest es über aria-label weiterhin vor. */
+@media(max-width:369px){.app-dex-kapsel.ist-coach .app-dex-gedaechtnis>span{display:none}}
+.app-dex-zurueck-pfeil{flex:none;display:block;width:16px;height:16px;line-height:0}
+/* Der Pfeil-Umriss liegt links im Symbolfeld; 3 px nach rechts mittig. */
+.app-dex-zurueck-pfeil svg{display:block;width:100%;height:100%;fill:currentColor;transform:translateX(3px)}
 .coach-shell.coach-chat{display:flex;flex-direction:column;gap:18px;width:min(100%,640px);min-height:100%;padding:calc(env(safe-area-inset-top) + var(--app-dex-header-h) + 16px) 12px calc(var(--coach-eingabe-h,72px) + var(--coach-tastatur,0px) + 22px)}
 .coach-shell.coach-chat.coach-gedaechtnis-seite{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
 .coach-kopf-knopf{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;padding:0;border:var(--kontur) solid var(--kontur-farbe);border-radius:6px;background:#C9BCF7;color:#1d1533;text-decoration:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);cursor:pointer}
@@ -15496,7 +15489,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header{--dex-ink:#0A1330;--brand-outline:#0A1330;background:#94DEFF!important;border-color:#0A1330!important;color:#0A1330!important;transform:translateY(var(--coach-oben,0px))}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFFFF!important;color:#0A1330!important}
-:root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-icon{filter:drop-shadow(0 1.5px 0 #0A1330)}
 :root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{display:block;background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:var(--kontur-farbe);background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea{border-color:var(--kontur-farbe);background:#FFFFFF;color:#0A1330;box-shadow:none}
@@ -15699,7 +15691,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf,.gedaechtnis-bereich>.btn,.gedaechtnis-aktionen .btn){
   min-height:44px!important;
 }
-:root[data-theme="retro"][data-seite="coach"] .app-dex-gedaechtnis-chip{height:44px}
 
 @media(max-width:370px){
   :root[data-theme="retro"][data-seite="body"] .body-v2-hero{
@@ -15864,19 +15855,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="body"] #view .comp-detail-card-content .body-reset-mini{border:var(--kontur) solid var(--kontur-farbe)!important;color:var(--mac-kontur)!important}
 
 /* ---------- Coach-Seiten · Kopf ---------- */
-/* Zurück als Kreisknopf wie in Notizen, Gedächtnis als Kapsel; die
-   aktuelle Seite zeigt eine weiche Auswahlfläche statt eines Schattens. */
-:root[data-seite="coach"] #app .app-dex-brand-zurueck{gap:10px!important;margin-left:0!important;padding:0!important}
-:root[data-seite="coach"] #app .app-dex-zurueck-pfeil{box-sizing:border-box;display:grid!important;place-items:center;width:40px!important;height:40px!important;border:var(--kontur) solid currentColor;border-radius:50%}
-/* Der Pfeil-Umriss liegt links im Symbolfeld; 3 px nach rechts mittig. */
-:root[data-seite="coach"] #app .app-dex-zurueck-pfeil svg{width:16px!important;height:16px!important;transform:translateX(3px)}
-:root[data-seite="coach"] #app .app-dex-gedaechtnis-chip{height:40px!important;gap:8px!important;padding:0 16px 0 12px!important;border-width:var(--kontur)!important;border-radius:999px!important;box-shadow:none!important}
-:root[data-seite="coach"] #app .app-dex-gedaechtnis-chip>span{font:750 13px/1 "Work Sans",sans-serif!important}
-:root[data-seite="coach"] #app .app-dex-gedaechtnis-chip .app-dex-gedaechtnis-icon{filter:none!important}
+/* Zurück und Gedächtnis stecken in der Kopf-Kapsel (Abschnitt
+   VORSCHLAG 2); hier nur die Linie unter dem Kopf in Retro schwarz. */
 :root[data-theme="retro"][data-seite="coach"] #app .app-dex-header{border-bottom-color:var(--ink)!important}
-:root[data-theme="retro"][data-seite="coach"] #app :is(.app-dex-zurueck-pfeil,.app-dex-gedaechtnis-chip){border-color:var(--ink)!important;background:#FFFFFF!important;color:#0A1330!important}
-:root[data-theme="retro"][data-seite="coach"] #app .app-dex-gedaechtnis-chip[aria-current="page"]{background:var(--mac-auswahl)!important}
-:root[data-theme="dark"][data-seite="coach"] #app .app-dex-gedaechtnis-chip[aria-current="page"]{background:rgba(237,240,246,.16)!important}
 
 /* ---------- Coach-Chat ---------- */
 :root[data-seite="coach"] #view .coach-chat-message{font:var(--mac-text)!important;letter-spacing:0!important}
@@ -16033,7 +16014,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:999px;
   background:#FFFFFF;
 }
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand){
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand,.app-dex-zurueck,.app-dex-gedaechtnis){
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
@@ -16052,10 +16033,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite] #app .app-dex-kapsel>*+*{border-left:1px solid var(--trennstrich)!important}
 :root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 10px 0 8px!important}
 :root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:#111!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-coach-icon,.app-dex-search-icon,.coin-kopf-symbol){width:24px!important;height:24px!important;flex-basis:24px!important;filter:none!important;transform:none!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.app-dex-gedaechtnis{gap:7px!important;padding:0 12px 0 10px!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel .app-dex-zurueck-pfeil{width:16px!important;height:16px!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-coach-icon,.app-dex-search-icon,.coin-kopf-symbol,.app-dex-gedaechtnis-icon){width:24px!important;height:24px!important;flex-basis:24px!important;filter:none!important;transform:none!important}
 :root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-search-icon,.app-dex-coach-icon)>svg{width:100%!important;height:100%!important}
 /* Aktive Seite (Suche, CAPCOINS): weiche Fläche statt Schatten. */
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-search.aktiv,.coin-kopfstand.aktiv){background:#E4E6EA!important}
+:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-search.aktiv,.coin-kopfstand.aktiv,.app-dex-gedaechtnis[aria-current="page"]){background:#E4E6EA!important}
 :root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.app-dex-coach.hat-hinweis::after{top:6px!important;right:6px!important}
 
 /* Menüband: aktive Seite als weiche Fläche in der Schriftfarbe des Bandes. */
@@ -16139,3 +16122,76 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:last-child{border-left:1px solid var(--trennstrich)!important}
 :root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:disabled{opacity:.35}
 :root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>div{display:grid;place-content:center;text-align:center}
+
+/* Filter auf den Sammlungsseiten und in der Suche: eine durchgehende
+   Kapsel wie die Segmentsteuerung am Mac. Die Leiste scrollt weiter bis
+   an die Displaykanten; die Knöpfe selbst bilden die Kapsel (Kontur oben
+   und unten, gerundete Enden, feine Trennstriche). Gewählt ist, was eine
+   weiche Fläche trägt. */
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter){
+  gap:0!important;
+}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button{
+  flex:0 0 auto!important;
+  min-height:38px!important;
+  height:38px!important;
+  margin:0!important;
+  padding:0 14px!important;
+  border-style:solid!important;
+  border-color:var(--kontur-farbe)!important;
+  border-width:var(--kontur) 0!important;
+  border-radius:0!important;
+  background:#FFFFFF!important;
+  box-shadow:none!important;
+  color:#111!important;
+  -webkit-text-fill-color:#111!important;
+  font:700 12.5px/1 "Work Sans",sans-serif!important;
+  letter-spacing:0!important;
+}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:first-of-type{
+  border-left-width:var(--kontur)!important;
+  border-radius:999px 0 0 999px!important;
+  padding-left:16px!important;
+}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:last-of-type{
+  border-right-width:var(--kontur)!important;
+  border-radius:0 999px 999px 0!important;
+  padding-right:16px!important;
+}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:first-of-type:last-of-type{border-radius:999px!important}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button+button{
+  border-left:1px solid var(--trennstrich)!important;
+}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:is(.aktiv,[aria-pressed="true"]){
+  background:#E4E6EA!important;
+  font-weight:800!important;
+}
+:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:active{transform:none!important}
+
+/* Einträge: Mehr und Schließen in einer Kapsel wie „Teilen · …“ in
+   Notizen. Das Aufklappmenü liegt im selben Container; deshalb runden die
+   beiden Knöpfe ihre Enden selbst, statt dass die Kapsel etwas abschneidet. */
+:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions){gap:0!important;align-items:center!important}
+:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button){
+  box-sizing:border-box!important;
+  display:grid!important;
+  place-items:center!important;
+  width:44px!important;
+  height:38px!important;
+  margin:0!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:999px!important;
+  background:#FFFFFF!important;
+  box-shadow:none!important;
+  color:#111!important;
+}
+:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu:has(+.neo-dex-action-close){
+  border-right:0!important;
+  border-radius:999px 0 0 999px!important;
+}
+:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu+.neo-dex-action-close{
+  border-left:1px solid var(--trennstrich)!important;
+  border-radius:0 999px 999px 0!important;
+}
+:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu[aria-expanded="true"]{background:#E4E6EA!important}
+:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg){width:20px!important;height:20px!important;fill:currentColor!important;color:inherit!important}
