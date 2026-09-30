@@ -157,12 +157,18 @@ function tastaturBeobachten() {
     wurzel.style.setProperty('--sicht-hoehe', `${Math.round(sicht.height)}px`);
     wurzel.style.setProperty('--sicht-oben', `${Math.round(sicht.offsetTop)}px`);
     wurzel.classList.toggle('tastatur-sichtbar', offen);
+    // Das Fenster selbst scrollt in CAPBOY nie; ohne offene Tastatur ist jede
+    // Verschiebung ein iOS-Rest (etwa nach dem Fokus in ein Menü-Feld).
+    if (!offen && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
     if (!offen) return;
     if (window.scrollY) window.scrollTo(0, 0);
     requestAnimationFrame(() => feld.scrollIntoView({ block: 'nearest' }));
   };
   sicht.addEventListener('resize', aktualisieren);
   sicht.addEventListener('scroll', aktualisieren);
+  window.addEventListener('scroll', () => {
+    if (!wurzel.classList.contains('tastatur-sichtbar') && sicht.height >= window.innerHeight - 80) window.scrollTo(0, 0);
+  }, { passive: true });
   document.addEventListener('focusin', () => setTimeout(aktualisieren, 60));
   document.addEventListener('focusout', () => setTimeout(aktualisieren, 60));
 }

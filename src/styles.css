@@ -2740,7 +2740,10 @@ button:active{transform:translate(2px,2px);box-shadow:none}
    in Dokument-Scrollen zurueckkippt.
    ============================================================ */
 html,body{width:100%;height:100vh;height:100lvh;overflow:hidden}
-body{overscroll-behavior:none}
+/* Auch auf html: iOS liest das Nachfedern des ganzen Bildschirms vom
+   Wurzelelement. Nur auf body federte auf kurzen Seiten (ESSEN, SUPPS) die
+   ganze App samt Header und Menüband. */
+html,body{overscroll-behavior:none}
 #app{
   width:100%;height:100%;min-height:0;overflow-y:auto;
   overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
