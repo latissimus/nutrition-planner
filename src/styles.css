@@ -16587,15 +16587,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root[data-theme][data-seite] #app>.app-dex-dock{
   --dex-ink:var(--ui-schrift);
+  /* Radius der Kapsel (halbe Höhe) und wie weit die Kartenkanten (16 px vom
+     Rand) innerhalb der Kapselkante (12 px) liegen. */
+  --kapsel-r:34;
+  --karten-einzug:4;
   color:var(--ui-schrift)!important;
-  padding:6px 12px var(--app-dex-dock-bottom)!important;
-  /* Deckende Fläche in der Seitenfarbe wie beim Header: Der Inhalt endet an
-     der Oberkante der Leiste und läuft nicht um die Kapsel herum. */
-  background:var(--dex-seitenfarbe,var(--bg))!important;
+  padding:0 12px var(--app-dex-dock-bottom)!important;
+  background:transparent!important;
 }
-:root[data-theme="dark"][data-seite] #app>.app-dex-dock{background:var(--bg)!important}
-:root[data-theme][data-seite] #app>.app-dex-dock::before,
-:root[data-theme][data-seite] #app>.app-dex-dock::after{display:none!important}
+:root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt{--kapsel-r:25}
+:root[data-theme][data-seite] #app>.app-dex-dock::before{display:none!important}
+/* Deckende Fläche in der Seitenfarbe (Dark: Seitengrund). Sie beginnt genau
+   dort, wo die senkrechte Kartenkante den Bogen der Kapsel trifft: Darüber
+   laufen die Karten bis an die Kapsel heran, darunter ist nichts mehr zu sehen.
+   Schnittpunkt Kreis/Gerade: r - Wurzel(r² - (r - Einzug)²). */
+:root[data-theme][data-seite] #app>.app-dex-dock::after{
+  display:block!important;
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:calc((var(--kapsel-r) - sqrt(var(--kapsel-r) * var(--kapsel-r) - (var(--kapsel-r) - var(--karten-einzug)) * (var(--kapsel-r) - var(--karten-einzug)))) * 1px);
+  right:0;
+  bottom:0;
+  left:0;
+  height:auto!important;
+  background:var(--dex-seitenfarbe,var(--bg))!important;
+  pointer-events:none;
+}
+:root[data-theme="dark"][data-seite] #app>.app-dex-dock::after{background:var(--bg)!important}
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{
   padding:4px!important;
   border-radius:999px!important;
