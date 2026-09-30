@@ -911,10 +911,15 @@ function appDexShellZeichnen(route, view) {
     if (!aktiv) return;
     const links = aktiv.offsetLeft;
     const rechts = links + aktiv.offsetWidth;
-    const istAusserhalb = links < tabLeiste.scrollLeft
-      || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth;
+    /* Schon der vorletzte sichtbare Reiter am Rand rückt die Leiste weiter,
+       nicht erst der äußerste: Liegt der aktive Reiter innerhalb von gut
+       einer Reiterbreite am linken oder rechten Rand, wandert er zur Mitte,
+       und daneben sind die nächsten Seiten zu sehen. */
+    const randzone = aktiv.offsetWidth * 1.2;
+    const istAmRand = links < tabLeiste.scrollLeft + randzone
+      || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth - randzone;
     const maximal = Math.max(0, tabLeiste.scrollWidth - tabLeiste.clientWidth);
-    const gewuenscht = istAusserhalb
+    const gewuenscht = istAmRand
       ? links - ((tabLeiste.clientWidth - aktiv.offsetWidth) / 2)
       : tabLeiste.scrollLeft;
     const rasterpunkte = [...tabLeiste.querySelectorAll('.app-dex-tab')]
@@ -930,7 +935,7 @@ function appDexShellZeichnen(route, view) {
     const untergrenze = Math.max(0, Math.min(rechts - tabLeiste.clientWidth, maximal));
     const obergrenze = Math.max(untergrenze, Math.min(links, maximal));
     const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze);
-    tabLeiste.scrollTo({ left: sicher, behavior: istAusserhalb ? 'smooth' : 'auto' });
+    tabLeiste.scrollTo({ left: sicher, behavior: istAmRand ? 'smooth' : 'auto' });
   });
 
   /* Tippen auf den Reiter der GERADE offenen Seite öffnet deren Menü statt
