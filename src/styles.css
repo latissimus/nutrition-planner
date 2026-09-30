@@ -16393,3 +16393,83 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view :is(.gedaechtnis-formular,.coach-woche-form) :is(input,select,textarea){background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
 :root[data-theme][data-seite="coach"] #view :is(.gedaechtnis-formular,.coach-woche-form) :is(input,textarea)::placeholder{color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important}
 :root[data-theme="dark"][data-seite="coach"] #view :is(.gedaechtnis-formular,.coach-woche-form) :is(input,select,textarea){color-scheme:dark}
+
+/* ============================================================
+   RETRO-PASTELL · Die früher dunklen Seiten tragen in Retro das pastellige
+   Gegenstück ihres Farbtons: TRAINING Seafoam, ROUTINEN Lavendel, SCHLAF
+   Periwinkle, CAPCOINS Orchidee, ESSEN Aprikose. Die dunkle Farbe bleibt
+   als Akzent (Knöpfe, Kacheln, Ringe); ESSEN nimmt Tomatenrot statt Braun.
+   Schrift, Konturen und Tapeten sind schwarz wie auf den übrigen hellen
+   Seiten. Die Seitenfarben selbst setzt categoryIcons.js (retroPastell).
+   Der ganze Block ist ein eigener Commit und lässt sich allein zurücknehmen.
+   ============================================================ */
+:root[data-theme="retro"][data-seite="training"]{
+  --pastell:#A3E4C8;--pastell-akzent:#203C3D;
+  --cap-tint:color-mix(in srgb,#203C3D 8%,#fff);
+  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%230A1330' fill-opacity='.075'/%3E%3C/svg%3E");
+}
+:root[data-theme="retro"][data-seite="habits"]{
+  --pastell:#C3B1F5;--pastell-akzent:#3F236F;
+  --muster-kreuzchen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cg fill='%230A1330' fill-opacity='.1'%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='8' y='5' width='1' height='1'/%3E%3Crect x='6' y='6' width='2' height='2'/%3E%3Crect x='5' y='8' width='1' height='1'/%3E%3Crect x='8' y='8' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+:root[data-theme="retro"][data-seite="sleep"]{
+  --pastell:#A9B8F5;--pastell-akzent:#0E1D47;
+  --cap-tint:color-mix(in srgb,#0E1D47 8%,#fff);
+  --muster-bildroehre-dunkel:var(--muster-bildroehre-retro);
+}
+:root[data-theme="retro"][data-seite="coins"]{
+  --pastell:#F0B3E6;--pastell-akzent:#432C5E;
+  --cap-tint:color-mix(in srgb,#432C5E 8%,#fff);
+  --muster-tetris-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='30' shape-rendering='crispEdges'%3E%3Cg fill='%230A1330' fill-opacity='.055'%3E%3Crect x='8' y='9' width='5' height='5'/%3E%3Crect x='14' y='9' width='5' height='5'/%3E%3Crect x='20' y='9' width='5' height='5'/%3E%3Crect x='14' y='15' width='5' height='5'/%3E%3C/g%3E%3C/svg%3E");
+}
+:root[data-theme="retro"][data-seite="essen"]{
+  --pastell:#FFC39E;--pastell-akzent:#C8412E;
+  --cap-tint:color-mix(in srgb,#C8412E 8%,#FFFCF5);
+  --muster-dithering-dunkel:var(--muster-dithering-retro);
+}
+
+/* Seitenfläche, Schrift auf der Seite */
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]),
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) body,
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) :is(#app,#view){
+  --dex-seitenfarbe:var(--pastell);
+  background-color:var(--pastell)!important;
+}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) #view:is(.neo-dex-page,.food-dex-page,.training-dex-page,.routine-dex-page,.sleep-dex-page,.sleep-log-dex-page,.coin-dex-page){
+  --ink:#111111;
+  --dex-ink:#111111;
+  background-color:var(--pastell)!important;
+  color:#111111!important;
+}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="essen"]) #view :is(
+  .dex-sammlungskopf,.unter-sammlungen-block>h2,.sammlung-alle>h2,
+  .dex-eintrag-gruppe>h2,.sammlung-leer,.sammlung-leer strong,.sammlung-leer span
+){color:#111111!important}
+:root[data-theme="retro"][data-seite="coins"] #view :is(.coin-section-title h2,.coin-history-title,.coin-history,.coin-history :is(span,small,b)){color:#111111!important}
+
+/* Kopfzeile und Menüband wie auf den hellen Seiten */
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-header{
+  --dex-ink:#111111;background:var(--pastell)!important;border-color:var(--kontur-farbe)!important;color:#111111!important;
+}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-header .nav-av{border-color:var(--kontur-farbe)!important}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-dock{--dex-ink:#111111;color:#111111!important}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-dock::after{background:var(--pastell)!important}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-dock-inner::before{
+  border-color:var(--kontur-farbe)!important;background:color-mix(in srgb,var(--pastell) 90%,transparent)!important;
+}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) #app .app-dex-tab{color:#111111!important}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) #app .app-dex-tab.aktiv{
+  background:color-mix(in srgb,currentColor 16%,transparent)!important;box-shadow:none!important;
+}
+:root[data-theme="retro"]:is([data-seite="training"],[data-seite="habits"],[data-seite="sleep"],[data-seite="coins"],[data-seite="essen"]) .app-dex-menu{border-left-color:var(--kontur-farbe)!important;color:#111111!important}
+
+/* SCHLAF: Der Nacht-Hero bleibt eine dunkelblaue Karte mit heller Schrift. */
+
+/* ESSEN: Tomatenrot statt Braun überall dort, wo der Akzent füllt */
+:root[data-theme="retro"][data-seite="essen"] #view :is(.neo-dex-page,.food-dex-page),
+:root[data-theme="retro"][data-seite="essen"] #view:is(.neo-dex-page,.food-dex-page){--surface2:color-mix(in srgb,#C8412E 7%,#FFFCF5)}
+:root[data-theme="retro"][data-seite="essen"] #view .dex-inhaltskarte-vorschau{background:#C8412E!important}
+:root[data-theme="retro"][data-seite="essen"] #view .dex-ordner-farbblatt{fill:#C8412E!important}
+:root[data-theme="retro"][data-seite="essen"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link,.dex-detail-foodmeta span,.dex-detail-tags span){background:#C8412E!important}
+:root[data-theme="retro"][data-seite="essen"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:#C8412E!important;color:#FFFFFF!important}
