@@ -1,5 +1,6 @@
 // What is missing or not followed through, across all areas: nutrition,
-// weighing, skinfolds, waist, sleep, routines and training. Computed from the
+// weighing, skinfolds, waist, sleep, routines and training (without the areas
+// the user switched off, see switchedOffAreas). Computed from the
 // last FOLLOW_THROUGH_DAYS completed days; today is left out because it is
 // rarely complete yet. The coach names these points, and COMP may recommend
 // exactly their actions. Deterministic like the rest of the context: the
@@ -52,6 +53,20 @@ export function durationMinutes(bedtime: string, wakeTime: string) {
   let duration = toMinutes(wakeTime) - toMinutes(bedtime);
   if (duration <= 0) duration += 24 * 60;
   return duration;
+}
+
+// Pages the user can switch off in the profile, and the area of the
+// assessment each one carries: the tracker holds the calories, the routine
+// and sleep pages hold routines and sleep. A switched-off area is left out of
+// the whole assessment, so an empty page never counts as a gap.
+export const SWITCHABLE_AREAS: Record<string, string> = { nutrition: 'reminders', routines: 'habits', sleep: 'sleep' };
+const CHECK_AREAS: Record<string, string> = { nutrition: 'ernaehrung', routines: 'routinen', sleep: 'schlaf' };
+
+// visibleRoutes: the stored list of visible pages (muscledex:sichtbare-sammlungen).
+// Without a stored list every page is visible.
+export function switchedOffAreas(visibleRoutes: unknown): string[] {
+  if (!Array.isArray(visibleRoutes)) return [];
+  return Object.keys(SWITCHABLE_AREAS).filter((area) => !visibleRoutes.includes(SWITCHABLE_AREAS[area]));
 }
 
 // kind: "daten" (logging missing - later conclusions depend on it),
@@ -181,7 +196,8 @@ export function buildFollowThrough(rows: Row, now: Date) {
     }
   }
 
-  return { window: { from, to, days: FOLLOW_THROUGH_DAYS }, checks };
+  const off = new Set((rows.switchedOffAreas || []).map((area: string) => CHECK_AREAS[area]));
+  return { window: { from, to, days: FOLLOW_THROUGH_DAYS }, checks: checks.filter((check) => !off.has(check.area)) };
 }
 
 // The follow-through actions as allowed COMP actions, before the skinfold

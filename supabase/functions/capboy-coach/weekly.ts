@@ -20,6 +20,12 @@ export const WEEKLY_NOTE_MAX = 300;
 const WEEKLY_ADHERENCE = new Set(['unbekannt', 'kaum', 'teilweise', 'ueberwiegend', 'voll']);
 // Compared week against week: every experiment metric with a weekly value.
 export const WEEKLY_METRICS = Object.keys(EXPERIMENT_METRICS).filter((id) => EXPERIMENT_METRICS[id].value);
+// Metrics of areas the user can switch off; those are neither compared nor
+// listed as not measured.
+const METRIC_AREAS: Record<string, string> = {
+  kalorien: 'nutrition', protein: 'nutrition', protokoll: 'nutrition',
+  schlafdauer: 'sleep', schlafqualitaet: 'sleep', morgenenergie: 'sleep',
+};
 
 const DAY = 86_400_000;
 const round = (value: number, digits = 1) => Number(value.toFixed(digits));
@@ -92,7 +98,9 @@ export function weeklyBlock(timeseries: Row | null | undefined, report: Row | nu
   const weeks = reviewWeeks(timeseries);
   if (!weeks) return null;
   const { current, previous } = weeks;
-  const comparison = WEEKLY_METRICS.flatMap((id) => {
+  const off = new Set(timeseries?.switchedOffAreas || []);
+  const metrics = WEEKLY_METRICS.filter((id) => !off.has(METRIC_AREAS[id]));
+  const comparison = metrics.flatMap((id) => {
     const metric = EXPERIMENT_METRICS[id];
     const now = metric.value!(current);
     const before = previous ? metric.value!(previous) : null;
@@ -112,7 +120,7 @@ export function weeklyBlock(timeseries: Row | null | undefined, report: Row | nu
     to: current.to,
     previousWeek: previous?.week ?? null,
     comparison,
-    notMeasuredThisWeek: WEEKLY_METRICS.filter((id) => EXPERIMENT_METRICS[id].value!(current) == null).map((id) => EXPERIMENT_METRICS[id].label),
+    notMeasuredThisWeek: metrics.filter((id) => EXPERIMENT_METRICS[id].value!(current) == null).map((id) => EXPERIMENT_METRICS[id].label),
     loggedIllnessDays: current.recovery?.illnessDays ?? 0,
     loggedTravelDays: current.recovery?.travelDays ?? 0,
     userReport: { circumstances: circumstances.map((id) => WEEKLY_CIRCUMSTANCES[id]), note },

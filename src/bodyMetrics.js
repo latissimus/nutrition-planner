@@ -11,6 +11,7 @@ import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
+import { collectionIsVisible } from './collectionPreferences.js';
 import { buildCompEvidence, compCoachFrage, requestCompAssessment } from './compAssessment.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
@@ -120,7 +121,9 @@ async function ladeMesswerte(userId) {
     // Wie oben bei Gewicht und Hautfalten: absteigend geholt, damit das Limit
     // die aeltesten Werte abschneidet, und hier wieder chronologisch gedreht.
     waists: (results[2].data || []).reverse(), performance: (results[3].data || []).reverse(),
-    sleep: (results[4].data || []).reverse(), checkins: (results[5].data || []).reverse(), settings,
+    // Ist Schlaf im Profil ausgeschaltet, zählt er für COMP nicht mit.
+    sleep: collectionIsVisible('sleep') ? (results[4].data || []).reverse() : [],
+    checkins: (results[5].data || []).reverse(), settings,
   };
 }
 

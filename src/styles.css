@@ -103,7 +103,7 @@
   --pink:var(--fe-pink);
   --pink-press:#EC1791;
   --pump:var(--fe-pink);
-  /* Hauptakzent: alles, was primaer bedient wird – Neuer Ordner, aktives
+  /* Hauptakzent:alles, was primaer bedient wird – Neuer Ordner, aktives
      Theme, Bibliothekskachel. Schwarz darauf kommt auf 6,1:1 und ist damit
      auch in Kleinschrift lesbar; Weiss laege bei 3,5:1. */
   --akzent:var(--fe-pink);
@@ -142,7 +142,7 @@
      unter dem Kopf und das Menüband. Trennlinien in Listen sind ebenso
      dünn, aber hell; die Kontur ist schwarz. */
   --kontur:1px;
-  /* Retro: schwarz wie am Mac; Kopflinie und Menüband folgen der Seite. */
+  /* Retro:schwarz wie am Mac; Kopflinie und Menüband folgen der Seite. */
   --kontur-farbe:#000000;
   --bw:var(--kontur);
   /* Karten besitzen appweit dieselbe ruhigere Kontur. Bedienelemente lesen
@@ -157,7 +157,7 @@
      Im hellen Theme bleiben neun Prozent des Musters sichtbar. */
   --tapeten-schleier:91%;
 
-  /* Ueberschriften: Retro setzt kursive Versalien, der Standard nicht. Damit
+  /* Ueberschriften:Retro setzt kursive Versalien, der Standard nicht. Damit
      die Basisregel weiter unten fuer beide Themes gilt, steckt der Unterschied
      in Variablen statt in einer zweiten Regel. */
   --h-style:normal;
@@ -189,7 +189,7 @@
   --feast-royal:var(--fe-blurple);
   --feast-violet:var(--fe-blurple);
 
-  /* In der App gibt es genau zwei Schriften: Work Sans für Text,
+  /* In der App gibt es genau zwei Schriften:Work Sans für Text,
      Überschriften und Bedienung, JetBrains Mono für Ziffern, Messwerte und
      technische Angaben. */
   --mono:"CAPBOY Ziffern","Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
@@ -200,21 +200,21 @@
 
 /* ============================================================
    Theme "Dark" — derselbe Neo-Brutalismus, nur umgedreht.
-   Text und Kontur sind bewusst getrennt: Text bleibt hell und gut lesbar,
-   waehrend die Ränder im Dunkeln ruhiger als im Retro-Theme auftreten.
+   Text und Konturen sind weiß wie am Mac mit „Kontrast erhöhen“; Flächen
+   bleiben dunkel.
    ============================================================ */
 :root[data-theme="dark"]{
-  /* Vorerst wie bisher die ruhige graue Kontur; Weiß folgt im Dark-Schritt. */
-  --kontur-farbe:var(--ink);
+  /* Konturen im Dark Mode weiß, wie am Mac mit „Kontrast erhöhen“. */
+  --kontur-farbe:#FFFFFF;
   --bg:#101A2B;       /* einheitliches tiefes Navy aus dem Notizbuch */
   --surface:#191C24;
   --surface2:#232733;
-  --ink:#697486;
-  --line:#697486;
-  --text:#EDF0F6;
+  --ink:#FFFFFF;
+  --line:#FFFFFF;
+  --text:#FFFFFF;
   --accent-ink:#0B1B44;
-  --muted:#98A2B3;
-  --faint:#8490A3;
+  --muted:#AEB7C6;
+  --faint:#AEB7C6;
 
   /* Navy verschwindet auf Fast-Schwarz. Aufgehellt bleibt es erkennbar
      dasselbe Blau und traegt weiter Laufband, LOAD-Badge, aktiven Tab. */
@@ -222,8 +222,8 @@
   --load:#443199;
   --middle:#225e61;
   --navy-panel:#1B2C5C;
-  --link:#91A9FF;
-  --dark-action:#9CCBFF;
+  --link:#FFFFFF;
+  --dark-action:#FFFFFF;
   --dark-action-ink:#0A1330;
   --dark-danger:#D2D9E5;
   --dark-danger-soft:#293244;
@@ -234,7 +234,7 @@
   --hold:#E0A93C;
   --prio-soft:#362641;
   --prio-wash:rgba(201,164,223,.16);
-  --prio-text:#D7B3EF;
+  --prio-text:#FFFFFF;
 
   /* Die SVG-Tapeten sind ueberwiegend schwarz gezeichnet. Auf tiefem Navy
      brauchen sie deutlich mehr Eigenanteil, um optisch so praesent zu sein
@@ -510,7 +510,7 @@ label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercas
 .prev{font-size:14px;color:var(--muted);font-family:var(--mono);margin:8px 0 9px;min-height:17px}
 .prev b{color:var(--text);font-weight:700}
 .d-down{background:#FFE0D8;color:var(--down)}
-:root[data-theme="dark"] .d-down{background:#3B211D;color:#FF9A83}
+:root[data-theme="dark"] .d-down{background:#3B211D;color:#FFFFFF}
 .fld{position:relative;flex:1;min-width:0}
 .fld input{width:100%;background:var(--surface);border:var(--bw) solid var(--ink);color:var(--text);
   font-family:var(--mono);font-size:17px;font-weight:700;text-align:center;padding:11px 4px;border-radius:var(--r)}
@@ -809,8 +809,8 @@ html.overlay-vollflaechig body::before{display:none}
   color:var(--muted);font-size:11.5px}
 .profile-hinweis{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
 .btn-danger{background:#FFE0D8;color:var(--down)}
-:root[data-theme="dark"] .btn-danger{background:#3B211D;color:#FF9A83}
-:root[data-theme="dark"] .profile-abschnitt.gefahr>summary{color:#FF9A83}
+:root[data-theme="dark"] .btn-danger{background:#3B211D;color:#FFFFFF}
+:root[data-theme="dark"] .profile-abschnitt.gefahr>summary{color:#FFFFFF}
 .profile-daten-status{min-height:17px;margin-top:8px;color:var(--muted);font-size:11.5px;text-align:center}
 
 /* ---------- Admin ---------- */
@@ -852,11 +852,11 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .push-onboarding-ja{border:var(--kontur) solid var(--kontur-farbe);background:#3A2E05;color:#FFFFFF}
 .push-onboarding-ja:active{transform:translateY(1px)}
 :root[data-theme="dark"] .push-onboarding{
-  border-color:#8A6D1F;background:#4A3D12;color:#FBE5B0;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  border-color:var(--kontur-farbe);background:#4A3D12;color:#FFFFFF;box-shadow:0 8px 24px rgba(0,0,0,.45);
 }
-:root[data-theme="dark"] .push-onboarding-text small{color:#D9C583}
-:root[data-theme="dark"] .push-onboarding-nein{color:#D9C583}
-:root[data-theme="dark"] .push-onboarding-ja{border-color:#FBE5B0;background:#FBE5B0;color:#3A2E05}
+:root[data-theme="dark"] .push-onboarding-text small{color:#FFFFFF}
+:root[data-theme="dark"] .push-onboarding-nein{color:#FFFFFF}
+:root[data-theme="dark"] .push-onboarding-ja{border-color:var(--kontur-farbe);background:#FBE5B0;color:#111111}
 .route-fehler-view{display:grid;min-height:100%;padding:calc(env(safe-area-inset-top) + 24px) 18px calc(env(safe-area-inset-bottom) + 24px);place-items:center;overflow:auto}
 .route-fehler{width:min(100%,430px);padding:28px 22px;border:var(--bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart);text-align:center}
 .route-fehler-symbol{display:grid;width:52px;height:52px;margin:0 auto 16px;place-items:center;border:var(--bw) solid var(--ink);border-radius:50%;background:var(--pink);font-family:var(--display);font-size:28px;font-weight:800}
@@ -1932,7 +1932,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-inhaltskarte-vorschau{border-bottom:var(--karten-bw) solid var(--ink)}
 .dex-inhaltskarte-vorschau img{
   position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:0;
-  /* Frueher .72s: das Bild lag fertig vor und wurde trotzdem noch drei
+  /* Frueher .72s:das Bild lag fertig vor und wurde trotzdem noch drei
      Viertelsekunden lang eingeblendet. Die Geste bleibt, nur kurz. */
   transition:opacity .18s ease-out;
 }
@@ -2373,7 +2373,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
    while the detail itself is a true overlay over the cached Dex view. */
 .dex-detail-overlay{
   /* Same full-screen modal layer as the Dex-edit sheet.  Do not derive this
-     colour from --bg: entry routes temporarily use the generic collection
+     colour from --bg:entry routes temporarily use the generic collection
      token and that caused a cream flash over Food-Dex's purple page. */
   position:fixed;left:0;top:0;width:100vw;height:100vh;height:100lvh;z-index:1000;
   display:grid;place-items:center;padding:22px;box-sizing:border-box;
@@ -2549,7 +2549,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .routine-coin-info{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:600}
 
 .kategorie-sheet-backdrop{
-  /* viewport-fit=cover + black-translucent: Diese EINE gerenderte Flaeche
+  /* viewport-fit=cover + black-translucent:Diese EINE gerenderte Flaeche
      beginnt am physischen Displayrand und liegt damit auch hinter Uhrzeit,
      Empfang und Akku. Kein Safe-Area-Padding und kein theme-color-Trick. */
   /* `inset:0` folgt auf iOS dem verkleinerten dynamischen Viewport und endet
@@ -2751,7 +2751,7 @@ body{overscroll-behavior:none}
   overscroll-behavior-x:none;overscroll-behavior-y:contain;
   -webkit-overflow-scrolling:touch;scroll-behavior:auto;
   background-attachment:scroll!important;
-  /* Kein globaler Kopf mehr: #view traegt das Safe-Area-Polster (Status-
+  /* Kein globaler Kopf mehr:#view traegt das Safe-Area-Polster (Status-
      Leiste/Notch) selbst, auf jeder Seite. */
   padding-top:env(safe-area-inset-top);
 }
@@ -2871,8 +2871,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-size:auto,112px!important;
 }
 :root[data-seite="reminders"]{
-  background-image:
-    linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),
+  background-image:linear-gradient(color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 35%,transparent)),
     url("../MUSCLEDEX-ICONS/pet_supplies-pattern.svg")!important;
   background-size:auto,112px!important;
 }
@@ -3101,7 +3100,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .food-dex-info-dialog-close .material-svg,.food-dex-info-dialog-close svg{width:26px!important;height:26px!important}
 
 [data-theme="dark"] .food-dex-info-dialog{
-  background:var(--surface);color:var(--ink);border-color:var(--ink);box-shadow:none;
+  background:var(--surface);color:var(--ink);border-color:var(--kontur-farbe);box-shadow:none;
 }
 [data-theme="dark"] .food-dex-info-dialog p{color:var(--muted)}
 [data-theme="dark"] .food-dex-info-dialog b{color:var(--ink)}
@@ -3616,11 +3615,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      Konsistenzpass darf die gemeinsamen Dark-Tokens nicht erneut aufhellen. */
   --surface:#191C24;
   --surface2:#232733;
-  --ink:#697486;
-  --line:#697486;
-  --text:#EDF0F6;
-  --muted:#98A2B3;
-  --faint:#8490A3;
+  --ink:#FFFFFF;
+  --line:#FFFFFF;
+  --text:#FFFFFF;
+  --muted:#AEB7C6;
+  --faint:#AEB7C6;
   --app-card:var(--surface);
   --app-field:var(--surface2);
   --app-outline:var(--ink);
@@ -3658,7 +3657,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ){background:#F2EBE0;color:#111}
 :root[data-theme="dark"] .icon-option.aktiv{background:var(--fe-pink);color:#111}
 :root[data-theme="dark"] :is(.emoji-eigen input,.sammlung-emoji-eigen input){
-  border-color:var(--ink);background:var(--surface2);color:var(--text);
+  border-color:var(--kontur-farbe);background:var(--surface2);color:var(--text);
 }
 :root[data-theme="dark"] .emoji-eigen button{color:#111}
 
@@ -3672,13 +3671,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme="dark"] .dex-ordner-form path{stroke:var(--ink)}
 :root[data-theme="dark"] .dex-detail-audio{
-  border-bottom-color:var(--ink);
+  border-bottom-color:var(--kontur-farbe);
   background:color-mix(in srgb,var(--eintrag-farbe) 22%,var(--surface));
 }
 :root[data-theme="dark"] .dex-auswahl-marker{
-  border-color:var(--ink);background:var(--surface2);
+  border-color:var(--kontur-farbe);background:var(--surface2);
 }
-:root[data-theme="dark"] .dex-auswahlleiste{border-color:var(--ink)}
+:root[data-theme="dark"] .dex-auswahlleiste{border-color:var(--kontur-farbe)}
 :root[data-theme="dark"] .dex-auswahlleiste button{color:var(--text)}
 :root[data-theme="dark"] .dex-auswahlleiste button :is(.material-svg,svg,svg *){
   color:var(--text)!important;fill:var(--text)!important;
@@ -3698,7 +3697,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb{background:var(--dark-action)}
 :root[data-theme="dark"] .switchline input{accent-color:var(--dark-action)}
 :root[data-theme="dark"] :is(.rem-push-warn,.msg.err){
-  color:#FFD1C7;background:#3B211D;border-color:#8E493D;
+  color:#FFFFFF;background:#3B211D;border-color:#8E493D;
 }
 
 /* Sichtbarer Tastaturfokus ist nicht nur fuer Desktop wichtig: Er hilft auch
@@ -6726,8 +6725,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry>.nutrition-entry-head{
   grid-template-columns:48px minmax(0,1fr) auto!important;
   grid-template-rows:auto auto;
-  grid-template-areas:
-    "entry-icon entry-name entry-kcal"
+  grid-template-areas:"entry-icon entry-name entry-kcal"
     "entry-icon entry-macros entry-macros";
   row-gap:3px;
 }
@@ -6978,7 +6976,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   z-index:0;
   inset:0;
   pointer-events:none;
-  /* Helles Muster auf dem violetten Grund: sichtbar, aber bewusst ruhig. */
+  /* Helles Muster auf dem violetten Grund:sichtbar, aber bewusst ruhig. */
   background:#fff;
   opacity:.12;
   -webkit-mask-image:var(--food-vozzy-pattern);
@@ -8059,12 +8057,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .themeseg,.sammlungs-sortierung,.themebtn,.sortier-tasten button,
   .profile-abschnitt .input,.profile-abschnitt .btn,.profile-ausloggen .btn
 ){
-  border-color:var(--ink)!important;
+  border-color:var(--kontur-farbe)!important;
   background:var(--surface);
   color:var(--text);
 }
 :root[data-theme="dark"][data-seite="profile"] .profile-abschnitt.profile-konto{
-  border-color:var(--ink)!important;
+  border-color:var(--kontur-farbe)!important;
   box-shadow:none!important;
 }
 :root[data-theme="dark"][data-seite="profile"] .profile-abschnitt>summary::after{
@@ -8178,7 +8176,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:850;
   letter-spacing:.045em;
 }
-:root[data-theme="dark"] .app-dex-sync.wait{color:#AEDCF6}
+:root[data-theme="dark"] .app-dex-sync.wait{color:#FFFFFF}
 
 .app-dex-dock{
   position:absolute;
@@ -8220,7 +8218,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin-inline:auto;
   padding:5px;
   display:grid;
-  /* Zweite Spalte entfernt: der MENÜ-Knopf ist weg, die Reiterleiste
+  /* Zweite Spalte entfernt:der MENÜ-Knopf ist weg, die Reiterleiste
      bekommt die volle Breite (353 statt 286 px bei 375 px Gerätebreite). */
   grid-template-columns:minmax(0,1fr);
   gap:6px;
@@ -8253,7 +8251,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      Gummibandeffekt. Die aktive Seite wird beim Wechsel weiterhin per
      Skript ins Bild gezogen. */
   touch-action:pan-x;
-  /* Luft nach oben und unten: overflow-y:hidden schnitt sonst die drei
+  /* Luft nach oben und unten:overflow-y:hidden schnitt sonst die drei
      Punkte (1 px unter der Kante) und den Druckeffekt (1,5 px darunter) ab. */
   padding-block:4px;
 }
@@ -8373,8 +8371,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 :root[data-theme="dark"] .app-dex-header{
   background:#101A2B;
-  border-color:#697486;
-  color:#EDF0F6;
+  border-color:var(--kontur-farbe);
+  color:#FFFFFF;
   --brand-outline:#EDF0F6;
 }
 :root[data-theme="dark"]{
@@ -8387,31 +8385,31 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --app-chrome-bg:#101A2B!important;
 }
 :root[data-theme="dark"] .app-dex-header .nav-av{
-  border-color:#697486;
+  border-color:var(--kontur-farbe);
   background:#191C24;
-  color:#EDF0F6;
+  color:#FFFFFF;
   box-shadow:none;
 }
 :root[data-theme="dark"] .app-dex-dock{
   background:transparent;
-  color:#EDF0F6;
+  color:#FFFFFF;
 }
 :root[data-theme="dark"] .app-dex-dock::before{background:linear-gradient(180deg,#101A2B 0,rgba(16,26,43,.7) 45%,transparent 100%)}
 :root[data-theme="dark"] .app-dex-dock::after{background:#101A2B}
-:root[data-theme="dark"] .app-dex-dock-inner::before{border-color:#697486;background:#101A2B}
-:root[data-theme="dark"] .app-dex-tab{color:#EDF0F6}
+:root[data-theme="dark"] .app-dex-dock-inner::before{border-color:var(--kontur-farbe);background:#101A2B}
+:root[data-theme="dark"] .app-dex-tab{color:#FFFFFF}
 :root[data-theme="dark"] .app-dex-tab.aktiv{
-  color:#EDF0F6;
+  color:#FFFFFF;
   background:#252E3D;
-  box-shadow:inset 0 0 0 var(--kontur) #697486;
+  box-shadow:inset 0 0 0 var(--kontur) var(--kontur-farbe);
 }
 :root[data-theme="dark"] .app-dex-tab.aktiv>span{
   filter:drop-shadow(2.5px 2.5px 0 #EDF0F6);
 }
 :root[data-theme="dark"] .app-dex-menu{
-  border-left-color:#697486;
+  border-left-color:var(--kontur-farbe);
   background:transparent;
-  color:#EDF0F6;
+  color:#FFFFFF;
 }
 @media(max-width:390px){
   .app-dex-header-inner{width:calc(100% - 24px)}
@@ -8483,7 +8481,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .nutrition-coin-overview,
   .mahl-zeitblock
 ){
-  border-color:#697486!important;
+  border-color:var(--kontur-farbe)!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
   position:relative;
@@ -8558,7 +8556,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
 }
 :root[data-theme="dark"][data-seite="reminders"] .special-dex-overlay>.special-dex-sheet{
-  border-color:#697486!important;
+  border-color:var(--kontur-farbe)!important;
 }
 :root[data-seite="reminders"] .special-dex-overlay>.special-dex-sheet>header{
   margin-bottom:4px!important;
@@ -8580,7 +8578,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .btn-primary,
   .rem-speichern
 ){
-  border-color:#697486!important;
+  border-color:var(--kontur-farbe)!important;
 }
 
 /* Der Trinkplan lebt teilweise direkt in seiner TRACKER-Karte und lag damit
@@ -8616,7 +8614,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-card:#fff;
   --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#4E342E)) 7%,#fff);
   --cap-muted:#5C5F66;
-  /* TRACKER ist auch fuer Dialoge die Referenz: auf dem iPhone liegen alle
+  /* TRACKER ist auch fuer Dialoge die Referenz:auf dem iPhone liegen alle
      Sheets 28px innerhalb des Viewports, unabhaengig von ihrer Seite. */
   --cap-sheet-inline:28px;
   --cap-sheet-max:520px;
@@ -8627,7 +8625,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --cap-card:#191C24;
   --cap-tint:color-mix(in srgb,var(--ordner,var(--dex-seitenfarbe,#4E342E)) 11%,#191C24);
   --cap-muted:#AEB7C6;
-  --cap-card-border:var(--kontur) solid #697486;
+  --cap-card-border:var(--kontur) solid var(--kontur-farbe);
 }
 
 /* Header: dieselbe ruhige Statushierarchie wie im fertigen TRACKER. */
@@ -8664,7 +8662,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:translateY(1px);
 }
 .app-dex-sync{height:21px}
-:root[data-theme="dark"] .app-dex-header .coin-kopfstand strong{color:#C7CFDC}
+:root[data-theme="dark"] .app-dex-header .coin-kopfstand strong{color:#FFFFFF}
 
 /* Das MIND-Piktogramm ist im gelieferten SVG optisch kleiner als die übrigen
    Seitenicons. Nur seine innere Zeichnung wächst, das 56-px-Tabraster bleibt
@@ -8777,7 +8775,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .app-dex-dock-inner::before{background:rgba(16,26,43,.78)}
 :root[data-theme="dark"] .app-dex-tab.aktiv{
   background:#252E3D;
-  box-shadow:inset 0 0 0 var(--kontur) #697486;
+  box-shadow:inset 0 0 0 var(--kontur) var(--kontur-farbe);
 }
 :root[data-theme="dark"] .app-dex-tab.aktiv>span{filter:drop-shadow(2px 2px 0 #EDF0F6)}
 
@@ -9032,7 +9030,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 .neo-dex-page :is(.neo-dex-filter,.food-dex-filter){
   /* Exakt dieselbe Viewport-Ausbruchstechnik wie die funktionierende
-     Einkauf-Tagleiste: Die Leiste selbst reicht bis zu beiden Displaykanten,
+     Einkauf-Tagleiste:Die Leiste selbst reicht bis zu beiden Displaykanten,
      nur ihre normale Startposition liegt auf der gemeinsamen Inhaltsachse. */
   box-sizing:border-box!important;
   width:100vw!important;
@@ -9078,7 +9076,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:var(--kontur) solid var(--kontur-farbe)!important;
 }
 :root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
-  border-color:#697486!important;
+  border-color:var(--kontur-farbe)!important;
 }
 :root[data-seite="shopping"] :is(.einkauf-add-backdrop,.einkauf-edit-backdrop,.einkauf-import-backdrop) .btn-primary{
   border:var(--kontur) solid var(--kontur-farbe)!important;
@@ -9187,8 +9185,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin:auto!important;
 }
 :root[data-theme="dark"] .kategorie-sheet :is(.sheet-menue,.kategorie-sheet-menu)>button{
-  border-bottom-color:#697486!important;
-  color:#EDF0F6!important;
+  border-bottom-color:var(--kontur-farbe)!important;
+  color:#FFFFFF!important;
 }
 
 /* Auf der Profilseite ersetzt der Seitenakzent die letzte alte braune
@@ -9371,13 +9369,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root[data-seite="reminders"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,var(--dex-ink,#4E342E) 8%,#FFFCF5);
+  --cap-tint:color-mix(in srgb,var(--dex-accent,#4E342E) 8%,#FFFCF5);
   --cap-card-border:var(--kontur) solid var(--kontur-farbe);
   --cap-muted:#5C5F66;
 }
 :root[data-seite="body"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,var(--dex-ink,#FF277F) 8%,#FFFCF5);
+  --cap-tint:color-mix(in srgb,var(--dex-accent,#FF277F) 8%,#FFFCF5);
   --cap-card-border:var(--kontur) solid var(--kontur-farbe);
   --cap-muted:#5C5F66;
 }
@@ -9477,7 +9475,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */
 :root[data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#FFFCF5;
-  --tracker-tint:color-mix(in srgb,var(--dex-ink,#4E342E) 8%,#FFFCF5);
+  --tracker-tint:color-mix(in srgb,var(--dex-accent,#4E342E) 8%,#FFFCF5);
   --muted:#5C5F66;
   color:var(--dex-ink,#111111)!important;
 }
@@ -9515,7 +9513,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
   border-color:var(--dex-ink,#4E342E)!important;
   background:var(--dex-ink,#4E342E)!important;
-  color:var(--dex-accent-ink,#FFFFFF)!important;
+  color:var(--dex-ink-schrift,#FFFFFF)!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:var(--dex-accent-ink,#FEEFB8)!important;
@@ -9576,7 +9574,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .body-entry-form .btn-primary
 ){
   background:var(--dex-ink,#FF277F)!important;
-  color:var(--dex-accent-ink,#FFFFFF)!important;
+  color:var(--dex-ink-schrift,#FFFFFF)!important;
 }
 :root[data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track{
   background:var(--dex-ink,#FF277F)!important;
@@ -10091,7 +10089,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-sammlungskopf button{
   border-color:var(--kontur-farbe)!important;
   background:var(--dex-ink,#FCEFBB)!important;
-  color:var(--dex-seitenfarbe,#111111)!important;
+  color:var(--dex-ink-schrift,#FFFFFF)!important;
 }
 :root[data-seite="training"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button{
   /* Die Filter sind Bedienelemente und erhalten deshalb die neutrale,
@@ -11603,7 +11601,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-secondary-relations>div>p{font-size:10.5px!important}
 :root[data-seite="body"] .ypsi-secondary-relations>.ypsi-factor-list{gap:7px;padding:0;border:0}
 :root[data-seite="body"] .ypsi-factor-list>span{display:block;padding:8px 10px;border-radius:8px;background:#fff;color:#111111;font:650 10.5px/1.35 var(--tech)}
-:root[data-seite="body"] .ypsi-relations-overview{display:grid;gap:9px;margin:13px -14px 14px;padding:13px 14px;border-block:1px solid color-mix(in srgb,var(--dex-ink,#FF277F) 24%,#ddd);background:#fff}
+:root[data-seite="body"] .ypsi-relations-overview{display:grid;gap:9px;margin:13px -14px 14px;padding:13px 14px;border-block:1px solid color-mix(in srgb,var(--dex-accent,#FF277F) 24%,#ddd);background:#fff}
 :root[data-seite="body"] .ypsi-relations-overview>header{display:flex;align-items:center;justify-content:space-between;gap:9px}
 :root[data-seite="body"] .ypsi-relations-overview>header>span{display:grid;gap:2px}
 :root[data-seite="body"] .ypsi-relations-overview>header small{color:var(--dex-ink,#111111)!important;font:850 8.5px/1 var(--ui)!important;letter-spacing:.07em}
@@ -11612,10 +11610,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-relations-overview>header>button:active{transform:translateY(1px);box-shadow:none}
 :root[data-seite="body"] .ypsi-relations-overview>p{margin:0!important;color:#5C5F66!important;font:500 10px/1.45 var(--tech)!important}
 :root[data-seite="body"] .ypsi-relations-overview>div{display:grid;gap:7px}
-:root[data-seite="body"] .ypsi-priority-list{display:grid;margin-inline:-14px;border-block:1px solid color-mix(in srgb,var(--dex-ink,#FF277F) 24%,#ddd)}
+:root[data-seite="body"] .ypsi-priority-list{display:grid;margin-inline:-14px;border-block:1px solid color-mix(in srgb,var(--dex-accent,#FF277F) 24%,#ddd)}
 :root[data-seite="body"] .ypsi-priority-list>button{display:grid;grid-template-columns:34px minmax(0,1fr) 20px;align-items:center;gap:10px;width:100%;min-height:70px;padding:10px 14px;border:0;border-bottom:1px solid #dedede;background:#fff;color:#111;text-align:left;box-shadow:none}
 :root[data-seite="body"] .ypsi-priority-list>button:last-child{border-bottom:0}
-:root[data-seite="body"] .ypsi-priority-list>button:active{background:color-mix(in srgb,var(--dex-ink,#FF277F) 9%,#fff)}
+:root[data-seite="body"] .ypsi-priority-list>button:active{background:color-mix(in srgb,var(--dex-accent,#FF277F) 9%,#fff)}
 :root[data-seite="body"] .ypsi-priority-list>button>i{display:grid;place-items:center;width:32px;height:32px;border:var(--kontur) solid var(--kontur-farbe);border-radius:50%;color:var(--dex-ink,#111111);font:850 14px/1 var(--tech);font-style:normal}
 :root[data-seite="body"] .ypsi-priority-list>button>span{display:grid;min-width:0;gap:2px}
 :root[data-seite="body"] .ypsi-priority-list>button b{color:#111!important;font:800 13px/1.2 "Work Sans",var(--ui),sans-serif}
@@ -11631,7 +11629,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-basis-form b{color:#111!important;font:800 12.5px/1.2 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .ypsi-basis-form small{color:#5C5F66!important;font:550 9.5px/1.4 var(--tech)!important}
 :root[data-seite="body"] .ypsi-basis-form select{min-height:39px;padding:0 29px 0 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:8px;background:#fff;color:#111;font:750 10.5px/1 var(--tech)}
-:root[data-seite="body"] .ypsi-basis-form>button{min-height:39px;padding:0 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:8px;background:var(--dex-ink,#FF277F);color:var(--dex-accent-ink,#FFFFFF);font:800 10px/1 var(--ui);box-shadow:none}
+:root[data-seite="body"] .ypsi-basis-form>button{min-height:39px;padding:0 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:8px;background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);font:800 10px/1 var(--ui);box-shadow:none}
 :root[data-seite="body"] .ypsi-basis-form>button:active{transform:translateY(1px);box-shadow:none}
 
 :root[data-seite="body"] .ypsi-guided-plan{display:grid;gap:14px;margin:20px 0 0;padding:0;border:0;border-radius:0;background:transparent}
@@ -11653,7 +11651,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-action-categories h4>.material-svg{width:21px;height:21px;color:var(--dex-ink,#111111)}
 :root[data-seite="body"] .ypsi-action-categories ol{display:grid;gap:11px;margin:0;padding:0;counter-reset:ypsi-action;list-style:none}
 :root[data-seite="body"] .ypsi-action-categories>article>ol>li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:3px 9px;color:#111111;font:600 11.5px/1.5 var(--tech);counter-increment:ypsi-action}
-:root[data-seite="body"] .ypsi-action-categories>article>ol>li::before{grid-row:1/3;display:grid;place-items:center;align-self:start;width:26px;height:26px;border-radius:50%;background:var(--dex-ink,#FF277F);color:var(--dex-accent-ink,#FFFFFF);content:counter(ypsi-action);font:850 10px/1 var(--tech)}
+:root[data-seite="body"] .ypsi-action-categories>article>ol>li::before{grid-row:1/3;display:grid;place-items:center;align-self:start;width:26px;height:26px;border-radius:50%;background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);content:counter(ypsi-action);font:850 10px/1 var(--tech)}
 :root[data-seite="body"] .ypsi-action-categories>article>ol>li>span{grid-column:2}
 :root[data-seite="body"] .ypsi-action-categories>article>ol>li>:is(small,a){grid-column:2;justify-self:start;color:#5C5F66!important;font:800 8px/1.3 var(--ui)!important;letter-spacing:.045em;text-decoration:none}
 :root[data-seite="body"] .ypsi-action-categories>article>ol>li>.is-seminar{color:#111111!important}
@@ -11672,7 +11670,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-observed-priorities small{color:var(--dex-ink,#111111)!important;font:850 8.5px/1 var(--ui)!important;letter-spacing:.06em}
 :root[data-seite="body"] .ypsi-observed-priorities b{overflow:hidden;color:#111!important;font:800 12px/1.2 "Work Sans",var(--ui),sans-serif;text-overflow:ellipsis;white-space:nowrap}
 :root[data-seite="body"] .ypsi-observed-priorities em{color:#5C5F66;font:650 9.5px/1.2 var(--tech);font-style:normal}
-:root[data-seite="body"] .ypsi-active-priority{display:grid;grid-template-columns:minmax(0,1fr) 20px;align-items:center;gap:9px;width:100%;margin:12px 0;padding:12px;border:0;border-radius:11px;background:var(--dex-ink,#FF277F);color:var(--dex-accent-ink,#FFFFFF);text-align:left;box-shadow:none}
+:root[data-seite="body"] .ypsi-active-priority{display:grid;grid-template-columns:minmax(0,1fr) 20px;align-items:center;gap:9px;width:100%;margin:12px 0;padding:12px;border:0;border-radius:11px;background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);text-align:left;box-shadow:none}
 :root[data-seite="body"] .ypsi-active-priority:active{transform:translateY(2px);box-shadow:none}
 :root[data-seite="body"] .ypsi-active-priority>span{display:grid;gap:3px}
 :root[data-seite="body"] .ypsi-active-priority small{color:inherit!important;font:850 8px/1 var(--ui)!important;letter-spacing:.06em}
@@ -11733,7 +11731,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values)>div,:root[data-seite="body"] .ypsi-detail-values>span{display:grid;gap:3px;padding:10px;border-radius:9px;background:var(--cap-tint,#f7f3ff)}
 :root[data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values) small{color:#5C5F66!important;font:700 9px/1.2 var(--tech)!important}
 :root[data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values) b{color:#111!important;font:800 13px/1.2 var(--tech)}
-:root[data-seite="body"] .ypsi-primary-fold{display:grid;gap:3px;padding:13px;border-radius:12px;background:var(--dex-ink,#FF277F);color:var(--dex-accent-ink,#FFFFFF)}
+:root[data-seite="body"] .ypsi-primary-fold{display:grid;gap:3px;padding:13px;border-radius:12px;background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF)}
 :root[data-seite="body"] .ypsi-primary-fold>small{color:inherit!important;font:850 8.5px/1 var(--ui)!important;letter-spacing:.07em}
 :root[data-seite="body"] .ypsi-primary-fold>b{color:inherit!important;font:850 22px/1.05 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .ypsi-primary-fold>span{color:inherit;font:650 9.5px/1.3 var(--tech)}
@@ -11758,7 +11756,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-relation>ul,:root[data-seite="body"] .ypsi-relation>div>ul,:root[data-seite="body"] .ypsi-protocol-conditions>ul{margin:2px 0 0;padding-left:16px;color:#5C5F66;font:550 9.5px/1.45 var(--tech)}
 :root[data-seite="body"] .ypsi-relation-protocols{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
 :root[data-seite="body"] .ypsi-relation-protocols>b{flex-basis:100%;color:#111;font:800 9px/1.25 var(--tech)}
-:root[data-seite="body"] .ypsi-relation-protocols>span{padding:4px 6px;border:1px solid color-mix(in srgb,var(--dex-ink,#FF277F) 35%,#ddd);border-radius:999px;background:#fff;color:#111111;font:700 8px/1.25 var(--tech)}
+:root[data-seite="body"] .ypsi-relation-protocols>span{padding:4px 6px;border:1px solid color-mix(in srgb,var(--dex-accent,#FF277F) 35%,#ddd);border-radius:999px;background:#fff;color:#111111;font:700 8px/1.25 var(--tech)}
 :root[data-seite="body"] .skinfold-context-form>p{margin:0;color:#5C5F66;font:500 11px/1.5 var(--tech)}
 :root[data-seite="body"] .skinfold-context-form fieldset{display:grid;gap:9px;margin:0;padding:12px;border:1px solid #dedede;border-radius:12px;background:#fff}
 :root[data-seite="body"] .skinfold-context-form fieldset>legend{padding:0 5px;color:#111;font:800 12px/1.2 "Work Sans",var(--ui),sans-serif}
@@ -11816,10 +11814,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .braverman-question>p{margin:0;color:#5C5F66;font:550 11.5px/1.45 var(--tech)}
 :root[data-seite="body"] .braverman-question>div{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}
 :root[data-seite="body"] .braverman-question>div>button{min-height:50px;border:var(--kontur) solid var(--kontur-farbe);border-radius:12px;background:#fff;color:#111;font:800 14px/1 var(--ui);box-shadow:none}
-:root[data-seite="body"] .braverman-question>div>button:active,:root[data-seite="body"] .braverman-question>div>button.selected{transform:translateY(2px);background:var(--dex-ink,#FF277F);color:var(--dex-accent-ink,#FFFFFF);box-shadow:none}
+:root[data-seite="body"] .braverman-question>div>button:active,:root[data-seite="body"] .braverman-question>div>button.selected{transform:translateY(2px);background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);box-shadow:none}
 :root[data-seite="body"] .braverman-nav{display:grid;grid-template-columns:1fr;gap:9px}
 :root[data-seite="body"] .braverman-nav>button,:root[data-seite="body"] .braverman-result-actions>button{min-height:48px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:#fff;color:#111;font:750 12px/1.2 var(--ui);box-shadow:none}
-:root[data-seite="body"] .braverman-nav>[data-braverman-pause]{grid-row:1;border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-accent-ink,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-accent-ink,#FFFFFF)!important;box-shadow:none!important}
+:root[data-seite="body"] .braverman-nav>[data-braverman-pause]{grid-row:1;border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-ink-schrift,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-ink-schrift,#FFFFFF)!important;box-shadow:none!important}
 :root[data-seite="body"] .braverman-nav>[data-braverman-pause]:active{transform:translateY(3px);box-shadow:none!important}
 :root[data-seite="body"] .braverman-nav>button:disabled{opacity:.35}
 :root[data-seite="body"] .braverman-safety{padding:13px;border:var(--kontur) solid #9c2638;border-radius:12px;background:#fff0f2;color:#111111}
@@ -11878,7 +11876,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .braverman-dose-list small{color:#5C5F66!important;font:550 8.5px/1.35 var(--tech)!important}
 :root[data-seite="body"] .braverman-warning{margin:0!important;padding:8px;border-radius:8px;background:#fff0f2;color:#5C5F66!important;font:600 9px/1.4 var(--tech)!important}
 :root[data-seite="body"] .braverman-result-actions{display:grid;grid-template-columns:1fr;gap:8px}
-:root[data-seite="body"] .braverman-result-actions>.btn-primary{border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-accent-ink,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-accent-ink,#FFFFFF)!important;box-shadow:none!important}
+:root[data-seite="body"] .braverman-result-actions>.btn-primary{border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-ink-schrift,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-ink-schrift,#FFFFFF)!important;box-shadow:none!important}
 :root[data-seite="body"] .braverman-result-actions>.btn-primary:active{transform:translateY(3px);box-shadow:none!important}
 
 @media(max-width:380px){
@@ -12755,9 +12753,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      nur noch Buttons und echte Akzente tragen, nicht Flaechen oder Konturen. */
   --dm-surface:#191C24;
   --dm-surface2:#232733;
-  --dm-text:#EDF0F6;
-  --dm-ink:#697486;
-  --dm-muted:#98A2B3;
+  --dm-text:#FFFFFF;
+  --dm-ink:#FFFFFF;
+  --dm-muted:#AEB7C6;
   --dm-faint:#8490A3;
   --cap-card:var(--dm-surface);
   --cap-tint:var(--dm-surface2);
@@ -13018,7 +13016,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:transparent!important;
 }
 :root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"]:checked{
-  border-color:#FFFFFF!important;
+  border-color:var(--kontur-farbe)!important;
   background-color:#FFFFFF!important;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4L19 6' fill='none' stroke='%23343A46' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
 }
@@ -13153,7 +13151,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .food-dex-info-dialog,.sammlung-editor,.teilen-sheet,.dex-auswahlleiste
 ){
   background:var(--dm-surface)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 
@@ -13186,7 +13184,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* --- Drei-Punkte- und Schließknopf der Eintrag-Detailseite ------------ */
 :root[data-theme="dark"] :is(.neo-dex-action-button,.food-dex-action-button){
   background:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"] :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *){
@@ -13199,7 +13197,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),textarea,select,.input
 ){
   background:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"] :is(.kategorie-sheet-backdrop,.dex-detail-overlay) :is(input,textarea)::placeholder{
@@ -13231,14 +13229,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .mahl-mini-switch-track,.switchline-track
 ){
   background:#FFFFFF!important;
-  box-shadow:inset 0 0 0 var(--kontur) #C9CFDA!important;
+  box-shadow:inset 0 0 0 var(--kontur) var(--kontur-farbe)!important;
 }
 :root[data-theme="dark"] :is(
   .rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,
   .mahl-mini-switch-track,.switchline-track
 )::after{
   background:#FFFFFF!important;
-  box-shadow:0 0 0 var(--kontur) #C9CFDA!important;
+  box-shadow:0 0 0 var(--kontur) var(--kontur-farbe)!important;
 }
 
 /* --- Seitenfarbe aus Flächen entfernen ------------------------------- */
@@ -13397,7 +13395,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
 )>button{
   background-color:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"] :is(
@@ -13405,8 +13403,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
 )>button.aktiv{
   background:#FFFFFF!important;
-  border-color:#FFFFFF!important;
-  color:#343A46!important;
+  border-color:var(--kontur-farbe)!important;
+  color:#111111!important;
 }
 
 /* --- Tags an Einträgen und im Einkauf --------------------------------- */
@@ -13415,7 +13413,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .sleep-tags span,.falten-detail-tags span,.dex-eintrag-tag,.tuck-tag
 ){
   background-color:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 
@@ -13429,7 +13427,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter
 ) button{
   background-color:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"][data-seite] [class*="dex-page"] :is(
@@ -13437,8 +13435,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter
 ) button.aktiv{
   background:#FFFFFF!important;
-  border-color:#FFFFFF!important;
-  color:#343A46!important;
+  border-color:var(--kontur-farbe)!important;
+  color:#111111!important;
 }
 
 :root[data-theme="dark"][data-seite] :is(.body-chart-block,.sleep-chart,.kurve) :is(
@@ -13502,7 +13500,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:#FFFFFF!important;
-  box-shadow:inset 0 0 0 var(--kontur) #C9CFDA!important;
+  box-shadow:inset 0 0 0 var(--kontur) var(--kontur-farbe)!important;
 }
 :root[data-theme="dark"] .rem-switch-thumb::after,
 :root[data-theme="dark"] .rem-switch-thumb::after,
@@ -13544,7 +13542,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
 :root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:#FFFFFF!important;
-  box-shadow:0 0 0 var(--kontur) #C9CFDA!important;
+  box-shadow:0 0 0 var(--kontur) var(--kontur-farbe)!important;
 }
 
 /* --- Eintragsfarbe aus Flächen entfernen ------------------------------ */
@@ -13562,7 +13560,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .dex-detail-popup .dex-detail-tags span,
 :root[data-theme="dark"] .dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-herkunft{
   background-color:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 
@@ -13659,14 +13657,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .routine-anhaenge,.sleep-checkin-overview-body,.sleep-month,
   .avatar
 ){
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
 }
 
 /* Die Rollenmarke ist Status, kein Knopf. Sie bleibt deshalb wie die
    umliegende Karte neutral statt den Navy-Akzent des Retro-Themes zu tragen. */
 :root[data-theme="dark"] .role-tag{
   background:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 
@@ -13679,19 +13677,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:inset 3px 0 0 var(--dm-ink)!important;
 }
 :root[data-theme="dark"][data-seite="body"] .ypsi-rule-note{
-  border-color:var(--dm-border)!important;
+  border-color:var(--kontur-farbe)!important;
   background:var(--app-field)!important;
   color:var(--dm-muted)!important;
 }
 :root[data-theme="dark"][data-seite="body"] .ypsi-plan-details{
-  border-color:var(--dm-border)!important;
+  border-color:var(--kontur-farbe)!important;
   background:var(--app-card)!important;
 }
 :root[data-theme="dark"][data-seite="body"] .ypsi-plan-details>summary{
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"][data-seite="body"] .ypsi-plan-details>div{
-  border-color:var(--dm-border)!important;
+  border-color:var(--kontur-farbe)!important;
 }
 
 /* LOGMAN-Karten tragen nur ihre Kontur. Die zwei uebrig gebliebenen harten
@@ -13715,7 +13713,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   dl,ol,li,details,div
 ),
 :root[data-theme="dark"][data-seite="body"] .mess-einst{
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
 }
 
 /* ============================================================
@@ -13789,7 +13787,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .routine-tag,.dex-tag,.dex-schlagwort,.kategorie-tag
 ){
   background-color:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
   -webkit-text-fill-color:var(--dm-text)!important;
 }
@@ -13798,7 +13796,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
 )>button{
   background:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
   -webkit-text-fill-color:var(--dm-text)!important;
 }
@@ -13807,9 +13805,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .supps-dex-filter,.stress-dex-filter,.wissenssuche-filter
 )>button.aktiv{
   background:#FFFFFF!important;
-  border-color:#FFFFFF!important;
-  color:#343A46!important;
-  -webkit-text-fill-color:#343A46!important;
+  border-color:var(--kontur-farbe)!important;
+  color:#111111!important;
+  -webkit-text-fill-color:#111111!important;
 }
 
 /* CAPCOINS ist im hellen Theme bewusst gelb. Im Darkmode gelten auch hier
@@ -13887,7 +13885,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .dex-inhaltskarte,.dex-detail-popup
 ){
   background-color:var(--dm-surface)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"][data-seite] :is(
@@ -13898,7 +13896,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .coin-verdienst>summary
 ){
   background-color:var(--dm-surface)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 
@@ -13912,7 +13910,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .dex-detail-tags span
 ){
   background-color:var(--dm-surface2)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
 }
 
 /* Primärtexte sind weiß. Nur echte Zusatzinformationen bleiben im
@@ -14005,7 +14003,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="habits"] #app .routine-dex-page .routine-hero{
   background:var(--dm-surface)!important;
   background-color:var(--dm-surface)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   color:var(--dm-text)!important;
 }
 :root[data-theme="dark"][data-seite="reminders"] #app .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after,
@@ -14033,7 +14031,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite] .app-dex-sync,
 :root[data-theme="dark"][data-seite] .app-dex-sync:is(.ok,.wait){
   color:var(--dm-muted)!important;
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
 }
 
 /* Die gelieferten Menübilder behalten ihre Farben, ihr äußerer Schatten ist
@@ -14108,9 +14106,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 )>button.aktiv{
   background:#FFFFFF!important;
   background-color:#FFFFFF!important;
-  border-color:#FFFFFF!important;
-  color:#343A46!important;
-  -webkit-text-fill-color:#343A46!important;
+  border-color:var(--kontur-farbe)!important;
+  color:#111111!important;
+  -webkit-text-fill-color:#111111!important;
 }
 
 /* Inhalts- und Overlay-Typografie neutralisieren. Die zweite Regel setzt
@@ -14326,7 +14324,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .neo-dex-page .grid-collection-info-help p+p{margin-top:13px}
 .neo-dex-page .grid-collection-info-help b{font-weight:750}
 :root[data-theme="dark"][data-seite] .neo-dex-page .grid-collection-info-help{
-  border-color:var(--dm-ink)!important;
+  border-color:var(--kontur-farbe)!important;
   background:var(--dm-surface)!important;
   color:var(--dm-text)!important;
 }
@@ -14346,7 +14344,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:var(--dm-surface)!important;
 }
 :root[data-theme="dark"][data-seite="habits"] body .meditation-timer .routine-timer-exercises li>span{
-  border:var(--kontur) solid var(--dm-ink)!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
   background:var(--dm-surface)!important;
   color:var(--dm-text)!important;
 }
@@ -14558,7 +14556,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   min-width:0;
   transform:translateX(-50%);
   pointer-events:none;
-  /* currentColor, nicht Weiß: der aktive Reiter liegt je nach Seite auf
+  /* currentColor, nicht Weiß:der aktive Reiter liegt je nach Seite auf
      Creme, Hellblau oder Dunkelgrün. currentColor folgt der Schriftfarbe
      des Reiters und bleibt dadurch überall lesbar – auf dunklem Grund ist
      das ohnehin Weiß. */
@@ -14820,7 +14818,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-weight:700!important;
 }
 :root[data-theme="dark"][data-seite] #view.neo-dex-page .grid-collection-info-help{
-  border-color:#141414!important;
+  border-color:var(--kontur-farbe)!important;
   background:var(--dm-surface)!important;
   color:var(--dm-text)!important;
 }
@@ -15046,14 +15044,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"] .comp-facts article,
 :root[data-theme="dark"] .comp-central-assessment,
 :root[data-theme="dark"] .comp-details{
-  border-color:var(--dm-border,#737b8c)!important;
+  border-color:var(--kontur-farbe)!important;
   background:var(--dm-card,#191c21)!important;
-  color:var(--dm-text,#f4f4f4)!important;
+  color:var(--dm-text,#FFFFFF)!important;
 }
 :root[data-theme="dark"] .comp-assessment-body ol li::before{background:var(--dm-text,#f4f4f4);color:#111}
 @media(min-width:560px){.comp-facts{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
-:root[data-theme="dark"] :is(.coach-hero,.coach-form){border-color:var(--dm-border,#737b8c)!important}
+:root[data-theme="dark"] :is(.coach-hero,.coach-form){border-color:var(--kontur-farbe)!important}
 :root[data-theme="dark"] .coach-spark{background:var(--dm-text)!important;color:#111!important}
 :root[data-theme="dark"][data-seite] #app .coach-spark{background:var(--dm-text)!important;color:#111!important}
 @media(max-width:520px){.coach-hero{grid-template-columns:42px minmax(0,1fr) 34px;padding:15px}.coach-hero .coach-spark{width:42px;height:42px}.coach-result h3{align-items:flex-start;flex-direction:column}.coach-result h3>em{white-space:normal}}
@@ -15225,40 +15223,30 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-attachment button{width:28px;height:28px;padding:0;border:var(--kontur) solid var(--kontur-farbe);border-radius:6px;background:var(--coach-lavendel);color:#111;font:800 15px/1 var(--tech)}
 /* Dark Mode: gleiche Formen, dunklere Flächen */
 :root[data-theme="dark"] .coach-chat{--coach-violett:#30204F;--coach-violett-hell:#6F55BC;--coach-nutzer:#6F55BC;--coach-nutzer-kopf:#30204F;--coach-nutzer-text:#fff;--coach-rand:#08050D;--coach-schatten:#000;--coach-grund:#101A2B;--coach-muster:var(--muster-millimeter-dunkel)}
-:root[data-theme="dark"] .coach-chat-window.is-fehler{background:#242830;color:var(--dm-text,#f4f4f4)}
+:root[data-theme="dark"] .coach-chat-window.is-fehler{background:#242830;color:var(--dm-text,#FFFFFF)}
 :root[data-theme="dark"] .coach-shell.coach-chat .coach-form{background:transparent}
-:root[data-theme="dark"] .coach-inputbar{border-color:var(--dm-ink,#697486);background:rgba(30,33,42,.27)}
-/* Die allgemeinen Dark-Mode-Regeln färben jeden Knopf und Text mit !important
-   um; die Retro-Knöpfe des Chats behalten ihre Farben. */
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken,.coach-knopf,.coach-kopf-knopf,.coach-attachment button){background:#edf0f6!important;color:#111!important;-webkit-text-fill-color:#111!important}
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-merken.ist-wichtig,.coach-knopf.ist-wichtig){background:var(--coach-violett)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-kopf-knopf,.coach-merken) :is(.material-svg,svg,svg *){fill:currentColor!important;color:inherit!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-inputbar :is(button.coach-plus,button.coach-send){background:none!important;border:0!important;box-shadow:none!important}
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-vorschlaege button,.coach-woche-chip span,.coach-werkzeug){background:#edf0f6!important;color:#111!important;-webkit-text-fill-color:#111!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-vorschlaege button:first-child,
-:root[data-theme="dark"][data-seite="coach"] #view .coach-woche-chip input:checked+span{background:var(--coach-violett)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug :is(span,.material-svg,svg,svg *){color:#111!important;-webkit-text-fill-color:#111!important;fill:#111!important}
+:root[data-theme="dark"] .coach-inputbar{border-color:var(--kontur-farbe);background:rgba(30,33,42,.27)}
+/* Dark Mode: Knöpfe, Eingabe, Plus und Senden folgen den gemeinsamen
+   Theme-Werten (Abschnitt MAC-KONTRAST); nur der Hinweis in Gelb behält
+   schwarze Schrift. */
 :root[data-theme="dark"][data-seite="coach"] #view .coach-werkzeug:has(input[type="checkbox"]:checked){background:#FFD400!important}
-:root[data-theme="dark"][data-seite="coach"] #view .coach-chat-window.is-user>header :is(b,span){color:#fff!important;-webkit-text-fill-color:#fff!important}
 :root[data-theme="dark"][data-seite="coach"] #view .coach-safety{color:#111!important;-webkit-text-fill-color:#111!important}
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea,.coach-woche-form select,.gedaechtnis-formular :is(input,select,textarea)){background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;caret-color:#111!important}
-:root[data-theme="dark"][data-seite="coach"] #view :is(.coach-inputbar textarea,.coach-woche-form textarea)::placeholder{color:#6b6480!important;-webkit-text-fill-color:#6b6480!important}
 
 /* RETRO-Chat: dieselbe ruhige Flächen- und Konturenlogik wie COMP. Die Bilder
    markieren den Absender, deshalb entfallen Titelleiste und Fensterknöpfe. */
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window{width:min(calc(100% - 46px),520px);overflow:visible;border:var(--kontur) solid var(--kontur-farbe);border-radius:14px;background:#FFFFFF;color:#111111;box-shadow:none}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{background:color-mix(in srgb,#FF277F 9%,#FFFFFF)}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{margin-left:42px}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{margin-right:42px}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header{position:static;display:block;min-height:0;height:0;padding:0;overflow:visible;border:0;background:transparent}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header>:is(b,.coach-fenster-knoepfe){display:none}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header>:is(.coach-chat-cap,.coach-chat-avatar){position:absolute;top:10px;z-index:2;display:grid}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach>header>.coach-chat-cap{left:-44px}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user>header>.coach-chat-avatar{right:-44px}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-message{padding:16px 17px}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-avatar{border-color:var(--kontur-farbe)}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button{border-color:var(--kontur-farbe);background:#FFFFFF;color:#111111}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button:first-child{background:#FF277F;color:#FFFFFF}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window{width:min(calc(100% - 46px),520px);overflow:visible;border:var(--kontur) solid var(--kontur-farbe);border-radius:14px;background:var(--ui-flaeche);color:var(--ui-schrift);box-shadow:none}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{background:color-mix(in srgb,#FF277F 12%,var(--ui-flaeche))}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{margin-left:42px}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{margin-right:42px}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header{position:static;display:block;min-height:0;height:0;padding:0;overflow:visible;border:0;background:transparent}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header>:is(b,.coach-fenster-knoepfe){display:none}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window>header>:is(.coach-chat-cap,.coach-chat-avatar){position:absolute;top:10px;z-index:2;display:grid}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach>header>.coach-chat-cap{left:-44px}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user>header>.coach-chat-avatar{right:-44px}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-message{padding:16px 17px}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-avatar{border-color:var(--kontur-farbe)}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button{border-color:var(--kontur-farbe);background:var(--ui-flaeche);color:var(--ui-schrift)}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button:first-child{background:#FF277F;color:var(--ui-schrift)}
 /* Gedächtnis-Seite: jeder Bereich ein Fenster in voller Breite */
 .coach-gedaechtnis-seite .gedaechtnis-inhalt{display:flex;flex-direction:column;gap:12px}
 .coach-chat-window.is-bereich{display:block;align-self:stretch;max-width:none;margin-inline:0;overflow:hidden}
@@ -15294,7 +15282,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .comp-detail-card-content .body-v2-card,.comp-detail-card-content .body-v2-overview{width:100%!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
 :root[data-seite="body"] .comp-detail-card-content .body-v2-card>header,:root[data-seite="body"] .comp-detail-card-content .body-v2-overview>summary{display:none!important}
 
-:root[data-theme="dark"] .comp-detail-card{border-color:var(--dm-border,#737b8c);background:var(--dm-card,#191c21);color:var(--dm-text,#f4f4f4)}
+:root[data-theme="dark"] .comp-detail-card{border-color:var(--kontur-farbe);background:var(--dm-card,#191c21);color:var(--dm-text,#FFFFFF)}
 /* COMP-Details im Stil der KI-Karte: eine Karte, Schrift in der Kartenfarbe,
    Abschnitte durch feine Linien getrennt, keine Kästen in der Karte. Die
    Inhalte stammen aus der früheren Körperseite und bringen deren pinke
@@ -15317,7 +15305,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*,.falten-protokoll-item>header){border:0!important;border-bottom:1px solid var(--app-divider,#ddd)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
 :root[data-seite] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-reset-mini{border:var(--kontur) solid currentColor!important;background:transparent!important;color:inherit!important}
 /* Im Dark Mode: weiße Nummern der nächsten Schritte, Kreis als Ring. */
-:root[data-theme="dark"] .comp-assessment-body ol li::before{background:transparent!important;color:#fff!important;box-shadow:inset 0 0 0 var(--kontur) #fff}
+:root[data-theme="dark"] .comp-assessment-body ol li::before{background:transparent!important;color:#fff!important;box-shadow:inset 0 0 0 var(--kontur) var(--kontur-farbe)}
 /* Optionale Schritte in der KI-Karte: aus den Seminar-Auswertungen der App. */
 .comp-optional>p{color:var(--muted)}
 .comp-optional-list{display:grid;gap:7px;margin-top:9px}
@@ -15447,7 +15435,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"]{
   --muster-bildroehre-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%230A1330' fill-opacity='.055'/%3E%3C/svg%3E");
   --muster-ziegel-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%230A1330' stroke-opacity='.09' fill='none'/%3E%3C/svg%3E");
-  /* TRAINING ist auch in Retro dunkel: helle Dreiecke wie im Darkmode,
+  /* TRAINING ist auch in Retro dunkel:helle Dreiecke wie im Darkmode,
      etwas kräftiger auf dem Schiefergrün. */
   --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.05'/%3E%3C/svg%3E");
   --muster-rechteckwelle-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%230A1330' stroke-opacity='.055' fill='none'/%3E%3C/svg%3E");
@@ -15494,38 +15482,38 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="coach"] .app-dex-header .nav-av{border-color:#0A1330!important;background:#FFFFFF!important;color:#111111!important}
 :root[data-theme="retro"][data-seite="coach"] .coach-shell.coach-chat .coach-form::after{display:block;background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
 :root[data-theme="retro"][data-seite="coach"] .coach-inputbar{border-color:var(--kontur-farbe);background:#94DEFF;-webkit-backdrop-filter:none;backdrop-filter:none}
-:root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea{border-color:var(--kontur-farbe);background:#FFFFFF;color:#111111;box-shadow:none}
-:root[data-theme="retro"][data-seite="coach"] .coach-inputbar textarea::placeholder{color:#5C5F66}
+:root[data-theme][data-seite="coach"] .coach-inputbar textarea{border-color:var(--kontur-farbe);background:var(--ui-flaeche);color:var(--ui-schrift);box-shadow:none}
+:root[data-theme][data-seite="coach"] .coach-inputbar textarea::placeholder{color:var(--ui-neben)}
 /* Hoher Kontrast wie „Kontrast erhöhen“ am Mac: deckende Flächen, keine
    Weichzeichner, und jede Kontur einheitlich 2 px im selben Dunkelblau.
    Trennlinien innerhalb einer Antwort ebenfalls dunkel statt weiß. */
-:root[data-theme="retro"][data-seite="coach"] .coach-chat{--coach-rand:#0A1330}
-:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-art,.coach-safety,.coach-woche-chip span,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-attachment,.coach-attachment button,.coach-chat-avatar,.coach-woche-form :is(select,textarea),.gedaechtnis-formular :is(input,select,textarea)){border-width:var(--kontur)!important;border-style:solid!important;border-color:var(--kontur-farbe)!important}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat-window .coach-mehr{border-top:var(--kontur) solid var(--kontur-farbe)}
-:root[data-theme="retro"][data-seite="coach"] .coach-wochenvergleich :is(th,td){border-top-color:rgba(10,19,48,.3)}
+:root[data-theme][data-seite="coach"] .coach-chat{--coach-rand:var(--kontur-farbe)}
+:root[data-theme][data-seite="coach"] :is(.coach-vorschlaege button,.coach-art,.coach-safety,.coach-woche-chip span,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-attachment,.coach-attachment button,.coach-chat-avatar,.coach-woche-form :is(select,textarea),.gedaechtnis-formular :is(input,select,textarea)){border-width:var(--kontur)!important;border-style:solid!important;border-color:var(--kontur-farbe)!important}
+:root[data-theme][data-seite="coach"] .coach-chat-window .coach-mehr{border-top:var(--kontur) solid var(--kontur-farbe)}
+:root[data-theme][data-seite="coach"] .coach-wochenvergleich :is(th,td){border-top-color:var(--ui-linie)}
 
 /* Knöpfe: gut treffbar (40 px) und in einer Schrift; Hauptaktion überall pink. */
-:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf){min-height:40px;padding:9px 14px;border-radius:6px;font:750 13.5px/1.2 var(--ui);font-size:13.5px!important;letter-spacing:0}
-:root[data-theme="retro"][data-seite="coach"] :is(.coach-merken,.coach-knopf){background:#FFFFFF;color:#111111}
-:root[data-theme="retro"][data-seite="coach"] :is(.coach-merken,.coach-knopf).ist-wichtig,:root[data-theme="retro"][data-seite="coach"] .coach-woche-chip input:checked+span{background:#FF277F;color:#FFFFFF}
+:root[data-theme][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf){min-height:40px;padding:9px 14px;border-radius:6px;font:750 13.5px/1.2 var(--ui);font-size:13.5px!important;letter-spacing:0}
+:root[data-theme][data-seite="coach"] :is(.coach-merken,.coach-knopf){background:var(--ui-flaeche);color:var(--ui-schrift)}
+:root[data-theme][data-seite="coach"] :is(.coach-merken,.coach-knopf).ist-wichtig,:root[data-theme][data-seite="coach"] .coach-woche-chip input:checked+span{background:#FF277F;color:var(--ui-schrift)}
 
 /* Antwort: Schritte als Abschnitte mit Trennlinie statt Kästen im Kasten. */
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte{gap:0}
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{padding:12px 0!important;border:0!important;border-top:var(--kontur) solid var(--kontur-farbe)!important;border-radius:0!important;background:transparent!important}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte{gap:0}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{padding:12px 0!important;border:0!important;border-top:var(--kontur) solid var(--kontur-farbe)!important;border-radius:0!important;background:transparent!important}
 
 /* Eigene Nachrichten und die Warte-Anzeige so breit wie ihr Text. */
-:root[data-theme="retro"][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window:is(.is-user,.is-loading){width:fit-content;max-width:min(calc(100% - 46px),520px)}
+:root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window:is(.is-user,.is-loading){width:fit-content;max-width:min(calc(100% - 46px),520px)}
 
 /* Gedächtnis-Seite wie der Chat: weiße Karten mit dunkelblauer Kontur, Titel
    als Kopfzeile ohne Fensterknöpfe, Einträge durch Linien getrennt. */
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window{border:var(--kontur) solid var(--kontur-farbe);border-radius:14px;background:#FFFFFF;color:#111111}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header{min-height:0;padding:12px 16px 10px;border-bottom:var(--kontur) solid var(--kontur-farbe);border-radius:12px 12px 0 0;background:transparent;color:#111111}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header b{font:820 15px/1.2 "Work Sans",var(--ui),sans-serif;letter-spacing:0}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header :is(.coach-fenster-knoepfe,.coach-chat-cap){display:none}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-message{padding:14px 16px 16px}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag,.gedaechtnis-formular){padding:12px 0 0!important;border:0!important;border-top:var(--kontur) solid var(--kontur-farbe)!important;border-radius:0!important;background:transparent!important;color:inherit}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf li{padding:4px 0 4px 10px;border:0;border-left:var(--kontur) solid var(--kontur-farbe);border-radius:0;background:transparent}
-:root[data-theme="retro"][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf small{color:inherit;opacity:.75}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window{border:var(--kontur) solid var(--kontur-farbe);border-radius:14px;background:var(--ui-flaeche);color:var(--ui-schrift)}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header{min-height:0;padding:12px 16px 10px;border-bottom:var(--kontur) solid var(--kontur-farbe);border-radius:12px 12px 0 0;background:transparent;color:var(--ui-schrift)}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header b{font:820 15px/1.2 "Work Sans",var(--ui),sans-serif;letter-spacing:0}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-window>header :is(.coach-fenster-knoepfe,.coach-chat-cap){display:none}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .coach-chat-message{padding:14px 16px 16px}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag,.gedaechtnis-formular){padding:12px 0 0!important;border:0!important;border-top:var(--kontur) solid var(--kontur-farbe)!important;border-radius:0!important;background:transparent!important;color:inherit}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf li{padding:4px 0 4px 10px;border:0;border-left:var(--kontur) solid var(--kontur-farbe);border-radius:0;background:transparent}
+:root[data-theme][data-seite="coach"] .coach-gedaechtnis-seite .gedaechtnis-verlauf small{color:inherit;opacity:.75}
 :root[data-theme="retro"][data-seite="habits"] .routine-dex-page{background-image:var(--muster-kreuzchen-dunkel)!important}
 :root[data-theme="retro"][data-seite="sleep"] :is(.sleep-dex-page,.sleep-log-dex-page){background-image:var(--muster-bildroehre-dunkel)!important}
 :root[data-theme="retro"][data-seite="search"] #view{background-image:var(--muster-bildroehre-retro)!important}
@@ -15566,12 +15554,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Eine starke Aussenkontur kennzeichnet die Karten. Innenlinien sind nur
    dort sichtbar, wo sie tatsaechlich zwei bedienbare oder inhaltlich
    getrennte Bereiche markieren. Dark bleibt von diesem Block unberuehrt. */
-:root[data-theme="retro"][data-seite="body"] .body-v2-hero{
+:root[data-theme][data-seite="body"] .body-v2-hero{
   grid-template-columns:82px minmax(0,1fr) 44px!important;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   box-shadow:none!important;
 }
-:root[data-theme="retro"][data-seite="body"] .body-analysis-info{
+:root[data-theme][data-seite="body"] .body-analysis-info{
   box-sizing:border-box;
   width:44px!important;
   height:44px!important;
@@ -15579,41 +15567,41 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:var(--kontur) solid var(--kontur-farbe)!important;
   box-shadow:none!important;
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-facts article,.comp-central-assessment,.comp-detail-card){
+:root[data-theme][data-seite="body"] :is(.comp-facts article,.comp-central-assessment,.comp-detail-card){
   border:var(--kontur) solid var(--kontur-farbe)!important;
   box-shadow:none!important;
 }
-:root[data-theme="retro"][data-seite="body"] .comp-details-list{gap:8px}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content{border-top:var(--kontur) solid var(--kontur-farbe)!important}
+:root[data-theme][data-seite="body"] .comp-details-list{gap:8px}
+:root[data-theme][data-seite="body"] .comp-detail-card-content{border-top:var(--kontur) solid var(--kontur-farbe)!important}
 
 /* Der Kartentitel sagt bereits, welche Messung gemeint ist. Die historische
    zweite Ueberschrift in der geoeffneten Karte war nur eine Wiederholung. */
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .body-v2-card-body>.mini-title{display:none!important}
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why,.comp-next-steps){display:block!important}
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain-wide,.comp-reason-wide,.comp-next-wide,.comp-optional-wide){display:none!important}
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group{display:block!important}
+:root[data-theme][data-seite="body"] .comp-detail-card-content .body-v2-card-body>.mini-title{display:none!important}
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why,.comp-next-steps){display:block!important}
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain-wide,.comp-reason-wide,.comp-next-wide,.comp-optional-wide){display:none!important}
+:root[data-theme][data-seite="body"] .comp-optional-group{display:block!important}
 
 /* Kennzahlen bilden eine kompakte Gruppe ohne Liniengitter. Diagramm,
    Untermenues und Handlungsplan bekommen jeweils hoechstens eine Trennlinie. */
-:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-metric-grid>*{
+:root[data-theme][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-metric-grid>*{
   border-bottom:0!important;
 }
-:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-goal-status,.ypsi-top-fold,.ypsi-rule-note,.ypsi-priority-reason,.ypsi-open-questions,.body-neutral-note,.braverman-result-focus,.body-chart-empty,.falten-protokoll-item){
+:root[data-theme][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.body-goal-status,.ypsi-top-fold,.ypsi-rule-note,.ypsi-priority-reason,.ypsi-open-questions,.body-neutral-note,.braverman-result-focus,.body-chart-empty,.falten-protokoll-item){
   border-top:0!important;
 }
-:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-inner-details li,
-:root[data-theme="retro"][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*,.falten-protokoll-item>header){
+:root[data-theme][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content .body-inner-details li,
+:root[data-theme][data-seite="body"] .comp-details-list .comp-detail-card>.comp-detail-card-content :is(.ypsi-priority-comparison>*,.ypsi-observed-priorities>*>*,.neurotransmitter-other-scores>*>*,.falten-protokoll-item>header){
   border-bottom-color:rgba(10,19,48,.2)!important;
 }
 
 /* Erklaerungen bleiben direkt erreichbar, konkurrieren aber nicht mehr mit
    Messwert, Verlauf und naechstem Schritt. */
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why){
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why){
   margin:0;
   border:0;
-  border-bottom:1px solid rgba(10,19,48,.28);
+  border-bottom:1px solid var(--ui-linie);
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary{
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary{
   display:grid;
   grid-template-columns:minmax(0,1fr) 20px;
   align-items:center;
@@ -15624,32 +15612,32 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   list-style:none;
   font:800 12px/1.2 "Work Sans",var(--ui),sans-serif!important;
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary::-webkit-details-marker{display:none}
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary>.material-svg{
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary::-webkit-details-marker{display:none}
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)>summary>.material-svg{
   width:18px;
   height:18px;
   transition:transform .18s ease;
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)[open]>summary>.material-svg{transform:rotate(90deg)}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-explain>.body-explain{
+:root[data-theme][data-seite="body"] :is(.comp-detail-explain,.comp-assessment-why)[open]>summary>.material-svg{transform:rotate(90deg)}
+:root[data-theme][data-seite="body"] .comp-detail-explain>.body-explain{
   margin:0 0 12px!important;
-  color:#111111!important;
+  color:var(--ui-schrift)!important;
   font:520 12px/1.48 "Work Sans",var(--ui),sans-serif!important;
 }
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-why>div{display:grid;gap:12px;padding:0 0 14px}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-why section{display:grid;gap:6px;padding:0;border:0}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-why h3{font-size:11px}
-:root[data-theme="retro"][data-seite="body"] .comp-assessment-why ul{margin:0}
+:root[data-theme][data-seite="body"] .comp-assessment-why>div{display:grid;gap:12px;padding:0 0 14px}
+:root[data-theme][data-seite="body"] .comp-assessment-why section{display:grid;gap:6px;padding:0;border:0}
+:root[data-theme][data-seite="body"] .comp-assessment-why h3{font-size:11px}
+:root[data-theme][data-seite="body"] .comp-assessment-why ul{margin:0}
 
 /* Der wichtigste Schritt bleibt offen. Weitere Schritte und der ausdrücklich
    optionale Seminarteil folgen als kompakte, gut treffbare Aufklapper. */
-:root[data-theme="retro"][data-seite="body"] .comp-next-more{
+:root[data-theme][data-seite="body"] .comp-next-more{
   grid-column:1/-1;
   margin-top:11px;
-  border-top:1px solid rgba(10,19,48,.28);
+  border-top:1px solid var(--ui-linie);
 }
-:root[data-theme="retro"][data-seite="body"] .comp-next-more>summary,
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary{
+:root[data-theme][data-seite="body"] .comp-next-more>summary,
+:root[data-theme][data-seite="body"] .comp-optional-group>summary{
   display:grid;
   grid-template-columns:minmax(0,1fr) 20px;
   align-items:center;
@@ -15659,47 +15647,80 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   list-style:none;
   font:800 12px/1.2 "Work Sans",var(--ui),sans-serif;
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-next-more,.comp-optional-group)>summary::-webkit-details-marker{display:none}
-:root[data-theme="retro"][data-seite="body"] :is(.comp-next-more,.comp-optional-group)>summary>.material-svg{
+:root[data-theme][data-seite="body"] :is(.comp-next-more,.comp-optional-group)>summary::-webkit-details-marker{display:none}
+:root[data-theme][data-seite="body"] :is(.comp-next-more,.comp-optional-group)>summary>.material-svg{
   width:18px;
   height:18px;
   transition:transform .18s ease;
 }
-:root[data-theme="retro"][data-seite="body"] :is(.comp-next-more,.comp-optional-group)[open]>summary>.material-svg{transform:rotate(90deg)}
-:root[data-theme="retro"][data-seite="body"] .comp-next-more>ol{
+:root[data-theme][data-seite="body"] :is(.comp-next-more,.comp-optional-group)[open]>summary>.material-svg{transform:rotate(90deg)}
+:root[data-theme][data-seite="body"] .comp-next-more>ol{
   padding-top:8px;
   counter-reset:comp-step 1;
 }
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group{
+:root[data-theme][data-seite="body"] .comp-optional-group{
   padding:0!important;
   border:0!important;
-  border-bottom:1px solid rgba(10,19,48,.28)!important;
+  border-bottom:1px solid var(--ui-linie)!important;
 }
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary{min-height:52px}
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary>span{display:grid;gap:3px}
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group>summary small{
-  color:#5C5F66;
+:root[data-theme][data-seite="body"] .comp-optional-group>summary{min-height:52px}
+:root[data-theme][data-seite="body"] .comp-optional-group>summary>span{display:grid;gap:3px}
+:root[data-theme][data-seite="body"] .comp-optional-group>summary small{
+  color:var(--ui-neben);
   font:650 9px/1.2 var(--tech);
 }
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group>div{padding:0 0 13px}
-:root[data-theme="retro"][data-seite="body"] .comp-optional-group>div>p{margin:0 0 10px;color:#111111;font-family:"Work Sans",var(--ui),sans-serif}
+:root[data-theme][data-seite="body"] .comp-optional-group>div{padding:0 0 13px}
+:root[data-theme][data-seite="body"] .comp-optional-group>div>p{margin:0 0 10px;color:var(--ui-schrift);font-family:"Work Sans",var(--ui),sans-serif}
 
 /* In der Faltenliste reicht fuer den Ueberblick Name plus Wert. Die genaue
    Position und Interpretation stehen weiterhin nach dem Antippen bereit. */
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .falten-item-head>small{display:none!important}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content .falten-legende-item{min-height:50px!important}
-:root[data-theme="retro"][data-seite="body"] .comp-detail-card-content :is(.body-legende-intro,.ypsi-rule-note){display:none!important}
+:root[data-theme][data-seite="body"] .comp-detail-card-content .falten-item-head>small{display:none!important}
+:root[data-theme][data-seite="body"] .comp-detail-card-content .falten-legende-item{min-height:50px!important}
+:root[data-theme][data-seite="body"] .comp-detail-card-content :is(.body-legende-intro,.ypsi-rule-note){display:none!important}
 
 /* Kleine Hauptaktionen muessen auch mit dem Daumen sicher erreichbar sein. */
-:root[data-theme="retro"][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf,.gedaechtnis-bereich>.btn,.gedaechtnis-aktionen .btn){
+:root[data-theme][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf,.gedaechtnis-bereich>.btn,.gedaechtnis-aktionen .btn){
   min-height:44px!important;
 }
 
 @media(max-width:370px){
-  :root[data-theme="retro"][data-seite="body"] .body-v2-hero{
+  :root[data-theme][data-seite="body"] .body-v2-hero{
     grid-template-columns:68px minmax(0,1fr) 44px!important;
     gap:10px!important;
   }
+}
+
+/* ============================================================
+   THEME-WERTE FÜR BEDIENELEMENTE
+   Dieselben Regeln gelten in Retro und Dark; nur diese Werte wechseln.
+   Fläche und Schrift von Knöpfen, Kapseln und Karten, weiche Auswahl,
+   gefüllte Auswahl (Filter, Tags) und die Schalter.
+   ============================================================ */
+:root{
+  --ui-flaeche:#FFFFFF;
+  --ui-schrift:#111111;
+  --ui-neben:#5C5F66;
+  --ui-linie:rgba(0,0,0,.14);
+  --ui-auswahl:#E4E6EA;
+  --ui-gefuellt:#111111;
+  --ui-gefuellt-schrift:#FFFFFF;
+  --schalter-aus:#E4E6EA;
+  --schalter-an:#111111;
+  --schalter-knopf:#FFFFFF;
+  --schalter-knopf-an:#FFFFFF;
+}
+:root[data-theme="dark"]{
+  --ui-flaeche:#1C2230;
+  --ui-schrift:#FFFFFF;
+  --ui-neben:#AEB7C6;
+  --ui-linie:rgba(255,255,255,.18);
+  --ui-auswahl:rgba(255,255,255,.16);
+  --ui-gefuellt:#FFFFFF;
+  --ui-gefuellt-schrift:#111111;
+  --schalter-aus:#1C2230;
+  --schalter-an:#FFFFFF;
+  --schalter-knopf:#FFFFFF;
+  --schalter-knopf-an:#111111;
 }
 
 /* ============================================================
@@ -15729,14 +15750,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --mac-neben:600 11px/1.35 var(--mac-tech);
   --mac-label:800 10px/1.2 var(--mac-schrift);
   --mac-knopf:750 13px/1.2 var(--mac-schrift);
-  --mac-farbe-neben:var(--muted);
-  --mac-linie:rgba(237,240,246,.16);
+  --mac-farbe-neben:var(--ui-neben);
+  --mac-linie:var(--ui-linie);
 }
-:root[data-theme="retro"]:is([data-seite="body"],[data-seite="coach"]){
-  --mac-kontur:var(--ink);
-  --mac-farbe-neben:#5C5F66;
-  --mac-linie:rgba(0,0,0,.14);
-  --mac-auswahl:#E4E6EA;
+:root:is([data-seite="body"],[data-seite="coach"]){
+  --mac-kontur:var(--kontur-farbe);
+  --mac-farbe-neben:var(--ui-neben);
+  --mac-linie:var(--ui-linie);
+  --mac-auswahl:var(--ui-auswahl);
 }
 
 /* ---------- COMP · Kennzahlen ---------- */
@@ -15772,7 +15793,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] #view .comp-assessment-body ol>li>b{font:var(--mac-ueberschrift)!important;letter-spacing:0!important}
 :root[data-seite="body"] #view .comp-assessment-body ol>li>span{font:var(--mac-text)!important;color:var(--mac-farbe-neben)!important}
 :root[data-seite="body"] #view .comp-assessment-body ol>li>small{margin-top:1px!important;font:var(--mac-neben)!important;letter-spacing:0!important;text-transform:none!important;color:var(--mac-farbe-neben)!important}
-:root[data-theme="retro"][data-seite="body"] #view .comp-next-steps{display:grid!important}
+:root[data-theme][data-seite="body"] #view .comp-next-steps{display:grid!important}
 /* Aufklapper als schlichte Zeilen. „Mit Coach besprechen“ behält die
    Gestaltung von der Schlafseite (gemeinsame Regeln weiter oben). */
 :root[data-seite="body"] #view .comp-assessment-body :is(.comp-assessment-why,.comp-optional-group)>summary{display:grid!important;grid-template-columns:minmax(0,1fr) 20px!important;align-items:center!important;gap:10px!important;min-height:44px!important;padding:0!important;font:var(--mac-zeile)!important;letter-spacing:0!important;list-style:none!important}
@@ -15808,7 +15829,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] #view .comp-detail-card>summary b{font:var(--mac-titel)!important;letter-spacing:0!important}
 :root[data-seite="body"] #view .comp-detail-card>summary small{font:var(--mac-neben)!important;color:var(--mac-farbe-neben)!important}
 :root[data-seite="body"] #view .comp-detail-card>.comp-detail-card-content{border-top:0!important}
-:root[data-theme="retro"][data-seite="body"] #view .comp-detail-card-content .comp-detail-explain{display:none!important}
+:root[data-theme][data-seite="body"] #view .comp-detail-card-content .comp-detail-explain{display:none!important}
 
 /* Geöffnete Detailkarten: dieselben Schriften und Größen. Kennzahlen,
    Verlauf, Messwert und Handlungsplan trennt der Abstand; feine Linien
@@ -15847,24 +15868,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Info-Knopf in allen Heroes: weißer Kreis mit Kontur wie ein Mac-Knopf,
    überall gleich groß. Auf farbiger Füllung war die Kontur nicht sichtbar. */
-:root[data-theme="retro"][data-seite] #view .special-dex-hero :is(.som-info-knopf,.body-analysis-info){box-sizing:border-box!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;border:var(--kontur) solid var(--kontur-farbe)!important;background:#FFFFFF!important;color:#000000!important;-webkit-text-fill-color:#000000!important;box-shadow:none!important}
-:root[data-theme="retro"][data-seite="body"] #view .body-comp-hero{grid-template-columns:82px minmax(0,1fr) 34px!important}
-@media(max-width:370px){:root[data-theme="retro"][data-seite="body"] #view .body-comp-hero{grid-template-columns:68px minmax(0,1fr) 34px!important}}
+:root[data-theme][data-seite] #view .special-dex-hero :is(.som-info-knopf,.body-analysis-info){box-sizing:border-box!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;border:var(--kontur) solid var(--kontur-farbe)!important;background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;box-shadow:none!important}
+:root[data-theme][data-seite="body"] #view .body-comp-hero{grid-template-columns:82px minmax(0,1fr) 34px!important}
+@media(max-width:370px){:root[data-theme][data-seite="body"] #view .body-comp-hero{grid-template-columns:68px minmax(0,1fr) 34px!important}}
 
 /* COMP · Retro: Schrift im Hero schwarz wie überall; Ring und Fläche
    behalten das COMP-Pink. */
-:root[data-theme="retro"][data-seite="body"] #view .body-comp-hero :is(.body-v2-hero-value>small,.body-v2-hero-value strong,[data-comp-hero-confidence],.body-v2-ring b,.body-v2-ring small){color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme][data-seite="body"] #view .body-comp-hero :is(.body-v2-hero-value>small,.body-v2-hero-value strong,[data-comp-hero-confidence],.body-v2-ring b,.body-v2-ring small){color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
 
 /* COMP · Retro: schwarze Konturen wie auf allen übrigen Seiten. */
-:root[data-theme="retro"][data-seite="body"] #view :is(.comp-facts article,.comp-central-assessment,.comp-detail-card,.body-v2-hero,.body-analysis-info){border:var(--kontur) solid var(--kontur-farbe)!important}
-:root[data-theme="retro"][data-seite="body"] #view .comp-central-assessment>header em{border-color:var(--kontur-farbe)!important;color:var(--mac-kontur)!important}
-:root[data-theme="retro"][data-seite="body"] #view .comp-assessment-body ol>li::before{background:var(--mac-kontur)!important;color:#FFFFFF!important}
-:root[data-theme="retro"][data-seite="body"] #view .comp-detail-card-content .body-reset-mini{border:var(--kontur) solid var(--kontur-farbe)!important;color:var(--mac-kontur)!important}
+:root[data-theme][data-seite="body"] #view :is(.comp-facts article,.comp-central-assessment,.comp-detail-card,.body-v2-hero,.body-analysis-info){border:var(--kontur) solid var(--kontur-farbe)!important}
+:root[data-theme][data-seite="body"] #view .comp-central-assessment>header em{border-color:var(--kontur-farbe)!important;color:var(--mac-kontur)!important}
+:root[data-theme][data-seite="body"] #view .comp-assessment-body ol>li::before{background:var(--mac-kontur)!important;color:var(--ui-gefuellt-schrift)!important}
+:root[data-theme][data-seite="body"] #view .comp-detail-card-content .body-reset-mini{border:var(--kontur) solid var(--kontur-farbe)!important;color:var(--mac-kontur)!important}
 
 /* ---------- Coach-Seiten · Kopf ---------- */
 /* Zurück und Gedächtnis stecken in der Kopf-Kapsel (Abschnitt
    VORSCHLAG 2); hier nur die Linie unter dem Kopf in Retro schwarz. */
-:root[data-theme="retro"][data-seite="coach"] #app .app-dex-header{border-bottom-color:var(--ink)!important}
+:root[data-theme][data-seite="coach"] #app .app-dex-header{border-bottom-color:var(--ink)!important}
 
 /* ---------- Coach-Chat ---------- */
 :root[data-seite="coach"] #view .coach-chat-message{font:var(--mac-text)!important;letter-spacing:0!important}
@@ -15903,14 +15924,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Chat · Retro: Fenster wie Mac-Tafeln mit schwarzer Kontur, Schritte
    ohne Linien. */
-:root[data-theme="retro"][data-seite="coach"] #view .coach-chat-window{border:var(--kontur) solid var(--kontur-farbe)!important;border-radius:18px!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{padding:0!important;border:0!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-chat-window .coach-mehr{padding:0!important;border-top:1px solid var(--mac-linie)!important}
-:root[data-theme="retro"][data-seite="coach"] #view :is(.coach-result h4,.coach-mehr h4,.coach-schritt p,.coach-schritt small,.coach-web-status,.coach-datenlage,.coach-chat-message>small){color:var(--mac-farbe-neben)!important}
-:root[data-theme="retro"][data-seite="coach"] #view :is(.coach-art,.coach-safety,.coach-chat-avatar,.coach-vorschlaege button,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-woche-chip span,.coach-attachment,.coach-attachment button,.coach-woche-form :is(select,textarea),.gedaechtnis-formular :is(input,select,textarea),.coach-inputbar textarea,.coach-inputbar){border-color:var(--kontur-farbe)!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-inputbar{border-width:var(--kontur)!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-inputbar textarea::placeholder{color:var(--mac-farbe-neben)!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-inputbar :is(.coach-plus,.coach-send){border:var(--kontur) solid var(--kontur-farbe)!important;background:#FFFFFF!important;color:#111111!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat-window{border:var(--kontur) solid var(--kontur-farbe)!important;border-radius:18px!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{padding:0!important;border:0!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat-window .coach-mehr{padding:0!important;border-top:1px solid var(--mac-linie)!important}
+:root[data-theme][data-seite="coach"] #view :is(.coach-result h4,.coach-mehr h4,.coach-schritt p,.coach-schritt small,.coach-web-status,.coach-datenlage,.coach-chat-message>small){color:var(--mac-farbe-neben)!important}
+:root[data-theme][data-seite="coach"] #view :is(.coach-art,.coach-safety,.coach-chat-avatar,.coach-vorschlaege button,.coach-merken,.coach-knopf,.coach-werkzeug,.coach-woche-chip span,.coach-attachment,.coach-attachment button,.coach-woche-form :is(select,textarea),.gedaechtnis-formular :is(input,select,textarea),.coach-inputbar textarea,.coach-inputbar){border-color:var(--kontur-farbe)!important}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar{border-width:var(--kontur)!important}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar textarea::placeholder{color:var(--mac-farbe-neben)!important}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar :is(.coach-plus,.coach-send){border:var(--kontur) solid var(--kontur-farbe)!important;background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important}
 
 /* ---------- Gedächtnis ---------- */
 /* Seitentitel statt einer Karte „Coach“; Bereiche wie Gruppen in den
@@ -15931,15 +15952,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-formular label{font:850 11px/1.3 var(--mac-schrift)!important;letter-spacing:.02em;text-transform:uppercase}
 :root[data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-aktionen{gap:8px!important}
 
-:root[data-theme="retro"][data-seite="coach"] #view .gedaechtnis-kopf{color:#111111}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-window>header{padding:16px 16px 0!important;border-bottom:0!important;border-radius:16px 16px 0 0!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-message{padding:8px 16px 16px!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-hinweis,.gedaechtnis-leer,.gedaechtnis-eintrag>small,.gedaechtnis-eintrag summary small,.gedaechtnis-verlauf small,.gedaechtnis-formular label){color:var(--mac-farbe-neben)!important;opacity:1!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-liste{gap:0!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag,.gedaechtnis-formular){padding:14px 0!important;border:0!important;border-radius:0!important;background:transparent!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-liste>li:not(:first-child){border-top:1px solid var(--mac-linie)!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border-left:var(--kontur) solid rgba(0,0,0,.28)!important}
-:root[data-theme="retro"][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-chip{border-color:var(--kontur-farbe)!important}
+:root[data-theme][data-seite="coach"] #view .gedaechtnis-kopf{color:var(--ui-schrift)}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-window>header{padding:16px 16px 0!important;border-bottom:0!important;border-radius:16px 16px 0 0!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite .coach-chat-message{padding:8px 16px 16px!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-hinweis,.gedaechtnis-leer,.gedaechtnis-eintrag>small,.gedaechtnis-eintrag summary small,.gedaechtnis-verlauf small,.gedaechtnis-formular label){color:var(--mac-farbe-neben)!important;opacity:1!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-liste{gap:0!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite :is(.gedaechtnis-eintrag,.gedaechtnis-formular){padding:14px 0!important;border:0!important;border-radius:0!important;background:transparent!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-liste>li:not(:first-child){border-top:1px solid var(--mac-linie)!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-verlauf li{border-left:var(--kontur) solid color-mix(in srgb,var(--kontur-farbe) 28%,transparent)!important}
+:root[data-theme][data-seite="coach"] #view .coach-gedaechtnis-seite .gedaechtnis-chip{border-color:var(--kontur-farbe)!important}
 
 
 /* ============================================================
@@ -15950,7 +15971,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    rundet.
    :is(#app,body) hebt die Regeln über die seitenspezifischen Größen.
    ============================================================ */
-:root[data-theme="retro"] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track){
+:root[data-theme] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track){
   --schalter-b:50px;
   --schalter-h:30px;
   --schalter-luft:1.5px;
@@ -15963,7 +15984,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border:var(--kontur) solid var(--kontur-farbe)!important;
   box-shadow:none!important;
 }
-:root[data-theme="retro"] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track)::after{
+:root[data-theme] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track)::after{
   top:50%!important;
   left:var(--schalter-luft)!important;
   box-sizing:border-box!important;
@@ -15975,15 +15996,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
   transform:translateY(-50%)!important;
 }
-:root[data-theme="retro"] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track)::after{
+:root[data-theme] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track)::after{
   transform:translate(calc(var(--schalter-b) - var(--schalter-h)),-50%)!important;
 }
 /* Eingeschaltet: schwarz, der Knopf weiß – auf jeder Seite gleich. */
-:root[data-theme="retro"] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track){
-  background:#111111!important;
+:root[data-theme] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track){
+  background:var(--schalter-an)!important;
 }
-:root[data-theme="retro"] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track)::after{
-  background:#FFFFFF!important;
+:root[data-theme] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track)::after{
+  background:var(--schalter-knopf)!important;
 }
 
 /* ============================================================
@@ -15992,19 +16013,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Felder (Uhrzeit, Kalorienziel, Makros) sind weiß mit Kontur wie ein
    Mac-Bedienelement; zwischen zwei Zeilen steht genau eine feine Linie.
    ============================================================ */
-:root[data-theme="retro"][data-seite="reminders"] #app #view :is(.rem-row-zeit,.nutrition-overview-target,.nutrition-overview-macros>span){
+:root[data-theme][data-seite="reminders"] #app #view :is(.rem-row-zeit,.nutrition-overview-target,.nutrition-overview-macros>span){
   border:var(--kontur) solid var(--kontur-farbe)!important;
-  background:#FFFFFF!important;
-  background-color:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
+  background-color:var(--ui-flaeche)!important;
 }
-:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row{border-top:0!important;border-bottom:0!important}
-:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row+.rem-row{border-top:1px solid color-mix(in srgb,#49251E 16%,transparent)!important}
-:root[data-theme="retro"][data-seite="reminders"] #app #view .rem-row[open] .rem-row-head{border-bottom:1px solid color-mix(in srgb,#49251E 16%,transparent)!important}
+:root[data-theme][data-seite="reminders"] #app #view .rem-row{border-top:0!important;border-bottom:0!important}
+:root[data-theme][data-seite="reminders"] #app #view .rem-row+.rem-row{border-top:1px solid var(--ui-linie)!important}
+:root[data-theme][data-seite="reminders"] #app #view .rem-row[open] .rem-row-head{border-bottom:1px solid var(--ui-linie)!important}
 
 /* SCHLAF · Kacheln in den Karten (Check-in-Werte, Planvergleich,
    7-Tage-Werte, Hinweis unter „Beobachtete Muster“) tragen die Kontur;
    ihre Fläche bleibt. */
-:root[data-theme="retro"][data-seite="sleep"] #app #view :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights div>p){
+:root[data-theme][data-seite="sleep"] #app #view :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights div>p){
   border:var(--kontur) solid var(--kontur-farbe)!important;
 }
 
@@ -16016,19 +16037,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Schatten. Außerhalb von Retro bleibt die Kapsel ohne eigene Gestalt.
    ============================================================ */
 .app-dex-kapsel{display:contents}
-:root[data-theme="retro"]{--trennstrich:color-mix(in srgb,var(--kontur-farbe) 30%,transparent)}
+:root{--trennstrich:color-mix(in srgb,var(--kontur-farbe) 30%,transparent)}
 
 /* Kopf: Coach, Suche und CAPCOINS in einer Kapsel. */
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel{
+:root[data-theme][data-seite] #app .app-dex-kapsel{
   display:inline-flex;
   align-items:stretch;
   height:40px;
   overflow:hidden;
   border:var(--kontur) solid var(--kontur-farbe);
   border-radius:999px;
-  background:#FFFFFF;
+  background:var(--ui-flaeche);
 }
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand,.app-dex-zurueck,.app-dex-gedaechtnis){
+:root[data-theme][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand,.app-dex-zurueck,.app-dex-gedaechtnis){
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
@@ -16042,49 +16063,49 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:0!important;
   background:transparent!important;
   box-shadow:none!important;
-  color:#111!important;
+  color:var(--ui-schrift)!important;
 }
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>*+*{border-left:1px solid var(--trennstrich)!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 10px 0 8px!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:#111!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.app-dex-gedaechtnis{gap:7px!important;padding:0 12px 0 10px!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel .app-dex-zurueck-pfeil{width:16px!important;height:16px!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-coach-icon,.app-dex-search-icon,.coin-kopf-symbol,.app-dex-gedaechtnis-icon){width:24px!important;height:24px!important;flex-basis:24px!important;filter:none!important;transform:none!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel :is(.app-dex-search-icon,.app-dex-coach-icon)>svg{width:100%!important;height:100%!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>*+*{border-left:1px solid var(--trennstrich)!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 10px 0 8px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:var(--ui-schrift)!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-gedaechtnis{gap:7px!important;padding:0 12px 0 10px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel .app-dex-zurueck-pfeil{width:16px!important;height:16px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel :is(.app-dex-coach-icon,.app-dex-search-icon,.coin-kopf-symbol,.app-dex-gedaechtnis-icon){width:24px!important;height:24px!important;flex-basis:24px!important;filter:none!important;transform:none!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel :is(.app-dex-search-icon,.app-dex-coach-icon)>svg{width:100%!important;height:100%!important}
 /* Aktive Seite (Suche, CAPCOINS): weiche Fläche statt Schatten. */
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>:is(.app-dex-search.aktiv,.coin-kopfstand.aktiv,.app-dex-gedaechtnis[aria-current="page"]){background:#E4E6EA!important}
-:root[data-theme="retro"][data-seite] #app .app-dex-kapsel>.app-dex-coach.hat-hinweis::after{top:6px!important;right:6px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>:is(.app-dex-search.aktiv,.coin-kopfstand.aktiv,.app-dex-gedaechtnis[aria-current="page"]){background:var(--ui-auswahl)!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-coach.hat-hinweis::after{top:6px!important;right:6px!important}
 
 /* Menüband: aktive Seite als weiche Fläche in der Schriftfarbe des Bandes. */
-:root[data-theme="retro"][data-seite] #app .app-dex-dock .app-dex-tab.aktiv{
+:root[data-theme][data-seite] #app .app-dex-dock .app-dex-tab.aktiv{
   background:color-mix(in srgb,currentColor 16%,transparent)!important;
   box-shadow:none!important;
 }
-:root[data-theme="retro"][data-seite] #app .app-dex-dock .app-dex-tab.aktiv>span{filter:none!important}
+:root[data-theme][data-seite] #app .app-dex-dock .app-dex-tab.aktiv>span{filter:none!important}
 
 /* ROUTINEN: Play und Anhang in einer Kapsel, hell statt lila gefüllt. */
-:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>:is(.routine-start,.routine-attach){
+:root[data-theme][data-seite] #app #view .routine-row-inhalt>:is(.routine-start,.routine-attach){
   justify-self:stretch!important;
   width:auto!important;
   min-width:0!important;
   height:34px!important;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   border-radius:999px!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
   color:inherit!important;
 }
-:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>:is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){
+:root[data-theme][data-seite] #app #view .routine-row-inhalt>:is(.routine-start,.routine-attach) :is(.material-svg,svg,svg *){
   color:inherit!important;
   fill:currentColor!important;
   -webkit-text-fill-color:currentColor!important;
 }
-:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>.routine-start:has(+.routine-attach){
+:root[data-theme][data-seite] #app #view .routine-row-inhalt>.routine-start:has(+.routine-attach){
   margin-right:-4px!important;
   border-right:1px solid var(--trennstrich)!important;
   border-radius:999px 0 0 999px!important;
 }
-:root[data-theme="retro"][data-seite] #app #view .routine-row-inhalt>.routine-start+.routine-attach{
+:root[data-theme][data-seite] #app #view .routine-row-inhalt>.routine-start+.routine-attach{
   margin-left:-4px!important;
   border-left:0!important;
   border-radius:0 999px 999px 0!important;
@@ -16093,24 +16114,24 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ROUTINEN: Tage und Angaben als einzelne helle Kapseln mit Kontur. Eine
    gemeinsame Kapsel passt nicht in die Zeile (sieben Tage oder
    „8 Übungen · 15 min · Täglich“); einzelne Kapseln dürfen umbrechen. */
-:root[data-theme="retro"][data-seite] #app #view .routine-meta{
+:root[data-theme][data-seite] #app #view .routine-meta{
   display:flex!important;
   flex-wrap:wrap!important;
   gap:4px!important;
 }
-:root[data-theme="retro"][data-seite] #app #view .routine-meta>small{
+:root[data-theme][data-seite] #app #view .routine-meta>small{
   margin:0!important;
   padding:2px 7px!important;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   border-radius:999px!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
   color:inherit!important;
   -webkit-text-fill-color:currentColor!important;
 }
 
 /* TRACKER: „‹ Heute ›“ als eine Kapsel. */
-:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day{
+:root[data-theme][data-seite] #app #view .nutrition-overview-day{
   display:grid!important;
   grid-template-columns:44px minmax(0,1fr) 44px!important;
   align-items:stretch!important;
@@ -16120,9 +16141,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:hidden;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   border-radius:999px!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
 }
-:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button{
+:root[data-theme][data-seite] #app #view .nutrition-overview-day>button{
   width:auto!important;
   height:auto!important;
   min-height:0!important;
@@ -16132,18 +16153,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:transparent!important;
   box-shadow:none!important;
 }
-:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:first-child{border-right:1px solid var(--trennstrich)!important}
-:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:last-child{border-left:1px solid var(--trennstrich)!important}
-:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>button:disabled{opacity:.35}
-:root[data-theme="retro"][data-seite] #app #view .nutrition-overview-day>div{display:grid;place-content:center;text-align:center}
+:root[data-theme][data-seite] #app #view .nutrition-overview-day>button:first-child{border-right:1px solid var(--trennstrich)!important}
+:root[data-theme][data-seite] #app #view .nutrition-overview-day>button:last-child{border-left:1px solid var(--trennstrich)!important}
+:root[data-theme][data-seite] #app #view .nutrition-overview-day>button:disabled{opacity:.35}
+:root[data-theme][data-seite] #app #view .nutrition-overview-day>div{display:grid;place-content:center;text-align:center}
 
 /* Filter auf den Sammlungsseiten und in der Suche: einzelne Kapseln wie
    in Musik und Fotos – weiß mit Kontur, der gewählte Filter schwarz
    gefüllt. Die Leiste scrollt weiter bis an die Displaykanten. */
-:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter){
+:root[data-theme][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter){
   gap:8px!important;
 }
-:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button{
+:root[data-theme][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button{
   flex:0 0 auto!important;
   min-height:38px!important;
   height:38px!important;
@@ -16151,26 +16172,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding:0 15px!important;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   border-radius:999px!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
-  color:#111!important;
-  -webkit-text-fill-color:#111!important;
+  color:var(--ui-schrift)!important;
+  -webkit-text-fill-color:var(--ui-schrift)!important;
   font:600 12.5px/1 "Work Sans",sans-serif!important;
   letter-spacing:0!important;
 }
-:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:is(.aktiv,[aria-pressed="true"]){
-  background:#111!important;
-  color:#FFFFFF!important;
-  -webkit-text-fill-color:#FFFFFF!important;
+:root[data-theme][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:is(.aktiv,[aria-pressed="true"]){
+  background:var(--ui-gefuellt)!important;
+  color:var(--ui-gefuellt-schrift)!important;
+  -webkit-text-fill-color:var(--ui-gefuellt-schrift)!important;
   font-weight:700!important;
 }
-:root[data-theme="retro"][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:active{transform:translateY(1px)!important}
+:root[data-theme][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:active{transform:translateY(1px)!important}
 
 /* Einträge: Mehr und Schließen in einer Kapsel wie „Teilen · …“ in
    Notizen. Das Aufklappmenü liegt im selben Container; deshalb runden die
    beiden Knöpfe ihre Enden selbst, statt dass die Kapsel etwas abschneidet. */
-:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions){gap:0!important;align-items:center!important}
-:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button){
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions){gap:0!important;align-items:center!important}
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button){
   box-sizing:border-box!important;
   display:grid!important;
   place-items:center!important;
@@ -16179,25 +16200,25 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   margin:0!important;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   border-radius:999px!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
-  color:#111!important;
+  color:var(--ui-schrift)!important;
 }
-:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu:has(+.neo-dex-action-close){
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu:has(+.neo-dex-action-close){
   border-right:0!important;
   border-radius:999px 0 0 999px!important;
 }
-:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu+.neo-dex-action-close{
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu+.neo-dex-action-close{
   border-left:1px solid var(--trennstrich)!important;
   border-radius:0 999px 999px 0!important;
 }
-:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu[aria-expanded="true"]{background:#E4E6EA!important}
-:root[data-theme="retro"] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg){width:20px!important;height:20px!important;fill:currentColor!important;color:inherit!important}
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>.neo-dex-retro-menu[aria-expanded="true"]{background:var(--ui-auswahl)!important}
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg){width:20px!important;height:20px!important;fill:currentColor!important;color:inherit!important}
 
 /* Overlays: Schließen als Kreisknopf mit Kontur wie die übrigen
    Kreisknöpfe; das X ist dafür kleiner. Gilt für alle reinen
    Symbolknöpfe mit „Schließen“, nicht für Textknöpfe wie „Fertig“. */
-:root[data-theme="retro"] :is(#app,body) button:is([aria-label="Schließen"],[aria-label="Info schließen"]):not(.btn){
+:root[data-theme] :is(#app,body) button:is([aria-label="Schließen"],[aria-label="Info schließen"]):not(.btn){
   box-sizing:border-box!important;
   display:grid!important;
   place-items:center!important;
@@ -16209,13 +16230,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding:0!important;
   border:var(--kontur) solid var(--kontur-farbe)!important;
   border-radius:50%!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
-  color:#111!important;
-  -webkit-text-fill-color:#111!important;
+  color:var(--ui-schrift)!important;
+  -webkit-text-fill-color:var(--ui-schrift)!important;
   font:600 18px/1 "Work Sans",sans-serif!important;
 }
-:root[data-theme="retro"] :is(#app,body) button:is([aria-label="Schließen"],[aria-label="Info schließen"]):not(.btn) :is(.material-svg,svg){
+:root[data-theme] :is(#app,body) button:is([aria-label="Schließen"],[aria-label="Info schließen"]):not(.btn) :is(.material-svg,svg){
   width:16px!important;
   height:16px!important;
   fill:currentColor!important;
@@ -16260,24 +16281,86 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Info-Knöpfe überall wie in den Heroes: weißer Kreis mit Kontur. Der
    kleine Info-Knopf an Tracker-Mahlzeiten behält seine Füllung, weil sie
    anzeigt, dass eine Info hinterlegt ist. */
-:root[data-theme="retro"][data-seite] #app #view .som-info-knopf:not(.mahl-slot-info){
+:root[data-theme][data-seite] #app #view .som-info-knopf:not(.mahl-slot-info){
   border:var(--kontur) solid var(--kontur-farbe)!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
-  color:#111111!important;
-  -webkit-text-fill-color:#111111!important;
+  color:var(--ui-schrift)!important;
+  -webkit-text-fill-color:var(--ui-schrift)!important;
 }
 /* EINKAUF: Tag-Chips wie die Filter – weiße Kapseln mit Kontur, gewählt
    schwarz gefüllt. */
-:root[data-theme="retro"][data-seite] #app #view :is(.einkauf-tag-chip,.einkauf-chip-btn){
+:root[data-theme][data-seite] #app #view :is(.einkauf-tag-chip,.einkauf-chip-btn){
   border:var(--kontur) solid var(--kontur-farbe)!important;
-  background:#FFFFFF!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
-  color:#111111!important;
-  -webkit-text-fill-color:#111111!important;
+  color:var(--ui-schrift)!important;
+  -webkit-text-fill-color:var(--ui-schrift)!important;
 }
-:root[data-theme="retro"][data-seite] #app #view :is(.einkauf-tag-chip,.einkauf-chip-btn).aktiv{
-  background:#111111!important;
-  color:#FFFFFF!important;
-  -webkit-text-fill-color:#FFFFFF!important;
+:root[data-theme][data-seite] #app #view :is(.einkauf-tag-chip,.einkauf-chip-btn).aktiv{
+  background:var(--ui-gefuellt)!important;
+  color:var(--ui-gefuellt-schrift)!important;
+  -webkit-text-fill-color:var(--ui-gefuellt-schrift)!important;
+}
+/* Eingeschalteter Schalter: Knopf in der Gegenfarbe der Bahn (Retro weiß
+   auf Schwarz, Dark schwarz auf Weiß). */
+:root[data-theme] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track)::after{
+  background:var(--schalter-knopf-an)!important;
+}
+:root[data-theme] :is(#app,body) :is(.rem-switch-thumb,.sleep-mini-switch span,.sleep-setting-switch .sleep-switch-track,.mahl-mini-switch-track,.switchline-track){
+  background:var(--schalter-aus)!important;
+}
+:root[data-theme] :is(#app,body) :is(.rem-switch input:checked~.rem-switch-thumb,.sleep-mini-switch input:checked+span,.sleep-setting-switch input:checked+.sleep-switch-track,.mahl-mini-switch input:checked+.mahl-mini-switch-track,.switchline input:checked~.switchline-track){
+  background:var(--schalter-an)!important;
+}
+/* Chat · „Webwissen an“: gelber Werkzeugknopf mit schwarzer Schrift. */
+:root[data-theme] #view .coach-werkzeug:has(input[type="checkbox"]:checked) :is(span,.material-svg,svg,svg *){color:#111111!important;-webkit-text-fill-color:#111111!important;fill:#111111!important}
+/* Profil: Name als Überschrift in voller Schriftfarbe, nicht als Nebentext. */
+:root[data-theme] #view .profile-name{color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
+
+/* ============================================================
+   FAQ · dieselben Karten wie das Profil. Jede Seite ist ein Bereich,
+   die Fragen stehen als ruhige Liste darin, getrennt durch die feine
+   gestrichelte Linie der LOGMAN-FAQ. Gilt in Retro und Dark.
+   ============================================================ */
+:root[data-theme] #view .faq-oeffnen{display:grid;place-items:center;text-decoration:none}
+:root[data-theme] #view .faq-kopf{display:grid;justify-items:start;gap:6px;margin:0 0 18px}
+:root[data-theme] #view .faq-zurueck{
+  display:inline-flex;align-items:center;gap:2px;min-height:34px;padding:0 13px 0 11px;
+  border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;
+  background:var(--ui-flaeche);color:var(--ui-schrift);
+  font:750 13px/1 "Work Sans",sans-serif;text-decoration:none;
+}
+:root[data-theme] #view .faq-zurueck-pfeil{width:14px;height:14px;fill:currentColor}
+:root[data-theme] #view .faq-kopf h1{
+  margin:10px 0 0;color:var(--ui-schrift);
+  font:850 28px/1.05 "Work Sans",sans-serif;letter-spacing:-.03em;
+}
+:root[data-theme] #view .faq-kopf p{margin:0;color:var(--ui-neben);font:500 12px/1.5 "JetBrains Mono",monospace}
+:root[data-theme] #view .faq-bereich>summary{flex-direction:column;align-items:flex-start;justify-content:center;gap:5px}
+:root[data-theme] #view .faq-bereich>summary small{
+  color:var(--ui-neben);font:600 11px/1.3 "JetBrains Mono",monospace;letter-spacing:0;
+}
+:root[data-theme] #view .faq-liste{display:block;padding:2px 18px}
+:root[data-theme] #view .faq-frage+.faq-frage{border-top:var(--kontur) dashed var(--kontur-farbe)}
+:root[data-theme] #view .faq-frage>summary{
+  position:relative;padding:14px 30px 14px 0;list-style:none;cursor:pointer;
+  color:var(--ui-schrift);font:750 14px/1.3 "Work Sans",sans-serif;letter-spacing:-.01em;
+}
+:root[data-theme] #view .faq-frage>summary::-webkit-details-marker{display:none}
+:root[data-theme] #view .faq-frage>summary::after{
+  content:"+";position:absolute;right:2px;top:13px;
+  color:var(--ui-schrift);font:600 17px/1 "JetBrains Mono",monospace;
+}
+:root[data-theme] #view .faq-frage[open]>summary::after{content:"−"}
+:root[data-theme] #view .faq-antwort{padding:0 0 14px;color:var(--ui-schrift);font:500 13px/1.55 "Work Sans",sans-serif}
+:root[data-theme] #view .faq-antwort p{margin:0 0 8px}
+:root[data-theme] #view .faq-antwort p:last-child{margin-bottom:0}
+/* Instagram-Vorschau in der Detailkarte: Hinweis, dass der Beitrag in
+   Instagram abspielt. */
+:root[data-theme] .dex-detail-instagram-hinweis{
+  position:absolute;left:10px;bottom:10px;padding:6px 11px;
+  border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;
+  background:var(--ui-flaeche);color:var(--ui-schrift);
+  font:750 12px/1 "Work Sans",sans-serif;
 }

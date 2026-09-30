@@ -76,7 +76,12 @@ async function oembed(endpoint: string) {
   return await response.json();
 }
 
-async function pageMetadata(url: URL, existingResponse?: Response) {
+const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+// Instagram zeigt Rechenzentrums-Adressen statt der Seite eine Anmeldung,
+// Link-Vorschau-Crawlern aber weiterhin die Open-Graph-Angaben.
+const CRAWLER_UA = 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)';
+
+async function pageMetadata(url: URL, existingResponse?: Response, userAgent = IPHONE_UA) {
   const fetchUrl = new URL(url.href);
   // Muscle & Strength liefert fuer serverseitige Standard-Requests teilweise
   // nur die Bot-Schutzseite. Die AMP-Variante enthaelt dieselben Artikel-
@@ -86,7 +91,7 @@ async function pageMetadata(url: URL, existingResponse?: Response) {
   }
   const response = existingResponse || await fetch(fetchUrl, {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+      'User-Agent': userAgent,
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
     },
@@ -157,11 +162,17 @@ async function instagramMetadata(url: URL) {
     }
   } catch { /* Danach bleiben API- oder Originalseiten-Daten. */ }
   let page: Record<string, unknown> = {};
-  try { page = await pageMetadata(canonical); } catch { /* Embed-Daten verwenden. */ }
+  for (const userAgent of [IPHONE_UA, CRAWLER_UA]) {
+    try { page = await pageMetadata(canonical, undefined, userAgent); } catch { /* Nächste Kennung versuchen. */ }
+    if (page.thumbnail_url) break;
+  }
   const fallbackDescription = embeddedJsonString(html, 'accessibility_caption')
     || embeddedJsonString(html, 'text');
+  // Zuletzt der Medien-Link: Er leitet auf das aktuelle Beitragsbild weiter,
+  // auch bei Reels. Gespiegelt wird es wie jedes Vorschaubild.
   const fallbackImage = embeddedJsonString(html, 'display_url')
-    || embeddedJsonString(html, 'thumbnail_src');
+    || embeddedJsonString(html, 'thumbnail_src')
+    || `https://www.instagram.com/p/${match[2]}/media/?size=l`;
   return {
     ...page,
     ...embed,
@@ -283,7 +294,11 @@ Deno.serve(async (request) => {
     const rawPreview = decodeHtmlEntities(data.thumbnail_url || '');
     let previewUrl = '';
     try { previewUrl = rawPreview ? new URL(rawPreview, url).href : ''; } catch { previewUrl = ''; }
-    const stablePreview = await stablePreviewUrl(previewUrl);
+    let stablePreview = await stablePreviewUrl(previewUrl);
+    // Instagram liefert Bilder nur an die eigene Seite aus (Cross-Origin-
+    // Resource-Policy). Ohne gespiegelte Kopie bliebe in der App ein
+    // kaputtes Bild; dann lieber keine Vorschau.
+    if (/instagram\.com|cdninstagram\.com|fbcdn\.net/i.test(stablePreview)) stablePreview = '';
     return json({
       title: decodeHtmlEntities(data.title || '').slice(0, 100),
       description: decodeHtmlEntities(data.description || data.author_name || '').slice(0, 500),

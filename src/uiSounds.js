@@ -7,23 +7,57 @@ let interfacePlayer = null;
 let routinePlayer = null;
 let initialized = false;
 let audioContext = null;
+let freigegeben = null;
+let neuAnlegen = false;
 
 // Ein gemeinsamer, selbst verwalteter AudioContext für beide Player. Dadurch
-// können wir seinen Zustand prüfen und ihn wieder aufwecken – iOS suspendiert
-// ihn im Hintergrund und nach Audio-Unterbrechungen, ohne ihn selbst fortzusetzen.
+// können wir seinen Zustand prüfen und ihn wieder aufwecken.
 function ensureContext() {
   if (typeof window === 'undefined') return null;
+  if (audioContext?.state === 'closed') kontextVerwerfen();
   if (!audioContext) {
     const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (Ctx) { try { audioContext = new Ctx(); } catch { audioContext = null; } }
+    if (Ctx) { try { audioContext = new Ctx({ latencyHint: 'interactive' }); } catch { audioContext = null; } }
   }
   return audioContext;
 }
 
-// Suspendierten Kontext fortsetzen (nach Rückkehr in den Vordergrund / Geste).
-function resumeAudio() {
+// iOS lässt den Kontext nach Hintergrund, Anruf, Siri oder Ton aus einer
+// anderen App oft stumm, auch wenn er „running“ meldet. Er wird deshalb nach
+// jeder Rückkehr beim nächsten Tippen neu angelegt; die Player entstehen mit
+// dem neuen Kontext neu.
+function kontextVerwerfen() {
+  const alt = audioContext;
+  interfacePlayer?.stopAll();
+  routinePlayer?.stopAll();
+  interfacePlayer = null;
+  routinePlayer = null;
+  audioContext = null;
+  freigegeben = null;
+  if (alt && alt.state !== 'closed') alt.close().catch(() => {});
+}
+
+// Gibt den Ton frei. Wirkt nur innerhalb einer echten Geste: iOS zählt
+// touchend, pointerup, click und keydown, aber nicht pointerdown beim Tippen.
+// Neben "suspended" meldet iOS nach Unterbrechungen auch "interrupted".
+function tonFreigeben() {
+  if (neuAnlegen) {
+    neuAnlegen = false;
+    kontextVerwerfen();
+  }
   const ctx = ensureContext();
-  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  if (!ctx) return;
+  if (ctx.state !== 'running') ctx.resume().catch(() => {});
+  // Ein stiller Puffer in der Geste weckt die Ausgabe auf iOS zuverlässig.
+  if (freigegeben !== ctx) {
+    freigegeben = ctx;
+    try {
+      const source = ctx.createBufferSource();
+      source.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+      source.connect(ctx.destination);
+      source.start(0);
+    } catch { /* ohne Ton bleibt die App bedienbar */ }
+  }
 }
 
 function player(kind = 'interface') {
@@ -63,7 +97,9 @@ export function playInterfaceSound(cue = 'snap', options) {
 export async function playRoutineSound(phase) {
   const sound = player('routine');
   if (!sound) return null;
-  await sound.unlock().catch(() => false);
+  // Der Routine-Ton kommt am Ende eines Timers, oft ohne Geste. Ein
+  // unterbrochener Kontext wird trotzdem angestoßen.
+  if (audioContext && audioContext.state !== 'running') await audioContext.resume().catch(() => {});
   return sound.play(phase === 'end' ? 'complete' : 'notification', {
     volume: soundVolume,
     retrigger: 'restart',
@@ -124,26 +160,21 @@ function cueForControl(control) {
 export function initInterfaceSounds(root = document) {
   if (initialized || !root?.addEventListener) return;
   initialized = true;
-  const unlock = () => {
-    player()?.unlock().catch(() => false);
-    player('routine')?.unlock().catch(() => false);
-  };
-  root.addEventListener('pointerdown', unlock, { capture: true, passive: true, once: true });
-  // Dauerhaft: bei Rückkehr in den Vordergrund und bei jeder Geste den
-  // ausgesetzten AudioContext fortsetzen (Zustandsprüfung ist billig, macht bei
-  // laufendem Kontext nichts). Behebt, dass Sounds nach längerer Nutzung/
-  // Hintergrund ausfallen, bis die App neu gestartet wird.
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') resumeAudio(); });
-  root.addEventListener('pointerdown', resumeAudio, { capture: true, passive: true });
+  // Bei jeder Geste prüfen (billig, solange der Kontext läuft). Die Geste
+  // kommt vor dem click, der den eigentlichen Klang auslöst.
+  for (const typ of ['touchend', 'pointerup', 'click', 'keydown']) {
+    root.addEventListener(typ, tonFreigeben, { capture: true, passive: true });
+  }
+  // Nach Hintergrund oder Rückkehr aus dem Seitenspeicher beim nächsten Tippen
+  // mit frischem Kontext weiter.
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') neuAnlegen = true; });
+  window.addEventListener('pageshow', (event) => { if (event.persisted) neuAnlegen = true; });
   root.addEventListener('input', (event) => {
     const field = event.target;
     if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {
       playInterfaceSound('typing', { retrigger: 'overlap', cooldownMs: 35 });
     }
   }, true);
-  root.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') unlock();
-  }, { capture: true, once: true });
   root.addEventListener('click', (event) => {
     const control = event.target.closest('button,a[href],summary,input[type="checkbox"],input[type="radio"],select');
     if (!control || control.disabled || control.matches('[data-no-interface-sound],[data-meditation-toggle],[data-routine-check],[data-item-check]')) return;

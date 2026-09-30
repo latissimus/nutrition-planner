@@ -55,44 +55,46 @@ describe('Anbieter- und Farbkontrast', () => {
     });
   });
 
+  // Retro: Seitenfarbe und Akzent bleiben fest; Schrift und Tinte sind je
+  // nach Kontrast schwarz oder weiß.
   it('verwendet für TRACKER, COMP, REZEPTE und TRAINING feste Retro-Farbpaare', () => {
     expect(pageLook('reminders', '#000000', 'wallpaper-burger')).toEqual(expect.objectContaining({
-      color: '#FFEDE3', ink: '#49251E', accent: '#49251E', accentInk: '#FFEDE3',
+      color: '#FFEDE3', ink: '#111111', accent: '#49251E', accentInk: '#FFFFFF',
     }));
     expect(pageLook('body', '#000000', 'wallpaper-comp')).toEqual(expect.objectContaining({
-      color: '#94DEFF', ink: '#FF277F', accent: '#FF277F', accentInk: '#94DEFF',
+      color: '#94DEFF', ink: '#111111', accent: '#FF277F', accentInk: '#111111',
     }));
     expect(pageLook('food-log', '#000000', 'wallpaper-pizza')).toEqual(expect.objectContaining({
-      color: '#F0C987', ink: '#3C153B', accent: '#F0C987', accentInk: '#3C153B',
+      color: '#F0C987', ink: '#111111', accent: '#F0C987', accentInk: '#111111',
     }));
     expect(pageLook('essen', '#000000', 'wallpaper-essen')).toEqual(expect.objectContaining({
-      color: '#945B39', ink: '#F6EFE9', accent: '#945B39', accentInk: '#F6EFE9',
+      color: '#945B39', ink: '#FFFFFF', accent: '#945B39', accentInk: '#FFFFFF',
     }));
     expect(pageLook('training', '#000000', 'wallpaper-dumbbell')).toEqual(expect.objectContaining({
-      color: '#203C3D', ink: '#F9DBBA', accent: '#203C3D', accentInk: '#F9DBBA',
+      color: '#203C3D', ink: '#FFFFFF', accent: '#203C3D', accentInk: '#FFFFFF',
     }));
     expect(pageLook('supps', '#000000', 'wallpaper-supps')).toEqual(expect.objectContaining({
-      color: '#D8BFD8', ink: '#2A1E5C', accent: '#2A1E5C', accentInk: '#D8BFD8',
+      color: '#D8BFD8', ink: '#111111', accent: '#2A1E5C', accentInk: '#FFFFFF',
     }));
     expect(pageLook('habits', '#000000', 'wallpaper-wolke')).toEqual(expect.objectContaining({
-      color: '#3F236F', ink: '#FFF8ED', accent: '#3F236F', accentInk: '#FFF8ED',
+      color: '#3F236F', ink: '#FFFFFF', accent: '#3F236F', accentInk: '#FFFFFF',
       pattern: 'wallpaper-stress',
     }));
     expect(pageLook('shopping', '#000000', 'wallpaper-brokkoli')).toEqual(expect.objectContaining({
-      color: '#FFEFB3', ink: '#013E37', accent: '#013E37', accentInk: '#FFEFB3',
+      color: '#FFEFB3', ink: '#111111', accent: '#013E37', accentInk: '#FFFFFF',
     }));
     expect(pageLook('sleep', '#000000', 'wallpaper-moon')).toEqual(expect.objectContaining({
-      color: '#0E1D47', ink: '#FFFCF3', accent: '#0E1D47', accentInk: '#FFFCF3',
+      color: '#0E1D47', ink: '#FFFFFF', accent: '#0E1D47', accentInk: '#FFFFFF',
     }));
     expect(pageLook('stress', '#000000', 'wallpaper-stress')).toEqual(expect.objectContaining({
-      color: '#E36887', ink: '#FFE08C', accent: '#E36887', accentInk: '#FFE08C',
+      color: '#E36887', ink: '#111111', accent: '#E36887', accentInk: '#111111',
       pattern: 'wallpaper-wolke',
     }));
     expect(pageLook('coins', '#000000', 'wallpaper-game')).toEqual(expect.objectContaining({
-      color: '#432C5E', ink: '#FFD400', accent: '#432C5E', accentInk: '#FFD400',
+      color: '#432C5E', ink: '#FFFFFF', accent: '#432C5E', accentInk: '#FFFFFF',
     }));
     expect(pageLook('profile', '#000000', 'drops')).toEqual(expect.objectContaining({
-      color: '#F7F3EA', ink: '#0A1330', accent: '#0A1330', accentInk: '#FFFCF5',
+      color: '#F7F3EA', ink: '#111111', accent: '#0A1330', accentInk: '#FFFFFF',
     }));
   });
 });

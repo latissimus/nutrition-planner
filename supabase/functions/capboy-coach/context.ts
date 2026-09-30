@@ -22,7 +22,21 @@ export type ContextRows = {
   routines: Row[];            // all routines (active and paused), ordered by position; created_at
   completions: Row[];         // routine_id, completed_on (last FETCH_WINDOW_DAYS days)
   ruleContext: Row;           // user_preferences comp:hautfalten-kontext-v1
+  // Areas the user switched off in the profile ('nutrition', 'routines',
+  // 'sleep'); their rows are already empty. Missing means none.
+  switchedOffAreas?: string[];
 };
+
+// A switched-off area appears as { switchedOff: true } instead of empty
+// values, so the model does not read it as a logging gap. With every area on,
+// facts and time series stay exactly as before (secured by the fixture).
+const SWITCHED_OFF = { switchedOff: true };
+const markSwitchedOff = <T extends Row>(value: T, off: Set<string>) => (off.size
+  ? { ...value, ...Object.fromEntries([...off].filter((area) => area in value).map((area) => [area, SWITCHED_OFF])) }
+  : value);
+const withoutSwitchedOff = <T extends Row>(value: T, off: Set<string>) => (off.size
+  ? { ...markSwitchedOff(value, off), switchedOffAreas: [...off] }
+  : value);
 
 // The facts keep their previous windows and row limits exactly; the time
 // series looks back twelve weeks and therefore loads more rows. buildCompFacts
@@ -127,15 +141,16 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
   const totalRoutineOpportunities = routines.reduce((sum, routine) => sum + Math.max(1, (routine.weekdays || []).length) * (30 / 7), 0);
   const latestFoldValues = skinfolds[0]?.falten || {};
   const foldRanks = rankedFolds(latestFoldValues, settings?.calculation_basis || 'male');
+  const off = new Set(rows.switchedOffAreas || []);
 
-  return {
+  return withoutSwitchedOff({
     generatedAt: now.toISOString(),
     period: { from: since42, to: now.toISOString().slice(0, 10) },
     profile: {
       age,
       heightCm: settings?.height_cm || null,
       goal: settings?.goal || 'unknown',
-      calorieTarget: settings?.adaptive_target || settings?.custom_calorie_target || null,
+      calorieTarget: off.has('nutrition') ? null : settings?.adaptive_target || settings?.custom_calorie_target || null,
     },
     bodyComposition: {
       currentWeightKg: latestWeight,
@@ -191,7 +206,7 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
       adherencePercent: totalRoutineOpportunities ? round((completions.length / totalRoutineOpportunities) * 100, 0) : null,
     },
     ruleContext: rows.ruleContext || {},
-  };
+  }, off);
 }
 
 // --------------------------------------------------------------------------
@@ -221,6 +236,7 @@ const plusDays = (date: string, days: number) => new Date(new Date(`${date}T00:0
 // the model.
 export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES_WEEKS) {
   const today = now.toISOString().slice(0, 10);
+  const off = new Set(rows.switchedOffAreas || []);
   const currentMonday = mondayOf(today);
   const mondays = Array.from({ length: weeks }, (_, index) => plusDays(currentMonday, -7 * (weeks - 1 - index)));
   const first = mondays[0];
@@ -403,9 +419,9 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
   const loggedPastDays = recentList.filter((day) => day.entries && !day.today);
   const averageEnteredKcal = round(mean(loggedPastDays.map((day) => day.enteredKcal!)), 0);
 
-  return {
+  return withoutSwitchedOff({
     window: { from: first, to: today, weeks },
-    recentDays: {
+    recentDays: off.has('nutrition') ? SWITCHED_OFF : {
       targetKcal: target,
       days: recentList,
       pastDaysWithEntries: loggedPastDays.length,
@@ -420,9 +436,9 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
       skinfoldChangeMm: folds.change, skinfoldChangeFromWeek: folds.fromWeek, skinfoldChangeToWeek: folds.toWeek,
       waistChangeCm: waist.change, waistChangeFromWeek: waist.fromWeek, waistChangeToWeek: waist.toWeek,
       weeksWithWeight: series.filter((week) => week.bodyComposition.weightMeasurements > 0).length,
-      weeksWithNutritionEntries: series.filter((week) => week.nutrition.daysWithEntries > 0).length,
+      weeksWithNutritionEntries: off.has('nutrition') ? null : series.filter((week) => week.nutrition.daysWithEntries > 0).length,
     },
-    weeks: series,
+    weeks: series.map((week) => markSwitchedOff(week, off)),
     events,
     routines: routineSeries,
     training: {
@@ -431,5 +447,5 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
       comparableExercisesTotal: comparableExercises.length,
       nonComparableExercises: exercises.length - comparableExercises.length,
     },
-  };
+  }, off);
 }

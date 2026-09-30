@@ -80,10 +80,6 @@ function notificationSymbol(reminder: Reminder) {
   return '◆';
 }
 
-function unitLabel(value: string) {
-  return ({ Kapsel: 'Kapsel(n)', Tablette: 'Tablette(n)' } as Record<string, string>)[value] || value;
-}
-
 function isConfiguredSupplement(reminder: Reminder) {
   return reminder.type === 'supplement'
     && !reminder.metadata?.deleted
@@ -124,13 +120,17 @@ function supplementGroupTitle(slot: string) {
   } as Record<string, string>)[slot] || 'Supplements';
 }
 
+// Einnahmehinweise wie in der App (reminders.js, HINWEISE).
+const HINWEIS_LABELS: Record<string, string> = {
+  nuechtern: 'Nüchtern',
+  'zum-essen': 'Zum Essen',
+  'nach-training': 'Nach dem Training',
+  'vor-schlafen': 'Vor dem Schlafen',
+};
+
+// Die Benachrichtigung nennt nur die Supplements, keine Dosierungen.
 function supplementGroupNotification(meal: Reminder, supplements: Reminder[]) {
-  const body = supplements.map((supplement) => {
-    const dosis = String(supplement.metadata?.dosis || '').trim();
-    const einheit = String(supplement.metadata?.einheit || '').trim();
-    const amount = dosis && einheit ? `${dosis} ${unitLabel(einheit)}` : dosis || unitLabel(einheit);
-    return amount ? `${supplement.label} (${amount})` : supplement.label;
-  }).join(' · ');
+  const body = supplements.map((supplement) => supplement.label).filter(Boolean).join(' · ');
   return {
     title: `💊 ${supplementGroupTitle(mealSlot(meal))}`,
     body: body || 'Supplement-Stack checken.',
@@ -165,15 +165,13 @@ function notification(reminder?: Reminder) {
       url: reminder.route || '#reminders',
     };
   }
-  // Bei Supplements Dosierung + Einheit + Hinweis in die Notification-Body ziehen
+  // Einzelnes Supplement: Name als Titel, keine Dosierung; nur der
+  // Einnahmehinweis (z. B. „Nüchtern“) steht im Text.
   if (reminder.type === 'supplement') {
-    const dosis = String(reminder.metadata?.dosis || '').trim();
-    const einheit = String(reminder.metadata?.einheit || '').trim();
-    const hinweis = String(reminder.metadata?.hinweis || '').trim();
-    const parts = [dosis && einheit ? `${dosis} ${unitLabel(einheit)}` : dosis || unitLabel(einheit), hinweis].filter(Boolean);
+    const hinweis = HINWEIS_LABELS[String(reminder.metadata?.hinweis || '').trim()] || '';
     return {
       title: `${notificationSymbol(reminder)} ${reminder.label}`,
-      body: parts.length ? parts.join(' · ') : bodies.supplement,
+      body: hinweis || bodies.supplement,
       tag: `nutrition-${reminder.id}`,
       url: reminder.route || '#reminders',
     };

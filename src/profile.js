@@ -321,6 +321,11 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   renderSammlungen();
   startseite.appendChild(sammlungsListe);
 
+  const hilfe = abschnitt(wrap, 'Hilfe & FAQ');
+  hilfe.innerHTML = `
+    <p class="profile-hinweis">Kurz erklärt für jede Seite: wie CAPBOY rechnet und was die KI darf.</p>
+    <a class="btn btn-block faq-oeffnen" href="#faq">FAQ öffnen</a>`;
+
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
     <p class="profile-hinweis">Exportiert Profil, Messwerte, Erinnerungen, Routinen, Seiten, Einträge, Einkaufsliste, Einstellungen, Freigaben und CAPCOINS als JSON-Datei. Private Medien werden als Speicherpfade aufgeführt.</p>

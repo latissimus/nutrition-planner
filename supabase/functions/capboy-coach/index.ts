@@ -4,7 +4,7 @@ import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } 
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
 import { reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion } from './weekly.ts';
-import { followThroughActions } from './followThrough.ts';
+import { followThroughActions, switchedOffAreas } from './followThrough.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -173,8 +173,29 @@ async function pagedRows(query: () => any): Promise<Row[]> {
   }
 }
 
+// Preferences the context reads: the skinfold rule context, the pages shown
+// in the profile, and whether the app has already added the sleep page to an
+// older list of visible pages (until then the app shows it anyway).
+const RULE_CONTEXT_KEY = 'comp:hautfalten-kontext-v1';
+const VISIBLE_PAGES_KEY = 'muscledex:sichtbare-sammlungen';
+const SLEEP_PAGE_MIGRATED_KEY = 'muscledex:sleep-dex-sichtbarkeit-v1';
+
+// The areas COMP looks at together; switched-off areas are named once and
+// left out. With every area on the sentence is the same as before.
+const AREA_NAMES: Record<string, string> = { nutrition: 'Ernährung', sleep: 'Schlaf', routines: 'Routinen' };
+const germanList = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} und ${items.at(-1)}` : items[0] || '');
+function compAreaText(off: string[]) {
+  const offNames = off.map((area) => AREA_NAMES[area]).filter(Boolean);
+  const areas = ['Körpermaße', 'Ernährung', 'Schlaf', 'Erholung', 'Routinen', 'Training'].filter((name) => !offNames.includes(name));
+  const text = `Betrachte alle Bereiche zusammen: ${germanList(areas)}.`;
+  return offNames.length
+    ? `${text} Im Profil ausgeschaltet hat die Person: ${germanList(offNames)} (switchedOffAreas). Dazu gibt es bewusst keine Daten: Bewerte nichts daraus, erwähne es nicht, auch nicht als fehlende Daten, und schlage dort weder Protokollieren noch Messen vor.`
+    : text;
+}
+
 // Loads the rows for the shared context. The time series needs twelve weeks;
 // buildCompFacts cuts the rows back to the previous windows and limits.
+// Areas switched off in the profile (tracker, routines, sleep) get no rows.
 async function fetchContextRows(userId: string, now: Date): Promise<ContextRows> {
   const since = dateDaysAgo(now, FETCH_WINDOW_DAYS);
   const [
@@ -192,17 +213,24 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     // All routines, paused ones included, so every completion has a name.
     admin.from('routines').select('id,name,period,weekdays,active,created_at').eq('user_id', userId).order('position'),
     pagedRows(() => admin.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', since).order('completed_on', { ascending: false }).order('routine_id')),
-    admin.from('user_preferences').select('value').eq('user_id', userId).eq('key', 'comp:hautfalten-kontext-v1').maybeSingle(),
+    admin.from('user_preferences').select('key,value').eq('user_id', userId).in('key', [RULE_CONTEXT_KEY, VISIBLE_PAGES_KEY, SLEEP_PAGE_MIGRATED_KEY]),
   ]);
   const failures = [nutritionSettings, routines, preferences].filter((result) => result.error);
   if (failures.length) throw failures[0].error;
+  const preference = (key: string) => (preferences.data || []).find((row: Row) => row.key === key)?.value;
+  const visiblePages = preference(VISIBLE_PAGES_KEY);
+  const off = switchedOffAreas(Array.isArray(visiblePages) && preference(SLEEP_PAGE_MIGRATED_KEY) !== true
+    ? [...visiblePages, 'sleep'] : visiblePages);
   return {
     settings: nutritionSettings.data || null,
-    weights, skinfolds, waists, performance, sleep, checkins,
-    nutritionEntries,
-    routines: routines.data || [],
-    completions,
-    ruleContext: preferences.data?.value || {},
+    weights, skinfolds, waists, performance,
+    sleep: off.includes('sleep') ? [] : sleep,
+    checkins,
+    nutritionEntries: off.includes('nutrition') ? [] : nutritionEntries,
+    routines: off.includes('routines') ? [] : routines.data || [],
+    completions: off.includes('routines') ? [] : completions,
+    ruleContext: preference(RULE_CONTEXT_KEY) || {},
+    ...(off.length ? { switchedOffAreas: off } : {}),
   };
 }
 
@@ -510,7 +538,7 @@ Deno.serve(async (request) => {
 
 Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.
 
-Betrachte alle Bereiche zusammen: Körpermaße, Ernährung, Schlaf, Erholung, Routinen und Training. Im Verlauf steht unter followThrough, was in den letzten 14 Tagen fehlt oder nicht umgesetzt wird, nach Wichtigkeit sortiert; die App hat das berechnet. Nenne diese Punkte in keyDevelopment, basis oder uncertainty und sag klar, was fehlt und warum es zählt, ohne Vorwurf. Gibt es solche Punkte, ist der erste nächste Schritt einer davon (actionId beginnt mit „umsetzung-“), in der Regel der erste der Liste: Fehlende Daten und fällige Messungen gehen neuen Maßnahmen vor, weil sich ohne sie nichts sicher beurteilen lässt. Schlage keine neue Änderung in einem Bereich vor, in dem schon ein Experiment läuft; ist eines fällig (reviewDue), nenne das.
+${compAreaText(contextRows.switchedOffAreas || [])} Im Verlauf steht unter followThrough, was in den letzten 14 Tagen fehlt oder nicht umgesetzt wird, nach Wichtigkeit sortiert; die App hat das berechnet. Nenne diese Punkte in keyDevelopment, basis oder uncertainty und sag klar, was fehlt und warum es zählt, ohne Vorwurf. Gibt es solche Punkte, ist der erste nächste Schritt einer davon (actionId beginnt mit „umsetzung-“), in der Regel der erste der Liste: Fehlende Daten und fällige Messungen gehen neuen Maßnahmen vor, weil sich ohne sie nichts sicher beurteilen lässt. Schlage keine neue Änderung in einem Bereich vor, in dem schon ein Experiment läuft; ist eines fällig (reviewDue), nenne das.
 
 optionalSeminarGuidance enthält bereits regelbasiert ausgewählte Hinweise aus Hautfaltenmessung und Neurotransmitter-Test. Erstelle für jeden vorhandenen Eintrag genau ein optionalInsight mit derselben guidanceId und einer kurzen verständlichen Zusammenfassung, warum er im Gesamtbild relevant sein könnte. Diese Hinweise bleiben getrennt von nextSteps. Wiederhole keine Dosierung und erfinde keine: Namen und exakte Seminar-Dosierungen setzt der Server anschließend unverändert ein.`,
       input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nWöchentlicher Verlauf der letzten 12 Wochen (deterministisch, dieselbe Grundlage wie beim Coach; Veränderungen stehen in summary und werden nicht selbst berechnet):\n${JSON.stringify(timeseries)}\n\nLaufende Experimente:\n${runningExperiments || 'keine'}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(compEvidence)}` }],

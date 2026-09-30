@@ -37,6 +37,7 @@ import {
 // Große Systembereiche werden erst geladen, wenn sie wirklich geöffnet
 // werden. Vite erzeugt daraus eigene, browserseitig gecachte Chunks.
 const profileModule = () => import('./profile.js');
+const faqModule = () => import('./faq.js');
 const bodyMetricsModule = () => import('./bodyMetrics.js');
 const remindersModule = () => import('./reminders.js');
 const nutritionModule = () => import('./nutrition.js');
@@ -55,6 +56,7 @@ function dexModulVorbereiten(route = '') {
     habits: routinesModule,
     sleep: sleepModule,
     profile: profileModule,
+    faq: faqModule,
   })[route];
   if (loader) void loader().catch(() => {});
 }
@@ -394,7 +396,7 @@ function commitSeiteDefer(verwerfen = false) {
 function writeSeite(name) {
   document.documentElement.dataset.seite = name;
   delete document.documentElement.dataset.dexMuster;
-  ['--dex-seitenfarbe', '--dex-ink', '--dex-accent', '--dex-accent-ink', '--ordner', '--ordner-ink', '--dex-tapete', '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg', '--food-page-purple']
+  ['--dex-seitenfarbe', '--dex-ink', '--dex-ink-schrift', '--dex-accent', '--dex-accent-ink', '--ordner', '--ordner-ink', '--dex-tapete', '--bg', '--app-bg', '--app-content-bg', '--app-chrome-bg', '--food-page-purple']
     .forEach((property) => document.documentElement.style.removeProperty(property));
 }
 
@@ -411,7 +413,7 @@ function dexLookAusAnsichtWiederherstellen(node) {
   const ink = node.style.getPropertyValue('--dex-ink').trim() || '#111111';
   root.style.setProperty('--dex-seitenfarbe', color);
   root.style.setProperty('--dex-ink', ink);
-  ['--dex-accent', '--dex-accent-ink', '--ordner', '--ordner-ink'].forEach((property) => {
+  ['--dex-ink-schrift', '--dex-accent', '--dex-accent-ink', '--ordner', '--ordner-ink'].forEach((property) => {
     const value = node.style.getPropertyValue(property).trim();
     if (value) root.style.setProperty(property, value);
   });
@@ -428,6 +430,7 @@ function dexLookAufAnsichtUebertragen(node, ziel) {
   [
     '--dex-seitenfarbe',
     '--dex-ink',
+    '--dex-ink-schrift',
     '--dex-accent',
     '--dex-accent-ink',
     '--ordner',
@@ -672,7 +675,7 @@ function appLetzteDexRoute() {
 }
 
 function istAppHauptDex(route, view) {
-  if (route === 'profile' || route === 'search' || route === 'coach' || route === 'coach-wissen') return true;
+  if (route === 'profile' || route === 'faq' || route === 'search' || route === 'coach' || route === 'coach-wissen') return true;
   if (APP_DEX_ROUTES.has(route)) return true;
   return route.startsWith('collection/') && Boolean(view?.dataset.appDockRoute);
 }
@@ -748,7 +751,8 @@ function appDexShellZeichnen(route, view) {
     return;
   }
   const aktiveDockRoute = view.dataset.appDockRoute || route;
-  const istProfil = route === 'profile';
+  // Die FAQ gehört zum Profil: Das Profilbild bleibt dort markiert.
+  const istProfil = route === 'profile' || route === 'faq';
   const istCoins = route === 'coins';
   const istSuche = route === 'search';
   const istCoach = route === 'coach' || route === 'coach-wissen';
@@ -893,7 +897,7 @@ function appDexShellAktualisieren(route, view, signal) {
   // Während eines schnellen Durchblätterns zählt nur der zuletzt erreichte
   // Dex. Lokal ist er sofort gespeichert; die Serverkopie folgt gesammelt,
   // sobald die Navigation fünf Sekunden ruht.
-  if (route !== 'profile' && route !== 'search' && route !== 'coach' && route !== 'coach-wissen') {
+  if (route !== 'profile' && route !== 'faq' && route !== 'search' && route !== 'coach' && route !== 'coach-wissen') {
     setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
   }
   appDexShellDatenLaden(route, view, signal);
@@ -1467,7 +1471,7 @@ async function renderRoute() {
     history.replaceState(history.state, '', `#${angefragt}`);
   }
   if (angefragt === 'recipes') { location.replace('#food-log'); return; }
-  const istBekannteRoute = ['profile', 'coins', 'search', 'coach', 'coach-wissen'].includes(angefragt)
+  const istBekannteRoute = ['profile', 'faq', 'coins', 'search', 'coach', 'coach-wissen'].includes(angefragt)
     || bereiche.some(([ziel]) => ziel === angefragt)
     || angefragt.startsWith('collection/') || angefragt.startsWith('entry/');
   let route = istBekannteRoute ? angefragt : appDexFallbackRoute();
@@ -1571,6 +1575,13 @@ async function renderRoute() {
         if (slot) slot.innerHTML = avatarMarkup();
       },
     });
+  } else if (route === 'faq') {
+    // Gleiche Schale und Optik wie das Profil.
+    setSeite('profile');
+    applyPageLook('profile', categoryColor('profile'), 'drops');
+    view.dataset.appDockRoute = appLetzteDexRoute();
+    const { mountFaq } = await faqModule();
+    mountFaq(view);
   } else if (route === 'coins') {
     setSeite('coins');
     applyPageLook('coins', categoryColor('coins'), 'wallpaper-game');

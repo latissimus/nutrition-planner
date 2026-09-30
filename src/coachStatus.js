@@ -4,7 +4,8 @@
 // hier in der App und ohne KI-Aufruf.
 
 import { supabase } from './supabase.js';
-import { FOLLOW_THROUGH_DAYS, buildFollowThrough } from '../supabase/functions/capboy-coach/followThrough.ts';
+import { FOLLOW_THROUGH_DAYS, buildFollowThrough, switchedOffAreas } from '../supabase/functions/capboy-coach/followThrough.ts';
+import { visibleCollectionRoutes } from './collectionPreferences.js';
 import { escapeHtml, fensterMarkup } from './coachFenster.js';
 
 const zahl = (wert) => Number(wert).toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -89,5 +90,7 @@ export async function ladeOffenePunkte(userId, jetzt = new Date()) {
   return buildFollowThrough({
     settings, weights: weights || [], skinfolds: skinfolds || [], waists: waists || [], performance: performance || [],
     sleep: sleep || [], nutritionEntries: nutritionEntries || [], routines: routines || [], completions: completions || [],
+    // Im Profil ausgeschaltete Seiten (Tracker, Routinen, Schlaf) sind nie offen.
+    switchedOffAreas: switchedOffAreas(visibleCollectionRoutes()),
   }, jetzt);
 }

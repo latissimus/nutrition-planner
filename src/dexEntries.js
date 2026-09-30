@@ -285,9 +285,9 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
       <label class="dex-entry-field" for="dex-entry-training-class-custom" data-training-class-custom hidden><span>${classConfig.customFieldLabel}</span>
         <input id="dex-entry-training-class-custom" class="input" maxlength="32" placeholder="${classConfig.customPlaceholder}">
       </label>` : ''}
-      <label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
+      ${rootKey === 'training' ? '' : `<label class="dex-entry-field" for="dex-entry-tags"><span>Tags <small>optional · mit Komma trennen</small></span>
         <input id="dex-entry-tags" class="input" maxlength="200" placeholder="${tagsPlaceholder}">
-      </label>
+      </label>`}
       ${audio ? '' : `<div class="dex-entry-field"><span>${note ? 'Notiz' : image ? 'Beschreibung' : 'Video-/Linkbeschreibung'} <small>${note && !ownRecipe ? '' : 'optional'}</small></span>
         ${noteEditorMarkup('dex-entry-note', '', { placeholder: note ? 'Gedanken, Liste oder Checkliste festhalten …' : image ? 'Warum möchtest du das Bild auf dieser Seite behalten?' : 'Kurze Beschreibung des Inhalts …', required: note && !ownRecipe })}
       </div>`}
@@ -592,7 +592,8 @@ export function openDexEntryEditor({ type, userId, rootKey, collectionId = null,
         url, image_path: imagePath, audio_path: audioPath,
         preview_url: linkPreview.previewUrl || null,
         provider: linkPreview.provider || null,
-        tags: form.querySelector('#dex-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
+        // TRAINING ordnet über die Trainings-Klassen; dort gibt es keine Tags.
+        tags: (form.querySelector('#dex-entry-tags')?.value || '').split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
         food_kind: foodMode ? (foodKind || 'recipe') : null,
         carb_class: foodMode ? form.querySelector('#dex-entry-carb').value : null,
         // Das bestehende Datenbankfeld speichert die einwertige Klassifikation

@@ -177,22 +177,16 @@ function notificationText(reminder) {
     const note = String(reminder.metadata?.notiz || '').trim();
     return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: note || 'Zeit für deine geplante Mahlzeit.' };
   }
+  // Benachrichtigungen nennen nur die Supplements, keine Dosierungen
+  // (wie send-reminders auf dem Server).
   if (reminder.type === 'supplement-group') {
     const supplements = reminder.metadata?.supplements || [];
-    const body = supplements.map((item) => {
-      const dosis = String(item.metadata?.dosis || '').trim();
-      const einheit = String(item.metadata?.einheit || '').trim();
-      const amount = dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit);
-      return amount ? `${item.label} (${amount})` : item.label;
-    }).join(' · ');
+    const body = supplements.map((item) => item.label).filter(Boolean).join(' · ');
     return { title: `💊 ${supplementGroupTitle(reminder.metadata?.meal_slot)}`, body: body || 'Supplement-Stack checken.' };
   }
   if (reminder.type === 'supplement') {
-    const dosis = String(reminder.metadata?.dosis || '').trim();
-    const einheit = String(reminder.metadata?.einheit || '').trim();
-    const hinweis = String(reminder.metadata?.hinweis || '').trim();
-    const parts = [dosis && einheit ? `${dosis} ${einheitLabel(einheit)}` : dosis || einheitLabel(einheit), hinweisLabel(hinweis)].filter(Boolean);
-    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: parts.join(' · ') || 'Supplement-Stack checken.' };
+    const hinweis = hinweisLabel(String(reminder.metadata?.hinweis || '').trim());
+    return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: hinweis || 'Supplement-Stack checken.' };
   }
   if (reminder.type === 'drink') return { title: `${notificationSymbol(reminder)} ${reminder.label}`, body: 'Ein Glas Wasser einplanen.' };
   if (reminder.type === 'sleep') {

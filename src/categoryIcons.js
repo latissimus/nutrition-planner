@@ -173,6 +173,10 @@ const colorGroups = [
 const retroColors = colorGroups.flatMap(([, colors]) => colors);
 export const dexEditorColors = [...new Set(retroColors.map(([, color]) => color))];
 
+export const kontrastSchrift = (farbe) => (colorIsDark(farbe) ? '#FFFFFF' : '#111111');
+// Retro ist die Vorgabe; ohne Dokument (Tests, Vorberechnung) gilt ebenfalls Retro.
+const kontrastModus = () => (typeof document === 'undefined' || document.documentElement?.dataset?.theme !== 'dark');
+
 export function colorIsDark(color) {
   const hex = String(color || '').trim().replace('#', '');
   if (!/^[0-9a-f]{6}$/i.test(hex)) return false;
@@ -294,11 +298,24 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   const fixedPattern = fixedSystemPatterns[scope];
   const fallback = fixedColor || fallbackColor || '#F2EBE0';
   const color = fixedColor || getPreference(pageColorKey(scope), fallback).toUpperCase();
+  const accent = fixedSystemAccents[scope] || fixedSystemInks[scope] || color;
+  // Retro: Schrift und Elemente sind schwarz oder weiß, je nachdem, was auf
+  // der Seiten- bzw. Knopffarbe den höheren Kontrast hat. Die Farben der
+  // Flächen bleiben. Im Dark Mode setzt das Stylesheet die Schrift.
+  if (kontrastModus()) {
+    return {
+      color,
+      ink: kontrastSchrift(color),
+      accent,
+      accentInk: kontrastSchrift(accent),
+      pattern: fixedPattern || normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
+    };
+  }
   const ink = fixedSystemInks[scope] || readableInkFor(color);
   return {
     color,
     ink,
-    accent: fixedSystemAccents[scope] || fixedSystemInks[scope] || color,
+    accent,
     accentInk: fixedSystemAccentInks[scope] || readableInkFor(color),
     // Alte Werte wie "drops", "triangles" oder "bones" werden beim Lesen
     // automatisch durch die erste SVG-Tapete aus MUSCLEDEX-TAPETEN ersetzt.
@@ -312,6 +329,7 @@ function writePageLook(target, look) {
   const accentInk = look.accentInk || readableInkFor(accent);
   target.style.setProperty('--dex-seitenfarbe', look.color);
   target.style.setProperty('--dex-ink', ink);
+  target.style.setProperty('--dex-ink-schrift', kontrastSchrift(ink));
   target.style.setProperty('--dex-accent', accent);
   target.style.setProperty('--dex-accent-ink', accentInk);
   target.style.setProperty('--ordner', accent);
@@ -658,6 +676,7 @@ export function mountCategoryChrome(container, route, title, options = {}) {
   const accentInk = look.accentInk || readableInkFor(accent);
   container.style.setProperty('--dex-seitenfarbe', look.color);
   container.style.setProperty('--dex-ink', ink);
+  container.style.setProperty('--dex-ink-schrift', kontrastSchrift(ink));
   container.style.setProperty('--dex-accent', accent);
   container.style.setProperty('--dex-accent-ink', accentInk);
   container.style.setProperty('--ordner', accent);

@@ -183,7 +183,7 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
       <label class="dex-entry-field" for="edit-entry-training-class-custom" data-edit-training-class-custom${fixedEntryClass || !entry.training_class ? ' hidden' : ''}><span>${classConfig.customFieldLabel}</span>
         <input id="edit-entry-training-class-custom" class="input" maxlength="32" value="${fixedEntryClass ? '' : escapeHtml(entry.training_class || '')}" placeholder="${classConfig.customPlaceholder}">
       </label>` : ''}
-      <label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>
+      ${entry.root_key === 'training' ? '' : `<label class="dex-entry-field" for="edit-entry-tags"><span>Tags <small>mit Komma trennen</small></span><input id="edit-entry-tags" class="input" maxlength="200" value="${escapeHtml((entry.tags || []).join(', '))}"></label>`}
       <div class="dex-entry-field"><span>${entry.entry_type === 'routine' ? 'Routine' : entry.entry_type === 'note' ? 'Notiz' : 'Notizen'} <small>${['note', 'routine'].includes(entry.entry_type) && !ownRecipe ? '' : 'optional'}</small></span>${noteEditorMarkup('edit-entry-note', entry.note || '', { required: ['note', 'routine'].includes(entry.entry_type) && !ownRecipe })}</div>
       <button class="btn btn-primary btn-block dex-entry-save" type="submit">Änderungen speichern</button>
       <button class="btn btn-block dex-entry-delete" type="button" data-entry-delete>Eintrag löschen</button>
@@ -222,7 +222,10 @@ export function editEntry(entry, onSaved, { onDeleted } = {}) {
       const payload = {
         title: backdrop.querySelector('#edit-entry-title').value.trim(),
         note: readNote(backdrop.querySelector('#edit-entry-note')),
-        tags: backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
+        // TRAINING hat kein Tag-Feld; vorhandene Tags älterer Einträge bleiben.
+        tags: backdrop.querySelector('#edit-entry-tags')
+          ? backdrop.querySelector('#edit-entry-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 12)
+          : (entry.tags || []),
       };
       if (ownRecipe && !payload.title) throw new Error('Bitte einen Titel für das Rezept eintragen.');
       if (entry.root_key === 'food-log') {
@@ -366,7 +369,9 @@ function detailMarkup(entry, look) {
     : entry.image_path && entry.preview_url
     ? `<button class="dex-detail-bild" type="button" data-fullscreen><img src="${escapeHtml(entry.preview_url)}" alt="${escapeHtml(entry.title)}"></button>`
     : provider?.key === 'instagram' && entry.preview_url
-    ? `<a class="dex-detail-linkvorschau dex-detail-instagram-vorschau" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram-Beitrag öffnen"><img src="${escapeHtml(entry.preview_url)}" alt=""></a>`
+    // Mit Vorschaubild spielt der Beitrag in Instagram selbst: Viele Konten
+    // erlauben das Einbetten nicht, der Player zeigte dann nur einen defekten Link.
+    ? `<a class="dex-detail-linkvorschau dex-detail-instagram-vorschau" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer" aria-label="In Instagram abspielen"><img src="${escapeHtml(entry.preview_url)}" alt=""><i>${materialIconMarkup('play_arrow')}</i><span class="dex-detail-instagram-hinweis">In Instagram abspielen</span></a>`
     : embed ? `<div class="dex-detail-video${provider?.key === 'instagram' ? ' dex-detail-video-instagram' : ''}"><iframe src="${escapeHtml(embed)}" title="${escapeHtml(entry.title || provider?.name || 'Video')}" loading="lazy" scrolling="no" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
       : entry.preview_url ? `<div class="dex-detail-linkvorschau"><img src="${escapeHtml(entry.preview_url)}" alt=""></div>`
         : provider ? `<div class="dex-detail-provider"><strong>${escapeHtml(entry.provider || provider.name)}</strong><span>Vorschau dieses Videos</span></div>` : '';
@@ -414,7 +419,7 @@ function detailMarkup(entry, look) {
         ${entry.note ? `<div class="dex-detail-notiztext">${renderNoteHtml(entry.note)}</div>` : ''}
         ${entry.url ? `<div class="dex-detail-herkunft"><span><b>Quelle</b>${escapeHtml(entry.provider || provider?.name || sourceFromUrl(entry.url))}</span><span><b>Gespeichert</b>${savedAt}</span></div>` : `<div class="dex-detail-herkunft"><span><b>Gespeichert</b>${savedAt}</span></div>`}
         ${entry.url ? `<a class="btn btn-primary dex-detail-link" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer"><span>Link aufrufen</span></a>` : ''}
-        <section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>
+        ${entry.root_key === 'training' ? '' : `<section class="dex-detail-tags"><h2>Tags</h2><div>${tags || '<small>Noch keine Tags vergeben.</small>'}</div></section>`}
         </div>
       </article>
     </div>
@@ -450,6 +455,7 @@ export async function mountDexEntryDetail(container, { userId, id, signal }) {
   const accentInk = look.accentInk || (colorIsDark(accent) ? '#FFFFFF' : '#111111');
   container.style.setProperty('--dex-seitenfarbe', look.color);
   container.style.setProperty('--dex-ink', ink);
+  container.style.setProperty('--dex-ink-schrift', colorIsDark(ink) ? '#FFFFFF' : '#111111');
   container.style.setProperty('--dex-accent', accent);
   container.style.setProperty('--dex-accent-ink', accentInk);
   container.style.setProperty('--ordner', accent);
