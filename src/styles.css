@@ -15528,7 +15528,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="essen"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-dithering-dunkel)!important}
 :root[data-theme="retro"][data-seite="profile"] :is(#view,.profil-fixkopf-view){background-image:var(--muster-dithering-retro)!important;background-repeat:repeat!important;background-position:center!important;background-attachment:fixed!important}
 :root[data-theme="retro"][data-seite="supps"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-punktraster-retro)!important}
-:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-page{background-image:var(--muster-ziegel-retro)!important}
+:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-page{background-image:var(--muster-dithering-retro)!important}
 :root[data-theme="retro"][data-seite="training"] :is(.neo-dex-page,.food-dex-page,.training-dex-page){background-image:var(--muster-dreieck-dunkel)!important}
 :root[data-theme="retro"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page){background-image:var(--muster-rechteckwelle-retro)!important}
 :root[data-theme="retro"][data-seite="coins"] .coin-dex-page{background-image:var(--muster-tetris-dunkel)!important}
@@ -15544,7 +15544,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root:root[data-theme="retro"][data-seite="food-log"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-quadrat-retro)!important}
 :root:root[data-theme="retro"][data-seite="essen"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-dithering-dunkel)!important}
 :root:root[data-theme="retro"][data-seite="supps"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-punktraster-retro)!important}
-:root:root[data-theme="retro"][data-seite="shopping"] #view.shopping-dex-page.shopping-dex-page{background-image:var(--muster-ziegel-retro)!important}
+:root:root[data-theme="retro"][data-seite="shopping"] #view.shopping-dex-page.shopping-dex-page{background-image:var(--muster-dithering-retro)!important}
 :root:root[data-theme="retro"][data-seite="training"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page,.training-dex-page.training-dex-page){background-image:var(--muster-dreieck-dunkel)!important}
 :root:root[data-theme="retro"][data-seite="stress"] #view:is(.neo-dex-page.neo-dex-page,.food-dex-page.food-dex-page){background-image:var(--muster-rechteckwelle-retro)!important}
 :root:root[data-theme="retro"][data-seite="coins"] #view.coin-dex-page.coin-dex-page{background-image:var(--muster-tetris-dunkel)!important}
