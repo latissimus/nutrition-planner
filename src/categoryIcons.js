@@ -112,6 +112,17 @@ const fixedSystemAccents = {
 // (weiße Symbole) statt im früheren Braun.
 const kontrastAkzente = {
   reminders: '#111111',
+  essen: '#C8412E',
+};
+// Retro-Pastell: Die früher dunklen Seiten tragen in Retro das pastellige
+// Gegenstück ihres Farbtons; die dunkle Farbe bleibt als Akzent (ESSEN nimmt
+// Tomatenrot statt Braun). Dark Mode bleibt unberührt.
+const retroPastell = {
+  training: '#A3E4C8',
+  habits: '#C3B1F5',
+  sleep: '#A9B8F5',
+  coins: '#F0B3E6',
+  essen: '#FFC39E',
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
@@ -194,7 +205,7 @@ export function colorIsDark(color) {
 }
 
 export function categoryColor(route) {
-  if (fixedSystemColors[route]) return fixedSystemColors[route];
+  if (fixedSystemColors[route]) return (kontrastModus() && retroPastell[route]) || fixedSystemColors[route];
   const saved = getPreference(colorKey(route));
   // Die frühere Routinen-Standardfarbe war Dunkelgrün. Bereits gespeicherte
   // Defaultwerte werden migriert, eigene Farbauswahlen bleiben erhalten.
@@ -309,9 +320,10 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   // Flächen bleiben. Im Dark Mode setzt das Stylesheet die Schrift.
   if (kontrastModus()) {
     const retroAccent = kontrastAkzente[scope] || accent;
+    const retroColor = retroPastell[scope] || color;
     return {
-      color,
-      ink: kontrastSchrift(color),
+      color: retroColor,
+      ink: kontrastSchrift(retroColor),
       accent: retroAccent,
       accentInk: kontrastSchrift(retroAccent),
       pattern: fixedPattern || normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
