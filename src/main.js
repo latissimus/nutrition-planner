@@ -167,8 +167,33 @@ function tastaturBeobachten() {
   document.addEventListener('focusout', () => setTimeout(aktualisieren, 60));
 }
 
+// Menüband-Kapsel: Wischt man den Inhalt nach oben (Lesen), wird sie flach und
+// zeigt nur Symbole; beim Zurückwischen oder ganz oben wieder die Namen.
+// Gemessen wird am jeweils gescrollten Inhaltsbereich; kleine Zuckungen und
+// das Federn am Rand zählen erst ab 24 px in eine Richtung.
+function menuebandSchrumpfen() {
+  const stand = new WeakMap();
+  document.addEventListener('scroll', (event) => {
+    const ziel = event.target === document ? document.scrollingElement : event.target;
+    if (!(ziel instanceof Element) || ziel.closest('.app-dex-dock,.kategorie-sheet-backdrop')) return;
+    const dock = app.querySelector(':scope > .app-dex-dock');
+    if (!dock) return;
+    const oben = ziel.scrollTop;
+    const vorher = stand.get(ziel) || { oben, summe: 0 };
+    const schritt = oben - vorher.oben;
+    // Seitliches Wischen (Filter, Ordner) ändert nichts an der Kapsel.
+    if (!schritt) return;
+    const summe = Math.sign(schritt) === Math.sign(vorher.summe) ? vorher.summe + schritt : schritt;
+    stand.set(ziel, { oben, summe });
+    if (oben <= 12) dock.classList.remove('ist-kompakt');
+    else if (summe > 24) dock.classList.add('ist-kompakt');
+    else if (summe < -24) dock.classList.remove('ist-kompakt');
+  }, { capture: true, passive: true });
+}
+
 konfiguriereSchreibfelder(document);
 tastaturBeobachten();
+menuebandSchrumpfen();
 new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
   if (node instanceof Element) konfiguriereSchreibfelder(node);
 }))).observe(document.body, { childList: true, subtree: true });
@@ -843,6 +868,11 @@ function appDexShellZeichnen(route, view) {
     app.append(dock);
   }
   dock.setAttribute('aria-label', 'Seite wechseln und Eintrag hinzufügen');
+  // Nach einem Seitenwechsel ist die Kapsel wieder groß und beschriftet.
+  if (dock.dataset.route !== route) {
+    dock.dataset.route = route;
+    dock.classList.remove('ist-kompakt');
+  }
   /* Der frühere MENÜ-Knopf rechts ist entfallen. Er hat die Leiste optisch
      abgeschnitten und ihr 68 px genommen (sichtbar 286 statt 353 px bei
      375 px Gerätebreite). Seine Aufgabe übernimmt ein zweiter Tipp auf den

@@ -16578,3 +16578,68 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Notizfelder in Sheets sind leer schon vier Zeilen hoch; die allgemeine
    Feldhöhe (52 px) gilt nur für einzeilige Felder. */
 :is(#app,body) :is(.kategorie-sheet,.special-dex-sheet) :is(textarea,.rte-area){min-height:116px!important}
+
+/* ============================================================
+   MENÜBAND ALS KAPSEL · wie die Kapsel im Header: deckende Fläche, eine
+   Kontur, runde Enden. Die aktive Seite ist eine weiche Pille. Beim Lesen
+   (Inhalt nach oben gewischt) wird die Kapsel flach und zeigt nur Symbole;
+   main.js setzt dafür .ist-kompakt. Tippen wirkt in beiden Zuständen sofort.
+   ============================================================ */
+:root[data-theme][data-seite] #app>.app-dex-dock{
+  --dex-ink:var(--ui-schrift);
+  color:var(--ui-schrift)!important;
+  padding:0 12px var(--app-dex-dock-bottom)!important;
+}
+/* Die Kapsel schwebt: kein Farbverlauf darüber, kein Streifen darunter. */
+:root[data-theme][data-seite] #app>.app-dex-dock::before,
+:root[data-theme][data-seite] #app>.app-dex-dock::after{display:none!important}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{
+  padding:3px!important;
+  border-radius:999px!important;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before{
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:999px!important;
+  background:var(--ui-flaeche)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs{
+  gap:2px!important;
+  padding-block:0!important;
+  border-radius:999px;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab{
+  width:60px!important;
+  min-width:60px!important;
+  height:52px!important;
+  padding:7px 2px 4px!important;
+  border-radius:999px!important;
+  color:var(--ui-schrift)!important;
+  transition:height .22s ease,padding .22s ease;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab small{
+  max-height:11px;
+  color:inherit!important;
+  opacity:1!important;
+  transition:opacity .15s ease,max-height .22s ease;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.aktiv{
+  background:color-mix(in srgb,var(--ui-schrift) 12%,transparent)!important;
+  box-shadow:none!important;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab>.app-dex-tab-punkte{top:2px}
+
+/* Flach beim Lesen: nur Symbole, niedrigere Pillen. */
+:root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt .app-dex-tab{
+  height:38px!important;
+  padding:6px 2px 3px!important;
+  grid-template-rows:27px 0!important;
+  gap:0!important;
+}
+:root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt .app-dex-tab small{max-height:0;opacity:0!important}
+:root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt .app-dex-tab>span{width:27px!important;height:27px!important}
+:root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt .app-dex-tab>.app-dex-tab-punkte{top:0}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab,.app-dex-tab small){transition:none}
+}
