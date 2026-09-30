@@ -59,7 +59,7 @@ describe('Anbieter- und Farbkontrast', () => {
   // nach Kontrast schwarz oder weiß.
   it('verwendet für TRACKER, COMP, REZEPTE und TRAINING feste Retro-Farbpaare', () => {
     expect(pageLook('reminders', '#000000', 'wallpaper-burger')).toEqual(expect.objectContaining({
-      color: '#FFEDE3', ink: '#111111', accent: '#49251E', accentInk: '#FFFFFF',
+      color: '#FFEDE3', ink: '#111111', accent: '#FFA175', accentInk: '#111111',
     }));
     expect(pageLook('body', '#000000', 'wallpaper-comp')).toEqual(expect.objectContaining({
       color: '#94DEFF', ink: '#111111', accent: '#FF277F', accentInk: '#111111',

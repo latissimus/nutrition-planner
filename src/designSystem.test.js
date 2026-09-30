@@ -258,13 +258,15 @@ describe('CAPBOY Design-System', () => {
     expect(heroCss).toContain('font-weight:700!important;');
   });
 
-  it('verwendet auf TRACKER das feste Soft-Blush-Braun-Paar', () => {
+  it('verwendet auf TRACKER Soft Blush mit Lachs statt des früheren Brauns', () => {
     expect(categoryIcons).toContain("reminders: '#FFEDE3'");
     expect(categoryIcons).toContain("reminders: '#49251E'");
     expect(designSystem).toContain(':root[data-seite="reminders"]{');
     expect(designSystem).toContain('--cap-card-border:var(--kontur) solid var(--kontur-farbe);');
-    expect(designSystem).toContain('background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;');
-    expect(designSystem).toContain('.nutrition-calibration-info :is(.material-svg,svg,svg *){\n  color:#fff!important;');
+    expect(categoryIcons).toContain("reminders: '#FFA175'");
+    expect(designSystem).toContain('background:color-mix(in srgb,#FFA175 14%,#FFFCF5)!important;');
+    expect(designSystem).not.toMatch(/#(?:492426|49251E|4E342E)\b(?!\))/i);
+    expect(designSystem).toContain('.nutrition-calibration-info :is(.material-svg,svg,svg *){\n  color:#111111!important;');
     expect(designSystem).toContain('.mahl-mini-switch input:checked+.mahl-mini-switch-track::after{\n  background:#fff!important;');
   });
 

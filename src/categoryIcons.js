@@ -108,6 +108,10 @@ const fixedSystemAccents = {
   coins: '#432C5E',
   profile: '#0A1330',
 };
+// Retro ersetzt das frühere Braun des TRACKERs durch das Lachs der Seite.
+const kontrastAkzente = {
+  reminders: '#FFA175',
+};
 const fixedSystemAccentInks = {
   body: '#94DEFF',
   'food-log': '#3C153B',
@@ -303,11 +307,12 @@ export function pageLook(scope, fallbackColor, fallbackPattern = 'drops') {
   // der Seiten- bzw. Knopffarbe den höheren Kontrast hat. Die Farben der
   // Flächen bleiben. Im Dark Mode setzt das Stylesheet die Schrift.
   if (kontrastModus()) {
+    const retroAccent = kontrastAkzente[scope] || accent;
     return {
       color,
       ink: kontrastSchrift(color),
-      accent,
-      accentInk: kontrastSchrift(accent),
+      accent: retroAccent,
+      accentInk: kontrastSchrift(retroAccent),
       pattern: fixedPattern || normalizePagePattern(getPreference(pagePatternKey(scope), fallbackPattern)),
     };
   }

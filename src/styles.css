@@ -165,8 +165,8 @@
   --h-weight:800;
   --h-spacing:-.03em;
 
---muster-dreieck:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%230B1B44' fill-opacity='.07'/%3E%3C/svg%3E");
---muster-tropfen:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%230B1B44' fill-opacity='.07' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
+--muster-dreieck:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%230B1B44' fill-opacity='.091'/%3E%3C/svg%3E");
+--muster-tropfen:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%230B1B44' fill-opacity='.091' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
 
   /* Aus frueheren Umbauten sind zwei parallele Variablennamen uebrig
      (--app-* und --feast-*), die noch an einzelnen Stellen gelesen werden.
@@ -208,7 +208,8 @@
   --kontur-farbe:#FFFFFF;
   --bg:#101A2B;       /* einheitliches tiefes Navy aus dem Notizbuch */
   --surface:#191C24;
-  --surface2:#232733;
+  /* Keine hellgrauen Innenflächen: wie in Retro liegt alles auf der Kartenfarbe. */
+  --surface2:#191C24;
   --ink:#FFFFFF;
   --line:#FFFFFF;
   --text:#FFFFFF;
@@ -248,8 +249,8 @@
      brightness(0) faerbt das PNG schwarz und laesst die Transparenz stehen,
      invert(1) macht daraus Weiss – so bleibt es bei einer Bilddatei. */
   --sil-filter:brightness(0) invert(1);
-  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.032'/%3E%3C/svg%3E");
-  --muster-tropfen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23EDF0F6' fill-opacity='.02' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
+  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.042'/%3E%3C/svg%3E");
+  --muster-tropfen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23EDF0F6' fill-opacity='.026' d='M6.362 0H2.878l.016.026C3.408.85 4.142 1.471 4.8 1.44 5.441 1.41 6.005.713 6.362 0ZM0 2.517V1.322c.15.364.12.784 0 1.195Zm0 10.6V8.532c.638.135 1.215.513 1.45 1.02.304.66.01 1.526-.435 2.316-.27.481-.6.934-1.015 1.249ZM6.356 24H2.878c-.503-.819-.786-1.821-.42-2.455.37-.641 1.394-.912 2.26-.821.87.091 1.58.545 1.865 1.142.286.598.161 1.335-.194 2.067a5.1 5.1 0 0 1-.033.067Zm10.066 0h-4.92a2.258 2.258 0 0 1-.016-.264c.01-.838.492-1.706 1.162-1.975.67-.269 1.514.045 2.275.542.673.44 1.292.975 1.499 1.697ZM24 8.532v4.585a2.07 2.07 0 0 1-.905.405c-.871.15-2.006-.248-2.4-1.006-.393-.758-.043-1.867.526-2.678.569-.812 1.353-1.325 2.193-1.359.196-.006.394.012.586.053ZM24 1.3v1.227a4.24 4.24 0 0 1-.286.696 2.971 2.971 0 0 1-1.262 1.397 2.446 2.446 0 0 1-2.086.154c-.698-.305-1.3-1.061-1.322-1.812-.022-.747.54-1.493 1.195-2.019a2.954 2.954 0 0 1 2.112-.72c.71.076 1.4.51 1.649 1.077ZM11.502 0h4.92c.027.094.047.192.059.293.105.873-.331 1.98-1.114 2.333-.782.352-1.862-.048-2.64-.65-.695-.54-1.139-1.239-1.225-1.976ZM6.6 3.953c-.84.033-1.625.547-2.194 1.358-.568.811-.919 1.92-.525 2.679.393.758 1.529 1.156 2.4 1.008.871-.15 1.476-.867 1.92-1.656.444-.79.749-1.654.439-2.316-.31-.663-1.2-1.102-2.04-1.073Zm8.093 3.487c-.96-.1-2.1.2-2.51.912-.411.713-.087 1.84.48 2.753.566.912 1.387 1.605 2.116 1.557.73-.048 1.37-.844 1.764-1.658.394-.814.538-1.632.216-2.294-.321-.663-1.104-1.179-2.066-1.27Zm-4.805 6.814c.588.607.895 1.624.61 2.4-.284.77-1.17 1.296-2.045 1.56-.876.264-1.757.254-2.453-.118s-1.229-1.12-1.236-1.81c-.007-.688.52-1.339 1.078-1.819a3.27 3.27 0 0 1 1.857-.907 2.686 2.686 0 0 1 2.189.694Zm7.488 5.56c.72.744 1.862 1.275 2.686.96.823-.314 1.33-1.454 1.488-2.596.158-1.143-.041-2.256-.67-2.715-.629-.458-1.704-.24-2.585.154-.88.393-1.557.977-1.747 1.74-.19.763.106 1.716.828 2.457Z'/%3E%3C/svg%3E");
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Scrollen bleibt per Touch, Mausrad und Tastatur erhalten; nur die sichtbare
@@ -1272,7 +1273,7 @@ label.fld-l,.falte span{font-family:var(--ui);color:var(--app-secondary)}
 .gesten-hinweis>button{width:44px;height:44px;display:grid;place-items:center;border:0;background:transparent;color:inherit;
   font:800 28px/1 var(--ui);padding:0}
 .gesten-hinweis-symbol{position:relative;width:44px;height:36px;display:flex;align-items:center;justify-content:center;gap:2px;
-  color:#fff;background:#492426;border-radius:10px}
+  color:var(--ui-gefuellt-schrift);background:var(--ui-gefuellt);border-radius:10px}
 .gesten-hinweis-symbol b{font:800 15px/1 var(--ui)}
 .gesten-hinweis-symbol.swipe i{font:800 17px/1 var(--ui);font-style:normal}
 .gesten-hinweis-symbol.hold b{position:relative;z-index:1;font-size:13px}
@@ -1798,7 +1799,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .tuck-ablage-knopf{
   display:grid;place-items:center;width:62px;padding:0;
   border:var(--karten-bw) solid var(--ink);border-radius:var(--r);
-  background:#492426;color:#fff;box-shadow:var(--hart-klein);
+  background:var(--ui-gefuellt);color:var(--ui-gefuellt-schrift);box-shadow:var(--hart-klein);
 }
 .tuck-ablage-knopf .material-svg,.tuck-ablage-knopf .material-svg svg{width:27px;height:27px;color:#fff;fill:#fff}
 .tuck-ablage-knopf .material-svg svg{stroke:#fff;stroke-width:14px;stroke-linejoin:round}
@@ -1942,6 +1943,9 @@ button,a,[role="button"],summary{touch-action:manipulation;
   position:relative!important;display:block!important;
   width:100%!important;min-width:100%!important;align-self:stretch!important;
   background:var(--surface)!important;
+}
+:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau.dex-artikel-vorschau{
+  width:calc(100% + 2*var(--kontur))!important;min-width:calc(100% + 2*var(--kontur))!important;
 }
 .dex-artikel-vorschau img{
   position:absolute!important;inset:0!important;
@@ -2212,8 +2216,8 @@ button,a,[role="button"],summary{touch-action:manipulation;
   font-family:var(--ui);font-size:14px;
 }
 :root:is([data-seite="reminders"],[data-seite="shopping"],[data-seite="habits"]) :is(.btn-primary,.rem-speichern){
-  min-height:48px;border:0!important;border-radius:11px;background:#492426!important;
-  color:#fff!important;box-shadow:none;font-family:var(--ui);font-style:normal;font-weight:800;
+  min-height:48px;border:0!important;border-radius:11px;background:#FFA175!important;
+  color:#111111!important;box-shadow:none;font-family:var(--ui);font-style:normal;font-weight:800;
 }
 .dex-inhaltskarte-body{display:flex;flex:1;min-height:0;flex-direction:column;gap:6px;padding:10px 10px 12px;overflow:hidden}
 .dex-inhaltskarte strong{
@@ -2243,11 +2247,11 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-video-vorschau,.dex-provider-vorschau{position:relative}
 .dex-video-vorschau>i,.dex-detail-linkvorschau>i{
   position:absolute;inset:50% auto auto 50%;display:grid;place-items:center;width:42px;height:42px;
-  border-radius:50%;background:rgba(73,36,38,.88);transform:translate(-50%,-50%);color:#fff;
+  border-radius:50%;background:color-mix(in srgb,var(--neutral-flaeche) 90%,transparent);transform:translate(-50%,-50%);color:var(--neutral-flaeche-schrift);
 }
-.dex-video-vorschau>i svg,.dex-detail-linkvorschau>i svg{width:25px;height:25px;fill:#fff!important}
-.dex-provider-vorschau{display:flex!important;align-items:center;justify-content:center;flex-direction:column;gap:5px;background:#492426;color:#fff}
-.dex-provider-vorschau i svg{width:32px;height:32px;fill:#fff!important}
+.dex-video-vorschau>i svg,.dex-detail-linkvorschau>i svg{width:25px;height:25px;fill:var(--neutral-flaeche-schrift)!important}
+.dex-provider-vorschau{display:flex!important;align-items:center;justify-content:center;flex-direction:column;gap:5px;background:var(--neutral-flaeche);color:var(--neutral-flaeche-schrift)}
+.dex-provider-vorschau i svg{width:32px;height:32px;fill:var(--neutral-flaeche-schrift)!important}
 .dex-provider-vorschau b{font-size:12px;letter-spacing:.05em;text-transform:uppercase}
 .dex-notiz-vorschau{
   display:flex!important;flex-direction:column;justify-content:center;gap:10px;padding:18px 16px;
@@ -2320,7 +2324,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-detail-linkvorschau{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
 .dex-detail-linkvorschau img{display:block;width:100%;height:100%;object-fit:cover}
 .dex-detail-linkvorschau img{object-position:50% 50%}
-.dex-detail-provider{display:grid;place-items:center;gap:7px;min-height:220px;background:#492426;color:#fff;text-align:center}
+.dex-detail-provider{display:grid;place-items:center;gap:7px;min-height:220px;background:var(--neutral-flaeche);color:var(--neutral-flaeche-schrift);text-align:center}
 .dex-detail-provider i svg{width:48px;height:48px;fill:#fff!important}.dex-detail-provider span{font-size:12px;opacity:.8}
 .dex-detail-inhalt{display:grid;gap:15px;padding:18px}
 .dex-detail-inhalt>small{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em}
@@ -2343,7 +2347,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .dex-bild-vollbild .dex-bild-schliessen{position:absolute;z-index:2;top:max(14px,env(safe-area-inset-top));right:14px}
 
 /* Globale primäre Aktion: dasselbe Braun wie der Suchknopf. */
-.btn-primary{background:#492426!important;color:#fff!important}
+.btn-primary{background:var(--ui-gefuellt)!important;color:var(--ui-gefuellt-schrift)!important}
 .btn-primary .material-svg,.btn-primary .material-svg svg,.btn-primary svg{color:#fff!important;fill:#fff!important}
 button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!important}
 
@@ -2362,7 +2366,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   flex:0 0 auto;min-height:34px;padding:7px 12px;border:1px solid var(--ink);border-radius:999px;
   background:var(--surface);color:var(--text);font:800 11px/1 var(--ui);white-space:nowrap;
 }
-:is(.neo-dex-filter,.food-dex-filter) button.aktiv{background:#492426;color:#fff}
+:is(.neo-dex-filter,.food-dex-filter) button.aktiv{background:var(--ui-gefuellt);color:var(--ui-gefuellt-schrift)}
 @media(max-width:380px){.food-entry-meta{grid-template-columns:1fr}}
 .tuck-fach.cyan{--ordner:var(--fe-blue-cloud)}
 .tuck-fach.pink{--ordner:var(--fe-pink)}
@@ -2539,7 +2543,7 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .coin-reward p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
 .coin-reward-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .coin-reward-actions button{min-height:38px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);font:800 12px/1 var(--ui)}
-.coin-reward-actions .coin-redeem{background:#492426;color:#fff}.coin-reward-actions .coin-redeem:disabled{opacity:.32}
+.coin-reward-actions .coin-redeem{background:var(--ui-gefuellt);color:var(--ui-gefuellt-schrift)}.coin-reward-actions .coin-redeem:disabled{opacity:.32}
 .coin-empty{display:grid;gap:4px;padding:18px;border:1px dashed var(--muted);border-radius:14px;text-align:center}.coin-empty span{color:var(--muted);font-size:13px}
 .coin-history{display:grid;border-top:1px solid color-mix(in srgb,var(--ink) 24%,transparent)}
 .coin-history>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
@@ -2966,9 +2970,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:translateY(2px)!important;
   box-shadow:none;
 }
+/* Die Vorschau liegt genau auf der Kartenkontur: um deren Stärke nach
+   links, rechts und oben verschoben und entsprechend breiter. */
 :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
-  box-sizing:border-box;width:calc(100% + 4px);max-width:none;
-  height:56%!important;flex-basis:56%!important;margin:-2px -2px 0;
+  box-sizing:border-box;width:calc(100% + 2*var(--kontur));max-width:none;
+  height:56%!important;flex-basis:56%!important;margin:calc(-1*var(--kontur)) calc(-1*var(--kontur)) 0;
   border:var(--kontur) solid var(--kontur-farbe);border-radius:var(--r-karte) var(--r-karte) 10px 10px;box-shadow:none!important;
   /* While a remote preview is loading, show the Dex surface rather than the
      global cream token. Once the image arrives it covers this colour. */
@@ -3146,7 +3152,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .mahl-zeitblock .nutrition-entry .nutrition-entry-icon{display:grid;place-items:center;border-radius:9px;background:var(--ordner)}
 .mahl-zeitblock .nutrition-entry .nutrition-entry-icon>.nutrition-food-icon{display:grid;place-items:center;width:24px;height:24px}
 /* Höhere Spezifität als .rem-row-emoji svg (fill:#000), damit das Icon weiß bleibt. */
-.mahl-zeitblock .nutrition-entry .nutrition-entry-icon .nutrition-food-icon svg{width:22px;height:22px;color:#fff;fill:#fff}
+.mahl-zeitblock .nutrition-entry .nutrition-entry-icon .nutrition-food-icon svg{width:22px;height:22px;color:var(--ordner-ink,#fff);fill:var(--ordner-ink,#fff)}
 /* Portionsauswahl (1 Tasse, 1 Apfel …) – setzt die Grammmenge. */
 .nutrition-portionen{display:flex;flex-wrap:wrap;gap:8px}
 .nutrition-portionen button{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 14px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--surface);color:var(--ink);font:800 13px/1 var(--ui);cursor:pointer}
@@ -3189,7 +3195,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-icon-waehler{display:grid;place-items:center;width:52px;height:48px;padding:0;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:10px;background:var(--app-field);color:#000;box-shadow:none}
 .rem-icon-waehler .reminder-svg,.rem-icon-waehler svg{display:block;width:24px;height:24px;color:#000;fill:#000}
 .rem-icon-waehler .reminder-emoji{font-size:22px;line-height:1}
-.rem-speichern{width:100%;min-height:48px;background:#492426!important;color:#fff!important}
+.rem-speichern{width:100%;min-height:48px;background:var(--ui-gefuellt)!important;color:var(--ui-gefuellt-schrift)!important}
 .rem-overlay-hinweis{margin:0 0 10px;color:var(--muted);font-size:13px}
 .rem-period-menu button{justify-content:space-between}
 .rem-period-menu button span{font-weight:800}
@@ -3201,7 +3207,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-eigenes-emoji{display:grid;gap:10px;margin-top:16px}
 .rem-eigenes-emoji label{display:grid;gap:7px;font-weight:800}
 .rem-eigenes-emoji input{width:100%;min-height:48px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--app-field);font-size:20px}
-.rem-eigenes-emoji .btn{min-height:48px;background:#492426!important;color:#fff!important}
+.rem-eigenes-emoji .btn{min-height:48px;background:var(--ui-gefuellt)!important;color:var(--ui-gefuellt-schrift)!important}
 .rem-mahlzeit-notiz{min-height:88px;padding:12px 13px;line-height:1.4;resize:vertical}
 .mahl-zeitblock input[type="time"],.mahl-zeitblock input[type="number"],.mahl-zeitblock select{height:48px;min-height:48px;padding-top:0;padding-bottom:0;line-height:48px;text-align:center;text-align-last:center}
 .mahl-zeitblock input[type="time"]::-webkit-date-and-time-value{height:48px;line-height:48px;text-align:center}
@@ -3322,7 +3328,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .einkauf-tag-chip{flex:0 0 auto;min-height:27px;padding:4px 10px;border:1px solid var(--ink);
   border-radius:999px;background:var(--surface);color:var(--text);font:700 11px/1 var(--ui);
   white-space:nowrap}
-.einkauf-tag-chip.aktiv{background:#492426;color:#fff;border-color:#492426}
+.einkauf-tag-chip.aktiv{background:var(--ui-gefuellt);color:var(--ui-gefuellt-schrift);border-color:var(--kontur-farbe)}
 /* Tag-Auswahl im Anlegen-/Bearbeiten-Formular: vorhandene Tags zum Antippen. */
 .einkauf-tag-picker{display:flex;flex-wrap:wrap;gap:6px;margin-top:-2px}
 .einkauf-tag-picker .einkauf-tag-chip{cursor:pointer}
@@ -3520,8 +3526,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .dex-auswahlmodus :is(.dex-ordner-test,.dex-inhaltskarte){cursor:pointer}
 .dex-auswahl-marker{position:absolute;z-index:8;top:9px;left:9px;display:grid;place-items:center;width:28px;height:28px;border:var(--kontur) solid var(--kontur-farbe);border-radius:50%;background:#fff;pointer-events:none}
 .dex-auswahl-marker .material-svg,.dex-auswahl-marker svg,.dex-auswahl-marker svg *{width:19px;height:19px;fill:#fff!important}
-:is(.dex-ordner-test,.dex-inhaltskarte).ausgewaehlt .dex-auswahl-marker{background:#492426}
-:is(.dex-ordner-test,.dex-inhaltskarte).ausgewaehlt{outline:4px solid #492426;outline-offset:2px}
+:is(.dex-ordner-test,.dex-inhaltskarte).ausgewaehlt .dex-auswahl-marker{background:var(--ui-gefuellt)}
+:is(.dex-ordner-test,.dex-inhaltskarte).ausgewaehlt{outline:4px solid var(--kontur-farbe);outline-offset:2px}
 .dex-auswahlleiste{position:fixed;z-index:900;left:50%;bottom:max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:auto 1fr repeat(3,58px);align-items:center;gap:7px;width:min(calc(100% - 24px),560px);padding:10px 11px;border:var(--kontur) solid var(--kontur-farbe);border-radius:16px;background:var(--surface);box-shadow:var(--hart);transform:translateX(-50%)}
 .dex-auswahlleiste>strong{font-size:12px;white-space:nowrap}
 .dex-auswahlleiste button{display:grid;place-items:center;gap:2px;min-height:48px;padding:3px;border:0;border-radius:9px;background:transparent;color:#000}
@@ -3614,7 +3620,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   /* Exakt dieselbe neutrale Staffelung wie in LOGMAN. Der spaetere
      Konsistenzpass darf die gemeinsamen Dark-Tokens nicht erneut aufhellen. */
   --surface:#191C24;
-  --surface2:#232733;
+  /* Keine hellgrauen Innenflächen: wie in Retro liegt alles auf der Kartenfarbe. */
+  --surface2:#191C24;
   --ink:#FFFFFF;
   --line:#FFFFFF;
   --text:#FFFFFF;
@@ -3711,7 +3718,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Ein wartender Service Worker wird erst nach ausdruecklichem Tipp aktiviert,
    damit offene Eingaben nicht durch einen ungefragten Reload verloren gehen. */
-.pwa-update-button{position:fixed;z-index:1200;right:50%;bottom:calc(88px + env(safe-area-inset-bottom));display:grid;gap:2px;box-sizing:border-box;width:min(calc(100vw - 28px),320px);padding:11px 15px;border:var(--kontur) solid var(--kontur-farbe);border-radius:13px;background:#492426;color:#fff;box-shadow:var(--hart-klein);font-family:var(--ui);text-align:left;transform:translateX(50%)}
+.pwa-update-button{position:fixed;z-index:1200;right:50%;bottom:calc(88px + env(safe-area-inset-bottom));display:grid;gap:2px;box-sizing:border-box;width:min(calc(100vw - 28px),320px);padding:11px 15px;border:var(--kontur) solid var(--kontur-farbe);border-radius:13px;background:var(--ui-gefuellt);color:#fff;box-shadow:var(--hart-klein);font-family:var(--ui);text-align:left;transform:translateX(50%)}
 .pwa-update-button[hidden]{display:none}
 .pwa-update-button b{font-size:13px}.pwa-update-button small{font-size:10px;opacity:.82}
 :root[data-theme="dark"] .pwa-update-button{background:var(--dark-action);color:var(--dark-action-ink);border-color:var(--text);box-shadow:none}
@@ -6922,9 +6929,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] :is(.reminder-overlay,.nutrition-overlay,.mahl-add-backdrop) .kategorie-sheet :is(
   .btn-primary,.rem-speichern
 ){
-  background:var(--dex-seitenfarbe,var(--ordner,#4E342E))!important;
+  background:var(--dex-seitenfarbe,var(--ordner,#FFA175))!important;
   border-color:var(--kontur-farbe)!important;
-  color:var(--dex-ink,#fff)!important;
+  color:var(--dex-ink,#111111)!important;
 }
 
 /* Bewusste Ausnahme der gemeinsamen Overlay-Regel. */
@@ -8589,8 +8596,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .rem-speichern
 ){
   border:var(--kontur) solid var(--kontur-farbe)!important;
-  background:var(--ordner,#4E342E)!important;
-  color:var(--ordner-ink,#fff)!important;
+  background:var(--ordner,#FFA175)!important;
+  color:var(--ordner-ink,#111111)!important;
 }
 
 /* ============================================================
@@ -9369,7 +9376,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    ============================================================ */
 :root[data-seite="reminders"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,var(--dex-accent,#4E342E) 8%,#FFFCF5);
+  --cap-tint:color-mix(in srgb,var(--dex-accent,#FFA175) 8%,#FFFCF5);
   --cap-card-border:var(--kontur) solid var(--kontur-farbe);
   --cap-muted:#5C5F66;
 }
@@ -9475,7 +9482,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* TRACKER: Butterflaeche mit Chocolate als durchgaengiger Druckfarbe. */
 :root[data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#FFFCF5;
-  --tracker-tint:color-mix(in srgb,var(--dex-accent,#4E342E) 8%,#FFFCF5);
+  --tracker-tint:color-mix(in srgb,var(--dex-accent,#FFA175) 8%,#FFFCF5);
   --muted:#5C5F66;
   color:var(--dex-ink,#111111)!important;
 }
@@ -9511,9 +9518,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
 :root[data-seite="reminders"] .nutrition-portionen button.aktiv,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
-  border-color:var(--dex-ink,#4E342E)!important;
-  background:var(--dex-ink,#4E342E)!important;
-  color:var(--dex-ink-schrift,#FFFFFF)!important;
+  border-color:var(--dex-ink,var(--kontur-farbe))!important;
+  background:var(--dex-ink,#FFA175)!important;
+  color:var(--dex-ink-schrift,#111111)!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:var(--dex-accent-ink,#FEEFB8)!important;
@@ -9885,20 +9892,20 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:currentColor!important;
 }
 
-/* SUPPS: das TRACKER-Paar in umgekehrter Richtung – Chocolate Brown #4E342E
+/* SUPPS: Indigo #2A1E5C (früher Chocolate Brown)
    als Seitenfarbe und Butter #FEEFB8 als Druckfarbe. Die dunkle Seite
    trägt die helle Druckfarbe; Karten invertieren das Paar für ruhige,
    gut lesbare Sammlungs- und Detailflächen. */
 :root[data-seite="supps"]{
   --supps-card:#FEEFB8;
   --cap-card:var(--supps-card);
-  --cap-tint:color-mix(in srgb,#4E342E 8%,#FEEFB8);
+  --cap-tint:color-mix(in srgb,#2A1E5C 8%,#FEEFB8);
   --cap-card-border:var(--kontur) solid var(--kontur-farbe);
   --cap-muted:#111111;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page){
   --surface:var(--supps-card);
-  --surface2:color-mix(in srgb,#4E342E 8%,#FEEFB8);
+  --surface2:color-mix(in srgb,#2A1E5C 8%,#FEEFB8);
   --text:#111111;
   --ink:#FFFFFF;
   --muted:#111111;
@@ -9927,7 +9934,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
-  background:#4E342E!important;
+  background:#2A1E5C!important;
   color:#FFFFFF!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{
@@ -9937,7 +9944,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
   border-color:var(--kontur-farbe)!important;
-  background:#4E342E!important;
+  background:#2A1E5C!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte :is(strong,.dex-inhaltskarte-text){
   color:#111111!important;
@@ -9952,7 +9959,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   fill:#FEEFB8!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-farbblatt{
-  fill:#4E342E!important;
+  fill:#2A1E5C!important;
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .dex-ordner-inhalt :is(h2,b,span){
@@ -9965,7 +9972,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
 :root[data-seite="supps"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after{
-  background:#4E342E!important;
+  background:#2A1E5C!important;
 }
 :root[data-seite="supps"] .dex-detail-popup{
   border-color:var(--kontur-farbe)!important;
@@ -9980,7 +9987,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-herkunft,.dex-detail-link){
   border-color:var(--kontur-farbe)!important;
-  background:#4E342E!important;
+  background:#2A1E5C!important;
   color:#FFFFFF!important;
 }
 :root[data-seite="supps"] .dex-detail-popup .dex-detail-herkunft :is(span,b),
@@ -9993,7 +10000,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] .dex-detail-popup :is(.dex-detail-foodmeta span,.dex-detail-tags span){
   border-color:var(--kontur-farbe)!important;
-  background:#4E342E!important;
+  background:#2A1E5C!important;
   color:#FFFFFF!important;
 }
 
@@ -10056,7 +10063,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   border-color:var(--kontur-farbe)!important;
-  background:#4E342E!important;
+  background:#2A1E5C!important;
   color:#FFFFFF!important;
 }
 :root[data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){
@@ -10409,13 +10416,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    zeigen. Header, Dock und neutrale Kontextmenüs bleiben schwarz/weiß. */
 :root[data-seite="shopping"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --cap-tint:color-mix(in srgb,#013E37 7%,#FFFCF5);
   --cap-card-border:var(--kontur) solid var(--kontur-farbe);
   --cap-muted:#5C5F66;
 }
 :root[data-seite="shopping"] .shopping-dex-wrap{
   --surface:#FFFCF5;
-  --surface2:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --surface2:color-mix(in srgb,#013E37 7%,#FFFCF5);
   --text:#111111;
   --ink:#111111;
   --muted:#5C5F66;
@@ -10432,7 +10439,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="shopping"] :is(.einkauf-tag-chip,.einkauf-chip-btn,.einkauf-reset){
   border-color:var(--kontur-farbe)!important;
-  background:#49251E!important;
+  background:#013E37!important;
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
   box-shadow:none!important;
@@ -10449,7 +10456,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:#111111!important;
 }
 :root[data-seite="shopping"] .einkauf-gruppe .reminder-group-head{
-  background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;
+  background:color-mix(in srgb,#013E37 7%,#FFFCF5)!important;
   color:#111111!important;
 }
 :root[data-seite="shopping"] .einkauf-gruppe .reminder-group-icon{
@@ -10479,7 +10486,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-size:15px 15px!important;
 }
 :root[data-seite="shopping"] .einkauf-row input[type="checkbox"]:checked{
-  background-color:#49251E!important;
+  background-color:#013E37!important;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4L19 6' fill='none' stroke='%23FFEDE3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
 }
 :root[data-seite="shopping"] .einkauf-row-name{color:#111111!important}
@@ -11210,17 +11217,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    lange Inhalte auf hellen, ruhigen Leseflächen.
    ============================================================ */
 
-/* TRACKER · Soft Blush #FFEDE3 / Braun #49251E */
+/* TRACKER · Soft Blush #FFEDE3 / Lachs #FFA175 (früher Braun) */
 :root[data-seite="reminders"]{
   --cap-card:#FFFCF5;
-  --cap-tint:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --cap-tint:color-mix(in srgb,#FFA175 14%,#FFFCF5);
   --cap-card-border:var(--kontur) solid var(--kontur-farbe);
   --cap-muted:#5C5F66;
 }
 :root[data-seite="reminders"],:root[data-seite="reminders"] body,:root[data-seite="reminders"] :is(#app,#view){background-color:#FFEDE3!important}
 :root[data-seite="reminders"] .meal-log-dex-page{
   --tracker-card:#FFFCF5;
-  --tracker-tint:color-mix(in srgb,#49251E 7%,#FFFCF5);
+  --tracker-tint:color-mix(in srgb,#FFA175 14%,#FFFCF5);
   --text:#111111;
   --ink:#111111;
   --muted:#5C5F66;
@@ -11231,7 +11238,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ){border-color:var(--kontur-farbe)!important;background:#FFFCF5!important;color:#111111!important}
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero{
   border-color:var(--kontur-farbe)!important;
-  background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important;
+  background:color-mix(in srgb,#FFA175 14%,#FFFCF5)!important;
   color:#111111!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page :is(
@@ -11239,33 +11246,33 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .mahl-zeitblock>header h2,.rem-row-titel b,.nutrition-entry b,.nutrition-entry strong
 ){color:#111111!important}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.nutrition-coin-hero-value small,.nutrition-coin-hero-value strong,.nutrition-coin-hero-value b,.nutrition-ring>span){color:#111111!important}
-:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after{background:color-mix(in srgb,#49251E 7%,#FFFCF5)!important}
+:root[data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after{background:color-mix(in srgb,#FFA175 14%,#FFFCF5)!important}
 :root[data-seite="reminders"] .meal-log-dex-page :is(.btn-primary,.rem-speichern),
 :root[data-seite="reminders"] .nutrition-portionen button.aktiv,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info{
-  border-color:#49251E!important;
-  background:#49251E!important;
-  color:#FFFFFF!important;
+  border-color:var(--kontur-farbe)!important;
+  background:#FFA175!important;
+  color:#111111!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info,
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info :is(.material-svg,svg,svg *){
-  color:#fff!important;
+  color:#111111!important;
   fill:currentColor!important;
-  -webkit-text-fill-color:#fff!important;
+  -webkit-text-fill-color:#111111!important;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after{
   background:#fff!important;
 }
-:root[data-seite="reminders"] .app-dex-header{--dex-ink:#111111;background:#FFEDE3!important;border-color:#49251E!important;color:#111111!important}
+:root[data-seite="reminders"] .app-dex-header{--dex-ink:#111111;background:#FFEDE3!important;border-color:var(--kontur-farbe)!important;color:#111111!important}
 :root[data-seite="reminders"] .app-dex-brand .brand{--brand-outline:#0A1330;--sil-filter:none}
-:root[data-seite="reminders"] .app-dex-header .nav-av{border-color:#49251E!important;background:#fff!important;color:#111111!important}
+:root[data-seite="reminders"] .app-dex-header .nav-av{border-color:var(--kontur-farbe)!important;background:#fff!important;color:#111111!important}
 :root[data-seite="reminders"] .app-dex-dock{--dex-ink:#111111;color:#111111!important}
 :root[data-seite="reminders"] .app-dex-dock::after{background:#FFEDE3!important}
-:root[data-seite="reminders"] .app-dex-dock-inner::before{border-color:#49251E!important;background:color-mix(in srgb,#FFEDE3 90%,transparent)!important}
+:root[data-seite="reminders"] .app-dex-dock-inner::before{border-color:var(--kontur-farbe)!important;background:color-mix(in srgb,#FFEDE3 90%,transparent)!important}
 :root[data-seite="reminders"] .app-dex-tab{color:#111111!important}
-:root[data-seite="reminders"] .app-dex-tab.aktiv{background:color-mix(in srgb,#49251E 9%,#FFEDE3)!important;box-shadow:inset 0 0 0 var(--kontur) #49251E!important}
-:root[data-seite="reminders"] .app-dex-menu{border-left-color:#49251E!important;color:#111111!important}
-:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:var(--kontur-farbe)!important;background:#49251E!important;color:#FFFFFF!important}
+:root[data-seite="reminders"] .app-dex-tab.aktiv{background:color-mix(in srgb,#FFA175 18%,#FFEDE3)!important;box-shadow:inset 0 0 0 var(--kontur) var(--kontur-farbe)!important}
+:root[data-seite="reminders"] .app-dex-menu{border-left-color:var(--kontur-farbe)!important;color:#111111!important}
+:root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){border-color:var(--kontur-farbe)!important;background:#FFA175!important;color:#111111!important}
 :root[data-seite="reminders"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#FFFFFF!important;fill:currentColor!important}
 
 /* ESSEN · Cinnamon #945B39 / Warmweiß #F6EFE9 */
@@ -12752,7 +12759,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   /* Unveraenderliche LOGMAN-Referenzwerte. Seitenfarben duerfen im Darkmode
      nur noch Buttons und echte Akzente tragen, nicht Flaechen oder Konturen. */
   --dm-surface:#191C24;
-  --dm-surface2:#232733;
+  /* Keine hellgrauen Innenflächen: Knöpfe und Zeilen tragen die Kartenfarbe. */
+  --dm-surface2:#191C24;
   --dm-text:#FFFFFF;
   --dm-ink:#FFFFFF;
   --dm-muted:#AEB7C6;
@@ -14067,7 +14075,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--dm-text)!important;
   -webkit-text-fill-color:var(--dm-text)!important;
 }
-:root[data-theme="dark"][data-seite] #app :is(button:not(.app-dex-menu),a.btn) :is(span,b,strong,small,i,.material-svg,svg,svg *),
+/* Mehrfarbige Originalsymbole (icon-originalfarben, etwa der Coach) behalten
+   ihre Farben; nur einfarbige Symbole folgen der Schrift. */
+:root[data-theme="dark"][data-seite] #app :is(button:not(.app-dex-menu),a.btn) :is(span,b,strong,small,i,.material-svg,svg,svg *):not(.icon-originalfarben,.icon-originalfarben *),
 :root[data-theme="dark"][data-seite] body :is(
   .kategorie-sheet.kategorie-sheet,
   .special-dex-sheet.special-dex-sheet,
@@ -14078,7 +14088,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .eintrag-typ-menue.eintrag-typ-menue,
   .rem-row-sheet.rem-row-sheet,
   .teilen-sheet.teilen-sheet
-) :is(button:not(.app-dex-menu),a.btn) :is(span,b,strong,small,i,.material-svg,svg,svg *){
+) :is(button:not(.app-dex-menu),a.btn) :is(span,b,strong,small,i,.material-svg,svg,svg *):not(.icon-originalfarben,.icon-originalfarben *){
   color:inherit!important;
   fill:currentColor!important;
   -webkit-text-fill-color:inherit!important;
@@ -14469,17 +14479,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:transparent!important;
   box-shadow:none!important;
 }
-:root:root[data-theme="dark"][data-seite] #app .dex-detail-popup.dex-detail-popup>.dex-detail-card-actions :is(
-  .neo-dex-floating-actions,.food-dex-floating-actions
-)>:is(
-  button.neo-dex-action-button,button.food-dex-action-button,
-  a.neo-dex-action-button,a.food-dex-action-button
-){
-  background:transparent!important;
-  background-color:transparent!important;
-  border-color:transparent!important;
-  box-shadow:none!important;
-}
 
 /* Instagram liefert häufig hochformatige Reel-Cover. In der Detailkarte ist
    das jedoch eine Vorschau, kein Vollbild: festes Querformat, genügend Abstand
@@ -14599,16 +14598,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
      Deckkraft auf und stehen deshalb bei 1,8–3,8 %; 1-px-Linien und -Pixel
      (Gitter, Streifen, Welle, Ziegel, Kreuzchen, Dithering, Millimeter)
      brauchen 3,5–8,5 %, dichte Linien weniger als einzelne. */
-  --muster-bildroehre-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%23EDF0F6' fill-opacity='.05'/%3E%3C/svg%3E");
-  --muster-ziegel-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%23EDF0F6' stroke-opacity='.035' fill='none'/%3E%3C/svg%3E");
-  --muster-rechteckwelle-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%23EDF0F6' stroke-opacity='.045' fill='none'/%3E%3C/svg%3E");
-  --muster-kreuzchen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.065'%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='8' y='5' width='1' height='1'/%3E%3Crect x='6' y='6' width='2' height='2'/%3E%3Crect x='5' y='8' width='1' height='1'/%3E%3Crect x='8' y='8' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
-  --muster-tetris-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='30' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.032'%3E%3Crect x='8' y='9' width='5' height='5'/%3E%3Crect x='14' y='9' width='5' height='5'/%3E%3Crect x='20' y='9' width='5' height='5'/%3E%3Crect x='14' y='15' width='5' height='5'/%3E%3C/g%3E%3C/svg%3E");
-  --muster-millimeter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%23EDF0F6' stroke-opacity='.082' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --muster-punktraster-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%23EDF0F6' fill-opacity='.038'/%3E%3C/svg%3E");
-  --muster-gitter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%23EDF0F6' stroke-opacity='.06' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --muster-dithering-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.085'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
-  --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.02'/%3E%3C/svg%3E");
+  --muster-bildroehre-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%23EDF0F6' fill-opacity='.04'/%3E%3C/svg%3E");
+  --muster-ziegel-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%23EDF0F6' stroke-opacity='.046' fill='none'/%3E%3C/svg%3E");
+  --muster-rechteckwelle-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%23EDF0F6' stroke-opacity='.058' fill='none'/%3E%3C/svg%3E");
+  --muster-kreuzchen-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.085'%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='8' y='5' width='1' height='1'/%3E%3Crect x='6' y='6' width='2' height='2'/%3E%3Crect x='5' y='8' width='1' height='1'/%3E%3Crect x='8' y='8' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-tetris-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='30' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.042'%3E%3Crect x='8' y='9' width='5' height='5'/%3E%3Crect x='14' y='9' width='5' height='5'/%3E%3Crect x='20' y='9' width='5' height='5'/%3E%3Crect x='14' y='15' width='5' height='5'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-millimeter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%23EDF0F6' stroke-opacity='.107' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-punktraster-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%23EDF0F6' fill-opacity='.049'/%3E%3C/svg%3E");
+  --muster-gitter-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%23EDF0F6' stroke-opacity='.078' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-dithering-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cg fill='%23EDF0F6' fill-opacity='.111'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-quadrat-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%23EDF0F6' fill-opacity='.026'/%3E%3C/svg%3E");
 }
 
 /* Reihenfolge im Menuband, links nach rechts - jedes Muster genau einmal:
@@ -15433,17 +15432,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Auf hellen Retro-Flaechen braucht dieselbe Geometrie dunkle Druckfarbe.
    Dunkle Seiten verwenden weiter die bereits abgestimmten weissen Varianten. */
 :root[data-theme="retro"]{
-  --muster-bildroehre-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%230A1330' fill-opacity='.055'/%3E%3C/svg%3E");
-  --muster-ziegel-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%230A1330' stroke-opacity='.09' fill='none'/%3E%3C/svg%3E");
+  --muster-bildroehre-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Crect width='4' height='1' fill='%230A1330' fill-opacity='.044'/%3E%3C/svg%3E");
+  --muster-ziegel-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 .5H32M0 8.5H32M.5 0V8M16.5 0V8M8.5 8V16M24.5 8V16' stroke='%230A1330' stroke-opacity='.117' fill='none'/%3E%3C/svg%3E");
   /* TRAINING ist auch in Retro dunkel:helle Dreiecke wie im Darkmode,
      etwas kräftiger auf dem Schiefergrün. */
-  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.05'/%3E%3C/svg%3E");
-  --muster-rechteckwelle-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%230A1330' stroke-opacity='.055' fill='none'/%3E%3C/svg%3E");
-  --muster-millimeter-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%230A1330' stroke-opacity='.085' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --muster-punktraster-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%230A1330' fill-opacity='.045'/%3E%3C/svg%3E");
-  --muster-gitter-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%230A1330' stroke-opacity='.06' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --muster-dithering-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cg fill='%230A1330' fill-opacity='.08'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
-  --muster-quadrat-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%230A1330' fill-opacity='.035'/%3E%3C/svg%3E");
+  --muster-dreieck-dunkel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9l4.2 7h-8.4z' fill='%23EDF0F6' fill-opacity='.065'/%3E%3C/svg%3E");
+  --muster-rechteckwelle-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath d='M0 8.5H4.5V3.5H12.5V8.5H16' stroke='%230A1330' stroke-opacity='.072' fill='none'/%3E%3C/svg%3E");
+  --muster-millimeter-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H44M0 0V44' stroke='%230A1330' stroke-opacity='.111' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-punktraster-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%230A1330' fill-opacity='.058'/%3E%3C/svg%3E");
+  --muster-gitter-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0H8M0 0V8' stroke='%230A1330' stroke-opacity='.078' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --muster-dithering-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cg fill='%230A1330' fill-opacity='.104'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  --muster-quadrat-retro:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Crect x='9.4' y='9.4' width='7.2' height='7.2' rx='1.1' fill='%230A1330' fill-opacity='.046'/%3E%3C/svg%3E");
 }
 
 /* Die alten grossen Illustrationen werden im Retromodus ebenso ersetzt wie
@@ -15496,6 +15495,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] :is(.coach-vorschlaege button,.coach-merken,.coach-knopf){min-height:40px;padding:9px 14px;border-radius:6px;font:750 13.5px/1.2 var(--ui);font-size:13.5px!important;letter-spacing:0}
 :root[data-theme][data-seite="coach"] :is(.coach-merken,.coach-knopf){background:var(--ui-flaeche);color:var(--ui-schrift)}
 :root[data-theme][data-seite="coach"] :is(.coach-merken,.coach-knopf).ist-wichtig,:root[data-theme][data-seite="coach"] .coach-woche-chip input:checked+span{background:#FF277F;color:var(--ui-schrift)}
+/* Im Dark Mode färbt die allgemeine Knopfregel (#app button) sonst auch die
+   Hauptaktion grau. Pink trägt in beiden Themes schwarze Schrift. */
+:root[data-theme][data-seite="coach"] #view :is(.coach-merken,.coach-knopf).ist-wichtig{background:#FF277F!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
 
 /* Antwort: Schritte als Abschnitte mit Trennlinie statt Kästen im Kasten. */
 :root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte{gap:0}
@@ -15697,6 +15699,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    gefüllte Auswahl (Filter, Tags) und die Schalter.
    ============================================================ */
 :root{
+  /* Neutrale Fläche für Ladeflächen und das Play-Symbol der Einträge
+     (früher Braun): Retro dunkelgrau, Dark hellgrau. */
+  --neutral-flaeche:#5C5F66;
+  --neutral-flaeche-schrift:#FFFFFF;
   --ui-flaeche:#FFFFFF;
   --ui-schrift:#111111;
   --ui-neben:#5C5F66;
@@ -15710,7 +15716,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   --schalter-knopf-an:#FFFFFF;
 }
 :root[data-theme="dark"]{
-  --ui-flaeche:#1C2230;
+  --neutral-flaeche:#AEB7C6;
+  --neutral-flaeche-schrift:#111111;
+  /* Wie in Retro (Weiß = Kartenweiß) tragen Bedienelemente die Kartenfarbe. */
+  --ui-flaeche:#191C24;
   --ui-schrift:#FFFFFF;
   --ui-neben:#AEB7C6;
   --ui-linie:rgba(255,255,255,.18);
@@ -16191,7 +16200,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Notizen. Das Aufklappmenü liegt im selben Container; deshalb runden die
    beiden Knöpfe ihre Enden selbst, statt dass die Kapsel etwas abschneidet. */
 :root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions){gap:0!important;align-items:center!important}
-:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button){
+/* :is(button,a) hebt die Regel über die allgemeine Dark-Knopfregel
+   („#app button“), die sonst den Mehr-Knopf grau einfärbt. */
+:root[data-theme] :is(#app,body) :is(.neo-dex-floating-actions,.food-dex-floating-actions)>:is(.neo-dex-action-button,.food-dex-action-button):is(button,a){
   box-sizing:border-box!important;
   display:grid!important;
   place-items:center!important;
@@ -16364,3 +16375,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--ui-flaeche);color:var(--ui-schrift);
   font:750 12px/1 "Work Sans",sans-serif;
 }
+/* Schritt-Nummern im Kreis: Die Ziffer folgt ihrer eigenen Farbe. Im Dark
+   Mode erbte sie sonst die weiße Textfüllung und verschwand im weißen Kreis. */
+:root[data-theme] :is(.comp-assessment-body ol li,.ypsi-action-categories>article>ol>li)::before{-webkit-text-fill-color:currentColor!important}
+/* Chat-Werkzeuge: „Bild anhängen“ ist ein label, kein button, und bekam im
+   Dark Mode nur die helle Grundfläche. Alle Werkzeuge folgen den Theme-Werten;
+   „Webwissen an“ behält seine gelbe Auswahl. */
+:root[data-theme][data-seite="coach"] #view .coach-werkzeug:not(:has(input:checked)){background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
+:root[data-theme][data-seite="coach"] #view .coach-werkzeug:not(:has(input:checked)) :is(span,.material-svg,svg,svg *){color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;fill:var(--ui-schrift)!important}
+/* Formulare in Gedächtnis und Wochen-Check-in: Feldfläche und Schrift aus
+   den Theme-Werten. Im Dark Mode waren die Felder weiß und erbten die weiße
+   Textfüllung, der Inhalt war unsichtbar. */
+:root[data-theme][data-seite="coach"] #view :is(.gedaechtnis-formular,.coach-woche-form) :is(input,select,textarea){background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
+:root[data-theme][data-seite="coach"] #view :is(.gedaechtnis-formular,.coach-woche-form) :is(input,textarea)::placeholder{color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important}
+:root[data-theme="dark"][data-seite="coach"] #view :is(.gedaechtnis-formular,.coach-woche-form) :is(input,select,textarea){color-scheme:dark}

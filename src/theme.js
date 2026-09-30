@@ -152,7 +152,11 @@ export function applyTheme(theme) {
 
 export function setTheme(theme) {
   const wert = gueltig(theme);
+  const vorher = document.documentElement.dataset.theme;
   try { localStorage.setItem(KEY, wert); } catch (e) { /* gilt nur fuer diese Sitzung */ }
   applyTheme(wert);
+  // Gemerkte Seiten tragen die Farben des alten Themes (etwa das dunkle Ink
+  // des TRACKERs); sie werden deshalb beim naechsten Aufruf neu aufgebaut.
+  if (vorher !== wert) window.dispatchEvent(new CustomEvent('muscledex:appearance-changed', { detail: { theme: wert } }));
   return wert;
 }
