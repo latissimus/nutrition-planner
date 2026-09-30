@@ -166,6 +166,15 @@ export function buildCompEvidence(state, context = {}, optionalSeminarGuidance =
   };
 }
 
+// Die zuletzt gespeicherte Gesamtbewertung, direkt aus der Datenbank. Kostet
+// keine KI-Anfrage; neu bewertet wird nur per Knopf (requestCompAssessment).
+export async function loadLatestCompAssessment(userId) {
+  const { data, error } = await supabase.from('ai_coach_analyses').select('result,created_at')
+    .eq('user_id', userId).eq('scope', 'comp').order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return data?.result ? { result: data.result, createdAt: data.created_at } : null;
+}
+
 export async function requestCompAssessment(evidence) {
   const { data, error } = await supabase.functions.invoke('capboy-coach', {
     body: { scope: 'comp', mode: 'ensure', evidence },

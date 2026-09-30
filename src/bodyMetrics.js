@@ -12,7 +12,7 @@ import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
 import { collectionIsVisible } from './collectionPreferences.js';
-import { buildCompEvidence, compCoachFrage, requestCompAssessment } from './compAssessment.js';
+import { buildCompEvidence, compCoachFrage, loadLatestCompAssessment, requestCompAssessment } from './compAssessment.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import { alterAmMessdatum, koerperfettAnteil, magermasse } from './ypsiFormel.js';
@@ -174,9 +174,34 @@ function compFactsMarkup(state) {
 
 function compAssessmentMarkup() {
   return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
-    <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>prüft</em></span></header>
-    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>${wartetextMarkup('Gesamtbild wird ausgewertet', 'Gesamtbild braucht noch einen Moment')}</b><p>Der Coach verbindet deine aktuellen Daten und Entwicklungen.</p></div>
+    <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>lädt</em></span></header>
+    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>Letzte Bewertung wird geladen</b></div>
   </section>`;
+}
+
+// Während der Coach neu bewertet (nur nach Knopfdruck).
+function compAssessmentWorkingMarkup() {
+  return `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>prüft</em></span></header>
+    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>${wartetextMarkup('Gesamtbild wird ausgewertet', 'Gesamtbild braucht noch einen Moment')}</b><p>Der Coach verbindet deine aktuellen Daten und Entwicklungen.</p></div>`;
+}
+
+// Noch keine gespeicherte Bewertung: erst auf Knopfdruck fragt die App die KI.
+function compAssessmentEmptyMarkup() {
+  return `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}</span></header>
+    <div class="comp-assessment-body">
+      <section><p>Noch keine Gesamtbewertung. Der Coach verbindet deine Messwerte, Trends und Seminarunterlagen zu einem Gesamtbild.</p></section>
+      ${compNeuBewertenMarkup('Bewertung erstellen')}
+    </div>`;
+}
+
+function compNeuBewertenMarkup(label = 'Neu bewerten') {
+  return `<div class="comp-neu-bewerten"><button class="btn btn-block" type="button" data-comp-neu>${label}</button><small>Nur auf Knopfdruck: Die KI bewertet mit deinen aktuellen Daten neu.</small></div>`;
+}
+
+const standFormat = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+function compStand(createdAt) {
+  const datum = createdAt ? new Date(createdAt) : null;
+  return datum && !Number.isNaN(datum.getTime()) ? `STAND ${standFormat.format(datum)}` : '';
 }
 
 function compDetailCard(title, subtitle, content) {
@@ -912,7 +937,7 @@ export function compOptionalMarkup(schritte = []) {
   return `<section class="comp-optional comp-optional-wide"><h3>Optional</h3><p>${hinweis}</p>${karten()}</section><details class="comp-optional comp-optional-group"><summary><span><b>Optionale Seminarhinweise</b><small>${schritte.length} ${schritte.length === 1 ? 'Auswertung' : 'Auswertungen'}</small></span>${materialIconMarkup('chevron_right')}</summary><div><p>${hinweis}</p>${karten(true)}</div></details>`;
 }
 
-function compResultMarkup(result, cached = false, optionaleSchritte = []) {
+function compResultMarkup(result, { status = '', optionaleSchritte = [] } = {}) {
   const basis = (result?.basis || []).slice(0, 4);
   const uncertainty = (result?.uncertainty || []).slice(0, 3);
   const nextSteps = (result?.nextSteps || []).slice(0, 3);
@@ -920,7 +945,7 @@ function compResultMarkup(result, cached = false, optionaleSchritte = []) {
   const schrittMarkup = (item) => `<li><b>${escapeHtml(item.action)}</b><span>${escapeHtml(item.rationale)}</span><small>${escapeHtml(item.timeframe)}</small></li>`;
   const begruendung = `${basis.length ? `<section class="comp-reason-wide"><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}${uncertainty.length ? `<section class="comp-reason-wide"><h3>Was noch unsicher ist</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}${basis.length || uncertainty.length ? `<details class="comp-assessment-why"><summary><span>Warum diese Bewertung?</span>${materialIconMarkup('chevron_right')}</summary><div>${basis.length ? `<section><h3>Grundlage</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}${uncertainty.length ? `<section><h3>Noch unsicher</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}</div></details>` : ''}`;
   const schritte = !nextSteps.length ? '' : `<section class="comp-next-wide"><h3>Nächste Schritte</h3><ol>${nextSteps.map(schrittMarkup).join('')}</ol></section><section class="comp-next-steps"><h3>Nächste Schritte</h3><ol>${nextSteps.map(schrittMarkup).join('')}</ol></section>`;
-  return `<header><span><small>ZENTRALE KI-AUSWERTUNG · ${cached ? 'UNVERÄNDERT' : 'NEU BEWERTET'}</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>${escapeHtml(result?.confidence || 'niedrig')}</em></span></header>
+  return `<header><span><small>ZENTRALE KI-AUSWERTUNG${status ? ` · ${escapeHtml(status)}` : ''}</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>${escapeHtml(result?.confidence || 'niedrig')}</em></span></header>
     <div class="comp-assessment-body">
       <section><h3>Wichtigste Entwicklung</h3><p>${escapeHtml(result?.keyDevelopment || 'Noch keine belastbare Gesamtbewertung verfügbar.')}</p></section>
       ${begruendung}
@@ -928,6 +953,7 @@ function compResultMarkup(result, cached = false, optionaleSchritte = []) {
       ${compOptionalMarkup(optionaleSchritte)}
       <button class="body-coach-entry comp-coach-entry" type="button" data-comp-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Mit Coach besprechen</b><small>Wie du die Schritte konkret angehst</small></span>${materialIconMarkup('chevron_right')}</button>
       ${sources.length ? `<details class="comp-assessment-sources"><summary>Verwendete Seminarquellen</summary><ul>${sources.map((source) => `<li><b>${escapeHtml(source.title || source.filename)}</b>${source.page ? `<span>Seite ${escapeHtml(source.page)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}
+      ${compNeuBewertenMarkup()}
     </div>`;
 }
 
@@ -961,35 +987,66 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   let renderQueued = false;
   let assessmentSequence = 0;
 
-  const refreshCentralAssessment = async () => {
+  // Zeigt eine Bewertung (gespeichert oder frisch) samt Knopf „Neu bewerten“.
+  const showCentralAssessment = (panel, result, status, optionaleSchritte) => {
+    panel.innerHTML = compResultMarkup(result, { status, optionaleSchritte: result?.optionalInsights || optionaleSchritte });
+    panel.querySelector('[data-comp-coach]')?.addEventListener('click', async () => {
+      const { openCoachQuestion } = await import('./coach.js');
+      openCoachQuestion({ question: compCoachFrage(result), senden: true });
+    });
+    panel.querySelector('[data-comp-neu]')?.addEventListener('click', reassessCentral);
+    const heroStatus = container.querySelector('[data-comp-hero-status]');
+    const heroConfidence = container.querySelector('[data-comp-hero-confidence]');
+    if (heroStatus) heroStatus.textContent = result?.status || result?.title || 'Gesamtbild aktualisiert';
+    if (heroConfidence) heroConfidence.textContent = datensicherheit(result?.confidence);
+  };
+
+  const showAssessmentError = (panel, error, retry) => {
+    panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>nicht verfügbar</em></span></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;
+    panel.querySelector('[data-comp-retry]').onclick = retry;
+    console.warn('COMP-Gesamtbewertung nicht geladen:', error);
+  };
+
+  // Beim Öffnen und nach jeder neuen Messung: nur die zuletzt gespeicherte
+  // Bewertung lesen. Das kostet keine KI-Anfrage.
+  const loadCentralAssessment = async () => {
     const panel = container.querySelector('[data-comp-assessment]');
     if (!panel || !state) return;
     const sequence = ++assessmentSequence;
     try {
-      const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
-      const optionaleSchritte = optionaleSchritteFuer(state);
-      const [response] = await Promise.all([
-        requestCompAssessment(buildCompEvidence(state, context, optionaleSchritte)),
-        new Promise((resolve) => setTimeout(resolve, 3000)),
-      ]);
+      const saved = await loadLatestCompAssessment(userId);
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      panel.innerHTML = compResultMarkup(response.result, response.cached === true, response.result?.optionalInsights || optionaleSchritte);
-      panel.querySelector('[data-comp-coach]')?.addEventListener('click', async () => {
-        const { openCoachQuestion } = await import('./coach.js');
-        openCoachQuestion({ question: compCoachFrage(response.result), senden: true });
-      });
-      const heroStatus = container.querySelector('[data-comp-hero-status]');
-      const heroConfidence = container.querySelector('[data-comp-hero-confidence]');
-      if (heroStatus) heroStatus.textContent = response.result?.status || response.result?.title || 'Gesamtbild aktualisiert';
-      // "Unverändert" oder "neu bewertet" steht im Kopf der KI-Karte.
-      if (heroConfidence) heroConfidence.textContent = datensicherheit(response.result?.confidence);
+      if (!saved) {
+        panel.innerHTML = compAssessmentEmptyMarkup();
+        panel.querySelector('[data-comp-neu]')?.addEventListener('click', reassessCentral);
+        return;
+      }
+      showCentralAssessment(panel, saved.result, compStand(saved.createdAt), optionaleSchritteFuer(state));
     } catch (error) {
       if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>nicht verfügbar</em></span></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;
-      panel.querySelector('[data-comp-retry]').onclick = refreshCentralAssessment;
-      console.warn('COMP-Gesamtbewertung nicht geladen:', error);
+      showAssessmentError(panel, error, loadCentralAssessment);
     }
   };
+
+  // Nur per Knopf: Der Server bewertet neu, wenn sich die Daten seit der
+  // letzten Bewertung geändert haben, sonst liefert er sie unverändert.
+  async function reassessCentral() {
+    const panel = container.querySelector('[data-comp-assessment]');
+    if (!panel || !state) return;
+    const sequence = ++assessmentSequence;
+    panel.innerHTML = compAssessmentWorkingMarkup();
+    try {
+      const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
+      const optionaleSchritte = optionaleSchritteFuer(state);
+      const response = await requestCompAssessment(buildCompEvidence(state, context, optionaleSchritte));
+      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
+      const status = response.cached === true ? `UNVERÄNDERT · ${compStand(response.createdAt)}` : 'NEU BEWERTET';
+      showCentralAssessment(panel, response.result, status.replace(/ · $/, ''), optionaleSchritte);
+    } catch (error) {
+      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
+      showAssessmentError(panel, error, reassessCentral);
+    }
+  }
 
   const renderOnce = async () => {
     state = await queryState(userId, signal);
@@ -1015,7 +1072,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const pageMeta = container.querySelector('[data-food-scroll-meta]');
     if (pageMeta) pageMeta.textContent = `${state.weights.length} ${state.weights.length === 1 ? 'Wiegung' : 'Wiegungen'}`;
     bind();
-    refreshCentralAssessment();
+    loadCentralAssessment();
     // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
     // (Update-Hinweis mit eigenen COMP-Notizen) wieder anzuhängen und
     // renderDexEntries darauf loszulassen. Sonst überlebt der Slot nur den

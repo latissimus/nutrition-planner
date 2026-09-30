@@ -58,7 +58,7 @@ export const FAQ = [
       ['Was bedeutet der Gesamtstatus?',
         '<p>Der Ring zählt, welche von vier Signalen vorliegen: Gewicht, Falten-Summe, Taille und Leistung. Den Status bildet die App aus Gewichtstrend, bestätigten Veränderungen, Leistung und Erholung (Schlafqualität, Morgenenergie, Erholungswerte). Eine Aussage gibt es erst nach etwa drei Wochen vergleichbarer Daten.</p>'],
       ['Was macht die KI in COMP?',
-        '<p>Beim Öffnen bekommt die KI die Ergebnisse der App und deinen Verlauf der letzten 12 Wochen. Sie nennt die wichtigste Entwicklung, Grundlagen, Unsicherheiten und höchstens drei nächste Schritte.</p><p>Die Schritte wählt sie aus einer Liste, die die App vorgibt. Fachquellen stammen nur aus deinen Seminarunterlagen. Solange sich deine Daten nicht ändern, siehst du die gespeicherte Bewertung.</p>'],
+        '<p>Beim Öffnen siehst du die zuletzt gespeicherte Bewertung; das kostet nichts. Erst mit <b>Neu bewerten</b> bekommt die KI die Ergebnisse der App und deinen Verlauf der letzten 12 Wochen. Sie nennt die wichtigste Entwicklung, Grundlagen, Unsicherheiten und höchstens drei nächste Schritte.</p><p>Die Schritte wählt sie aus einer Liste, die die App vorgibt. Fachquellen stammen nur aus deinen Seminarunterlagen. Haben sich deine Daten seit der letzten Bewertung nicht geändert, bleibt sie unverändert.</p>'],
     ],
   },
   {

@@ -16557,3 +16557,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="sleep"] .special-dex-overlay :is(.sleep-tags input:checked+span,.sleep-rating input:checked+span){background:var(--pastell)!important;color:#111111!important}
 /* Fortschrittsringe sind auf den Pastell-Seiten schwarz wie beim TRACKER. */
 :root[data-theme="retro"][data-seite="habits"] #view .routine-progress-ring{background:conic-gradient(#111111 var(--routine-progress),color-mix(in srgb,#111111 12%,transparent) 0)!important}
+/* COMP: Neu bewerten nur auf Knopfdruck, mit kurzem Hinweis darunter. */
+:root[data-theme] #view .comp-neu-bewerten{display:grid;gap:6px;margin-top:4px}
+:root[data-theme] #view .comp-neu-bewerten small{color:var(--ui-neben);font:500 11px/1.4 "JetBrains Mono",monospace;text-align:center}
