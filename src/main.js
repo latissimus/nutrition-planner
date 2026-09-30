@@ -101,28 +101,39 @@ registriereServiceWorker().catch(() => {});
 document.addEventListener('touchstart', () => {}, { passive: true });
 
 // Einheitliches iOS-Schreibverhalten fuer alle dynamisch gemounteten
-// App-Formulare. Safari darf die systemeigene QuickType-Leiste trotz dieser
-// Attribute weiterhin anzeigen; die Webseite kann sie nicht erzwingen. Der
-// blaue Fertig-Haken wird fuer einzeilige Felder jedoch explizit angefordert.
+// App-Formulare. Freie Texte (Titel, Namen, Notizen, Chat) bekommen
+// Wortvorschläge und Autokorrektur, damit die Leiste über der Tastatur etwas
+// Nützliches zeigt. Suche, Links, Telefon und Zahlenfelder bleiben ohne,
+// ebenso Felder mit data-ohne-vorschlaege. AutoFill (Kontakte, Adressen)
+// bleibt überall aus. Einzeilige Felder fordern den blauen Fertig-Haken an.
+const OHNE_VORSCHLAEGE_MODI = new Set(['numeric', 'decimal', 'tel', 'url', 'email', 'search', 'none']);
+
+function freierText(element) {
+  if (element.hasAttribute('data-ohne-vorschlaege')) return false;
+  if (OHNE_VORSCHLAEGE_MODI.has((element.getAttribute('inputmode') || '').toLowerCase())) return false;
+  return !(element instanceof HTMLInputElement) || (element.type || 'text').toLowerCase() === 'text';
+}
+
 function konfiguriereSchreibfeld(element) {
   if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) return;
+  if (element.dataset.schreibfeld) return;
   if (element instanceof HTMLInputElement) {
     const type = (element.type || 'text').toLowerCase();
     if (!['text', 'search', 'url', 'tel'].includes(type)) return;
-    element.setAttribute('enterkeyhint', 'done');
-    element.setAttribute('autocomplete', 'off');
+    element.setAttribute('enterkeyhint', element.getAttribute('enterkeyhint') || 'done');
+    if (type === 'url') element.setAttribute('autocapitalize', 'none');
+  }
+  element.dataset.schreibfeld = '1';
+  element.setAttribute('autocomplete', 'off');
+  element.setAttribute('aria-autocomplete', 'none');
+  if (freierText(element)) {
+    element.setAttribute('autocorrect', 'on');
+    element.setAttribute('spellcheck', 'true');
+    if (!element.hasAttribute('autocapitalize')) element.setAttribute('autocapitalize', 'sentences');
+  } else {
     element.setAttribute('autocorrect', 'off');
     element.setAttribute('spellcheck', 'false');
-    element.setAttribute('aria-autocomplete', 'none');
-    if (type === 'url') element.setAttribute('autocapitalize', 'none');
-    return;
   }
-  // Mehrzeilige Notizen behalten die Return-Taste, damit Absätze möglich
-  // bleiben. Vorschläge und Rechtschreibkorrektur werden trotzdem deaktiviert.
-  element.setAttribute('autocomplete', 'off');
-  element.setAttribute('autocorrect', 'off');
-  element.setAttribute('spellcheck', 'false');
-  element.setAttribute('aria-autocomplete', 'none');
 }
 
 function konfiguriereSchreibfelder(root) {
@@ -130,7 +141,34 @@ function konfiguriereSchreibfelder(root) {
   root.querySelectorAll?.('input,textarea').forEach(konfiguriereSchreibfeld);
 }
 
+// Offene Tastatur (iOS): Overlays füllen nur den sichtbaren Bereich über der
+// Tastatur und setzen ihr Sheet unten direkt auf die Leiste. Sonst schiebt
+// iOS die ganze Ansicht hoch, bis das Feld sichtbar ist, mit viel Luft
+// dazwischen. Der Coach-Chat regelt seine Eingabe selbst (coach.js).
+function tastaturBeobachten() {
+  const sicht = window.visualViewport;
+  if (!sicht) return;
+  const wurzel = document.documentElement;
+  const aktualisieren = () => {
+    const feld = document.activeElement;
+    const imSheet = feld?.matches?.('input,textarea,select,[contenteditable="true"]')
+      && feld.closest('.kategorie-sheet-backdrop');
+    const offen = Boolean(imSheet) && sicht.height < window.innerHeight - 80;
+    wurzel.style.setProperty('--sicht-hoehe', `${Math.round(sicht.height)}px`);
+    wurzel.style.setProperty('--sicht-oben', `${Math.round(sicht.offsetTop)}px`);
+    wurzel.classList.toggle('tastatur-sichtbar', offen);
+    if (!offen) return;
+    if (window.scrollY) window.scrollTo(0, 0);
+    requestAnimationFrame(() => feld.scrollIntoView({ block: 'nearest' }));
+  };
+  sicht.addEventListener('resize', aktualisieren);
+  sicht.addEventListener('scroll', aktualisieren);
+  document.addEventListener('focusin', () => setTimeout(aktualisieren, 60));
+  document.addEventListener('focusout', () => setTimeout(aktualisieren, 60));
+}
+
 konfiguriereSchreibfelder(document);
+tastaturBeobachten();
 new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
   if (node instanceof Element) konfiguriereSchreibfelder(node);
 }))).observe(document.body, { childList: true, subtree: true });

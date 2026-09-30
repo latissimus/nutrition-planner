@@ -72,7 +72,7 @@ export function noteEditorMarkup(id, value = '', { placeholder = '', required = 
       <button type="button" data-rte-cmd="heading" aria-label="Überschrift" title="Überschrift">H</button>
       <button type="button" data-rte-cmd="list" aria-label="Liste" title="Liste">&#8226;&#8202;&#8801;</button>
     </div>
-    <div class="rte-area input" id="${id}" data-rte-area contenteditable="true" role="textbox" aria-multiline="true"${placeholder ? ` data-placeholder="${escapeAttr(placeholder)}"` : ''}${required ? ' data-required="true"' : ''}>${initialHtml(value)}</div>
+    <div class="rte-area input" id="${id}" data-rte-area contenteditable="true" role="textbox" aria-multiline="true" autocorrect="on" spellcheck="true" autocapitalize="sentences"${placeholder ? ` data-placeholder="${escapeAttr(placeholder)}"` : ''}${required ? ' data-required="true"' : ''}>${initialHtml(value)}</div>
   </div>`;
 }
 
