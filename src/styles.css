@@ -16588,9 +16588,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite] #app>.app-dex-dock{
   --dex-ink:var(--ui-schrift);
   color:var(--ui-schrift)!important;
-  padding:0 12px var(--app-dex-dock-bottom)!important;
+  padding:6px 12px var(--app-dex-dock-bottom)!important;
+  /* Deckende Fläche in der Seitenfarbe wie beim Header: Der Inhalt endet an
+     der Oberkante der Leiste und läuft nicht um die Kapsel herum. */
+  background:var(--dex-seitenfarbe,var(--bg))!important;
 }
-/* Die Kapsel schwebt: kein Farbverlauf darüber, kein Streifen darunter. */
+:root[data-theme="dark"][data-seite] #app>.app-dex-dock{background:var(--bg)!important}
 :root[data-theme][data-seite] #app>.app-dex-dock::before,
 :root[data-theme][data-seite] #app>.app-dex-dock::after{display:none!important}
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{
