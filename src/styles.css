@@ -14381,9 +14381,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="shopping"],
 :root[data-theme="retro"][data-seite="shopping"] body,
 :root[data-theme="retro"][data-seite="shopping"] :is(#app,#view),
-:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-page,
-:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-wrap{
+:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-page{
   background-color:#F7F3EA!important;
+}
+/* Der Inhaltsbereich bleibt durchsichtig, sonst deckt er die Ziegel-Tapete
+   der Seite ab. */
+:root[data-theme="retro"][data-seite="shopping"] .shopping-dex-wrap{
+  background-color:transparent!important;
 }
 :root[data-theme="retro"][data-seite="shopping"] .shopping-dex-wrap{
   --surface:#fff!important;

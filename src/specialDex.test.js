@@ -37,8 +37,8 @@ describe('Special-Dex-Vorlage', () => {
     vi.stubGlobal('requestAnimationFrame', (callback) => callback());
     createSpecialDexOverlay({ markup: '<p>Info</p>', ariaLabel: 'Dex-Info' });
     expect(backdrop.innerHTML).toContain('aria-label="Dex-Info"');
-    expect(backdrop.style.setProperty).toHaveBeenCalledWith('--ordner', '#FFA175');
-    expect(backdrop.style.setProperty).toHaveBeenCalledWith('--ordner-ink', '#111111');
+    expect(backdrop.style.setProperty).toHaveBeenCalledWith('--ordner', '#111111');
+    expect(backdrop.style.setProperty).toHaveBeenCalledWith('--ordner-ink', '#FFFFFF');
     expect(backdrop.style.setProperty).toHaveBeenCalledWith('--dex-seitenfarbe', '#FFEDE3');
     expect(backdrop.style.setProperty).toHaveBeenCalledWith('--dex-ink', '#111111');
     listeners.click({ target: { closest: () => true } });

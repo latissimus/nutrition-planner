@@ -108,9 +108,10 @@ const fixedSystemAccents = {
   coins: '#432C5E',
   profile: '#0A1330',
 };
-// Retro ersetzt das frühere Braun des TRACKERs durch das Lachs der Seite.
+// Retro: Der TRACKER füllt Kalorienring und Lebensmittel-Icons schwarz
+// (weiße Symbole) statt im früheren Braun.
 const kontrastAkzente = {
-  reminders: '#FFA175',
+  reminders: '#111111',
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
