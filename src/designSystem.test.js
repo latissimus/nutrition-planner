@@ -395,7 +395,10 @@ describe('CAPBOY Design-System', () => {
   });
 
   it('zeichnet alle Konturen in einer Stärke und einer Farbe', () => {
-    expect(css).toContain('--kontur:1px;');
+    // Konturen wie im LOGMAN 1,5 px, gestrichelte Trennlinien 1 px.
+    expect(css).toContain('--kontur:1.5px;');
+    expect(css).toContain('--haarlinie:1px;');
+    expect(css).not.toContain('var(--kontur) dashed');
     expect(css).toContain('--kontur-farbe:#000000;');
     expect(css).toContain('--bw:var(--kontur);');
     // Konturen stehen nicht mehr als feste 1,5-, 2- oder 3-px-Werte in den

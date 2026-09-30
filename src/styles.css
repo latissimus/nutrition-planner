@@ -137,11 +137,12 @@
      eine Bilddatei per Filter aufgehellt. */
   --sil-filter:none;
 
-  /* Eine Konturstärke für die ganze App, dünn wie am Mac mit „Kontrast
-     erhöhen“: Karten, Knöpfe, Chips, Tags, Felder, Schalter, die Linie
-     unter dem Kopf und das Menüband. Trennlinien in Listen sind ebenso
-     dünn, aber hell; die Kontur ist schwarz. */
-  --kontur:1px;
+  /* Eine Konturstärke für die ganze App wie im LOGMAN (--bw 1.5px):
+     Karten, Knöpfe, Chips, Tags, Felder, Schalter, die Linie unter dem Kopf
+     und das Menüband. Gestrichelte Trennlinien zwischen Zeilen bleiben wie
+     die LOGMAN-Haarlinie 1 px. */
+  --kontur:1.5px;
+  --haarlinie:1px;
   /* Retro:schwarz wie am Mac; Kopflinie und Menüband folgen der Seite. */
   --kontur-farbe:#000000;
   --bw:var(--kontur);
@@ -472,7 +473,7 @@ label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercas
 .chip.rest{background:var(--surface);font-family:var(--mono);font-weight:700}
 .chip.rest:disabled{opacity:.55}
 
-.ex{border-top:var(--kontur) dashed var(--ink);padding:12px 13px}
+.ex{border-top:var(--haarlinie) dashed var(--ink);padding:12px 13px}
 .role{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);border:var(--bw) solid var(--ink);
   padding:2px 7px;border-radius:999px;flex:0 0 auto;font-family:var(--display);font-style:italic;background:var(--surface2)}
 .role.comp{color:#fff;background:var(--navy)}
@@ -949,7 +950,7 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .falte .input{margin-bottom:0;padding:9px;text-align:center;font-size:15px}
 .falten-summe{font-family:var(--mono);font-size:13px;margin:12px 0;text-align:center}
 .falten-summe b{font-size:17px}
-.mess-einst{margin-top:14px;border-top:var(--kontur) dashed var(--faint);padding-top:12px;
+.mess-einst{margin-top:14px;border-top:var(--haarlinie) dashed var(--faint);padding-top:12px;
   display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
 .mess-zeile{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
 .gew-eingabe{display:grid;grid-template-columns:minmax(0,1fr);
@@ -972,7 +973,7 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 [data-reminders-card]{position:relative;overflow:hidden}
 [data-reminders-card]::before{
   content:"";position:absolute;inset:0 0 auto;height:7px;background:var(--pink)}
-.mess-neu{border-top:var(--kontur) dashed var(--faint);padding-top:5px}
+.mess-neu{border-top:var(--haarlinie) dashed var(--faint);padding-top:5px}
 .mess-neu summary{min-height:42px;display:flex;align-items:center}
 [data-skinfold-form]{padding-top:4px}
 
@@ -3951,7 +3952,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .body-inline-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px;align-items:end;margin-top:11px}.body-inline-form>*{min-width:0}.body-inline-form>label,.body-inline-form>.btn{grid-column:1/-1}.body-inline-form>label{display:flex;align-items:center;gap:8px;font-size:12px}
 .body-checkin-form,.body-threshold-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding-top:7px}.body-checkin-form>label,.body-threshold-form>label{display:grid;min-width:0;gap:5px;font-size:11px;font-weight:800}.body-checkin-form>div,.body-checkin-form>.btn,.body-threshold-form>p,.body-threshold-form>.btn{grid-column:1/-1}.body-checkin-form>div{display:flex;flex-wrap:wrap;gap:8px 14px}.body-checkin-form>div label{display:flex;align-items:center;gap:6px;font-size:11px}
 .body-threshold-form{grid-template-columns:repeat(2,minmax(0,1fr))}.body-threshold-form>p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
-.body-file-input{display:grid;place-items:center;justify-items:center;align-items:center;position:relative;min-height:54px;margin-top:12px;padding:11px;border:var(--kontur) dashed var(--app-outline);border-radius:11px;background:var(--app-field);font-size:13px;font-weight:800;text-align:center;cursor:pointer}.body-file-input span{display:block;width:100%;text-align:center}.body-file-input input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.body-file-input{display:grid;place-items:center;justify-items:center;align-items:center;position:relative;min-height:54px;margin-top:12px;padding:11px;border:var(--haarlinie) dashed var(--app-outline);border-radius:11px;background:var(--app-field);font-size:13px;font-weight:800;text-align:center;cursor:pointer}.body-file-input span{display:block;width:100%;text-align:center}.body-file-input input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .body-neutral-note{padding:10px 11px;border-radius:10px;background:var(--app-field);color:var(--muted);font-size:12px;line-height:1.4}
 .nutrition-adaptive{margin-top:10px;border-top:1px solid var(--app-divider)}.nutrition-adaptive>summary{display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:13px;font-weight:850;cursor:pointer;list-style:none}.nutrition-adaptive>summary::-webkit-details-marker{display:none}.nutrition-adaptive h4{margin:10px 0 4px;font-size:13px}.nutrition-adaptive>p,.nutrition-adaptive>small{display:block;color:var(--muted);font-size:11px;line-height:1.5}.nutrition-adaptive-values{margin:10px 0}.nutrition-adaptive .btn{width:100%;margin:10px 0}.nutrition-adaptive-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.nutrition-adaptive-actions .btn{margin:0}.nutrition-adaptive-actions .btn-primary{grid-column:1/-1}
 .nutrition-calculation span i{display:block;margin-top:2px;color:var(--muted);font-size:10px;font-style:normal;line-height:1.3}
@@ -5493,7 +5494,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* Exakt die feine gestrichelte LOGMAN-FAQ-Sektionslinie. */
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-timeline .rem-row+.rem-row,:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-entry+.nutrition-entry,:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .nutrition-period-inline{
-  border-top:var(--kontur) dashed var(--ink);
+  border-top:var(--haarlinie) dashed var(--ink);
 }
 
 /* Im Mahlzeiten-Infoeditor ist nur der eigentliche Notiztext technisch.
@@ -7473,7 +7474,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   top:0!important;
   left:18px!important;
   right:18px!important;
-  border-top:var(--kontur) dashed color-mix(in srgb,#111 42%,transparent)!important;
+  border-top:var(--haarlinie) dashed color-mix(in srgb,#111 42%,transparent)!important;
   pointer-events:none!important;
   z-index:2!important;
 }
@@ -15163,7 +15164,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .coach-merken.ist-wichtig,.coach-knopf.ist-wichtig{background:var(--coach-violett);color:#fff}
 .coach-merken:disabled,.coach-knopf:disabled{opacity:.7;cursor:default}
 .coach-safety{margin:0;padding:8px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:7px;background:#FFD400;color:#111;font:700 14px/1.4 var(--ui)}
-.coach-chat-window .coach-mehr{padding:9px 0 0;border:0;border-top:var(--kontur) dashed rgba(255,255,255,.5);border-radius:0}
+.coach-chat-window .coach-mehr{padding:9px 0 0;border:0;border-top:var(--haarlinie) dashed rgba(255,255,255,.5);border-radius:0}
 .coach-chat-window .coach-mehr summary{cursor:pointer;font:800 11px/1 var(--tech);letter-spacing:.06em;text-transform:uppercase}
 .coach-mehr h4{margin-top:10px!important}
 .coach-mehr ul{display:grid;gap:5px;margin:6px 0 0;padding-left:16px}
@@ -16357,7 +16358,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ui-neben);font:600 11px/1.3 "JetBrains Mono",monospace;letter-spacing:0;
 }
 :root[data-theme] #view .faq-liste{display:block;padding:2px 18px}
-:root[data-theme] #view .faq-frage+.faq-frage{border-top:var(--kontur) dashed var(--kontur-farbe)}
+:root[data-theme] #view .faq-frage+.faq-frage{border-top:var(--haarlinie) dashed var(--kontur-farbe)}
 :root[data-theme] #view .faq-frage>summary{
   position:relative;padding:14px 30px 14px 0;list-style:none;cursor:pointer;
   color:var(--ui-schrift);font:750 14px/1.3 "Work Sans",sans-serif;letter-spacing:-.01em;
