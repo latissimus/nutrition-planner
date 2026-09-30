@@ -191,6 +191,11 @@ function menuebandSchrumpfen() {
     stand.set(ziel, { oben, summe });
     // Seitliches Wischen (Filter, Ordner) ändert nichts an der Kapsel.
     if (!schritt) return;
+    // Am Seitenende ist man meist fertig und will wechseln: Kapsel groß.
+    if (oben + ziel.clientHeight >= ziel.scrollHeight - 12) {
+      dock.classList.remove('ist-kompakt');
+      return;
+    }
     if (oben <= 12) dock.classList.remove('ist-kompakt');
     else if (summe > 24) dock.classList.add('ist-kompakt');
     else if (summe < -24) dock.classList.remove('ist-kompakt');
@@ -321,6 +326,10 @@ let appDockCoinStand = null;
 // Wochen-Check-in (Schritt 7): Punkt am Coach-Symbol, solange die Bilanz der
 // abgeschlossenen Woche fehlt. Einmal je Sitzung und Nutzer geprüft.
 let wochenbilanzHinweis = false;
+// Hinweis-Punkte im Menüband: ROUTINEN mit heute offenen Routinen, SCHLAF
+// ohne heutigen Morgen-Check-in.
+let dockHinweise = { habits: false, sleep: false };
+let dockHinweiseStand = 0;
 let wochenbilanzGeprueftFuer = null;
 let preferencesLadePromise = Promise.resolve();
 let preferencesLadeUserId = '';
@@ -786,7 +795,7 @@ function appDockEintraegeMarkup(aktiveDockRoute, aufSeite = true) {
   const punkte = '<i class="app-dex-tab-punkte" aria-hidden="true"></i>';
   const istOffen = (route) => aktiveDockRoute === route && aufSeite;
   const standard = sichtbareSammlungen().map(([route, titel]) => `
-    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}" href="#${route}"
+    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}${dockHinweise[route] && aktiveDockRoute !== route ? ' hat-hinweis' : ''}" href="#${route}"
        data-sammlung="${route}" style="--app-dex-tab-color:${escapeHtml(pageLook(route, categoryColor(route), 'drops').color)}"
        aria-label="${escapeHtml(istOffen(route) ? `Menü für ${titel} öffnen` : titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
       ${istOffen(route) ? punkte : ''}
@@ -842,6 +851,8 @@ function appDexShellZeichnen(route, view) {
   const coachZurueckTitel = route === 'coach-wissen' ? 'COACH' : appDockTitel(coachZurueckRoute);
   const istNebenansicht = istProfil || istSuche || istCoach;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
+  const alteAuswahl = app.querySelector(':scope > .app-dex-dock .app-dex-auswahl');
+  const alteAuswahlX = alteAuswahl?.dataset.x ? Number(alteAuswahl.dataset.x) : null;
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
 
@@ -899,12 +910,37 @@ function appDexShellZeichnen(route, view) {
      Punkte als Hinweis. */
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
-      <div class="app-dex-tabs">${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
+      <div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
     </div>`;
   appSyncStatusAktualisieren();
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
   tabLeiste.scrollLeft = alterScrollstand;
+  /* Die Auswahl ist eine eigene Pille in der Leiste. Sie startet an der
+     Stelle des vorher aktiven Reiters und gleitet zum neuen, statt zu
+     springen. */
+  const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
+  const aktiverReiter = tabLeiste.querySelector('.app-dex-tab.aktiv');
+  if (auswahl && aktiverReiter) {
+    const x = aktiverReiter.offsetLeft;
+    auswahl.style.width = `${aktiverReiter.offsetWidth}px`;
+    auswahl.style.transition = 'none';
+    auswahl.style.transform = `translateX(${alteAuswahlX ?? x}px)`;
+    auswahl.getBoundingClientRect();
+    auswahl.style.transition = '';
+    auswahl.style.transform = `translateX(${x}px)`;
+    auswahl.dataset.x = String(x);
+    tabLeiste.classList.add('hat-auswahl');
+  }
+  /* Weitere Reiter am Rand andeuten: Das Kapselende, hinter dem noch Reiter
+     liegen, blendet sanft aus. */
+  const randAktualisieren = () => {
+    const maximal = tabLeiste.scrollWidth - tabLeiste.clientWidth;
+    tabLeiste.classList.toggle('mehr-links', tabLeiste.scrollLeft > 4);
+    tabLeiste.classList.toggle('mehr-rechts', tabLeiste.scrollLeft < maximal - 4);
+  };
+  tabLeiste.addEventListener('scroll', randAktualisieren, { passive: true });
+  randAktualisieren();
   // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
   // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
   // keine Daten geladen und keine sichtbare Ansicht verändert.
@@ -994,7 +1030,51 @@ function appDexShellAktualisieren(route, view, signal) {
   }
   appDexShellDatenLaden(route, view, signal);
   wochenbilanzHinweisLaden();
+  dockHinweiseLaden();
 }
+
+// Hinweis-Punkte: höchstens einmal pro Minute beim Seitenwechsel, sofort nach
+// Änderungen an Routinen oder Schlaf. Dieselbe Rechnung wie die Seiten:
+// geplant ist, was den heutigen Wochentag trägt; der Check-in trägt das
+// heutige Datum und wird erst ab 4 Uhr vermisst.
+async function dockHinweiseLaden(sofort = false) {
+  const userId = session?.user?.id;
+  if (!userId || (!sofort && Date.now() - dockHinweiseStand < 60_000)) return;
+  dockHinweiseStand = Date.now();
+  const jetzt = new Date();
+  const heute = jetzt.toLocaleDateString('sv-SE');
+  const wochentag = jetzt.getDay() || 7;
+  try {
+    const [routinen, erledigt, schlaf] = await Promise.all([
+      supabase.from('routines').select('id,weekdays').eq('user_id', userId),
+      supabase.from('routine_completions').select('routine_id').eq('user_id', userId).eq('completed_on', heute),
+      supabase.from('sleep_logs').select('id').eq('user_id', userId).eq('sleep_date', heute).limit(1),
+    ]);
+    const fehler = routinen.error || erledigt.error || schlaf.error;
+    if (fehler) throw fehler;
+    const fertig = new Set((erledigt.data || []).map((zeile) => zeile.routine_id));
+    const neu = {
+      habits: (routinen.data || []).some((routine) => routine.weekdays?.includes(wochentag) && !fertig.has(routine.id)),
+      sleep: !(schlaf.data || []).length && jetzt.getHours() >= 4,
+    };
+    if (neu.habits === dockHinweise.habits && neu.sleep === dockHinweise.sleep) return;
+    dockHinweise = neu;
+    app.querySelectorAll(':scope > .app-dex-dock .app-dex-tab[data-sammlung]').forEach((reiter) => {
+      reiter.classList.toggle('hat-hinweis', Boolean(dockHinweise[reiter.dataset.sammlung]) && !reiter.classList.contains('aktiv'));
+    });
+  } catch (error) {
+    console.warn('Hinweise im Menüband nicht geladen:', error?.message);
+  }
+}
+
+const betrifftHinweise = (event) => {
+  const bereich = event.detail?.bereich;
+  const liste = Array.isArray(bereich) ? bereich : [bereich];
+  return !bereich || liste.some((eintrag) => eintrag === 'habits' || eintrag === 'sleep');
+};
+window.addEventListener('muscledex:counts-changed', (event) => { if (betrifftHinweise(event)) dockHinweiseLaden(true); });
+window.addEventListener('muscledex:coins-changed', (event) => { if (betrifftHinweise(event)) dockHinweiseLaden(true); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') dockHinweiseLaden(); });
 
 function wochenbilanzHinweisLaden() {
   const userId = session?.user?.id;
