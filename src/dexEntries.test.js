@@ -47,7 +47,7 @@ describe('Anbieter- und Farbkontrast', () => {
       habits: '#C3B1F5',
       shopping: '#FFEFB3',
       essen: '#FFC39E',
-      training: '#A3E4C8',
+      training: '#3E9C9F',
       supps: '#D8BFD8',
       body: '#94DEFF',
       stress: '#E36887',
@@ -69,23 +69,23 @@ describe('Anbieter- und Farbkontrast', () => {
       color: '#F0C987', ink: '#111111', accent: '#F0C987', accentInk: '#111111',
     }));
     expect(pageLook('essen', '#000000', 'wallpaper-essen')).toEqual(expect.objectContaining({
-      color: '#FFC39E', ink: '#111111', accent: '#C8412E', accentInk: '#FFFFFF',
+      color: '#FFC39E', ink: '#111111', accent: '#FFC39E', accentInk: '#111111',
     }));
     expect(pageLook('training', '#000000', 'wallpaper-dumbbell')).toEqual(expect.objectContaining({
-      color: '#A3E4C8', ink: '#111111', accent: '#203C3D', accentInk: '#FFFFFF',
+      color: '#3E9C9F', ink: '#111111', accent: '#3E9C9F', accentInk: '#111111',
     }));
     expect(pageLook('supps', '#000000', 'wallpaper-supps')).toEqual(expect.objectContaining({
       color: '#D8BFD8', ink: '#111111', accent: '#2A1E5C', accentInk: '#FFFFFF',
     }));
     expect(pageLook('habits', '#000000', 'wallpaper-wolke')).toEqual(expect.objectContaining({
-      color: '#C3B1F5', ink: '#111111', accent: '#3F236F', accentInk: '#FFFFFF',
+      color: '#C3B1F5', ink: '#111111', accent: '#C3B1F5', accentInk: '#111111',
       pattern: 'wallpaper-stress',
     }));
     expect(pageLook('shopping', '#000000', 'wallpaper-brokkoli')).toEqual(expect.objectContaining({
       color: '#FFEFB3', ink: '#111111', accent: '#013E37', accentInk: '#FFFFFF',
     }));
     expect(pageLook('sleep', '#000000', 'wallpaper-moon')).toEqual(expect.objectContaining({
-      color: '#A9B8F5', ink: '#111111', accent: '#0E1D47', accentInk: '#FFFFFF',
+      color: '#A9B8F5', ink: '#111111', accent: '#A9B8F5', accentInk: '#111111',
     }));
     expect(pageLook('stress', '#000000', 'wallpaper-stress')).toEqual(expect.objectContaining({
       color: '#E36887', ink: '#111111', accent: '#E36887', accentInk: '#111111',

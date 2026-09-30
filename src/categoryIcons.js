@@ -108,21 +108,25 @@ const fixedSystemAccents = {
   coins: '#432C5E',
   profile: '#0A1330',
 };
-// Retro: Der TRACKER füllt Kalorienring und Lebensmittel-Icons schwarz
-// (weiße Symbole) statt im früheren Braun.
-const kontrastAkzente = {
-  reminders: '#111111',
-  essen: '#C8412E',
-};
 // Retro-Pastell: Die früher dunklen Seiten tragen in Retro das pastellige
-// Gegenstück ihres Farbtons; die dunkle Farbe bleibt als Akzent (ESSEN nimmt
-// Tomatenrot statt Braun). Dark Mode bleibt unberührt.
+// Gegenstück ihres Farbtons (TRAINING Petrol, hell genug für schwarze
+// Schrift). Knöpfe und Ladeflächen nehmen die Seitenfarbe als Akzent; nur
+// CAPCOINS behält Pflaume. Dark Mode bleibt unberührt.
 const retroPastell = {
-  training: '#A3E4C8',
+  training: '#3E9C9F',
   habits: '#C3B1F5',
   sleep: '#A9B8F5',
   coins: '#F0B3E6',
   essen: '#FFC39E',
+};
+// Retro-Akzente: Der TRACKER füllt Kalorienring und Lebensmittel-Icons
+// schwarz (weiße Symbole) statt im früheren Braun.
+const kontrastAkzente = {
+  reminders: '#111111',
+  training: retroPastell.training,
+  habits: retroPastell.habits,
+  sleep: retroPastell.sleep,
+  essen: retroPastell.essen,
 };
 const fixedSystemAccentInks = {
   body: '#94DEFF',
