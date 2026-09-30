@@ -179,16 +179,29 @@ function menuebandSchrumpfen() {
     const dock = app.querySelector(':scope > .app-dex-dock');
     if (!dock) return;
     const oben = ziel.scrollTop;
-    const vorher = stand.get(ziel) || { oben, summe: 0 };
-    const schritt = oben - vorher.oben;
+    const vorher = stand.get(ziel);
+    const schritt = vorher ? oben - vorher.oben : 0;
+    const summe = vorher && Math.sign(schritt) === Math.sign(vorher.summe) ? vorher.summe + schritt : schritt;
+    stand.set(ziel, { oben, summe });
     // Seitliches Wischen (Filter, Ordner) ändert nichts an der Kapsel.
     if (!schritt) return;
-    const summe = Math.sign(schritt) === Math.sign(vorher.summe) ? vorher.summe + schritt : schritt;
-    stand.set(ziel, { oben, summe });
     if (oben <= 12) dock.classList.remove('ist-kompakt');
     else if (summe > 24) dock.classList.add('ist-kompakt');
     else if (summe < -24) dock.classList.remove('ist-kompakt');
   }, { capture: true, passive: true });
+  // Ausgangswert schon beim Berühren merken: Sonst dient das erste
+  // Scroll-Ereignis eines Bereichs nur als Ausgangswert, und ein einzelner
+  // großer Sprung (Mausrad, schneller Wisch) bliebe folgenlos.
+  const ausgangswertMerken = (event) => {
+    for (let element = event.target; element instanceof Element && element !== document.body; element = element.parentElement) {
+      if (element.scrollHeight <= element.clientHeight + 1) continue;
+      if (!/auto|scroll/.test(getComputedStyle(element).overflowY)) continue;
+      if (!stand.has(element)) stand.set(element, { oben: element.scrollTop, summe: 0 });
+      return;
+    }
+  };
+  document.addEventListener('touchstart', ausgangswertMerken, { capture: true, passive: true });
+  document.addEventListener('wheel', ausgangswertMerken, { capture: true, passive: true });
 }
 
 konfiguriereSchreibfelder(document);
