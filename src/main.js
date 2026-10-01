@@ -142,15 +142,18 @@ function konfiguriereSchreibfelder(root) {
   root.querySelectorAll?.('input,textarea').forEach(konfiguriereSchreibfeld);
 }
 
-// Offene Tastatur (iOS): Overlays füllen nur den sichtbaren Bereich über der
-// Tastatur und setzen ihr Sheet unten direkt auf die Leiste. Sonst schiebt
-// iOS die ganze Ansicht hoch, bis das Feld sichtbar ist, mit viel Luft
-// dazwischen. Der Coach-Chat regelt seine Eingabe selbst (coach.js).
+// Offene Tastatur (iOS): Das Sheet sitzt unten direkt auf der Tastatur, die
+// Abdunklung deckt weiter den ganzen Bildschirm. Ohne das schiebt iOS die
+// ganze Ansicht hoch, bis das Feld sichtbar ist, mit viel Luft dazwischen.
+// Der Coach-Chat regelt seine Eingabe selbst (coach.js).
 function tastaturBeobachten() {
   const sicht = window.visualViewport;
   if (!sicht) return;
   const wurzel = document.documentElement;
+  const SPEICHER = 'capboy:tastatur-hoehe';
   const istTextfeld = (element) => Boolean(element?.matches?.('input,textarea,select,[contenteditable="true"]'));
+  const sheetFeld = (element = document.activeElement) => (
+    istTextfeld(element) && element.closest('.kategorie-sheet-backdrop') ? element : null);
   // Zurücksetzen nur, wenn kein Textfeld aktiv ist oder das aktive Feld in
   // einem Sheet sitzt. Felder auf der Seite selbst (etwa der Chat) braucht
   // iOS die Verschiebung, um sie über die Tastatur zu bringen.
@@ -158,27 +161,94 @@ function tastaturBeobachten() {
     const feld = document.activeElement;
     return !istTextfeld(feld) || Boolean(feld.closest('.kategorie-sheet-backdrop'));
   };
-  const aktualisieren = () => {
-    const feld = document.activeElement;
-    const imSheet = istTextfeld(feld) && feld.closest('.kategorie-sheet-backdrop');
-    const offen = Boolean(imSheet) && sicht.height < window.innerHeight - 80;
-    wurzel.style.setProperty('--sicht-hoehe', `${Math.round(sicht.height)}px`);
-    wurzel.style.setProperty('--sicht-oben', `${Math.round(sicht.offsetTop)}px`);
-    wurzel.classList.toggle('tastatur-sichtbar', offen);
+  const tastaturDa = () => sicht.height < window.innerHeight - 80;
+  let gemerkteHoehe = 0;
+  try { gemerkteHoehe = Number(localStorage.getItem(SPEICHER)) || 0; } catch {}
+  let zuletzt = '';
+  const setzen = (hoehe, oben, unten) => {
+    const wert = `${Math.round(hoehe)}|${Math.round(oben)}|${Math.round(unten)}`;
+    if (wert === zuletzt) return false;
+    zuletzt = wert;
+    wurzel.style.setProperty('--sicht-hoehe', `${Math.round(hoehe)}px`);
+    wurzel.style.setProperty('--sicht-oben', `${Math.round(oben)}px`);
+    wurzel.style.setProperty('--tastatur-unten', `${Math.max(0, Math.round(unten))}px`);
+    return true;
+  };
+  // Nur den Inhalt des Sheets scrollen, nie das Fenster: scrollIntoView
+  // verschob sonst die ganze Ansicht mit.
+  const feldZeigen = (feld) => {
+    let bereich = feld.parentElement;
+    while (bereich && !bereich.matches('.kategorie-sheet-backdrop')) {
+      if (/auto|scroll/.test(getComputedStyle(bereich).overflowY) && bereich.scrollHeight > bereich.clientHeight + 1) break;
+      bereich = bereich.parentElement;
+    }
+    if (!bereich || bereich.matches('.kategorie-sheet-backdrop')) return;
+    const f = feld.getBoundingClientRect();
+    const b = bereich.getBoundingClientRect();
+    const luft = 12;
+    if (f.top < b.top + luft || f.height > b.height - 2 * luft) bereich.scrollTop -= b.top + luft - f.top;
+    else if (f.bottom > b.bottom - luft) bereich.scrollTop += f.bottom - (b.bottom - luft);
+  };
+  let vorhersageSeit = 0;
+  const anwenden = () => {
+    const feld = sheetFeld();
+    if (feld && tastaturDa()) {
+      const flaeche = feld.closest('.kategorie-sheet-backdrop').getBoundingClientRect();
+      const unten = flaeche.bottom - (sicht.offsetTop + sicht.height);
+      if (Math.abs(unten - gemerkteHoehe) > 1) {
+        gemerkteHoehe = Math.round(unten);
+        try { localStorage.setItem(SPEICHER, String(gemerkteHoehe)); } catch {}
+      }
+      vorhersageSeit = 0;
+      let geaendert = setzen(sicht.height, sicht.offsetTop, unten);
+      if (!wurzel.classList.contains('tastatur-sichtbar')) {
+        wurzel.classList.add('tastatur-sichtbar');
+        geaendert = true;
+      }
+      if (window.scrollY || window.scrollX) window.scrollTo(0, 0);
+      if (geaendert) feldZeigen(feld);
+      return true;
+    }
+    // Vorab gesetzt, Tastatur noch unterwegs: kurz auf sie warten.
+    if (feld && vorhersageSeit && performance.now() - vorhersageSeit < 900) return true;
+    vorhersageSeit = 0;
+    if (wurzel.classList.contains('tastatur-sichtbar')) {
+      wurzel.classList.remove('tastatur-sichtbar');
+      zuletzt = '';
+    }
     // Das Fenster selbst scrollt in CAPBOY nie; ohne offene Tastatur ist jede
     // Verschiebung ein iOS-Rest (etwa nach dem Fokus in ein Menü-Feld).
-    if (!offen && darfZuruecksetzen() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
-    if (!offen) return;
-    if (window.scrollY) window.scrollTo(0, 0);
-    requestAnimationFrame(() => feld.scrollIntoView({ block: 'nearest' }));
+    if (darfZuruecksetzen() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
+    return false;
   };
-  sicht.addEventListener('resize', aktualisieren);
-  sicht.addEventListener('scroll', aktualisieren);
+  // Solange die Tastatur offen ist, wird jeden Frame nachgemessen. iOS meldet
+  // Größenwechsel (etwa die Wortvorschläge) nicht immer zuverlässig; das Sheet
+  // stand dann versetzt zur Tastatur.
+  let schleife = 0;
+  const nachfuehren = () => {
+    schleife = anwenden() ? requestAnimationFrame(nachfuehren) : 0;
+  };
+  const starten = () => {
+    if (!schleife) schleife = requestAnimationFrame(nachfuehren);
+  };
+  document.addEventListener('focusin', (event) => {
+    const feld = sheetFeld(event.target);
+    // Vorab dorthin, wo das Sheet mit Tastatur stehen wird: iOS sieht das Feld
+    // dann schon frei und schiebt die Ansicht nicht erst selbst hoch.
+    if (feld && gemerkteHoehe && !tastaturDa() && !wurzel.classList.contains('tastatur-sichtbar')) {
+      setzen(window.innerHeight - gemerkteHoehe, 0, gemerkteHoehe);
+      wurzel.classList.add('tastatur-sichtbar');
+      vorhersageSeit = performance.now();
+      feldZeigen(feld);
+    }
+    starten();
+  });
+  document.addEventListener('focusout', () => setTimeout(starten, 60));
+  sicht.addEventListener('resize', starten);
+  sicht.addEventListener('scroll', starten);
   window.addEventListener('scroll', () => {
-    if (!wurzel.classList.contains('tastatur-sichtbar') && sicht.height >= window.innerHeight - 80 && darfZuruecksetzen()) window.scrollTo(0, 0);
+    if (!wurzel.classList.contains('tastatur-sichtbar') && !tastaturDa() && darfZuruecksetzen()) window.scrollTo(0, 0);
   }, { passive: true });
-  document.addEventListener('focusin', () => setTimeout(aktualisieren, 60));
-  document.addEventListener('focusout', () => setTimeout(aktualisieren, 60));
 }
 
 // Menüband-Kapsel: Wischt man den Inhalt nach oben (Lesen), wird sie flach und

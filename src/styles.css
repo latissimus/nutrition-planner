@@ -16360,16 +16360,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme] #view .comp-neu-bewerten{display:grid;gap:6px;margin-top:4px}
 :root[data-theme] #view .comp-neu-bewerten small{color:var(--ui-neben);font:500 11px/1.4 "JetBrains Mono",monospace;text-align:center}
 
-/* Offene Tastatur (iOS, Klasse von main.js): Die Overlay-Fläche füllt nur den
-   sichtbaren Bereich, das Sheet sitzt unten direkt auf der Zubehörleiste. So
-   schiebt iOS die Ansicht nicht mehr mit viel Luft nach oben. */
+/* Offene Tastatur (iOS, Klasse von main.js): Das Sheet sitzt unten direkt auf
+   der Zubehörleiste. Die Abdunklung bleibt bildschirmfüllend, nur ihr
+   Innenabstand unten wächst um die Tastatur – so blitzt die Seite nie
+   zwischen Sheet und Tastatur durch. */
 :root.tastatur-sichtbar .kategorie-sheet-backdrop{
-  top:var(--sicht-oben,0px)!important;
-  height:var(--sicht-hoehe,100dvh)!important;
   place-items:end center!important;
   align-content:end!important;
-  padding-top:8px!important;
-  padding-bottom:6px!important;
+  padding-top:calc(var(--sicht-oben,0px) + 8px)!important;
+  padding-bottom:calc(var(--tastatur-unten,0px) + 6px)!important;
 }
 :root.tastatur-sichtbar .kategorie-sheet-backdrop :is(.kategorie-sheet,.special-dex-sheet){
   max-height:calc(var(--sicht-hoehe,100dvh) - 14px)!important;
