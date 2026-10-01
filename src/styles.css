@@ -16701,36 +16701,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-auswahl{transition:none}
 }
 
-/* Weitere Reiter am Rand andeuten: Eine schmale Ebene am Kapselende
-   verwischt die angeschnittenen Symbole und läuft nach innen aus, statt sie
-   in die Kapselfarbe ausblenden zu lassen. */
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-rand{
-  position:absolute;
-  z-index:2;
-  top:4px;
-  bottom:4px;
-  width:44px;
-  opacity:0;
-  pointer-events:none;
-  -webkit-backdrop-filter:blur(4px);
-  backdrop-filter:blur(4px);
-  transition:opacity .2s ease;
-}
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-rand.ist-links{
-  left:4px;
-  border-radius:999px 0 0 999px;
-  -webkit-mask-image:linear-gradient(90deg,#000 30%,transparent);
-  mask-image:linear-gradient(90deg,#000 30%,transparent);
-}
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-rand.ist-rechts{
-  right:4px;
-  border-radius:0 999px 999px 0;
-  -webkit-mask-image:linear-gradient(270deg,#000 30%,transparent);
-  mask-image:linear-gradient(270deg,#000 30%,transparent);
-}
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.mehr-links>.app-dex-rand.ist-links,
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.mehr-rechts>.app-dex-rand.ist-rechts{opacity:1}
-
 /* Hinweis-Punkt wie am Coach-Symbol im Header: ROUTINEN mit heute offenen
    Routinen, SCHLAF ohne heutigen Morgen-Check-in. */
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.hat-hinweis::after{
@@ -16750,8 +16720,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ============================================================
    CHAT-LEISTE WIE DAS MENÜBAND · dieselbe Kapsel (Kartenfläche, eine
    Kontur, runde Enden) an derselben Stelle, 12 px vom Rand. Beim Wechsel in
-   den Chat wird aus der Menü-Kapsel die Eingabe-Kapsel. Das Textfeld liegt
-   randlos darin, Plus und Senden bleiben Kreisknöpfe an den Enden. Dahinter
+   den Chat wird aus der Menü-Kapsel die Eingabe-Kapsel. Das Textfeld ist
+   darin eine eigene Pille mit Kontur, Plus und Senden bleiben Kreisknöpfe an
+   den Enden. Dahinter
    dieselbe deckende Fläche wie beim Menüband; sie beginnt, wo die Kante der
    Nachrichten (12 px) den Kapselbogen trifft, also auf halber Höhe der
    einzeiligen Kapsel (Radius 30 px).
@@ -16779,10 +16750,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme][data-seite="coach"] #view .coach-inputbar textarea{
   min-height:44px!important;
-  padding:11px 6px!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
+  padding:11px 16px!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:22px!important;
+  background:var(--ui-flaeche)!important;
   box-shadow:none!important;
 }
 
@@ -16793,3 +16764,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    abgerundeten Ecken.
    ============================================================ */
 :root[data-theme] :is(#app,body) :is(.btn,.coach-knopf,.coach-merken,.coin-reward-actions button){border-radius:999px!important}
+
+/* Genau fünf ganze Reiter: Jeder Reiter ist ein Fünftel der Leiste, und nach
+   dem Wischen rastet sie an einem Reiterrand ein. Ohne Ausblenden oder
+   Unschärfe am Rand; der fünfte Reiter steht immer vollständig da. Kein
+   scroll-snap-stop: Ein kräftiger Wisch darf mehrere Reiter weit laufen. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs{scroll-snap-type:x mandatory}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab{
+  flex:0 0 20%!important;
+  width:20%!important;
+  min-width:0!important;
+  scroll-snap-align:start;
+}

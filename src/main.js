@@ -913,7 +913,6 @@ function appDexShellZeichnen(route, view) {
   dock.innerHTML = `
     <div class="app-dex-dock-inner">
       <div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
-      <i class="app-dex-rand ist-links" aria-hidden="true"></i><i class="app-dex-rand ist-rechts" aria-hidden="true"></i>
     </div>`;
   appSyncStatusAktualisieren();
 
@@ -935,16 +934,7 @@ function appDexShellZeichnen(route, view) {
     auswahl.dataset.x = String(x);
     tabLeiste.classList.add('hat-auswahl');
   }
-  /* Weitere Reiter am Rand andeuten: Das Kapselende, hinter dem noch Reiter
-     liegen, zeichnet sie unscharf (Ebene .app-dex-rand in der Kapsel). */
-  const randAktualisieren = () => {
-    const maximal = tabLeiste.scrollWidth - tabLeiste.clientWidth;
-    const kapsel = tabLeiste.parentElement;
-    kapsel.classList.toggle('mehr-links', tabLeiste.scrollLeft > 4);
-    kapsel.classList.toggle('mehr-rechts', tabLeiste.scrollLeft < maximal - 4);
-  };
-  tabLeiste.addEventListener('scroll', randAktualisieren, { passive: true });
-  randAktualisieren();
+
   // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
   // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
   // keine Daten geladen und keine sichtbare Ansicht verändert.
