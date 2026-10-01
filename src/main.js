@@ -923,6 +923,7 @@ function appSyncStatusAktualisieren() {
    bleibt beim Neuzeichnen dasselbe Element, das Federn läuft also durch. */
 function leisteFedernLassen(leiste) {
   if (!leiste) return;
+  letzterLeistenTipp = performance.now();
   if (leiste.classList.contains('ist-angetippt')) {
     leiste.classList.remove('ist-angetippt');
     void leiste.offsetWidth;
@@ -1772,6 +1773,26 @@ async function profilSicherLaden() {
    am Ende anhielt. Alle anderen Seitenwechsel bleiben ohne Animation. */
 const istChatRoute = (route) => route === 'coach' || route === 'coach-wissen';
 let kapselWechselTimer = 0;
+
+/* Nach einem Tipp aufs Menüband zwei Frames warten, bevor die neue Seite
+   eingesetzt wird. Gemessen auf dem iPhone: Der Tausch belegt den Hauptthread
+   rund 90 ms. Federn, Auswahl und Weiterrücken waren beim Tipp gestartet,
+   gehen aber erst mit dem nächsten gezeichneten Frame an den Grafikchip –
+   der kam erst nach dem Tausch. Sie standen so lange still und sprangen dann
+   mitten in die Bewegung. Nach zwei Frames laufen sie auf dem Grafikchip
+   weiter, während getauscht wird. Kostet rund 30 ms, nur direkt nach einem
+   Tipp; ohne sichtbare Seite (keine Frames) begrenzt ein Zeitlimit. */
+let letzterLeistenTipp = -Infinity;
+function animationenAnstossen() {
+  if (performance.now() - letzterLeistenTipp > 400) return Promise.resolve();
+  return new Promise((weiter) => {
+    const notfall = setTimeout(weiter, 80);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      clearTimeout(notfall);
+      weiter();
+    }));
+  });
+}
 async function seiteTauschen(von, nach, tauschen) {
   ruckelMarke('Tausch');
   tauschen();
@@ -1855,6 +1876,8 @@ async function renderRoute() {
   // atomar getauscht.
   ruckelMarke(`Seite ${route}${richtung !== 'gleich' && ansichtsCache.peek(route) ? ' aus Speicher' : ' wird aufgebaut'}`);
   if (richtung !== 'gleich' && ansichtsCache.peek(route)) {
+    await animationenAnstossen();
+    if (generation !== renderGeneration) return;
     let gezeigt = false;
     await seiteTauschen(aktiveRoute, route, () => { gezeigt = gemerkteAnsichtZeigen(route); });
     if (gezeigt) return;
@@ -2297,6 +2320,7 @@ async function renderRoute() {
      kurz bevor die neue Ansicht sichtbar wird. So sieht der Nutzer einen
      einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
   if (app.querySelector(':scope > .app-start-splash')) await appStartSplashAbwarten();
+  await animationenAnstossen();
   if (generation !== renderGeneration) {
     view.remove();
     commitSeiteDefer(true);
