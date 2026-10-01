@@ -916,11 +916,41 @@ function appSyncStatusAktualisieren() {
   status.setAttribute('aria-label', status.title);
 }
 
-/* Antippen eines Reiters: Die Leiste federt kurz und leicht größer, dieselbe
-   Bewegung wie beim Wechsel zum Chat. Als CSS-Animation am echten Element,
-   nicht als View Transition: Die hielt auf dem iPhone die Darstellung beim
-   Start und beim Ende jeweils 50–90 ms an, das war das Ruckeln. Die Leiste
-   bleibt beim Neuzeichnen dasselbe Element, das Federn läuft also durch. */
+/* Federn einer Kapsel: Rahmen und Fläche (::before) werden per CSS kurz 3 %
+   größer (leiste-federn). Der Inhalt wird nicht skaliert, er rückt nur so
+   weit nach außen, wie es der Vergrößerung entspricht – jedes Element um den
+   Mittelpunkt der Kapsel, mit demselben Zeitverlauf. Auf dem iPhone Bild für
+   Bild gemessen: Wurde der Inhalt mitskaliert, rasterte iOS die Symbole in
+   höherer Auflösung, und am Ende sprangen sie um 1–2 px an ihren Platz. Die
+   Größe der Symbole ändert sich bei 3 % ohnehin um weniger als einen Pixel. */
+const FEDERN_MS = 520;
+const FEDERN_SKALA = 1.03;
+function inhaltMitfedern(kapsel, elemente) {
+  if (!kapsel || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const k = kapsel.getBoundingClientRect();
+  // Eingeklappt beginnt die sichtbare Kapsel tiefer (::before mit top).
+  const oben = Math.max(0, parseFloat(getComputedStyle(kapsel, '::before').top) || 0);
+  const mitteX = k.left + k.width / 2;
+  const mitteY = k.top + oben + (k.height - oben) / 2;
+  for (const element of elemente) {
+    const r = element.getBoundingClientRect();
+    if (!r.width || r.right < k.left || r.left > k.right) continue;
+    const dx = (FEDERN_SKALA - 1) * (r.left + r.width / 2 - mitteX);
+    const dy = (FEDERN_SKALA - 1) * (r.top + r.height / 2 - mitteY);
+    // Die Auswahl-Pille trägt ihre Position in transform; sie rückt über translate.
+    const pille = element.classList.contains('app-dex-auswahl');
+    const ruhe = pille ? '0px 0px' : 'translate(0px, 0px)';
+    const aussen = pille ? `${dx}px ${dy}px` : `translate(${dx}px, ${dy}px)`;
+    const eigenschaft = pille ? 'translate' : 'transform';
+    element.animate([
+      { [eigenschaft]: ruhe, easing: 'cubic-bezier(.25,.1,.25,1)' },
+      { [eigenschaft]: aussen, offset: 0.38, easing: 'cubic-bezier(.45,0,.2,1)' },
+      { [eigenschaft]: ruhe },
+    ], { duration: FEDERN_MS });
+  }
+}
+
+/* Antippen eines Reiters: Die Kapsel federt kurz, die Reiter rücken mit. */
 function leisteFedernLassen(leiste) {
   if (!leiste) return;
   letzterLeistenTipp = performance.now();
@@ -929,6 +959,8 @@ function leisteFedernLassen(leiste) {
     void leiste.offsetWidth;
   }
   leiste.classList.add('ist-angetippt');
+  const reiterleiste = leiste.querySelector('.app-dex-tabs');
+  if (reiterleiste) inhaltMitfedern(leiste, [...reiterleiste.children]);
   ruckelMarke('Federn startet');
 }
 
@@ -1837,6 +1869,15 @@ async function seiteTauschen(von, nach, tauschen) {
   wurzel.classList.add('kapsel-wechsel');
   clearTimeout(kapselWechselTimer);
   kapselWechselTimer = setTimeout(() => wurzel.classList.remove('kapsel-wechsel'), 700);
+  // Inhalt der unteren Kapsel rückt beim Federn mit, ohne skaliert zu werden.
+  if (istChatRoute(nach)) {
+    const eingabe = app.querySelector(':scope > #view .coach-inputbar');
+    if (eingabe) inhaltMitfedern(eingabe, [...eingabe.children]);
+  } else {
+    const leiste = app.querySelector(':scope > .app-dex-dock .app-dex-dock-inner');
+    const reiterleiste = leiste?.querySelector('.app-dex-tabs');
+    if (reiterleiste) inhaltMitfedern(leiste, [...reiterleiste.children]);
+  }
 }
 
 async function renderRoute() {

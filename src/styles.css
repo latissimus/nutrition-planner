@@ -2556,6 +2556,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   background:var(--surface);color:var(--text);box-shadow:none;
   transform-origin:50% 50%;
   animation:overlayKarteZoom .44s cubic-bezier(.16,.78,.22,1) both;
+  /* Dauerhaft eigene Ebene: Sonst nimmt iOS sie am Ende des Aufzoomens weg,
+     und Symbole und Schrift im Sheet springen um einen Pixel. */
+  will-change:transform,opacity;
 }
 @keyframes overlayAbdunkeln{
   from{background-color:rgba(0,0,0,0)}
@@ -16614,10 +16617,34 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    beider Kapseln blendet ein (Klasse kapsel-wechsel aus seiteTauschen).
    ============================================================ */
 :root.kapsel-wechsel #app .app-dex-kapsel>*{animation:kapsel-her .26s ease-out both}
-:root.kapsel-wechsel #app>.app-dex-dock .app-dex-dock-inner,
-:root.kapsel-wechsel .coach-inputbar{animation:leiste-federn .52s both}
+/* Nur die Kapselform federt; der Inhalt rückt per Skript mit (inhaltMitfedern). */
+:root.kapsel-wechsel #app>.app-dex-dock .app-dex-dock-inner::before,
+:root.kapsel-wechsel .coach-inputbar::before{animation:leiste-federn .52s both}
 :root.kapsel-wechsel #app>.app-dex-dock .app-dex-tabs,
 :root.kapsel-wechsel .coach-inputbar>*{animation:kapsel-her .26s ease-out .04s both}
+/* Was hier einblendet, liegt dauerhaft auf eigenen Ebenen. Gemessen: Endete
+   das Einblenden, sprangen die Symbole der Header-Kapsel um etwa 1 px. */
+#app .app-dex-kapsel>*,
+#app>.app-dex-dock .app-dex-tabs{will-change:opacity}
+.coach-inputbar>*{will-change:opacity,transform}
+/* Chat-Leiste: Rahmen und Fläche liegen auf dem ::before, damit beim Federn
+   nur sie wachsen und Plus, Feld und Senden nicht skaliert werden. */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-inputbar{
+  position:relative;
+  isolation:isolate;
+  border-color:transparent!important;
+  background:transparent!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:calc(-1 * var(--kontur));
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:34px;
+  background:var(--ui-flaeche);
+  pointer-events:none;
+}
 /* Sanft hinaus und weich zurück, ohne Nachschwingen. */
 @keyframes leiste-federn{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
@@ -16626,21 +16653,26 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 @keyframes kapsel-her{from{opacity:0}}
 
-/* Reiter antippen: Die echte Leiste federt (main.js: leisteFedernLassen), mit
-   derselben Bewegung wie beim Wechsel zum Chat. Sie liegt dauerhaft auf einer
-   eigenen Ebene, damit der Grafikchip die Bewegung allein führt – auch während
-   die neue Seite eingesetzt wird. Das Menüband schneidet nichts mehr ab: Beim
-   Federn ragt die obere Kontur sonst über seinen Rand hinaus und verschwand. */
+/* Reiter antippen: Die Kapsel federt (Rahmen und Fläche am ::before), die
+   Reiter und die Auswahl rücken per Skript genau so weit mit, wie es der
+   Vergrößerung entspricht – ohne selbst skaliert zu werden (main.js:
+   inhaltMitfedern). Auf dem iPhone Bild für Bild gemessen: Wurde der Inhalt
+   skaliert, rasterte iOS die Symbole während des Federns in höherer
+   Auflösung; am Ende sprangen sie um 1–2 px zurück an ihren Platz. Das
+   Menüband schneidet nichts ab, damit die Kontur beim Federn ganz bleibt. */
 :root[data-theme][data-seite] #app>.app-dex-dock{overflow:visible!important}
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{
-  will-change:transform;
-  /* Mitte der sichtbaren Kapsel; eingeklappt liegt sie 9 px tiefer. */
-  transform-origin:50% calc(50% + (34 - var(--kapsel-r)) * 1px);
-}
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:leiste-federn .52s both}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt::before{animation:leiste-federn .52s both}
+/* Reiter und Auswahl liegen dauerhaft auf eigenen Ebenen: Entsteht eine Ebene
+   erst mit der Animation und verschwindet danach wieder, springt ihr Inhalt
+   beim Wechsel um einen Pixel. */
+:root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab,.app-dex-auswahl){will-change:transform}
+/* Ebenso Symbol, Schrift und Punkte: Sie verkleinern sich beim Einklappen
+   und blenden aus; ohne eigene Ebene sprangen sie am Ende um einen Pixel. */
+:root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab>span,.app-dex-tab small,.app-dex-tab>.app-dex-tab-punkte){will-change:transform,opacity}
 @media (prefers-reduced-motion:reduce){
-  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt,
-  :root.kapsel-wechsel :is(#app .app-dex-kapsel>*,#app>.app-dex-dock .app-dex-dock-inner,#app>.app-dex-dock .app-dex-tabs,.coach-inputbar,.coach-inputbar>*){animation:none}
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt::before,
+  :root.kapsel-wechsel :is(#app .app-dex-kapsel>*,#app>.app-dex-dock .app-dex-tabs,.coach-inputbar>*),
+  :root.kapsel-wechsel :is(#app>.app-dex-dock .app-dex-dock-inner,.coach-inputbar)::before{animation:none}
 }
 
 /* CAPCOINS zurücksetzen: unten auf der Seite, als Kapsel mit Kontur wie
