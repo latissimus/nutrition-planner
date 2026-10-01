@@ -14037,9 +14037,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-color:var(--dm-ink)!important;
   box-shadow:none!important;
 }
-:root[data-theme="dark"][data-seite] .app-dex-header .nav-av img{
-  filter:grayscale(1)!important;
-}
 :root[data-theme="dark"][data-seite] .app-dex-sync,
 :root[data-theme="dark"][data-seite] .app-dex-sync:is(.ok,.wait){
   color:var(--dm-muted)!important;
@@ -15505,7 +15502,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] :is(.coach-merken,.coach-knopf).ist-wichtig,:root[data-theme][data-seite="coach"] .coach-woche-chip input:checked+span{background:#FF277F;color:var(--ui-schrift)}
 /* Im Dark Mode färbt die allgemeine Knopfregel (#app button) sonst auch die
    Hauptaktion grau. Pink trägt in beiden Themes schwarze Schrift. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-merken,.coach-knopf).ist-wichtig{background:#FF277F!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme][data-seite="coach"] #view :is(.coach-merken,.coach-knopf).ist-wichtig,
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege button:first-child{background:#FF277F!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
 
 /* Antwort: Schritte als Abschnitte mit Trennlinie statt Kästen im Kasten. */
 :root[data-theme][data-seite="coach"] .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte{gap:0}
@@ -16703,19 +16701,35 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-auswahl{transition:none}
 }
 
-/* Weitere Reiter am Rand andeuten: das Kapselende blendet sanft aus. */
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs.mehr-rechts{
-  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 30px),transparent);
-  mask-image:linear-gradient(90deg,#000 calc(100% - 30px),transparent);
+/* Weitere Reiter am Rand andeuten: Eine schmale Ebene am Kapselende
+   verwischt die angeschnittenen Symbole und läuft nach innen aus, statt sie
+   in die Kapselfarbe ausblenden zu lassen. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-rand{
+  position:absolute;
+  z-index:2;
+  top:4px;
+  bottom:4px;
+  width:44px;
+  opacity:0;
+  pointer-events:none;
+  -webkit-backdrop-filter:blur(4px);
+  backdrop-filter:blur(4px);
+  transition:opacity .2s ease;
 }
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs.mehr-links{
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 30px);
-  mask-image:linear-gradient(90deg,transparent,#000 30px);
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-rand.ist-links{
+  left:4px;
+  border-radius:999px 0 0 999px;
+  -webkit-mask-image:linear-gradient(90deg,#000 30%,transparent);
+  mask-image:linear-gradient(90deg,#000 30%,transparent);
 }
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs.mehr-links.mehr-rechts{
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent);
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-rand.ist-rechts{
+  right:4px;
+  border-radius:0 999px 999px 0;
+  -webkit-mask-image:linear-gradient(270deg,#000 30%,transparent);
+  mask-image:linear-gradient(270deg,#000 30%,transparent);
 }
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.mehr-links>.app-dex-rand.ist-links,
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.mehr-rechts>.app-dex-rand.ist-rechts{opacity:1}
 
 /* Hinweis-Punkt wie am Coach-Symbol im Header: ROUTINEN mit heute offenen
    Routinen, SCHLAF ohne heutigen Morgen-Check-in. */
@@ -16732,3 +16746,42 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--brand-pink,#FF69AE);
 }
 :root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt .app-dex-tab.hat-hinweis::after{top:5px}
+
+/* ============================================================
+   CHAT-LEISTE WIE DAS MENÜBAND · dieselbe Kapsel (Kartenfläche, eine
+   Kontur, runde Enden) an derselben Stelle, 12 px vom Rand. Beim Wechsel in
+   den Chat wird aus der Menü-Kapsel die Eingabe-Kapsel. Das Textfeld liegt
+   randlos darin, Plus und Senden bleiben Kreisknöpfe an den Enden. Dahinter
+   dieselbe deckende Fläche wie beim Menüband; sie beginnt, wo die Kante der
+   Nachrichten (12 px) den Kapselbogen trifft, also auf halber Höhe der
+   einzeiligen Kapsel (Radius 30 px).
+   ============================================================ */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{
+  padding:0 12px var(--app-dex-dock-bottom)!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-page.tastatur-offen .coach-shell.coach-chat .coach-form,
+:root[data-theme][data-seite="coach"] #view.tastatur-offen .coach-shell.coach-chat .coach-form{padding-bottom:4px!important}
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form::after{
+  display:block!important;
+  top:30px;
+  height:auto!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-form-innen{width:min(100%,580px)}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar{
+  min-height:60px!important;
+  padding:4px 6px!important;
+  gap:4px!important;
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  border-radius:30px!important;
+  background:var(--ui-flaeche)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar textarea{
+  min-height:44px!important;
+  padding:11px 6px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
