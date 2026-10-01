@@ -96,20 +96,13 @@ export async function registriereServiceWorker() {
   window.addEventListener('focus', aufUpdatePruefen);
   window.addEventListener('online', aufUpdatePruefen);
 
-  // GitHub Pages liefert sw.js mit bis zu zehn Minuten Cachezeit aus. Wird die
-  // PWA direkt nach einem Deployment geöffnet, kann der erste Check deshalb
-  // noch den alten Worker sehen. Während dieser Phase prüfen wir minütlich;
-  // danach genügt wieder das reguläre 15-Minuten-Intervall.
-  let schnellePruefungen = 0;
+  // Solange die App im Vordergrund ist, wird jede Minute nachgesehen. Früher
+  // nur in den ersten zwölf Minuten nach dem Start, danach alle 15 Minuten:
+  // Blieb die App länger offen, kam ein Update erst bis zu 15 Minuten nach
+  // dem Deployment an. Die Abfrage holt nur sw.js und ist klein.
   schnellePruefung = setInterval(() => {
-    schnellePruefungen += 1;
-    void aufUpdatePruefen();
-    if (schnellePruefungen >= 12 && schnellePruefung != null) {
-      clearInterval(schnellePruefung);
-      schnellePruefung = null;
-    }
+    if (document.visibilityState === 'visible') void aufUpdatePruefen();
   }, 60 * 1000);
-  setInterval(aufUpdatePruefen, 15 * 60 * 1000);
 
   // Der Listener steht jetzt, bevor aktiv geprueft wird. So kann auch ein
   // Update, das exakt waehrend des App-Starts gefunden wird, nicht durchrutschen.

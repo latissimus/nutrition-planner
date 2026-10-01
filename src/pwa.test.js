@@ -59,7 +59,6 @@ describe('registriereServiceWorker', () => {
     expect(serviceWorker.register).toHaveBeenCalledWith('./sw.js', { updateViaCache: 'none' });
     expect(updateButton.hidden).toBe(true);
     expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 60 * 1000);
-    expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 15 * 60 * 1000);
 
     worker.state = 'installed';
     worker.ausloesen('statechange');
