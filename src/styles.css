@@ -16862,10 +16862,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
 
-/* Reiter antippen: Die ganze Leiste federt kurz (main.js: leisteFedernLassen),
-   dieselbe Bewegung wie beim Übergang zum Chat. --federn-start setzt sie nach
-   einem Neuzeichnen der Leiste fort. */
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:leiste-federn .52s var(--federn-start,0ms) both}
+/* Reiter antippen: Die Kapsel federt kurz (main.js: leisteFedernLassen),
+   dieselbe Bewegung wie beim Übergang zum Chat. Nur Rahmen und Fläche, die
+   Symbole bleiben ruhig und scharf. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt::before{animation:leiste-federn .52s both}
 @media (prefers-reduced-motion:reduce){
-  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:none}
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt::before{animation:none}
 }

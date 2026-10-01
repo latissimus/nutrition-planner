@@ -843,14 +843,12 @@ function appSyncStatusAktualisieren() {
   status.setAttribute('aria-label', status.title);
 }
 
-/* Antippen eines Reiters: Die ganze Leiste federt kurz und leicht größer,
-   wie beim Übergang zum Chat. Sie wird beim Seitenwechsel neu gezeichnet;
-   das Federn läuft dann in der neuen Leiste an derselben Stelle weiter. */
-const LEISTE_FEDERN_MS = 520;
-let leisteGetippt = 0;
-function leisteFedernLassen(leiste, vergangen = 0) {
+/* Antippen eines Reiters: Die Kapsel der Leiste federt kurz und leicht
+   größer, wie beim Übergang zum Chat. Nur Rahmen und Fläche (::before)
+   bewegen sich – mitskalierte Symbole wirkten beim Zurückfedern kurz zu
+   klein. */
+function leisteFedernLassen(leiste) {
   leiste.classList.remove('ist-angetippt');
-  leiste.style.setProperty('--federn-start', `${-Math.round(vergangen)}ms`);
   void leiste.offsetWidth;
   leiste.classList.add('ist-angetippt');
 }
@@ -936,10 +934,16 @@ function appDexShellZeichnen(route, view) {
      375 px Gerätebreite). Seine Aufgabe übernimmt ein zweiter Tipp auf den
      Reiter der Seite, auf der man ohnehin steht – dieser trägt dafür drei
      Punkte als Hinweis. */
-  dock.innerHTML = `
-    <div class="app-dex-dock-inner">
-      <div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>
-    </div>`;
+  /* Die Kapsel selbst bleibt beim Neuzeichnen bestehen, nur die Reiter
+     werden ersetzt. So läuft ihr Federn nach dem Antippen ungestört weiter,
+     auch wenn die neue Seite die Leiste mitten darin neu zeichnet. */
+  let leiste = dock.querySelector(':scope > .app-dex-dock-inner');
+  if (!leiste) {
+    leiste = document.createElement('div');
+    leiste.className = 'app-dex-dock-inner';
+    dock.replaceChildren(leiste);
+  }
+  leiste.innerHTML = `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`;
   appSyncStatusAktualisieren();
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
@@ -960,8 +964,6 @@ function appDexShellZeichnen(route, view) {
     auswahl.dataset.x = String(x);
     tabLeiste.classList.add('hat-auswahl');
   }
-  const seitTippen = performance.now() - leisteGetippt;
-  if (seitTippen < LEISTE_FEDERN_MS) leisteFedernLassen(dock.querySelector('.app-dex-dock-inner'), seitTippen);
 
   // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
   // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
@@ -1009,8 +1011,7 @@ function appDexShellZeichnen(route, view) {
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
     if (reiter) {
-      leisteGetippt = performance.now();
-      leisteFedernLassen(dock.querySelector('.app-dex-dock-inner'));
+      leisteFedernLassen(leiste);
       // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
       if (auswahl && !reiter.classList.contains('aktiv')) {
         auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
