@@ -1899,7 +1899,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
 .dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben),.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben) svg,.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben) svg *{color:#fff!important;fill:#fff!important}
-.dex-ordner-test:active .dex-ordner-form{filter:none}
 
 /* Reserviertes Inhaltskarten-Design fuer Bilder, Notizen und Videolinks. */
 .dex-inhaltskarte{
@@ -2698,8 +2697,8 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .card,.reminder-group,.profile-abschnitt{box-shadow:var(--hart-klein)}
 .btn{box-shadow:var(--hart-klein)}
 /* Bewusst kein Drückeffekt: Knöpfe, Chips, Tags, Menüfelder, Ordner und
-   Reiter rücken beim Antippen nicht nach unten und verlieren keinen
-   Schatten. Neue :active-Regeln dürfen nichts verschieben. */
+   Reiter rücken beim Antippen nicht nach unten, schrumpfen nicht und
+   verlieren keinen Schatten. Neue :active-Regeln dürfen nichts bewegen. */
 .input{box-shadow:none}
 .input:focus{border-color:var(--prio);box-shadow:0 0 0 3px var(--prio-wash)}
 
@@ -3648,9 +3647,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Dex-Ordner und Auswahlmodus: Konturen und Versatz duerfen auf Navy nicht
    verschwinden; der Schatten folgt deshalb demselben gedeckten Stahlblau. */
 :root[data-theme="dark"] .dex-ordner-form{
-  filter:none;
-}
-:root[data-theme="dark"] .dex-ordner-test:active .dex-ordner-form{
   filter:none;
 }
 :root[data-theme="dark"] .dex-ordner-form path{stroke:var(--ink)}
@@ -6427,9 +6423,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ordner-ink,#fff)!important;
   fill:var(--ordner-ink,#fff)!important;
 }
-:root[data-seite="sleep"] .sleep-tonight button:active{
-  transform:scale(.94);
-}
 :root[data-seite="sleep"] .sleep-tonight .sleep-analysis-info{
   width:34px;
   height:34px;
@@ -8939,10 +8932,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font-style:normal;
   -webkit-appearance:none;
   appearance:none;
-}
-.neo-dex-page .dex-sammlungskopf button:active,
-.neo-dex-page .dex-sammlungskopf .dex-sammlungskopf-zurueck:active{
-  transform:scale(.94);
 }
 .neo-dex-page .dex-sammlungskopf + .unter-sammlungen-block{
   margin-top:2px!important;
@@ -16744,7 +16733,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:none;
   font:800 13px/1 "Work Sans",sans-serif;
   white-space:nowrap;
-  transition:transform .12s ease,opacity .2s ease;
+  transition:opacity .2s ease;
 }
 :root[data-theme] body .pwa-update-button[hidden]{display:none}
 :root[data-theme] body .pwa-update-button b{font:inherit}
@@ -16754,7 +16743,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   font:600 13px/1 "Work Sans",sans-serif;
   opacity:.8;
 }
-:root[data-theme] body .pwa-update-button:active{transform:scale(.96);box-shadow:none}
 :root[data-theme] body .pwa-update-button:disabled{opacity:.75}
 
 /* ============================================================
