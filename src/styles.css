@@ -16693,7 +16693,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:999px;
   background:color-mix(in srgb,var(--ui-schrift) 12%,transparent);
   pointer-events:none;
-  transition:transform .28s cubic-bezier(.3,.7,.2,1),width .28s ease;
+  transition:transform .5s cubic-bezier(.22,1,.36,1),width .3s ease;
 }
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs.hat-auswahl .app-dex-tab.aktiv{background:transparent!important}
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab{z-index:1}
@@ -16855,3 +16855,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 ::view-transition-new(*.kapsel-inhalt){animation:kapsel-her .22s ease-out .14s both}
 @keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
+
+/* Reiter antippen: Symbol springt kurz größer (main.js: reiterSpringenLassen).
+   --sprung-start setzt den Sprung nach einem Neuzeichnen der Leiste fort. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.ist-angetippt>span{animation:reiter-sprung .38s cubic-bezier(.3,.7,.4,1) var(--sprung-start,0ms) both}
+@keyframes reiter-sprung{0%{transform:scale(1)}35%{transform:scale(1.2)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.ist-angetippt>span{animation:none}
+}

@@ -843,6 +843,18 @@ function appSyncStatusAktualisieren() {
   status.setAttribute('aria-label', status.title);
 }
 
+/* Antippen eines Reiters: Das Symbol springt kurz größer und wieder zurück
+   (wie bei Instagram). Die Leiste wird beim Seitenwechsel neu gezeichnet;
+   der Sprung läuft dann im neuen Reiter an derselben Stelle weiter. */
+const REITER_SPRUNG_MS = 380;
+let reiterSprung = null;
+function reiterSpringenLassen(reiter, vergangen = 0) {
+  reiter.classList.remove('ist-angetippt');
+  reiter.style.setProperty('--sprung-start', `${-Math.round(vergangen)}ms`);
+  void reiter.offsetWidth;
+  reiter.classList.add('ist-angetippt');
+}
+
 function appDexShellZeichnen(route, view) {
   if (!istAppHauptDex(route, view)) {
     appDexShellEntfernen();
@@ -859,7 +871,14 @@ function appDexShellZeichnen(route, view) {
   const istNebenansicht = istProfil || istSuche || istCoach;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
   const alteAuswahl = app.querySelector(':scope > .app-dex-dock .app-dex-auswahl');
-  const alteAuswahlX = alteAuswahl?.dataset.x ? Number(alteAuswahl.dataset.x) : null;
+  /* Die aktuelle, womöglich noch gleitende Position statt des Ziels: Wird die
+     Leiste mitten im Gleiten neu gezeichnet, gleitet die Pille weiter, statt
+     ans Ziel zu springen. */
+  const alteAuswahlX = alteAuswahl?.dataset.x
+    ? (typeof DOMMatrixReadOnly === 'function'
+      ? new DOMMatrixReadOnly(getComputedStyle(alteAuswahl).transform).m41
+      : Number(alteAuswahl.dataset.x))
+    : null;
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
 
@@ -941,6 +960,12 @@ function appDexShellZeichnen(route, view) {
     auswahl.dataset.x = String(x);
     tabLeiste.classList.add('hat-auswahl');
   }
+  if (reiterSprung) {
+    const vergangen = performance.now() - reiterSprung.zeit;
+    const reiter = vergangen < REITER_SPRUNG_MS
+      && [...tabLeiste.querySelectorAll('.app-dex-tab')].find((tab) => tab.getAttribute('href') === reiterSprung.ziel);
+    if (reiter) reiterSpringenLassen(reiter, vergangen);
+  }
 
   // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
   // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
@@ -987,6 +1012,15 @@ function appDexShellZeichnen(route, view) {
      der Reiter ein normaler Verweis und bringt einen zurück. */
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
+    if (reiter) {
+      reiterSprung = { ziel: reiter.getAttribute('href'), zeit: performance.now() };
+      reiterSpringenLassen(reiter);
+      // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
+      if (auswahl && !reiter.classList.contains('aktiv')) {
+        auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
+        auswahl.dataset.x = String(reiter.offsetLeft);
+      }
+    }
     /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
        Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
        der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
