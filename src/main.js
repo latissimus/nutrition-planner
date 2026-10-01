@@ -1039,8 +1039,13 @@ function appDexShellZeichnen(route, view) {
      der Reiter ein normaler Verweis und bringt einen zurück. */
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
+    const oeffnetMenue = Boolean(reiter) && !istNebenansicht
+      && reiter.getAttribute('href')?.replace(/^#/, '') === aktiveDockRoute;
     if (reiter) {
-      leisteFedernLassen();
+      /* Öffnet der Tipp das Menü, federt die Leiste nicht: Ihr Bild läge
+         während des Federns über der Abdunklung, und die Leiste würde erst
+         danach dunkel. */
+      if (!oeffnetMenue) leisteFedernLassen();
       // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
       if (auswahl && !reiter.classList.contains('aktiv')) {
         auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
@@ -1050,8 +1055,7 @@ function appDexShellZeichnen(route, view) {
     /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
        Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
        der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
-    if (!reiter || istNebenansicht) return;
-    if (reiter.getAttribute('href')?.replace(/^#/, '') !== aktiveDockRoute) return;
+    if (!oeffnetMenue) return;
     event.preventDefault();
     reiter.classList.add('ist-gedrueckt');
     window.setTimeout(() => reiter.classList.remove('ist-gedrueckt'), 220);

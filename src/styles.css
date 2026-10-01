@@ -3847,7 +3847,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .rem-row-body input[type="time"]::-webkit-date-and-time-value{height:44px!important;line-height:44px!important;text-align:center;padding:0}
 .mahl-slot-info{display:inline-grid;place-items:center;width:26px;height:26px;margin-left:6px;padding:0;border:0;border-radius:50%;background:transparent;color:color-mix(in srgb,var(--ink) 45%,transparent);cursor:pointer;box-shadow:none;transition:color .12s,background .12s}
 .mahl-slot-info svg{display:block;width:16px;height:16px}
-.mahl-slot-info:hover{color:var(--ink);background:color-mix(in srgb,var(--ordner) 22%,var(--surface))}
 .mahl-slot-info.hat-info{color:var(--ink);background:color-mix(in srgb,var(--ordner) 30%,var(--surface))}
 .mahl-slot-zeit{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;min-height:44px}
 .mahl-slot-zeit input{width:64px;height:24px!important;min-height:24px!important;padding:0;border:0;border-radius:0;background:transparent;color:var(--muted);font:850 10.5px/24px var(--ui);letter-spacing:.02em;box-shadow:none;text-align:right}
@@ -13222,9 +13221,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background-color:var(--dm-surface2)!important;
 }
 :root[data-theme="dark"] .mahl-slot-titel>.reminder-svg{
-  background-color:var(--dm-surface2)!important;
-}
-:root[data-theme="dark"] .mahl-slot-info:hover{
   background-color:var(--dm-surface2)!important;
 }
 :root[data-theme="dark"] .mahl-slot-info.hat-info{
