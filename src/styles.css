@@ -16819,3 +16819,38 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme] body .pwa-update-button:active{transform:scale(.96);box-shadow:none}
 :root[data-theme] body .pwa-update-button:disabled{opacity:.75}
+
+/* ============================================================
+   SEITE ⇄ CHAT · Kopf- und Fußkapsel bleiben, nur der Inhalt wechselt.
+   Nur während des Übergangs (Klasse aus seiteTauschen in main.js) tragen
+   die Kapseln und ihr Inhalt eigene Namen. Weil der Inhalt eigene Namen
+   hat, enthält das Bild der Kapsel nur Rahmen und Fläche: Es wird auf den
+   neuen Zuschnitt gezogen, der Inhalt blendet darin über.
+   ============================================================ */
+:root.kapsel-uebergang #app .app-dex-kapsel{view-transition-name:kopf-kapsel;view-transition-class:kapsel}
+:root.kapsel-uebergang #app>.app-dex-dock .app-dex-dock-inner,
+:root.kapsel-uebergang .coach-inputbar{view-transition-name:fuss-kapsel;view-transition-class:kapsel}
+:root.kapsel-uebergang #app .app-dex-kapsel>.coin-kopfstand{view-transition-name:kopf-coins;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-search{view-transition-name:kopf-suche;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-coach{view-transition-name:kopf-coach;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-zurueck{view-transition-name:kopf-zurueck;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-gedaechtnis{view-transition-name:kopf-gedaechtnis;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang #app>.app-dex-dock .app-dex-tabs{view-transition-name:fuss-reiter;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang .coach-inputbar>.coach-plus{view-transition-name:fuss-plus;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang .coach-inputbar>textarea{view-transition-name:fuss-feld;view-transition-class:kapsel-inhalt}
+:root.kapsel-uebergang .coach-inputbar>.coach-send{view-transition-name:fuss-senden;view-transition-class:kapsel-inhalt}
+
+::view-transition-group(*){animation-duration:.38s;animation-timing-function:cubic-bezier(.22,.9,.24,1)}
+/* Die Seite selbst blendet nur kurz über (Standard-Überblendung, kürzer). */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.26s}
+/* Rahmen und Fläche sind vorher wie nachher gleich: Das neue Bild genügt
+   und wird auf die gleitende Größe gezogen, ohne doppelten Rand. */
+::view-transition-old(*.kapsel){display:none}
+::view-transition-new(*.kapsel){height:100%;animation:none}
+/* Gedächtnis hat keine Fußkapsel: Dort blendet sie ganz aus oder ein. */
+::view-transition-old(*.kapsel):only-child{display:block;height:100%;animation:kapsel-weg .2s ease-out both}
+::view-transition-new(*.kapsel):only-child{animation:kapsel-her .22s ease-out .06s both}
+::view-transition-old(*.kapsel-inhalt){animation:kapsel-weg .14s ease-out both}
+::view-transition-new(*.kapsel-inhalt){animation:kapsel-her .22s ease-out .14s both}
+@keyframes kapsel-weg{to{opacity:0}}
+@keyframes kapsel-her{from{opacity:0}}

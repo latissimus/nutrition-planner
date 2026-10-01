@@ -1598,6 +1598,37 @@ async function profilSicherLaden() {
   return profile;
 }
 
+/* Seite ⇄ Chat: Kopf- und Fußkapsel behalten ihre Form, nur ihr Inhalt
+   wechselt (Coins, Suche, Coach ⇄ Zurück, Gedächtnis; Reiter ⇄ Eingabe).
+   Ein View Transition lässt beide Kapseln in ihren neuen Zuschnitt gleiten
+   und blendet nur den Inhalt über. Alle anderen Seitenwechsel bleiben wie
+   beim LOGMAN ohne Animation. */
+const istChatRoute = (route) => route === 'coach' || route === 'coach-wissen';
+async function seiteTauschen(von, nach, tauschen) {
+  const mitUebergang = von && istChatRoute(von) !== istChatRoute(nach)
+    && typeof document.startViewTransition === 'function'
+    && !document.hidden
+    && app.querySelector(':scope > #view')
+    && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (!mitUebergang) {
+    tauschen();
+    return;
+  }
+  const wurzel = document.documentElement;
+  wurzel.classList.add('kapsel-uebergang');
+  const aufraeumen = () => wurzel.classList.remove('kapsel-uebergang');
+  let uebergang;
+  try {
+    uebergang = document.startViewTransition(tauschen);
+  } catch {
+    aufraeumen();
+    tauschen();
+    return;
+  }
+  uebergang.finished.then(aufraeumen, aufraeumen);
+  await uebergang.updateCallbackDone;
+}
+
 async function renderRoute() {
   const generation = ++renderGeneration;
   /* Safety-Net: falls ein vorheriger renderRoute-Lauf durch einen Fehler
@@ -1660,8 +1691,11 @@ async function renderRoute() {
   // Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
   // sofort verfügbar. Die sichtbare Seite wird ohne Übergangsanimation
   // atomar getauscht.
-  if (richtung !== 'gleich' && ansichtsCache.peek(route)
-    && gemerkteAnsichtZeigen(route)) return;
+  if (richtung !== 'gleich' && ansichtsCache.peek(route)) {
+    let gezeigt = false;
+    await seiteTauschen(aktiveRoute, route, () => { gezeigt = gemerkteAnsichtZeigen(route); });
+    if (gezeigt) return;
+  }
 
   const vorherigeRoute = aktiveRoute;
   const vorherigerController = routeAbortController;
@@ -2106,19 +2140,21 @@ async function renderRoute() {
     commitPageLookDefer(true);
     return;
   }
-  commitSeiteDefer();
-  commitPageLookDefer();
-  appStartSplashVerwerfen();
-  const alteSeite = app.querySelector(':scope > #view');
-  if (alteSeite) {
-    if (richtung !== 'gleich') ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
-    else alteSeite.remove();
-  }
-  aktiveRoute = route;
-  view.id = 'view';
-  view.hidden = false;
-  view.classList.remove('warten-auf-daten');
-  appDexShellAktualisieren(route, view, signal);
+  await seiteTauschen(vorherigeRoute, route, () => {
+    commitSeiteDefer();
+    commitPageLookDefer();
+    appStartSplashVerwerfen();
+    const alteSeite = app.querySelector(':scope > #view');
+    if (alteSeite) {
+      if (richtung !== 'gleich') ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
+      else alteSeite.remove();
+    }
+    aktiveRoute = route;
+    view.id = 'view';
+    view.hidden = false;
+    view.classList.remove('warten-auf-daten');
+    appDexShellAktualisieren(route, view, signal);
+  });
   const dexAddButton = app.querySelector(':scope > .app-dex-dock .app-dex-tab.ist-offen')
     || view.querySelector('.kategorie-plus');
   if (dexAddButton) showGestureHintOnce({
