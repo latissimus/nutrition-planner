@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { signieren } from './signierteAdressen.js';
 import { hole, schluessel } from './datenspeicher.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
@@ -102,10 +103,9 @@ const VORSCHAU_MASSE = { width: 540, height: 304, resize: 'cover', quality: 70 }
    Rueckfall auf die unveraenderte Datei, falls die Verkleinerung einmal nicht
    zur Verfuegung steht. Toene brauchen keine und bleiben im Stapel. */
 async function signiereVorschau(pfad) {
-  const verkleinert = await supabase.storage.from(BUCKET)
-    .createSignedUrl(pfad, 60 * 60, { transform: VORSCHAU_MASSE });
+  const verkleinert = await signieren(BUCKET, pfad, 60 * 60, { transform: VORSCHAU_MASSE });
   if (verkleinert.data?.signedUrl) return [pfad, verkleinert.data.signedUrl];
-  const original = await supabase.storage.from(BUCKET).createSignedUrl(pfad, 60 * 60);
+  const original = await signieren(BUCKET, pfad, 60 * 60);
   return [pfad, original.data?.signedUrl || ''];
 }
 

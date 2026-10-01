@@ -46,6 +46,11 @@ export function bildknotenUebernehmen(alt, neu) {
       if (geladen) passend.classList.add('ist-geladen');
     }
     knoten.replaceWith(passend);
+    // Der neue Rahmen einer Vorschau wartete auf das Laden seines eigenen,
+    // jetzt ersetzten Bildes; ohne diese Zeile bliebe der Lade-Schimmer stehen.
+    if (passend.classList?.contains('ist-geladen')) {
+      passend.closest('.dex-inhaltskarte-vorschau')?.classList.add('hat-vorschaubild', 'vorschau-geladen');
+    }
   }
 }
 

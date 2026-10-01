@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { signieren } from './signierteAdressen.js';
 import { applyPageLook, categoryColor, colorIsDark, materialIconMarkup, pageLook } from './categoryIcons.js';
 import {
   sourceFromUrl, videoEmbedUrl, videoProvider, mountIngredientEditor, ingredientLine,
@@ -129,8 +130,8 @@ async function loadEntry(userId, id, signal) {
        bleibt fuer das Vollbild, damit Hineinzoomen scharf bleibt. Beide
        Signaturen laufen parallel, kosten also keine zusaetzliche Wartezeit. */
     const [klein, gross] = await Promise.all([
-      supabase.storage.from(BUCKET).createSignedUrl(data.image_path, 60 * 60, { transform: DETAIL_MASSE }),
-      supabase.storage.from(BUCKET).createSignedUrl(data.image_path, 60 * 60),
+      signieren(BUCKET, data.image_path, 60 * 60, { transform: DETAIL_MASSE }),
+      signieren(BUCKET, data.image_path, 60 * 60),
     ]);
     data.vollbild_url = gross.data?.signedUrl || '';
     data.preview_url = klein.data?.signedUrl || data.vollbild_url;

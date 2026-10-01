@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { signieren } from './signierteAdressen.js';
 import { hole, schluessel } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { materialIconMarkup, pageLook } from './categoryIcons.js';
@@ -671,10 +672,9 @@ async function signImagePaths(paths, transform = MAHLZEIT_MASSE) {
   if (!unique.length) return new Map();
   try {
     const eintraege = await Promise.all(unique.map(async (pfad) => {
-      const klein = await supabase.storage.from(DEX_BUCKET)
-        .createSignedUrl(pfad, 60 * 60, { transform });
+      const klein = await signieren(DEX_BUCKET, pfad, 60 * 60, { transform });
       if (klein.data?.signedUrl) return [pfad, klein.data.signedUrl];
-      const gross = await supabase.storage.from(DEX_BUCKET).createSignedUrl(pfad, 60 * 60);
+      const gross = await signieren(DEX_BUCKET, pfad, 60 * 60);
       return [pfad, gross.data?.signedUrl || ''];
     }));
     return new Map(eintraege.filter(([, url]) => url));
