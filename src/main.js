@@ -984,6 +984,12 @@ function appDexShellZeichnen(route, view) {
     const randzone = aktiv.offsetWidth * 1.2;
     const istAmRand = links < tabLeiste.scrollLeft + randzone
       || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth - randzone;
+    /* Liegt der Reiter ganz im Bild und nicht am Rand, bleibt die Leiste
+       stehen. Das erneute Einrasten verschob sie sonst nach dem Antippen
+       noch um ein paar Pixel – die Symbole ruckten nach dem Federn nach. */
+    const ganzSichtbar = links >= tabLeiste.scrollLeft - 1
+      && rechts <= tabLeiste.scrollLeft + tabLeiste.clientWidth + 1;
+    if (!istAmRand && ganzSichtbar) return;
     const maximal = Math.max(0, tabLeiste.scrollWidth - tabLeiste.clientWidth);
     const gewuenscht = istAmRand
       ? links - ((tabLeiste.clientWidth - aktiv.offsetWidth) / 2)

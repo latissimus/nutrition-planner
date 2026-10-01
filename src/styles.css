@@ -16853,7 +16853,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Sanft hinaus und weich zurück, ohne Nachschwingen. */
 @keyframes leiste-federn{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
-  38%{transform:scale(1.018);animation-timing-function:cubic-bezier(.45,0,.2,1)}
+  38%{transform:scale(1.03);animation-timing-function:cubic-bezier(.45,0,.2,1)}
   100%{transform:scale(1)}
 }
 ::view-transition-old(*.kapsel-inhalt){animation:kapsel-weg .18s ease-out both}
