@@ -16673,3 +16673,35 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    „Gewichtsverlauf zurücksetzen“ in COMP. */
 :root[data-theme][data-seite="coins"] #view .coin-zuruecksetzen{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:8px;padding:0 16px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:transparent;color:var(--kontur-farbe);box-shadow:none;font:750 13px/1.2 "Work Sans",sans-serif;text-transform:none}
 :root[data-theme][data-seite="coins"] #view .coin-zuruecksetzen:disabled{opacity:.55}
+
+/* Menüband beim Scrollen: Höhe, Symbolgröße, Beschriftung, Punkte und die
+   deckende Fläche gleiten gemeinsam in einer weichen Bewegung, statt dass
+   Symbole und Beschriftungszeile sofort umspringen. Beim Einklappen
+   verschwindet die Schrift schnell, beim Ausklappen erscheint sie, sobald
+   Platz für sie da ist. */
+:root[data-theme][data-seite] #app>.app-dex-dock{
+  --leiste-weich:cubic-bezier(.32,.72,.24,1);
+  transition:--kapsel-r .34s var(--leiste-weich);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab{
+  transition:height .34s var(--leiste-weich),padding .34s var(--leiste-weich),grid-template-rows .34s var(--leiste-weich),gap .34s var(--leiste-weich);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab>span{
+  transition:width .34s var(--leiste-weich),height .34s var(--leiste-weich);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab small{
+  transform-origin:50% 0;
+  transition:opacity .22s ease .1s,max-height .34s var(--leiste-weich),transform .34s var(--leiste-weich);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock.ist-kompakt .app-dex-tab small{
+  transform:scale(.85);
+  transition:opacity .14s ease,max-height .34s var(--leiste-weich),transform .34s var(--leiste-weich);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab>.app-dex-tab-punkte,
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.hat-hinweis::after{
+  transition:top .34s var(--leiste-weich);
+}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite] #app>.app-dex-dock,
+  :root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab,.app-dex-tab>span,.app-dex-tab small,.app-dex-tab>.app-dex-tab-punkte,.app-dex-tab.hat-hinweis::after){transition:none}
+}
