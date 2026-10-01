@@ -1,5 +1,6 @@
 import './styles.css';
 import { bildknotenUebernehmen, markupAngleichen } from './bildknoten.js';
+import { ruckelDiagnoseEinrichten } from './ruckelDiagnose.js';
 import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
 // Genau zwei Schriften, lokal über styles.css eingebunden: Work Sans für
@@ -301,6 +302,7 @@ new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.add
 }))).observe(document.body, { childList: true, subtree: true });
 setupDialogAccessibility();
 initInterfaceSounds();
+ruckelDiagnoseEinrichten();
 
 const netzstatus = document.createElement('div');
 netzstatus.className = 'netzstatus';
