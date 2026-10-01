@@ -231,11 +231,24 @@ function tastaturBeobachten() {
   const starten = () => {
     if (!schleife) schleife = requestAnimationFrame(nachfuehren);
   };
+  // Vorhersage nur, wenn das Feld selbst angetippt wurde. Ein Fokus per Skript
+  // (etwa beim Öffnen des Einkauf-Menüs) öffnet auf iOS keine Tastatur: Das
+  // Sheet sprang sonst vorsorglich hoch und nach 0,9 s wieder herunter.
+  let letzteBeruehrung = null;
+  document.addEventListener('pointerdown', (event) => {
+    letzteBeruehrung = { ziel: event.target, zeit: performance.now() };
+  }, { capture: true, passive: true });
+  const vonBeruehrung = (feld) => {
+    if (!letzteBeruehrung || performance.now() - letzteBeruehrung.zeit > 1000) return false;
+    const ziel = letzteBeruehrung.ziel;
+    if (!(ziel instanceof Node)) return false;
+    return ziel === feld || feld.contains(ziel) || Boolean(ziel.closest?.('label')?.contains(feld));
+  };
   document.addEventListener('focusin', (event) => {
     const feld = sheetFeld(event.target);
     // Vorab dorthin, wo das Sheet mit Tastatur stehen wird: iOS sieht das Feld
     // dann schon frei und schiebt die Ansicht nicht erst selbst hoch.
-    if (feld && gemerkteHoehe && !tastaturDa() && !wurzel.classList.contains('tastatur-sichtbar')) {
+    if (feld && vonBeruehrung(feld) && gemerkteHoehe && !tastaturDa() && !wurzel.classList.contains('tastatur-sichtbar')) {
       setzen(window.innerHeight - gemerkteHoehe, 0, gemerkteHoehe);
       wurzel.classList.add('tastatur-sichtbar');
       vorhersageSeit = performance.now();
