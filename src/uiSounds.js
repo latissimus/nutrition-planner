@@ -104,16 +104,8 @@ export function setInterfaceSoundsEnabled(enabled) {
 }
 
 export function playInterfaceSound(cue = 'snap', options) {
-  const start = performance.now();
-  const ergebnis = player()?.play(cue, { ...(options || {}), volume: soundVolume }) || null;
-  const dauer = performance.now() - start;
-  if (dauer > 2) tonDauerMelden?.(cue, dauer);
-  return ergebnis;
+  return player()?.play(cue, { ...(options || {}), volume: soundVolume }) || null;
 }
-
-// Für die vorübergehende Ruckel-Messung: meldet langsame Töne.
-let tonDauerMelden = null;
-export function tonDauerBeobachten(melden) { tonDauerMelden = melden; }
 
 // Routine-Sounds sind bewusst NICHT an den Interface-Schalter gekoppelt.
 // Meditationen rufen diese Funktion nicht auf und behalten ihre eigenen

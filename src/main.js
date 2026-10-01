@@ -1,6 +1,5 @@
 import './styles.css';
 import { bildknotenUebernehmen, markupAngleichen } from './bildknoten.js';
-import { ruckelDiagnoseEinrichten, ruckelMarke } from './ruckelDiagnose.js';
 import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
 // Genau zwei Schriften, lokal über styles.css eingebunden: Work Sans für
@@ -302,7 +301,6 @@ new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.add
 }))).observe(document.body, { childList: true, subtree: true });
 setupDialogAccessibility();
 initInterfaceSounds();
-ruckelDiagnoseEinrichten();
 
 const netzstatus = document.createElement('div');
 netzstatus.className = 'netzstatus';
@@ -961,7 +959,6 @@ function leisteFedernLassen(leiste) {
   leiste.classList.add('ist-angetippt');
   const reiterleiste = leiste.querySelector('.app-dex-tabs');
   if (reiterleiste) inhaltMitfedern(leiste, [...reiterleiste.children]);
-  ruckelMarke('Federn startet');
 }
 
 /* Wohin die Reiterleiste rücken soll, damit der Reiter gut im Bild steht;
@@ -1041,7 +1038,7 @@ function reiterleisteBinden(tabLeiste) {
      Federns über der Abdunklung. Navigiert wird weiterhin beim Klick. */
   let letzteTippBewegung = null;
   const tippBewegungen = (reiter) => {
-    const tippStart = performance.now();
+    const zeit = performance.now();
     leisteFedernLassen(tabLeiste.parentElement);
     const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
     if (auswahl && !reiter.classList.contains('aktiv')) {
@@ -1050,7 +1047,7 @@ function reiterleisteBinden(tabLeiste) {
     }
     const ziel = reiterZiel(tabLeiste, reiter);
     if (ziel != null) leisteRuecken(tabLeiste, ziel);
-    const bewegung = { reiter, zeit: tippStart, geklickt: false };
+    const bewegung = { reiter, zeit, geklickt: false };
     letzteTippBewegung = bewegung;
     /* Kommt nach dem Loslassen doch kein Klick (der Finger ist zu weit
        gerutscht), kehrt die Auswahl zum offenen Reiter zurück. */
@@ -1062,7 +1059,6 @@ function reiterleisteBinden(tabLeiste) {
         auswahl.dataset.x = String(aktiv.offsetLeft);
       }
     }, 700);
-    ruckelMarke(`Tipp verarbeitet ${Math.round(performance.now() - tippStart)} ms`);
   };
   tabLeiste.addEventListener('pointerup', (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -1847,15 +1843,12 @@ function animationenAnstossen() {
     const notfall = setTimeout(weiter, 80);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       clearTimeout(notfall);
-      ruckelMarke('zwei Frames gewartet');
       weiter();
     }));
   });
 }
 async function seiteTauschen(von, nach, tauschen) {
-  ruckelMarke('Tausch');
   tauschen();
-  ruckelMarke('Tausch fertig');
   if (!von || istChatRoute(von) === istChatRoute(nach)) return;
   // Ein altes Federn vom Antippen überdeckte sonst das Federn des Wechsels.
   app.querySelector(':scope > .app-dex-dock .app-dex-dock-inner')?.classList.remove('ist-angetippt');
@@ -1942,7 +1935,6 @@ async function renderRoute() {
   // Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
   // sofort verfügbar. Die sichtbare Seite wird ohne Übergangsanimation
   // atomar getauscht.
-  ruckelMarke(`Seite ${route}${richtung !== 'gleich' && ansichtsCache.peek(route) ? ' aus Speicher' : ' wird aufgebaut'}`);
   // Vor jedem Aufbau oder Tausch: Animationen vom Tipp erst an den
   // Grafikchip übergeben (siehe animationenAnstossen).
   await animationenAnstossen();
@@ -2396,7 +2388,6 @@ async function renderRoute() {
     commitPageLookDefer(true);
     return;
   }
-  ruckelMarke('Inhalt fertig');
   await seiteTauschen(vorherigeRoute, route, () => {
     commitSeiteDefer();
     commitPageLookDefer();
@@ -2568,7 +2559,6 @@ async function render() {
 }
 
 window.addEventListener('hashchange', () => {
-  ruckelMarke(`Wechsel ${location.hash}`);
   render();
 });
 
