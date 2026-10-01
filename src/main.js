@@ -843,16 +843,16 @@ function appSyncStatusAktualisieren() {
   status.setAttribute('aria-label', status.title);
 }
 
-/* Antippen eines Reiters: Das Symbol springt kurz größer und wieder zurück
-   (wie bei Instagram). Die Leiste wird beim Seitenwechsel neu gezeichnet;
-   der Sprung läuft dann im neuen Reiter an derselben Stelle weiter. */
-const REITER_SPRUNG_MS = 380;
-let reiterSprung = null;
-function reiterSpringenLassen(reiter, vergangen = 0) {
-  reiter.classList.remove('ist-angetippt');
-  reiter.style.setProperty('--sprung-start', `${-Math.round(vergangen)}ms`);
-  void reiter.offsetWidth;
-  reiter.classList.add('ist-angetippt');
+/* Antippen eines Reiters: Die ganze Leiste federt kurz und leicht größer,
+   wie beim Übergang zum Chat. Sie wird beim Seitenwechsel neu gezeichnet;
+   das Federn läuft dann in der neuen Leiste an derselben Stelle weiter. */
+const LEISTE_FEDERN_MS = 520;
+let leisteGetippt = 0;
+function leisteFedernLassen(leiste, vergangen = 0) {
+  leiste.classList.remove('ist-angetippt');
+  leiste.style.setProperty('--federn-start', `${-Math.round(vergangen)}ms`);
+  void leiste.offsetWidth;
+  leiste.classList.add('ist-angetippt');
 }
 
 function appDexShellZeichnen(route, view) {
@@ -960,12 +960,8 @@ function appDexShellZeichnen(route, view) {
     auswahl.dataset.x = String(x);
     tabLeiste.classList.add('hat-auswahl');
   }
-  if (reiterSprung) {
-    const vergangen = performance.now() - reiterSprung.zeit;
-    const reiter = vergangen < REITER_SPRUNG_MS
-      && [...tabLeiste.querySelectorAll('.app-dex-tab')].find((tab) => tab.getAttribute('href') === reiterSprung.ziel);
-    if (reiter) reiterSpringenLassen(reiter, vergangen);
-  }
+  const seitTippen = performance.now() - leisteGetippt;
+  if (seitTippen < LEISTE_FEDERN_MS) leisteFedernLassen(dock.querySelector('.app-dex-dock-inner'), seitTippen);
 
   // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
   // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
@@ -1013,8 +1009,8 @@ function appDexShellZeichnen(route, view) {
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
     if (reiter) {
-      reiterSprung = { ziel: reiter.getAttribute('href'), zeit: performance.now() };
-      reiterSpringenLassen(reiter);
+      leisteGetippt = performance.now();
+      leisteFedernLassen(dock.querySelector('.app-dex-dock-inner'));
       // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
       if (auswahl && !reiter.classList.contains('aktiv')) {
         auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;

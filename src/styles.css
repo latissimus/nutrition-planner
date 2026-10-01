@@ -16849,18 +16849,23 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Rahmen, gleiche Größe) und federn dabei kurz größer, wie beim Antippen
    eines Reiters. Auf der Gedächtnis-Seite gibt es keine Leiste: Dort blendet
    sie nur aus oder ein. */
-::view-transition-image-pair(fuss-kapsel){animation:kapsel-federn .42s cubic-bezier(.3,.7,.4,1) both}
-::view-transition-old(fuss-kapsel),::view-transition-new(fuss-kapsel){animation-duration:.3s}
-@keyframes kapsel-federn{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
+::view-transition-image-pair(fuss-kapsel){animation:leiste-federn .52s both}
+::view-transition-old(fuss-kapsel),::view-transition-new(fuss-kapsel){animation-duration:.34s}
+/* Sanft hinaus und weich zurück, ohne Nachschwingen. */
+@keyframes leiste-federn{
+  0%{transform:scale(1);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+  38%{transform:scale(1.018);animation-timing-function:cubic-bezier(.45,0,.2,1)}
+  100%{transform:scale(1)}
+}
 ::view-transition-old(*.kapsel-inhalt){animation:kapsel-weg .18s ease-out both}
 ::view-transition-new(*.kapsel-inhalt){animation:kapsel-her .24s ease-out .08s both}
 @keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
 
-/* Reiter antippen: Symbol springt kurz größer (main.js: reiterSpringenLassen).
-   --sprung-start setzt den Sprung nach einem Neuzeichnen der Leiste fort. */
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.ist-angetippt>span{animation:reiter-sprung .38s cubic-bezier(.3,.7,.4,1) var(--sprung-start,0ms) both}
-@keyframes reiter-sprung{0%{transform:scale(1)}35%{transform:scale(1.2)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+/* Reiter antippen: Die ganze Leiste federt kurz (main.js: leisteFedernLassen),
+   dieselbe Bewegung wie beim Übergang zum Chat. --federn-start setzt sie nach
+   einem Neuzeichnen der Leiste fort. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:leiste-federn .52s var(--federn-start,0ms) both}
 @media (prefers-reduced-motion:reduce){
-  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.ist-angetippt>span{animation:none}
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:none}
 }
