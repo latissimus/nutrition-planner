@@ -16780,3 +16780,42 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   scroll-snap-align:start;
 }
 :root[data-theme][data-seite="coach"] #view .coach-inputbar textarea::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ============================================================
+   UPDATE-HINWEIS · kleine Kapsel über dem Menüband statt großem Block.
+   Mittig ohne transform: Der allgemeine Drück-Effekt (button:active)
+   ersetzte sonst das translateX(50%), und der Knopf sprang beim Antippen
+   um seine halbe Breite zur Seite.
+   ============================================================ */
+:root[data-theme] body .pwa-update-button{
+  right:0;
+  left:0;
+  bottom:calc(max(6px,calc(env(safe-area-inset-bottom) - 6px)) + 68px + 12px);
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  width:max-content;
+  max-width:calc(100vw - 32px);
+  height:42px;
+  margin-inline:auto;
+  padding:0 18px;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:999px;
+  background:var(--ui-gefuellt);
+  color:var(--ui-gefuellt-schrift);
+  box-shadow:none;
+  transform:none;
+  font:800 13px/1 "Work Sans",sans-serif;
+  white-space:nowrap;
+  transition:transform .12s ease,opacity .2s ease;
+}
+:root[data-theme] body .pwa-update-button[hidden]{display:none}
+:root[data-theme] body .pwa-update-button b{font:inherit}
+:root[data-theme] body .pwa-update-button small{
+  padding-left:9px;
+  border-left:1px solid color-mix(in srgb,currentColor 40%,transparent);
+  font:600 13px/1 "Work Sans",sans-serif;
+  opacity:.8;
+}
+:root[data-theme] body .pwa-update-button:active{transform:scale(.96);box-shadow:none}
+:root[data-theme] body .pwa-update-button:disabled{opacity:.75}

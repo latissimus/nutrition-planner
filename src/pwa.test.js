@@ -65,6 +65,6 @@ describe('registriereServiceWorker', () => {
     worker.ausloesen('statechange');
 
     expect(updateButton.hidden).toBe(false);
-    expect(unterzeile.textContent).toBe('Jetzt aktualisieren');
+    expect(unterzeile.textContent).toBe('Aktualisieren');
   });
 });

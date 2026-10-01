@@ -24,7 +24,7 @@ export async function registriereServiceWorker() {
   if (!updateButton.isConnected) {
     updateButton.type = 'button';
     updateButton.className = 'pwa-update-button';
-    updateButton.innerHTML = '<b>Update verfügbar</b><small>Jetzt aktualisieren</small>';
+    updateButton.innerHTML = '<b>Update verfügbar</b><small>Aktualisieren</small>';
     updateButton.hidden = true;
     updateButton.setAttribute('aria-live', 'polite');
     document.body.append(updateButton);
@@ -34,7 +34,7 @@ export async function registriereServiceWorker() {
     if (!worker || !navigator.serviceWorker.controller) return;
     neuerWorker = worker;
     updateButton.disabled = false;
-    updateButton.querySelector('small').textContent = 'Jetzt aktualisieren';
+    updateButton.querySelector('small').textContent = 'Aktualisieren';
     updateButton.hidden = false;
     if (schnellePruefung != null) {
       clearInterval(schnellePruefung);
