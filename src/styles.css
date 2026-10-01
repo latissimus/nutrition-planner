@@ -16476,7 +16476,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:999px;
   background:color-mix(in srgb,var(--ui-schrift) 12%,transparent);
   pointer-events:none;
-  transition:transform .5s cubic-bezier(.22,1,.36,1),width .3s ease;
+  /* Sanft anfahren, weich abbremsen. Die frühere Kurve (.22,1,.36,1) legte
+     im iOS-Simulator schon im ersten Frame 64 % des Weges zurück – die Pille
+     sah aus, als springe sie, und schlich dann nach. */
+  transition:transform .42s cubic-bezier(.4,0,.2,1),width .3s ease;
 }
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs.hat-auswahl .app-dex-tab.aktiv{background:transparent!important}
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab{z-index:1}

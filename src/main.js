@@ -969,21 +969,14 @@ function reiterZiel(tabLeiste, reiter) {
   return Math.abs(sicher - tabLeiste.scrollLeft) < 1 ? null : sicher;
 }
 
-/* Die Leiste springt sofort an ihr Ziel, ihre Reiter gleiten per Transform
-   von der alten Stelle nach. Gemessen auf dem iPhone: Das weiche scrollTo
-   begann erst 130–170 ms nach dem Tipp, wenn die neue Seite stand, und lief
-   dann in Sprüngen von 2 bis 11 px, weil es mit dem Seitenaufbau um den
-   Hauptthread rang. Die Transform-Bewegung übernimmt der Grafikchip. */
+/* Die Leiste scrollt weich an ihr Ziel. Im iOS-Simulator Bild für Bild
+   geprüft: Das native weiche Scrollen läuft flüssig, auch während die neue
+   Seite den Hauptthread blockiert. Die vorige Lösung (sofort springen, Reiter
+   per Transform nachgleiten lassen) zeigte für einen Frame den Sprung, bevor
+   iOS die Gegenbewegung einsetzte – die Leiste sprang sichtbar. */
 function leisteRuecken(tabLeiste, ziel) {
-  const vorher = tabLeiste.scrollLeft;
-  tabLeiste.scrollLeft = ziel;
-  const versatz = tabLeiste.scrollLeft - vorher;
-  if (!versatz || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-  for (const kind of tabLeiste.children) {
-    kind.animate?.([{ translate: `${versatz}px 0` }, { translate: '0 0' }], {
-      duration: 360, easing: 'cubic-bezier(.32,.72,.24,1)',
-    });
-  }
+  const ruhig = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  tabLeiste.scrollTo({ left: ziel, behavior: ruhig ? 'auto' : 'smooth' });
 }
 
 /* Die Reiterleiste bleibt beim Neuzeichnen dasselbe Element (markupAngleichen).
@@ -1080,15 +1073,9 @@ function appDexShellZeichnen(route, view) {
   const coachZurueckTitel = route === 'coach-wissen' ? 'COACH' : appDockTitel(coachZurueckRoute);
   const istNebenansicht = istProfil || istSuche || istCoach;
   const alterScrollstand = app.querySelector(':scope > .app-dex-dock .app-dex-tabs')?.scrollLeft || 0;
-  const alteAuswahl = app.querySelector(':scope > .app-dex-dock .app-dex-auswahl');
-  /* Die aktuelle, womöglich noch gleitende Position statt des Ziels: Wird die
-     Leiste mitten im Gleiten neu gezeichnet, gleitet die Pille weiter, statt
-     ans Ziel zu springen. */
-  const alteAuswahlX = alteAuswahl?.dataset.x
-    ? (typeof DOMMatrixReadOnly === 'function'
-      ? new DOMMatrixReadOnly(getComputedStyle(alteAuswahl).transform).m41
-      : Number(alteAuswahl.dataset.x))
-    : null;
+  // Stand die Pille schon irgendwo, gleitet sie zum neuen Reiter; eine neue
+  // Leiste setzt sie ohne Bewegung.
+  const pilleStandSchon = Boolean(app.querySelector(':scope > .app-dex-dock .app-dex-auswahl')?.dataset.x);
   app.classList.add('dex-app-shell');
   app.classList.toggle('dex-app-shell-unterdex', view.dataset.appDockSubdex === 'true');
 
@@ -1160,7 +1147,7 @@ function appDexShellZeichnen(route, view) {
   /* Angleichen statt neu füllen: Reiter, Symbole und Auswahl bleiben dieselben
      Elemente, nur Klassen und Beschriftungen ändern sich. Neu eingehängte
      Symbole rechnete iOS jedes Mal neu, sie ruckten nach jedem Tipp. */
-  markupAngleichen(leiste, `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`);
+  markupAngleichen(leiste, `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true" data-angleichen-behalten="style data-x"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`);
   appSyncStatusAktualisieren();
   dockZustand = { view, istNebenansicht, aktiveDockRoute };
 
@@ -1173,13 +1160,22 @@ function appDexShellZeichnen(route, view) {
   const aktiverReiter = tabLeiste.querySelector('.app-dex-tab.aktiv');
   if (auswahl && aktiverReiter) {
     const x = aktiverReiter.offsetLeft;
-    auswahl.style.width = `${aktiverReiter.offsetWidth}px`;
-    auswahl.style.transition = 'none';
-    auswahl.style.transform = `translateX(${alteAuswahlX ?? x}px)`;
-    auswahl.getBoundingClientRect();
-    auswahl.style.transition = '';
-    auswahl.style.transform = `translateX(${x}px)`;
-    auswahl.dataset.x = String(x);
+    const breite = `${aktiverReiter.offsetWidth}px`;
+    if (auswahl.style.width !== breite) auswahl.style.width = breite;
+    /* Gleitet die Pille schon zu diesem Reiter (gestartet beim Tippen), bleibt
+       sie unberührt. Ein erneutes Setzen startete ihre Bewegung neu: Sie fuhr
+       mitten im Gleiten noch einmal sanft an und stockte. */
+    if (auswahl.dataset.x !== String(x)) {
+      if (!pilleStandSchon) {
+        auswahl.style.transition = 'none';
+        auswahl.style.transform = `translateX(${x}px)`;
+        auswahl.getBoundingClientRect();
+        auswahl.style.transition = '';
+      } else {
+        auswahl.style.transform = `translateX(${x}px)`;
+      }
+      auswahl.dataset.x = String(x);
+    }
     tabLeiste.classList.add('hat-auswahl');
   }
 

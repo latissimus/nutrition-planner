@@ -366,10 +366,9 @@ describe('CAPBOY Design-System', () => {
     // Ohne diese Grenze rutschten EINKAUF und MIND aus dem Fenster – seit sie
     // selbst das Menü öffnen, müssen sie sichtbar sein.
     expect(main).toContain('const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze)');
-    // Die Leiste springt an ihr Ziel, die Reiter gleiten per Transform nach
-    // (ein weiches scrollTo stockte auf dem iPhone beim Seitenaufbau).
-    expect(main).toContain('tabLeiste.scrollLeft = ziel;');
-    expect(main).toContain("kind.animate?.([{ translate: `${versatz}px 0` }, { translate: '0 0' }]");
+    // Die Leiste scrollt weich an ihr Ziel (im iOS-Simulator geprüft: flüssig,
+    // auch während der Seitenaufbau den Hauptthread blockiert).
+    expect(main).toContain("tabLeiste.scrollTo({ left: ziel, behavior: ruhig ? 'auto' : 'smooth' })");
     expect(main).not.toContain("aktiv.scrollIntoView({ behavior: 'smooth'");
   });
 

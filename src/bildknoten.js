@@ -71,8 +71,13 @@ export function markupMitBildernSetzen(ziel, markup) {
 const gleicheArt = (a, b) => a.nodeType === b.nodeType
   && a.nodeName === b.nodeName && a.namespaceURI === b.namespaceURI;
 
+// data-angleichen-behalten="style data-x": Diese Attribute setzt das Skript
+// selbst (etwa die Position der gleitenden Auswahl); das Markup kennt sie
+// nicht, und sie bleiben beim Angleichen stehen.
 function attributeAngleichen(alt, neu) {
+  const behalten = new Set((alt.getAttribute('data-angleichen-behalten') || '').split(/\s+/).filter(Boolean));
   for (const attribut of [...alt.attributes]) {
+    if (behalten.has(attribut.name)) continue;
     if (!neu.hasAttributeNS(attribut.namespaceURI, attribut.localName)) {
       alt.removeAttributeNS(attribut.namespaceURI, attribut.localName);
     }
