@@ -149,17 +149,24 @@ function tastaturBeobachten() {
   const sicht = window.visualViewport;
   if (!sicht) return;
   const wurzel = document.documentElement;
+  const istTextfeld = (element) => Boolean(element?.matches?.('input,textarea,select,[contenteditable="true"]'));
+  // Zurücksetzen nur, wenn kein Textfeld aktiv ist oder das aktive Feld in
+  // einem Sheet sitzt. Felder auf der Seite selbst (etwa der Chat) braucht
+  // iOS die Verschiebung, um sie über die Tastatur zu bringen.
+  const darfZuruecksetzen = () => {
+    const feld = document.activeElement;
+    return !istTextfeld(feld) || Boolean(feld.closest('.kategorie-sheet-backdrop'));
+  };
   const aktualisieren = () => {
     const feld = document.activeElement;
-    const imSheet = feld?.matches?.('input,textarea,select,[contenteditable="true"]')
-      && feld.closest('.kategorie-sheet-backdrop');
+    const imSheet = istTextfeld(feld) && feld.closest('.kategorie-sheet-backdrop');
     const offen = Boolean(imSheet) && sicht.height < window.innerHeight - 80;
     wurzel.style.setProperty('--sicht-hoehe', `${Math.round(sicht.height)}px`);
     wurzel.style.setProperty('--sicht-oben', `${Math.round(sicht.offsetTop)}px`);
     wurzel.classList.toggle('tastatur-sichtbar', offen);
     // Das Fenster selbst scrollt in CAPBOY nie; ohne offene Tastatur ist jede
     // Verschiebung ein iOS-Rest (etwa nach dem Fokus in ein Menü-Feld).
-    if (!offen && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
+    if (!offen && darfZuruecksetzen() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
     if (!offen) return;
     if (window.scrollY) window.scrollTo(0, 0);
     requestAnimationFrame(() => feld.scrollIntoView({ block: 'nearest' }));
@@ -167,7 +174,7 @@ function tastaturBeobachten() {
   sicht.addEventListener('resize', aktualisieren);
   sicht.addEventListener('scroll', aktualisieren);
   window.addEventListener('scroll', () => {
-    if (!wurzel.classList.contains('tastatur-sichtbar') && sicht.height >= window.innerHeight - 80) window.scrollTo(0, 0);
+    if (!wurzel.classList.contains('tastatur-sichtbar') && sicht.height >= window.innerHeight - 80 && darfZuruecksetzen()) window.scrollTo(0, 0);
   }, { passive: true });
   document.addEventListener('focusin', () => setTimeout(aktualisieren, 60));
   document.addEventListener('focusout', () => setTimeout(aktualisieren, 60));
