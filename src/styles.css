@@ -16604,55 +16604,41 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 
 /* ============================================================
    SEITE ⇄ CHAT · Kopf- und Fußkapsel bleiben, nur der Inhalt wechselt.
-   Nur während des Übergangs (Klasse aus seiteTauschen in main.js) tragen
-   die Kapseln eigene Namen. Im Kopf hat auch der Inhalt eigene Namen; das
-   Bild der Kapsel enthält deshalb nur Rahmen und Fläche, wird auf den neuen
-   Zuschnitt gezogen, und der Inhalt blendet darin über. Die Fußkapsel ist
-   vorher wie nachher gleich groß und blendet als Ganzes über.
+   Ohne View Transition: Gemessen auf dem iPhone hielt sie die Darstellung
+   beim Start 50–90 ms an (alten Zustand festhalten, Seite tauschen) und
+   kostete am Ende beim Abbau noch einmal 50–70 ms – genau dieses Stocken war
+   das Ruckeln. Jetzt wird sofort getauscht; die Fußkapsel federt, der Inhalt
+   beider Kapseln blendet ein (Klasse kapsel-wechsel aus seiteTauschen).
    ============================================================ */
-:root.kapsel-uebergang #app .app-dex-kapsel{view-transition-name:kopf-kapsel;view-transition-class:kapsel}
-:root.kapsel-uebergang #app>.app-dex-dock .app-dex-dock-inner,
-:root.kapsel-uebergang .coach-inputbar{view-transition-name:fuss-kapsel}
-:root.kapsel-uebergang #app .app-dex-kapsel>.coin-kopfstand{view-transition-name:kopf-coins;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-search{view-transition-name:kopf-suche;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-coach{view-transition-name:kopf-coach;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-zurueck{view-transition-name:kopf-zurueck;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-gedaechtnis{view-transition-name:kopf-gedaechtnis;view-transition-class:kapsel-inhalt}
-
-::view-transition-group(*){animation-duration:.38s;animation-timing-function:cubic-bezier(.22,.9,.24,1)}
-/* Die Seite selbst blendet nur kurz über (Standard-Überblendung, kürzer). */
-::view-transition-old(root),::view-transition-new(root){animation-duration:.26s}
-/* Rahmen und Fläche sind vorher wie nachher gleich: Das neue Bild genügt
-   und wird auf die gleitende Größe gezogen, ohne doppelten Rand. */
-::view-transition-old(*.kapsel){display:none}
-::view-transition-new(*.kapsel){height:100%;animation:none}
-/* Menüband und Chat-Leiste blenden als Ganzes ineinander über (gleicher
-   Rahmen, gleiche Größe) und federn dabei kurz größer, wie beim Antippen
-   eines Reiters. Auf der Gedächtnis-Seite gibt es keine Leiste: Dort blendet
-   sie nur aus oder ein. */
-::view-transition-image-pair(fuss-kapsel){animation:leiste-federn .52s both}
-::view-transition-old(fuss-kapsel),::view-transition-new(fuss-kapsel){animation-duration:.34s}
+:root.kapsel-wechsel #app .app-dex-kapsel>*{animation:kapsel-her .26s ease-out both}
+:root.kapsel-wechsel #app>.app-dex-dock .app-dex-dock-inner,
+:root.kapsel-wechsel .coach-inputbar{animation:leiste-federn .52s both}
+:root.kapsel-wechsel #app>.app-dex-dock .app-dex-tabs,
+:root.kapsel-wechsel .coach-inputbar>*{animation:kapsel-her .26s ease-out .04s both}
 /* Sanft hinaus und weich zurück, ohne Nachschwingen. */
 @keyframes leiste-federn{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
   38%{transform:scale(1.03);animation-timing-function:cubic-bezier(.45,0,.2,1)}
   100%{transform:scale(1)}
 }
-::view-transition-old(*.kapsel-inhalt){animation:kapsel-weg .18s ease-out both}
-::view-transition-new(*.kapsel-inhalt){animation:kapsel-her .24s ease-out .08s both}
-@keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
 
-/* Reiter antippen: Die Leiste federt als Bild (main.js: leisteFedernLassen),
-   mit derselben Bewegung wie beim Übergang zum Chat (leiste-federn). Die
-   Seite selbst bleibt dabei unverändert sichtbar, ohne Überblendung. */
-:root.leiste-federt #app>.app-dex-dock .app-dex-dock-inner{view-transition-name:fuss-kapsel}
-:root.leiste-federt::view-transition-old(root),
-:root.leiste-federt::view-transition-old(fuss-kapsel){display:none}
-:root.leiste-federt::view-transition-new(root),
-:root.leiste-federt::view-transition-new(fuss-kapsel){animation:none}
-/* Während eines Übergangs bleibt alles antippbar, auch ein zweiter Reiter. */
-::view-transition{pointer-events:none}
+/* Reiter antippen: Die echte Leiste federt (main.js: leisteFedernLassen), mit
+   derselben Bewegung wie beim Wechsel zum Chat. Sie liegt dauerhaft auf einer
+   eigenen Ebene, damit der Grafikchip die Bewegung allein führt – auch während
+   die neue Seite eingesetzt wird. Das Menüband schneidet nichts mehr ab: Beim
+   Federn ragt die obere Kontur sonst über seinen Rand hinaus und verschwand. */
+:root[data-theme][data-seite] #app>.app-dex-dock{overflow:visible!important}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{
+  will-change:transform;
+  /* Mitte der sichtbaren Kapsel; eingeklappt liegt sie 9 px tiefer. */
+  transform-origin:50% calc(50% + (34 - var(--kapsel-r)) * 1px);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:leiste-federn .52s both}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt,
+  :root.kapsel-wechsel :is(#app .app-dex-kapsel>*,#app>.app-dex-dock .app-dex-dock-inner,#app>.app-dex-dock .app-dex-tabs,.coach-inputbar,.coach-inputbar>*){animation:none}
+}
 
 /* CAPCOINS zurücksetzen: unten auf der Seite, als Kapsel mit Kontur wie
    „Gewichtsverlauf zurücksetzen“ in COMP. */
@@ -16705,8 +16691,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   transform:translateY(8px) scale(.8);
   transition:opacity .14s ease,transform var(--leiste-dauer) var(--leiste-weich);
 }
-/* Federn beim Antippen um die Mitte der sichtbaren, eingeklappten Kapsel. */
-:root.leiste-federt:has(#app>.app-dex-dock.ist-kompakt)::view-transition-image-pair(fuss-kapsel){transform-origin:50% 63.2%}
 @media (prefers-reduced-motion:reduce){
   :root[data-theme][data-seite] #app>.app-dex-dock,
   :root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab>span,.app-dex-tab small,.app-dex-tab>.app-dex-tab-punkte),

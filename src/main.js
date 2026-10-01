@@ -917,36 +917,18 @@ function appSyncStatusAktualisieren() {
 }
 
 /* Antippen eines Reiters: Die Leiste federt kurz und leicht größer, dieselbe
-   Bewegung wie beim Übergang zum Chat und wie dort auf einem Bild der Leiste
-   (View Transition). Die echte Leiste wird nie skaliert: Skalierte iOS sie
-   selbst, zeichnete es Reiter und Symbole am Ende neu, sie standen kurz zu
-   eng, und oben schnitt das Menüband die Kontur ab. Das Bild ist live, die
-   gleitende Auswahl und ein Neuzeichnen der Reiter bleiben darin sichtbar. */
-let leistenFedern = null;
-function leisteFedernLassen() {
-  const wurzel = document.documentElement;
-  if (typeof document.startViewTransition !== 'function'
-    || wurzel.classList.contains('kapsel-uebergang')
-    || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-  wurzel.classList.add('leiste-federt');
-  let uebergang;
-  try {
-    uebergang = document.startViewTransition(() => {});
-  } catch {
-    wurzel.classList.remove('leiste-federt');
-    return;
+   Bewegung wie beim Wechsel zum Chat. Als CSS-Animation am echten Element,
+   nicht als View Transition: Die hielt auf dem iPhone die Darstellung beim
+   Start und beim Ende jeweils 50–90 ms an, das war das Ruckeln. Die Leiste
+   bleibt beim Neuzeichnen dasselbe Element, das Federn läuft also durch. */
+function leisteFedernLassen(leiste) {
+  if (!leiste) return;
+  if (leiste.classList.contains('ist-angetippt')) {
+    leiste.classList.remove('ist-angetippt');
+    void leiste.offsetWidth;
   }
-  leistenFedern = uebergang;
+  leiste.classList.add('ist-angetippt');
   ruckelMarke('Federn startet');
-  uebergang.ready.then(() => ruckelMarke('Federn läuft'), () => ruckelMarke('Federn übersprungen'));
-  // Nur das jeweils letzte Federn räumt auf; ein schneller zweiter Tipp
-  // startet ein neues, das die Klasse noch braucht.
-  const aufraeumen = () => {
-    if (leistenFedern !== uebergang) return;
-    leistenFedern = null;
-    wurzel.classList.remove('leiste-federt');
-  };
-  uebergang.finished.then(aufraeumen, aufraeumen);
 }
 
 /* Wohin die Reiterleiste rücken soll, damit der Reiter gut im Bild steht;
@@ -1031,7 +1013,7 @@ function reiterleisteBinden(tabLeiste) {
       /* Öffnet der Tipp das Menü, federt die Leiste nicht: Ihr Bild läge
          während des Federns über der Abdunklung, und die Leiste würde erst
          danach dunkel. */
-      if (!oeffnetMenue) leisteFedernLassen();
+      if (!oeffnetMenue) leisteFedernLassen(tabLeiste.parentElement);
       // Pille und Leiste bewegen sich sofort, nicht erst, wenn die Seite
       // geladen ist.
       const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
@@ -1784,44 +1766,29 @@ async function profilSicherLaden() {
 
 /* Seite ⇄ Chat: Kopf- und Fußkapsel behalten ihre Form, nur ihr Inhalt
    wechselt (Coins, Suche, Coach ⇄ Zurück, Gedächtnis; Reiter ⇄ Eingabe).
-   Ein View Transition lässt beide Kapseln in ihren neuen Zuschnitt gleiten
-   und blendet nur den Inhalt über. Alle anderen Seitenwechsel bleiben wie
-   beim LOGMAN ohne Animation. */
+   Getauscht wird sofort; die Klasse kapsel-wechsel lässt die Fußkapsel
+   federn und den Inhalt beider Kapseln einblenden (styles.css). Früher lief
+   das als View Transition, die auf dem iPhone die Darstellung am Anfang und
+   am Ende anhielt. Alle anderen Seitenwechsel bleiben ohne Animation. */
 const istChatRoute = (route) => route === 'coach' || route === 'coach-wissen';
+let kapselWechselTimer = 0;
 async function seiteTauschen(von, nach, tauschen) {
-  const mitUebergang = von && istChatRoute(von) !== istChatRoute(nach)
-    && typeof document.startViewTransition === 'function'
-    && !document.hidden
-    && app.querySelector(':scope > #view')
-    && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  if (!mitUebergang) {
-    ruckelMarke('Tausch');
-    tauschen();
-    ruckelMarke('Tausch fertig');
-    return;
-  }
-  ruckelMarke('Übergang startet');
+  ruckelMarke('Tausch');
+  tauschen();
+  ruckelMarke('Tausch fertig');
+  if (!von || istChatRoute(von) === istChatRoute(nach)) return;
+  // Ein altes Federn vom Antippen überdeckte sonst das Federn des Wechsels.
+  app.querySelector(':scope > .app-dex-dock .app-dex-dock-inner')?.classList.remove('ist-angetippt');
   const wurzel = document.documentElement;
-  // Ein noch laufendes Federn des Menübands endet mit diesem Übergang.
-  leistenFedern = null;
-  wurzel.classList.remove('leiste-federt');
-  wurzel.classList.add('kapsel-uebergang');
-  const aufraeumen = () => wurzel.classList.remove('kapsel-uebergang');
-  let uebergang;
-  try {
-    uebergang = document.startViewTransition(() => {
-      ruckelMarke('Tausch');
-      tauschen();
-      ruckelMarke('Tausch fertig');
-    });
-  } catch {
-    aufraeumen();
-    tauschen();
-    return;
+  // Neu starten nur, wenn der letzte Wechsel noch läuft: Das erzwungene
+  // Layout direkt nach dem Tausch kostet sonst unnötig Zeit.
+  if (wurzel.classList.contains('kapsel-wechsel')) {
+    wurzel.classList.remove('kapsel-wechsel');
+    void wurzel.offsetWidth;
   }
-  uebergang.ready.then(() => ruckelMarke('Übergang läuft'), () => ruckelMarke('Übergang übersprungen'));
-  uebergang.finished.then(() => { ruckelMarke('Übergang fertig'); aufraeumen(); }, aufraeumen);
-  await uebergang.updateCallbackDone;
+  wurzel.classList.add('kapsel-wechsel');
+  clearTimeout(kapselWechselTimer);
+  kapselWechselTimer = setTimeout(() => wurzel.classList.remove('kapsel-wechsel'), 700);
 }
 
 async function renderRoute() {
