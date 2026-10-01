@@ -316,7 +316,6 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 .nav-av img{width:100%;height:100%;object-fit:cover;display:block}
 .nav-av-fb{font-family:var(--display);font-style:italic;font-weight:700;font-size:16px;color:var(--link)}
 .nav-av.active{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink)}
-.nav-av:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Generic card / buttons ---------- */
 .card{background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-karte);padding:18px}
@@ -387,8 +386,6 @@ body:not([data-seite="log"]) #view>.wrap{animation:none}
 @media (prefers-reduced-motion:reduce){.btn-primary{transition:none}}
 .btn-block{width:100%}
 .btn:disabled{opacity:.5}
-.btn:active{
-  transform:translateY(1px)}
 
 /* ---------- Inputs ---------- */
 label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 5px}
@@ -852,7 +849,6 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .push-onboarding-nein{border:0;background:transparent;color:#5A4708}
 .push-onboarding-nein:active{background:rgba(0,0,0,.08)}
 .push-onboarding-ja{border:var(--kontur) solid var(--kontur-farbe);background:#3A2E05;color:#FFFFFF}
-.push-onboarding-ja:active{transform:translateY(1px)}
 :root[data-theme="dark"] .push-onboarding{
   border-color:var(--kontur-farbe);background:#4A3D12;color:#FFFFFF;box-shadow:0 8px 24px rgba(0,0,0,.45);
 }
@@ -1234,10 +1230,6 @@ label.fld-l,.falte span{font-family:var(--ui);color:var(--app-secondary)}
   background:#432C5E!important;
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
-  box-shadow:none!important;
-}
-:root[data-seite="auth"] .auth-shell :is([data-auth-form],[data-recovery-form]) .btn-primary:active:not(:disabled){
-  transform:translateY(4px)!important;
   box-shadow:none!important;
 }
 :root[data-seite="auth"] .auth-shell{color:#fff}
@@ -1804,7 +1796,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .tuck-ablage-knopf .material-svg,.tuck-ablage-knopf .material-svg svg{width:27px;height:27px;color:#fff;fill:#fff}
 .tuck-ablage-knopf .material-svg svg{stroke:#fff;stroke-width:14px;stroke-linejoin:round}
-.tuck-ablage-knopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* Auf schmalen Geräten braucht der Suchknopf etwas Luft für Kontur und
    Versatzschatten. Die Eingabe wird dadurch minimal kürzer, der Button bleibt
@@ -1835,7 +1826,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .coin-kopfstand .coin-kopf-symbol{width:44px;height:44px;flex-basis:44px}
 .coin-kopfstand strong{min-width:13px;font-size:12px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
-.coin-kopfstand:active{transform:translateY(1px)}
 /* Selektiert (Route #coins): derselbe harte Schlagschatten wie die aktiven
    Menü-Icons — filter:drop-shadow folgt der Alpha-Kante des CAPCOIN-SVGs. */
 .coin-kopfstand.aktiv .muscle-coin{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
@@ -1909,9 +1899,7 @@ button,a,[role="button"],summary{touch-action:manipulation;
 }
 .dex-ordner-dunkel .dex-ordner-kartenicon{color:#fff}
 .dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben),.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben) svg,.dex-ordner-dunkel .dex-ordner-kartenicon .material-svg:not(.icon-originalfarben) svg *{color:#fff!important;fill:#fff!important}
-.tuck-karte.dex-ordner-test:active{transform:translateY(2px)}
 .dex-ordner-test:active .dex-ordner-form{filter:none}
-.tuck-karte:active{transform:translate(2px,2px);box-shadow:none}
 
 /* Reserviertes Inhaltskarten-Design fuer Bilder, Notizen und Videolinks. */
 .dex-inhaltskarte{
@@ -2229,7 +2217,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
   display:-webkit-box;overflow:hidden;color:var(--muted);font-size:12px;line-height:1.3;
   -webkit-box-orient:vertical;-webkit-line-clamp:1;margin-bottom:0;
 }
-.dex-inhaltskarte:active{transform:translate(2px,2px);box-shadow:none}
 .dex-inhaltskarte.eigenes-rezept:active{transform:none;box-shadow:var(--hart)}
 
 .dex-eintraege{margin:24px 2px 8px}
@@ -2315,7 +2302,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
   border-radius:var(--r);background:var(--surface);color:#000;box-shadow:var(--hart-klein);
 }
 .dex-detail-knopf .material-svg,.dex-detail-knopf svg{width:23px;height:23px;fill:#000}
-.dex-detail-knopf:active{transform:translate(2px,2px);box-shadow:none}
 .dex-detail-karte{width:calc(100% - 8px);max-width:calc(100% - 8px);min-width:0;margin-inline:auto;overflow:hidden;border:var(--karten-bw) solid var(--ink);border-radius:var(--r-karte);background:var(--surface);box-shadow:var(--hart)}
 .dex-detail-bild{display:block;width:100%;padding:0;border:0;background:#000}
 .dex-detail-bild img{display:block;width:100%;max-height:58dvh;object-fit:contain}
@@ -2495,7 +2481,6 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 .hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss,.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss .material-svg,.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss .material-svg svg,.hat-kategoriefarbe .kategorie-kopfknopf.kategorie-plus.kontrast-weiss .material-svg svg *{color:#fff!important;fill:#fff!important}
 .hat-kategoriefarbe .kategorie-kopfknopf[href="#home"] .material-svg svg,.hat-kategoriefarbe .kategorie-kopfknopf[data-category-settings] .material-svg svg{fill:#000}
 .hat-kategoriefarbe .app-icon{color:#000}
-.kategorie-kopfknopf:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- COIN-DEX ---------- */
 .coin-dex-inhalt{display:grid;gap:18px;padding:6px 2px 24px}
@@ -2689,7 +2674,6 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
   font-size:0;text-decoration:none;
 }
 :root[data-seite] .seitenkopf .zurueck .pf{font:800 22px/1 var(--ui);font-style:normal}
-:root[data-seite] .seitenkopf .zurueck:active{transform:translate(2px,2px);box-shadow:none}
 
 /* ---------- Einstellungen (Profil) ---------- */
 /* Tuckii gruppiert Einstellungen unter grauen Versalien-Labels und legt jede
@@ -2713,11 +2697,9 @@ button.btn-primary .material-svg svg,a.btn-primary .material-svg svg{fill:#fff!i
 }
 .card,.reminder-group,.profile-abschnitt{box-shadow:var(--hart-klein)}
 .btn{box-shadow:var(--hart-klein)}
-.btn:active{transform:translate(2px,2px);box-shadow:none}
-/* Einheitlicher Drückeffekt (wie .kategorie-kopfknopf) als Fallback fuer
-   alle <button>-Elemente ohne eigene :active-Regel. Eingabe- und Suchfelder
-   sind nie betroffen, da hier ausschliesslich der button-Tag greift. */
-button:active{transform:translate(2px,2px);box-shadow:none}
+/* Bewusst kein Drückeffekt: Knöpfe, Chips, Tags, Menüfelder, Ordner und
+   Reiter rücken beim Antippen nicht nach unten und verlieren keinen
+   Schatten. Neue :active-Regeln dürfen nichts verschieben. */
 .input{box-shadow:none}
 .input:focus{border-color:var(--prio);box-shadow:0 0 0 3px var(--prio-wash)}
 
@@ -2970,10 +2952,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   position:relative;z-index:1;
 }
 :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte{border-width:var(--kontur);box-shadow:none}
-:is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte:active{
-  transform:translateY(2px)!important;
-  box-shadow:none;
-}
 /* Die Vorschau liegt genau auf der Kartenkontur: um deren Stärke nach
    links, rechts und oben verschoben und entsprechend breiter. */
 :is(.neo-dex-page,.food-dex-page) .dex-inhaltskarte-vorschau{
@@ -3078,10 +3056,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button.aktiv{
   background:var(--food-page-purple)!important;
   color:var(--dex-ink,#000)!important;
-}
-:is(.neo-dex-page,.food-dex-page) :is(.neo-dex-filter,.food-dex-filter) button:active{
-  transform:translateY(2px);
-  box-shadow:none;
 }
 .food-dex-info-dialog-overlay{
   position:fixed;z-index:180;inset:0;display:grid;place-items:center;
@@ -3346,7 +3320,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .einkauf-chip-btn,.einkauf-reset{padding:6px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:99px;
   background:var(--surface);color:var(--text);font-size:11.5px;font-weight:700}
 .einkauf-chip-btn.aktiv{background:var(--pink);color:var(--accent-ink);border-color:var(--pink)}
-.einkauf-chip-btn:active,.einkauf-reset:active{transform:translate(1px,1px)}
 
 /* Die Abteilungs-Icons (Obst, Fleisch, Haushalt, ...) sitzen in einer
    viereckigen Flaeche und faerben sich nach der Ordnerfarbe, die im
@@ -4115,10 +4088,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:0!important;
   text-transform:uppercase!important;
 }
-.dex-detail-overlay.dex-detail-fixkopf .dex-detail-popup .dex-detail-link:active{
-  transform:translateY(2px)!important;
-  box-shadow:none!important;
-}
 .dex-detail-overlay.dex-detail-fixkopf.dex-detail-dunkel .dex-detail-popup .dex-detail-link{
   color:#fff!important;
 }
@@ -4278,10 +4247,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *),:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button) :is(.material-svg,svg,svg *){
   color:currentColor!important;
   fill:currentColor!important;
-}
-:is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-button,.food-dex-action-button):active,:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-button,.food-dex-action-button):active{
-  transform:translateY(2px)!important;
-  box-shadow:none!important;
 }
 :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover),:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover){
   position:absolute!important;
@@ -4510,10 +4475,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   letter-spacing:-.025em!important;
   text-transform:uppercase!important;
 }
-.kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save):active{
-  transform:translateY(2px)!important;
-  box-shadow:none!important;
-}
 .kategorie-sheet :is(.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
   background:var(--dex-seitenfarbe,#492426)!important;
   color:var(--dex-ink,#fff)!important;
@@ -4531,9 +4492,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   box-shadow:none!important;
 }
 :root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){
-  box-shadow:none!important;
-}
-:root[data-theme="dark"] .kategorie-sheet :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save):active{
   box-shadow:none!important;
 }
 
@@ -5444,9 +5402,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:var(--ordner)!important;
   color:#fff!important;
 }
-:root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-slot-info-edit:active{
-  transform:translateY(1px);
-}
 :root[data-seite="reminders"] .meal-log-dex-page .mahl-zeitblock .mahl-timeline{
   background:var(--surface)!important;
 }
@@ -5594,9 +5549,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-form>.btn-primary[type="submit"]{
   margin-bottom:4px!important;
-  box-shadow:none!important;
-}
-:root[data-seite="reminders"] .nutrition-calculator-overlay .nutrition-form>.btn-primary[type="submit"]:active{
   box-shadow:none!important;
 }
 
@@ -6103,7 +6055,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-transform:none!important;
   box-shadow:none!important;
 }
-:root[data-seite="body"] .body-reset-mini:active{transform:translateY(1px)}
 :root[data-seite="body"] .body-reminder-settings{
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
@@ -8360,10 +8311,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:visible;
 }
 .app-dex-menu .menue-computer-front{transition:transform 70ms ease-out}
-.app-dex-menu:active .menue-computer-front,
-.app-dex-menu.ist-gedrueckt .menue-computer-front{
-  transform:translate(4px,3px);
-}
 .app-dex-menu:active .menue-computer-schatten,
 .app-dex-menu.ist-gedrueckt .menue-computer-schatten{
   opacity:0;
@@ -8654,7 +8601,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   text-decoration:none;
 }
 .app-dex-search-icon,.app-dex-search-icon>svg{display:block;width:29px;height:29px}
-.app-dex-search:active{transform:translateY(1px)}
 .app-dex-search.aktiv{background:color-mix(in srgb,#fff 62%,var(--dex-seitenfarbe,#FFF8ED))}
 .app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(2.5px 2.5px 0 #0A1330)}
 :root[data-theme="dark"] .app-dex-search.aktiv .app-dex-search-icon{filter:drop-shadow(2.5px 2.5px 0 #EDF0F6)}
@@ -11618,7 +11564,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-relations-overview>header small{color:var(--dex-ink,#111111)!important;font:850 8.5px/1 var(--ui)!important;letter-spacing:.07em}
 :root[data-seite="body"] .ypsi-relations-overview>header b{color:#111!important;font:800 13px/1.2 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .ypsi-relations-overview>header>button{flex:none;min-height:34px;padding:0 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:9px;background:var(--cap-tint,#f7f3ff);color:#111;font:750 9px/1 var(--ui);box-shadow:none}
-:root[data-seite="body"] .ypsi-relations-overview>header>button:active{transform:translateY(1px);box-shadow:none}
 :root[data-seite="body"] .ypsi-relations-overview>p{margin:0!important;color:#5C5F66!important;font:500 10px/1.45 var(--tech)!important}
 :root[data-seite="body"] .ypsi-relations-overview>div{display:grid;gap:7px}
 :root[data-seite="body"] .ypsi-priority-list{display:grid;margin-inline:-14px;border-block:1px solid color-mix(in srgb,var(--dex-accent,#FF277F) 24%,#ddd)}
@@ -11641,7 +11586,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-basis-form small{color:#5C5F66!important;font:550 9.5px/1.4 var(--tech)!important}
 :root[data-seite="body"] .ypsi-basis-form select{min-height:39px;padding:0 29px 0 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:8px;background:#fff;color:#111;font:750 10.5px/1 var(--tech)}
 :root[data-seite="body"] .ypsi-basis-form>button{min-height:39px;padding:0 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:8px;background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);font:800 10px/1 var(--ui);box-shadow:none}
-:root[data-seite="body"] .ypsi-basis-form>button:active{transform:translateY(1px);box-shadow:none}
 
 :root[data-seite="body"] .ypsi-guided-plan{display:grid;gap:14px;margin:20px 0 0;padding:0;border:0;border-radius:0;background:transparent}
 :root[data-seite="body"] .ypsi-guided-plan>header{display:grid!important;gap:4px}
@@ -11654,7 +11598,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-open-questions b{color:#111!important;font:800 12px/1.2 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .ypsi-open-questions small{color:#5C5F66!important;font:550 9.5px/1.4 var(--tech)!important}
 :root[data-seite="body"] .ypsi-open-questions>button{min-height:38px;padding:0 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:8px;background:#fff;color:#111;font:800 9.5px/1.15 var(--ui);box-shadow:none}
-:root[data-seite="body"] .ypsi-open-questions>button:active{transform:translateY(1px);box-shadow:none}
 :root[data-seite="body"] .ypsi-action-categories{display:grid;gap:0}
 :root[data-seite="body"] .ypsi-action-categories>article{display:grid;gap:11px;padding:16px 0;border:0;border-top:1px solid #dedede;border-radius:0;background:transparent}
 :root[data-seite="body"] .ypsi-action-categories>article:first-child{border-top:0}
@@ -11682,7 +11625,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-observed-priorities b{overflow:hidden;color:#111!important;font:800 12px/1.2 "Work Sans",var(--ui),sans-serif;text-overflow:ellipsis;white-space:nowrap}
 :root[data-seite="body"] .ypsi-observed-priorities em{color:#5C5F66;font:650 9.5px/1.2 var(--tech);font-style:normal}
 :root[data-seite="body"] .ypsi-active-priority{display:grid;grid-template-columns:minmax(0,1fr) 20px;align-items:center;gap:9px;width:100%;margin:12px 0;padding:12px;border:0;border-radius:11px;background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);text-align:left;box-shadow:none}
-:root[data-seite="body"] .ypsi-active-priority:active{transform:translateY(2px);box-shadow:none}
 :root[data-seite="body"] .ypsi-active-priority>span{display:grid;gap:3px}
 :root[data-seite="body"] .ypsi-active-priority small{color:inherit!important;font:850 8px/1 var(--ui)!important;letter-spacing:.06em}
 :root[data-seite="body"] .ypsi-active-priority b{color:inherit!important;font:850 15px/1.15 "Work Sans",var(--ui),sans-serif}
@@ -11825,11 +11767,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .braverman-question>p{margin:0;color:#5C5F66;font:550 11.5px/1.45 var(--tech)}
 :root[data-seite="body"] .braverman-question>div{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}
 :root[data-seite="body"] .braverman-question>div>button{min-height:50px;border:var(--kontur) solid var(--kontur-farbe);border-radius:12px;background:#fff;color:#111;font:800 14px/1 var(--ui);box-shadow:none}
-:root[data-seite="body"] .braverman-question>div>button:active,:root[data-seite="body"] .braverman-question>div>button.selected{transform:translateY(2px);background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF);box-shadow:none}
+:root[data-seite="body"] .braverman-question>div>button:active,:root[data-seite="body"] .braverman-question>div>button.selected{background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF)}
 :root[data-seite="body"] .braverman-nav{display:grid;grid-template-columns:1fr;gap:9px}
 :root[data-seite="body"] .braverman-nav>button,:root[data-seite="body"] .braverman-result-actions>button{min-height:48px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:#fff;color:#111;font:750 12px/1.2 var(--ui);box-shadow:none}
 :root[data-seite="body"] .braverman-nav>[data-braverman-pause]{grid-row:1;border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-ink-schrift,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-ink-schrift,#FFFFFF)!important;box-shadow:none!important}
-:root[data-seite="body"] .braverman-nav>[data-braverman-pause]:active{transform:translateY(3px);box-shadow:none!important}
 :root[data-seite="body"] .braverman-nav>button:disabled{opacity:.35}
 :root[data-seite="body"] .braverman-safety{padding:13px;border:var(--kontur) solid #9c2638;border-radius:12px;background:#fff0f2;color:#111111}
 :root[data-seite="body"] .braverman-safety b{font:800 13px/1.2 var(--ui)}
@@ -11888,7 +11829,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .braverman-warning{margin:0!important;padding:8px;border-radius:8px;background:#fff0f2;color:#5C5F66!important;font:600 9px/1.4 var(--tech)!important}
 :root[data-seite="body"] .braverman-result-actions{display:grid;grid-template-columns:1fr;gap:8px}
 :root[data-seite="body"] .braverman-result-actions>.btn-primary{border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-ink-schrift,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-ink-schrift,#FFFFFF)!important;box-shadow:none!important}
-:root[data-seite="body"] .braverman-result-actions>.btn-primary:active{transform:translateY(3px);box-shadow:none!important}
 
 @media(max-width:380px){
   :root[data-seite="body"] .falten-detail-status{grid-template-columns:1fr}
@@ -14570,8 +14510,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
     radial-gradient(circle, currentColor 48%, transparent 54%) 100% 50%/4px 4px no-repeat;
   opacity:.85;
 }
-/* Kurze Rückmeldung beim Antippen – wie zuvor beim MENÜ-Knopf. */
-.app-dex-tab.ist-gedrueckt{transform:translateY(1.5px)}
 .app-dex-tab.ist-gedrueckt>.app-dex-tab-punkte{opacity:1}
 
 /* ---------- Ruhige Seiten-Tapeten nach LOGMAN-Vorbild ----------------- */
@@ -16200,7 +16138,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   -webkit-text-fill-color:var(--ui-gefuellt-schrift)!important;
   font-weight:700!important;
 }
-:root[data-theme][data-seite] #app #view :is(.neo-dex-filter,.food-dex-filter,.training-dex-filter,.essen-dex-filter,.supps-dex-filter,.stress-dex-filter,.wissenssuche-filter)>button:active{transform:translateY(1px)!important}
 
 /* Einträge: Mehr und Schließen in einer Kapsel wie „Teilen · …“ in
    Notizen. Das Aufklappmenü liegt im selben Container; deshalb runden die
