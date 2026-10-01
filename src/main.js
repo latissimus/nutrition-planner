@@ -1005,34 +1005,59 @@ function reiterleisteBinden(tabLeiste) {
      erneut dorthin zu navigieren. Auf einer Nebenansicht (Profil, Suche,
      CAPCOINS, Eintragsseite) steht man nicht auf dieser Seite – dort bleibt
      der Reiter ein normaler Verweis und bringt einen zurück. */
-  tabLeiste.addEventListener('click', (event) => {
-    const tippStart = performance.now();
-    const { view, istNebenansicht, aktiveDockRoute } = dockZustand;
-    const reiter = event.target.closest?.('.app-dex-tab');
-    const oeffnetMenue = Boolean(reiter) && !istNebenansicht
+  const oeffnetMenue = (reiter) => {
+    const { istNebenansicht, aktiveDockRoute } = dockZustand;
+    return Boolean(reiter) && !istNebenansicht
       && reiter.getAttribute('href')?.replace(/^#/, '') === aktiveDockRoute;
-    if (reiter) {
-      /* Öffnet der Tipp das Menü, federt die Leiste nicht: Ihr Bild läge
-         während des Federns über der Abdunklung, und die Leiste würde erst
-         danach dunkel. */
-      if (!oeffnetMenue) leisteFedernLassen(tabLeiste.parentElement);
-      // Pille und Leiste bewegen sich sofort, nicht erst, wenn die Seite
-      // geladen ist.
-      const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
-      if (auswahl && !reiter.classList.contains('aktiv')) {
-        auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
-        auswahl.dataset.x = String(reiter.offsetLeft);
+  };
+  /* Federn, Auswahl und Weiterrücken starten schon beim Loslassen des Fingers.
+     Gemessen auf dem iPhone: Den Klick meldet iOS erst 40–90 ms danach. Öffnet
+     der Tipp das Menü, federt die Leiste nicht: Sie läge sonst während des
+     Federns über der Abdunklung. Navigiert wird weiterhin beim Klick. */
+  let letzteTippBewegung = null;
+  const tippBewegungen = (reiter) => {
+    const tippStart = performance.now();
+    leisteFedernLassen(tabLeiste.parentElement);
+    const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
+    if (auswahl && !reiter.classList.contains('aktiv')) {
+      auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
+      auswahl.dataset.x = String(reiter.offsetLeft);
+    }
+    const ziel = reiterZiel(tabLeiste, reiter);
+    if (ziel != null) leisteRuecken(tabLeiste, ziel);
+    const bewegung = { reiter, zeit: tippStart, geklickt: false };
+    letzteTippBewegung = bewegung;
+    /* Kommt nach dem Loslassen doch kein Klick (der Finger ist zu weit
+       gerutscht), kehrt die Auswahl zum offenen Reiter zurück. */
+    window.setTimeout(() => {
+      if (bewegung.geklickt || letzteTippBewegung !== bewegung) return;
+      const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
+      if (auswahl && aktiv) {
+        auswahl.style.transform = `translateX(${aktiv.offsetLeft}px)`;
+        auswahl.dataset.x = String(aktiv.offsetLeft);
       }
-      if (!oeffnetMenue) {
-        const ziel = reiterZiel(tabLeiste, reiter);
-        if (ziel != null) leisteRuecken(tabLeiste, ziel);
-      }
-      ruckelMarke(`Tipp verarbeitet ${Math.round(performance.now() - tippStart)} ms`);
+    }, 700);
+    ruckelMarke(`Tipp verarbeitet ${Math.round(performance.now() - tippStart)} ms`);
+  };
+  tabLeiste.addEventListener('pointerup', (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    const reiter = event.target.closest?.('.app-dex-tab');
+    if (reiter && !oeffnetMenue(reiter)) tippBewegungen(reiter);
+  }, { passive: true });
+  tabLeiste.addEventListener('click', (event) => {
+    const { view } = dockZustand;
+    const reiter = event.target.closest?.('.app-dex-tab');
+    const menue = oeffnetMenue(reiter);
+    if (reiter && !menue) {
+      // Ohne vorheriges Loslassen (Tastatur, Maus ohne Pointer Events) hier.
+      const bewegung = letzteTippBewegung;
+      if (bewegung?.reiter === reiter && performance.now() - bewegung.zeit < 700) bewegung.geklickt = true;
+      else tippBewegungen(reiter);
     }
     /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
        Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
        der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
-    if (!oeffnetMenue || !view) return;
+    if (!menue || !view) return;
     event.preventDefault();
     reiter.classList.add('ist-gedrueckt');
     window.setTimeout(() => reiter.classList.remove('ist-gedrueckt'), 220);
@@ -1777,13 +1802,13 @@ const istChatRoute = (route) => route === 'coach' || route === 'coach-wissen';
 let kapselWechselTimer = 0;
 
 /* Nach einem Tipp aufs Menüband zwei Frames warten, bevor die neue Seite
-   eingesetzt wird. Gemessen auf dem iPhone: Der Tausch belegt den Hauptthread
-   rund 90 ms. Federn, Auswahl und Weiterrücken waren beim Tipp gestartet,
-   gehen aber erst mit dem nächsten gezeichneten Frame an den Grafikchip –
-   der kam erst nach dem Tausch. Sie standen so lange still und sprangen dann
-   mitten in die Bewegung. Nach zwei Frames laufen sie auf dem Grafikchip
-   weiter, während getauscht wird. Kostet rund 30 ms, nur direkt nach einem
-   Tipp; ohne sichtbare Seite (keine Frames) begrenzt ein Zeitlimit. */
+   aufgebaut oder eingesetzt wird. Gemessen auf dem iPhone: Aufbau und Tausch
+   belegen den Hauptthread je 40–90 ms. Federn, Auswahl und Weiterrücken waren
+   beim Tipp gestartet, gehen aber erst mit dem nächsten gezeichneten Frame an
+   den Grafikchip – der kam erst danach. Sie standen so lange still und
+   sprangen dann mitten in die Bewegung. Nach zwei Frames laufen sie auf dem
+   Grafikchip weiter, während die Seite entsteht. Kostet rund 30 ms, nur
+   direkt nach einem Tipp; ohne sichtbare Seite begrenzt ein Zeitlimit. */
 let letzterLeistenTipp = -Infinity;
 function animationenAnstossen() {
   if (performance.now() - letzterLeistenTipp > 400) return Promise.resolve();
@@ -1878,9 +1903,11 @@ async function renderRoute() {
   // sofort verfügbar. Die sichtbare Seite wird ohne Übergangsanimation
   // atomar getauscht.
   ruckelMarke(`Seite ${route}${richtung !== 'gleich' && ansichtsCache.peek(route) ? ' aus Speicher' : ' wird aufgebaut'}`);
+  // Vor jedem Aufbau oder Tausch: Animationen vom Tipp erst an den
+  // Grafikchip übergeben (siehe animationenAnstossen).
+  await animationenAnstossen();
+  if (generation !== renderGeneration) return;
   if (richtung !== 'gleich' && ansichtsCache.peek(route)) {
-    await animationenAnstossen();
-    if (generation !== renderGeneration) return;
     let gezeigt = false;
     await seiteTauschen(aktiveRoute, route, () => { gezeigt = gemerkteAnsichtZeigen(route); });
     if (gezeigt) return;
@@ -2323,7 +2350,6 @@ async function renderRoute() {
      kurz bevor die neue Ansicht sichtbar wird. So sieht der Nutzer einen
      einzigen atomaren Wechsel statt Header→Hintergrund→Inhalt in Etappen. */
   if (app.querySelector(':scope > .app-start-splash')) await appStartSplashAbwarten();
-  await animationenAnstossen();
   if (generation !== renderGeneration) {
     view.remove();
     commitSeiteDefer(true);
