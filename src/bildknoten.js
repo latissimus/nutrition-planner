@@ -94,8 +94,16 @@ function kinderAngleichen(alt, neu) {
   let zeiger = 0;
   for (const kind of [...neu.childNodes]) {
     let treffer = -1;
-    for (let index = zeiger; index < alteKinder.length; index += 1) {
-      if (gleicheArt(alteKinder[index], kind)) { treffer = index; break; }
+    if (kind.nodeType === Node.ELEMENT_NODE) {
+      for (let index = zeiger; index < alteKinder.length; index += 1) {
+        if (gleicheArt(alteKinder[index], kind)) { treffer = index; break; }
+      }
+    } else if (alteKinder[zeiger] && gleicheArt(alteKinder[zeiger], kind)) {
+      // Text nur an Ort und Stelle übernehmen. Eine Suche nach vorn sprang
+      // sonst über das nächste Element hinweg (das Leerzeichen hinter den
+      // neuen Punkten traf das Leerzeichen HINTER dem Symbol), und das
+      // Symbol des getippten Reiters wurde neu angelegt.
+      treffer = zeiger;
     }
     if (treffer < 0) {
       alt.insertBefore(kind, alteKinder[zeiger] || null);

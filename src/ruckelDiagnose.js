@@ -35,10 +35,20 @@ const rechteck = (element) => {
 };
 
 let laeuft = false;
+let marken = null;
+let markenStart = 0;
+// Zeitmarken aus main.js (Seitenwechsel, Übergang, Tausch). Nur während einer
+// laufenden Messung aufgezeichnet.
+export function ruckelMarke(text) {
+  if (marken) marken.push(`${Math.round(performance.now() - markenStart)} ${text}`);
+}
+
 function messen() {
   if (laeuft) return;
   laeuft = true;
   const start = performance.now();
+  marken = [];
+  markenStart = start;
   const ziele = sichtbareSymbole().map((element) => ({ element, name: name(element), erste: rechteck(element), max: 0, spruenge: [] }));
   const ersetzt = [];
   const beobachter = new MutationObserver((eintraege) => {
@@ -75,6 +85,8 @@ function messen() {
   function auswerten() {
     beobachter.disconnect();
     laeuft = false;
+    const ablauf = marken || [];
+    marken = null;
     const bewegt = ziele.filter((ziel) => ziel.max > 0.2 || ziel.weg != null);
     const zeilen = [
       `Symbole gemessen: ${ziele.length}`,
@@ -85,6 +97,7 @@ function messen() {
       `Ausgetauschte Knoten: ${ersetzt.length}`,
       ...ersetzt.slice(0, 6).map((zeile) => `• ${zeile}`),
       `Ausgefallene Frames: ${ausfaelle.length ? ausfaelle.slice(0, 8).join(', ') : 'keine'}`,
+      `Ablauf (ms): ${ablauf.length ? ablauf.join(' · ') : '–'}`,
     ];
     tafelZeigen(zeilen.join('\n'));
   }

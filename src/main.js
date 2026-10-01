@@ -1,6 +1,6 @@
 import './styles.css';
 import { bildknotenUebernehmen, markupAngleichen } from './bildknoten.js';
-import { ruckelDiagnoseEinrichten } from './ruckelDiagnose.js';
+import { ruckelDiagnoseEinrichten, ruckelMarke } from './ruckelDiagnose.js';
 import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
 // Genau zwei Schriften, lokal über styles.css eingebunden: Work Sans für
@@ -937,6 +937,8 @@ function leisteFedernLassen() {
     return;
   }
   leistenFedern = uebergang;
+  ruckelMarke('Federn startet');
+  uebergang.ready.then(() => ruckelMarke('Federn läuft'), () => ruckelMarke('Federn übersprungen'));
   // Nur das jeweils letzte Federn räumt auf; ein schneller zweiter Tipp
   // startet ein neues, das die Klasse noch braucht.
   const aufraeumen = () => {
@@ -945,6 +947,60 @@ function leisteFedernLassen() {
     wurzel.classList.remove('leiste-federt');
   };
   uebergang.finished.then(aufraeumen, aufraeumen);
+}
+
+/* Wohin die Reiterleiste rücken soll, damit der Reiter gut im Bild steht;
+   null, wenn sie bleiben kann. */
+function reiterZiel(tabLeiste, reiter) {
+  const links = reiter.offsetLeft;
+  const rechts = links + reiter.offsetWidth;
+  /* Schon der vorletzte sichtbare Reiter am Rand rückt die Leiste weiter,
+     nicht erst der äußerste: Liegt der Reiter innerhalb von gut einer
+     Reiterbreite am linken oder rechten Rand, wandert er zur Mitte, und
+     daneben sind die nächsten Seiten zu sehen. */
+  const randzone = reiter.offsetWidth * 1.2;
+  const istAmRand = links < tabLeiste.scrollLeft + randzone
+    || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth - randzone;
+  /* Liegt der Reiter ganz im Bild und nicht am Rand, bleibt die Leiste
+     stehen. Das erneute Einrasten verschob sie sonst nach dem Antippen
+     noch um ein paar Pixel – die Symbole ruckten nach dem Federn nach. */
+  const ganzSichtbar = links >= tabLeiste.scrollLeft - 1
+    && rechts <= tabLeiste.scrollLeft + tabLeiste.clientWidth + 1;
+  if (!istAmRand && ganzSichtbar) return null;
+  const maximal = Math.max(0, tabLeiste.scrollWidth - tabLeiste.clientWidth);
+  const gewuenscht = istAmRand
+    ? links - ((tabLeiste.clientWidth - reiter.offsetWidth) / 2)
+    : tabLeiste.scrollLeft;
+  const rasterpunkte = [...tabLeiste.querySelectorAll('.app-dex-tab')]
+    .map((tab) => Math.min(tab.offsetLeft, maximal));
+  const eingerastet = rasterpunkte.reduce((naechster, punkt) => (
+    Math.abs(punkt - gewuenscht) < Math.abs(naechster - gewuenscht) ? punkt : naechster
+  ), 0);
+  /* Das Einrasten auf den naechsten Reiteranfang konnte den Reiter aus dem
+     Fenster schieben – gemessen bei EINKAUF und MIND. Deshalb wird das
+     eingerastete Ziel in den Bereich gezwungen, in dem er ganz im Bild
+     liegt: scrollLeft zwischen (rechts - Fensterbreite) und links. */
+  const untergrenze = Math.max(0, Math.min(rechts - tabLeiste.clientWidth, maximal));
+  const obergrenze = Math.max(untergrenze, Math.min(links, maximal));
+  const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze);
+  return Math.abs(sicher - tabLeiste.scrollLeft) < 1 ? null : sicher;
+}
+
+/* Die Leiste springt sofort an ihr Ziel, ihre Reiter gleiten per Transform
+   von der alten Stelle nach. Gemessen auf dem iPhone: Das weiche scrollTo
+   begann erst 130–170 ms nach dem Tipp, wenn die neue Seite stand, und lief
+   dann in Sprüngen von 2 bis 11 px, weil es mit dem Seitenaufbau um den
+   Hauptthread rang. Die Transform-Bewegung übernimmt der Grafikchip. */
+function leisteRuecken(tabLeiste, ziel) {
+  const vorher = tabLeiste.scrollLeft;
+  tabLeiste.scrollLeft = ziel;
+  const versatz = tabLeiste.scrollLeft - vorher;
+  if (!versatz || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  for (const kind of tabLeiste.children) {
+    kind.animate?.([{ translate: `${versatz}px 0` }, { translate: '0 0' }], {
+      duration: 360, easing: 'cubic-bezier(.32,.72,.24,1)',
+    });
+  }
 }
 
 /* Die Reiterleiste bleibt beim Neuzeichnen dasselbe Element (markupAngleichen).
@@ -976,11 +1032,16 @@ function reiterleisteBinden(tabLeiste) {
          während des Federns über der Abdunklung, und die Leiste würde erst
          danach dunkel. */
       if (!oeffnetMenue) leisteFedernLassen();
-      // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
+      // Pille und Leiste bewegen sich sofort, nicht erst, wenn die Seite
+      // geladen ist.
       const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
       if (auswahl && !reiter.classList.contains('aktiv')) {
         auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
         auswahl.dataset.x = String(reiter.offsetLeft);
+      }
+      if (!oeffnetMenue) {
+        const ziel = reiterZiel(tabLeiste, reiter);
+        if (ziel != null) leisteRuecken(tabLeiste, ziel);
       }
     }
     /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
@@ -1113,42 +1174,12 @@ function appDexShellZeichnen(route, view) {
   }
 
   reiterleisteBinden(tabLeiste);
+  // Kam die Seite nicht über einen Tipp auf die Leiste (etwa über den Kopf
+  // oder den Zurück-Pfeil), rückt die Leiste hier nach.
   requestAnimationFrame(() => {
     const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
-    if (!aktiv) return;
-    const links = aktiv.offsetLeft;
-    const rechts = links + aktiv.offsetWidth;
-    /* Schon der vorletzte sichtbare Reiter am Rand rückt die Leiste weiter,
-       nicht erst der äußerste: Liegt der aktive Reiter innerhalb von gut
-       einer Reiterbreite am linken oder rechten Rand, wandert er zur Mitte,
-       und daneben sind die nächsten Seiten zu sehen. */
-    const randzone = aktiv.offsetWidth * 1.2;
-    const istAmRand = links < tabLeiste.scrollLeft + randzone
-      || rechts > tabLeiste.scrollLeft + tabLeiste.clientWidth - randzone;
-    /* Liegt der Reiter ganz im Bild und nicht am Rand, bleibt die Leiste
-       stehen. Das erneute Einrasten verschob sie sonst nach dem Antippen
-       noch um ein paar Pixel – die Symbole ruckten nach dem Federn nach. */
-    const ganzSichtbar = links >= tabLeiste.scrollLeft - 1
-      && rechts <= tabLeiste.scrollLeft + tabLeiste.clientWidth + 1;
-    if (!istAmRand && ganzSichtbar) return;
-    const maximal = Math.max(0, tabLeiste.scrollWidth - tabLeiste.clientWidth);
-    const gewuenscht = istAmRand
-      ? links - ((tabLeiste.clientWidth - aktiv.offsetWidth) / 2)
-      : tabLeiste.scrollLeft;
-    const rasterpunkte = [...tabLeiste.querySelectorAll('.app-dex-tab')]
-      .map((tab) => Math.min(tab.offsetLeft, maximal));
-    const eingerastet = rasterpunkte.reduce((naechster, punkt) => (
-      Math.abs(punkt - gewuenscht) < Math.abs(naechster - gewuenscht) ? punkt : naechster
-    ), 0);
-    /* Das Einrasten auf den naechsten Reiteranfang konnte den aktiven Reiter
-       aus dem Fenster schieben – gemessen bei EINKAUF und MIND. Seit der
-       Reiter selbst das Menue oeffnet, muss er sichtbar sein. Deshalb wird
-       das eingerastete Ziel in den Bereich gezwungen, in dem er ganz im Bild
-       liegt: scrollLeft zwischen (rechts - Fensterbreite) und links. */
-    const untergrenze = Math.max(0, Math.min(rechts - tabLeiste.clientWidth, maximal));
-    const obergrenze = Math.max(untergrenze, Math.min(links, maximal));
-    const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze);
-    tabLeiste.scrollTo({ left: sicher, behavior: istAmRand ? 'smooth' : 'auto' });
+    const ziel = aktiv ? reiterZiel(tabLeiste, aktiv) : null;
+    if (ziel != null) leisteRuecken(tabLeiste, ziel);
   });
 }
 
@@ -1764,9 +1795,12 @@ async function seiteTauschen(von, nach, tauschen) {
     && app.querySelector(':scope > #view')
     && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   if (!mitUebergang) {
+    ruckelMarke('Tausch');
     tauschen();
+    ruckelMarke('Tausch fertig');
     return;
   }
+  ruckelMarke('Übergang startet');
   const wurzel = document.documentElement;
   // Ein noch laufendes Federn des Menübands endet mit diesem Übergang.
   leistenFedern = null;
@@ -1775,13 +1809,18 @@ async function seiteTauschen(von, nach, tauschen) {
   const aufraeumen = () => wurzel.classList.remove('kapsel-uebergang');
   let uebergang;
   try {
-    uebergang = document.startViewTransition(tauschen);
+    uebergang = document.startViewTransition(() => {
+      ruckelMarke('Tausch');
+      tauschen();
+      ruckelMarke('Tausch fertig');
+    });
   } catch {
     aufraeumen();
     tauschen();
     return;
   }
-  uebergang.finished.then(aufraeumen, aufraeumen);
+  uebergang.ready.then(() => ruckelMarke('Übergang läuft'), () => ruckelMarke('Übergang übersprungen'));
+  uebergang.finished.then(() => { ruckelMarke('Übergang fertig'); aufraeumen(); }, aufraeumen);
   await uebergang.updateCallbackDone;
 }
 
@@ -1847,6 +1886,7 @@ async function renderRoute() {
   // Ein bereits fertig aufgebauter Dex ist unabhängig von der Richtung
   // sofort verfügbar. Die sichtbare Seite wird ohne Übergangsanimation
   // atomar getauscht.
+  ruckelMarke(`Seite ${route}${richtung !== 'gleich' && ansichtsCache.peek(route) ? ' aus Speicher' : ' wird aufgebaut'}`);
   if (richtung !== 'gleich' && ansichtsCache.peek(route)) {
     let gezeigt = false;
     await seiteTauschen(aktiveRoute, route, () => { gezeigt = gemerkteAnsichtZeigen(route); });
@@ -2296,6 +2336,7 @@ async function renderRoute() {
     commitPageLookDefer(true);
     return;
   }
+  ruckelMarke('Inhalt fertig');
   await seiteTauschen(vorherigeRoute, route, () => {
     commitSeiteDefer();
     commitPageLookDefer();
@@ -2467,6 +2508,7 @@ async function render() {
 }
 
 window.addEventListener('hashchange', () => {
+  ruckelMarke(`Wechsel ${location.hash}`);
   render();
 });
 
