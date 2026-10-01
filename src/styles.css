@@ -16008,7 +16008,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ui-schrift)!important;
 }
 :root[data-theme][data-seite] #app .app-dex-kapsel>*+*{border-left:1px solid var(--trennstrich)!important}
-:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 8px 0 12px!important}
+/* Die Felder tragen die Rundung der Kapsel selbst, statt sich auf deren
+   Abschneiden zu verlassen: Beim Übergang zum Chat werden sie als eigenes
+   Bild gezeichnet, und die graue Auswahl stand dort eckig über den Rand. */
+:root[data-theme][data-seite] #app .app-dex-kapsel>:first-child{border-top-left-radius:999px!important;border-bottom-left-radius:999px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>:last-child{border-top-right-radius:999px!important;border-bottom-right-radius:999px!important}
+/* top:0 statt der älteren -2 px: Die graue Auswahl reicht so bis an den
+   unteren Rand. Zahl und Coin bleiben an ihrer gewohnten Höhe. */
+:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{top:0!important;padding:0 8px 0 12px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand>*{position:relative;top:-2px}
 :root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:var(--ui-schrift)!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-gedaechtnis{gap:7px!important;padding:0 12px 0 10px!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel .app-dex-zurueck-pfeil{width:16px!important;height:16px!important}
