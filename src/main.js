@@ -1,5 +1,5 @@
 import './styles.css';
-import { bildknotenUebernehmen, markupMitBildernSetzen } from './bildknoten.js';
+import { bildknotenUebernehmen, markupAngleichen } from './bildknoten.js';
 import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
 // Genau zwei Schriften, lokal über styles.css eingebunden: Work Sans für
@@ -945,6 +945,53 @@ function leisteFedernLassen() {
   uebergang.finished.then(aufraeumen, aufraeumen);
 }
 
+/* Die Reiterleiste bleibt beim Neuzeichnen dasselbe Element (markupAngleichen).
+   Ihre Listener werden deshalb nur einmal gebunden und lesen den jeweils
+   aktuellen Zustand aus dockZustand. */
+let dockZustand = { view: null, istNebenansicht: false, aktiveDockRoute: '' };
+const gebundeneReiterleisten = new WeakSet();
+function reiterleisteBinden(tabLeiste) {
+  if (gebundeneReiterleisten.has(tabLeiste)) return;
+  gebundeneReiterleisten.add(tabLeiste);
+  // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
+  // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
+  // keine Daten geladen und keine sichtbare Ansicht verändert.
+  tabLeiste.addEventListener('pointerdown', (event) => {
+    const ziel = event.target.closest?.('.app-dex-tab')?.getAttribute('href')?.replace(/^#/, '');
+    if (ziel) dexModulVorbereiten(ziel);
+  }, { passive: true });
+  /* Tippen auf den Reiter der GERADE offenen Seite öffnet deren Menü statt
+     erneut dorthin zu navigieren. Auf einer Nebenansicht (Profil, Suche,
+     CAPCOINS, Eintragsseite) steht man nicht auf dieser Seite – dort bleibt
+     der Reiter ein normaler Verweis und bringt einen zurück. */
+  tabLeiste.addEventListener('click', (event) => {
+    const { view, istNebenansicht, aktiveDockRoute } = dockZustand;
+    const reiter = event.target.closest?.('.app-dex-tab');
+    const oeffnetMenue = Boolean(reiter) && !istNebenansicht
+      && reiter.getAttribute('href')?.replace(/^#/, '') === aktiveDockRoute;
+    if (reiter) {
+      /* Öffnet der Tipp das Menü, federt die Leiste nicht: Ihr Bild läge
+         während des Federns über der Abdunklung, und die Leiste würde erst
+         danach dunkel. */
+      if (!oeffnetMenue) leisteFedernLassen();
+      // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
+      const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
+      if (auswahl && !reiter.classList.contains('aktiv')) {
+        auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
+        auswahl.dataset.x = String(reiter.offsetLeft);
+      }
+    }
+    /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
+       Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
+       der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
+    if (!oeffnetMenue || !view) return;
+    event.preventDefault();
+    reiter.classList.add('ist-gedrueckt');
+    window.setTimeout(() => reiter.classList.remove('ist-gedrueckt'), 220);
+    view.querySelector('.kategorie-plus')?.click();
+  });
+}
+
 function appDexShellZeichnen(route, view) {
   if (!istAppHauptDex(route, view)) {
     appDexShellEntfernen();
@@ -987,7 +1034,7 @@ function appDexShellZeichnen(route, view) {
      Kontostand nach links, Suche und Coach bleiben an ihrem Platz, und der
      Coach sitzt neben dem Profilbild am besten erreichbar. Auf den
      Coach-Seiten trägt die Kapsel Zurück und Gedächtnis. */
-  markupMitBildernSetzen(header, `
+  markupAngleichen(header, `
     <div class="app-dex-header-inner">
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
@@ -1037,11 +1084,15 @@ function appDexShellZeichnen(route, view) {
     leiste.className = 'app-dex-dock-inner';
     dock.replaceChildren(leiste);
   }
-  markupMitBildernSetzen(leiste, `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`);
+  /* Angleichen statt neu füllen: Reiter, Symbole und Auswahl bleiben dieselben
+     Elemente, nur Klassen und Beschriftungen ändern sich. Neu eingehängte
+     Symbole rechnete iOS jedes Mal neu, sie ruckten nach jedem Tipp. */
+  markupAngleichen(leiste, `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`);
   appSyncStatusAktualisieren();
+  dockZustand = { view, istNebenansicht, aktiveDockRoute };
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
-  tabLeiste.scrollLeft = alterScrollstand;
+  if (tabLeiste.scrollLeft !== alterScrollstand) tabLeiste.scrollLeft = alterScrollstand;
   /* Die Auswahl ist eine eigene Pille in der Leiste. Sie startet an der
      Stelle des vorher aktiven Reiters und gleitet zum neuen, statt zu
      springen. */
@@ -1059,13 +1110,7 @@ function appDexShellZeichnen(route, view) {
     tabLeiste.classList.add('hat-auswahl');
   }
 
-  // Zwischen pointerdown und click kann WebKit den noch nicht ausgewerteten
-  // Modul-Chunk des angetippten System-Dex bereits vorbereiten. Dabei werden
-  // keine Daten geladen und keine sichtbare Ansicht verändert.
-  tabLeiste.addEventListener('pointerdown', (event) => {
-    const ziel = event.target.closest?.('.app-dex-tab')?.getAttribute('href')?.replace(/^#/, '');
-    if (ziel) dexModulVorbereiten(ziel);
-  }, { passive: true });
+  reiterleisteBinden(tabLeiste);
   requestAnimationFrame(() => {
     const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
     if (!aktiv) return;
@@ -1102,35 +1147,6 @@ function appDexShellZeichnen(route, view) {
     const obergrenze = Math.max(untergrenze, Math.min(links, maximal));
     const sicher = Math.min(Math.max(eingerastet, untergrenze), obergrenze);
     tabLeiste.scrollTo({ left: sicher, behavior: istAmRand ? 'smooth' : 'auto' });
-  });
-
-  /* Tippen auf den Reiter der GERADE offenen Seite öffnet deren Menü statt
-     erneut dorthin zu navigieren. Auf einer Nebenansicht (Profil, Suche,
-     CAPCOINS, Eintragsseite) steht man nicht auf dieser Seite – dort bleibt
-     der Reiter ein normaler Verweis und bringt einen zurück. */
-  tabLeiste.addEventListener('click', (event) => {
-    const reiter = event.target.closest?.('.app-dex-tab');
-    const oeffnetMenue = Boolean(reiter) && !istNebenansicht
-      && reiter.getAttribute('href')?.replace(/^#/, '') === aktiveDockRoute;
-    if (reiter) {
-      /* Öffnet der Tipp das Menü, federt die Leiste nicht: Ihr Bild läge
-         während des Federns über der Abdunklung, und die Leiste würde erst
-         danach dunkel. */
-      if (!oeffnetMenue) leisteFedernLassen();
-      // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
-      if (auswahl && !reiter.classList.contains('aktiv')) {
-        auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
-        auswahl.dataset.x = String(reiter.offsetLeft);
-      }
-    }
-    /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
-       Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
-       der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
-    if (!oeffnetMenue) return;
-    event.preventDefault();
-    reiter.classList.add('ist-gedrueckt');
-    window.setTimeout(() => reiter.classList.remove('ist-gedrueckt'), 220);
-    view.querySelector('.kategorie-plus')?.click();
   });
 }
 

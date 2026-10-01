@@ -454,13 +454,30 @@ export async function mountRoutines(container, { session, signal }) {
   const toggleRoutine = async (item) => {
     const completed = state.completed.has(item.id);
     try {
-      await setRoutineCompletion({ routineId: item.id, date: today(), completed: !completed });
+      // seite: ROUTINEN zeigt den neuen Stand gleich selbst (zeileAktualisieren).
+      await setRoutineCompletion({ routineId: item.id, date: today(), completed: !completed, seite: 'habits' });
     } catch {
       return toast('Status konnte nicht gespeichert werden.');
     }
     if (completed) state.completed.delete(item.id); else state.completed.add(item.id);
     playInterfaceSound(completed ? 'uncheck' : 'check');
-    paint();
+    zeileAktualisieren(item);
+  };
+  /* Abhaken ändert nur diese eine Zeile und die Fortschrittsanzeige. Früher
+     wurde die ganze Liste neu gezeichnet: Die Vorschaubilder der Anhänge
+     wurden dabei neu eingehängt, und iOS dekodierte sie neu – sie flackerten.
+     Die Anhänge bleiben jetzt unberührt. */
+  const zeileAktualisieren = (item) => {
+    const zeile = [...container.querySelectorAll('.routine-row[data-routine-id]')]
+      .find((element) => element.dataset.routineId === item.id);
+    if (!zeile) return paint();
+    const erledigt = state.completed.has(item.id);
+    const vorlage = document.createElement('template');
+    vorlage.innerHTML = routineRow(item, erledigt, [], colorIsDark(categoryColor('habits')));
+    const neuerKnopf = vorlage.content.querySelector('[data-routine-check]');
+    zeile.querySelector('[data-routine-check]')?.replaceWith(neuerKnopf);
+    zeile.classList.toggle('erledigt', erledigt);
+    container.querySelector('[data-routine-hero]').innerHTML = routineHeroMarkup(state);
   };
   const refresh = async () => {
     state = await load(userId, signal);

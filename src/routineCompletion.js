@@ -8,7 +8,7 @@ export const localDate = (date = new Date()) => date.toLocaleDateString('sv-SE')
  * Die zugehoerige RPC garantiert, dass Routine, Erinnerung und Coins nie in
  * unterschiedlichen Zustaenden zurueckbleiben.
  */
-export async function setRoutineCompletion({ routineId, date = localDate(), completed, snoozedUntil = null }) {
+export async function setRoutineCompletion({ routineId, date = localDate(), completed, snoozedUntil = null, seite } = {}) {
   if (!routineId) throw new Error('Routine fehlt.');
   const { data, error } = await supabase.rpc('set_routine_completion_state', {
     target_routine: routineId,
@@ -17,6 +17,6 @@ export async function setRoutineCompletion({ routineId, date = localDate(), comp
     target_snoozed_until: snoozedUntil,
   });
   if (error) throw error;
-  notifyCoinBalanceChanged(['habits', 'coins']);
+  notifyCoinBalanceChanged(['habits', 'coins'], { seite });
   return Number(data || 0);
 }

@@ -27,9 +27,11 @@ export function notifyHomeCountsChanged(bereich) {
   window.dispatchEvent(new CustomEvent('muscledex:counts-changed', { detail: { bereich } }));
 }
 
-export function notifyCoinBalanceChanged(bereich) {
+// seite: Die Seite, die die Änderung selbst ausgelöst und schon angezeigt hat.
+// Sie lädt sich daraufhin nicht noch einmal neu (siehe attachRefresh).
+export function notifyCoinBalanceChanged(bereich, { seite } = {}) {
   if (typeof window === 'undefined') return;
-  window.dispatchEvent(new CustomEvent('muscledex:coins-changed', { detail: { bereich } }));
+  window.dispatchEvent(new CustomEvent('muscledex:coins-changed', { detail: { bereich, seite } }));
 }
 
 /* Mehrere schnelle Anfragen (z. B. ein Rezeptimport) werden zu genau
@@ -87,7 +89,13 @@ export function passtZumBereich(bereich, quelle) {
 
 function attachRefresh(request, signal, bereich) {
   if (typeof window === 'undefined') return () => {};
-  const listener = (event) => { if (passtZumBereich(bereich, event?.detail?.bereich)) request(); };
+  /* Eine Änderung, die die Seite selbst ausgelöst und bereits dargestellt
+     hat, lädt dieselbe Seite nicht neu. Beim Abhaken einer Routine baute sich
+     ROUTINEN sonst komplett neu auf, und die Vorschaubilder flackerten. */
+  const listener = (event) => {
+    if (bereich && event?.detail?.seite === bereich) return;
+    if (passtZumBereich(bereich, event?.detail?.bereich)) request();
+  };
   const visibility = () => { if (document.visibilityState === 'visible') request(); };
   REFRESH_EVENTS.forEach((event) => window.addEventListener(event, listener));
   document.addEventListener('visibilitychange', visibility);
