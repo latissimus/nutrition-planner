@@ -16824,22 +16824,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ============================================================
    SEITE ⇄ CHAT · Kopf- und Fußkapsel bleiben, nur der Inhalt wechselt.
    Nur während des Übergangs (Klasse aus seiteTauschen in main.js) tragen
-   die Kapseln und ihr Inhalt eigene Namen. Weil der Inhalt eigene Namen
-   hat, enthält das Bild der Kapsel nur Rahmen und Fläche: Es wird auf den
-   neuen Zuschnitt gezogen, der Inhalt blendet darin über.
+   die Kapseln eigene Namen. Im Kopf hat auch der Inhalt eigene Namen; das
+   Bild der Kapsel enthält deshalb nur Rahmen und Fläche, wird auf den neuen
+   Zuschnitt gezogen, und der Inhalt blendet darin über. Die Fußkapsel ist
+   vorher wie nachher gleich groß und blendet als Ganzes über.
    ============================================================ */
 :root.kapsel-uebergang #app .app-dex-kapsel{view-transition-name:kopf-kapsel;view-transition-class:kapsel}
 :root.kapsel-uebergang #app>.app-dex-dock .app-dex-dock-inner,
-:root.kapsel-uebergang .coach-inputbar{view-transition-name:fuss-kapsel;view-transition-class:kapsel}
+:root.kapsel-uebergang .coach-inputbar{view-transition-name:fuss-kapsel}
 :root.kapsel-uebergang #app .app-dex-kapsel>.coin-kopfstand{view-transition-name:kopf-coins;view-transition-class:kapsel-inhalt}
 :root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-search{view-transition-name:kopf-suche;view-transition-class:kapsel-inhalt}
 :root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-coach{view-transition-name:kopf-coach;view-transition-class:kapsel-inhalt}
 :root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-zurueck{view-transition-name:kopf-zurueck;view-transition-class:kapsel-inhalt}
 :root.kapsel-uebergang #app .app-dex-kapsel>.app-dex-gedaechtnis{view-transition-name:kopf-gedaechtnis;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang #app>.app-dex-dock .app-dex-tabs{view-transition-name:fuss-reiter;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang .coach-inputbar>.coach-plus{view-transition-name:fuss-plus;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang .coach-inputbar>textarea{view-transition-name:fuss-feld;view-transition-class:kapsel-inhalt}
-:root.kapsel-uebergang .coach-inputbar>.coach-send{view-transition-name:fuss-senden;view-transition-class:kapsel-inhalt}
 
 ::view-transition-group(*){animation-duration:.38s;animation-timing-function:cubic-bezier(.22,.9,.24,1)}
 /* Die Seite selbst blendet nur kurz über (Standard-Überblendung, kürzer). */
@@ -16848,11 +16845,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    und wird auf die gleitende Größe gezogen, ohne doppelten Rand. */
 ::view-transition-old(*.kapsel){display:none}
 ::view-transition-new(*.kapsel){height:100%;animation:none}
-/* Gedächtnis hat keine Fußkapsel: Dort blendet sie ganz aus oder ein. */
-::view-transition-old(*.kapsel):only-child{display:block;height:100%;animation:kapsel-weg .2s ease-out both}
-::view-transition-new(*.kapsel):only-child{animation:kapsel-her .22s ease-out .06s both}
-::view-transition-old(*.kapsel-inhalt){animation:kapsel-weg .14s ease-out both}
-::view-transition-new(*.kapsel-inhalt){animation:kapsel-her .22s ease-out .14s both}
+/* Menüband und Chat-Leiste blenden als Ganzes ineinander über (gleicher
+   Rahmen, gleiche Größe) und federn dabei kurz größer, wie beim Antippen
+   eines Reiters. Auf der Gedächtnis-Seite gibt es keine Leiste: Dort blendet
+   sie nur aus oder ein. */
+::view-transition-image-pair(fuss-kapsel){animation:kapsel-federn .42s cubic-bezier(.3,.7,.4,1) both}
+::view-transition-old(fuss-kapsel),::view-transition-new(fuss-kapsel){animation-duration:.3s}
+@keyframes kapsel-federn{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
+::view-transition-old(*.kapsel-inhalt){animation:kapsel-weg .18s ease-out both}
+::view-transition-new(*.kapsel-inhalt){animation:kapsel-her .24s ease-out .08s both}
 @keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
 
