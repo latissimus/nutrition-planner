@@ -1181,8 +1181,11 @@ function appDexShellZeichnen(route, view) {
 
   reiterleisteBinden(tabLeiste);
   // Kam die Seite nicht über einen Tipp auf die Leiste (etwa über den Kopf
-  // oder den Zurück-Pfeil), rückt die Leiste hier nach.
+  // oder den Zurück-Pfeil), rückt die Leiste hier nach. Nach einem Tipp läuft
+  // das Scrollen schon: Ein zweites scrollTo mitten darin startete es von der
+  // aktuellen Stelle neu – die Leiste hielt kurz an und fuhr wieder los.
   requestAnimationFrame(() => {
+    if (performance.now() - letzterLeistenTipp < 1000) return;
     const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
     const ziel = aktiv ? reiterZiel(tabLeiste, aktiv) : null;
     if (ziel != null) leisteRuecken(tabLeiste, ziel);
