@@ -1006,6 +1006,7 @@ function reiterleisteBinden(tabLeiste) {
      CAPCOINS, Eintragsseite) steht man nicht auf dieser Seite – dort bleibt
      der Reiter ein normaler Verweis und bringt einen zurück. */
   tabLeiste.addEventListener('click', (event) => {
+    const tippStart = performance.now();
     const { view, istNebenansicht, aktiveDockRoute } = dockZustand;
     const reiter = event.target.closest?.('.app-dex-tab');
     const oeffnetMenue = Boolean(reiter) && !istNebenansicht
@@ -1026,6 +1027,7 @@ function reiterleisteBinden(tabLeiste) {
         const ziel = reiterZiel(tabLeiste, reiter);
         if (ziel != null) leisteRuecken(tabLeiste, ziel);
       }
+      ruckelMarke(`Tipp verarbeitet ${Math.round(performance.now() - tippStart)} ms`);
     }
     /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
        Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
@@ -1789,6 +1791,7 @@ function animationenAnstossen() {
     const notfall = setTimeout(weiter, 80);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       clearTimeout(notfall);
+      ruckelMarke('zwei Frames gewartet');
       weiter();
     }));
   });

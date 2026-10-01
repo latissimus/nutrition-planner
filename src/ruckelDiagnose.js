@@ -1,3 +1,5 @@
+import { tonDauerBeobachten } from './uiSounds.js';
+
 /* Vorübergehende Messung für ruckelnde Symbole (nur auf Wunsch aktiv).
    Fünfmal schnell auf das CAPBOY-Logo tippen schaltet sie ein oder aus. Nach
    jedem Tipp zeichnet sie 1,5 Sekunden lang pro Frame auf, wo die sichtbaren
@@ -63,7 +65,9 @@ function messen() {
   beobachter.observe(document.body, { childList: true, subtree: true });
   const ausfaelle = [];
   let vorher = start;
+  let ersterFrame = true;
   const frame = (jetzt) => {
+    if (ersterFrame) { ersterFrame = false; ruckelMarke('erster Frame'); }
     if (jetzt - vorher > 34) ausfaelle.push(`${Math.round(vorher - start)}–${Math.round(jetzt - start)} ms`);
     vorher = jetzt;
     for (const ziel of ziele) {
@@ -89,6 +93,8 @@ function messen() {
     marken = null;
     const bewegt = ziele.filter((ziel) => ziel.max > 0.2 || ziel.weg != null);
     const zeilen = [
+      `Ablauf (ms): ${ablauf.length ? ablauf.join(' · ') : '–'}`,
+      `Ausgefallene Frames: ${ausfaelle.length ? ausfaelle.slice(0, 8).join(', ') : 'keine'}`,
       `Symbole gemessen: ${ziele.length}`,
       `Bewegt/ersetzt: ${bewegt.length}`,
       ...bewegt.slice(0, 14).map((ziel) => (ziel.weg != null
@@ -96,8 +102,6 @@ function messen() {
         : `• ${ziel.name} – max ${ziel.max.toFixed(1)} px, Schritte ${ziel.spruenge.slice(0, 6).join(' ')}`)),
       `Ausgetauschte Knoten: ${ersetzt.length}`,
       ...ersetzt.slice(0, 6).map((zeile) => `• ${zeile}`),
-      `Ausgefallene Frames: ${ausfaelle.length ? ausfaelle.slice(0, 8).join(', ') : 'keine'}`,
-      `Ablauf (ms): ${ablauf.length ? ablauf.join(' · ') : '–'}`,
     ];
     tafelZeigen(zeilen.join('\n'));
   }
@@ -119,6 +123,7 @@ function tafelZeigen(text) {
 }
 
 export function ruckelDiagnoseEinrichten() {
+  tonDauerBeobachten((cue, dauer) => ruckelMarke(`Ton ${cue} ${Math.round(dauer)} ms`));
   let logoTipps = [];
   document.addEventListener('click', (event) => {
     if (!event.target.closest?.('.app-dex-brand')) return;
