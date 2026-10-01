@@ -847,7 +847,6 @@ html.tastatur-bedienung :focus-visible{outline:3px solid var(--pink);outline-off
 .push-onboarding-aktionen{display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-left:auto}
 .push-onboarding-aktionen button{min-height:38px;padding:0 15px;border-radius:10px;font:800 13px/1 var(--ui);cursor:pointer}
 .push-onboarding-nein{border:0;background:transparent;color:#5A4708}
-.push-onboarding-nein:active{background:rgba(0,0,0,.08)}
 .push-onboarding-ja{border:var(--kontur) solid var(--kontur-farbe);background:#3A2E05;color:#FFFFFF}
 :root[data-theme="dark"] .push-onboarding{
   border-color:var(--kontur-farbe);background:#4A3D12;color:#FFFFFF;box-shadow:0 8px 24px rgba(0,0,0,.45);
@@ -2034,7 +2033,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
 .routine-row.swipe-aktiv .routine-row-inhalt{transition:none}
 .routine-row:last-child{border-bottom:0}
 .routine-check{position:relative;display:grid;place-items:center;width:27px;height:27px;padding:0;border:var(--kontur) solid var(--kontur-farbe);border-radius:50%;background:#fff;color:#000}
-.routine-check:active{transform:none!important;box-shadow:none!important}
 .routine-check>.material-svg{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:18px;height:18px;transform:translate(-50%,-50%);line-height:0}
 .routine-check>.material-svg>svg{display:block;width:18px;height:18px;margin:0;fill:#000}
 .routine-check .material-svg svg *{fill:#000}
@@ -2216,7 +2214,6 @@ button,a,[role="button"],summary{touch-action:manipulation;
   display:-webkit-box;overflow:hidden;color:var(--muted);font-size:12px;line-height:1.3;
   -webkit-box-orient:vertical;-webkit-line-clamp:1;margin-bottom:0;
 }
-.dex-inhaltskarte.eigenes-rezept:active{transform:none;box-shadow:var(--hart)}
 
 .dex-eintraege{margin:24px 2px 8px}
 .dex-eintrag-gruppe{margin:0 0 28px}
@@ -3382,7 +3379,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding:10px 8px;border:0;border-bottom:var(--kontur) solid color-mix(in srgb,var(--ink) 16%,transparent);
   background:transparent;color:var(--text);text-align:left;cursor:pointer}
 .einkauf-rezept:last-child{border-bottom:0}
-.einkauf-rezept:active{background:color-mix(in srgb,var(--ordner) 10%,transparent)}
 .einkauf-rezept-titel{font-size:14.5px;font-weight:700}
 .einkauf-rezept-auszug{color:var(--muted);font-size:11.5px;line-height:1.35;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -3394,7 +3390,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding:6px 4px;background:var(--app-field)}
 .einkauf-import-zeile{display:flex;align-items:flex-start;gap:10px;
   padding:8px 8px;border-radius:8px;cursor:pointer}
-.einkauf-import-zeile:hover,.einkauf-import-zeile:active{background:color-mix(in srgb,var(--ordner) 10%,transparent)}
 .einkauf-import-zeile input[type="checkbox"]{flex:0 0 auto;width:20px;height:20px;
   margin-top:1px;accent-color:var(--ordner)}
 .einkauf-import-zeile span{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.35;color:var(--text);
@@ -4192,9 +4187,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button+button,:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button+button{
   border-top:1px solid #000!important;
 }
-:is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) button:active,:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) button:active{
-  background:transparent!important;
-}
 :is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) .material-svg,:is(.neo-dex-page,.food-dex-page,.special-dex-page) :is(.neo-dex-action-popover,.food-dex-action-popover) svg,:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) .material-svg,:is(.neo-dex-entry-view,.food-dex-entry-view) :is(.neo-dex-action-popover,.food-dex-action-popover) svg{
   width:19px!important;
   height:19px!important;
@@ -4904,9 +4896,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   cursor:pointer;
   -webkit-appearance:none;
   appearance:none;
-}
-:root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-info:active{
-  transform:none;
 }
 :root[data-seite="reminders"] .meal-log-dex-page .nutrition-calibration-help{
   margin:-10px 0 14px;
@@ -8284,7 +8273,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .app-dex-menu-icon svg{display:block;width:44px;height:44px;max-width:100%;max-height:100%}
 /* Der globale button:active-Effekt darf den Knopf samt Trennlinie nicht
    verschieben. Der darin liegende LOGMAN-Computer reagiert separat. */
-.app-dex-menu:active,.app-dex-menu.ist-gedrueckt{
+.app-dex-menu.ist-gedrueckt{
   transform:none!important;
   box-shadow:none!important;
 }
@@ -8303,7 +8292,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   overflow:visible;
 }
 .app-dex-menu .menue-computer-front{transition:transform 70ms ease-out}
-.app-dex-menu:active .menue-computer-schatten,
 .app-dex-menu.ist-gedrueckt .menue-computer-schatten{
   opacity:0;
 }
@@ -9242,11 +9230,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   border-radius:8px!important;
   background:transparent!important;
   color:var(--text,#111)!important;
-  box-shadow:none!important;
-}
-.dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-action-button,.food-dex-action-button):active{
-  background:var(--cap-tint)!important;
-  transform:none!important;
   box-shadow:none!important;
 }
 .dex-detail-popup>.dex-detail-card-actions :is(.neo-dex-more-dots,.food-dex-more-dots){margin:auto!important;gap:3px!important}
@@ -11557,7 +11540,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .ypsi-priority-list{display:grid;margin-inline:-14px;border-block:1px solid color-mix(in srgb,var(--dex-accent,#FF277F) 24%,#ddd)}
 :root[data-seite="body"] .ypsi-priority-list>button{display:grid;grid-template-columns:34px minmax(0,1fr) 20px;align-items:center;gap:10px;width:100%;min-height:70px;padding:10px 14px;border:0;border-bottom:1px solid #dedede;background:#fff;color:#111;text-align:left;box-shadow:none}
 :root[data-seite="body"] .ypsi-priority-list>button:last-child{border-bottom:0}
-:root[data-seite="body"] .ypsi-priority-list>button:active{background:color-mix(in srgb,var(--dex-accent,#FF277F) 9%,#fff)}
 :root[data-seite="body"] .ypsi-priority-list>button>i{display:grid;place-items:center;width:32px;height:32px;border:var(--kontur) solid var(--kontur-farbe);border-radius:50%;color:var(--dex-ink,#111111);font:850 14px/1 var(--tech);font-style:normal}
 :root[data-seite="body"] .ypsi-priority-list>button>span{display:grid;min-width:0;gap:2px}
 :root[data-seite="body"] .ypsi-priority-list>button b{color:#111!important;font:800 13px/1.2 "Work Sans",var(--ui),sans-serif}
@@ -11634,7 +11616,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .falten-legende-liste{display:grid;margin-inline:-18px;border-block:1px solid #ddd}
 :root[data-seite="body"] .falten-legende-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;min-height:58px;padding:10px 18px;border:0;border-bottom:1px solid #e3e3e3;background:#fff;color:#111;text-align:left;box-shadow:none}
 :root[data-seite="body"] .falten-legende-item:last-child{border-bottom:0}
-:root[data-seite="body"] .falten-legende-item:active{background:var(--cap-tint,#f7f3ff)}
 :root[data-seite="body"] .falten-item-head{display:grid;min-width:0;gap:3px}
 :root[data-seite="body"] .falten-item-head>b{color:#111!important;font:800 12px/1.2 "Work Sans",var(--ui),sans-serif}
 :root[data-seite="body"] .falten-item-head>small{overflow:hidden;color:#5C5F66!important;font:500 9.5px/1.3 var(--tech)!important;text-overflow:ellipsis;white-space:nowrap}
@@ -11755,7 +11736,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-seite="body"] .braverman-question>p{margin:0;color:#5C5F66;font:550 11.5px/1.45 var(--tech)}
 :root[data-seite="body"] .braverman-question>div{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}
 :root[data-seite="body"] .braverman-question>div>button{min-height:50px;border:var(--kontur) solid var(--kontur-farbe);border-radius:12px;background:#fff;color:#111;font:800 14px/1 var(--ui);box-shadow:none}
-:root[data-seite="body"] .braverman-question>div>button:active,:root[data-seite="body"] .braverman-question>div>button.selected{background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF)}
+:root[data-seite="body"] .braverman-question>div>button.selected{background:var(--dex-ink,#FF277F);color:var(--dex-ink-schrift,#FFFFFF)}
 :root[data-seite="body"] .braverman-nav{display:grid;grid-template-columns:1fr;gap:9px}
 :root[data-seite="body"] .braverman-nav>button,:root[data-seite="body"] .braverman-result-actions>button{min-height:48px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:#fff;color:#111;font:750 12px/1.2 var(--ui);box-shadow:none}
 :root[data-seite="body"] .braverman-nav>[data-braverman-pause]{grid-row:1;border-color:var(--kontur-farbe)!important;background:var(--dex-ink,#FF277F)!important;color:var(--dex-ink-schrift,#FFFFFF)!important;-webkit-text-fill-color:var(--dex-ink-schrift,#FFFFFF)!important;box-shadow:none!important}
@@ -12182,90 +12163,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="training"] :is(.neo-dex-page,.food-dex-page) .dex-leer-symbol i::after,
 :root[data-theme="dark"] /* ============================================================ BODY-LOG Breite Special-Dex-Vorlage: Zahlen-Hero,
 :root[data-theme="dark"] eine gerahmte Übersicht und danach ruhige,
-:root[data-theme="dark"] flache Messkarten. Körperfett wird bewusst nicht geschätzt. ============================================================ */ :root[data-seite="body"],
-:root[data-theme="dark"][data-seite="body"] body,
-:root[data-theme="dark"][data-seite="body"] .body-v2-ring,
-:root[data-theme="dark"][data-seite="body"] .body-v2-ring::after,
-:root[data-theme="dark"][data-seite="body"] .body-v2-overview,
-:root[data-theme="dark"][data-seite="body"] .body-v2-card-body,
-:root[data-theme="dark"][data-seite="body"] .body-v2-overview .body-v2-card-body,
-:root[data-theme="dark"][data-seite="body"] .body-analysis-help,
-:root[data-theme="dark"][data-seite="body"] .body-chart-empty,
-:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation,
-:root[data-theme="dark"][data-seite="body"] .body-goal-status,
-:root[data-theme="dark"][data-seite="body"] .body-weight-history>ol,
-:root[data-theme="dark"][data-seite="body"] .guided-fold-grid fieldset,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-log-dex-page::before,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring::after,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values>span,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-section,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-stats>div,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page::before,
-:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring,
-:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring::after,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-anhaenge,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head,
-:root[data-theme="dark"] .coin-dex-page .coin-next,
-:root[data-theme="dark"] .coin-dex-page .coin-reward,
-:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,
-:root[data-theme="dark"][data-seite="profile"] .avatar,
-:root[data-theme="dark"][data-seite="profile"] .profile-datei,
-:root[data-theme="dark"][data-seite="profile"] :is(.themeseg,.sammlungs-sortierung),
-:root[data-theme="dark"][data-seite="body"] :is(.body-v2-overview,.body-v2-card,.body-v2-card-body,.body-analysis-help),
-:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
-:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after,
-:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p),
-:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,
-:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after,
-:root[data-theme="dark"][data-seite="stress"] .app-dex-dock::after,
-:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst-gruppe>div>span,.coin-verdienst-frei),
-:root[data-theme="dark"][data-seite="reminders"],
-:root[data-theme="dark"][data-seite="reminders"] :is(#app,#view),
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after,
-:root[data-theme="dark"][data-seite="reminders"] .app-dex-dock::after,
-:root[data-theme="dark"][data-seite="shopping"],
-:root[data-theme="dark"][data-seite="shopping"] body,
-:root[data-theme="dark"][data-seite="shopping"] :is(#app,#view),
-:root[data-theme="dark"][data-seite="shopping"] .app-dex-dock::after,
-:root[data-theme="dark"][data-seite="supps"],
-:root[data-theme="dark"][data-seite="supps"] body,
-:root[data-theme="dark"][data-seite="supps"] :is(#app,#view),
-:root[data-theme="dark"][data-seite="supps"] .app-dex-dock::after,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring::after,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block,
-:root[data-theme="dark"][data-seite="body"] .ypsi-top-fold,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-reason,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview,
-:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form,
-:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities>div>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-background,
-:root[data-theme="dark"][data-seite="body"] .ypsi-inactive-notice,
-:root[data-theme="dark"][data-seite="body"] .falten-legende-item:active,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-status,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-section,
-:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values)>div,
-:root[data-theme="dark"][data-seite="body"] .ypsi-detail-values>span,
-:root[data-theme="dark"][data-seite="body"] .ypsi-relation,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-form fieldset,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-priority,
-:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label,
-:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item,
-:root[data-theme="dark"][data-seite="body"] .ypsi-protocol-conditions,
-:root[data-theme="dark"][data-seite="body"] .braverman-intro,
-:root[data-theme="dark"][data-seite="body"] .braverman-progress>span,
-:root[data-theme="dark"][data-seite="body"] .braverman-result-focus,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores span,
-:root[data-theme="dark"][data-seite="body"] .braverman-score-list i,
-:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy,
-:root[data-theme="dark"][data-seite="profile"],
-:root[data-theme="dark"][data-seite="profile"] body,
-:root[data-theme="dark"][data-seite="profile"] :is(#app,#view),
-:root[data-theme="dark"][data-seite="profile"] .app-dex-dock::after{
+:root[data-theme="dark"] flache Messkarten. Körperfett wird bewusst nicht geschätzt. ============================================================ */ :root[data-seite="body"],:root[data-theme="dark"][data-seite="body"] body,:root[data-theme="dark"][data-seite="body"] .body-v2-ring,:root[data-theme="dark"][data-seite="body"] .body-v2-ring::after,:root[data-theme="dark"][data-seite="body"] .body-v2-overview,:root[data-theme="dark"][data-seite="body"] .body-v2-card-body,:root[data-theme="dark"][data-seite="body"] .body-v2-overview .body-v2-card-body,:root[data-theme="dark"][data-seite="body"] .body-analysis-help,:root[data-theme="dark"][data-seite="body"] .body-chart-empty,:root[data-theme="dark"][data-seite="body"] .body-threshold-explanation,:root[data-theme="dark"][data-seite="body"] .body-goal-status,:root[data-theme="dark"][data-seite="body"] .body-weight-history>ol,:root[data-theme="dark"][data-seite="body"] .guided-fold-grid fieldset,:root[data-theme="dark"][data-seite="sleep"] .sleep-log-dex-page::before,:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring,:root[data-theme="dark"][data-seite="sleep"] .sleep-duration-ring::after,:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-values>span,:root[data-theme="dark"][data-seite="sleep"] .sleep-plan-comparison,:root[data-theme="dark"][data-seite="sleep"] .sleep-section,:root[data-theme="dark"][data-seite="sleep"] .sleep-stats>div,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page::before,:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring,:root[data-theme="dark"][data-seite="habits"] .routine-progress-ring::after,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-anhaenge,:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe,:root[data-theme="dark"][data-seite="shopping"] .einkauf-gruppe .reminder-group-head,:root[data-theme="dark"] .coin-dex-page .coin-next,:root[data-theme="dark"] .coin-dex-page .coin-reward,:root[data-theme="dark"][data-seite="profile"] .profile-abschnitt,:root[data-theme="dark"][data-seite="profile"] .avatar,:root[data-theme="dark"][data-seite="profile"] .profile-datei,:root[data-theme="dark"][data-seite="profile"] :is(.themeseg,.sammlungs-sortierung),:root[data-theme="dark"][data-seite="body"] :is(.body-v2-overview,.body-v2-card,.body-v2-card-body,.body-analysis-help),:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,:root[data-theme="dark"][data-seite="food-log"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after,:root[data-theme="dark"][data-seite="sleep"] :is(.sleep-checkin-values>span,.sleep-plan-comparison,.sleep-stats>div,.sleep-insights p),:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::before,:root[data-theme="dark"][data-seite="stress"] :is(.neo-dex-page,.food-dex-page) .sammlung-leer .dex-leer-symbol i::after,:root[data-theme="dark"][data-seite="stress"] .app-dex-dock::after,:root[data-theme="dark"][data-seite="coins"] .coin-dex-page :is(.coin-verdienst-gruppe>div>span,.coin-verdienst-frei),:root[data-theme="dark"][data-seite="reminders"],:root[data-theme="dark"][data-seite="reminders"] :is(#app,#view),:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .nutrition-coin-hero .nutrition-ring::after,:root[data-theme="dark"][data-seite="reminders"] .app-dex-dock::after,:root[data-theme="dark"][data-seite="shopping"],:root[data-theme="dark"][data-seite="shopping"] body,:root[data-theme="dark"][data-seite="shopping"] :is(#app,#view),:root[data-theme="dark"][data-seite="shopping"] .app-dex-dock::after,:root[data-theme="dark"][data-seite="supps"],:root[data-theme="dark"][data-seite="supps"] body,:root[data-theme="dark"][data-seite="supps"] :is(#app,#view),:root[data-theme="dark"][data-seite="supps"] .app-dex-dock::after,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-progress-ring::after,:root[data-theme="dark"][data-seite="body"] .ypsi-priority-block,:root[data-theme="dark"][data-seite="body"] .ypsi-top-fold,:root[data-theme="dark"][data-seite="body"] .ypsi-priority-comparison>span,:root[data-theme="dark"][data-seite="body"] .ypsi-priority-reason,:root[data-theme="dark"][data-seite="body"] .ypsi-relations-overview,:root[data-theme="dark"][data-seite="body"] .ypsi-basis-form,:root[data-theme="dark"][data-seite="body"] .ypsi-observed-priorities>div>span,:root[data-theme="dark"][data-seite="body"] .ypsi-background,:root[data-theme="dark"][data-seite="body"] .ypsi-inactive-notice,:root[data-theme="dark"][data-seite="body"] .falten-detail-status,:root[data-theme="dark"][data-seite="body"] .falten-detail-section,:root[data-theme="dark"][data-seite="body"] :is(.falten-detail-norm,.ypsi-detail-values)>div,:root[data-theme="dark"][data-seite="body"] .ypsi-detail-values>span,:root[data-theme="dark"][data-seite="body"] .ypsi-relation,:root[data-theme="dark"][data-seite="body"] .skinfold-context-form fieldset,:root[data-theme="dark"][data-seite="body"] .skinfold-context-priority,:root[data-theme="dark"][data-seite="body"] .skinfold-context-question label,:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item,:root[data-theme="dark"][data-seite="body"] .ypsi-protocol-conditions,:root[data-theme="dark"][data-seite="body"] .braverman-intro,:root[data-theme="dark"][data-seite="body"] .braverman-progress>span,:root[data-theme="dark"][data-seite="body"] .braverman-result-focus,:root[data-theme="dark"][data-seite="body"] .neurotransmitter-other-scores span,:root[data-theme="dark"][data-seite="body"] .braverman-score-list i,:root[data-theme="dark"][data-seite="body"] .neurotransmitter-strategy,:root[data-theme="dark"][data-seite="profile"],:root[data-theme="dark"][data-seite="profile"] body,:root[data-theme="dark"][data-seite="profile"] :is(#app,#view),:root[data-theme="dark"][data-seite="profile"] .app-dex-dock::after{
   background:var(--app-card)!important;
 }
 :root[data-theme="dark"] .routine-timer-exercises li>span,
@@ -12442,37 +12340,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="dark"][data-seite="body"] .skinfold-context-question label:has(input:checked){
   border-color:var(--app-outline)!important;
 }
-:root[data-theme="dark"] .sleep-mini-switch input:checked+span::after,
-:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,
-:root[data-theme="dark"] .mahl-mini-switch-track,
-:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
-:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,
-:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"][data-seite="body"] .body-v2-overview>summary,
-:root[data-theme="dark"][data-seite="body"] .body-v2-card>header,
-:root[data-theme="dark"][data-seite="body"] .body-skinfold-history .ist-unvollstaendig>summary,
-:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline-track,
-:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview>summary,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-row-inhalt,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-suche,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-row-inhalt,
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt,
-:root[data-theme="dark"] .coin-dex-page .coin-verdienst>summary,
-:root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,
-:root[data-theme="dark"] .wissenssuche-feld,
-:root[data-theme="dark"] .wissenssuche-gruppe>div,
-:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,
-:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge),
-:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"],
-:root[data-theme="dark"][data-seite="profile"] .switchline-track::after,
-:root[data-theme="dark"][data-seite="body"] .ypsi-priority-list>button:active,
-:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions,
-:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions.is-complete,
-:root[data-theme="dark"][data-seite="body"] .falten-detail-header,
-:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>header,
-:root[data-theme="dark"][data-seite="body"] .braverman-safety button{
+:root[data-theme="dark"] .sleep-mini-switch input:checked+span::after,:root[data-theme="dark"] .sleep-setting-switch input:checked+.sleep-switch-track::after,:root[data-theme="dark"] .mahl-mini-switch-track,:root[data-theme="dark"] .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,:root[data-theme="dark"] .rem-switch input:checked~.rem-switch-thumb::after,:root[data-theme="dark"] .switchline input:checked~.switchline-track::after,:root[data-theme="dark"][data-seite="body"] .body-v2-overview>summary,:root[data-theme="dark"][data-seite="body"] .body-v2-card>header,:root[data-theme="dark"][data-seite="body"] .body-skinfold-history .ist-unvollstaendig>summary,:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline-track,:root[data-theme="dark"][data-seite="body"] .body-reminder-settings .switchline input:checked~.switchline-track::after,:root[data-theme="dark"][data-seite="sleep"] .sleep-checkin-overview>summary,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-zeitblock>header,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page .routine-row-inhalt,:root[data-theme="dark"][data-seite="shopping"] .einkauf-suche,:root[data-theme="dark"][data-seite="shopping"] .einkauf-row-inhalt,:root[data-theme="dark"][data-seite="shopping"] .einkauf-row.ist-ausgewaehlt .einkauf-row-inhalt,:root[data-theme="dark"] .coin-dex-page .coin-verdienst>summary,:root[data-theme="dark"][data-seite="profile"] .switchline input:checked~.switchline-track::after,:root[data-theme="dark"] .wissenssuche-feld,:root[data-theme="dark"] .wissenssuche-gruppe>div,:root[data-theme="dark"][data-seite="reminders"] .meal-log-dex-page .mahl-mini-switch input:checked+.mahl-mini-switch-track::after,:root[data-theme="dark"][data-seite="habits"] .routine-dex-page :is(.routine-row-inhalt,.routine-anhaenge),:root[data-theme="dark"][data-seite="shopping"] .einkauf-row input[type="checkbox"],:root[data-theme="dark"][data-seite="profile"] .switchline-track::after,:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions,:root[data-theme="dark"][data-seite="body"] .ypsi-open-questions.is-complete,:root[data-theme="dark"][data-seite="body"] .falten-detail-header,:root[data-theme="dark"][data-seite="body"] .falten-protokoll-item>header,:root[data-theme="dark"][data-seite="body"] .braverman-safety button{
   background:var(--app-field)!important;
 }
 :root[data-theme="dark"][data-seite="auth"] .auth-shell [data-auth-form] .input,
