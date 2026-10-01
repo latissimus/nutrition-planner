@@ -60,6 +60,19 @@ function tonFreigeben() {
   }
 }
 
+/* Die Töne werden beim ersten Abspielen auf dem Hauptthread berechnet und erst
+   danach zwischengespeichert – gemessen bis zu 29 ms je Ton am Desktop, auf
+   dem iPhone ein Mehrfaches. Das fiel genau in den Moment des Tippens und
+   verzögerte den ersten Frame. Die häufigen Töne werden deshalb in einer
+   ruhigen Phase vorberechnet, sobald ein Player entsteht. */
+const HAEUFIGE_TOENE = ['forward', 'back', 'hover', 'expand', 'collapse', 'check', 'uncheck',
+  'typing', 'skip-next', 'skip-previous', 'achievement'];
+function vorladen(neuerPlayer) {
+  const start = () => { neuerPlayer?.preload?.(HAEUFIGE_TOENE)?.catch?.(() => {}); };
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(start, { timeout: 2000 });
+  else setTimeout(start, 400);
+}
+
 function player(kind = 'interface') {
   if (typeof window === 'undefined') return null;
   const context = ensureContext() || undefined;
@@ -67,9 +80,12 @@ function player(kind = 'interface') {
     routinePlayer ||= createUISFX({ pack: 'arcade', volume: soundVolume, enabled: true, cooldownMs: 35, context });
     return routinePlayer;
   }
-  interfacePlayer ||= createUISFX({
-    pack: 'arcade', volume: soundVolume, enabled: interfaceSoundsEnabled(), cooldownMs: 45, context,
-  });
+  if (!interfacePlayer) {
+    interfacePlayer = createUISFX({
+      pack: 'arcade', volume: soundVolume, enabled: interfaceSoundsEnabled(), cooldownMs: 45, context,
+    });
+    vorladen(interfacePlayer);
+  }
   return interfacePlayer;
 }
 
@@ -88,8 +104,16 @@ export function setInterfaceSoundsEnabled(enabled) {
 }
 
 export function playInterfaceSound(cue = 'snap', options) {
-  return player()?.play(cue, { ...(options || {}), volume: soundVolume }) || null;
+  const start = performance.now();
+  const ergebnis = player()?.play(cue, { ...(options || {}), volume: soundVolume }) || null;
+  const dauer = performance.now() - start;
+  if (dauer > 2) tonDauerMelden?.(cue, dauer);
+  return ergebnis;
 }
+
+// Für die vorübergehende Ruckel-Messung: meldet langsame Töne.
+let tonDauerMelden = null;
+export function tonDauerBeobachten(melden) { tonDauerMelden = melden; }
 
 // Routine-Sounds sind bewusst NICHT an den Interface-Schalter gekoppelt.
 // Meditationen rufen diese Funktion nicht auf und behalten ihre eigenen
@@ -165,10 +189,23 @@ export function initInterfaceSounds(root = document) {
   for (const typ of ['touchend', 'pointerup', 'click', 'keydown']) {
     root.addEventListener(typ, tonFreigeben, { capture: true, passive: true });
   }
-  // Nach Hintergrund oder Rückkehr aus dem Seitenspeicher beim nächsten Tippen
-  // mit frischem Kontext weiter.
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') neuAnlegen = true; });
-  window.addEventListener('pageshow', (event) => { if (event.persisted) neuAnlegen = true; });
+  // Nach Hintergrund oder Rückkehr aus dem Seitenspeicher mit frischem Kontext
+  // weiter. Neu angelegt wird schon beim Zurückkommen, nicht erst beim
+  // nächsten Tippen: So sind die Töne vorberechnet, bevor getippt wird. Der
+  // neue Kontext ist bis zur nächsten Geste angehalten; tonFreigeben weckt ihn.
+  const frischAnlegen = () => {
+    neuAnlegen = false;
+    kontextVerwerfen();
+    if (interfaceSoundsEnabled()) player();
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') neuAnlegen = true;
+    else if (neuAnlegen) frischAnlegen();
+  });
+  window.addEventListener('pageshow', (event) => { if (event.persisted) frischAnlegen(); });
+  // Gleich zum Start anlegen und vorberechnen, damit schon der erste Tipp
+  // nicht rechnen muss.
+  if (interfaceSoundsEnabled()) player();
   root.addEventListener('input', (event) => {
     const field = event.target;
     if (field instanceof Element && isTextEntry(field) && !field.matches('[data-no-interface-sound]')) {
