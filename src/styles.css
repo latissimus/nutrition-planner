@@ -16081,7 +16081,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ui-schrift)!important;
 }
 :root[data-theme][data-seite] #app .app-dex-kapsel>*+*{border-left:1px solid var(--trennstrich)!important}
-:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 10px 0 8px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{padding:0 8px 0 12px!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:var(--ui-schrift)!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-gedaechtnis{gap:7px!important;padding:0 12px 0 10px!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel .app-dex-zurueck-pfeil{width:16px!important;height:16px!important}

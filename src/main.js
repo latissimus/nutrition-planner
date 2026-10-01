@@ -867,8 +867,10 @@ function appDexShellZeichnen(route, view) {
     : (getComputedStyle(document.documentElement).getPropertyValue('--dex-seitenfarbe').trim()
       || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
   /* Überall derselbe Kopf: Logo links, rechts eine Kapsel und das Profilbild.
-     Auf den Coach-Seiten trägt die Kapsel Zurück und Gedächtnis statt Coach,
-     Suche und CAPCOINS. */
+     Reihenfolge CAPCOINS, Suche, Coach: Die Coin-Anzeige wächst mit dem
+     Kontostand nach links, Suche und Coach bleiben an ihrem Platz, und der
+     Coach sitzt neben dem Profilbild am besten erreichbar. Auf den
+     Coach-Seiten trägt die Kapsel Zurück und Gedächtnis. */
   header.innerHTML = `
     <div class="app-dex-header-inner">
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
@@ -879,11 +881,11 @@ function appDexShellZeichnen(route, view) {
         <a class="app-dex-gedaechtnis" href="#coach-wissen" aria-label="Gedächtnis: Was der Coach über mich weiß" title="Was der Coach über mich weiß"${route === 'coach-wissen' ? ' aria-current="page"' : ''}>${gedaechtnisIconMarkup('app-dex-gedaechtnis-icon')}<span>Gedächtnis</span></a>
         </span>` : `
         <span class="app-dex-kapsel">
-        <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
-           aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
+        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
-        ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
+        <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
+           aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
         </span>`}
         <span class="app-dex-sync save-dot" role="status"></span>
         <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
