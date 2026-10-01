@@ -843,10 +843,8 @@ function appSyncStatusAktualisieren() {
   status.setAttribute('aria-label', status.title);
 }
 
-/* Antippen eines Reiters: Die Kapsel der Leiste federt kurz und leicht
-   größer, wie beim Übergang zum Chat. Nur Rahmen und Fläche (::before)
-   bewegen sich – mitskalierte Symbole wirkten beim Zurückfedern kurz zu
-   klein. */
+/* Antippen eines Reiters: Die ganze Leiste federt kurz und leicht größer,
+   wie beim Übergang zum Chat. */
 function leisteFedernLassen(leiste) {
   leiste.classList.remove('ist-angetippt');
   void leiste.offsetWidth;
@@ -936,7 +934,9 @@ function appDexShellZeichnen(route, view) {
      Punkte als Hinweis. */
   /* Die Kapsel selbst bleibt beim Neuzeichnen bestehen, nur die Reiter
      werden ersetzt. So läuft ihr Federn nach dem Antippen ungestört weiter,
-     auch wenn die neue Seite die Leiste mitten darin neu zeichnet. */
+     auch wenn die neue Seite die Leiste mitten darin neu zeichnet. Früher
+     entstand dabei eine neue Leiste, die für ein Bild auf Normalgröße
+     zurücksprang – die Symbole wirkten kurz zu klein. */
   let leiste = dock.querySelector(':scope > .app-dex-dock-inner');
   if (!leiste) {
     leiste = document.createElement('div');

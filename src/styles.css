@@ -16862,10 +16862,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
 
-/* Reiter antippen: Die Kapsel federt kurz (main.js: leisteFedernLassen),
-   dieselbe Bewegung wie beim Übergang zum Chat. Nur Rahmen und Fläche, die
-   Symbole bleiben ruhig und scharf. */
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt::before{animation:leiste-federn .52s both}
+/* Reiter antippen: Die ganze Leiste samt Symbolen federt kurz
+   (main.js: leisteFedernLassen), dieselbe Bewegung wie beim Übergang zum
+   Chat. will-change hält die Leiste dauerhaft auf einer eigenen Ebene: So
+   rechnet iOS sie zu Beginn und Ende des Federns nicht neu, und die Symbole
+   springen dabei nicht kurz in der Größe. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{will-change:transform}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:leiste-federn .52s both}
 @media (prefers-reduced-motion:reduce){
-  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt::before{animation:none}
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:none}
 }
