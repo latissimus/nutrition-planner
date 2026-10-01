@@ -173,7 +173,8 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     ${next ? `<section class="coin-next special-dex-wide-card"><span><b>Nächste Belohnung</b><small>${escapeHtml(next.name)} · ${next.cost} CAPCOINS</small></span><strong>${Math.max(0, next.cost - balance)} fehlen</strong><div class="coin-progress"><i style="width:${progress}%"></i></div></section>` : ''}
     <header class="coin-section-title"><h2>Deine Belohnungen</h2></header>
     <section class="coin-reward-list">${(rewards || []).length ? rewards.map((item) => rewardMarkup(item, balance)).join('') : '<div class="coin-empty"><b>Noch keine Belohnung</b><span>Lege etwas fest, auf das du dich wirklich freust.</span></div>'}</section>
-    ${(ledger || []).length ? `<h2 class="coin-history-title">Zuletzt</h2><section class="coin-history">${ledger.slice(0, 8).map((item) => `<div><span>${escapeHtml(historyText(item))}<small>${new Date(item.created_at).toLocaleDateString('de-DE')}</small></span><b class="${item.amount > 0 ? 'plus' : 'minus'}">${item.amount > 0 ? '+' : ''}${item.amount}</b></div>`).join('')}</section>` : ''}`;
+    ${(ledger || []).length ? `<h2 class="coin-history-title">Zuletzt</h2><section class="coin-history">${ledger.slice(0, 8).map((item) => `<div><span>${escapeHtml(historyText(item))}<small>${new Date(item.created_at).toLocaleDateString('de-DE')}</small></span><b class="${item.amount > 0 ? 'plus' : 'minus'}">${item.amount > 0 ? '+' : ''}${item.amount}</b></div>`).join('')}</section>` : ''}
+    ${balance || (ledger || []).length ? '<button class="coin-zuruecksetzen" type="button" data-coins-zuruecksetzen>CAPCOINS zurücksetzen</button>' : ''}`;
   container.querySelector('.coin-reward-list').onclick = async (event) => {
     const card = event.target.closest('[data-reward-id]');
     if (!card) return;
@@ -191,6 +192,20 @@ export async function mountCoinDex(container, { userId, signal, mountChrome }) {
     }
     notifyCoinBalanceChanged('coins');
     toast('Belohnung eingelöst'); refresh();
+  };
+  // Kontostand auf null, Belohnungen bleiben. Die gelöschten Buchungen hält
+  // der Datenverlauf der Datenbank fest.
+  const zuruecksetzen = container.querySelector('[data-coins-zuruecksetzen]');
+  if (zuruecksetzen) zuruecksetzen.onclick = async () => {
+    if (!confirm('Wirklich den CAPCOINS-Kontostand auf null setzen? Deine Belohnungen bleiben erhalten.')) return;
+    zuruecksetzen.disabled = true;
+    const { error: resetError } = await supabase.rpc('reset_muscle_coins');
+    if (resetError) {
+      zuruecksetzen.disabled = false;
+      return toast('Zurücksetzen fehlgeschlagen. Es wurde nichts gelöscht.');
+    }
+    notifyCoinBalanceChanged('coins');
+    toast('CAPCOINS zurückgesetzt'); refresh();
   };
   return {
     meta: `${(rewards || []).length} ${(rewards || []).length === 1 ? 'Belohnung' : 'Belohnungen'}`,

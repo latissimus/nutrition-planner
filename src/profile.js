@@ -7,7 +7,6 @@ import {
   setCoinDexVisible, setCollectionVisible,
 } from './collectionPreferences.js';
 import { createFullDataExport, exportFileName } from './dataExport.js';
-import { notifyCoinBalanceChanged, notifyHomeCountsChanged } from './realtime.js';
 import {
   interfaceSoundsEnabled, playInterfaceSound, setInterfaceSoundsEnabled,
 } from './uiSounds.js';
@@ -352,48 +351,6 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
       if (button.isConnected) button.disabled = false;
     }
   };
-
-  /* Einzelne Bereiche neu beginnen, ohne den Account zu löschen. Gelöschte
-     Zeilen hält der Datenverlauf der Datenbank fest. */
-  const zuruecksetzen = abschnitt(wrap, 'Zurücksetzen');
-  zuruecksetzen.innerHTML = `
-    <p class="profile-hinweis">Löscht alle Gewichtseinträge oder setzt den CAPCOINS-Kontostand auf null. Deine Belohnungen bleiben erhalten.</p>
-    <div class="profile-zuruecksetzen">
-      <button class="btn btn-block" type="button" data-zuruecksetzen="gewicht">Gewichtseinträge zurücksetzen</button>
-      <button class="btn btn-block" type="button" data-zuruecksetzen="coins">CAPCOINS zurücksetzen</button>
-    </div>
-    <div class="profile-daten-status" aria-live="polite"></div>`;
-  const ruecksetzAktionen = {
-    gewicht: {
-      frage: 'Wirklich alle Gewichtseinträge löschen?',
-      ausfuehren: () => supabase.from('weights').delete().eq('user_id', session.user.id),
-      fertig: 'Gewichtseinträge zurückgesetzt.',
-      melden: () => notifyHomeCountsChanged('body'),
-    },
-    coins: {
-      frage: 'Wirklich den CAPCOINS-Kontostand auf null setzen?',
-      ausfuehren: () => supabase.rpc('reset_muscle_coins'),
-      fertig: 'CAPCOINS zurückgesetzt.',
-      melden: () => notifyCoinBalanceChanged('coins'),
-    },
-  };
-  zuruecksetzen.querySelectorAll('[data-zuruecksetzen]').forEach((button) => {
-    button.onclick = async () => {
-      const aktion = ruecksetzAktionen[button.dataset.zuruecksetzen];
-      if (!aktion || !confirm(aktion.frage)) return;
-      const status = zuruecksetzen.querySelector('.profile-daten-status');
-      button.disabled = true;
-      status.textContent = 'Wird zurückgesetzt …';
-      const { error } = await aktion.ausfuehren();
-      if (button.isConnected) button.disabled = false;
-      if (error) {
-        status.textContent = 'Zurücksetzen fehlgeschlagen. Es wurde nichts gelöscht.';
-        return;
-      }
-      status.textContent = aktion.fertig;
-      aktion.melden();
-    };
-  });
 
   const gefahr = abschnitt(wrap, 'Account löschen', false, 'gefahr');
   gefahr.innerHTML = `
