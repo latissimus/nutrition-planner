@@ -16785,3 +16785,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   background:transparent!important;
   box-shadow:none!important;
 }
+
+/* ============================================================
+   KAPSEL-KNÖPFE · Alles, was man als Aktion antippt, ist eine Kapsel wie
+   Header, Menüband und Chat-Leiste. Karten, Eingabefelder, Listenzeilen und
+   Kacheln (etwa „Kalorienziel“ oder „Mit Coach besprechen“) behalten ihre
+   abgerundeten Ecken.
+   ============================================================ */
+:root[data-theme] :is(#app,body) :is(.btn,.coach-knopf,.coach-merken,.coin-reward-actions button){border-radius:999px!important}
