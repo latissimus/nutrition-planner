@@ -843,12 +843,35 @@ function appSyncStatusAktualisieren() {
   status.setAttribute('aria-label', status.title);
 }
 
-/* Antippen eines Reiters: Die ganze Leiste federt kurz und leicht größer,
-   wie beim Übergang zum Chat. */
-function leisteFedernLassen(leiste) {
-  leiste.classList.remove('ist-angetippt');
-  void leiste.offsetWidth;
-  leiste.classList.add('ist-angetippt');
+/* Antippen eines Reiters: Die Leiste federt kurz und leicht größer, dieselbe
+   Bewegung wie beim Übergang zum Chat und wie dort auf einem Bild der Leiste
+   (View Transition). Die echte Leiste wird nie skaliert: Skalierte iOS sie
+   selbst, zeichnete es Reiter und Symbole am Ende neu, sie standen kurz zu
+   eng, und oben schnitt das Menüband die Kontur ab. Das Bild ist live, die
+   gleitende Auswahl und ein Neuzeichnen der Reiter bleiben darin sichtbar. */
+let leistenFedern = null;
+function leisteFedernLassen() {
+  const wurzel = document.documentElement;
+  if (typeof document.startViewTransition !== 'function'
+    || wurzel.classList.contains('kapsel-uebergang')
+    || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  wurzel.classList.add('leiste-federt');
+  let uebergang;
+  try {
+    uebergang = document.startViewTransition(() => {});
+  } catch {
+    wurzel.classList.remove('leiste-federt');
+    return;
+  }
+  leistenFedern = uebergang;
+  // Nur das jeweils letzte Federn räumt auf; ein schneller zweiter Tipp
+  // startet ein neues, das die Klasse noch braucht.
+  const aufraeumen = () => {
+    if (leistenFedern !== uebergang) return;
+    leistenFedern = null;
+    wurzel.classList.remove('leiste-federt');
+  };
+  uebergang.finished.then(aufraeumen, aufraeumen);
 }
 
 function appDexShellZeichnen(route, view) {
@@ -1017,7 +1040,7 @@ function appDexShellZeichnen(route, view) {
   tabLeiste.addEventListener('click', (event) => {
     const reiter = event.target.closest?.('.app-dex-tab');
     if (reiter) {
-      leisteFedernLassen(leiste);
+      leisteFedernLassen();
       // Die Pille gleitet sofort los, nicht erst, wenn die Seite geladen ist.
       if (auswahl && !reiter.classList.contains('aktiv')) {
         auswahl.style.transform = `translateX(${reiter.offsetLeft}px)`;
@@ -1652,6 +1675,9 @@ async function seiteTauschen(von, nach, tauschen) {
     return;
   }
   const wurzel = document.documentElement;
+  // Ein noch laufendes Federn des Menübands endet mit diesem Übergang.
+  leistenFedern = null;
+  wurzel.classList.remove('leiste-federt');
   wurzel.classList.add('kapsel-uebergang');
   const aufraeumen = () => wurzel.classList.remove('kapsel-uebergang');
   let uebergang;

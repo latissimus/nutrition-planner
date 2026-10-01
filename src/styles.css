@@ -16794,16 +16794,16 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes kapsel-weg{to{opacity:0}}
 @keyframes kapsel-her{from{opacity:0}}
 
-/* Reiter antippen: Die ganze Leiste samt Symbolen federt kurz
-   (main.js: leisteFedernLassen), dieselbe Bewegung wie beim Übergang zum
-   Chat. will-change hält die Leiste dauerhaft auf einer eigenen Ebene: So
-   rechnet iOS sie zu Beginn und Ende des Federns nicht neu, und die Symbole
-   springen dabei nicht kurz in der Größe. */
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner{will-change:transform}
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:leiste-federn .52s both}
-@media (prefers-reduced-motion:reduce){
-  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-angetippt{animation:none}
-}
+/* Reiter antippen: Die Leiste federt als Bild (main.js: leisteFedernLassen),
+   mit derselben Bewegung wie beim Übergang zum Chat (leiste-federn). Die
+   Seite selbst bleibt dabei unverändert sichtbar, ohne Überblendung. */
+:root.leiste-federt #app>.app-dex-dock .app-dex-dock-inner{view-transition-name:fuss-kapsel}
+:root.leiste-federt::view-transition-old(root),
+:root.leiste-federt::view-transition-old(fuss-kapsel){display:none}
+:root.leiste-federt::view-transition-new(root),
+:root.leiste-federt::view-transition-new(fuss-kapsel){animation:none}
+/* Während eines Übergangs bleibt alles antippbar, auch ein zweiter Reiter. */
+::view-transition{pointer-events:none}
 
 /* CAPCOINS zurücksetzen: unten auf der Seite, als Kapsel mit Kontur wie
    „Gewichtsverlauf zurücksetzen“ in COMP. */
