@@ -1,4 +1,5 @@
 import './styles.css';
+import { bildknotenUebernehmen, markupMitBildernSetzen } from './bildknoten.js';
 import * as datenspeicher from './datenspeicher.js';
 import { bindLongPress } from './longPress.js';
 // Genau zwei Schriften, lokal über styles.css eingebunden: Work Sans für
@@ -916,7 +917,7 @@ function appDexShellZeichnen(route, view) {
      Kontostand nach links, Suche und Coach bleiben an ihrem Platz, und der
      Coach sitzt neben dem Profilbild am besten erreichbar. Auf den
      Coach-Seiten trägt die Kapsel Zurück und Gedächtnis. */
-  header.innerHTML = `
+  markupMitBildernSetzen(header, `
     <div class="app-dex-header-inner">
       <span class="app-dex-brand" aria-label="CAPBOY">${capboyMarkup()}</span>
       <div class="app-dex-header-actions">
@@ -936,7 +937,7 @@ function appDexShellZeichnen(route, view) {
         <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
            aria-label="Profil und Einstellungen"${istProfil ? ' aria-current="page"' : ''}>${avatarMarkup()}</a>
       </div>
-    </div>`;
+    </div>`);
 
   let dock = app.querySelector(':scope > .app-dex-dock');
   if (!dock) {
@@ -966,7 +967,7 @@ function appDexShellZeichnen(route, view) {
     leiste.className = 'app-dex-dock-inner';
     dock.replaceChildren(leiste);
   }
-  leiste.innerHTML = `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`;
+  markupMitBildernSetzen(leiste, `<div class="app-dex-tabs"><i class="app-dex-auswahl" aria-hidden="true"></i>${appDockEintraegeMarkup(aktiveDockRoute, !istNebenansicht)}</div>`);
   appSyncStatusAktualisieren();
 
   const tabLeiste = dock.querySelector('.app-dex-tabs');
@@ -2214,7 +2215,12 @@ async function renderRoute() {
     const alteSeite = app.querySelector(':scope > #view');
     if (alteSeite) {
       if (richtung !== 'gleich') ansichtMerken(vorherigeRoute, alteSeite, vorherigerController, vorherigeSeite);
-      else alteSeite.remove();
+      else {
+        // Auffrischen derselben Seite: Bilder und Symbole der alten Fassung
+        // übernehmen, sonst flackern sie beim Neuaufbau kurz.
+        bildknotenUebernehmen(alteSeite, view);
+        alteSeite.remove();
+      }
     }
     aktiveRoute = route;
     view.id = 'view';

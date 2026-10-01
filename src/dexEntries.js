@@ -750,13 +750,16 @@ function groupMarkup(type, entries, color) {
 
 export function vorschaubilderEinblenden(container) {
   container.querySelectorAll('.dex-inhaltskarte-vorschau img').forEach((bild) => {
-    bild.closest('.dex-inhaltskarte-vorschau')?.classList.add('hat-vorschaubild');
-    const anzeigen = () => requestAnimationFrame(() => {
+    const huelle = bild.closest('.dex-inhaltskarte-vorschau');
+    huelle?.classList.add('hat-vorschaubild');
+    const zeigen = () => {
       bild.classList.add('ist-geladen');
-      bild.closest('.dex-inhaltskarte-vorschau')?.classList.add('vorschau-geladen');
-    });
-    if (bild.complete && bild.naturalWidth > 0) anzeigen();
-    else bild.addEventListener('load', anzeigen, { once: true });
+      huelle?.classList.add('vorschau-geladen');
+    };
+    // Schon geladene Bilder (Neuaufbau, Abhaken) sofort und ohne Einblenden
+    // zeigen: Über den nächsten Frame verschoben flackerten sie kurz.
+    if (bild.complete && bild.naturalWidth > 0) zeigen();
+    else bild.addEventListener('load', () => requestAnimationFrame(zeigen), { once: true });
   });
 }
 

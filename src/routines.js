@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { markupMitBildernSetzen } from './bildknoten.js';
 import { hole, schluessel } from './datenspeicher.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { chooseReminderIcon, reminderIconMarkup } from './reminders.js';
@@ -468,7 +469,8 @@ export async function mountRoutines(container, { session, signal }) {
   const paint = () => {
     const darkColor = colorIsDark(categoryColor('habits'));
     container.querySelector('[data-routine-hero]').innerHTML = routineHeroMarkup(state);
-    container.querySelector('[data-routine-plan]').innerHTML = periods.map(([key, label]) => {
+    // Bilder übernehmen: Beim Abhaken flackerten sonst die Link-Vorschauen.
+    markupMitBildernSetzen(container.querySelector('[data-routine-plan]'), periods.map(([key, label]) => {
       // In der Übersicht nach Uhrzeit sortieren (ohne Uhrzeit ans Ende).
       const zeitMinuten = (time) => {
         if (!time) return Number.MAX_SAFE_INTEGER;
@@ -480,7 +482,7 @@ export async function mountRoutines(container, { session, signal }) {
       return `<section class="routine-zeitblock ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><h2>${label}</h2><small>${items.length} ${items.length === 1 ? 'Routine' : 'Routinen'}</small></header><div>${items.length
         ? items.map((item) => routineRow(item, state.completed.has(item.id), state.attachments.filter((entry) => entry.routine_id === item.id), darkColor)).join('')
         : '<p class="routine-zeitblock-leer">Noch keine Routine geplant.</p>'}</div></section>`;
-    }).join('');
+    }).join(''));
     container.querySelector('[data-toggle-routine-info]')?.addEventListener('click', (event) => {
       const help = container.querySelector('[data-routine-info-help]');
       const open = help?.hasAttribute('hidden');
