@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { signieren } from './signierteAdressen.js';
+import { markupMitBildernSetzen } from './bildknoten.js';
 import { hole, schluessel } from './datenspeicher.js';
 import { categoryColor, colorIsDark, materialIconMarkup } from './categoryIcons.js';
 import { dexEntryCardMarkup } from './dexEntryCard.js';
@@ -870,7 +871,9 @@ export async function renderDexEntries(container, {
       const hasMore = entries.length < total;
       const filterIstLeer = (foodFilters && activeFilter !== 'all') || (classFilters && activeClassFilter !== 'all');
       const classConfig = entryClassConfig(rootKey);
-      slot.innerHTML = `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${classFilters ? entryClassFiltersMarkup(entries, rootKey, activeClassFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : classConfig?.emptyText, filterIstLeer ? false : hasChildren, filterIstLeer ? false : hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`;
+      // Bilder übernehmen: Beim Filtern, Nachladen und nach Änderungen
+      // flackerten sonst die Vorschaubilder der Kacheln kurz.
+      markupMitBildernSetzen(slot, `${foodFilters ? foodFiltersMarkup(activeFilter) : ''}${classFilters ? entryClassFiltersMarkup(entries, rootKey, activeClassFilter) : ''}<div class="dex-eintrag-listen">${entriesMarkup(visibleEntries, color, foodFilters ? 'Für diesen Filter gibt es noch keine Mahlzeit.' : classConfig?.emptyText, filterIstLeer ? false : hasChildren, filterIstLeer ? false : hideEmpty)}</div>${hasMore ? `<div class="dex-mehr-laden"><button class="btn" type="button" data-dex-load-more>Weitere Einträge laden<small>${entries.length} von ${total}</small></button></div>` : ''}`);
       const filterBar = slot.querySelector('.neo-dex-filter,.food-dex-filter');
       if (filterBar && filterScrollLeft != null) {
         filterBar.scrollLeft = filterScrollLeft;
