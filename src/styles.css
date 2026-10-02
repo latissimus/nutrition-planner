@@ -16920,3 +16920,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Mehrzeiliges Feld im KI-Dialog: Die Zeilenhöhe der einzeiligen Felder
    (52 px) riss die Zeilen sonst weit auseinander. */
 .ki-zutaten-overlay textarea.input{line-height:1.4!important;padding:12px 14px!important;resize:none}
+/* „Einsprechen“ im KI-Dialog: Während der Aufnahme ersetzt der pulsierende
+   Punkt das Mikrofon, der Knopf zeigt Zeit und „Aufnahme beenden“. */
+.ki-zutaten-overlay .ki-einsprechen{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;font-variant-numeric:tabular-nums}
+.ki-zutaten-overlay .ki-einsprechen .material-svg,.ki-zutaten-overlay .ki-einsprechen .material-svg svg{width:20px;height:20px;fill:currentColor}
+.ki-zutaten-overlay .ki-einsprechen.nimmt-auf .material-svg{display:none}
+.ki-zutaten-overlay .ki-einsprechen.nimmt-auf::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--brand-pink,#FF69AE);animation:aufnahme-puls 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.ki-zutaten-overlay .ki-einsprechen.nimmt-auf::before{animation:none}}
+/* Nebenknopf: hell mit Kontur, damit „Zutaten anlegen“ der Hauptknopf bleibt. */
+:root[data-theme] .ki-zutaten-overlay .ki-einsprechen.btn{border:var(--kontur) solid var(--kontur-farbe)!important;background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;box-shadow:none!important}

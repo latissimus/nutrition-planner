@@ -7,7 +7,8 @@ import { notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
 import { blsSuche, preloadBls } from './blsFoods.js';
-import { zutatenAusBeschreibung } from './kiWerkzeuge.js';
+import { spracheVerschriftlichen, zutatenAusBeschreibung } from './kiWerkzeuge.js';
+import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from './sprachaufnahme.js';
 import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp, initialEnergyEstimate, weightTrendSummary } from './bodyComposition.js';
 import { performanceTrend } from './logmanImport.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
@@ -658,15 +659,18 @@ export function pickFoodIngredient(onPick) {
   });
 }
 
-// Rezept-Editor: Zutaten mit KI. Man beschreibt, was in das Rezept kommt; die
-// KI legt die Zutaten aus der Lebensmittel-Datenbank an (kiWerkzeuge.js). Jede
-// gefundene Zutat landet wie bei „Zutat suchen“ über onPick im Rezept, Mengen
-// und Treffer bleiben dort änderbar.
+// Rezept-Editor: Zutaten mit KI. Man beschreibt, was in das Rezept kommt –
+// getippt oder eingesprochen; Eingesprochenes steht erst im Feld, damit man es
+// vor dem Anlegen prüfen kann. Die KI legt die Zutaten aus der
+// Lebensmittel-Datenbank an (kiWerkzeuge.js). Jede gefundene Zutat landet wie
+// bei „Zutat suchen“ über onPick im Rezept, Mengen und Treffer bleiben dort
+// änderbar.
 export function pickIngredientsWithAi(onPick) {
   preloadBls();
   const backdrop = createOverlay(`<header><h2>Zutaten mit KI</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
     <form class="nutrition-form" data-ki-zutaten-form>
       <label class="nutrition-form-field"><span>Was kommt in das Rezept?</span><textarea class="input" data-ki-beschreibung rows="4" maxlength="2000" placeholder="z. B. 200 g Basmatireis, 2 Eier, eine rote Paprika, 1 EL Olivenöl, eine Prise Salz" required></textarea></label>
+      <button type="button" class="btn ki-einsprechen" data-ki-einsprechen>${materialIconMarkup('mic')}<span data-ki-einsprechen-text>Einsprechen</span></button>
       <p class="nutrition-form-hint" data-ki-status>Die KI sucht jede Zutat in der Lebensmittel-Datenbank. Mengen und Treffer kannst du danach im Rezept anpassen.</p>
       <button class="btn btn-primary btn-block" type="submit">Zutaten anlegen</button>
     </form>`, 'ki-zutaten-overlay');
@@ -674,8 +678,70 @@ export function pickIngredientsWithAi(onPick) {
   const feld = form.querySelector('[data-ki-beschreibung]');
   const status = form.querySelector('[data-ki-status]');
   const knopf = form.querySelector('button[type="submit"]');
+  const einsprechen = form.querySelector('[data-ki-einsprechen]');
+  const einsprechenText = form.querySelector('[data-ki-einsprechen-text]');
+  const HINWEIS = status.textContent;
+  // Erster Tipp startet die Aufnahme, zweiter beendet sie; der Text wird an
+  // das Feld angehängt. Schließt man den Dialog, geht das Mikrofon aus.
+  let aufnahme = null;
+  const einsprechenZeigen = (zustand) => {
+    einsprechen.classList.toggle('nimmt-auf', zustand === 'laeuft');
+    einsprechen.disabled = zustand === 'verschriftlicht';
+    knopf.disabled = zustand !== null;
+    feld.disabled = zustand !== null;
+    if (zustand === null) einsprechenText.textContent = 'Einsprechen';
+    if (zustand === 'verschriftlicht') einsprechenText.textContent = 'Wird verschriftlicht …';
+  };
+  const aufnahmeBeenden = async () => {
+    const laufend = aufnahme;
+    if (!laufend) return;
+    aufnahme = null;
+    window.clearInterval(laufend.uhr);
+    einsprechenZeigen('verschriftlicht');
+    const datei = await laufend.steuerung.stoppen();
+    try {
+      if (!datei) { status.textContent = 'Die Aufnahme war zu kurz.'; return; }
+      const text = await spracheVerschriftlichen(datei);
+      if (!backdrop.isConnected) return;
+      if (text.length < 2) { status.textContent = 'In der Aufnahme war nichts zu verstehen.'; return; }
+      const bisher = feld.value.trim();
+      feld.value = bisher ? `${bisher}, ${text}` : text;
+      status.textContent = 'Prüfe den Text und tippe dann auf „Zutaten anlegen“.';
+    } catch (error) {
+      status.textContent = error?.message || 'Die Aufnahme konnte nicht verschriftlicht werden.';
+    } finally {
+      einsprechenZeigen(null);
+    }
+  };
+  einsprechen.onclick = async () => {
+    if (aufnahme) { aufnahmeBeenden(); return; }
+    if (!spracheMoeglich()) { status.textContent = 'Einsprechen wird auf diesem Gerät nicht unterstützt.'; return; }
+    let steuerung;
+    try {
+      steuerung = await aufnahmeStarten();
+    } catch {
+      status.textContent = 'Mikrofon konnte nicht geöffnet werden.';
+      return;
+    }
+    aufnahme = { steuerung, uhr: 0 };
+    aufnahme.uhr = window.setInterval(() => {
+      if (!backdrop.isConnected) {
+        window.clearInterval(aufnahme?.uhr);
+        aufnahme?.steuerung.verwerfen();
+        aufnahme = null;
+        return;
+      }
+      einsprechenText.textContent = `Aufnahme beenden · ${aufnahmeZeit(steuerung.dauer())}`;
+      if (steuerung.dauer() >= AUFNAHME_MAX_MS) aufnahmeBeenden();
+    }, 250);
+    feld.blur();
+    status.textContent = HINWEIS;
+    einsprechenText.textContent = 'Aufnahme beenden · 0:00';
+    einsprechenZeigen('laeuft');
+  };
   form.onsubmit = async (event) => {
     event.preventDefault();
+    if (aufnahme) return;
     const beschreibung = feld.value.trim();
     if (beschreibung.length < 3) return;
     knopf.disabled = true;

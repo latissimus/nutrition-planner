@@ -5,6 +5,7 @@ import { materialIconMarkup } from './categoryIcons.js';
 import plusSvg from '../MUSCLEDEX-ICONS/add_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg?raw';
 import { toast } from './toast.js';
 import { spracheVerschriftlichen } from './kiWerkzeuge.js';
+import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from './sprachaufnahme.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
@@ -424,10 +425,9 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
      Aufnahme wird verschriftlicht (Edge Function ki-werkzeuge) und geht dann
      wie getippter Text an den Coach; die Nachricht im Verlauf zeigt, was
      verstanden wurde. Das Mikrofon steht nur bei leerem Feld da. */
-  const AUFNAHME_MAX_MS = 120_000;
   const mikro = form.querySelector('[data-coach-mikro]');
   const aufnahmeBox = form.querySelector('[data-coach-aufnahme]');
-  const aufnahmeZeit = form.querySelector('[data-aufnahme-zeit]');
+  const aufnahmeUhr = form.querySelector('[data-aufnahme-zeit]');
   const aufnahmeText = form.querySelector('[data-aufnahme-text]');
   let aufnahme = null;
   const aufnahmeZeigen = (zustand) => {
@@ -442,77 +442,60 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     if (!laufend) return;
     aufnahme = null;
     window.clearInterval(laufend.uhr);
-    laufend.recorder.onstop = () => laufend.stream.getTracks().forEach((spur) => spur.stop());
-    if (laufend.recorder.state === 'recording') laufend.recorder.stop();
-    else laufend.recorder.onstop();
+    laufend.steuerung.verwerfen();
     aufnahmeZeigen(null);
   };
-  const aufnahmeSenden = () => {
+  const aufnahmeSenden = async () => {
     const laufend = aufnahme;
     if (!laufend) return;
     aufnahme = null;
     window.clearInterval(laufend.uhr);
-    const dauer = performance.now() - laufend.start;
     aufnahmeZeigen('verschriftlicht');
-    laufend.recorder.onstop = async () => {
-      laufend.stream.getTracks().forEach((spur) => spur.stop());
-      if (dauer < 700 || !laufend.teile.length) {
-        aufnahmeZeigen(null);
-        toast('Die Aufnahme war zu kurz.');
+    const datei = await laufend.steuerung.stoppen();
+    if (!datei) {
+      aufnahmeZeigen(null);
+      toast('Die Aufnahme war zu kurz.');
+      return;
+    }
+    try {
+      const text = await spracheVerschriftlichen(datei);
+      aufnahmeZeigen(null);
+      if (!container.isConnected) return;
+      if (text.length < 2) {
+        toast('In der Aufnahme war nichts zu verstehen.');
         return;
       }
-      const mime = (laufend.recorder.mimeType || laufend.teile[0]?.type || 'audio/webm').split(';')[0];
-      const endung = mime.includes('mp4') ? 'm4a' : mime.includes('ogg') ? 'ogg' : 'webm';
-      const datei = new File([new Blob(laufend.teile, { type: mime })], `sprachnachricht.${endung}`, { type: mime });
-      try {
-        const text = await spracheVerschriftlichen(datei);
-        aufnahmeZeigen(null);
-        if (!container.isConnected) return;
-        if (text.length < 2) {
-          toast('In der Aufnahme war nichts zu verstehen.');
-          return;
-        }
-        field.value = text;
-        resizeField();
-        form.requestSubmit();
-      } catch (error) {
-        aufnahmeZeigen(null);
-        toast(error?.message || 'Die Aufnahme konnte nicht verschriftlicht werden.');
-      }
-    };
-    if (laufend.recorder.state === 'recording') laufend.recorder.stop();
-    else laufend.recorder.onstop();
+      field.value = text;
+      resizeField();
+      form.requestSubmit();
+    } catch (error) {
+      aufnahmeZeigen(null);
+      toast(error?.message || 'Die Aufnahme konnte nicht verschriftlicht werden.');
+    }
   };
   mikro.onclick = async () => {
     if (aufnahme || form.classList.contains('verschriftlicht')) return;
-    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+    if (!spracheMoeglich()) {
       toast('Sprachnachrichten werden auf diesem Gerät nicht unterstützt.');
       return;
     }
-    let stream;
+    let steuerung;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      steuerung = await aufnahmeStarten();
     } catch {
       toast('Mikrofon konnte nicht geöffnet werden.');
       return;
     }
-    const recorder = new MediaRecorder(stream);
-    const teile = [];
-    recorder.ondataavailable = (event) => { if (event.data.size) teile.push(event.data); };
-    const start = performance.now();
-    aufnahme = { recorder, stream, teile, start, uhr: 0 };
+    aufnahme = { steuerung, uhr: 0 };
     // Verlässt man den Chat, endet die Aufnahme, sonst bliebe das Mikrofon an.
     aufnahme.uhr = window.setInterval(() => {
       if (!container.isConnected) { aufnahmeVerwerfen(); return; }
-      const ms = performance.now() - start;
-      const sekunden = Math.floor(ms / 1000);
-      aufnahmeZeit.textContent = `${Math.floor(sekunden / 60)}:${String(sekunden % 60).padStart(2, '0')}`;
-      if (ms >= AUFNAHME_MAX_MS) aufnahmeSenden();
+      aufnahmeUhr.textContent = aufnahmeZeit(steuerung.dauer());
+      if (steuerung.dauer() >= AUFNAHME_MAX_MS) aufnahmeSenden();
     }, 250);
-    recorder.start();
     field.blur();
     werkzeugeZeigen(false);
-    aufnahmeZeit.textContent = '0:00';
+    aufnahmeUhr.textContent = '0:00';
     aufnahmeZeigen('laeuft');
   };
   form.querySelector('[data-aufnahme-verwerfen]').onclick = aufnahmeVerwerfen;
