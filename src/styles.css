@@ -625,10 +625,17 @@ label.fld-l{display:block;font-size:12px;font-weight:700;text-transform:uppercas
    Uhrzeit und Akku. Sie scrollt nicht mit und liegt ueber Tutorialkarte (60)
    und Uebungswaehler (80), endet aber exakt vor deren Inhalt. So kann weder
    der hellblaue Header noch die weisse Tutorialkarte in die Safe Area rutschen. */
-html.statusleiste-overlay body::before{content:"";position:fixed;z-index:1010;
-  top:calc(0px - env(safe-area-inset-top));left:0;right:0;
-  height:calc(env(safe-area-inset-top) + env(safe-area-inset-top) + 3px);
-  background:var(--statusbar-bg,var(--bg));pointer-events:none}
+/* Seit iOS 27 ist das ein echtes Element (main.js: statusleisteMitAbdunkeln):
+   iOS färbt die Statusleiste nach einer festen, deckenden Fläche am oberen
+   Rand und übersah das frühere ::before mit pointer-events:none. Der
+   Streifen nimmt Tipps an und blendet im Tempo der Abdunklung von der
+   Kopffarbe zur abgedunkelten Farbe – jede Zwischenstufe bleibt deckend. */
+.statusleiste-abdunkler{position:fixed;z-index:1010;top:0;left:0;right:0;
+  height:max(12px,env(safe-area-inset-top));
+  background:var(--statusbar-bg,var(--bg));
+  animation:statusleisteAbdunkeln .28s ease-out both}
+@keyframes statusleisteAbdunkeln{from{background-color:var(--statusbar-hell,var(--statusbar-bg))}}
+@media(prefers-reduced-motion:reduce){.statusleiste-abdunkler{animation:none}}
 /* Bringt das Overlay seine eigene durchscheinende Flaeche mit, muss der
    deckende Streifen weg: Er laege mit z-index 1010 ueber dem Backdrop (1000)
    und schnitte die Abdunkelung genau an der Safe Area ab. Der Backdrop
@@ -13582,7 +13589,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   .special-dex-page,.body-log-dex-page,.coin-dex-page,.food-dex-page,
   .meal-log-dex-page,.neo-dex-page,.routine-dex-page,.shopping-dex-page,
   .sleep-dex-page,.sleep-log-dex-page,.training-dex-page,.wissenssuche-seite
-) :is(small,i):not(.material-svg):not(.dex-tag):not(.dex-schlagwort):not(.kategorie-tag):not(.dex-eintrag-tag):not(.tuck-tag){
+) :is(small,i):not(.material-svg):not(.dex-tag):not(.dex-schlagwort):not(.kategorie-tag):not(.dex-eintrag-tag):not(.tuck-tag):not(.dex-leer-symbol *){
   background-color:transparent!important;
 }
 
@@ -16772,3 +16779,58 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme="retro"][data-seite="training"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:var(--pastell)!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
 :root[data-theme="retro"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:var(--dex-seitenfarbe)!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
 :root[data-theme="retro"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#111111!important;fill:currentColor!important}
+
+/* LEERE EINTRAGSSEITEN: ein Bild für alle Seiten. Retro zeichnet alles
+   schwarz auf Kartenweiß, Dark weiße Konturen und graue Zeilen auf der
+   Kartenfarbe. Das Blatt wird nicht mehr durchscheinend, damit seine
+   Kontur genauso kräftig bleibt wie die der Ablage. */
+:root[data-theme][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer .dex-leer-symbol :is(i,b){
+  border:var(--kontur) solid var(--kontur-farbe)!important;
+  background:var(--ui-flaeche)!important;
+  box-shadow:none!important;
+}
+@media (prefers-reduced-motion:no-preference){
+  :root[data-theme][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer .dex-leer-symbol i{
+    animation-name:dexAblegenDeckend!important;
+  }
+}
+:root[data-theme="retro"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer .dex-leer-symbol i::before,
+:root[data-theme="retro"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer .dex-leer-symbol i::after{
+  background:#111111!important;
+}
+:root[data-theme="retro"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer,
+:root[data-theme="retro"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer :is(strong,span){
+  color:#111111!important;
+}
+:root[data-theme="dark"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer .dex-leer-symbol i::before,
+:root[data-theme="dark"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer .dex-leer-symbol i::after{
+  background:#AEB7C6!important;
+}
+:root[data-theme="dark"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer strong{color:#FFFFFF!important}
+:root[data-theme="dark"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer,
+:root[data-theme="dark"][data-seite] :is(.neo-dex-page,.food-dex-page) .sammlung-leer.sammlung-leer span{
+  color:#AEB7C6!important;
+}
+@keyframes dexAblegenDeckend{0%,18%{transform:translateY(-8px)}52%,82%{transform:translateY(27px)}100%{transform:translateY(-8px)}}
+
+/* Geöffneter Eintrag: Die Karte zoomt wie ein Kontextmenü auf (eintragAufzoomen
+   in main.js). Dauerhaft eigene Ebene, sonst springen Schrift und Symbole am
+   Ende des Zooms um einen Pixel. */
+.dex-detail-overlay.dex-detail-fixkopf .dex-detail-scrollinhalt .dex-detail-popup{
+  will-change:transform,opacity;
+}
+
+/* Menüband halten und schieben (main.js, reiterleisteBinden): Solange der
+   Finger liegt, bleibt die Kapsel so groß wie auf dem Höhepunkt des Federns.
+   Hin mit dem Verlauf des Federns nach außen, zurück mit dem des Rückwegs.
+   Die Reiter rücken per Skript (translate) mit, die Auswahl folgt dem Finger. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before{
+  transition:transform .32s cubic-bezier(.45,0,.2,1);
+}
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner.ist-gehalten::before{
+  transform:scale(1.03);
+  transition:transform .2s cubic-bezier(.25,.1,.25,1);
+}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before{transition:none}
+}

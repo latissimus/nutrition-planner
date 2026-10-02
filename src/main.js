@@ -258,8 +258,10 @@ function abdunklungSchuetzen() {
    darunter; die halbdurchsichtige Abdunklung der Overlays übernimmt es nicht
    mehr (im Video: Seite dunkel, Statusleiste hell). Solange ein Overlay offen
    ist, liegt deshalb ein deckender Streifen in der abgedunkelten Farbe unter
-   der Statusleiste (styles.css: html.statusleiste-overlay body::before), und
-   theme-color folgt ihm. */
+   der Statusleiste, und theme-color folgt ihm. iOS sucht die Farbe an einer
+   festen Fläche mit deckendem Hintergrund am oberen Rand; ein ::before mit
+   pointer-events:none übersah es offenbar und nahm weiter die helle
+   Kopfzeile. Der Streifen ist deshalb ein echtes Element, das Tipps annimmt. */
 function statusleisteMitAbdunkeln() {
   const wurzel = document.documentElement;
   const OVERLAY = ':scope > :is(.kategorie-sheet-backdrop, .food-dex-info-dialog-overlay)';
@@ -271,6 +273,7 @@ function statusleisteMitAbdunkeln() {
   };
   let offen = false;
   let alteMetaFarbe = null;
+  let streifen = null;
   const pruefen = () => {
     const jetzt = Boolean(document.body.querySelector(OVERLAY));
     if (jetzt === offen) return;
@@ -286,12 +289,21 @@ function statusleisteMitAbdunkeln() {
     };
     if (offen) {
       const kopf = app.querySelector(':scope > .app-dex-header');
-      const dunkel = abgedunkelt(getComputedStyle(kopf || document.body).backgroundColor);
+      const hell = getComputedStyle(kopf || document.body).backgroundColor;
+      const dunkel = abgedunkelt(hell);
       wurzel.style.setProperty('--statusbar-bg', dunkel);
+      wurzel.style.setProperty('--statusbar-hell', hell);
       alteMetaFarbe = document.querySelector('meta[name="theme-color"]')?.getAttribute('content') || null;
       metaSetzen(dunkel);
+      streifen = document.createElement('div');
+      streifen.className = 'statusleiste-abdunkler';
+      streifen.setAttribute('aria-hidden', 'true');
+      document.body.append(streifen);
     } else {
+      streifen?.remove();
+      streifen = null;
       wurzel.style.removeProperty('--statusbar-bg');
+      wurzel.style.removeProperty('--statusbar-hell');
       metaSetzen(alteMetaFarbe);
       alteMetaFarbe = null;
     }
@@ -1127,6 +1139,8 @@ function reiterleisteBinden(tabLeiste) {
   tabLeiste.addEventListener('pointerup', (event) => {
     const start = aufsetzen;
     aufsetzen = null;
+    // Nach dem Halten entscheidet das Loslassen weiter unten.
+    if (halten?.aktiv) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if (!start || performance.now() - start.zeit > 600
       || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10
@@ -1135,6 +1149,8 @@ function reiterleisteBinden(tabLeiste) {
     if (reiter && !oeffnetMenue(reiter)) tippBewegungen(reiter);
   }, { passive: true });
   tabLeiste.addEventListener('click', (event) => {
+    // Klick aus dem Halten: Auswahl und Leiste stehen schon, nur noch öffnen.
+    if (ausHaltenKlick) return;
     const { view } = dockZustand;
     const reiter = event.target.closest?.('.app-dex-tab');
     const menue = oeffnetMenue(reiter);
@@ -1151,6 +1167,198 @@ function reiterleisteBinden(tabLeiste) {
     window.setTimeout(() => reiter.classList.remove('ist-gedrueckt'), 220);
     view.querySelector('.kategorie-plus')?.click();
   });
+
+  /* Halten und Schieben wie bei Instagram: Bleibt der Finger kurz ruhig auf
+     der Leiste, wächst die Kapsel so weit wie beim Federn und bleibt so groß,
+     die Reiter rücken mit nach außen. Die Auswahl folgt dann dem Finger, am
+     Rand rollt die Leiste weiter, und beim Loslassen öffnet der Reiter
+     darunter. Wischt der Finger vorher, scrollt die Leiste wie gewohnt. */
+  const HALTEN_MS = 200;
+  const RAND_ZONE = 30;
+  let halten = null;
+  let ausHaltenKlick = false;
+  let klickSchlucken = false;
+  const alleReiter = () => [...tabLeiste.querySelectorAll('.app-dex-tab')];
+  const reiterUnter = (inhaltX) => {
+    const reiter = alleReiter();
+    return reiter.find((r) => inhaltX >= r.offsetLeft && inhaltX < r.offsetLeft + r.offsetWidth)
+      || reiter.reduce((naechster, r) => (
+        Math.abs(r.offsetLeft + r.offsetWidth / 2 - inhaltX)
+          < Math.abs(naechster.offsetLeft + naechster.offsetWidth / 2 - inhaltX) ? r : naechster
+      ), reiter[0]);
+  };
+  // Wie weit ein Inhalt bei 3 % größerer Kapsel nach außen rückt.
+  const aussenVersatz = (sichtMitte) => {
+    if (halten?.ruhig) return 0;
+    const kapsel = tabLeiste.parentElement.getBoundingClientRect();
+    return (FEDERN_SKALA - 1) * (sichtMitte - (kapsel.left + kapsel.width / 2));
+  };
+  const reiterAuslenken = (zurueck) => {
+    const links = tabLeiste.getBoundingClientRect().left - tabLeiste.scrollLeft;
+    const verlauf = zurueck ? '.32s cubic-bezier(.45,0,.2,1)' : '.2s cubic-bezier(.25,.1,.25,1)';
+    for (const reiter of alleReiter()) {
+      const dx = zurueck ? 0 : aussenVersatz(links + reiter.offsetLeft + reiter.offsetWidth / 2);
+      reiter.style.transition = `translate ${verlauf}`;
+      reiter.style.translate = `${dx.toFixed(2)}px 0px`;
+    }
+  };
+  const halteBildAktualisieren = () => {
+    const h = halten;
+    if (!h?.aktiv) return;
+    const leiste = tabLeiste.getBoundingClientRect();
+    const inhaltX = h.x - leiste.left + tabLeiste.scrollLeft;
+    const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
+    if (auswahl) {
+      const breite = auswahl.offsetWidth;
+      const maximal = tabLeiste.scrollWidth - breite;
+      const x = Math.min(Math.max(inhaltX - breite / 2, 0), maximal);
+      // Ganz am Rand schnitte die Leiste die Pille sonst an.
+      const sichtbar = Math.min(Math.max(x + aussenVersatz(leiste.left + x - tabLeiste.scrollLeft + breite / 2), 0), maximal);
+      auswahl.style.transform = `translateX(${sichtbar.toFixed(2)}px)`;
+    }
+    if (tabLeiste.scrollLeft !== h.scrollStand) {
+      h.scrollStand = tabLeiste.scrollLeft;
+      reiterAuslenken(false);
+    }
+    const reiter = reiterUnter(inhaltX);
+    if (reiter && reiter !== h.reiter) {
+      h.reiter = reiter;
+      const ziel = reiter.getAttribute('href')?.replace(/^#/, '');
+      if (ziel) dexModulVorbereiten(ziel);
+    }
+  };
+  const randRollen = () => {
+    const h = halten;
+    if (!h?.aktiv) return;
+    if (h.bewegt) {
+      const leiste = tabLeiste.getBoundingClientRect();
+      const links = h.x - leiste.left;
+      const rechts = leiste.right - h.x;
+      let schritt = 0;
+      if (links < RAND_ZONE) schritt = -Math.ceil(7 * (1 - Math.max(links, 0) / RAND_ZONE));
+      else if (rechts < RAND_ZONE) schritt = Math.ceil(7 * (1 - Math.max(rechts, 0) / RAND_ZONE));
+      if (schritt) {
+        tabLeiste.scrollLeft += schritt;
+        halteBildAktualisieren();
+      }
+    }
+    h.rahmen = requestAnimationFrame(randRollen);
+  };
+  const haltenAbbrechen = () => {
+    if (halten) clearTimeout(halten.timer);
+    halten = null;
+  };
+  const haltenBeginnen = () => {
+    const h = halten;
+    if (!h || h.aktiv) return;
+    h.aktiv = true;
+    h.ruhig = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+    h.scrollStand = tabLeiste.scrollLeft;
+    const kapsel = tabLeiste.parentElement;
+    // Ein noch laufendes Federn vom letzten Tipp endet hier.
+    kapsel.classList.remove('ist-angetippt');
+    for (const element of tabLeiste.children) {
+      for (const animation of element.getAnimations()) {
+        if (animation.constructor === Animation) animation.cancel();
+      }
+    }
+    if (!h.ruhig) kapsel.classList.add('ist-gehalten');
+    const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
+    if (auswahl) auswahl.style.transition = 'transform .14s cubic-bezier(.2,.8,.2,1),width .3s ease';
+    reiterAuslenken(false);
+    halteBildAktualisieren();
+    try { tabLeiste.setPointerCapture(h.pointerId); } catch { /* schon losgelassen */ }
+    h.rahmen = requestAnimationFrame(randRollen);
+  };
+  const haltenLoslassen = (reiter) => {
+    const h = halten;
+    halten = null;
+    clearTimeout(h.timer);
+    cancelAnimationFrame(h.rahmen);
+    klickSchlucken = true;
+    window.setTimeout(() => { klickSchlucken = false; }, 700);
+    letzterLeistenTipp = performance.now();
+    tabLeiste.parentElement.classList.remove('ist-gehalten');
+    reiterAuslenken(true);
+    window.setTimeout(() => {
+      if (halten?.aktiv) return;
+      for (const r of alleReiter()) {
+        r.style.removeProperty('translate');
+        r.style.removeProperty('transition');
+      }
+    }, 360);
+    const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
+    const ziel = reiter || tabLeiste.querySelector('.app-dex-tab.aktiv');
+    if (auswahl) {
+      auswahl.style.removeProperty('transition');
+      if (ziel) {
+        auswahl.style.transform = `translateX(${ziel.offsetLeft}px)`;
+        auswahl.dataset.x = String(ziel.offsetLeft);
+      }
+    }
+    if (!reiter) return;
+    const rueck = reiterZiel(tabLeiste, reiter);
+    if (rueck != null) leisteRuecken(tabLeiste, rueck);
+    // Loslassen über der offenen Seite: nur zurückfedern, kein Menü.
+    if (oeffnetMenue(reiter)) return;
+    ausHaltenKlick = true;
+    try { reiter.click(); } finally { ausHaltenKlick = false; }
+  };
+  tabLeiste.addEventListener('pointerdown', (event) => {
+    klickSchlucken = false;
+    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    haltenAbbrechen();
+    halten = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      x: event.clientX,
+      aktiv: false,
+      bewegt: false,
+      reiter: null,
+    };
+    halten.timer = window.setTimeout(haltenBeginnen, HALTEN_MS);
+  }, { passive: true });
+  tabLeiste.addEventListener('pointermove', (event) => {
+    const h = halten;
+    if (!h || event.pointerId !== h.pointerId) return;
+    if (!h.aktiv) {
+      if (Math.hypot(event.clientX - h.startX, event.clientY - h.startY) > 8) haltenAbbrechen();
+      return;
+    }
+    h.x = event.clientX;
+    if (Math.abs(h.x - h.startX) > 12) h.bewegt = true;
+    halteBildAktualisieren();
+  }, { passive: true });
+  tabLeiste.addEventListener('pointerup', (event) => {
+    const h = halten;
+    if (!h || event.pointerId !== h.pointerId) return;
+    if (!h.aktiv) { haltenAbbrechen(); return; }
+    h.x = event.clientX;
+    halteBildAktualisieren();
+    haltenLoslassen(h.reiter);
+  }, { passive: true });
+  tabLeiste.addEventListener('pointercancel', (event) => {
+    const h = halten;
+    if (!h || event.pointerId !== h.pointerId) return;
+    if (h.aktiv) haltenLoslassen(null);
+    else haltenAbbrechen();
+  }, { passive: true });
+  // Während des Haltens scrollt nicht die Leiste, sondern die Auswahl wandert.
+  tabLeiste.addEventListener('touchmove', (event) => {
+    if (halten?.aktiv) event.preventDefault();
+  }, { passive: false });
+  tabLeiste.addEventListener('contextmenu', (event) => {
+    if (halten) event.preventDefault();
+  });
+  // Den Klick, den der Browser nach dem Loslassen noch meldet, schluckt die
+  // Leiste: Geöffnet wurde schon beim Loslassen.
+  window.addEventListener('click', (event) => {
+    if (!klickSchlucken || !event.isTrusted || !tabLeiste.contains(event.target)) return;
+    klickSchlucken = false;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
 }
 
 function appDexShellZeichnen(route, view) {
@@ -1916,8 +2124,24 @@ function animationenAnstossen() {
     }));
   });
 }
+// Ein geöffneter Eintrag zoomt wie die Kontextmenüs auf (overlayKarteZoom).
+// Die Mitte liegt in der sichtbaren Kartenhälfte, sonst wüchse eine lange
+// Karte vom unsichtbaren Teil her.
+function eintragAufzoomen() {
+  const karte = app.querySelector(':scope > #view .dex-detail-popup');
+  if (!karte || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rahmen = karte.getBoundingClientRect();
+  const mitte = (Math.max(rahmen.top, 0) + Math.min(rahmen.bottom, innerHeight)) / 2 - rahmen.top;
+  karte.style.transformOrigin = `50% ${Math.round(mitte)}px`;
+  karte.animate([
+    { transform: 'scale(.88)', opacity: 0 },
+    { transform: 'scale(1)', opacity: 1 },
+  ], { duration: 440, easing: 'cubic-bezier(.16,.78,.22,1)', fill: 'backwards' });
+}
+
 async function seiteTauschen(von, nach, tauschen) {
   tauschen();
+  if (von && von !== nach && nach.startsWith('entry/') && !von.startsWith('entry/')) eintragAufzoomen();
   if (!von || istChatRoute(von) === istChatRoute(nach)) return;
   // Ein altes Federn vom Antippen überdeckte sonst das Federn des Wechsels.
   app.querySelector(':scope > .app-dex-dock .app-dex-dock-inner')?.classList.remove('ist-angetippt');
