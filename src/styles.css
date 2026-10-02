@@ -16737,3 +16737,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   :root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab>span,.app-dex-tab small,.app-dex-tab>.app-dex-tab-punkte),
   :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tab.hat-hinweis::after{transition:none}
 }
+
+/* Chat: Steht Text im Feld, füllt sich der Senden-Knopf – Retro schwarz mit
+   weißem Pfeil, Dark umgekehrt (--ui-gefuellt folgt dem Theme). */
+:root[data-theme][data-seite="coach"] #view .coach-form.kann-senden .coach-inputbar .coach-send{
+  border-color:var(--ui-gefuellt)!important;
+  background:var(--ui-gefuellt)!important;
+  color:var(--ui-gefuellt-schrift)!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-form.kann-senden .coach-inputbar .coach-send :is(.coach-eingabe-icon,svg){
+  color:var(--ui-gefuellt-schrift)!important;
+  fill:var(--ui-gefuellt-schrift)!important;
+}

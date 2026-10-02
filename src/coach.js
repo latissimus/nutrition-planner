@@ -290,8 +290,11 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const resizeField = () => {
     field.style.height = 'auto';
     field.style.height = `${Math.min(field.scrollHeight, 120)}px`;
+    // Sobald Text im Feld steht, zeigt der gefüllte Senden-Knopf: abschickbar.
+    form.classList.toggle('kann-senden', field.value.trim().length > 0);
   };
   field.addEventListener('input', resizeField);
+  resizeField();
   field.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
     event.preventDefault();
