@@ -14554,6 +14554,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   height:20px;
   fill:currentColor;
 }
+/* Allein im Kopf (ohne Info-Knopf) sitzt der Kreis bündig rechts. Das
+   Symbol bekommt eine feste Größe, damit es exakt mittig im Kreis steht. */
+:root[data-theme][data-seite] #view .dex-sammlungskopf .dex-sammlungskopf-zurueck{margin-right:0}
+:root[data-theme][data-seite] #view .dex-sammlungskopf .dex-sammlungskopf-zurueck .dex-sammlungskopf-pfeil{
+  display:grid!important;
+  place-items:center!important;
+  width:20px!important;
+  height:20px!important;
+  margin:0!important;
+}
+:root[data-theme][data-seite] #view .dex-sammlungskopf .dex-sammlungskopf-zurueck .dex-sammlungskopf-pfeil svg{width:100%!important;height:100%!important}
 
 /* ============================================================
    DARKMODE · Ordner, Produktsuche und Raster-Infos
@@ -16705,9 +16716,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite] #app>.app-dex-dock::after{
   top:calc(((34 - var(--kapsel-r)) * 2 + var(--kapsel-r) - sqrt(var(--kapsel-r) * var(--kapsel-r) - (var(--kapsel-r) - var(--karten-einzug)) * (var(--kapsel-r) - var(--karten-einzug)))) * 1px);
 }
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before,
-:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-auswahl{
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before{
   top:calc((34 - var(--kapsel-r)) * 2px);
+}
+/* Die Pille ist oben und unten je 4 px flacher als der Reiter. */
+:root[data-theme][data-seite] #app>.app-dex-dock .app-dex-auswahl{
+  top:calc((34 - var(--kapsel-r)) * 2px + 4px);
+  bottom:4px;
 }
 /* Die eingeklappte Leiste nimmt oberhalb der Kante keine Tipps mehr an. */
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs{

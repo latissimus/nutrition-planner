@@ -1615,10 +1615,12 @@ function gridCollectionMastheadMarkup(title, folders = 0, zurueckHref = '') {
       <h1>${escapeHtml(title)}</h1>
       <small data-grid-collection-meta>${gridCollectionMetaText(0, folders)}</small>
     </div>
-    ${zurueckHref ? `<a class="som-info-knopf dex-sammlungskopf-zurueck" href="${escapeHtml(zurueckHref)}" aria-label="Zurück zur übergeordneten Seite">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>` : ''}
-    <button class="som-info-knopf" type="button" data-grid-collection-info aria-expanded="false" aria-controls="grid-collection-info-help" aria-label="Info zur Sammlung">i</button>
+    ${zurueckHref
+      // Unterordner: nur der Zurück-Kreis, ohne Info-Knopf daneben.
+      ? `<a class="som-info-knopf dex-sammlungskopf-zurueck" href="${escapeHtml(zurueckHref)}" aria-label="Zurück zur übergeordneten Seite">${materialIconMarkup('chevron_right', 'dex-sammlungskopf-pfeil')}</a>`
+      : '<button class="som-info-knopf" type="button" data-grid-collection-info aria-expanded="false" aria-controls="grid-collection-info-help" aria-label="Info zur Sammlung">i</button>'}
   </section>
-  <div class="som-kurzhilfe nutrition-calibration-help grid-collection-info-help" id="grid-collection-info-help" data-grid-collection-info-help hidden></div>`;
+  ${zurueckHref ? '' : '<div class="som-kurzhilfe nutrition-calibration-help grid-collection-info-help" id="grid-collection-info-help" data-grid-collection-info-help hidden></div>'}`;
 }
 
 function mountGridCollectionMasthead(root, { infoKind, title }) {
