@@ -11,7 +11,7 @@ import { dexStoragePath } from './storagePaths.js';
 import { showGestureHintOnce } from './gestureHints.js';
 import { playInterfaceSound } from './uiSounds.js';
 import { notifyHomeCountsChanged, subscribeToTableChanges } from './realtime.js';
-import { pickFoodIngredient, scanFoodIngredient } from './nutrition.js';
+import { pickFoodIngredient, pickIngredientsWithAi, scanFoodIngredient } from './nutrition.js';
 import { noteEditorMarkup, mountNoteEditors, readNote, readNoteText, noteToText } from './richText.js';
 
 const BUCKET = 'dex-entries';
@@ -274,6 +274,7 @@ function editorMarkup(type, { foodKind = null, foodMode = false, rootKey = '', e
         <div class="dex-zutat-aktionen">
           <button type="button" class="btn dex-zutat-add" data-zutat-add>${materialIconMarkup('search')}<span>Zutat suchen</span></button>
           <button type="button" class="btn dex-zutat-add" data-zutat-scan>${materialIconMarkup('photo_camera')}<span>Barcode scannen</span></button>
+          <button type="button" class="btn dex-zutat-add dex-zutat-ki" data-zutat-ki>${materialIconMarkup('stars')}<span>Mit KI anlegen</span></button>
         </div>
       </div>` : ''}
       ${classConfig ? `<label class="dex-entry-field" for="dex-entry-training-class"><span>${classConfig.fieldLabel}</span>
@@ -306,6 +307,7 @@ export function mountIngredientEditor(root, initial = []) {
   const list = root.querySelector('[data-zutaten-liste]');
   const addBtn = root.querySelector('[data-zutat-add]');
   const scanBtn = root.querySelector('[data-zutat-scan]');
+  const kiBtn = root.querySelector('[data-zutat-ki]');
   if (!list || !addBtn) return { getItems: () => [] };
   const normPortions = (list) => (Array.isArray(list) ? list : [])
     .map(([label, grams]) => [String(label || ''), Number(grams) || 0])
@@ -342,7 +344,7 @@ export function mountIngredientEditor(root, initial = []) {
         <span class="dex-zutat-name">${escapeHtml(item.name)}</span>
         <button type="button" class="dex-zutat-remove" data-zutat-remove aria-label="Zutat entfernen">${materialIconMarkup('close')}</button>
         <div class="dex-zutat-controls">${controls(item)}</div>
-      </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Suche ein Lebensmittel oder scanne den Barcode.</p>';
+      </div>`).join('') : '<p class="dex-zutaten-leer">Noch keine Zutat. Suche ein Lebensmittel, scanne den Barcode oder beschreibe das Rezept der KI.</p>';
   };
   // Menge (Anzahl bzw. Gramm) ändern – ohne Neurender, damit der Fokus bleibt.
   list.addEventListener('input', (event) => {
@@ -398,6 +400,7 @@ export function mountIngredientEditor(root, initial = []) {
   };
   addBtn.addEventListener('click', () => pickFoodIngredient(addIngredient));
   scanBtn?.addEventListener('click', () => scanFoodIngredient(addIngredient));
+  kiBtn?.addEventListener('click', () => pickIngredientsWithAi(addIngredient));
   render();
   return {
     getItems: () => items.filter((it) => it.name && it.grams > 0).map((it) => ({

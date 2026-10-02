@@ -7,6 +7,7 @@ import { notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js
 import { playInterfaceSound } from './uiSounds.js';
 import { bindLongPress } from './longPress.js';
 import { blsSuche, preloadBls } from './blsFoods.js';
+import { zutatenAusBeschreibung } from './kiWerkzeuge.js';
 import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp, initialEnergyEstimate, weightTrendSummary } from './bodyComposition.js';
 import { performanceTrend } from './logmanImport.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
@@ -655,6 +656,53 @@ export function pickFoodIngredient(onPick) {
       });
     },
   });
+}
+
+// Rezept-Editor: Zutaten mit KI. Man beschreibt, was in das Rezept kommt; die
+// KI legt die Zutaten aus der Lebensmittel-Datenbank an (kiWerkzeuge.js). Jede
+// gefundene Zutat landet wie bei „Zutat suchen“ über onPick im Rezept, Mengen
+// und Treffer bleiben dort änderbar.
+export function pickIngredientsWithAi(onPick) {
+  preloadBls();
+  const backdrop = createOverlay(`<header><h2>Zutaten mit KI</h2><button type="button" data-nutrition-close aria-label="Schließen">${materialIconMarkup('close')}</button></header>
+    <form class="nutrition-form" data-ki-zutaten-form>
+      <label class="nutrition-form-field"><span>Was kommt in das Rezept?</span><textarea class="input" data-ki-beschreibung rows="4" maxlength="2000" placeholder="z. B. 200 g Basmatireis, 2 Eier, eine rote Paprika, 1 EL Olivenöl, eine Prise Salz" required></textarea></label>
+      <p class="nutrition-form-hint" data-ki-status>Die KI sucht jede Zutat in der Lebensmittel-Datenbank. Mengen und Treffer kannst du danach im Rezept anpassen.</p>
+      <button class="btn btn-primary btn-block" type="submit">Zutaten anlegen</button>
+    </form>`, 'ki-zutaten-overlay');
+  const form = backdrop.querySelector('[data-ki-zutaten-form]');
+  const feld = form.querySelector('[data-ki-beschreibung]');
+  const status = form.querySelector('[data-ki-status]');
+  const knopf = form.querySelector('button[type="submit"]');
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const beschreibung = feld.value.trim();
+    if (beschreibung.length < 3) return;
+    knopf.disabled = true;
+    feld.disabled = true;
+    status.textContent = 'Zutaten werden gesucht …';
+    const streamingSound = playInterfaceSound('streaming', { loop: true, retrigger: 'restart' });
+    try {
+      const zutaten = await zutatenAusBeschreibung(beschreibung);
+      if (!zutaten.length) {
+        status.textContent = 'Keine Zutaten erkannt. Beschreibe, was in das Rezept kommt, gern mit Mengen.';
+        return;
+      }
+      const gefunden = zutaten.filter((zutat) => zutat.produkt && zutat.gramm > 0);
+      gefunden.forEach((zutat) => onPick(zutat.produkt, zutat.gramm, zutat.portion));
+      const fehlend = zutaten.filter((zutat) => !zutat.produkt).map((zutat) => zutat.name);
+      backdrop.remove();
+      if (fehlend.length) toast(`Nicht gefunden: ${fehlend.join(', ')}. Ergänze das über „Zutat suchen“.`);
+      else toast(gefunden.length === 1 ? '1 Zutat angelegt' : `${gefunden.length} Zutaten angelegt`);
+    } catch (error) {
+      status.textContent = error?.message || 'Die KI konnte gerade keine Zutaten anlegen.';
+    } finally {
+      streamingSound?.stop?.();
+      knopf.disabled = false;
+      feld.disabled = false;
+    }
+  };
+  setTimeout(() => feld.focus(), 120);
 }
 
 // Rezept- und Log-Bilder liegen im privaten dex-entries-Bucket und werden für

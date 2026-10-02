@@ -4,6 +4,7 @@ import { materialIconMarkup } from './categoryIcons.js';
 // Symbolsammlung zuerst Add.svg (Plus im Kästchen).
 import plusSvg from '../MUSCLEDEX-ICONS/add_24dp_E3E3E3_FILL1_wght700_GRAD200_opsz24.svg?raw';
 import { toast } from './toast.js';
+import { spracheVerschriftlichen } from './kiWerkzeuge.js';
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
@@ -233,6 +234,11 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
           <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
           <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
+          <div class="coach-aufnahme" data-coach-aufnahme hidden>
+            <button class="coach-aufnahme-weg" type="button" data-aufnahme-verwerfen aria-label="Aufnahme verwerfen">${materialIconMarkup('close', 'coach-eingabe-icon')}</button>
+            <div class="coach-aufnahme-feld" aria-live="polite"><i class="coach-aufnahme-punkt" aria-hidden="true"></i><b data-aufnahme-zeit>0:00</b><span data-aufnahme-text>Aufnahme läuft</span></div>
+          </div>
+          <button class="coach-mikro" type="button" data-coach-mikro aria-label="Sprachnachricht aufnehmen">${materialIconMarkup('mic', 'coach-eingabe-icon')}</button>
           <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('arrow_forward_ios', 'coach-eingabe-icon')}</button>
         </div>
       </div>
@@ -414,8 +420,108 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     },
   });
 
+  /* Sprachnachricht: Mikrofon antippen, sprechen, mit dem Pfeil senden. Die
+     Aufnahme wird verschriftlicht (Edge Function ki-werkzeuge) und geht dann
+     wie getippter Text an den Coach; die Nachricht im Verlauf zeigt, was
+     verstanden wurde. Das Mikrofon steht nur bei leerem Feld da. */
+  const AUFNAHME_MAX_MS = 120_000;
+  const mikro = form.querySelector('[data-coach-mikro]');
+  const aufnahmeBox = form.querySelector('[data-coach-aufnahme]');
+  const aufnahmeZeit = form.querySelector('[data-aufnahme-zeit]');
+  const aufnahmeText = form.querySelector('[data-aufnahme-text]');
+  let aufnahme = null;
+  const aufnahmeZeigen = (zustand) => {
+    form.classList.toggle('nimmt-auf', zustand !== null);
+    form.classList.toggle('verschriftlicht', zustand === 'verschriftlicht');
+    aufnahmeBox.hidden = zustand === null;
+    aufnahmeText.textContent = zustand === 'verschriftlicht' ? 'Wird verschriftlicht …' : 'Aufnahme läuft';
+    form.querySelector('button[type="submit"]').disabled = zustand === 'verschriftlicht';
+  };
+  const aufnahmeVerwerfen = () => {
+    const laufend = aufnahme;
+    if (!laufend) return;
+    aufnahme = null;
+    window.clearInterval(laufend.uhr);
+    laufend.recorder.onstop = () => laufend.stream.getTracks().forEach((spur) => spur.stop());
+    if (laufend.recorder.state === 'recording') laufend.recorder.stop();
+    else laufend.recorder.onstop();
+    aufnahmeZeigen(null);
+  };
+  const aufnahmeSenden = () => {
+    const laufend = aufnahme;
+    if (!laufend) return;
+    aufnahme = null;
+    window.clearInterval(laufend.uhr);
+    const dauer = performance.now() - laufend.start;
+    aufnahmeZeigen('verschriftlicht');
+    laufend.recorder.onstop = async () => {
+      laufend.stream.getTracks().forEach((spur) => spur.stop());
+      if (dauer < 700 || !laufend.teile.length) {
+        aufnahmeZeigen(null);
+        toast('Die Aufnahme war zu kurz.');
+        return;
+      }
+      const mime = (laufend.recorder.mimeType || laufend.teile[0]?.type || 'audio/webm').split(';')[0];
+      const endung = mime.includes('mp4') ? 'm4a' : mime.includes('ogg') ? 'ogg' : 'webm';
+      const datei = new File([new Blob(laufend.teile, { type: mime })], `sprachnachricht.${endung}`, { type: mime });
+      try {
+        const text = await spracheVerschriftlichen(datei);
+        aufnahmeZeigen(null);
+        if (!container.isConnected) return;
+        if (text.length < 2) {
+          toast('In der Aufnahme war nichts zu verstehen.');
+          return;
+        }
+        field.value = text;
+        resizeField();
+        form.requestSubmit();
+      } catch (error) {
+        aufnahmeZeigen(null);
+        toast(error?.message || 'Die Aufnahme konnte nicht verschriftlicht werden.');
+      }
+    };
+    if (laufend.recorder.state === 'recording') laufend.recorder.stop();
+    else laufend.recorder.onstop();
+  };
+  mikro.onclick = async () => {
+    if (aufnahme || form.classList.contains('verschriftlicht')) return;
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      toast('Sprachnachrichten werden auf diesem Gerät nicht unterstützt.');
+      return;
+    }
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      toast('Mikrofon konnte nicht geöffnet werden.');
+      return;
+    }
+    const recorder = new MediaRecorder(stream);
+    const teile = [];
+    recorder.ondataavailable = (event) => { if (event.data.size) teile.push(event.data); };
+    const start = performance.now();
+    aufnahme = { recorder, stream, teile, start, uhr: 0 };
+    // Verlässt man den Chat, endet die Aufnahme, sonst bliebe das Mikrofon an.
+    aufnahme.uhr = window.setInterval(() => {
+      if (!container.isConnected) { aufnahmeVerwerfen(); return; }
+      const ms = performance.now() - start;
+      const sekunden = Math.floor(ms / 1000);
+      aufnahmeZeit.textContent = `${Math.floor(sekunden / 60)}:${String(sekunden % 60).padStart(2, '0')}`;
+      if (ms >= AUFNAHME_MAX_MS) aufnahmeSenden();
+    }, 250);
+    recorder.start();
+    field.blur();
+    werkzeugeZeigen(false);
+    aufnahmeZeit.textContent = '0:00';
+    aufnahmeZeigen('laeuft');
+  };
+  form.querySelector('[data-aufnahme-verwerfen]').onclick = aufnahmeVerwerfen;
+
   form.onsubmit = async (event) => {
     event.preventDefault();
+    // Während der Aufnahme sendet der Pfeil die Sprachnachricht.
+    if (aufnahme) { aufnahmeSenden(); return; }
+    if (form.classList.contains('verschriftlicht')) return;
     const question = field.value.trim();
     if (question.length < 2) return;
     const webResearch = webOption.checked;
