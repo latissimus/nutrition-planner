@@ -16370,11 +16370,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root.tastatur-sichtbar .kategorie-sheet-backdrop{
   place-items:end center!important;
   align-content:end!important;
-  padding-top:calc(var(--sicht-oben,0px) + 8px)!important;
+  /* Nie unter die Statusleiste: Dort liegt bei offenen Menüs der
+     abgedunkelte Streifen (statusleisteMitAbdunkeln in main.js). */
+  padding-top:calc(var(--sicht-oben,0px) + env(safe-area-inset-top) + 8px)!important;
   padding-bottom:calc(var(--tastatur-unten,0px) + 6px)!important;
 }
 :root.tastatur-sichtbar .kategorie-sheet-backdrop :is(.kategorie-sheet,.special-dex-sheet){
-  max-height:calc(var(--sicht-hoehe,100dvh) - 14px)!important;
+  max-height:calc(var(--sicht-hoehe,100dvh) - env(safe-area-inset-top) - 14px)!important;
 }
 /* Notizfelder in Sheets sind leer schon vier Zeilen hoch; die allgemeine
    Feldhöhe (52 px) gilt nur für einzeilige Felder. */

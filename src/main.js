@@ -253,6 +253,53 @@ function abdunklungSchuetzen() {
   }, true);
 }
 
+/* Statusleiste bei offenen Menüs mit abdunkeln. Seit iOS 27 zeichnet das
+   System den Streifen hinter Uhrzeit und Akku selbst, in der Farbe der Seite
+   darunter; die halbdurchsichtige Abdunklung der Overlays übernimmt es nicht
+   mehr (im Video: Seite dunkel, Statusleiste hell). Solange ein Overlay offen
+   ist, liegt deshalb ein deckender Streifen in der abgedunkelten Farbe unter
+   der Statusleiste (styles.css: html.statusleiste-overlay body::before), und
+   theme-color folgt ihm. */
+function statusleisteMitAbdunkeln() {
+  const wurzel = document.documentElement;
+  const OVERLAY = ':scope > :is(.kategorie-sheet-backdrop, .food-dex-info-dialog-overlay)';
+  // Gleiche Stärke wie die Abdunklung der Overlays: schwarz mit 68 %.
+  const abgedunkelt = (farbe) => {
+    const teile = String(farbe).match(/\d+(\.\d+)?/g)?.map(Number);
+    if (!teile || teile.length < 3) return '#000000';
+    return `#${teile.slice(0, 3).map((wert) => Math.round(wert * 0.32).toString(16).padStart(2, '0')).join('')}`;
+  };
+  let offen = false;
+  let alteMetaFarbe = null;
+  const pruefen = () => {
+    const jetzt = Boolean(document.body.querySelector(OVERLAY));
+    if (jetzt === offen) return;
+    offen = jetzt;
+    // iOS übernimmt eine neue Farbe zuverlässig nur über ein neues Element.
+    const metaSetzen = (farbe) => {
+      const alt = document.querySelector('meta[name="theme-color"]');
+      if (!alt || !farbe) return;
+      const neu = document.createElement('meta');
+      neu.name = 'theme-color';
+      neu.content = farbe;
+      alt.replaceWith(neu);
+    };
+    if (offen) {
+      const kopf = app.querySelector(':scope > .app-dex-header');
+      const dunkel = abgedunkelt(getComputedStyle(kopf || document.body).backgroundColor);
+      wurzel.style.setProperty('--statusbar-bg', dunkel);
+      alteMetaFarbe = document.querySelector('meta[name="theme-color"]')?.getAttribute('content') || null;
+      metaSetzen(dunkel);
+    } else {
+      wurzel.style.removeProperty('--statusbar-bg');
+      metaSetzen(alteMetaFarbe);
+      alteMetaFarbe = null;
+    }
+    wurzel.classList.toggle('statusleiste-overlay', offen);
+  };
+  new MutationObserver(pruefen).observe(document.body, { childList: true });
+}
+
 // Menüband-Kapsel: Wischt man den Inhalt nach oben (Lesen), wird sie flach und
 // zeigt nur Symbole; beim Zurückwischen oder ganz oben wieder die Namen.
 // Gemessen wird am jeweils gescrollten Inhaltsbereich; kleine Zuckungen und
@@ -298,6 +345,7 @@ function menuebandSchrumpfen() {
 konfiguriereSchreibfelder(document);
 tastaturBeobachten();
 abdunklungSchuetzen();
+statusleisteMitAbdunkeln();
 menuebandSchrumpfen();
 new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
   if (node instanceof Element) konfiguriereSchreibfelder(node);
