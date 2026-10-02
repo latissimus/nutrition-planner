@@ -16681,6 +16681,10 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    „Gewichtsverlauf zurücksetzen“ in COMP. */
 :root[data-theme][data-seite="coins"] #view .coin-zuruecksetzen{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:8px;padding:0 16px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:transparent;color:var(--kontur-farbe);box-shadow:none;font:750 13px/1.2 "Work Sans",sans-serif;text-transform:none}
 :root[data-theme][data-seite="coins"] #view .coin-zuruecksetzen:disabled{opacity:.55}
+/* Belohnung anlegen: gefüllte Kapsel über „zurücksetzen“. */
+:root[data-theme][data-seite="coins"] #view .coin-aktionen{display:grid;gap:8px;margin-top:8px}
+:root[data-theme][data-seite="coins"] #view .coin-aktionen .coin-zuruecksetzen{margin-top:0}
+:root[data-theme][data-seite="coins"] #view .coin-belohnung-anlegen{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;padding:0 16px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-gefuellt);color:var(--ui-gefuellt-schrift);box-shadow:none;font:750 13px/1.2 "Work Sans",sans-serif;text-transform:none}
 
 /* ============================================================
    MENÜBAND EINKLAPPEN · nur Transform und eine einzige Kante
