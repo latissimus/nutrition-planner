@@ -936,7 +936,7 @@ function appDockEintraegeMarkup(aktiveDockRoute, aufSeite = true) {
   const punkte = '<i class="app-dex-tab-punkte" aria-hidden="true"></i>';
   const istOffen = (route) => aktiveDockRoute === route && aufSeite;
   const standard = sichtbareSammlungen().map(([route, titel]) => `
-    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}${dockHinweise[route] && aktiveDockRoute !== route ? ' hat-hinweis' : ''}" href="#${route}"
+    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}${dockHinweise[route] && aktiveDockRoute !== route ? ' hat-hinweis' : ''}" href="#${route}" draggable="false"
        data-sammlung="${route}" style="--app-dex-tab-color:${escapeHtml(pageLook(route, categoryColor(route), 'drops').color)}"
        aria-label="${escapeHtml(istOffen(route) ? `Menü für ${titel} öffnen` : titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
       ${istOffen(route) ? punkte : ''}
@@ -946,7 +946,7 @@ function appDockEintraegeMarkup(aktiveDockRoute, aufSeite = true) {
   const eigene = appDockEigene.map((item) => {
     const route = `collection/${item.id}`;
     return `
-      <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}" href="#${route}"
+      <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}" href="#${route}" draggable="false"
          data-collection-id="${item.id}" style="--app-dex-tab-color:${escapeHtml(item.color || '#FF69AE')}"
          aria-label="${escapeHtml(istOffen(route) ? `Menü für ${item.name} öffnen` : item.name)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
         ${istOffen(route) ? punkte : ''}
@@ -1175,6 +1175,8 @@ function reiterleisteBinden(tabLeiste) {
      darunter. Wischt der Finger vorher, scrollt die Leiste wie gewohnt. */
   const HALTEN_MS = 200;
   const RAND_ZONE = 30;
+  // Wie bei Instagram wird die Auswahl beim Schieben zur etwas größeren Linse.
+  const LUPE_BREITE = 1.14;
   let halten = null;
   let ausHaltenKlick = false;
   let klickSchlucken = false;
@@ -1212,9 +1214,12 @@ function reiterleisteBinden(tabLeiste) {
       const breite = auswahl.offsetWidth;
       const maximal = tabLeiste.scrollWidth - breite;
       const x = Math.min(Math.max(inhaltX - breite / 2, 0), maximal);
-      // Ganz am Rand schnitte die Leiste die Pille sonst an.
-      const sichtbar = Math.min(Math.max(x + aussenVersatz(leiste.left + x - tabLeiste.scrollLeft + breite / 2), 0), maximal);
-      auswahl.style.transform = `translateX(${sichtbar.toFixed(2)}px)`;
+      // Ganz am Rand schnitte die Leiste die Linse sonst an.
+      const ueberstand = h.ruhig ? 0 : breite * (LUPE_BREITE - 1) / 2;
+      const sichtbar = Math.min(Math.max(x + aussenVersatz(leiste.left + x - tabLeiste.scrollLeft + breite / 2), ueberstand), maximal - ueberstand);
+      auswahl.style.transform = h.ruhig
+        ? `translateX(${sichtbar.toFixed(2)}px)`
+        : `translateX(${sichtbar.toFixed(2)}px) scale(${LUPE_BREITE}, ${h.lupeHoehe.toFixed(4)})`;
     }
     if (tabLeiste.scrollLeft !== h.scrollStand) {
       h.scrollStand = tabLeiste.scrollLeft;
@@ -1264,7 +1269,17 @@ function reiterleisteBinden(tabLeiste) {
     }
     if (!h.ruhig) kapsel.classList.add('ist-gehalten');
     const auswahl = tabLeiste.querySelector('.app-dex-auswahl');
-    if (auswahl) auswahl.style.transition = 'transform .14s cubic-bezier(.2,.8,.2,1),width .3s ease';
+    // Nach oben und unten wächst die Linse nur bis an den Rand der Reiter:
+    // Darüber schnitte die Leiste sie ab (eingeklappt liegt sie schon dort).
+    h.lupeHoehe = 1;
+    if (auswahl) {
+      const pille = auswahl.getBoundingClientRect();
+      const r = parseFloat(getComputedStyle(auswahl).getPropertyValue('--kapsel-r')) || 34;
+      // Abstand oben wie in styles.css: (r − 25) / 6 px, unten bis zum Rand.
+      const luft = Math.max(0, Math.min((r - 25) / 6, tabLeiste.getBoundingClientRect().bottom - pille.bottom));
+      h.lupeHoehe = (pille.height + 2 * luft) / (pille.height || 1);
+      auswahl.style.transition = 'transform .14s cubic-bezier(.2,.8,.2,1),width .3s ease';
+    }
     reiterAuslenken(false);
     halteBildAktualisieren();
     try { tabLeiste.setPointerCapture(h.pointerId); } catch { /* schon losgelassen */ }
@@ -1351,6 +1366,11 @@ function reiterleisteBinden(tabLeiste) {
   tabLeiste.addEventListener('contextmenu', (event) => {
     if (halten) event.preventDefault();
   });
+  /* Auf dem iPhone gemessen: Nach einer halben Sekunde Halten hob iOS den
+     Reiter als Link zum Ziehen an (Karte mit Titel und Adresse) und nahm der
+     Leiste die Berührung weg – die Auswahl blieb stehen. Die Reiter sind
+     deshalb nicht ziehbar (draggable="false", -webkit-user-drag:none). */
+  tabLeiste.addEventListener('dragstart', (event) => event.preventDefault());
   // Den Klick, den der Browser nach dem Loslassen noch meldet, schluckt die
   // Leiste: Geöffnet wurde schon beim Loslassen.
   window.addEventListener('click', (event) => {

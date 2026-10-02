@@ -16726,10 +16726,13 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before{
   top:calc((34 - var(--kapsel-r)) * 2px);
 }
-/* Die Pille ist oben und unten je 4 px flacher als der Reiter. */
+/* Die Pille ist oben und unten je 1,5 px flacher als der Reiter. Bei 4 px
+   ragten die drei Punkte (3–7 px) oben heraus. Eingeklappt liegt die Kante
+   genau an der Kapsel (Abstand (r − 25) / 6 px läuft mit auf 0), sonst
+   stünden die Punkte dort 3 px über der Pille. */
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-auswahl{
-  top:calc((34 - var(--kapsel-r)) * 2px + 4px);
-  bottom:4px;
+  top:calc((34 - var(--kapsel-r)) * 2px + (var(--kapsel-r) - 25) * 1px / 6);
+  bottom:1.5px;
 }
 /* Die eingeklappte Leiste nimmt oberhalb der Kante keine Tipps mehr an. */
 :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-tabs{
@@ -16834,3 +16837,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media (prefers-reduced-motion:reduce){
   :root[data-theme][data-seite] #app>.app-dex-dock .app-dex-dock-inner::before{transition:none}
 }
+/* Reiter lassen sich nicht als Link ziehen: Sonst übernimmt iOS nach einer
+   halben Sekunde Halten die Berührung (main.js, reiterleisteBinden). */
+:root[data-theme][data-seite] #app>.app-dex-dock :is(.app-dex-tab,.app-dex-tab *){-webkit-user-drag:none}
