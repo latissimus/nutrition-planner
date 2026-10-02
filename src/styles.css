@@ -16764,3 +16764,11 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   color:var(--ui-gefuellt-schrift)!important;
   fill:var(--ui-gefuellt-schrift)!important;
 }
+
+/* Knöpfe in Menüs und Sheets auf TRAINING und SUPPS in der Seitenfarbe, wie
+   auf ESSEN, ROUTINEN und SCHLAF: TRAINING im Petrol der Seite, SUPPS in
+   ihrer Seitenfarbe – Schrift jeweils schwarz. Bisher blieb TRAINING beim
+   alten Grün und SUPPS beim alten Dunkelblau. */
+:root[data-theme="retro"][data-seite="training"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:var(--pastell)!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme="retro"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save){background:var(--dex-seitenfarbe)!important;color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme="retro"][data-seite="supps"] :is(.special-dex-sheet,.kategorie-sheet) :is(.btn,.btn-primary,.rem-speichern,.sammlung-editor-speichern,.dex-entry-save) :is(span,b,strong,.material-svg,svg,svg *){color:#111111!important;fill:currentColor!important}
