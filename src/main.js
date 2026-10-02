@@ -150,7 +150,6 @@ function tastaturBeobachten() {
   const sicht = window.visualViewport;
   if (!sicht) return;
   const wurzel = document.documentElement;
-  const SPEICHER = 'capboy:tastatur-hoehe';
   const istTextfeld = (element) => Boolean(element?.matches?.('input,textarea,select,[contenteditable="true"]'));
   const sheetFeld = (element = document.activeElement) => (
     istTextfeld(element) && element.closest('.kategorie-sheet-backdrop') ? element : null);
@@ -162,8 +161,6 @@ function tastaturBeobachten() {
     return !istTextfeld(feld) || Boolean(feld.closest('.kategorie-sheet-backdrop'));
   };
   const tastaturDa = () => sicht.height < window.innerHeight - 80;
-  let gemerkteHoehe = 0;
-  try { gemerkteHoehe = Number(localStorage.getItem(SPEICHER)) || 0; } catch {}
   let zuletzt = '';
   const setzen = (hoehe, oben, unten) => {
     const wert = `${Math.round(hoehe)}|${Math.round(oben)}|${Math.round(unten)}`;
@@ -189,17 +186,13 @@ function tastaturBeobachten() {
     if (f.top < b.top + luft || f.height > b.height - 2 * luft) bereich.scrollTop -= b.top + luft - f.top;
     else if (f.bottom > b.bottom - luft) bereich.scrollTop += f.bottom - (b.bottom - luft);
   };
-  let vorhersageSeit = 0;
+  let fokusSeit = 0;
+  document.addEventListener('focusin', () => { fokusSeit = performance.now(); }, true);
   const anwenden = () => {
     const feld = sheetFeld();
     if (feld && tastaturDa()) {
       const flaeche = feld.closest('.kategorie-sheet-backdrop').getBoundingClientRect();
       const unten = flaeche.bottom - (sicht.offsetTop + sicht.height);
-      if (Math.abs(unten - gemerkteHoehe) > 1) {
-        gemerkteHoehe = Math.round(unten);
-        try { localStorage.setItem(SPEICHER, String(gemerkteHoehe)); } catch {}
-      }
-      vorhersageSeit = 0;
       let geaendert = setzen(sicht.height, sicht.offsetTop, unten);
       if (!wurzel.classList.contains('tastatur-sichtbar')) {
         wurzel.classList.add('tastatur-sichtbar');
@@ -209,9 +202,8 @@ function tastaturBeobachten() {
       if (geaendert) feldZeigen(feld);
       return true;
     }
-    // Vorab gesetzt, Tastatur noch unterwegs: kurz auf sie warten.
-    if (feld && vorhersageSeit && performance.now() - vorhersageSeit < 900) return true;
-    vorhersageSeit = 0;
+    // Fokus im Sheet, Tastatur noch unterwegs: kurz weiter nachsehen.
+    if (feld && performance.now() - fokusSeit < 900) return true;
     if (wurzel.classList.contains('tastatur-sichtbar')) {
       wurzel.classList.remove('tastatur-sichtbar');
       zuletzt = '';
@@ -231,37 +223,34 @@ function tastaturBeobachten() {
   const starten = () => {
     if (!schleife) schleife = requestAnimationFrame(nachfuehren);
   };
-  // Vorhersage nur, wenn das Feld selbst angetippt wurde. Ein Fokus per Skript
-  // (etwa beim Öffnen des Einkauf-Menüs) öffnet auf iOS keine Tastatur: Das
-  // Sheet sprang sonst vorsorglich hoch und nach 0,9 s wieder herunter.
-  let letzteBeruehrung = null;
-  document.addEventListener('pointerdown', (event) => {
-    letzteBeruehrung = { ziel: event.target, zeit: performance.now() };
-  }, { capture: true, passive: true });
-  const vonBeruehrung = (feld) => {
-    if (!letzteBeruehrung || performance.now() - letzteBeruehrung.zeit > 1000) return false;
-    const ziel = letzteBeruehrung.ziel;
-    if (!(ziel instanceof Node)) return false;
-    return ziel === feld || feld.contains(ziel) || Boolean(ziel.closest?.('label')?.contains(feld));
-  };
-  document.addEventListener('focusin', (event) => {
-    const feld = sheetFeld(event.target);
-    // Vorab dorthin, wo das Sheet mit Tastatur stehen wird: iOS sieht das Feld
-    // dann schon frei und schiebt die Ansicht nicht erst selbst hoch.
-    if (feld && vonBeruehrung(feld) && gemerkteHoehe && !tastaturDa() && !wurzel.classList.contains('tastatur-sichtbar')) {
-      setzen(window.innerHeight - gemerkteHoehe, 0, gemerkteHoehe);
-      wurzel.classList.add('tastatur-sichtbar');
-      vorhersageSeit = performance.now();
-      feldZeigen(feld);
-    }
-    starten();
-  });
+  /* Keine Vorhersage beim Antippen mehr: Das Sheet sprang dabei unter dem
+     Finger hoch, bevor iOS den Klick meldete – der Klick landete auf der
+     Abdunklung und schloss das Sheet (im Video Bild für Bild gesehen). Das
+     Sheet folgt der Tastatur erst, wenn sie da ist. */
+  document.addEventListener('focusin', starten);
   document.addEventListener('focusout', () => setTimeout(starten, 60));
   sicht.addEventListener('resize', starten);
   sicht.addEventListener('scroll', starten);
   window.addEventListener('scroll', () => {
     if (!wurzel.classList.contains('tastatur-sichtbar') && !tastaturDa() && darfZuruecksetzen()) window.scrollTo(0, 0);
   }, { passive: true });
+}
+
+/* Eine Abdunklung schließt ihr Overlay nur, wenn der Finger auch auf ihr
+   aufgesetzt hat. Verschiebt sich das Sheet zwischen Aufsetzen und Klick
+   (Tastatur, Animation), meldet iOS den Klick an der alten Fingerposition –
+   dort lag dann die Abdunklung, und das Sheet schloss sich beim Tippen in ein
+   Feld. */
+function abdunklungSchuetzen() {
+  const ABDUNKLUNG = '.kategorie-sheet-backdrop, .food-dex-info-dialog-overlay, .dex-detail-overlay';
+  let aufgesetztAuf = null;
+  document.addEventListener('pointerdown', (event) => { aufgesetztAuf = event.target; }, { capture: true, passive: true });
+  document.addEventListener('click', (event) => {
+    const ziel = event.target;
+    if (!(ziel instanceof Element) || !ziel.matches(ABDUNKLUNG) || aufgesetztAuf === ziel) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
 }
 
 // Menüband-Kapsel: Wischt man den Inhalt nach oben (Lesen), wird sie flach und
@@ -308,6 +297,7 @@ function menuebandSchrumpfen() {
 
 konfiguriereSchreibfelder(document);
 tastaturBeobachten();
+abdunklungSchuetzen();
 menuebandSchrumpfen();
 new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
   if (node instanceof Element) konfiguriereSchreibfelder(node);
