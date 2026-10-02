@@ -1098,21 +1098,39 @@ function reiterleisteBinden(tabLeiste) {
     }
     const ziel = reiterZiel(tabLeiste, reiter);
     if (ziel != null) leisteRuecken(tabLeiste, ziel);
-    const bewegung = { reiter, zeit, geklickt: false };
+    const bewegung = { reiter, zeit };
     letzteTippBewegung = bewegung;
-    /* Kommt nach dem Loslassen doch kein Klick (der Finger ist zu weit
-       gerutscht), kehrt die Auswahl zum offenen Reiter zurück. */
+    /* Führt der Tipp doch nicht zur Seite (kein Klick), kehrt die Auswahl zum
+       offenen Reiter zurück. Geprüft wird die Adresse, nicht der Zeitpunkt
+       des Klicks: Kam er bei viel Arbeit erst spät, sprang die Pille sonst
+       zurück, obwohl die Seite gleich danach wechselte. */
+    const adresse = reiter.getAttribute('href');
     window.setTimeout(() => {
-      if (bewegung.geklickt || letzteTippBewegung !== bewegung) return;
+      if (letzteTippBewegung !== bewegung || location.hash === adresse || reiter.classList.contains('aktiv')) return;
       const aktiv = tabLeiste.querySelector('.app-dex-tab.aktiv');
       if (auswahl && aktiv) {
         auswahl.style.transform = `translateX(${aktiv.offsetLeft}px)`;
         auswahl.dataset.x = String(aktiv.offsetLeft);
       }
-    }, 700);
+    }, 1500);
   };
+  /* Nur ein echter Tipp zählt: kurz, ohne nennenswerte Bewegung und ohne
+     dass die Leiste dabei gescrollt hat. Sonst hielt ein seitliches Wischen
+     über die Leiste beim Loslassen als Tipp her – sie federte, die Pille
+     sprang auf einen fremden Reiter, die Leiste scrollte gegen die Hand und
+     sprang danach zurück. */
+  let aufsetzen = null;
+  tabLeiste.addEventListener('pointerdown', (event) => {
+    aufsetzen = { x: event.clientX, y: event.clientY, zeit: performance.now(), scroll: tabLeiste.scrollLeft };
+  }, { passive: true });
+  tabLeiste.addEventListener('pointercancel', () => { aufsetzen = null; }, { passive: true });
   tabLeiste.addEventListener('pointerup', (event) => {
+    const start = aufsetzen;
+    aufsetzen = null;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (!start || performance.now() - start.zeit > 600
+      || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10
+      || Math.abs(tabLeiste.scrollLeft - start.scroll) > 2) return;
     const reiter = event.target.closest?.('.app-dex-tab');
     if (reiter && !oeffnetMenue(reiter)) tippBewegungen(reiter);
   }, { passive: true });
@@ -1120,12 +1138,10 @@ function reiterleisteBinden(tabLeiste) {
     const { view } = dockZustand;
     const reiter = event.target.closest?.('.app-dex-tab');
     const menue = oeffnetMenue(reiter);
-    if (reiter && !menue) {
-      // Ohne vorheriges Loslassen (Tastatur, Maus ohne Pointer Events) hier.
-      const bewegung = letzteTippBewegung;
-      if (bewegung?.reiter === reiter && performance.now() - bewegung.zeit < 700) bewegung.geklickt = true;
-      else tippBewegungen(reiter);
-    }
+    // Ohne vorheriges Loslassen (Tastatur, Maus ohne Pointer Events) hier.
+    const schonBewegt = letzteTippBewegung?.reiter === reiter
+      && performance.now() - letzteTippBewegung.zeit < 1500;
+    if (reiter && !menue && !schonBewegt) tippBewegungen(reiter);
     /* Auf Nebenansichten (Profil, Suche) bleibt der Reiter ein reiner
        Verweis. Ueberall sonst – auch im Unterordner – oeffnet er das Menue
        der gerade offenen Seite; zurueck geht es dort ueber den Pfeil im Kopf. */
