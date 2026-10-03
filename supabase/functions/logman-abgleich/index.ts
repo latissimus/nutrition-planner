@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
-import { parseLogmanExport } from './umrechnung.js';
+import { einheitenMitSaetzen, parseLogmanExport } from './umrechnung.js';
 
 // LOGMAN-Abgleich: CAPBOY liest das Trainingslog des eigenen LOGMAN-Kontos
 // selbst. Gekoppelt wird einmal per Code aus LOGMAN (Profil → „Mit CAPBOY
@@ -44,6 +44,22 @@ const ABGLEICH_ABSTAND_MS = 30 * 60 * 1000;
 
 type Row = Record<string, any>;
 
+const berlinDatum = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(new Date());
+
+/* Datum je Einheit „Tag|Cycle“, an dem CAPBOY sie erstmals mit Sätzen sah.
+   LOGMAN speichert ein Datum nur, wenn man es einstellt oder „vollständig“
+   tippt. Beim ersten Abgleich nach dem Koppeln ist der Tag unbekannt (null).
+   Verschwindet eine Einheit (Phasen-Reset, alle Sätze gelöscht), fällt sie
+   heraus: Sonst erbte der neue Cycle 1 das Datum des alten. */
+function einheitenDatieren(payload: unknown, bisher: Row | null, erstmals: boolean) {
+  const heute = berlinDatum();
+  const gesehen: Row = {};
+  for (const schluessel of einheitenMitSaetzen(payload)) {
+    gesehen[schluessel] = bisher && schluessel in bisher ? bisher[schluessel] : (erstmals ? null : heute);
+  }
+  return gesehen;
+}
+
 async function kopplungLesen(userId: string) {
   const { data, error } = await admin.from('logman_kopplung').select('*').eq('user_id', userId).maybeSingle();
   if (error) throw new Error(`Kopplung lesen: ${error.message}`);
@@ -68,9 +84,11 @@ async function statusAntwort(userId: string, zusatz: Row = {}) {
 // heutigen Datum als Ersatz entstünden bei jedem Abgleich neue Zeilen.
 // Dieselbe Übung zweimal am selben Tag würde den Upsert abbrechen; es zählt
 // dann der bessere Wert.
-function leistungsZeilen(payload: unknown, userId: string) {
+function leistungsZeilen(payload: Row, gesehen: Row, userId: string) {
   const beste = new Map<string, Row>();
-  for (const zeile of parseLogmanExport(payload, '') as Row[]) {
+  // Ein in LOGMAN eingestelltes Datum hat Vorrang vor dem ersten Sehen.
+  const datum = { ...Object.fromEntries(Object.entries(gesehen).filter(([, tag]) => tag)), ...(payload?.datum || {}) };
+  for (const zeile of parseLogmanExport({ ...payload, datum }, '') as Row[]) {
     if (!/^\d{4}-\d{2}-\d{2}/.test(String(zeile.performed_on || ''))) continue;
     const performed_on = String(zeile.performed_on).slice(0, 10);
     const schluessel = `${performed_on}|${zeile.exercise}|${zeile.category}`;
@@ -90,7 +108,7 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
     return statusAntwort(userId, { ergebnis: 'uebersprungen' });
   }
 
-  const { data: spiegel } = await admin.from('logman_spiegel').select('logman_version').eq('user_id', userId).maybeSingle();
+  const { data: spiegel } = await admin.from('logman_spiegel').select('logman_version,einheiten_gesehen').eq('user_id', userId).maybeSingle();
   const { data: antwort, error } = await logman.rpc('capboy_training_log', {
     p_token: kopplung.token,
     p_bekannte_version: neu ? null : spiegel?.logman_version ?? null,
@@ -107,16 +125,19 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
   await admin.from('logman_kopplung').update({ zuletzt_abgeglichen_am: jetzt }).eq('user_id', userId);
   if (antwort?.status !== 'ok') return statusAntwort(userId, { ergebnis: antwort?.status === 'leer' ? 'leer' : 'unveraendert' });
 
+  const payload = antwort.payload || {};
+  const gesehen = einheitenDatieren(payload, spiegel?.einheiten_gesehen || null, !spiegel);
   const { error: spiegelFehler } = await admin.from('logman_spiegel').upsert({
     user_id: userId,
-    payload: antwort.payload || {},
+    payload,
     logman_version: antwort.version,
     logman_stand: antwort.updated_at || null,
     abgerufen_am: jetzt,
+    einheiten_gesehen: gesehen,
   });
   if (spiegelFehler) throw new Error(`Spiegel schreiben: ${spiegelFehler.message}`);
 
-  const zeilen = leistungsZeilen(antwort.payload, userId);
+  const zeilen = leistungsZeilen(payload, gesehen, userId);
   if (zeilen.length) {
     const { error: leistungFehler } = await admin.from('logman_performance')
       .upsert(zeilen, { onConflict: 'user_id,performed_on,exercise,category' });

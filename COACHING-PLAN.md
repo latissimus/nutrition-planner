@@ -92,21 +92,40 @@ Abnahme:
 
 ## Schritt 2 – Trainingsauswertung (ohne KI, reines Modul mit Tests)
 
-Ein Modul in `capboy-coach` (neben `context.ts`) rechnet aus dem Spiegel:
-- Je Übung: letzter Wert gegen den vorherigen derselben Einheit (e1RM nach
-  Epley, wie `progression.js`), gesteigert, gleich oder gefallen, sowie
-  Stillstand über mehrere Einheiten.
-- Ziel für die nächste Einheit nach doppelter Steigerung: oberes Ende des
-  Bereichs bei passendem RIR erreicht, dann Last erhöhen, sonst eine
-  Wiederholung mehr.
-- Nächste Einheit der Rotation (OK-H → UK-H → OK-P → UK-P), Zyklus- und
-  Deload-Stand, Level je Tag.
-- Harte Sätze je Muskel und Woche über die `konten` der Vorlage.
-- Offener Punkt: Bereiche und `konten` stehen in LOGMANs `template.js`
-  (Fassung v4 weicht von `LOGMAN-Training.md` ab, es gilt der Code). Wie die
-  Kopie in CAPBOY mit LOGMAN abgeglichen bleibt, muss noch geklärt werden.
-- Abnahme: Tests mit festen Fixtures (Steigerung, Stillstand, Lastsprung,
-  Deload, fehlende Daten), jeweils gegen von Hand nachgerechnete Werte.
+Gebaut am 03.10.2026: `supabase/functions/capboy-coach/training.js`, Tests in
+`src/coachTraining.test.js` (18 Fälle, alle grün).
+
+- **LOGMAN rechnet mit:** LOGMANs reine Rechenmodule liegen als unveränderte
+  Kopie in `capboy-coach/logman/`: Vorlage, Katalog, eigene Übungen, Sätze,
+  Prioritäten, Set-O-Meter, Fortschritt und Sprungwarnung.
+  `scripts/logman-module-uebernehmen.mjs` holt sie neu. Ein Test meldet lokal,
+  wenn die Kopie von LOGMAN abweicht. So klärt sich der offene Punkt: Es gilt
+  der Code von LOGMAN (Vorlage v4), CAPBOY rechnet nichts davon nach.
+- **Je Einheit:** Sätze, bester e1RM, Vergleich zum letzten Mal derselben
+  Einheit (gesteigert, gleich, gefallen, erstmals), e1RM-Differenz,
+  Lastsprung nach LOGMANs Regel (mehr als 10 % und mehr als 2,5 kg) und RIR über
+  dem Ziel.
+- **Je Übung über die Cycles:** Verlauf und die Zahl der Vergleiche ohne
+  Fortschritt. 2 heißt drei Einheiten auf demselben Stand. Dazu ein Merker,
+  wenn die Leistung wiederholt fällt (LOGMAN-Training.md, Abschnitt 7).
+- **Nächste Einheit:** LOGMANs Stand (`week`/`day`). Hat sie schon Sätze, gilt
+  die nächste der Rotation. Nach Cycle 7 kommt der Deload, danach ist die
+  Phase zu Ende.
+- **Ziel je HEAVYS-/MIDDLES-Übung (doppelte Steigerung):** Haben alle Sätze mit
+  dem schwersten Gewicht das obere Ende erreicht, steigt die Last um 2,5 kg und
+  es geht am unteren Ende neu los. Sonst bleibt das Gewicht, plus eine
+  Wiederholung. Im Deload gelten halbe Sätze und 3–5 RIR.
+- **Sätze je Muskel im Cycle:** geplant (Set-O-Meter) und erledigt, mit
+  derselben Gewichtung, Nebenspieler zählen halb.
+- **Datum der Einheit:** LOGMAN speichert ein Datum nur, wenn man es
+  einstellt oder „Diese Einheit ist vollständig“ tippt. Deshalb trägt der
+  Abgleich je Einheit den Tag ein, an dem er sie erstmals mit Sätzen sah
+  (`logman_spiegel.einheiten_gesehen`, Migration 20261003090000). Ein
+  LOGMAN-Datum hat Vorrang. Einheiten von vor der Kopplung bleiben ohne Datum.
+  Daraus kommen „heute trainiert“ und „Tage seit der letzten Einheit“, und die
+  Leistungszeilen in COMP bekommen so überhaupt erst ein Datum.
+- Offen für Schritt 3: `capboy-coach` muss beim Deploy die Dateien
+  `training.js` und `logman/*.js` mitnehmen.
 
 ## Schritt 3 – Coaching-Lauf (KI)
 

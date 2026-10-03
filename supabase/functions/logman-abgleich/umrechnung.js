@@ -16,6 +16,22 @@ export const estimatedOneRepMax = (weight, repetitions) => {
   return kg > 0 && reps > 0 ? kg * (1 + reps / 30) : 0;
 };
 
+// Einheiten („Tag|Cycle“, z. B. „OK-H|3“) mit mindestens einem eingetragenen
+// Satz. LOGMAN legt beim bloßen Ansehen eines Tages leere Blöcke an; die
+// zählen nicht.
+export function einheitenMitSaetzen(input) {
+  const payload = input?.training?.payload || input?.payload || input?.training || input;
+  const schluessel = [];
+  Object.entries(payload?.data || {}).forEach(([day, cycles]) => {
+    Object.entries(cycles || {}).forEach(([cycle, blocks]) => {
+      const hatSatz = Object.values(blocks || {}).some((entry) => (entry?.sets || []).some((sets) => (sets || [])
+        .some((set) => number(set?.w) >= 0 && String(set?.w ?? '').trim() !== '' && number(set?.r) > 0)));
+      if (hatSatz) schluessel.push(`${day}|${cycle}`);
+    });
+  });
+  return schluessel;
+}
+
 export function parseLogmanExport(input, fallbackDate = new Date().toISOString().slice(0, 10)) {
   const payload = input?.training?.payload || input?.payload || input?.training || input;
   const data = payload?.data || {};
