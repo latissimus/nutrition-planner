@@ -1593,6 +1593,19 @@ window.addEventListener('muscledex:counts-changed', (event) => { if (betrifftHin
 window.addEventListener('muscledex:coins-changed', (event) => { if (betrifftHinweise(event)) dockHinweiseLaden(true); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') dockHinweiseLaden(); });
 
+/* LOGMAN-Einheiten still nachholen, sobald die App startet oder wieder in den
+   Vordergrund kommt. logmanKopplung.js ruft höchstens alle 30 Minuten an und
+   gar nicht, solange LOGMAN nicht verbunden ist. */
+function logmanNachholen() {
+  if (!session?.user?.id) return;
+  const start = () => import('./logmanKopplung.js')
+    .then(({ logmanImHintergrundAbgleichen }) => logmanImHintergrundAbgleichen())
+    .catch(() => {});
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(start, { timeout: 4000 });
+  else setTimeout(start, 1500);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') logmanNachholen(); });
+
 function wochenbilanzHinweisLaden() {
   const userId = session?.user?.id;
   if (!userId || wochenbilanzGeprueftFuer === userId) return;
@@ -2925,6 +2938,7 @@ if (!supabaseKonfiguriert) {
       // Loop mit forceRestart neu bewerten: sobald ein Server-Abo existiert, muss
       // der lokale 30-Sekunden-Loop abgebaut werden, sonst feuern beide (doppelt).
       maybeShowPushOnboarding(aktiveUserId, () => reminderLoopStarten({ forceRestart: true }));
+      logmanNachholen();
     }
     // Ein still erneuertes Zugriffstoken darf die gerade benutzte Unterseite
     // nicht neu aufbauen. Auch wiederholte SIGNED_IN-Ereignisse desselben

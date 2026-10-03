@@ -7,6 +7,7 @@ import {
   setCoinDexVisible, setCollectionVisible,
 } from './collectionPreferences.js';
 import { createFullDataExport, exportFileName } from './dataExport.js';
+import { mountLogmanKopplung } from './logmanKopplung.js';
 import {
   interfaceSoundsEnabled, playInterfaceSound, setInterfaceSoundsEnabled,
 } from './uiSounds.js';
@@ -325,6 +326,9 @@ export function mountProfile(container, { session, profile, signal, onProfileUpd
   hilfe.innerHTML = `
     <p class="profile-hinweis">Kurz erklärt für jede Seite: wie CAPBOY rechnet und was die KI darf.</p>
     <a class="btn btn-block faq-oeffnen" href="#faq">FAQ öffnen</a>`;
+
+  // LOGMAN koppeln: Danach liest CAPBOY die Einheiten selbst (kein Export mehr).
+  mountLogmanKopplung(abschnitt(wrap, 'LOGMAN'));
 
   const daten = abschnitt(wrap, 'Meine Daten');
   daten.innerHTML = `
