@@ -13,6 +13,7 @@ import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
 import { fensterMarkup } from './coachFenster.js';
 import { sanduhrMarkup } from './sanduhr.js';
 import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
+import { alsGelesenMarkieren, coachingKarteMarkup, istFrisch, neuestesCoaching } from './coaching.js';
 
 export { fensterMarkup };
 
@@ -211,6 +212,15 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   // Eine Frage von einer Fachseite beginnt immer ein neues Gespräch.
   if (pending.question) gespraechSchreiben(null);
   let gespraech = gespraechLesen();
+  // Tägliches Coaching (coaching.js): Ein frisches, noch ungelesenes Coaching
+  // beginnt das Gespräch zu ihm. Seine id ist die Gesprächs-id, unter der der
+  // Server das Coaching abgelegt hat; Rückfragen kennen es dadurch.
+  let coaching = null;
+  try { coaching = await neuestesCoaching(userId); } catch (error) { console.warn('Coaching nicht geladen:', error?.message); }
+  if (coaching?.status === 'bereit' && !coaching.gelesen_am && istFrisch(coaching) && !pending.question && gespraech?.id !== coaching.id) {
+    gespraech = { id: coaching.id, runden: [] };
+    gespraechSchreiben(gespraech);
+  }
   // Die gerade sichtbaren Runden; "Merken" und "Ergebnis übernehmen" gehören
   // zur Antwort, unter der sie stehen.
   let runden = gespraech?.runden || [];
@@ -291,8 +301,18 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     .catch((error) => { start.fehler = true; console.warn('Offene Punkte nicht geladen:', error?.message); })
     .finally(startErneuern);
 
+  // Die Karte steht über dem Gespräch zum Coaching, im leeren Chat zeigt sie
+  // das frische Coaching statt der Startnachricht. Ein laufendes oder
+  // gescheitertes Coaching steht als Status über jedem Gespräch, sonst bliebe
+  // ein Fehlschlag bei offenem älterem Gespräch unbemerkt.
+  let karteAusgeblendet = false;
+  const karteSichtbar = () => coaching?.status === 'bereit'
+    && (gespraech?.id === coaching.id || (!runden.length && !karteAusgeblendet && istFrisch(coaching)));
+  const statusSichtbar = () => Boolean(coaching) && coaching.status !== 'bereit' && !karteAusgeblendet && istFrisch(coaching);
+  const kopf = () => (karteSichtbar() || statusSichtbar() ? coachingKarteMarkup(coaching) : '');
   const zeichnen = (zusatz = '') => {
-    answer.innerHTML = (runden.length ? verlaufMarkup(runden, avatar) : startMarkup(start)) + zusatz;
+    answer.innerHTML = kopf() + (runden.length ? verlaufMarkup(runden, avatar) : (karteSichtbar() ? '' : startMarkup(start))) + zusatz;
+    if (karteSichtbar()) alsGelesenMarkieren(coaching);
   };
   const resizeField = () => {
     field.style.height = 'auto';
@@ -341,6 +361,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
 
   neuesGespraech.onclick = () => {
     werkzeugeZeigen(false);
+    // Ein neues Gespräch beginnt leer, ohne die Coaching-Karte.
+    karteAusgeblendet = true;
     gespraech = null;
     runden = [];
     gespraechSchreiben(null);
@@ -514,13 +536,15 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     field.value = '';
     resizeField();
     werkzeugeZeigen(false);
-    answer.innerHTML = verlaufMarkup(runden, avatar)
+    answer.innerHTML = kopf() + verlaufMarkup(runden, avatar)
       + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang) })
       + tipptMarkup((webResearch ? LADEPHASEN.web : LADEPHASEN.coach)[0]);
     const ladephasenStoppen = ladephasenStarten(answer, webResearch ? LADEPHASEN.web : LADEPHASEN.coach);
     nachUnten();
     try {
-      const response = await invokeCoach('coach', question, webResearch, gespraech?.id, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);
+      // Steht die Coaching-Karte über einem leeren Chat, gehört die Frage zu ihr.
+      const gespraechsId = gespraech?.id || (karteSichtbar() && coaching.status === 'bereit' ? coaching.id : null);
+      const response = await invokeCoach('coach', question, webResearch, gespraechsId, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);
       // Nur wenn der Server die Runde gespeichert hat, gibt es ein
       // Gespräch, an das die nächste Frage anschließen kann.
       const frueher = gespraech?.id === response.conversationId ? runden : [];

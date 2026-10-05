@@ -5,10 +5,13 @@ import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateD
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
 import { reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion } from './weekly.ts';
 import { followThroughActions, switchedOffAreas } from './followThrough.ts';
+import webpush from 'npm:web-push@3.6.7';
+import { COACHING_SCHEMA, coachingBereinigen, coachingSystemPrompt, coachingText, coachingUserPrompt, geaenderteBereiche, hatNeueDaten } from './coaching.ts';
+import { trainingsAuswertung } from './training.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
+  'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info, x-cron-secret',
 };
 
 const json = (body: Record<string, unknown>, status = 200) => new Response(JSON.stringify(body), {
@@ -19,6 +22,13 @@ const json = (body: Record<string, unknown>, status = 200) => new Response(JSON.
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const openAiKey = Deno.env.get('OPENAI_API_KEY') || '';
+// Tägliches Coaching: derselbe Cron-Schlüssel und dieselben Push-Schlüssel wie
+// beim Erinnerungslauf (send-reminders).
+const cronSecret = Deno.env.get('CRON_SECRET') || '';
+const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY') || '';
+const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY') || '';
+const vapidSubject = Deno.env.get('VAPID_SUBJECT') || 'mailto:admin@example.com';
 const admin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
@@ -206,9 +216,9 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     userRows('weights', userId, 'gemessen_am', FETCH_LIMITS.weights, 'gemessen_am,kg'),
     userRows('skinfolds', userId, 'gemessen_am', FETCH_LIMITS.skinfolds, 'gemessen_am,falten,standardisiert,messqualitaet'),
     userRows('waist_measurements', userId, 'gemessen_am', FETCH_LIMITS.waists, 'gemessen_am,cm,standardisiert'),
-    userRows('logman_performance', userId, 'performed_on', FETCH_LIMITS.performance, 'performed_on,exercise,category,estimated_1rm,volume'),
+    userRows('logman_performance', userId, 'performed_on', FETCH_LIMITS.performance, 'performed_on,exercise,category,estimated_1rm,volume,source'),
     userRows('sleep_logs', userId, 'sleep_date', FETCH_LIMITS.sleep, 'sleep_date,bedtime,wake_time,quality,energy,awakenings,tags'),
-    userRows('bodycomp_checkins', userId, 'checkin_date', FETCH_LIMITS.checkins, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals'),
+    userRows('bodycomp_checkins', userId, 'checkin_date', FETCH_LIMITS.checkins, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals,note'),
     pagedRows(() => admin.from('nutrition_log_entries').select('log_date,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }).order('id')),
     // All routines, paused ones included, so every completion has a name.
     admin.from('routines').select('id,name,period,weekdays,active,created_at').eq('user_id', userId).order('position'),
@@ -456,10 +466,200 @@ function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null
   };
 }
 
+// ---------------------------------------------------------------------------
+// Tägliches Coaching um 21 Uhr (COACHING-PLAN.md, Schritt 3)
+// ---------------------------------------------------------------------------
+
+const berlinTeile = (jetzt: Date) => {
+  const teile = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23',
+  }).formatToParts(jetzt).map((teil) => [teil.type, teil.value]));
+  return { datum: `${teile.year}-${teile.month}-${teile.day}`, stunde: Number(teile.hour) };
+};
+
+// Vor dem Coaching die LOGMAN-Einheiten frisch holen (logman-abgleich, Weg
+// für den Zeitplan). Ein Fehler darf nicht als frischer Trainingsstand gelten.
+async function logmanVorDemCoaching(userId: string) {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/logman-abgleich`, {
+      method: 'POST',
+      signal: AbortSignal.timeout(15_000),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${anonKey}`, apikey: anonKey, 'x-cron-secret': cronSecret },
+      body: JSON.stringify({ aktion: 'abgleichen', erzwingen: true, userId }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const status = await response.json();
+    if (status?.ergebnis === 'getrennt') return { verbunden: false, frisch: false, grund: 'LOGMAN-Verbindung getrennt' };
+    return { verbunden: status?.verbunden === true, frisch: status?.verbunden === true, grund: '' };
+  } catch (error) {
+    console.error('Coaching: LOGMAN-Abgleich fehlgeschlagen', error instanceof Error ? error.message : error);
+    return { verbunden: false, frisch: false, grund: 'LOGMAN-Abgleich fehlgeschlagen' };
+  }
+}
+
+async function coachingPush(userId: string, datum: string, ueberschrift: string) {
+  if (!vapidPublicKey || !vapidPrivateKey) return 0;
+  const { data, error } = await admin.from('push_subscriptions').select('id,endpoint,p256dh,auth').eq('user_id', userId);
+  if (error || !data?.length) return 0;
+  webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+  let gesendet = 0;
+  for (const abo of data as Row[]) {
+    try {
+      await webpush.sendNotification(
+        { endpoint: abo.endpoint, keys: { p256dh: abo.p256dh, auth: abo.auth } },
+        JSON.stringify({ title: 'Coaching', body: ueberschrift, tag: `coaching-${datum}`, url: '#coach' }),
+        { TTL: 6 * 3600, urgency: 'normal' },
+      );
+      gesendet += 1;
+    } catch (fehler) {
+      const status = Number((fehler as { statusCode?: number })?.statusCode || 0);
+      // Abgelaufene Abos wie beim Erinnerungslauf entfernen.
+      if (status === 404 || status === 410) await admin.from('push_subscriptions').delete().eq('id', abo.id);
+    }
+  }
+  return gesendet;
+}
+
+/* Ein Coaching je Person und Tag. Die eindeutige Zeile wird vor dem API-Aufruf
+   angelegt: parallele Läufe können denselben Tag nicht doppelt berechnen. */
+async function coachingFuerNutzer(userId: string, jetzt: Date, heute: string) {
+  const { data: vorhanden, error: vorhandenFehler } = await admin.from('coach_coachings').select('id,status').eq('user_id', userId).eq('art', 'tag').eq('datum', heute).maybeSingle();
+  if (vorhandenFehler) throw vorhandenFehler;
+  if (vorhanden) return 'schon_erledigt';
+  const logmanStatus = await logmanVorDemCoaching(userId);
+  const [rows, revisionResult, letzterResult] = await Promise.all([
+    fetchContextRows(userId, jetzt),
+    admin.from('coach_input_revisions').select('revision,quellen_revisionen').eq('user_id', userId).maybeSingle(),
+    admin.from('coach_coachings').select('input_revision').eq('user_id', userId).eq('art', 'tag')
+      .order('erstellt_am', { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  if (revisionResult.error) throw revisionResult.error;
+  if (letzterResult.error) throw letzterResult.error;
+  const revision = Number(revisionResult.data?.revision || 0);
+  const letzteRevision = Number(letzterResult.data?.input_revision || 0);
+  if (!hatNeueDaten(revision, letzteRevision)) return 'nichts_neues';
+  const manuellerTrainingsstand = rows.performance.some((zeile) => zeile.source !== 'LOGMAN-Abgleich');
+  const aenderungen = geaenderteBereiche(revisionResult.data?.quellen_revisionen || {}, letzteRevision, rows.switchedOffAreas || [])
+    .filter((bereich) => bereich !== 'training' || logmanStatus.frisch || manuellerTrainingsstand);
+  if (!aenderungen.length) return 'nichts_relevantes';
+
+  // Die Unique-Constraint ist der atomare Anspruch. Auch ein Fehler bleibt als
+  // Status stehen, damit derselbe Datenstand keinen zweiten KI-Aufruf erzeugt.
+  const { data: anspruch, error: anspruchFehler } = await admin.from('coach_coachings').insert({
+    user_id: userId, art: 'tag', datum: heute, status: 'laeuft', input_revision: revision,
+  }).select('id').single();
+  if (anspruchFehler?.code === '23505') return 'schon_erledigt';
+  if (anspruchFehler) throw anspruchFehler;
+  try {
+    const [spiegelResult, vortagResult] = await Promise.all([
+      logmanStatus.frisch
+        ? admin.from('logman_spiegel').select('payload,einheiten_gesehen').eq('user_id', userId).maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
+      admin.from('coach_coachings').select('datum,ergebnis').eq('user_id', userId).eq('art', 'tag').eq('status', 'bereit').lt('datum', heute)
+        .order('datum', { ascending: false }).limit(1).maybeSingle(),
+    ]);
+    if (spiegelResult.error) throw spiegelResult.error;
+    if (vortagResult.error) throw vortagResult.error;
+    const spiegel = spiegelResult.data;
+    const vortag = vortagResult.data;
+    const training = spiegel ? trainingsAuswertung(spiegel.payload, { gesehen: spiegel.einheiten_gesehen || {}, heute }) : null;
+    if (!logmanStatus.frisch) rows.performance = rows.performance.filter((zeile) => zeile.source !== 'LOGMAN-Abgleich');
+    const snapshot: Row = buildCompFacts(rows, jetzt);
+    if (!logmanStatus.frisch && !rows.performance.length) snapshot.training = { status: logmanStatus.grund || 'LOGMAN nicht verbunden' };
+    const timeseries = buildTimeseries(rows, jetzt);
+    const recentCheckinNotes = rows.checkins.filter((zeile) => String(zeile.note || '').trim()).slice(0, 5)
+      .map((zeile) => ({ date: zeile.checkin_date, text: String(zeile.note).trim().slice(0, 300) }));
+    // Gedächtnis ohne Gespräch: nur bestätigte Fakten und laufende Experimente.
+    const memory = await loadMemory(userId, crypto.randomUUID(), heute, timeseries);
+    const antwort = await openAi('/responses', {
+      method: 'POST',
+      signal: AbortSignal.timeout(90_000),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: COACH_MODEL,
+        instructions: coachingSystemPrompt(),
+        input: [{ role: 'user', content: coachingUserPrompt({
+          snapshot, timeseries, training, logmanStatus, aenderungen, recentCheckinNotes,
+          vortag: vortag ? { datum: vortag.datum, ...(vortag.ergebnis || {}) } : null,
+          memory: { profile_memory: memory.blocks.profile_memory, intervention_log: memory.blocks.intervention_log },
+          heute,
+        }) }],
+        reasoning: { effort: 'medium' },
+        max_output_tokens: 3000,
+        text: { format: { type: 'json_schema', name: 'capboy_coaching', strict: true, schema: COACHING_SCHEMA } },
+      }),
+    });
+    if (antwort.status === 'incomplete') throw new Error(`OpenAI response incomplete: ${antwort.incomplete_details?.reason || 'unknown'}`);
+    const roh = outputText(antwort);
+    if (!roh) throw new Error('Leere Coaching-Antwort');
+    const ergebnis = coachingBereinigen(JSON.parse(roh));
+    const { error } = await admin.from('coach_coachings').update({
+      status: 'bereit', ergebnis, bereiche: ergebnis.bereiche, modell: COACH_MODEL,
+    }).eq('id', anspruch.id).eq('status', 'laeuft');
+    if (error) throw error;
+    // Erste Nachricht im Gespräch zum Coaching (Gesprächs-id = Coaching-id).
+    const { error: gespraechFehler } = await admin.from('ai_coach_messages').insert({
+      user_id: userId, conversation_id: anspruch.id, role: 'assistant', content: coachingText(ergebnis),
+      context: { coaching: ergebnis, coachingId: anspruch.id },
+    });
+    if (gespraechFehler) console.error('Coaching nicht im Gesprächsgedächtnis abgelegt', userId, gespraechFehler.message);
+    try {
+      await coachingPush(userId, heute, ergebnis.ueberschrift);
+    } catch (pushFehler) {
+      console.error('Coaching gespeichert, Push fehlgeschlagen', userId, pushFehler instanceof Error ? pushFehler.message : pushFehler);
+    }
+    return 'erstellt';
+  } catch (error) {
+    const { error: statusFehler } = await admin.from('coach_coachings').update({
+      status: 'fehlgeschlagen', fehler: String((error as Error)?.message || error).slice(0, 500),
+    }).eq('id', anspruch.id).eq('status', 'laeuft');
+    if (statusFehler) console.error('Coaching-Fehlerstatus konnte nicht gespeichert werden', userId, statusFehler);
+    throw error;
+  }
+}
+
+// Lauf über alle Konten. Nur um 21 Uhr in Europe/Berlin, außer erzwingen
+// (Test für ein einzelnes Konto über denselben geschützten Weg).
+async function coachingLauf({ erzwingen = false, userId = null as string | null } = {}) {
+  const jetzt = new Date();
+  const { datum, stunde } = berlinTeile(jetzt);
+  if (!erzwingen && stunde !== 21) return;
+  const konten = userId ? [{ id: userId }] : await pagedRows(() => admin.from('profiles').select('id').order('id'));
+  for (let index = 0; index < konten.length; index += 2) {
+    await Promise.all(konten.slice(index, index + 2).map(async (konto: Row) => {
+      try {
+        const ergebnis = await coachingFuerNutzer(konto.id, jetzt, datum);
+        console.log('Coaching', konto.id, ergebnis);
+      } catch (error) {
+        console.error('Coaching fehlgeschlagen', konto.id, error instanceof Error ? error.message : error);
+      }
+    }));
+  }
+}
+
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (request.method !== 'POST') return json({ error: 'Nur POST ist erlaubt.' }, 405);
   if (!supabaseUrl || !serviceRoleKey || !openAiKey) return json({ error: 'Coach ist noch nicht vollständig konfiguriert.' }, 503);
+
+  // Zeitplan (pg_cron, Migration 20261003120000): berechtigt allein über
+  // x-cron-secret. Die Antwort kommt sofort, das Coaching läuft im Hintergrund
+  // weiter (der Zeitplan wartet nur 5 Sekunden).
+  const cronKopf = request.headers.get('x-cron-secret');
+  if (cronKopf) {
+    if (!cronSecret || cronKopf !== cronSecret) return json({ error: 'Nicht autorisiert.' }, 401);
+    const auftrag = await request.json().catch(() => ({}));
+    if (auftrag?.mode !== 'coaching-lauf') return json({ error: 'Unbekannter Auftrag.' }, 400);
+    if (auftrag?.erzwingen === true && !isUuid(auftrag?.userId)) return json({ error: 'Testlauf nur für ein einzelnes Konto.' }, 400);
+    const lauf = coachingLauf({
+      erzwingen: auftrag?.erzwingen === true,
+      userId: isUuid(auftrag?.userId) ? auftrag.userId as string : null,
+    });
+    const laufzeit = (globalThis as Row).EdgeRuntime;
+    if (laufzeit?.waitUntil) laufzeit.waitUntil(lauf);
+    else await lauf;
+    return json({ ok: true }, 202);
+  }
 
   const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') || '';
   const { data: userData, error: authError } = await admin.auth.getUser(token);

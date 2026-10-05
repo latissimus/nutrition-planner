@@ -1,0 +1,69 @@
+<svg width="100%" height="100%" viewBox="-1.5 2 103 98" xmlns="http://www.w3.org/2000/svg">
+  <!-- Entwurf v3: wie v2, Brille höher und quadratischer; „HEAVY“ größer. Basis v2: Coach als Sticker nach Mike Mentzer in der Heavy-Duty-
+       Zeit: dunkles Haar eng am Kopf, Seitenscheitel mit Welle in die Stirn, rechteckige Brille
+       mit kräftigem dunklem Rahmen, buschiger Schnauzbart über die
+       Mundwinkel, etwas volleres Gesicht, schwarzes „HEAVY“-Shirt.
+       Erst die schwarze Außenkontur aus denselben Formen, darüber die
+       Farbflächen. -->
+  <defs>
+    <path id="koerper" d="M36 70 C35 76 33 80 28 83 C20 86 12 89 6 95 L6 100 L94 100 L94 95 C88 89 80 86 72 83 C67 80 65 76 64 70 Z"/>
+    <path id="gesicht" d="M27 24 L27 58 C27 72 37 81 50 81 C63 81 73 72 73 58 L73 24 Z"/>
+    <path id="haare" d="M22 52 C20 44 20 33 24 25 C29 16 39 12 50 12 C62 12 72 16 76.5 24 C80 31 80 42 78 52 L73 52 L73 36 C70 33 66 31.5 61 31 C56 30.5 50 31 45 29.5 C41 28.3 38 26 36.5 23.5 C34 26 31 28.5 28.5 31 C27.6 32 27 33.5 27 35 L27 52 Z"/>
+  </defs>
+  <g fill="#000" stroke="#000" stroke-width="13" stroke-linejoin="round">
+    <use href="#koerper"/>
+    <circle cx="25.5" cy="55" r="6"/>
+    <circle cx="74.5" cy="55" r="6"/>
+    <use href="#gesicht"/>
+    <use href="#haare"/>
+  </g>
+
+  <!-- Nacken und Trapez, schwarzes Shirt mit Rundhals und „HEAVY“ -->
+  <use href="#koerper" fill="#E39A70"/>
+  <path d="M6 95 C12 89 20 86 28 84 C33 90.5 67 90.5 72 84 C80 86 88 89 94 95 L94 100 L6 100 Z" fill="#26262B"/>
+  <path d="M28 84 C33 90.5 67 90.5 72 84" fill="none" stroke="#45454D" stroke-width="2.6" stroke-linecap="round"/>
+  <g fill="#FFFFFF">
+    <rect x="29.5" y="91.4" width="2.6" height="7.4"/><rect x="33.9" y="91.4" width="2.6" height="7.4"/><rect x="29.5" y="94.1" width="7" height="2"/>
+    <rect x="37.9" y="91.4" width="2.6" height="7.4"/><rect x="37.9" y="91.4" width="6.2" height="2.1"/><rect x="37.9" y="94.1" width="5.2" height="2"/><rect x="37.9" y="96.7" width="6.2" height="2.1"/>
+    <path d="M46 98.8 L48.8 91.4 L51 91.4 L53.8 98.8 L51.4 98.8 L49.9 94.6 L48.4 98.8 Z"/><rect x="47.8" y="95.6" width="4.4" height="1.6"/>
+    <path d="M54.6 91.4 L57 91.4 L58.4 96.2 L59.8 91.4 L62.2 91.4 L59.5 98.8 L57.3 98.8 Z"/>
+    <path d="M63 91.4 L65.4 91.4 L66.8 94.7 L68.2 91.4 L70.6 91.4 L68 96.2 L68 98.8 L65.6 98.8 L65.6 96.2 Z"/>
+  </g>
+  <path d="M38 76 C45 81 55 81 62 76 L62 70 L38 70 Z" fill="#C97F58"/>
+
+  <!-- Ohren und Gesicht -->
+  <circle cx="25.5" cy="55" r="6" fill="#E39A70"/>
+  <circle cx="74.5" cy="55" r="6" fill="#E39A70"/>
+  <use href="#gesicht" fill="#ECA67C"/>
+
+  <!-- Frisur: dunkel, eng am Kopf, Seitenscheitel mit Welle in die Stirn -->
+  <use href="#haare" fill="#33251A"/>
+  <g fill="none" stroke="#56432F" stroke-width="2.4" stroke-linecap="round">
+    <path d="M36.5 22.5 C38 18 41 15 45 14"/>
+    <path d="M40 22 C48 19 60 20 70 26"/>
+  </g>
+
+  <!-- Brauen und Augen -->
+  <path d="M33.5 39.3 L45 39.6" stroke="#1B130D" stroke-width="4" stroke-linecap="round"/>
+  <path d="M66.5 39.3 L55 39.6" stroke="#1B130D" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="39.5" cy="49.5" rx="2.3" ry="2.6" fill="#1B120B"/>
+  <ellipse cx="60.5" cy="49.5" rx="2.3" ry="2.6" fill="#1B120B"/>
+
+  <!-- Quadratische, hohe Brille mit kräftigem, oben betontem Rahmen -->
+  <g stroke="#15100C" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="31" y="41.5" width="17" height="16" rx="2.6" fill="#FFF3DC" fill-opacity="0.4" stroke-width="3"/>
+    <rect x="52" y="41.5" width="17" height="16" rx="2.6" fill="#FFF3DC" fill-opacity="0.4" stroke-width="3"/>
+    <path d="M31.5 41.6 L47.5 41.6 M52.5 41.6 L68.5 41.6" fill="none" stroke-width="4.4"/>
+    <path d="M48 45.5 C49.2 44.3 50.8 44.3 52 45.5" fill="none" stroke-width="2.6"/>
+    <path d="M31 43.5 L26.5 44 M69 43.5 L73.5 44" fill="none" stroke-width="2.6"/>
+  </g>
+
+  <!-- Nase als Schatten -->
+  <path d="M50 51.5 C48.5 56 47.5 58.5 49 60.5 L52.5 60.5" fill="none" stroke="#C97F58" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Buschiger, breiter Schnauzbart über die Mundwinkel -->
+  <path d="M29.5 72 C29.5 63.5 39 60 50 62.3 C61 60 70.5 63.5 70.5 72 C70.5 76 68 77.5 65.5 74.5 C62 70.5 56.5 69.5 50 70 C43.5 69.5 38 70.5 34.5 74.5 C32 77.5 29.5 76 29.5 72 Z" fill="#2A221C"/>
+  <g fill="none" stroke="#4A3F36" stroke-width="1.6" stroke-linecap="round">
+    <path d="M38 64.5 L36.5 68"/><path d="M44 63.5 L43 67"/><path d="M56 63.5 L57 67"/><path d="M62 64.5 L63.5 68"/>
+  </g>
+</svg>

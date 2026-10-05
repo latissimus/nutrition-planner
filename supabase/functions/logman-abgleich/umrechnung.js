@@ -32,6 +32,43 @@ export function einheitenMitSaetzen(input) {
   return schluessel;
 }
 
+/* Tage, deren Leistungszeilen der Abgleich neu bestimmt: jeder Tag mit einer
+   datierten Einheit im alten oder neuen Stand. Nach einem Phasen-Reset in
+   LOGMAN (meta.phasenReset neuer als zuvor) gibt es keine: Die alte Phase ist
+   vorbei, nicht falsch, ihr Verlauf bleibt in CAPBOY erhalten. */
+export function betroffeneTage({ altGesehen = {}, altDatum = {}, altReset = '', neuGesehen = {}, neuDatum = {}, neuReset = '' }) {
+  if (String(neuReset || '') > String(altReset || '')) return [];
+  const tage = new Set();
+  const sammeln = (gesehen, datum) => Object.keys(gesehen || {}).forEach((schluessel) => {
+    const tag = (datum || {})[schluessel] || (gesehen || {})[schluessel];
+    if (/^\d{4}-\d{2}-\d{2}/.test(String(tag || ''))) tage.add(String(tag).slice(0, 10));
+  });
+  sammeln(altGesehen, altDatum);
+  sammeln(neuGesehen, neuDatum);
+  return [...tage].sort();
+}
+
+/* Vorhandene Leistungszeilen aus dem Abgleich, die es im neuen Stand nicht
+   mehr gibt (Sätze oder Einheit in LOGMAN gelöscht). Nur betroffene Tage und
+   nur Zeilen aus dem Abgleich; ein manueller Export-Import bleibt stehen. */
+export function veralteteLeistung(vorhandene = [], neueZeilen = [], tage = []) {
+  const tagSet = new Set(tage);
+  const neu = new Set(neueZeilen.map((zeile) => `${zeile.performed_on}|${zeile.exercise}|${zeile.category}`));
+  return vorhandene.filter((zeile) => zeile.source === 'LOGMAN-Abgleich'
+    && tagSet.has(String(zeile.performed_on).slice(0, 10))
+    && !neu.has(`${String(zeile.performed_on).slice(0, 10)}|${zeile.exercise}|${zeile.category}`));
+}
+
+/* Neue Abgleich-Zeilen ohne die Schlüssel (Tag, Übung, Kategorie), die schon
+   eine Zeile aus anderer Quelle haben, etwa einen manuellen Export-Import.
+   Der automatische Abgleich überschreibt sie nie; ein manueller Import
+   überschreibt dagegen eine Abgleich-Zeile (bodyMetrics.js). */
+export function ohneFremdeZeilen(neueZeilen = [], vorhandene = []) {
+  const schluessel = (zeile) => `${String(zeile.performed_on).slice(0, 10)}|${zeile.exercise}|${zeile.category}`;
+  const fremd = new Set(vorhandene.filter((zeile) => zeile.source !== 'LOGMAN-Abgleich').map(schluessel));
+  return neueZeilen.filter((zeile) => !fremd.has(schluessel(zeile)));
+}
+
 export function parseLogmanExport(input, fallbackDate = new Date().toISOString().slice(0, 10)) {
   const payload = input?.training?.payload || input?.payload || input?.training || input;
   const data = payload?.data || {};

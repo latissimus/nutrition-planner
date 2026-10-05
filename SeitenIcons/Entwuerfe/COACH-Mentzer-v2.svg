@@ -1,0 +1,69 @@
+<svg width="100%" height="100%" viewBox="-1.5 2 103 98" xmlns="http://www.w3.org/2000/svg">
+  <!-- Entwurf v2: Coach als Sticker nach Mike Mentzer in der Heavy-Duty-
+       Zeit: dunkles Haar eng am Kopf, Seitenscheitel mit Welle in die Stirn, rechteckige Brille
+       mit kräftigem dunklem Rahmen, buschiger Schnauzbart über die
+       Mundwinkel, etwas volleres Gesicht, schwarzes „HEAVY“-Shirt.
+       Erst die schwarze Außenkontur aus denselben Formen, darüber die
+       Farbflächen. -->
+  <defs>
+    <path id="koerper" d="M36 70 C35 76 33 80 28 83 C20 86 12 89 6 95 L6 100 L94 100 L94 95 C88 89 80 86 72 83 C67 80 65 76 64 70 Z"/>
+    <path id="gesicht" d="M27 24 L27 58 C27 72 37 81 50 81 C63 81 73 72 73 58 L73 24 Z"/>
+    <path id="haare" d="M22 52 C20 44 20 33 24 25 C29 16 39 12 50 12 C62 12 72 16 76.5 24 C80 31 80 42 78 52 L73 52 L73 36 C70 33 66 31.5 61 31 C56 30.5 50 31 45 29.5 C41 28.3 38 26 36.5 23.5 C34 26 31 28.5 28.5 31 C27.6 32 27 33.5 27 35 L27 52 Z"/>
+  </defs>
+  <g fill="#000" stroke="#000" stroke-width="13" stroke-linejoin="round">
+    <use href="#koerper"/>
+    <circle cx="25.5" cy="55" r="6"/>
+    <circle cx="74.5" cy="55" r="6"/>
+    <use href="#gesicht"/>
+    <use href="#haare"/>
+  </g>
+
+  <!-- Nacken und Trapez, schwarzes Shirt mit Rundhals und „HEAVY“ -->
+  <use href="#koerper" fill="#E39A70"/>
+  <path d="M6 95 C12 89 20 86 28 84 C33 90.5 67 90.5 72 84 C80 86 88 89 94 95 L94 100 L6 100 Z" fill="#26262B"/>
+  <path d="M28 84 C33 90.5 67 90.5 72 84" fill="none" stroke="#45454D" stroke-width="2.6" stroke-linecap="round"/>
+  <g fill="#FFFFFF">
+    <rect x="29" y="94.5" width="2.4" height="5.5"/><rect x="33.6" y="94.5" width="2.4" height="5.5"/><rect x="29" y="96.4" width="7" height="1.8"/>
+    <rect x="38.5" y="94.5" width="2.4" height="5.5"/><rect x="38.5" y="94.5" width="5.8" height="1.7"/><rect x="38.5" y="96.6" width="4.8" height="1.6"/><rect x="38.5" y="98.5" width="5.8" height="1.5"/>
+    <path d="M46.5 100 L49.3 94.5 L51.5 94.5 L54.3 100 L52 100 L50.4 96.6 L48.8 100 Z"/><rect x="48.4" y="97.7" width="4" height="1.3"/>
+    <path d="M55.5 94.5 L57.9 94.5 L59.4 98 L60.9 94.5 L63.3 94.5 L60.5 100 L58.3 100 Z"/>
+    <path d="M64.5 94.5 L66.9 94.5 L68.3 96.8 L69.7 94.5 L72.1 94.5 L69.4 98.4 L69.4 100 L67.2 100 L67.2 98.4 Z"/>
+  </g>
+  <path d="M38 76 C45 81 55 81 62 76 L62 70 L38 70 Z" fill="#C97F58"/>
+
+  <!-- Ohren und Gesicht -->
+  <circle cx="25.5" cy="55" r="6" fill="#E39A70"/>
+  <circle cx="74.5" cy="55" r="6" fill="#E39A70"/>
+  <use href="#gesicht" fill="#ECA67C"/>
+
+  <!-- Frisur: dunkel, eng am Kopf, Seitenscheitel mit Welle in die Stirn -->
+  <use href="#haare" fill="#33251A"/>
+  <g fill="none" stroke="#56432F" stroke-width="2.4" stroke-linecap="round">
+    <path d="M36.5 22.5 C38 18 41 15 45 14"/>
+    <path d="M40 22 C48 19 60 20 70 26"/>
+  </g>
+
+  <!-- Brauen und Augen -->
+  <path d="M33.5 41.5 L45 42" stroke="#1B130D" stroke-width="4" stroke-linecap="round"/>
+  <path d="M66.5 41.5 L55 42" stroke="#1B130D" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="40" cy="50" rx="2.3" ry="2.6" fill="#1B120B"/>
+  <ellipse cx="60" cy="50" rx="2.3" ry="2.6" fill="#1B120B"/>
+
+  <!-- Rechteckige Brille mit kräftigem, oben betontem Rahmen -->
+  <g stroke="#15100C" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="30.5" y="43.5" width="18" height="12.5" rx="3.2" fill="#FFF3DC" fill-opacity="0.4" stroke-width="3"/>
+    <rect x="51.5" y="43.5" width="18" height="12.5" rx="3.2" fill="#FFF3DC" fill-opacity="0.4" stroke-width="3"/>
+    <path d="M31 43.6 L48 43.6 M52 43.6 L69 43.6" fill="none" stroke-width="4.4"/>
+    <path d="M48.5 46.5 C49.5 45.4 50.5 45.4 51.5 46.5" fill="none" stroke-width="2.6"/>
+    <path d="M30.5 45.5 L26.5 46 M69.5 45.5 L73.5 46" fill="none" stroke-width="2.6"/>
+  </g>
+
+  <!-- Nase als Schatten -->
+  <path d="M50 51.5 C48.5 56 47.5 58.5 49 60.5 L52.5 60.5" fill="none" stroke="#C97F58" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Buschiger, breiter Schnauzbart über die Mundwinkel -->
+  <path d="M29.5 72 C29.5 63.5 39 60 50 62.3 C61 60 70.5 63.5 70.5 72 C70.5 76 68 77.5 65.5 74.5 C62 70.5 56.5 69.5 50 70 C43.5 69.5 38 70.5 34.5 74.5 C32 77.5 29.5 76 29.5 72 Z" fill="#2A221C"/>
+  <g fill="none" stroke="#4A3F36" stroke-width="1.6" stroke-linecap="round">
+    <path d="M38 64.5 L36.5 68"/><path d="M44 63.5 L43 67"/><path d="M56 63.5 L57 67"/><path d="M62 64.5 L63.5 68"/>
+  </g>
+</svg>

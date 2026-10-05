@@ -471,6 +471,12 @@ let wochenbilanzHinweis = false;
 // ohne heutigen Morgen-Check-in.
 let dockHinweise = { habits: false, sleep: false };
 let dockHinweiseStand = 0;
+// Tägliches Coaching (coaching.js): ungelesen → Briefumschlag am Coach-Symbol;
+// angesprochene Bereiche → Punkt am Reiter, bis die Seite besucht wurde.
+let coachingStand = null;
+let coachingNachricht = false;
+let coachingRouten = new Set();
+const hatDockHinweis = (route) => Boolean(dockHinweise[route]) || coachingRouten.has(route);
 let wochenbilanzGeprueftFuer = null;
 let preferencesLadePromise = Promise.resolve();
 let preferencesLadeUserId = '';
@@ -936,7 +942,7 @@ function appDockEintraegeMarkup(aktiveDockRoute, aufSeite = true) {
   const punkte = '<i class="app-dex-tab-punkte" aria-hidden="true"></i>';
   const istOffen = (route) => aktiveDockRoute === route && aufSeite;
   const standard = sichtbareSammlungen().map(([route, titel]) => `
-    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}${dockHinweise[route] && aktiveDockRoute !== route ? ' hat-hinweis' : ''}" href="#${route}" draggable="false"
+    <a class="app-dex-tab${aktiveDockRoute === route ? ' aktiv' : ''}${istOffen(route) ? ' ist-offen' : ''}${hatDockHinweis(route) && aktiveDockRoute !== route ? ' hat-hinweis' : ''}" href="#${route}" draggable="false"
        data-sammlung="${route}" style="--app-dex-tab-color:${escapeHtml(pageLook(route, categoryColor(route), 'drops').color)}"
        aria-label="${escapeHtml(istOffen(route) ? `Menü für ${titel} öffnen` : titel)}"${aktiveDockRoute === route ? ' aria-current="page"' : ''}>
       ${istOffen(route) ? punkte : ''}
@@ -1430,8 +1436,8 @@ function appDexShellZeichnen(route, view) {
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
-        <a class="app-dex-coach${wochenbilanzHinweis ? ' hat-hinweis' : ''}" href="#coach"
-           aria-label="Coach fragen${wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : ''}">${coachIconMarkup('app-dex-coach-icon')}</a>
+        <a class="app-dex-coach${coachingNachricht ? ' hat-nachricht' : (wochenbilanzHinweis ? ' hat-hinweis' : '')}" href="#coach"
+           aria-label="Coach fragen${coachingNachricht ? ' – neues Coaching' : (wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : '')}">${coachIconMarkup('app-dex-coach-icon')}${coachingNachricht ? COACHING_BRIEF : ''}</a>
         </span>`}
         <span class="app-dex-sync save-dot" role="status"></span>
         <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
@@ -1548,6 +1554,7 @@ function appDexShellAktualisieren(route, view, signal) {
   appDexShellDatenLaden(route, view, signal);
   wochenbilanzHinweisLaden();
   dockHinweiseLaden();
+  coachingHinweisLaden(route);
 }
 
 // Hinweis-Punkte: höchstens einmal pro Minute beim Seitenwechsel, sofort nach
@@ -1577,7 +1584,7 @@ async function dockHinweiseLaden(sofort = false) {
     if (neu.habits === dockHinweise.habits && neu.sleep === dockHinweise.sleep) return;
     dockHinweise = neu;
     app.querySelectorAll(':scope > .app-dex-dock .app-dex-tab[data-sammlung]').forEach((reiter) => {
-      reiter.classList.toggle('hat-hinweis', Boolean(dockHinweise[reiter.dataset.sammlung]) && !reiter.classList.contains('aktiv'));
+      reiter.classList.toggle('hat-hinweis', hatDockHinweis(reiter.dataset.sammlung) && !reiter.classList.contains('aktiv'));
     });
   } catch (error) {
     console.warn('Hinweise im Menüband nicht geladen:', error?.message);
@@ -1605,6 +1612,55 @@ function logmanNachholen() {
   else setTimeout(start, 1500);
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') logmanNachholen(); });
+
+/* Coaching-Hinweise: Briefumschlag am Coach-Symbol, solange das neueste
+   Coaching ungelesen ist, und Punkte an den Reitern der angesprochenen
+   Bereiche. Ein Seitenbesuch nimmt den Punkt dieser Seite weg. Geladen wird
+   höchstens einmal pro Minute und sofort, wenn ein Coaching gelesen wurde. */
+const COACHING_BRIEF = '<span class="app-dex-coach-brief" aria-hidden="true"><svg viewBox="0 0 16 12"><rect x="0.75" y="0.75" width="14.5" height="10.5" rx="1.5"/><path d="M1.2 1.6 8 6.8l6.8-5.2"/></svg></span>';
+let coachingHinweisStand = 0;
+// Konto des geladenen Stands: Nach einem Kontowechsel gilt er nicht mehr.
+let coachingStandFuer = '';
+function coachingHinweiseZuruecksetzen() {
+  coachingStand = null;
+  coachingStandFuer = '';
+  coachingNachricht = false;
+  coachingRouten = new Set();
+  coachingHinweisStand = 0;
+}
+function coachingHinweiseAnwenden(hinweise) {
+  const vorher = coachingNachricht;
+  coachingNachricht = hinweise.ungelesen;
+  coachingRouten = hinweise.routen;
+  app.querySelectorAll(':scope > .app-dex-dock .app-dex-tab[data-sammlung]').forEach((reiter) => {
+    reiter.classList.toggle('hat-hinweis', hatDockHinweis(reiter.dataset.sammlung) && !reiter.classList.contains('aktiv'));
+  });
+  if (vorher !== coachingNachricht) {
+    const view = app.querySelector(':scope > #view');
+    if (view && istAppHauptDex(aktiveRoute, view)) appDexShellZeichnen(aktiveRoute, view);
+  }
+}
+async function coachingHinweisLaden(route = '', sofort = false) {
+  const userId = session?.user?.id;
+  if (!userId) return;
+  try {
+    const { coachingHinweise, neuestesCoaching, routeBesucht } = await import('./coaching.js');
+    if (sofort || coachingStandFuer !== userId || Date.now() - coachingHinweisStand > 60_000) {
+      coachingHinweisStand = Date.now();
+      const geladen = await neuestesCoaching(userId);
+      // Während des Ladens abgemeldet oder Konto gewechselt: verwerfen.
+      if (session?.user?.id !== userId) return;
+      coachingStand = geladen;
+      coachingStandFuer = userId;
+    }
+    if (route) routeBesucht(coachingStand, route);
+    coachingHinweiseAnwenden(coachingHinweise(coachingStand));
+  } catch (error) {
+    console.warn('Coaching-Hinweise nicht geladen:', error?.message);
+  }
+}
+window.addEventListener('capboy:coaching-gelesen', () => coachingHinweisLaden('', true));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') coachingHinweisLaden(); });
 
 function wochenbilanzHinweisLaden() {
   const userId = session?.user?.id;
@@ -2904,6 +2960,7 @@ if (!supabaseKonfiguriert) {
       appDockCoinStand = null;
       wochenbilanzHinweis = false;
       wochenbilanzGeprueftFuer = null;
+      coachingHinweiseZuruecksetzen();
       setPreferenceUser('');
       preferencesLadeUserId = '';
       preferencesLadePromise = Promise.resolve();
@@ -2921,6 +2978,7 @@ if (!supabaseKonfiguriert) {
       appDockCoinStand = null;
       wochenbilanzHinweis = false;
       wochenbilanzGeprueftFuer = null;
+      coachingHinweiseZuruecksetzen();
     }
     if (session?.user?.id) {
       const aktiveUserId = session.user.id;

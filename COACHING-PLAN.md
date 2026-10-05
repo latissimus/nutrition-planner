@@ -1,6 +1,6 @@
 # Tägliches Coaching – Schrittplan
 
-Stand: 02.10.2026. Ziel: CAPBOY wird zum Coach, der jeden Abend um 21 Uhr alle
+Stand: 03.10.2026. Ziel: CAPBOY wird zum Coach, der jeden Abend um 21 Uhr alle
 Daten zusammenzieht – Training aus LOGMAN, Schlaf, Ernährung, Erholung,
 Körperwerte – und eine kurze, klare Nachricht schickt. Der Vorsprung: Das
 Regelwerk in `LOGMAN-Training.md` verlangt für Volumenänderungen Erholung,
@@ -9,8 +9,8 @@ Ernährung und Körpergewicht. Diese Daten hat nur CAPBOY.
 ## Entscheidungen des Nutzers
 
 1. CAPBOY holt die Trainingsdaten selbst aus LOGMAN. Kein JSON-Export mehr.
-2. Das Coaching kommt täglich um 21 Uhr (Europe/Berlin). Ohne neue Daten seit dem
-   letzten Lauf gibt es keinen KI-Aufruf und keine Nachricht.
+2. Das Coaching kommt täglich um 21 Uhr (Europe/Berlin). Ohne Änderungen an
+   relevanten Daten seit dem letzten Lauf gibt es keinen KI-Aufruf und keine Nachricht.
 3. Täglich: Bewertung der heutigen Einheit im Zusammenhang, Ziele für die
    nächste Einheit der Rotation, Warnungen. Volumen je Muskel (Level/Sätze)
    nur im Wochenteil, montags um 21 Uhr.
@@ -81,6 +81,18 @@ des Nutzers mit ihren Konten.
 - Auslöser: beim Öffnen von CAPBOY (höchstens alle 30 Minuten, wegen des
   Log-Volumens) und vor jedem Coaching-Lauf. Der manuelle Import bleibt als
   Rückfall.
+- Gelöschte Sätze: Der Abgleich entfernt Leistungszeilen aus dem Abgleich, die
+  im neuen LOGMAN-Stand fehlen. Er tut das nur an Tagen mit einer datierten
+  Einheit im alten oder neuen Stand (`betroffeneTage`, `veralteteLeistung`,
+  Tests in `src/logmanAbgleich.test.js`). Nach einem Phasen-Reset
+  (`meta.phasenReset` neuer) bleibt der Verlauf der alten Phase stehen. Manuelle
+  Importe bleiben immer stehen.
+- Schlüsselkonflikt (GPT-Review Schritt 4): Hat ein Tag mit derselben Übung und
+  Kategorie schon eine Zeile aus anderer Quelle (manueller Import, ohne
+  Quelle), schreibt der Abgleich diesen Schlüssel nicht (`ohneFremdeZeilen`,
+  Tests in `src/logmanAbgleich.test.js`). Umgekehrt überschreibt ein manueller
+  Import eine Abgleich-Zeile. Bei gleichem Schlüssel gewinnt also immer der
+  manuelle Wert.
 
 Abnahme:
 - Nach dem Koppeln erscheinen neue Sätze in CAPBOY ohne Export.
@@ -129,38 +141,150 @@ Gebaut am 03.10.2026: `supabase/functions/capboy-coach/training.js`, Tests in
 
 ## Schritt 3 – Coaching-Lauf (KI)
 
-- Neuer Modus `coaching` in `capboy-coach`, analog zu `weekly`. Eingabe: die
-  bisherigen Blöcke plus die Trainingsauswertung aus Schritt 2 und das
-  Coaching vom Vortag (damit es nachfasst und sich nicht wiederholt).
-- Antwort kurz: Überschrift, höchstens drei Punkte, ein Fokus für die nächste
-  Einheit, die angesprochenen Bereiche (für die Punkte an den Reitern). Keine
-  erzwungenen Maßnahmen; Experimente bleiben im Wochenteil.
-- Takt: pg_cron um 19:00 und 20:00 UTC, die Funktion läuft nur, wenn es in
-  Europe/Berlin 21 Uhr ist (Sommer- und Winterzeit). Davor ein
-  Abgleich aus Schritt 1, danach der Vergleich „neu seit dem letzten Lauf?“.
-  Gibt es nichts Neues, endet der Lauf ohne KI-Aufruf.
-- Neue Tabelle `coach_coachings` (Tag bzw. Woche, Inhalt, Bereiche,
-  gelesen_am), höchstens ein Tageslauf je Nutzer und Datum.
-- Push über die bestehende Erinnerungs-Infrastruktur.
-- Abnahme: eigener Fallsatz (`--faelle coaching`). Darin unter anderem:
-  Trainingstag mit Steigerung, Stillstand bei schlechtem Schlaf, Pausentag ohne
-  Neues (kein Aufruf), kein Vermischen fachfremder Bereiche ohne Bezug.
+Gebaut am 03.10.2026, Tests in `src/coachCoaching.test.js` (8 Fälle, grün).
+
+- **Eigener, kurzer Prompt** in `capboy-coach/coaching.ts`. Der geprüfte Prompt
+  des Chat-Coaches bleibt unverändert, ein Test sichert das ab.
+  - Ziel: Muskelaufbau; steigende Kraft im Wiederholungsbereich ist die
+    Erfolgskontrolle.
+  - Bei einem Trainingstag zuerst das Training, mit den Zielen der nächsten
+    Einheit aus `naechsteEinheit`.
+  - Andere Bereiche nur, wenn sie die Bewertung ändern.
+  - Bei Stillstand die wahrscheinlichste, durch Daten gestützte Ursache als
+    Vermutung.
+  - Keine Volumenänderungen, keine Experimente, keine Pflichtlisten.
+  - Ein Coach für Muskelaufbau, kein Arzt (Entscheidung 04.10.2026): keine
+    Diagnosen, keine Warnzeichen-Erkennung, kein Sicherheitshinweis; keine
+    Medikamente, Mittel oder Dosierungen.
+  - Trainingstypische Beschwerden an Gelenken, Sehnen und Muskeln (etwa
+    Impingement, GTPS, Tennisarm, Knie, Rücken; nur Beispiele) behandelt er
+    wie ein erfahrener Krafttrainer: Er nimmt die Beschreibung der Person, wie
+    sie ist, und bezieht sie auf die betroffenen Übungen. Solange es wehtut,
+    rät er zu schmerzfreiem Training: Last halten statt steigern, schmerzfreier
+    Bewegungsumfang, gelenkschonende Variante. Nur wenn es anhält oder schlimmer
+    wird, nennt er in einem Satz den Physio.
+  - Körper nach Hautfalten, nicht nach Gewicht allein (Wunsch 04.10.2026):
+    Faltensumme, ihre Veränderung und Taille zusammen mit dem Gewichtstrend.
+    Gewicht hoch bei gleichbleibenden oder sinkenden Falten spricht für
+    Muskelaufbau, steigende Falten für Fettzunahme; immer als Vermutung.
+- **Eingabe:** dieselben Blöcke wie beim Coach (`coachInput`).
+  `<timeseries>` trägt zusätzlich `training` (die Auswertung aus Schritt 2)
+  und `coachingVortag`, den LOGMAN-Abgleichstatus, kurze datierte
+  Erholungsnotizen und die seit dem letzten Coaching geänderten Bereiche,
+  wie die Wochenbilanz ihren Check-in. Die feste
+  Blockschnittstelle bleibt gleich.
+- **Antwort** (strenges Schema): Überschrift (zugleich der Push-Text, höchstens
+  70 Zeichen), 1–3 Punkte mit Bereich, genau ein Fokus und die Datenlage.
+  Die Bereiche steuern in Schritt 4 die
+  Punkte an den Reitern.
+- **Ablauf je Person:**
+  1. Ist heute ein Coaching-Lauf beansprucht oder abgeschlossen, ist nichts zu tun.
+  2. LOGMAN abgleichen (logman-abgleich, Weg für den Zeitplan). HTTP-Fehler und
+     fehlgeschlagene Antworten gelten als veralteter Trainingsstand.
+  3. Ein Datenbank-Zähler erfasst Änderungen an Training, Ernährung, Schlaf,
+     Körperwerten, Check-ins und Routinen, auch bei nachträglichen Einträgen.
+     Ausgeschaltete Bereiche und ein gerade nicht abrufbarer LOGMAN-Stand
+     lösen allein keinen KI-Aufruf aus. Ein Update zählt nur, wenn sich die
+     Zeile wirklich ändert. Der LOGMAN-Spiegel zählt nur, wenn eine Einheit
+     erstmals Sätze bekommt oder wegfällt: Schon ein Blick auf einen Tag in
+     LOGMAN legt leere Blöcke an und erhöht die Version. Das ist kein Training
+     und darf keinen bezahlten Lauf auslösen.
+  4. Vor dem API-Aufruf eine eindeutige Tageszeile mit Status „läuft“ anlegen.
+     Das sperrt parallele und automatische Wiederholungsaufrufe.
+  5. Ein KI-Aufruf ohne Werkzeuge (`gpt-6-sol`, Aufwand mittel). Eine Antwort
+     ohne Überschrift, Punkt oder Fokus wird als fehlgeschlagen gespeichert.
+  6. Ergebnis speichern, dann Push mit dem Titel „Coaching“, Ziel `#coach`.
+     Bei Fehler bleibt ein für die App lesbarer Status stehen; ein neuer
+     KI-Versuch geschieht nicht automatisch für denselben Datenstand.
+- **Takt:** pg_cron `coaching-taeglich` um 19:00 und 20:00 UTC. Die Funktion
+  arbeitet nur, wenn es in Europe/Berlin 21 Uhr ist. Berechtigt ist der Lauf
+  allein über `x-cron-secret` (derselbe Tresor-Eintrag wie beim
+  Erinnerungslauf). Die Funktion antwortet sofort und arbeitet im Hintergrund
+  weiter (`EdgeRuntime.waitUntil`).
+- Migration `20261003120000_coach_coachings` legt Tabelle und Zeitplan an.
+  Lesen und „gelesen“ markieren darf nur die eigene Zeile.
+- Abnahme: erst `npm run eval:coaching` kostenlos prüfen. Der kleine Fallsatz
+  umfasst Steigerung, Stillstand, nachgetragenes Training, Pausentag, eine
+  neue Hautfaltenmessung und eine trainingstypische Beschwerde (Hüfte vor
+  Kniebeugen). `npm run eval:coaching -- --live` ruft das Modell sechsmal auf und
+  speichert alle Antworten zur menschlichen Durchsicht; nur der Nutzer gibt
+  diesen bezahlten Lauf frei. Danach ein von Hand ausgelöster Lauf für das
+  eigene Konto. Migration und Deployment bleiben freigabepflichtig.
+
+**Prüfung in der echten Datenbank (03.10.2026, kostenlos, zurückgerollt):**
+Migration `20261003120000` eingespielt (Zeitplan = Job 4). Die Zähler wurden
+in einem Block geprüft, der sich am Ende selbst zurückrollt. Danach war der
+Stand nachweislich unverändert (Spiegel-Version 133, keine Testzeilen, Zähler
+leer).
+
+| Fall | Zähler |
+| --- | --- |
+| 1. Tag in LOGMAN geöffnet (neue Version, leere Blöcke) | +0 |
+| 2. neue Leistung | +1 |
+| 3. unverändert neu geschrieben (anderes `imported_at`/`source`) | +0 |
+| 4. Leistung fachlich geändert | +1 |
+| 5. Sätze gelöscht → Zeile entfernt | +1 |
+| 6. Spiegel gelöscht (Neu-Koppeln) | +0 |
+| 7. leerer Spiegel angelegt | +0 |
+| 8. Einheit ohne Datum (vor der Kopplung) | +0 |
+| 9. neue Einheit mit Datum | +1 |
+| 10. danach erneut Tag geöffnet | +0 |
+
+Vorschlag für die Freigabe: `logman-abgleich` (Bereinigung, Weg für den
+Zeitplan) jetzt bereitstellen. `capboy-coach` erst bereitstellen, wenn der
+Fehlerstatus im Chat sichtbar ist (Schritt 4) und die Montagsregel feststeht.
+Bis dahin trifft der Zeitplan die alte Funktion und endet ohne Wirkung mit 401.
 
 ## Schritt 4 – Darstellung
 
-- Coaching-Karte ganz oben im Chat, ältere im Verlauf, Nachfragen direkt darunter.
-- E-Mail-Symbol am Coach-Symbol, solange ein Coaching ungelesen ist.
-- Rosa Punkte an den angesprochenen Reitern, die beim Besuch der Seite
-  verschwinden.
-- Der Push öffnet den Chat.
-- Farben der drei Nachrichtenarten. Hier wird auch der Schalter „Frage /
-  Bewertung & Schritte“ eingebaut, weil er dasselbe Farbsystem nutzt
-  (siehe Antwortstil-Entscheidung).
+Gebaut am 03.10.2026: `src/coaching.js`, Tests in `src/coaching.test.js`
+(7 Fälle). Chat (`src/coach.js`) und Menüband/Kopf (`src/main.js`) nutzen es.
+
+- **Karte im Chat:** Das neueste Coaching steht als Karte über dem Gespräch:
+  Coaching-Marke in eigener Farbe (`--coaching-farbe`), Datum, Überschrift,
+  Punkte mit Bereich, Fokus, Datenlage. Ist es frisch (bis 36 Stunden) und
+  ungelesen, beginnt der Chat das Gespräch zu ihm. Die Gesprächs-id ist die
+  Coaching-id; `capboy-coach` legt das Coaching dort als erste Nachricht ab
+  (`coachingText`). Rückfragen kennen es dadurch im `<conversation>`-Block.
+  Eine Frage unter der Karte im leeren Chat geht ebenfalls in dieses Gespräch.
+  „Neues Gespräch“ blendet die Karte aus.
+- **Status statt Lücke:** Läuft das Coaching noch, steht dort „wird gerade
+  erstellt“. Ist es gescheitert, steht dort klar, dass es diesmal nicht
+  erstellt wurde, und dass man den Coach trotzdem fragen kann. Dieser Status
+  steht über jedem Gespräch, auch über einem älteren offenen (GPT-Review
+  Schritt 4); „Neues Gespräch“ blendet ihn aus. Steht ein Lauf nach
+  15 Minuten noch auf „läuft“, wurde die Funktion abgebrochen; die Karte
+  meldet ihn dann als gescheitert. Einen
+  automatischen zweiten Versuch für denselben Datenstand gibt es nicht
+  (Kostenregel). Wer nach 21 Uhr trainiert, findet die Einheit im
+  nächsten Coaching unter „letzte Einheit“.
+- **Briefumschlag:** Solange das neueste fertige Coaching ungelesen ist, trägt
+  das Coach-Symbol im Kopf einen rosa Briefumschlag statt des Punkts. Gelesen
+  ist es, sobald die Karte im Chat erscheint (`gelesen_am`).
+- **Punkte an den Reitern** für die angesprochenen Bereiche:
+  Training → TRAINING, Ernährung → TRACKER, Schlaf → SCHLAF,
+  Körper/Erholung → COMP, Routinen → ROUTINEN. Ein Punkt verschwindet beim
+  Besuch der Seite (je Coaching im localStorage gemerkt). Sie gelten nur für
+  ein frisches Coaching.
+- **Kontowechsel:** Abmelden und Kontowechsel setzen Briefumschlag, Reiterpunkte
+  und den Minuten-Zwischenspeicher zurück. Eine Abfrage, die erst nach dem
+  Wechsel zurückkommt, wird verworfen.
+- **Push:** Titel „Coaching“, Text = Überschrift, Ziel `#coach`. Der Service
+  Worker öffnet den Chat.
+- **Montagsregel:** Montags läuft höchstens ein bezahlter Lauf. Bis Schritt 5
+  steht, ist das der Tageslauf. Mit Schritt 5 ersetzt der Wochenteil
+  montags den Tageslauf und nimmt den Tag mit auf, statt zusätzlich zu laufen.
+- **Getrennt geplant (4b):** Der Schalter „Frage / Bewertung & Schritte“ im
+  Chat. Er ändert den Prompt des Chat-Coaches und braucht deshalb ein eigenes
+  Review und einen bezahlten Prüflauf. Die Farbe der Coaching-Marke ist
+  schon die erste der drei Nachrichtenfarben.
 
 ## Schritt 5 – Wochenteil automatisch
 
 - Montags um 21 Uhr läuft statt des Tageslaufs der Wochenteil: Vergleich mit der
   Vorwoche, fällige Experimente, Volumen je Muskel nach dem LOGMAN-Regelwerk.
+- Beim Einbau des Wochenteils den Tageslauf montags ausdrücklich aussetzen;
+  insgesamt höchstens ein automatischer KI-Aufruf je Person an diesem Tag.
 - Der Knopf „Wochenbilanz starten“ entfällt. Die Angaben bleiben als
   freiwilliges Kärtchen (Umsetzung, Umstände, Notiz).
 
@@ -171,6 +295,7 @@ Gebaut am 03.10.2026: `supabase/functions/capboy-coach/training.js`, Tests in
 
 ## Kosten
 
-Höchstens ein KI-Aufruf pro Tag mit neuen Daten und einer pro Woche. Die
+Höchstens ein automatischer KI-Aufruf pro Tag mit neuen Daten; montags ersetzt
+der Wochenteil den Tageslauf. Die
 Abgleiche und Auswertungen aus den Schritten 1 und 2 kosten nichts außer
 Supabase-Aufrufen.

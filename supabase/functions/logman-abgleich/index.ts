@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
-import { einheitenMitSaetzen, parseLogmanExport } from './umrechnung.js';
+import { betroffeneTage, einheitenMitSaetzen, ohneFremdeZeilen, parseLogmanExport, veralteteLeistung } from './umrechnung.js';
 
 // LOGMAN-Abgleich: CAPBOY liest das Trainingslog des eigenen LOGMAN-Kontos
 // selbst. Gekoppelt wird einmal per Code aus LOGMAN (Profil → „Mit CAPBOY
@@ -16,7 +16,7 @@ import { einheitenMitSaetzen, parseLogmanExport } from './umrechnung.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
+  'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info, x-cron-secret',
 };
 
 const json = (body: Record<string, unknown>, status = 200) => new Response(JSON.stringify(body), {
@@ -26,6 +26,9 @@ const json = (body: Record<string, unknown>, status = 200) => new Response(JSON.
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+// Das tägliche Coaching (capboy-coach) gleicht vor dem Lauf je Person ab und
+// meldet sich dafür mit demselben Cron-Schlüssel wie der Erinnerungslauf.
+const cronSecret = Deno.env.get('CRON_SECRET') || '';
 const admin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
@@ -108,7 +111,8 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
     return statusAntwort(userId, { ergebnis: 'uebersprungen' });
   }
 
-  const { data: spiegel } = await admin.from('logman_spiegel').select('logman_version,einheiten_gesehen').eq('user_id', userId).maybeSingle();
+  const { data: spiegel } = await admin.from('logman_spiegel')
+    .select('logman_version,einheiten_gesehen,datum:payload->datum,reset:payload->meta->>phasenReset').eq('user_id', userId).maybeSingle();
   const { data: antwort, error } = await logman.rpc('capboy_training_log', {
     p_token: kopplung.token,
     p_bekannte_version: neu ? null : spiegel?.logman_version ?? null,
@@ -138,12 +142,39 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
   if (spiegelFehler) throw new Error(`Spiegel schreiben: ${spiegelFehler.message}`);
 
   const zeilen = leistungsZeilen(payload, gesehen, userId);
+  let schreiben = zeilen;
   if (zeilen.length) {
+    // Manuelle Importe mit demselben Schlüssel bleiben stehen.
+    const zeilenTage = [...new Set(zeilen.map((zeile) => zeile.performed_on))];
+    const { data: belegt, error: belegtFehler } = await admin.from('logman_performance')
+      .select('performed_on,exercise,category,source').eq('user_id', userId).in('performed_on', zeilenTage);
+    if (belegtFehler) throw new Error(`Leistung lesen: ${belegtFehler.message}`);
+    schreiben = ohneFremdeZeilen(zeilen, belegt || []);
+  }
+  if (schreiben.length) {
     const { error: leistungFehler } = await admin.from('logman_performance')
-      .upsert(zeilen, { onConflict: 'user_id,performed_on,exercise,category' });
+      .upsert(schreiben, { onConflict: 'user_id,performed_on,exercise,category' });
     if (leistungFehler) throw new Error(`Leistung schreiben: ${leistungFehler.message}`);
   }
-  return statusAntwort(userId, { ergebnis: 'neu', leistungswerte: zeilen.length });
+  // In LOGMAN gelöschte Sätze dürfen nicht als Leistung stehen bleiben. Nach
+  // einem Phasen-Reset bleibt der Verlauf der alten Phase dagegen erhalten.
+  const tage = betroffeneTage({
+    altGesehen: spiegel?.einheiten_gesehen || {}, altDatum: spiegel?.datum || {}, altReset: spiegel?.reset || '',
+    neuGesehen: gesehen, neuDatum: payload?.datum || {}, neuReset: payload?.meta?.phasenReset || '',
+  });
+  let entfernt = 0;
+  if (tage.length) {
+    const { data: vorhandene, error: lesenFehler } = await admin.from('logman_performance')
+      .select('id,performed_on,exercise,category,source').eq('user_id', userId).in('performed_on', tage);
+    if (lesenFehler) throw new Error(`Leistung lesen: ${lesenFehler.message}`);
+    const veraltet = veralteteLeistung(vorhandene || [], zeilen, tage);
+    if (veraltet.length) {
+      const { error: loeschFehler } = await admin.from('logman_performance').delete().in('id', veraltet.map((zeile) => zeile.id));
+      if (loeschFehler) throw new Error(`Leistung bereinigen: ${loeschFehler.message}`);
+      entfernt = veraltet.length;
+    }
+  }
+  return statusAntwort(userId, { ergebnis: 'neu', leistungswerte: schreiben.length, entfernt });
 }
 
 async function koppeln(userId: string, code: string) {
@@ -181,13 +212,25 @@ Deno.serve(async (request) => {
   if (request.method !== 'POST') return json({ error: 'Nur POST ist erlaubt.' }, 405);
   if (!supabaseUrl || !serviceRoleKey) return json({ error: 'Der LOGMAN-Abgleich ist noch nicht eingerichtet.' }, 503);
 
+  const body = await request.json().catch(() => ({}));
+  const cronKopf = request.headers.get('x-cron-secret');
+  if (cronKopf) {
+    if (!cronSecret || cronKopf !== cronSecret) return json({ error: 'Nicht autorisiert.' }, 401);
+    if (body?.aktion !== 'abgleichen' || !/^[0-9a-f-]{36}$/i.test(String(body?.userId || ''))) return json({ error: 'Unbekannter Auftrag.' }, 400);
+    try {
+      return await abgleichen(String(body.userId), true);
+    } catch (error) {
+      console.error('logman-abgleich (Zeitplan)', error instanceof Error ? error.message : error);
+      return json({ error: 'Der Abgleich mit LOGMAN hat gerade nicht geklappt.' }, 500);
+    }
+  }
+
   const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') || '';
   const { data: userData, error: authError } = await admin.auth.getUser(token);
   if (authError || !userData?.user) return json({ error: 'Nicht angemeldet.' }, 401);
   const userId = userData.user.id;
 
   try {
-    const body = await request.json().catch(() => ({}));
     const aktion = String(body?.aktion || 'status');
     if (aktion === 'status') return await statusAntwort(userId);
     if (aktion === 'koppeln') return await koppeln(userId, String(body?.code || '').slice(0, 40));

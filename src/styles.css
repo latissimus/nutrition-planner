@@ -15900,8 +15900,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite] #app .app-dex-kapsel>:last-child{border-top-right-radius:999px!important;border-bottom-right-radius:999px!important}
 /* top:0 statt der älteren -2 px: Die graue Auswahl reicht so bis an den
    unteren Rand. Zahl und Coin bleiben an ihrer gewohnten Höhe. */
-:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{top:0!important;padding:0 8px 0 12px!important}
-:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand>*{position:relative;top:-2px}
+/* Ruhiger Takt wie im Menüband: gleiche Abstände zwischen CAPCOINS, Suche
+   und Coach (22 px), links und rechts gleich viel Luft (14 px), alle Symbole
+   auf derselben Höhe. Früher: links 12 px, rechts 8 px, Zahl und Coin 2 px
+   höher als die übrigen Symbole. */
+:root[data-theme][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand){padding:0 11px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand):first-child{padding-left:14px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>:is(.app-dex-coach,.app-dex-search,.coin-kopfstand):last-child{padding-right:14px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand{top:0!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel>.coin-kopfstand strong{color:var(--ui-schrift)!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-gedaechtnis{gap:7px!important;padding:0 12px 0 10px!important}
 :root[data-theme][data-seite] #app .app-dex-kapsel .app-dex-zurueck-pfeil{width:16px!important;height:16px!important}
@@ -15909,7 +15915,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite] #app .app-dex-kapsel :is(.app-dex-search-icon,.app-dex-coach-icon)>svg{width:100%!important;height:100%!important}
 /* Aktive Seite (Suche, CAPCOINS): weiche Fläche statt Schatten. */
 :root[data-theme][data-seite] #app .app-dex-kapsel>:is(.app-dex-search.aktiv,.coin-kopfstand.aktiv,.app-dex-gedaechtnis[aria-current="page"]){background:var(--ui-auswahl)!important}
-:root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-coach.hat-hinweis::after{top:6px!important;right:6px!important}
+:root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-coach.hat-hinweis::after{top:6px!important;right:11px!important}
 
 /* Menüband: aktive Seite als weiche Fläche in der Schriftfarbe des Bandes. */
 :root[data-theme][data-seite] #app .app-dex-dock .app-dex-tab.aktiv{
@@ -16929,3 +16935,48 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.ki-zutaten-overlay .ki-einsprechen.nimmt-auf::before{animation:none}}
 /* Nebenknopf: hell mit Kontur, damit „Zutaten anlegen“ der Hauptknopf bleibt. */
 :root[data-theme] .ki-zutaten-overlay .ki-einsprechen.btn{border:var(--kontur) solid var(--kontur-farbe)!important;background:var(--ui-flaeche)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;box-shadow:none!important}
+
+/* ============================================================
+   TÄGLICHES COACHING (coaching.js, COACHING-PLAN.md Schritt 4)
+   Eigene Farbe für Coaching-Nachrichten: So ist auf einen Blick klar, dass
+   der Coach sich von selbst gemeldet hat. Die Karte steht über dem Gespräch.
+   ============================================================ */
+:root{--coaching-farbe:#FFE07A}
+:root[data-theme][data-seite="coach"] #view .coaching-karte{
+  margin:0 0 14px;
+  padding:16px 16px 14px;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:22px;
+  background:var(--ui-flaeche);
+  color:var(--ui-schrift);
+  box-shadow:none;
+  font-family:"Work Sans",sans-serif;
+}
+:root[data-theme][data-seite="coach"] #view .coaching-karte header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+:root[data-theme][data-seite="coach"] #view .coaching-marke{display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--coaching-farbe);color:#111111;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+:root[data-theme][data-seite="coach"] #view .coaching-karte header small{color:var(--ui-neben);font:600 12px/1 "JetBrains Mono",monospace}
+:root[data-theme][data-seite="coach"] #view .coaching-karte h2{margin:0 0 12px;font:800 20px/1.2 "Work Sans",sans-serif;letter-spacing:-.01em}
+:root[data-theme][data-seite="coach"] #view .coaching-punkte{display:grid;gap:10px;margin:0 0 12px;padding:0;list-style:none}
+:root[data-theme][data-seite="coach"] #view .coaching-punkte li{display:grid;gap:3px}
+:root[data-theme][data-seite="coach"] #view .coaching-bereich{color:var(--ui-neben);font:700 11px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase}
+:root[data-theme][data-seite="coach"] #view .coaching-karte p{margin:0;font:500 15px/1.45 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #view .coaching-fokus{padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:14px;background:var(--coaching-farbe);color:#111111}
+:root[data-theme][data-seite="coach"] #view .coaching-fokus b{display:block;margin:0 0 3px;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+:root[data-theme][data-seite="coach"] #view .coaching-fokus p{color:#111111}
+:root[data-theme][data-seite="coach"] #view .coaching-karte footer{margin-top:12px;color:var(--ui-neben);font:500 12px/1.35 "JetBrains Mono",monospace}
+:root[data-theme][data-seite="coach"] #view .coaching-karte.is-status p{color:var(--ui-neben)}
+:root[data-theme][data-seite="coach"] #view .coaching-karte.is-fehler .coaching-marke{background:var(--ui-auswahl);color:var(--ui-schrift)}
+
+/* Briefumschlag am Coach-Symbol: ein neues Coaching ist da (statt Punkt). */
+#app .app-dex-coach{position:relative}
+#app .app-dex-coach-brief{position:absolute;top:3px;right:1px;display:block;width:17px;height:13px;pointer-events:none}
+#app .app-dex-coach-brief svg{display:block;width:100%;height:100%;overflow:visible}
+#app .app-dex-coach-brief rect{fill:var(--brand-pink,#FF69AE);stroke:var(--kontur-farbe);stroke-width:1.5}
+#app .app-dex-coach-brief path{fill:none;stroke:var(--kontur-farbe);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+/* In der Kapsel schneidet die runde Ecke sonst die obere rechte Kante ab;
+   er sitzt deshalb an der Ecke des Symbols, nicht der Kapsel. */
+:root[data-theme][data-seite] #app .app-dex-kapsel>.app-dex-coach .app-dex-coach-brief{top:7px;right:12px;width:15px;height:11px}
+/* Auf Gelb bleibt die Schrift dunkel, auch wo der Dark Mode der Coach-Seite
+   Texte allgemein weiß setzt. */
+:root[data-theme][data-seite="coach"] #view :is(.coaching-marke,.coaching-fokus,.coaching-fokus b,.coaching-fokus p){color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme][data-seite="coach"] #view .coaching-karte.is-fehler .coaching-marke{color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
