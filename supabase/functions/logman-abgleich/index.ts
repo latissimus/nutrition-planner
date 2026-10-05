@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import { betroffeneTage, einheitenMitSaetzen, ohneFremdeZeilen, parseLogmanExport, veralteteLeistung } from './umrechnung.js';
+import { abgleichSchreiben } from './schreibreihenfolge.js';
 
 // LOGMAN-Abgleich: CAPBOY liest das Trainingslog des eigenen LOGMAN-Kontos
 // selbst. Gekoppelt wird einmal per Code aus LOGMAN (Profil → „Mit CAPBOY
@@ -131,50 +132,54 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
 
   const payload = antwort.payload || {};
   const gesehen = einheitenDatieren(payload, spiegel?.einheiten_gesehen || null, !spiegel);
-  const { error: spiegelFehler } = await admin.from('logman_spiegel').upsert({
-    user_id: userId,
-    payload,
-    logman_version: antwort.version,
-    logman_stand: antwort.updated_at || null,
-    abgerufen_am: jetzt,
-    einheiten_gesehen: gesehen,
-  });
-  if (spiegelFehler) throw new Error(`Spiegel schreiben: ${spiegelFehler.message}`);
-
   const zeilen = leistungsZeilen(payload, gesehen, userId);
-  let schreiben = zeilen;
-  if (zeilen.length) {
-    // Manuelle Importe mit demselben Schlüssel bleiben stehen.
-    const zeilenTage = [...new Set(zeilen.map((zeile) => zeile.performed_on))];
-    const { data: belegt, error: belegtFehler } = await admin.from('logman_performance')
-      .select('performed_on,exercise,category,source').eq('user_id', userId).in('performed_on', zeilenTage);
-    if (belegtFehler) throw new Error(`Leistung lesen: ${belegtFehler.message}`);
-    schreiben = ohneFremdeZeilen(zeilen, belegt || []);
-  }
-  if (schreiben.length) {
-    const { error: leistungFehler } = await admin.from('logman_performance')
-      .upsert(schreiben, { onConflict: 'user_id,performed_on,exercise,category' });
-    if (leistungFehler) throw new Error(`Leistung schreiben: ${leistungFehler.message}`);
-  }
   // In LOGMAN gelöschte Sätze dürfen nicht als Leistung stehen bleiben. Nach
   // einem Phasen-Reset bleibt der Verlauf der alten Phase dagegen erhalten.
   const tage = betroffeneTage({
     altGesehen: spiegel?.einheiten_gesehen || {}, altDatum: spiegel?.datum || {}, altReset: spiegel?.reset || '',
     neuGesehen: gesehen, neuDatum: payload?.datum || {}, neuReset: payload?.meta?.phasenReset || '',
   });
-  let entfernt = 0;
-  if (tage.length) {
-    const { data: vorhandene, error: lesenFehler } = await admin.from('logman_performance')
-      .select('id,performed_on,exercise,category,source').eq('user_id', userId).in('performed_on', tage);
-    if (lesenFehler) throw new Error(`Leistung lesen: ${lesenFehler.message}`);
-    const veraltet = veralteteLeistung(vorhandene || [], zeilen, tage);
-    if (veraltet.length) {
+
+  // Der Spiegel mit der neuen Version kommt zuletzt (schreibreihenfolge.js).
+  const { entfernt, geschrieben } = await abgleichSchreiben({
+    veralteteEntfernen: async () => {
+      if (!tage.length) return 0;
+      const { data: vorhandene, error: lesenFehler } = await admin.from('logman_performance')
+        .select('id,performed_on,exercise,category,source').eq('user_id', userId).in('performed_on', tage);
+      if (lesenFehler) throw new Error(`Leistung lesen: ${lesenFehler.message}`);
+      const veraltet = veralteteLeistung(vorhandene || [], zeilen, tage);
+      if (!veraltet.length) return 0;
       const { error: loeschFehler } = await admin.from('logman_performance').delete().in('id', veraltet.map((zeile) => zeile.id));
       if (loeschFehler) throw new Error(`Leistung bereinigen: ${loeschFehler.message}`);
-      entfernt = veraltet.length;
-    }
-  }
-  return statusAntwort(userId, { ergebnis: 'neu', leistungswerte: schreiben.length, entfernt });
+      return veraltet.length;
+    },
+    leistungSchreiben: async () => {
+      if (!zeilen.length) return 0;
+      // Manuelle Importe mit demselben Schlüssel bleiben stehen.
+      const zeilenTage = [...new Set(zeilen.map((zeile) => zeile.performed_on))];
+      const { data: belegt, error: belegtFehler } = await admin.from('logman_performance')
+        .select('performed_on,exercise,category,source').eq('user_id', userId).in('performed_on', zeilenTage);
+      if (belegtFehler) throw new Error(`Leistung lesen: ${belegtFehler.message}`);
+      const schreiben = ohneFremdeZeilen(zeilen, belegt || []);
+      if (!schreiben.length) return 0;
+      const { error: leistungFehler } = await admin.from('logman_performance')
+        .upsert(schreiben, { onConflict: 'user_id,performed_on,exercise,category' });
+      if (leistungFehler) throw new Error(`Leistung schreiben: ${leistungFehler.message}`);
+      return schreiben.length;
+    },
+    spiegelSchreiben: async () => {
+      const { error: spiegelFehler } = await admin.from('logman_spiegel').upsert({
+        user_id: userId,
+        payload,
+        logman_version: antwort.version,
+        logman_stand: antwort.updated_at || null,
+        abgerufen_am: jetzt,
+        einheiten_gesehen: gesehen,
+      });
+      if (spiegelFehler) throw new Error(`Spiegel schreiben: ${spiegelFehler.message}`);
+    },
+  });
+  return statusAntwort(userId, { ergebnis: 'neu', leistungswerte: geschrieben, entfernt });
 }
 
 async function koppeln(userId: string, code: string) {

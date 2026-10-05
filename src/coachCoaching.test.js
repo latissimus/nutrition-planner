@@ -47,10 +47,14 @@ describe('Antwort des Coachings', () => {
     expect(() => coachingBereinigen({ ueberschrift: 'Heute', punkte: [], fokus: { bereich: 'training', text: 'Morgen.' } })).toThrow('Coaching-Antwort');
   });
 
-  it('bleibt ein Coach für Muskelaufbau: kein Sicherheitshinweis, keine Warnzeichen-Erkennung', () => {
+  it('bleibt ein Coach für Muskelaufbau: kein Sicherheitshinweis, nur eine knappe Ausnahme für eindeutig Ernstes', () => {
+    const prompt = coachingSystemPrompt();
     expect(COACHING_SCHEMA.properties).not.toHaveProperty('sicherheitshinweis');
-    expect(coachingSystemPrompt()).toContain('not a doctor');
-    expect(coachingSystemPrompt()).not.toMatch(/chest pain|palpitations|red flag|sicherheitshinweis/i);
+    expect(prompt).toContain('not a doctor');
+    // Ausnahme nach GPT-Review 05.10.: nur aus eigenen Notizen, ein ruhiger Satz im Fokus, kein Alarm.
+    expect(prompt).toContain("Only exception: if the user's own note clearly reports something beyond a training complaint");
+    expect(prompt).toContain('No alarm, no emergency wording, no diagnosis.');
+    expect(prompt).not.toMatch(/palpitations|red flag|sicherheitshinweis|112|emergency number/i);
   });
 
   it('berücksichtigt trainingstypische Beschwerden allgemein, Impingement und GTPS nur als Beispiele', () => {

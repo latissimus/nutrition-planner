@@ -6,6 +6,57 @@ Körperwerte – und eine kurze, klare Nachricht schickt. Der Vorsprung: Das
 Regelwerk in `LOGMAN-Training.md` verlangt für Volumenänderungen Erholung,
 Ernährung und Körpergewicht. Diese Daten hat nur CAPBOY.
 
+## Zwischenstand 05.10.2026 (für das Review)
+
+- **Bereitgestellt:** `logman-abgleich` v4 (manuelle Importe werden bei
+  gleichem Schlüssel nie überschrieben; 401 ohne Anmeldung, CORS geprüft).
+- **Nicht bereitgestellt:** `capboy-coach` mit Coaching (live weiter v20, der
+  Zeitplan endet dort mit 401). Freigabe erst nach diesem Review und dem
+  App-Upload durch den Nutzer.
+- **GPT-Review Schritt 4 umgesetzt:** Importschutz (`ohneFremdeZeilen`),
+  Status „läuft/gescheitert“ über jedem Gespräch (hängender Lauf nach 15
+  Minuten gilt als gescheitert), Coaching-Hinweise beim Kontowechsel
+  zurückgesetzt (`coachingHinweiseZuruecksetzen`, `coachingStandFuer`).
+- **Prompt-Änderungen nach Nutzerwunsch (04.10.):** Notfall-/Warnzeichen-Logik
+  und Feld `sicherheitshinweis` entfernt („Coach für Muskelaufbau, kein
+  Arzt“, Regel 8). Neu Regel 9 (trainingstypische Beschwerden wie ein
+  Krafttrainer, Beispiele Impingement/GTPS) und Regel 10 (Körper nach
+  Hautfalten und Taille, nie nach Gewicht allein).
+- **Live-Fallsatz 05.10.** (`scripts/coach-evals/results/2026-10-05T19-20-47-001Z-coaching.json`,
+  6 Fälle, vom Nutzer gestartet): alle verwendbar, Zahlen korrekt übernommen,
+  Hautfalten-Fall deutet „Gewicht hoch, Falten runter“ als wahrscheinlich
+  fettarmen Zuwachs, Hüften-Fall rät zu schmerzfreiem Training ohne
+  Laststeigerung. Schwäche: In 3 von 6 Fällen ist ein Punkt nur „heute fehlen
+  Schlaf-/Erholungswerte“ (Füllstoff trotz Regel 7). Vorschlag: nach den
+  ersten echten Abenden Regel 7 verschärfen (fehlende Daten nie als eigener
+  Punkt).
+- **Karte angesehen:** Testzeile im eigenen Konto (danach gelöscht); Karte,
+  Briefumschlag und Reiterpunkte geprüft. Briefumschlag in der Kopf-Kapsel
+  eingerückt; Kapsel mit gleichen Abständen (22 px) und gleicher Luft links
+  und rechts (14 px).
+- **Coach-Icon nach Mike Mentzer:** Entwürfe in `SeitenIcons/Entwuerfe/`,
+  noch nicht final; die App nutzt weiter `COACH.svg`.
+- **GPT-Review 05.10., Punkt 1 behoben (lokal, noch nicht bereitgestellt):**
+  Der Spiegel mit der neuen LOGMAN-Version wird jetzt zuletzt geschrieben
+  (`logman-abgleich/schreibreihenfolge.js`): erst veraltete Zeilen entfernen,
+  dann Leistungswerte schreiben, dann der Spiegel. Scheitert ein Schritt,
+  bleibt die alte Version stehen und der nächste Abgleich holt alles nach.
+  Drei Fehlertests in `src/logmanAbgleich.test.js`. Restfall: Scheitert nur
+  das Schreiben des Spiegels selbst und kommt der nächste Abgleich erst an
+  einem späteren Tag, datiert er neue Einheiten auf diesen Tag; die Zeilen
+  des ersten Versuchs bleiben dann zusätzlich stehen. Server bestätigt: v4
+  am Server ist identisch mit dem lokalen Stand vor dieser Änderung.
+- **GPT-Review 05.10., Punkt 2 (Entscheidung des Nutzers: knapp):** Regel 8
+  hat eine einzige Ausnahme. Nur wenn die eigene Notiz eindeutig mehr als eine
+  Trainingsbeschwerde meldet (etwa Brustschmerz, Ohnmacht), gibt es an dem Tag
+  kein Trainingsziel, und der Fokus sagt in einem ruhigen Satz, das vor dem
+  nächsten Training abklären zu lassen. Kein Alarm, kein Notruf-Text, keine
+  Diagnose, kein eigenes Feld. Trainingsbeschwerden bleiben bei Regel 9.
+  Neuer Fall `ernste-angabe` im Fallsatz; einzeln prüfbar mit
+  `npm run eval:coaching -- --live --nur=ernste-angabe` (ein bezahlter Aufruf).
+- **Offen:** 4b (Chat-Schalter), 5 (Wochenteil montags, „Wochenbilanz
+  starten“ entfällt), 6 (COMP-KI-Karte und Bewerten-Knöpfe entfernen).
+
 ## Entscheidungen des Nutzers
 
 1. CAPBOY holt die Trainingsdaten selbst aus LOGMAN. Kein JSON-Export mehr.
@@ -206,7 +257,7 @@ Gebaut am 03.10.2026, Tests in `src/coachCoaching.test.js` (8 Fälle, grün).
 - Abnahme: erst `npm run eval:coaching` kostenlos prüfen. Der kleine Fallsatz
   umfasst Steigerung, Stillstand, nachgetragenes Training, Pausentag, eine
   neue Hautfaltenmessung und eine trainingstypische Beschwerde (Hüfte vor
-  Kniebeugen). `npm run eval:coaching -- --live` ruft das Modell sechsmal auf und
+  Kniebeugen) sowie eine eindeutig ernste Angabe. `npm run eval:coaching -- --live` ruft das Modell siebenmal auf und
   speichert alle Antworten zur menschlichen Durchsicht; nur der Nutzer gibt
   diesen bezahlten Lauf frei. Danach ein von Hand ausgelöster Lauf für das
   eigene Konto. Migration und Deployment bleiben freigabepflichtig.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { betroffeneTage, ohneFremdeZeilen, veralteteLeistung } from '../supabase/functions/logman-abgleich/umrechnung.js';
+import { abgleichSchreiben } from '../supabase/functions/logman-abgleich/schreibreihenfolge.js';
 
 // Gelöschte Sätze in LOGMAN dürfen in CAPBOY nicht als Leistung stehen bleiben;
 // der Verlauf früherer Phasen und manuelle Importe bleiben aber erhalten.
@@ -77,5 +78,54 @@ describe('LOGMAN-Abgleich: manuelle Importe schützen', () => {
   it('behandelt Zeilen ohne Quelle wie manuelle und lässt andere Tage frei', () => {
     expect(ohneFremdeZeilen(neu, [zeile('2026-10-02', 'Kabelzug', null)])).toHaveLength(2);
     expect(ohneFremdeZeilen(neu, [zeile('2026-10-01', 'Kabelzug', 'LOGMAN-Import')])).toHaveLength(3);
+  });
+});
+
+describe('LOGMAN-Abgleich: Schreibreihenfolge bei Fehlern', () => {
+  // Kleiner Speicher wie in der Datenbank: Spiegel-Version (daran erkennt der
+  // nächste Abgleich „unverändert“) und Leistungszeilen. LOGMAN steht auf 134.
+  const lauf = (speicher, fehlerBei = '') => abgleichSchreiben({
+    veralteteEntfernen: async () => {
+      speicher.schritte.push('entfernen');
+      if (fehlerBei === 'entfernen') throw new Error('Leistung bereinigen: Zeitüberschreitung');
+      speicher.zeilen = speicher.zeilen.filter((zeile) => zeile !== 'gelöscht');
+      return 1;
+    },
+    leistungSchreiben: async () => {
+      speicher.schritte.push('schreiben');
+      if (fehlerBei === 'schreiben') throw new Error('Leistung schreiben: Zeitüberschreitung');
+      if (!speicher.zeilen.includes('neu')) speicher.zeilen.push('neu');
+      return 1;
+    },
+    spiegelSchreiben: async () => {
+      speicher.schritte.push('spiegel');
+      speicher.version = 134;
+    },
+  });
+  const neuerSpeicher = () => ({ version: 133, zeilen: ['gelöscht'], schritte: [] });
+
+  it('schreibt den Spiegel erst nach dem Bereinigen und den Leistungswerten', async () => {
+    const speicher = neuerSpeicher();
+    expect(await lauf(speicher)).toEqual({ entfernt: 1, geschrieben: 1 });
+    expect(speicher.schritte).toEqual(['entfernen', 'schreiben', 'spiegel']);
+    expect(speicher).toMatchObject({ version: 134, zeilen: ['neu'] });
+  });
+
+  it('lässt die alte Version stehen, wenn das Schreiben scheitert, und holt beim nächsten Abgleich alles nach', async () => {
+    const speicher = neuerSpeicher();
+    await expect(lauf(speicher, 'schreiben')).rejects.toThrow('Leistung schreiben');
+    expect(speicher.schritte).toEqual(['entfernen', 'schreiben']);
+    // Spiegel 133 ≠ LOGMAN 134: Der nächste Abgleich meldet nicht „unverändert“.
+    expect(speicher.version).toBe(133);
+    speicher.schritte = [];
+    await lauf(speicher);
+    expect(speicher).toMatchObject({ version: 134, zeilen: ['neu'] });
+  });
+
+  it('schreibt nichts weiter, wenn schon das Bereinigen scheitert', async () => {
+    const speicher = neuerSpeicher();
+    await expect(lauf(speicher, 'entfernen')).rejects.toThrow('Leistung bereinigen');
+    expect(speicher.schritte).toEqual(['entfernen']);
+    expect(speicher).toMatchObject({ version: 133, zeilen: ['gelöscht'] });
   });
 });
