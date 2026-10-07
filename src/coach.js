@@ -313,18 +313,18 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     <section class="coach-woche" data-coach-woche hidden></section>
     <form class="coach-form" data-coach-form>
       <div class="coach-form-innen">
-        <div class="coach-compose-tools" data-coach-tools hidden>
-          <label class="coach-werkzeug">${materialIconMarkup('add_photo_alternate')}<span>Bild anhängen</span><input type="file" accept="image/*" data-coach-file></label>
-          <label class="coach-werkzeug"><input type="checkbox" data-coach-web checked><span>Webwissen einbeziehen</span></label>
-          <button class="coach-werkzeug" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}<span>Neues Gespräch</span></button>
-          <div class="coach-modus-wahl" role="radiogroup" aria-label="Modus">
-            ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-werkzeug ist-${wert}"><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><span>${escapeHtml(text)}</span></label>`).join('')}
+        <div class="coach-compose-tools coach-menue" data-coach-tools hidden>
+          <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-foto">${materialIconMarkup('add_photo_alternate')}</span><span>Foto anhängen</span><input type="file" accept="image/*" data-coach-file></label>
+          <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-web">${materialIconMarkup('search')}</span><span>Webwissen</span><input type="checkbox" role="switch" data-coach-web checked><i class="coach-menue-schalter" aria-hidden="true"></i></label>
+          <button class="coach-menue-zeile" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}><span class="coach-menue-symbol ist-neu">${materialIconMarkup('edit')}</span><span>Neues Gespräch</span></button>
+          <div class="coach-menue-modi" role="radiogroup" aria-label="Modus">
+            ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-menue-zeile"><span class="coach-menue-symbol ist-${wert}">${wert === 'frage' ? '<b>?</b>' : materialIconMarkup('target')}</span><span>${escapeHtml(text)}</span><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><i class="coach-menue-haken" aria-hidden="true">${materialIconMarkup('check_small')}</i></label>`).join('')}
           </div>
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
         <div class="coach-inputbar">
           <button class="coach-modus" type="button" data-coach-modus></button>
-          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen, neues Gespräch oder Modus"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Foto, Webwissen, neues Gespräch oder Modus"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
           <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
           <div class="coach-aufnahme" data-coach-aufnahme hidden>
@@ -435,11 +435,16 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     attachmentBox.hidden = !anhang;
     attachmentBox.innerHTML = anhang ? `<img src="${anhang.dataUrl}" alt=""><span>${escapeHtml(anhang.name)}</span><button type="button" data-remove-attachment aria-label="Anhang entfernen">×</button>` : '';
   };
+  // Plus-Menü wie in Apple Nachrichten: Der Chat dahinter wird unscharf.
   const werkzeugeZeigen = (offen) => {
     tools.hidden = !offen;
     plus.setAttribute('aria-expanded', String(offen));
+    container.classList.toggle('menue-offen', offen);
   };
   plus.onclick = () => werkzeugeZeigen(tools.hidden);
+  container.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !tools.hidden) werkzeugeZeigen(false);
+  });
   // Ein Tipp irgendwo in den Chat schließt das Plus-Menü wieder.
   container.addEventListener('click', (event) => {
     if (!tools.hidden && !event.target.closest('[data-coach-form]')) werkzeugeZeigen(false);
