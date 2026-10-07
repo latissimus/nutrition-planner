@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { betroffeneTage, ohneFremdeZeilen, veralteteLeistung } from '../supabase/functions/logman-abgleich/umrechnung.js';
+import { betroffeneTage, einheitenDatieren, einheitenVormerken, ohneFremdeZeilen, veralteteLeistung } from '../supabase/functions/logman-abgleich/umrechnung.js';
 import { abgleichSchreiben } from '../supabase/functions/logman-abgleich/schreibreihenfolge.js';
 
 // Gelöschte Sätze in LOGMAN dürfen in CAPBOY nicht als Leistung stehen bleiben;
@@ -85,6 +85,7 @@ describe('LOGMAN-Abgleich: Schreibreihenfolge bei Fehlern', () => {
   // Kleiner Speicher wie in der Datenbank: Spiegel-Version (daran erkennt der
   // nächste Abgleich „unverändert“) und Leistungszeilen. LOGMAN steht auf 134.
   const lauf = (speicher, fehlerBei = '') => abgleichSchreiben({
+    datenVormerken: async () => { speicher.schritte.push('vormerken'); },
     veralteteEntfernen: async () => {
       speicher.schritte.push('entfernen');
       if (fehlerBei === 'entfernen') throw new Error('Leistung bereinigen: Zeitüberschreitung');
@@ -107,14 +108,14 @@ describe('LOGMAN-Abgleich: Schreibreihenfolge bei Fehlern', () => {
   it('schreibt den Spiegel erst nach dem Bereinigen und den Leistungswerten', async () => {
     const speicher = neuerSpeicher();
     expect(await lauf(speicher)).toEqual({ entfernt: 1, geschrieben: 1 });
-    expect(speicher.schritte).toEqual(['entfernen', 'schreiben', 'spiegel']);
+    expect(speicher.schritte).toEqual(['vormerken', 'entfernen', 'schreiben', 'spiegel']);
     expect(speicher).toMatchObject({ version: 134, zeilen: ['neu'] });
   });
 
   it('lässt die alte Version stehen, wenn das Schreiben scheitert, und holt beim nächsten Abgleich alles nach', async () => {
     const speicher = neuerSpeicher();
     await expect(lauf(speicher, 'schreiben')).rejects.toThrow('Leistung schreiben');
-    expect(speicher.schritte).toEqual(['entfernen', 'schreiben']);
+    expect(speicher.schritte).toEqual(['vormerken', 'entfernen', 'schreiben']);
     // Spiegel 133 ≠ LOGMAN 134: Der nächste Abgleich meldet nicht „unverändert“.
     expect(speicher.version).toBe(133);
     speicher.schritte = [];
@@ -125,7 +126,47 @@ describe('LOGMAN-Abgleich: Schreibreihenfolge bei Fehlern', () => {
   it('schreibt nichts weiter, wenn schon das Bereinigen scheitert', async () => {
     const speicher = neuerSpeicher();
     await expect(lauf(speicher, 'entfernen')).rejects.toThrow('Leistung bereinigen');
-    expect(speicher.schritte).toEqual(['entfernen']);
+    expect(speicher.schritte).toEqual(['vormerken', 'entfernen']);
     expect(speicher).toMatchObject({ version: 133, zeilen: ['gelöscht'] });
+  });
+});
+
+describe('LOGMAN-Abgleich: Datum neuer Einheiten bleibt bei einem späteren Versuch gleich', () => {
+  // Stand mit zwei Einheiten, die Sätze haben.
+  const satz = { w: '80', r: '8', rir: '2' };
+  const stand = (...einheiten) => ({ data: Object.fromEntries(einheiten.map((schluessel) => {
+    const [tag, cycle] = schluessel.split('|');
+    return [tag, { [cycle]: { b1: { sets: [[satz]] } } }];
+  })) });
+
+  it('datiert neue Einheiten mit heute, bekannte mit ihrem bisherigen Datum, beim ersten Abgleich ohne Datum', () => {
+    expect(einheitenDatieren(stand('OK-H|1', 'UK-H|1'), { 'OK-H|1': '2026-10-01' }, false, '2026-10-05'))
+      .toEqual({ 'OK-H|1': '2026-10-01', 'UK-H|1': '2026-10-05' });
+    expect(einheitenDatieren(stand('OK-H|1'), null, true, '2026-10-05')).toEqual({ 'OK-H|1': null });
+  });
+
+  it('merkt nur neue Einheiten vor und behält verschwundene bis zum Abschluss', () => {
+    expect(einheitenVormerken({ 'OK-H|1': '2026-10-01' }, { 'OK-H|1': '2026-10-01' })).toBeNull();
+    expect(einheitenVormerken({ 'OK-H|1': '2026-10-01', 'OK-P|1': '2026-10-02' }, { 'OK-H|1': '2026-10-01', 'UK-H|1': '2026-10-05' }))
+      .toEqual({ 'OK-H|1': '2026-10-01', 'OK-P|1': '2026-10-02', 'UK-H|1': '2026-10-05' });
+  });
+
+  it('scheitert der Spiegel am 05.10., bekommt der Versuch am 06.10. dasselbe Datum (keine Zeilen unter zwei Daten)', () => {
+    const bisher = { 'OK-H|1': '2026-10-01' };
+    const tag1 = einheitenDatieren(stand('OK-H|1', 'UK-H|1'), bisher, false, '2026-10-05');
+    // Vorgemerkt wurde vor dem Schreiben; danach scheiterte nur der Spiegel.
+    const vorgemerkt = einheitenVormerken(bisher, tag1);
+    const tag2 = einheitenDatieren(stand('OK-H|1', 'UK-H|1'), vorgemerkt, false, '2026-10-06');
+    expect(tag2['UK-H|1']).toBe('2026-10-05');
+    // Ohne Vormerken hätte der zweite Versuch den 06.10. vergeben.
+    expect(einheitenDatieren(stand('OK-H|1', 'UK-H|1'), bisher, false, '2026-10-06')['UK-H|1']).toBe('2026-10-06');
+  });
+
+  it('bereinigt beim späteren Versuch auch Einheiten, die zwischendurch verschwunden sind', () => {
+    const bisher = { 'OK-H|1': '2026-10-01', 'OK-P|1': '2026-10-02' };
+    const neu = einheitenDatieren(stand('OK-H|1', 'UK-H|1'), bisher, false, '2026-10-05');
+    const vorgemerkt = einheitenVormerken(bisher, neu);
+    // Der nächste Versuch liest den vorgemerkten Stand als „alt“: Der 02.10. bleibt betroffen.
+    expect(betroffeneTage({ altGesehen: vorgemerkt, neuGesehen: neu })).toEqual(['2026-10-01', '2026-10-02', '2026-10-05']);
   });
 });

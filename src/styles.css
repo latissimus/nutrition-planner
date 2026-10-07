@@ -16966,6 +16966,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coaching-karte footer{margin-top:12px;color:var(--ui-neben);font:500 12px/1.35 "JetBrains Mono",monospace}
 :root[data-theme][data-seite="coach"] #view .coaching-karte.is-status p{color:var(--ui-neben)}
 :root[data-theme][data-seite="coach"] #view .coaching-karte.is-fehler .coaching-marke{background:var(--ui-auswahl);color:var(--ui-schrift)}
+/* Wochen-Coaching (Schritt 5): Volumen, Experimente, Wochenvergleich. */
+:root[data-theme][data-seite="coach"] #view .coaching-volumen{display:grid;gap:4px;margin:0 0 12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:14px}
+:root[data-theme][data-seite="coach"] #view .coaching-volumen b{font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+:root[data-theme][data-seite="coach"] #view :is(.coaching-volumen,.coaching-experiment) small{color:var(--ui-neben);font:500 13px/1.4 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #view .coaching-experiment{display:grid;gap:4px;justify-items:start;margin:0 0 12px}
+:root[data-theme][data-seite="coach"] #view .coaching-experiment .coach-merken{margin-top:4px}
+:root[data-theme][data-seite="coach"] #view .coaching-vergleich{margin:0 0 12px}
+:root[data-theme][data-seite="coach"] #view .coaching-vergleich summary{cursor:pointer;color:var(--ui-neben);font:700 12px/1.3 "JetBrains Mono",monospace;letter-spacing:.04em}
+:root[data-theme][data-seite="coach"] #view .coaching-vergleich .coach-result{margin-top:8px}
 
 /* Briefumschlag am Coach-Symbol: ein neues Coaching ist da (statt Punkt). */
 #app .app-dex-coach{position:relative}

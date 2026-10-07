@@ -9,11 +9,12 @@ import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from 
 import {
   ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
-import { mountWochenbilanz, vergleichMarkup } from './coachWeekly.js';
+import { vergleichMarkup } from './coachWeekly.js';
+import { mountWochenKaertchen } from './wochenKaertchen.js';
 import { fensterMarkup } from './coachFenster.js';
 import { sanduhrMarkup } from './sanduhr.js';
 import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
-import { alsGelesenMarkieren, coachingKarteMarkup, istFrisch, neuestesCoaching } from './coaching.js';
+import { alsGelesenMarkieren, alsUebernommenMerken, coachingKarteMarkup, istFrisch, neuestesCoaching } from './coaching.js';
 
 export { fensterMarkup };
 
@@ -380,6 +381,28 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       form.requestSubmit();
       return;
     }
+    // Wochen-Coaching: Urteil oder neues Experiment über dieselben Wege wie im
+    // Chat übernehmen; nichts wird automatisch gestartet oder beendet.
+    const urteilKnopf = event.target.closest('[data-coaching-urteil]');
+    const experimentKnopf = event.target.closest('[data-coaching-experiment]');
+    if ((urteilKnopf || experimentKnopf) && coaching?.ergebnis) {
+      const knopf = urteilKnopf || experimentKnopf;
+      const index = Number(urteilKnopf ? urteilKnopf.dataset.coachingUrteil : experimentKnopf.dataset.coachingExperiment);
+      const eintrag = urteilKnopf ? coaching.ergebnis.experimente?.[index] : coaching.ergebnis.neuesExperiment?.[index];
+      if (!eintrag) return;
+      knopf.disabled = true;
+      try {
+        if (urteilKnopf) await uebernimmAuswertung(userId, eintrag);
+        else await merkeEmpfehlung(userId, eintrag);
+        alsUebernommenMerken(coaching.id, `${urteilKnopf ? 'urteil' : 'experiment'}:${index}`);
+        knopf.textContent = urteilKnopf ? 'Ergebnis übernommen' : 'Gemerkt';
+        toast(urteilKnopf ? 'Übernommen.' : 'Gemerkt. Am Prüfdatum wertet der Coach das Experiment aus.');
+      } catch (error) {
+        knopf.disabled = false;
+        toast(istNichtEingerichtet(error) ? 'Das Gedächtnis ist noch nicht eingerichtet.' : (error?.message || 'Konnte nicht übernommen werden.'));
+      }
+      return;
+    }
     const ergebnis = runden[Number(event.target.closest('[data-runde]')?.dataset.runde)]?.result;
     const auswertungsKnopf = event.target.closest('[data-auswertung-uebernehmen]');
     const auswertung = auswertungsKnopf && ergebnis?.experimentReviews?.[Number(auswertungsKnopf.dataset.auswertungUebernehmen)];
@@ -415,33 +438,10 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     }
   });
 
-  // Wochen-Check-in (Schritt 7): Der Coach stellt die Fragen im Chat. Die Bilanz
-  // beginnt ein neues Gespräch, damit Rückfragen an sie anschließen.
-  mountWochenbilanz(container.querySelector('[data-coach-woche]'), {
-    userId,
-    anfragen: rufeCoach,
-    zeigen: ({ frage, laden, fehler, text, result, weekly, conversationId }) => {
-      if (frage) {
-        answer.insertAdjacentHTML('beforeend', fensterMarkup({ klasse: 'coach-checkin', inhalt: frage }));
-        nachUnten();
-        return answer.lastElementChild;
-      }
-      if (laden) {
-        answer.innerHTML = fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(text) }) + tipptMarkup(LADEPHASEN.woche[0]);
-        ladephasenStarten(answer, LADEPHASEN.woche);
-      } else if (fehler) {
-        zeichnen(fehlerMarkup('Keine Wochenbilanz erstellt. Deine Messwerte bleiben unverändert. Versuche es später erneut.'));
-      } else {
-        runden = [{ frage: text, result, weekly }];
-        gespraech = conversationId ? { id: conversationId, runden } : null;
-        gespraechSchreiben(gespraech);
-        neuesGespraech.hidden = !gespraech;
-        zeichnen();
-      }
-      nachUnten();
-      return null;
-    },
-  });
+  // Wochenrückblick (Schritt 5 des Coaching-Plans): von Sonntag bis Montag
+  // 21 Uhr ein freiwilliges Kärtchen ohne KI-Aufruf. Die Bilanz selbst kommt
+  // automatisch als Wochen-Coaching am Montag um 21 Uhr.
+  mountWochenKaertchen(container.querySelector('[data-coach-woche]'), { userId });
 
   /* Sprachnachricht: Mikrofon antippen, sprechen, mit dem Pfeil senden. Die
      Aufnahme wird verschriftlicht (Edge Function ki-werkzeuge) und geht dann

@@ -35,6 +35,9 @@ const LIMITS = {
   minDays: 5,
   routineMinPlanned: 4,
 };
+// Dieselben Grenzen gelten für die Volumen-Entscheidung im Wochen-Coaching
+// (volumen.js), damit Erholung, Schlaf und Ernährung überall gleich zählen.
+export const FOLLOW_THROUGH_LIMITS = LIMITS;
 
 const DAY = 86_400_000;
 const number = (value: unknown) => Number.isFinite(Number(value)) ? Number(value) : 0;

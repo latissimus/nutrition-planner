@@ -10,9 +10,13 @@ Ernährung und Körpergewicht. Diese Daten hat nur CAPBOY.
 
 - **Bereitgestellt:** `logman-abgleich` v4 (manuelle Importe werden bei
   gleichem Schlüssel nie überschrieben; 401 ohne Anmeldung, CORS geprüft).
-- **Nicht bereitgestellt:** `capboy-coach` mit Coaching (live weiter v20, der
-  Zeitplan endet dort mit 401). Freigabe erst nach diesem Review und dem
-  App-Upload durch den Nutzer.
+- **Bereitgestellt am 05.10.2026, ca. 21:45 (Freigabe des Nutzers nach zwei
+  Review-Runden):** `logman-abgleich` v5 und `capboy-coach` mit dem täglichen
+  Coaching. Kostenlos geprüft: beide starten (CORS 200), ohne Anmeldung 401,
+  falsches Cron-Geheimnis 401 („Nicht autorisiert.“), Chat ohne Nutzer 401.
+  Kein Lauf von Hand; der erste automatische Lauf ist am 06.10. um 21 Uhr
+  (der Termin um 22 Uhr Berliner Zeit bricht ab, weil er nicht 21 Uhr ist).
+  Die App mit Karte, Briefumschlag und Reiterpunkten war schon hochgeladen.
 - **GPT-Review Schritt 4 umgesetzt:** Importschutz (`ohneFremdeZeilen`),
   Status „läuft/gescheitert“ über jedem Gespräch (hängender Lauf nach 15
   Minuten gilt als gescheitert), Coaching-Hinweise beim Kontowechsel
@@ -41,16 +45,24 @@ Ernährung und Körpergewicht. Diese Daten hat nur CAPBOY.
   (`logman-abgleich/schreibreihenfolge.js`): erst veraltete Zeilen entfernen,
   dann Leistungswerte schreiben, dann der Spiegel. Scheitert ein Schritt,
   bleibt die alte Version stehen und der nächste Abgleich holt alles nach.
-  Drei Fehlertests in `src/logmanAbgleich.test.js`. Restfall: Scheitert nur
-  das Schreiben des Spiegels selbst und kommt der nächste Abgleich erst an
-  einem späteren Tag, datiert er neue Einheiten auf diesen Tag; die Zeilen
-  des ersten Versuchs bleiben dann zusätzlich stehen. Server bestätigt: v4
+  Drei Fehlertests in `src/logmanAbgleich.test.js`. Server bestätigt: v4
   am Server ist identisch mit dem lokalen Stand vor dieser Änderung.
+- **Zweite Review-Runde, Restfall gelöst:** Neue Einheiten werden vor allen
+  Schreibschritten mit ihrem Datum im Spiegel vorgemerkt, ohne neue Version
+  (`einheitenVormerken`). Ein späterer Versuch, auch am Folgetag, übernimmt
+  dieses Datum; keine Zeilen unter zwei Daten. Verschwundene Einheiten bleiben
+  bis zum Abschluss vorgemerkt, damit ihre veralteten Zeilen noch bereinigt
+  werden. „Zuletzt abgeglichen“ wird erst nach Erfolg gesetzt. Vier weitere
+  Tests (Folgetag, Vormerken, Bereinigen). Verbleibend, sehr selten: Scheitert
+  der Abschluss und kehrt genau dieselbe Einheit nach einem Phasen-Reset
+  zurück, erbt sie das vorgemerkte Datum.
 - **GPT-Review 05.10., Punkt 2 (Entscheidung des Nutzers: knapp):** Regel 8
   hat eine einzige Ausnahme. Nur wenn die eigene Notiz eindeutig mehr als eine
   Trainingsbeschwerde meldet (etwa Brustschmerz, Ohnmacht), gibt es an dem Tag
-  kein Trainingsziel, und der Fokus sagt in einem ruhigen Satz, das vor dem
-  nächsten Training abklären zu lassen. Kein Alarm, kein Notruf-Text, keine
+  kein Trainingsziel, und der Fokus sagt ruhig und klar, das zeitnah ärztlich
+  abklären zu lassen, bevor wieder trainiert wird; deutet die Notiz auf etwas
+  Anhaltendes oder Schweres, sofort Hilfe holen (zweite Review-Runde: die
+  frühere Fassung „kein Notruf-Text“ war zu absolut). Kein Drama, keine
   Diagnose, kein eigenes Feld. Trainingsbeschwerden bleiben bei Regel 9.
   Neuer Fall `ernste-angabe` im Fallsatz; einzeln prüfbar mit
   `npm run eval:coaching -- --live --nur=ernste-angabe` (ein bezahlter Aufruf).
@@ -330,14 +342,267 @@ Gebaut am 03.10.2026: `src/coaching.js`, Tests in `src/coaching.test.js`
   Review und einen bezahlten Prüflauf. Die Farbe der Coaching-Marke ist
   schon die erste der drei Nachrichtenfarben.
 
-## Schritt 5 – Wochenteil automatisch
+## Schritt 5 – Wochenteil automatisch (Konzept 05.10.2026, zur Prüfung)
 
-- Montags um 21 Uhr läuft statt des Tageslaufs der Wochenteil: Vergleich mit der
-  Vorwoche, fällige Experimente, Volumen je Muskel nach dem LOGMAN-Regelwerk.
-- Beim Einbau des Wochenteils den Tageslauf montags ausdrücklich aussetzen;
-  insgesamt höchstens ein automatischer KI-Aufruf je Person an diesem Tag.
-- Der Knopf „Wochenbilanz starten“ entfällt. Die Angaben bleiben als
-  freiwilliges Kärtchen (Umsetzung, Umstände, Notiz).
+**Ziel:** Montags um 21 Uhr bekommt die Person statt des Tages-Coachings ein
+Wochen-Coaching. Es bilanziert die abgeschlossene Woche (Montag bis Sonntag)
+gegen die Vorwoche, prüft fällige Experimente und entscheidet über das
+Trainingsvolumen nach `LOGMAN-Training.md` (Abschnitte 7 und 8). Der Knopf
+„Wochenbilanz starten“ und der rosa Punkt dafür entfallen.
+
+**Was es heute gibt (wird wiederverwendet):**
+- `weekly.ts`: Wochenvergleich, den die App rechnet (`weeklyBlock`:
+  Vergleichszeilen, nicht gemessene Werte, Krank- und Reisetage, Bericht der
+  Person, Umsetzung der Maßnahmen, Fokus der letzten Bilanz).
+- `experiments.ts` und `<experiment_reviews>` im Chat-Prompt: Messung und
+  Urteil fälliger Experimente (`reviewDue`).
+- `training.js`: Verlauf je Übung (`ohneFortschritt`, `faelltWiederholt`),
+  Sätze je Muskel (geplant und erledigt), Stand im Zyklus und Deload.
+- LOGMANs Volumenhebel im Spiegel: Stufe je Einheit (`tier` 0/1/2 = Kompakt/
+  Standard/Voll) und Priorität je Muskel (`volumen.prioritaet`, „plus“ mit 1
+  oder 2 Extra-Sätzen je passender Einheit).
+
+**Neu:**
+1. **Volumen-Entscheidung (ohne KI, reines Modul `volumen.js` mit Tests),**
+   nach GPT-Review in fester Reihenfolge:
+   - **a) Sperren** – greift eine, gilt für alle Muskeln nur `beibehalten`
+     (mit Grund):
+     - Krank- oder Reisetage in der bewerteten Woche oder der Vorwoche
+       (Erholungs-Check-ins) oder „krank“/„unterwegs“ im Kärtchen.
+     - Deload läuft oder steht bevor (`deload` oder `cyclesBisDeload` ≤ 1).
+     - Volumenänderung in den letzten zwei abgeschlossenen Wochen. Erkannt
+       am LOGMAN-Volumenstand (Prioritäten, Stufen der laufenden Einheiten),
+       den jeder Wochen-Lauf speichert. Gibt es noch keine zwei früheren
+       Wochen-Läufe mit Stand, wird zuerst beobachtet.
+     - Zu wenig vergleichbare Daten: weniger als zwei abgeschlossene Zyklen
+       (alle vier Einheiten OK-H, UK-H, OK-P, UK-P mit Sätzen).
+     - Eine Beschwerde in einer Notiz sperrt nicht und ist kein Grund, den
+       Plan umzustellen; sie wirkt über Regel 9 auf die nächste Einheit.
+   - **b) Muskel bewerten** (nur ohne Sperre), über die letzten zwei
+     abgeschlossenen Zyklen:
+     - *Satz-Erfüllung* je Muskel und Zyklus: erledigte ÷ geplante Sätze
+       (gewichtet wie im Set-O-Meter, je Zyklus gerechnet).
+     - *Leistung* je Muskel über die Übungen mit diesem Hauptmuskel:
+       „stagniert“, wenn alle `ohneFortschritt` ≥ 2 haben; „fällt“, wenn eine
+       `faelltWiederholt` hat.
+     - *Erholung gut* nur mit genug Werten aus den letzten 14 Tagen:
+       mindestens 5 Erholungs-Check-ins mit Ø ≥ 3 von 5 und, wenn Schlaf an
+       ist, mindestens 5 Nächte mit Ø ≥ 420 min und Qualität ≥ 3 (dieselben
+       Grenzen wie `followThrough`). Fehlende Werte heißen „unbekannt“, nie
+       „gut“.
+     - *Ernährung passt* (nur wenn Ernährung an ist): mindestens 5 Tage mit
+       Einträgen in 14 Tagen, Ø kcal ≥ 95 % des Ziels, Protein ≥ 80 % von
+       1,8 g/kg (wie `followThrough`). Sonst „unbekannt“ oder „passt nicht“.
+     - *Gewicht*: Wochenmittel der letzten drei abgeschlossenen Wochen nicht
+       fallend (letzte − erste ≥ −0,3 kg); weniger als zwei Werte heißt
+       „unbekannt“. Hautfalten, falls in den letzten 4 Wochen gemessen und um
+       mehr als 3 mm gestiegen: keine Erhöhung.
+     - **erhöhen möglich**: stagniert, keine Übung fällt, Satz-Erfüllung
+       ≥ 90 % in beiden Zyklen, Erholung gut, Ernährung passt (oder aus),
+       Gewicht nicht fallend.
+     - **reduzieren nötig**: eine Übung fällt wiederholt. (Geringe
+       Satz-Erfüllung allein reduziert nicht; sie kann eine Lücke in der
+       Protokollierung sein und verhindert nur eine Erhöhung – dritte
+       Review-Runde.)
+     - sonst **beibehalten**.
+   - **c) Nur zulässige LOGMAN-Hebel.** Die App erzeugt die Liste der
+     erlaubten Aktionen; die KI wählt genau eine ID daraus, jede andere
+     Ausgabe wird verworfen und gilt als `beibehalten`. Höchstens eine
+     Änderung pro Woche.
+     - erhöhen, Muskel ohne Priorität → `plus1:<Muskel>`: Priorität „plus“
+       mit 1 Satz, also je passender Einheit (schwer und leicht) ein Satz,
+       +2 Sätze je Zyklus – das ist „zunächst 1–2 Sätze“ aus Regel 7.
+     - erhöhen, „plus 1“ aktiv → `plus2:<Muskel>`; „plus 2“ aktiv → keine
+       weitere Erhöhung.
+     - reduzieren, „plus 2“ aktiv → `plus1:<Muskel>`; „plus 1“ aktiv →
+       `prioritaet-aus:<Muskel>`; ohne Priorität keine Muskel-Aktion. Nur
+       wenn in einer Körperhälfte mindestens zwei Muskeln „reduzieren“
+       zeigen → `kompakt:<OK|UK>` (Stufe Kompakt für die Einheiten dieser
+       Hälfte; betrifft alle ihre Muskeln).
+     - `beibehalten` ist immer erlaubt.
+2. **Wochen-Lauf.** Derselbe Zeitplan; `coachingLauf` erkennt Montag
+   (Europe/Berlin) und schreibt eine Zeile `art = 'woche'` statt `'tag'`.
+   Montags läuft kein Tageslauf; der Wochen-Lauf nimmt das Training des
+   Tages mit auf. **Gemeinsamer Anspruch je Person und Datum** (GPT-Review):
+   Die Eindeutigkeit von `coach_coachings` wird von (Person, Art, Datum) auf
+   (Person, Datum) umgestellt. Ein zweiter Lauf am selben Tag scheitert damit
+   schon beim Reservieren, egal welcher Art. Er läuft, wenn die abgeschlossene Woche überhaupt Daten hat
+   (sonst kein Aufruf, keine Kosten). Reservieren, Status, Fehler und Push
+   wie beim Tageslauf.
+3. **Eigener Prompt und eigenes Schema** (`wochenSystemPrompt`, nicht der
+   Chat-Prompt): Überschrift (Push-Text), höchstens drei Punkte mit Bereich,
+   Urteil zu jedem fälligen Experiment (`wirksam`/`nicht_wirksam`/`unklar`,
+   wie bisher), **eine** Volumen-Entscheidung (Muskel, `beibehalten`/
+   `erhoehen`/`reduzieren`, konkreter LOGMAN-Hebel, z. B. „Priorität Rücken:
+   plus 1 Satz“ oder „UK-Einheiten auf Kompakt“), höchstens ein neues
+   Experiment, ein Fokus für die Woche, Datenlage. Regeln: Volumen nur ändern,
+   wenn das Signal es erlaubt, sonst `beibehalten`; nach einer Änderung
+   2–3 Wochen beobachten (die letzte Wochen-Entscheidung wird mitgegeben);
+   eine nicht repräsentative Woche (krank, Reise) führt zu keiner Änderung.
+   Dieselben Grenzen wie beim Tages-Coaching (kein Arzt, Beschwerden wie ein
+   Krafttrainer, Körper nach Hautfalten).
+4. **Freiwilliges Wochen-Kärtchen (ohne KI).** Von Sonntag bis Montag 21 Uhr
+   steht im Chat ein kleines Kärtchen: Umsetzung der laufenden Maßnahmen,
+   Umstände (krank, unterwegs, Stress, wenig Schlaf, Ausnahme), Notiz.
+   Speichern kostet nichts; der Montags-Lauf liest es. Wer es nicht ausfüllt,
+   bekommt das Wochen-Coaching trotzdem.
+5. **Darstellung.** Dieselbe Karte wie beim Tages-Coaching mit der Marke
+   „Wochen-Coaching“, darunter die Vergleichstabelle der App
+   (`vergleichMarkup`), die Volumen-Entscheidung als eigene Zeile und die
+   Experiment-Urteile. Briefumschlag und Reiterpunkte wie gehabt.
+   Neue Experimente und Urteile übernimmt die Person mit einem Knopf auf der
+   Karte (bestehende Speicherwege, keine KI); nichts wird automatisch
+   gestartet oder beendet.
+6. **Aufräumen.** „Wochenbilanz starten“, `mountWochenbilanz` im Chat und der
+   Wochen-Punkt am Coach-Symbol (`wochenbilanzHinweis`) entfallen.
+   `coach_weekly_reviews` bleibt als Verlauf: Der Wochen-Lauf schreibt dort
+   zusätzlich seine Bilanz, damit die nächste Woche den Fokus kennt.
+
+**Datenbank:** eine Migration (Nutzer spielt sie ein): Eindeutigkeit
+(Person, Datum) für `coach_coachings`, Spalte `volumen_stand` für den
+gespeicherten LOGMAN-Volumenstand der Wochen-Läufe, Tabelle für das Kärtchen
+(`coach_wochen_checkins`: Woche, Umstände, Notiz, Umsetzung; nur eigene
+Zeilen lesen und schreiben). Bewusst **kein** Auslöser für den
+Änderungszähler: Das Kärtchen allein soll am Sonntag kein bezahltes
+Tages-Coaching auslösen.
+
+**Kosten:** unverändert höchstens ein bezahlter Aufruf je Person und Tag;
+montags ersetzt der Wochen-Lauf den Tageslauf.
+
+**Abnahme:** deterministische Gegenproben vor jedem bezahlten Test:
+Krankheit plus Leistungsabfall (→ beibehalten), unvollständiger Zyklus
+(→ beibehalten), fehlende Erholungsdaten (→ keine Erhöhung), bereits aktive
+Priorität (→ `plus2` bzw. keine Erhöhung), Volumenänderung vor einer Woche
+(→ beibehalten), zwei Muskeln einer Hälfte reduzieren (→ `kompakt`), KI-Aktion
+außerhalb der Liste (→ verworfen), doppelter Montagslauf (→ der zweite
+Anspruch scheitert; Datenbanktest, zurückgerollt). Kleiner Fallsatz
+`npm run eval:wochen` mit fünf Fällen: normale Woche mit Fortschritt,
+Stillstand bei guter Erholung (→ erhöhen), wiederholter Abfall (→ reduzieren),
+Krankheitswoche (→ nichts ändern), fälliges Experiment. Den bezahlten Lauf
+startet der Nutzer.
+
+**Entscheidungen des Nutzers (05.10.2026):**
+- Volumenänderungen schlägt der Coach nur vor; die Person stellt sie selbst in
+  LOGMAN um. CAPBOY liest LOGMAN nur und schreibt dort nichts.
+- Das Kärtchen ist der eigene Rückblick auf die Woche und steht von Sonntag
+  bis Montag 21 Uhr im Chat.
+
+### Stand Schritt 5 (05.10.2026, lokal gebaut, nicht bereitgestellt)
+
+- `capboy-coach/volumen.js`: Sperren, Muskelbewertung, zulässige Aktionen,
+  14-Tage-Fenster; Grenzen aus `followThrough.ts` (`FOLLOW_THROUGH_LIMITS`).
+  15 Gegenproben in `src/coachVolumen.test.js`, darunter alle aus dem Review.
+- `capboy-coach/wochenCoaching.ts`: Prompt, Schema mit den erlaubten
+  Aktions-IDs als feste Auswahl, Bereinigen (Aktion außerhalb der Liste →
+  „beibehalten“, Urteile nur zu fälligen Experimenten, höchstens ein neues
+  Experiment), Gedächtnistext. Regeln 8–10 teilen Tages- und Wochen-Coaching
+  über `COACHING_GRENZEN`; der Tages-Prompt ist dadurch unverändert
+  (gleicher Fingerabdruck). Tests in `src/coachWochen.test.js`.
+- `capboy-coach/index.ts`: montags `wochenCoachingFuerNutzer` statt des
+  Tageslaufs; Anspruch und Existenzprüfung je Person und Datum (beide Arten);
+  `volumen_stand` wird beim Reservieren gespeichert; Bilanz zusätzlich in
+  `coach_weekly_reviews` (Fokus für die nächste Woche); Push „Wochen-Coaching“.
+- App: Wochenkarte (`src/coaching.js`, Marke „Wochen-Coaching“, Volumen,
+  Experiment-Urteile und neues Experiment mit Übernehmen-Knopf über die
+  bestehenden Speicherwege, Wochenvergleich zum Aufklappen), Kärtchen
+  (`src/wochenKaertchen.js`, Sonntag bis Montag 21 Uhr, ohne KI). Entfernt:
+  „Wochenbilanz starten“ im Chat, der Wochen-Punkt am Coach-Symbol und die
+  alten Chat-Funktionen in `coachWeekly.js`.
+- Migration `20261005220000_wochen_coaching.sql`, noch nicht eingespielt.
+- Fallsatz `npm run eval:wochen` (5 Fälle, Trockenlauf geprüft).
+- Alle 425 kostenlosen Tests grün.
+- **Offen vor der Freigabe:** Migration einspielen; Datenbanktest für den
+  doppelten Montagslauf (zurückgerollt); Review; bezahlter Fallsatz durch den
+  Nutzer; Bereitstellen von `capboy-coach` erst nach der Migration.
+- **Für Schritt 6 vorgemerkt:** Der alte Chat-Modus `mode: 'weekly'` in
+  `capboy-coach` ist von der App aus nicht mehr erreichbar und kann weg.
+
+### GPT-Review Schritt 5, Nachbesserung (06.10.2026)
+
+1. **Damalige Sollwerte:** `logman-abgleich` schreibt einen Verlauf der
+   LOGMAN-Prioritäten (`logman_spiegel.prioritaet_verlauf`, neue Spalte in
+   derselben Migration; Eintrag `{ ab, prioritaet }` bei jeder Änderung).
+   `volumen.js` rechnet jeden Zyklus mit der Priorität nach, die vor seiner
+   ersten Einheit galt (`prioritaetImZyklus`). Änderte sie sich innerhalb des
+   Zyklus oder liegt er vor dem Beginn der Aufzeichnung, ist er nicht
+   vergleichbar. Eine Prioritätsänderung in den letzten 14 Tagen sperrt
+   zusätzlich zur Wochen-Stand-Prüfung.
+2. **Vergleichbare Zyklen:** kein Deload, alle vier Einheiten mit Datum,
+   damalige Vorgabe bekannt, jede geplante Übung (wie im Set-O-Meter, inkl.
+   Prioritäts-Slots) mit mindestens einem Satz. Leistung über die letzten
+   drei, Satz-Erfüllung über die letzten zwei dieser Zyklen; ein laufender
+   oder lückenhafter Zyklus fließt nirgends ein. Mindestens drei vergleichbare
+   Zyklen, sonst Sperre mit Grund.
+3. **Experimentregeln im Code** (`wochenBereinigen`): Fehlt ein Urteil zu
+   einem fälligen Experiment, steht es als „unklar, nicht bewertet“ mit
+   Messung und Umsetzung auf der Karte (ohne Übernehmen-Knopf). Ein neues
+   Experiment wird verworfen bei: nicht repräsentativer Woche, fehlender
+   Zielgröße, Richtung, Hypothese oder Ausgangswert, Prüfdatum unter 14 Tagen
+   (21 bei Hautfalten, Taille, Kraft) oder über 56 Tagen, laufendem Experiment
+   im selben Bereich, Trainingsexperiment neben einer Volumenänderung.
+   „Beobachten“ bleibt erlaubt.
+4. **Kärtchen nach Berliner Zeit** (wie der Montagslauf), nicht nach der
+   Zeitzone des Geräts.
+5. **Eigener Fehler gefunden:** Gespeicherte Stände kommen aus jsonb mit
+   anderer Schlüsselreihenfolge zurück; der Vergleich hätte immer „kürzlich
+   geändert“ gemeldet. Jetzt Vergleich mit sortierten Schlüsseln
+   (`stabilesJson`), mit Test.
+
+Gegenproben in `src/coachVolumen.test.js` (23), `src/coachWochen.test.js`,
+`src/coachWeekly.test.js`; alle 437 kostenlosen Tests grün.
+
+**Folge für den Start:** Weil der Prioritäten-Verlauf erst mit dem
+Bereitstellen beginnt, zählen nur Zyklen, die danach komplett absolviert
+werden. Volumenänderungen schlägt das Wochen-Coaching deshalb frühestens nach
+drei solchen Zyklen vor (bei vier Einheiten pro Woche etwa drei Wochen). Bis
+dahin lautet die Volumen-Zeile „unverändert“ mit Grund.
+
+### GPT-Review Schritt 5, dritte Runde (06.10.2026)
+
+1. **Geringe Satz-Erfüllung reduziert nicht mehr.** Wer überall nur einen
+   von zwei Sätzen einträgt, besteht die Vergleichbarkeitsprüfung; ohne
+   eindeutiges Signal „bewusst verkürzt“ wäre eine Reduktion falsch. Reduziert
+   wird nur bei wiederholt fallender Leistung; Erfüllung unter 75 % erscheint
+   als Grund „erst vollständig protokollieren“ und verhindert eine Erhöhung.
+2. **Änderungszeitpunkt unbekannt:** Der Verlauf hält je Fassung `ab` (erstes
+   Sehen) und `zuletzt` (letztes Sehen) fest. Eine Fassung gilt nur an Tagen
+   strikt dazwischen als sicher; ein Zyklus wird nur bewertet, wenn er ganz in
+   so einem Zeitraum liegt. Damit fällt jeder Zyklus in der Lücke zwischen
+   „zuletzt alt gesehen“ und „erstmals neu gesehen“ heraus, auch wenn CAPBOY
+   erst nach dem Zyklus geöffnet wurde. LOGMAN bleibt unverändert. (Genauer
+   ginge es, wenn LOGMAN selbst den Änderungszeitpunkt speichert – das wäre
+   eine Änderung in LOGMAN und braucht vorher die Zustimmung des Nutzers.)
+3. **Eine Regel für „nicht repräsentativ“** (`nichtRepraesentativ` in
+   `volumen.js`): Krank- oder Reisetage in der bewerteten Woche oder der
+   Vorwoche, oder jeder Umstand aus dem Kärtchen (auch Feier oder Urlaub,
+   Stress, wenig Schlaf). Dieselbe Funktion sperrt die Volumenänderung
+   (`nicht-repraesentativ`) und das neue Experiment (Server), passend zu
+   Prompt-Regel 2.
+
+Gegenproben ergänzt; alle 440 kostenlosen Tests grün. Die Migration bleibt
+wie sie ist (die Verlaufseinträge tragen `zuletzt` im jsonb, keine neue Spalte).
+
+**Stand 07.10.2026:** GPT gibt die dritte Runde frei. Migration
+`20261005220000_wochen_coaching.sql` vom Nutzer eingespielt und geprüft
+(Eindeutigkeit Person + Datum, `volumen_stand`, `prioritaet_verlauf`,
+Kärtchen-Tabelle mit RLS und vier Regeln). `logman-abgleich` v6 bereitgestellt
+(CORS 200, ohne Anmeldung 401, falsches Cron-Geheimnis 401); der
+Prioritäten-Verlauf läuft ab jetzt mit. Datenbanktest doppelter Anspruch:
+zweiter Lauf am selben Tag mit 23505 abgewiesen, zurückgerollt (0 Zeilen).
+Live-Fallsatz (Nutzer, 5 Fälle): alle Volumen-Entscheidungen wie erwartet
+(beibehalten, plus1:Brust, prioritaet-aus:Brust, Krankheitswoche
+beibehalten, fälliges Experiment beurteilt). Füllstoff „Repräsentative
+Woche: …“ in 3 von 5 Überschriften → Regel 2 geändert (nur erwähnen, wenn
+nicht repräsentativ); erneut geprüft mit 3 Fällen (fortschritt,
+krankheitswoche, experiment-faellig), Prompt-Fingerabdruck passend: behoben.
+**`capboy-coach` mit Wochen-Coaching bereitgestellt (07.10.2026)**; CORS 200,
+ohne Anmeldung 401, falsches Cron-Geheimnis 401, Chat ohne Nutzer 401.
+Offen: App hochladen vor Montag, 12.10. (erstes Wochen-Coaching, Kärtchen ab
+Sonntag, 11.10.).
+
+**Reihenfolge der Freigabe:** Migration einspielen → `logman-abgleich` v6
+(schreibt den Verlauf; braucht die neue Spalte) → Datenbanktest doppelter
+Montagslauf → `capboy-coach` → App hochladen.
 
 ## Schritt 6 – Aufräumen
 

@@ -464,9 +464,6 @@ let aktiveRoute = (location.hash || '#home').slice(1) || 'home';
 let appDockEigene = [];
 let appDockGeladen = false;
 let appDockCoinStand = null;
-// Wochen-Check-in (Schritt 7): Punkt am Coach-Symbol, solange die Bilanz der
-// abgeschlossenen Woche fehlt. Einmal je Sitzung und Nutzer geprüft.
-let wochenbilanzHinweis = false;
 // Hinweis-Punkte im Menüband: ROUTINEN mit heute offenen Routinen, SCHLAF
 // ohne heutigen Morgen-Check-in.
 let dockHinweise = { habits: false, sleep: false };
@@ -477,7 +474,6 @@ let coachingStand = null;
 let coachingNachricht = false;
 let coachingRouten = new Set();
 const hatDockHinweis = (route) => Boolean(dockHinweise[route]) || coachingRouten.has(route);
-let wochenbilanzGeprueftFuer = null;
 let preferencesLadePromise = Promise.resolve();
 let preferencesLadeUserId = '';
 
@@ -1436,8 +1432,8 @@ function appDexShellZeichnen(route, view) {
         ${coinDexIsVisible() ? coinHeaderMarkup(appDockCoinStand || { balance: 0 }, { aktiv: istCoins }) : ''}
         <a class="app-dex-search${istSuche ? ' aktiv' : ''}" href="#${istSuche ? appLetzteDexRoute() : 'search'}"
            aria-label="Wissen durchsuchen"${istSuche ? ' aria-current="page"' : ''}>${searchIconMarkup()}</a>
-        <a class="app-dex-coach${coachingNachricht ? ' hat-nachricht' : (wochenbilanzHinweis ? ' hat-hinweis' : '')}" href="#coach"
-           aria-label="Coach fragen${coachingNachricht ? ' – neues Coaching' : (wochenbilanzHinweis ? ' – Wochen-Check-in bereit' : '')}">${coachIconMarkup('app-dex-coach-icon')}${coachingNachricht ? COACHING_BRIEF : ''}</a>
+        <a class="app-dex-coach${coachingNachricht ? ' hat-nachricht' : ''}" href="#coach"
+           aria-label="Coach fragen${coachingNachricht ? ' – neues Coaching' : ''}">${coachIconMarkup('app-dex-coach-icon')}${coachingNachricht ? COACHING_BRIEF : ''}</a>
         </span>`}
         <span class="app-dex-sync save-dot" role="status"></span>
         <a class="nav-av nav-av-fb${istProfil ? ' aktiv' : ''}" href="#profile"
@@ -1552,7 +1548,6 @@ function appDexShellAktualisieren(route, view, signal) {
     setPreference(LETZTER_DEX_KEY, view.dataset.appDockRoute || route, { syncDelay: 5000 });
   }
   appDexShellDatenLaden(route, view, signal);
-  wochenbilanzHinweisLaden();
   dockHinweiseLaden();
   coachingHinweisLaden(route);
 }
@@ -1661,27 +1656,6 @@ async function coachingHinweisLaden(route = '', sofort = false) {
 }
 window.addEventListener('capboy:coaching-gelesen', () => coachingHinweisLaden('', true));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') coachingHinweisLaden(); });
-
-function wochenbilanzHinweisLaden() {
-  const userId = session?.user?.id;
-  if (!userId || wochenbilanzGeprueftFuer === userId) return;
-  wochenbilanzGeprueftFuer = userId;
-  import('./coachWeekly.js')
-    .then(({ istWochenbilanzFaellig }) => istWochenbilanzFaellig(userId))
-    .then((faellig) => {
-      if (!faellig || session?.user?.id !== userId) return;
-      wochenbilanzHinweis = true;
-      const view = app.querySelector(':scope > #view');
-      if (view && istAppHauptDex(aktiveRoute, view)) appDexShellZeichnen(aktiveRoute, view);
-    })
-    .catch((error) => console.warn('Wochen-Check-in konnte nicht geprüft werden:', error?.message));
-}
-
-window.addEventListener('muscledex:wochenbilanz-erledigt', () => {
-  wochenbilanzHinweis = false;
-  const view = app.querySelector(':scope > #view');
-  if (view && istAppHauptDex(aktiveRoute, view)) appDexShellZeichnen(aktiveRoute, view);
-});
 
 window.addEventListener('muscledex:coins-changed', async () => {
   const view = app.querySelector(':scope > #view');
@@ -2958,8 +2932,6 @@ if (!supabaseKonfiguriert) {
       appDockEigene = [];
       appDockGeladen = false;
       appDockCoinStand = null;
-      wochenbilanzHinweis = false;
-      wochenbilanzGeprueftFuer = null;
       coachingHinweiseZuruecksetzen();
       setPreferenceUser('');
       preferencesLadeUserId = '';
@@ -2976,8 +2948,6 @@ if (!supabaseKonfiguriert) {
       appDockEigene = [];
       appDockGeladen = false;
       appDockCoinStand = null;
-      wochenbilanzHinweis = false;
-      wochenbilanzGeprueftFuer = null;
       coachingHinweiseZuruecksetzen();
     }
     if (session?.user?.id) {

@@ -1,5 +1,7 @@
 import { supabase } from './supabase.js';
 import { escapeHtml } from './coachFenster.js';
+import { ENTSCHEIDUNGEN, URTEILE, ZIELGROESSEN } from './coachMemory.js';
+import { vergleichMarkup } from './coachWeekly.js';
 
 // Tägliches Coaching in der App (COACHING-PLAN.md, Schritt 4). Der Chat ist
 // seine Heimat: Das neueste Coaching steht als Karte über dem Gespräch, und
@@ -28,11 +30,11 @@ const besuchteRouten = (id) => {
   try { return new Set(JSON.parse(localStorage.getItem(besuchtKey(id)) || '[]')); } catch { return new Set(); }
 };
 
-/** Das neueste Coaching der Person (Tag), auch wenn es noch läuft oder fehlschlug. */
+/** Das neueste Coaching der Person (Tag oder Woche), auch wenn es noch läuft oder fehlschlug. */
 export async function neuestesCoaching(userId) {
   const { data, error } = await supabase.from('coach_coachings')
-    .select('id,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am')
-    .eq('user_id', userId).eq('art', 'tag')
+    .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am')
+    .eq('user_id', userId)
     .order('datum', { ascending: false }).limit(1).maybeSingle();
   // Ohne Tabelle (Migration fehlt) gibt es schlicht kein Coaching.
   if (error) {
@@ -90,28 +92,76 @@ const HAENGT_NACH_MS = 15 * 60_000;
 const haengt = (coaching) => coaching.status === 'laeuft' && Boolean(coaching.erstellt_am)
   && Date.now() - Date.parse(coaching.erstellt_am) > HAENGT_NACH_MS;
 
+const bezeichnung = (liste, wert) => liste.find(([id]) => id === wert)?.[1] || wert || '';
+
+/* Übernommene Urteile und Experimente einer Wochenkarte (je Coaching im
+   localStorage), damit der Knopf nach dem Neuladen nicht wieder aktiv ist. */
+const uebernommenKey = (id) => `capboy:coaching-uebernommen:${id}`;
+export function uebernommen(coachingId) {
+  try { return new Set(JSON.parse(localStorage.getItem(uebernommenKey(coachingId)) || '[]')); } catch { return new Set(); }
+}
+export function alsUebernommenMerken(coachingId, schluessel) {
+  const liste = uebernommen(coachingId);
+  liste.add(schluessel);
+  try { localStorage.setItem(uebernommenKey(coachingId), JSON.stringify([...liste])); } catch {}
+}
+
+// Nur im Wochen-Coaching: Volumen, Experiment-Urteile, neues Experiment und
+// der Wochenvergleich der App (zum Aufklappen, damit die Karte kurz bleibt).
+function wochenteilMarkup(coaching) {
+  const ergebnis = coaching.ergebnis || {};
+  const erledigt = uebernommen(coaching.id);
+  const knopf = (schluessel, attribut, index, text, fertig) => (erledigt.has(schluessel)
+    ? `<button class="coach-merken" type="button" disabled>${escapeHtml(fertig)}</button>`
+    : `<button class="coach-merken" type="button" ${attribut}="${index}">${escapeHtml(text)}</button>`);
+  const aktion = ergebnis.volumen?.aktion;
+  const volumen = aktion ? `<div class="coaching-volumen"><b>Volumen</b>
+      <p>${escapeHtml(aktion.art === 'beibehalten' ? 'Unverändert lassen.' : aktion.text)}</p>
+      ${ergebnis.volumen.begruendung ? `<small>${escapeHtml(ergebnis.volumen.begruendung)}</small>` : ''}
+    </div>` : '';
+  // Ein vom Coach nicht bewertetes fälliges Experiment (ergaenzt) steht als
+  // „nicht bewertet“ da, ohne Knopf: Das Ergebnis trägt die Person selbst ein.
+  const urteile = (ergebnis.experimente || []).map((urteil, index) => `<article class="coaching-experiment">
+      <span class="coaching-bereich">Experiment · ${urteil.ergaenzt ? 'nicht bewertet' : `${escapeHtml(bezeichnung(URTEILE, urteil.verdict))} · ${escapeHtml(bezeichnung(ENTSCHEIDUNGEN, urteil.decision))}`}</span>
+      <p>${escapeHtml(urteil.basis)}</p>
+      ${urteil.ergaenzt ? '' : knopf(`urteil:${index}`, 'data-coaching-urteil', index, 'Ergebnis übernehmen', 'Ergebnis übernommen')}
+    </article>`).join('');
+  const neu = (ergebnis.neuesExperiment || []).map((empfehlung, index) => `<article class="coaching-experiment">
+      <span class="coaching-bereich">${empfehlung.kind === 'experiment' ? 'Neues Experiment' : 'Beobachten'}${empfehlung.targetMetric && empfehlung.targetMetric !== 'keine' ? ` · ${escapeHtml(bezeichnung(ZIELGROESSEN, empfehlung.targetMetric))}` : ''}</span>
+      <p>${escapeHtml(empfehlung.action)}</p>
+      ${empfehlung.hypothesis ? `<small>${escapeHtml(empfehlung.hypothesis)}</small>` : ''}
+      ${knopf(`experiment:${index}`, 'data-coaching-experiment', index, empfehlung.kind === 'experiment' ? 'Als Experiment merken' : 'Als Maßnahme merken', 'Gemerkt')}
+    </article>`).join('');
+  const vergleich = ergebnis.wochenvergleich?.comparison?.length
+    ? `<details class="coaching-vergleich"><summary>Die Woche im Vergleich</summary>${vergleichMarkup(ergebnis.wochenvergleich)}</details>` : '';
+  return volumen + urteile + neu + vergleich;
+}
+
 /** Karte über dem Gespräch: Überschrift, Punkte, Fokus. Laufend oder gescheitert ein klarer Status. */
 export function coachingKarteMarkup(coaching) {
   if (!coaching) return '';
+  const woche = coaching.art === 'woche';
+  const marke = woche ? 'Wochen-Coaching' : 'Coaching';
   if (coaching.status === 'laeuft' && !haengt(coaching)) {
     return `<section class="coaching-karte is-status" aria-live="polite">
-      <header><span class="coaching-marke">Coaching</span><small>${escapeHtml(datumText(coaching))}</small></header>
-      <p>Dein Coaching wird gerade erstellt …</p>
+      <header><span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
+      <p>Dein ${marke} wird gerade erstellt …</p>
     </section>`;
   }
   if (coaching.status !== 'bereit') {
     return `<section class="coaching-karte is-status is-fehler">
-      <header><span class="coaching-marke">Coaching</span><small>${escapeHtml(datumText(coaching))}</small></header>
-      <p>Das Coaching konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.</p>
+      <header><span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
+      <p>Das ${marke} konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.</p>
     </section>`;
   }
   const ergebnis = coaching.ergebnis || {};
   const punkte = (ergebnis.punkte || []).map((punkt) => `<li><span class="coaching-bereich">${escapeHtml(BEREICH_NAMEN[punkt.bereich] || punkt.bereich)}</span><p>${escapeHtml(punkt.text)}</p></li>`).join('');
-  return `<section class="coaching-karte" aria-label="Coaching">
-    <header><span class="coaching-marke">Coaching</span><small>${escapeHtml(datumText(coaching))}</small></header>
+  return `<section class="coaching-karte${woche ? ' is-woche' : ''}" aria-label="${marke}">
+    <header><span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
     <h2>${escapeHtml(ergebnis.ueberschrift || '')}</h2>
     ${punkte ? `<ul class="coaching-punkte">${punkte}</ul>` : ''}
-    ${ergebnis.fokus ? `<div class="coaching-fokus"><b>Fokus</b><p>${escapeHtml(ergebnis.fokus.text)}</p></div>` : ''}
+    ${woche ? wochenteilMarkup(coaching) : ''}
+    ${ergebnis.fokus ? `<div class="coaching-fokus"><b>${woche ? 'Fokus der Woche' : 'Fokus'}</b><p>${escapeHtml(ergebnis.fokus.text)}</p></div>` : ''}
     <footer>Datenlage: ${escapeHtml(ergebnis.datenlage || 'niedrig')} · Frag einfach unten nach.</footer>
   </section>`;
 }

@@ -32,6 +32,30 @@ export function einheitenMitSaetzen(input) {
   return schluessel;
 }
 
+/* Datum je Einheit „Tag|Cycle“, an dem CAPBOY sie erstmals mit Sätzen sah.
+   LOGMAN speichert ein Datum nur, wenn man es einstellt oder „vollständig“
+   tippt. Beim ersten Abgleich nach dem Koppeln ist der Tag unbekannt (null).
+   Verschwindet eine Einheit (Phasen-Reset, alle Sätze gelöscht), fällt sie
+   heraus: Sonst erbte der neue Cycle 1 das Datum des alten. */
+export function einheitenDatieren(payload, bisher, erstmals, heute) {
+  const gesehen = {};
+  for (const schluessel of einheitenMitSaetzen(payload)) {
+    gesehen[schluessel] = bisher && schluessel in bisher ? bisher[schluessel] : (erstmals ? null : heute);
+  }
+  return gesehen;
+}
+
+/* Vor dem Schreiben vorzumerkende Einheiten: der bisherige Stand plus die neu
+   gesehenen Einheiten mit ihrem Datum, oder null, wenn keine neu ist.
+   Scheitert ein späterer Schritt und kommt der nächste Versuch erst am
+   Folgetag, behalten neue Einheiten so ihr erstes Datum (keine Zeilen unter
+   zwei Daten). Verschwundene Einheiten bleiben bis zum Abschluss vorgemerkt,
+   damit der nächste Versuch ihre veralteten Zeilen noch bereinigt. */
+export function einheitenVormerken(bisher = {}, gesehen = {}) {
+  const neu = Object.keys(gesehen).filter((schluessel) => !(schluessel in (bisher || {})));
+  return neu.length ? { ...(bisher || {}), ...Object.fromEntries(neu.map((schluessel) => [schluessel, gesehen[schluessel]])) } : null;
+}
+
 /* Tage, deren Leistungszeilen der Abgleich neu bestimmt: jeder Tag mit einer
    datierten Einheit im alten oder neuen Stand. Nach einem Phasen-Reset in
    LOGMAN (meta.phasenReset neuer als zuvor) gibt es keine: Die alte Phase ist
@@ -67,6 +91,47 @@ export function ohneFremdeZeilen(neueZeilen = [], vorhandene = []) {
   const schluessel = (zeile) => `${String(zeile.performed_on).slice(0, 10)}|${zeile.exercise}|${zeile.category}`;
   const fremd = new Set(vorhandene.filter((zeile) => zeile.source !== 'LOGMAN-Abgleich').map(schluessel));
   return neueZeilen.filter((zeile) => !fremd.has(schluessel(zeile)));
+}
+
+/* JSON mit sortierten Schlüsseln: jsonb gibt Objekte in eigener
+   Schlüsselreihenfolge zurück; ein gelesener Stand muss trotzdem gleich sein. */
+export const stabilesJson = (wert) => JSON.stringify(wert, (_schluessel, inhalt) => (inhalt && typeof inhalt === 'object' && !Array.isArray(inhalt)
+  ? Object.fromEntries(Object.keys(inhalt).sort().map((schluessel) => [schluessel, inhalt[schluessel]]))
+  : inhalt));
+
+/* LOGMAN-Prioritäten so, wie LOGMAN sie für die geplanten Sätze nutzt: nur
+   gültige Einträge (reihenfolge, plus, tausch) mit Satzzahl und beim Tausch
+   dem Spender. capboy-coach/volumen.js rechnet dieselbe Fassung (ein Test
+   prüft, dass beide gleich sind). */
+export function prioritaetNormalisieren(payload) {
+  const roh = payload?.volumen?.prioritaet || {};
+  const ergebnis = {};
+  Object.keys(roh).sort().forEach((konto) => {
+    const cfg = roh[konto];
+    if (!cfg || !['reihenfolge', 'plus', 'tausch'].includes(cfg.modus)) return;
+    const saetze = cfg.modus === 'reihenfolge' || Number(cfg.saetze) === 0 ? 0 : (Number(cfg.saetze) === 1 ? 1 : 2);
+    ergebnis[konto] = { modus: cfg.modus, saetze, ...(cfg.modus === 'tausch' && cfg.spender ? { spender: String(cfg.spender) } : {}) };
+  });
+  return ergebnis;
+}
+
+export const PRIORITAET_VERLAUF_MAX = 40;
+/* Verlauf der Prioritäten (logman_spiegel.prioritaet_verlauf). Jeder Eintrag
+   { ab, zuletzt, prioritaet }: ab = Tag, an dem CAPBOY diese Fassung erstmals
+   sah, zuletzt = Tag, an dem CAPBOY sie zuletzt sah. CAPBOY kennt nur den
+   Abgleich, nicht den Moment der Änderung in LOGMAN (GPT-Review Schritt 5,
+   dritte Runde): Eine Änderung liegt irgendwo zwischen „zuletzt“ des alten
+   und „ab“ des neuen Eintrags. volumen.js bewertet keinen Zyklus, der in
+   diese Lücke fällt. */
+export function prioritaetVerlaufFortschreiben(verlauf, payload, heute) {
+  const liste = (Array.isArray(verlauf) ? verlauf : [])
+    .filter((eintrag) => /^\d{4}-\d{2}-\d{2}$/.test(String(eintrag?.ab || '')) && eintrag?.prioritaet && typeof eintrag.prioritaet === 'object');
+  const jetzt = prioritaetNormalisieren(payload);
+  const letzter = liste.at(-1);
+  if (letzter && stabilesJson(letzter.prioritaet) === stabilesJson(jetzt)) {
+    return [...liste.slice(0, -1), { ...letzter, zuletzt: heute > String(letzter.zuletzt || letzter.ab) ? heute : String(letzter.zuletzt || letzter.ab) }];
+  }
+  return [...liste, { ab: heute, zuletzt: heute, prioritaet: jetzt }].slice(-PRIORITAET_VERLAUF_MAX);
 }
 
 export function parseLogmanExport(input, fallbackDate = new Date().toISOString().slice(0, 10)) {

@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
-import { betroffeneTage, einheitenMitSaetzen, ohneFremdeZeilen, parseLogmanExport, veralteteLeistung } from './umrechnung.js';
+import { betroffeneTage, einheitenDatieren, einheitenVormerken, ohneFremdeZeilen, parseLogmanExport, prioritaetVerlaufFortschreiben, veralteteLeistung } from './umrechnung.js';
 import { abgleichSchreiben } from './schreibreihenfolge.js';
 
 // LOGMAN-Abgleich: CAPBOY liest das Trainingslog des eigenen LOGMAN-Kontos
@@ -50,19 +50,6 @@ type Row = Record<string, any>;
 
 const berlinDatum = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(new Date());
 
-/* Datum je Einheit „Tag|Cycle“, an dem CAPBOY sie erstmals mit Sätzen sah.
-   LOGMAN speichert ein Datum nur, wenn man es einstellt oder „vollständig“
-   tippt. Beim ersten Abgleich nach dem Koppeln ist der Tag unbekannt (null).
-   Verschwindet eine Einheit (Phasen-Reset, alle Sätze gelöscht), fällt sie
-   heraus: Sonst erbte der neue Cycle 1 das Datum des alten. */
-function einheitenDatieren(payload: unknown, bisher: Row | null, erstmals: boolean) {
-  const heute = berlinDatum();
-  const gesehen: Row = {};
-  for (const schluessel of einheitenMitSaetzen(payload)) {
-    gesehen[schluessel] = bisher && schluessel in bisher ? bisher[schluessel] : (erstmals ? null : heute);
-  }
-  return gesehen;
-}
 
 async function kopplungLesen(userId: string) {
   const { data, error } = await admin.from('logman_kopplung').select('*').eq('user_id', userId).maybeSingle();
@@ -113,7 +100,7 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
   }
 
   const { data: spiegel } = await admin.from('logman_spiegel')
-    .select('logman_version,einheiten_gesehen,datum:payload->datum,reset:payload->meta->>phasenReset').eq('user_id', userId).maybeSingle();
+    .select('logman_version,einheiten_gesehen,prioritaet_verlauf,datum:payload->datum,reset:payload->meta->>phasenReset').eq('user_id', userId).maybeSingle();
   const { data: antwort, error } = await logman.rpc('capboy_training_log', {
     p_token: kopplung.token,
     p_bekannte_version: neu ? null : spiegel?.logman_version ?? null,
@@ -127,11 +114,17 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
     throw new Error(`LOGMAN lesen: ${error.message}`);
   }
   const jetzt = new Date().toISOString();
-  await admin.from('logman_kopplung').update({ zuletzt_abgeglichen_am: jetzt }).eq('user_id', userId);
-  if (antwort?.status !== 'ok') return statusAntwort(userId, { ergebnis: antwort?.status === 'leer' ? 'leer' : 'unveraendert' });
+  // „Zuletzt abgeglichen“ erst nach Erfolg: Ein gescheiterter Abgleich wird
+  // beim nächsten Öffnen sofort wiederholt, nicht erst nach 30 Minuten.
+  const abgeglichen = () => admin.from('logman_kopplung').update({ zuletzt_abgeglichen_am: jetzt }).eq('user_id', userId);
+  if (antwort?.status !== 'ok') {
+    await abgeglichen();
+    return statusAntwort(userId, { ergebnis: antwort?.status === 'leer' ? 'leer' : 'unveraendert' });
+  }
 
   const payload = antwort.payload || {};
-  const gesehen = einheitenDatieren(payload, spiegel?.einheiten_gesehen || null, !spiegel);
+  const gesehen = einheitenDatieren(payload, spiegel?.einheiten_gesehen || null, !spiegel, berlinDatum());
+  const vorgemerkt = spiegel ? einheitenVormerken(spiegel.einheiten_gesehen || {}, gesehen) : null;
   const zeilen = leistungsZeilen(payload, gesehen, userId);
   // In LOGMAN gelöschte Sätze dürfen nicht als Leistung stehen bleiben. Nach
   // einem Phasen-Reset bleibt der Verlauf der alten Phase dagegen erhalten.
@@ -140,8 +133,14 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
     neuGesehen: gesehen, neuDatum: payload?.datum || {}, neuReset: payload?.meta?.phasenReset || '',
   });
 
-  // Der Spiegel mit der neuen Version kommt zuletzt (schreibreihenfolge.js).
+  // Neue Einheiten zuerst mit Datum vormerken, der Spiegel mit der neuen
+  // Version kommt zuletzt (schreibreihenfolge.js).
   const { entfernt, geschrieben } = await abgleichSchreiben({
+    datenVormerken: async () => {
+      if (!vorgemerkt) return;
+      const { error: vormerkFehler } = await admin.from('logman_spiegel').update({ einheiten_gesehen: vorgemerkt }).eq('user_id', userId);
+      if (vormerkFehler) throw new Error(`Einheiten vormerken: ${vormerkFehler.message}`);
+    },
     veralteteEntfernen: async () => {
       if (!tage.length) return 0;
       const { data: vorhandene, error: lesenFehler } = await admin.from('logman_performance')
@@ -175,10 +174,13 @@ async function abgleichen(userId: string, erzwingen: boolean, neu = false) {
         logman_stand: antwort.updated_at || null,
         abgerufen_am: jetzt,
         einheiten_gesehen: gesehen,
+        // Damalige Vorgaben je Zyklus für das Wochen-Coaching (volumen.js).
+        prioritaet_verlauf: prioritaetVerlaufFortschreiben(spiegel?.prioritaet_verlauf, payload, berlinDatum()),
       });
       if (spiegelFehler) throw new Error(`Spiegel schreiben: ${spiegelFehler.message}`);
     },
   });
+  await abgeglichen();
   return statusAntwort(userId, { ergebnis: 'neu', leistungswerte: geschrieben, entfernt });
 }
 

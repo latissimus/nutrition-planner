@@ -8,6 +8,9 @@ import { followThroughActions, switchedOffAreas } from './followThrough.ts';
 import webpush from 'npm:web-push@3.6.7';
 import { COACHING_SCHEMA, coachingBereinigen, coachingSystemPrompt, coachingText, coachingUserPrompt, geaenderteBereiche, hatNeueDaten } from './coaching.ts';
 import { trainingsAuswertung } from './training.js';
+import { BEIBEHALTEN, fensterWerte, nichtRepraesentativ as wocheNichtRepraesentativ, volumenEntscheidung } from './volumen.js';
+import { wochenBereinigen, wochenSchema, wochenSystemPrompt, wochenText, wochenUserPrompt } from './wochenCoaching.ts';
+import { experimentMeasurement } from './experiments.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -472,9 +475,9 @@ function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null
 
 const berlinTeile = (jetzt: Date) => {
   const teile = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23',
+    timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23', weekday: 'short',
   }).formatToParts(jetzt).map((teil) => [teil.type, teil.value]));
-  return { datum: `${teile.year}-${teile.month}-${teile.day}`, stunde: Number(teile.hour) };
+  return { datum: `${teile.year}-${teile.month}-${teile.day}`, stunde: Number(teile.hour), montag: teile.weekday === 'Mon' };
 };
 
 // Vor dem Coaching die LOGMAN-Einheiten frisch holen (logman-abgleich, Weg
@@ -497,7 +500,7 @@ async function logmanVorDemCoaching(userId: string) {
   }
 }
 
-async function coachingPush(userId: string, datum: string, ueberschrift: string) {
+async function coachingPush(userId: string, datum: string, ueberschrift: string, titel = 'Coaching') {
   if (!vapidPublicKey || !vapidPrivateKey) return 0;
   const { data, error } = await admin.from('push_subscriptions').select('id,endpoint,p256dh,auth').eq('user_id', userId);
   if (error || !data?.length) return 0;
@@ -507,7 +510,7 @@ async function coachingPush(userId: string, datum: string, ueberschrift: string)
     try {
       await webpush.sendNotification(
         { endpoint: abo.endpoint, keys: { p256dh: abo.p256dh, auth: abo.auth } },
-        JSON.stringify({ title: 'Coaching', body: ueberschrift, tag: `coaching-${datum}`, url: '#coach' }),
+        JSON.stringify({ title: titel, body: ueberschrift, tag: `coaching-${datum}`, url: '#coach' }),
         { TTL: 6 * 3600, urgency: 'normal' },
       );
       gesendet += 1;
@@ -520,17 +523,18 @@ async function coachingPush(userId: string, datum: string, ueberschrift: string)
   return gesendet;
 }
 
-/* Ein Coaching je Person und Tag. Die eindeutige Zeile wird vor dem API-Aufruf
-   angelegt: parallele Läufe können denselben Tag nicht doppelt berechnen. */
+/* Ein Coaching je Person und Tag, egal welcher Art (Schritt 5: Eindeutigkeit
+   Person + Datum). Die eindeutige Zeile wird vor dem API-Aufruf angelegt:
+   parallele Läufe können denselben Tag nicht doppelt berechnen. */
 async function coachingFuerNutzer(userId: string, jetzt: Date, heute: string) {
-  const { data: vorhanden, error: vorhandenFehler } = await admin.from('coach_coachings').select('id,status').eq('user_id', userId).eq('art', 'tag').eq('datum', heute).maybeSingle();
+  const { data: vorhanden, error: vorhandenFehler } = await admin.from('coach_coachings').select('id,status').eq('user_id', userId).eq('datum', heute).maybeSingle();
   if (vorhandenFehler) throw vorhandenFehler;
   if (vorhanden) return 'schon_erledigt';
   const logmanStatus = await logmanVorDemCoaching(userId);
   const [rows, revisionResult, letzterResult] = await Promise.all([
     fetchContextRows(userId, jetzt),
     admin.from('coach_input_revisions').select('revision,quellen_revisionen').eq('user_id', userId).maybeSingle(),
-    admin.from('coach_coachings').select('input_revision').eq('user_id', userId).eq('art', 'tag')
+    admin.from('coach_coachings').select('input_revision').eq('user_id', userId)
       .order('erstellt_am', { ascending: false }).limit(1).maybeSingle(),
   ]);
   if (revisionResult.error) throw revisionResult.error;
@@ -555,7 +559,7 @@ async function coachingFuerNutzer(userId: string, jetzt: Date, heute: string) {
       logmanStatus.frisch
         ? admin.from('logman_spiegel').select('payload,einheiten_gesehen').eq('user_id', userId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
-      admin.from('coach_coachings').select('datum,ergebnis').eq('user_id', userId).eq('art', 'tag').eq('status', 'bereit').lt('datum', heute)
+      admin.from('coach_coachings').select('datum,ergebnis').eq('user_id', userId).eq('status', 'bereit').lt('datum', heute)
         .order('datum', { ascending: false }).limit(1).maybeSingle(),
     ]);
     if (spiegelResult.error) throw spiegelResult.error;
@@ -618,18 +622,159 @@ async function coachingFuerNutzer(userId: string, jetzt: Date, heute: string) {
   }
 }
 
+/* Wochen-Coaching am Montag (COACHING-PLAN.md, Schritt 5): ersetzt den
+   Tageslauf. Läuft, wenn die abgeschlossene Woche Daten hat; sonst kein
+   Aufruf und keine Kosten. Der Anspruch ist dieselbe Zeile je Person und Tag. */
+async function wochenCoachingFuerNutzer(userId: string, jetzt: Date, heute: string) {
+  const { data: vorhanden, error: vorhandenFehler } = await admin.from('coach_coachings').select('id').eq('user_id', userId).eq('datum', heute).maybeSingle();
+  if (vorhandenFehler) throw vorhandenFehler;
+  if (vorhanden) return 'schon_erledigt';
+  const logmanStatus = await logmanVorDemCoaching(userId);
+  const [rows, revisionResult] = await Promise.all([
+    fetchContextRows(userId, jetzt),
+    admin.from('coach_input_revisions').select('revision').eq('user_id', userId).maybeSingle(),
+  ]);
+  if (revisionResult.error) throw revisionResult.error;
+  if (!logmanStatus.frisch) rows.performance = rows.performance.filter((zeile) => zeile.source !== 'LOGMAN-Abgleich');
+  const timeseries = buildTimeseries(rows, jetzt);
+  const reviewed = reviewWeeks(timeseries);
+  if (!reviewed) return 'keine_woche';
+  const woche = reviewed.current.week;
+
+  const [kaertchenResult, spiegelResult, staendeResult, vortagResult] = await Promise.all([
+    admin.from('coach_wochen_checkins').select('umstaende,notiz,umsetzung').eq('user_id', userId).eq('woche', woche).maybeSingle(),
+    logmanStatus.frisch
+      ? admin.from('logman_spiegel').select('payload,einheiten_gesehen,prioritaet_verlauf').eq('user_id', userId).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    admin.from('coach_coachings').select('datum,volumen_stand').eq('user_id', userId).eq('art', 'woche')
+      .not('volumen_stand', 'is', null).lt('datum', heute).order('datum', { ascending: false }).limit(2),
+    admin.from('coach_coachings').select('datum,ergebnis').eq('user_id', userId).eq('status', 'bereit').lt('datum', heute)
+      .order('datum', { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  for (const ergebnis of [kaertchenResult, spiegelResult, staendeResult, vortagResult]) if (ergebnis.error) throw ergebnis.error;
+  const kaertchen = kaertchenResult.data
+    ? { circumstances: kaertchenResult.data.umstaende || [], note: kaertchenResult.data.notiz || '', interventions: kaertchenResult.data.umsetzung || [] }
+    : null;
+  const memory = await loadMemory(userId, crypto.randomUUID(), heute, timeseries);
+  const weekly = weeklyBlock(timeseries, kaertchen, await loadPreviousReview(userId, woche), memory.interventions || []);
+  if (!weekly) return 'keine_woche';
+  const spiegel = spiegelResult.data;
+  const hatTraining = rows.performance.some((zeile) => {
+    const tag = String(zeile.performed_on || '').slice(0, 10);
+    return tag >= weekly.from && tag <= weekly.to;
+  });
+  if (!hatTraining && !weekly.comparison.some((zeile: Row) => zeile.current != null)) return 'keine_daten';
+
+  const training = spiegel ? trainingsAuswertung(spiegel.payload, { gesehen: spiegel.einheiten_gesehen || {}, heute }) : null;
+  const volumen = spiegel
+    ? volumenEntscheidung({
+      payload: spiegel.payload, gesehen: spiegel.einheiten_gesehen || {}, heute, timeseries,
+      fenster: fensterWerte(rows, heute), aus: rows.switchedOffAreas || [], kaertchen,
+      fruehereStaende: (staendeResult.data || []).map((zeile: Row) => zeile.volumen_stand),
+      prioritaetVerlauf: spiegel.prioritaet_verlauf || [],
+    })
+    : { stand: null, sperren: [{ id: 'logman', text: logmanStatus.grund || 'Kein aktueller LOGMAN-Stand.' }], muskeln: [], aktionen: [BEIBEHALTEN], grundlage: null };
+
+  const { data: anspruch, error: anspruchFehler } = await admin.from('coach_coachings').insert({
+    user_id: userId, art: 'woche', datum: heute, status: 'laeuft',
+    input_revision: Number(revisionResult.data?.revision || 0), volumen_stand: volumen.stand,
+  }).select('id').single();
+  if (anspruchFehler?.code === '23505') return 'schon_erledigt';
+  if (anspruchFehler) throw anspruchFehler;
+  try {
+    const snapshot: Row = buildCompFacts(rows, jetzt);
+    if (!logmanStatus.frisch && !rows.performance.length) snapshot.training = { status: logmanStatus.grund || 'LOGMAN nicht verbunden' };
+    const recentCheckinNotes = rows.checkins.filter((zeile) => String(zeile.note || '').trim()).slice(0, 5)
+      .map((zeile) => ({ date: zeile.checkin_date, text: String(zeile.note).trim().slice(0, 300) }));
+    const vortag = vortagResult.data;
+    const aktionsIds = volumen.aktionen.map((aktion: Row) => aktion.id);
+    const antwort = await openAi('/responses', {
+      method: 'POST',
+      signal: AbortSignal.timeout(120_000),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: COACH_MODEL,
+        instructions: wochenSystemPrompt(),
+        input: [{ role: 'user', content: wochenUserPrompt({
+          snapshot, timeseries, weekly, training, volumen, recentCheckinNotes,
+          vortag: vortag ? { datum: vortag.datum, ...(vortag.ergebnis || {}) } : null,
+          memory: { profile_memory: memory.blocks.profile_memory, intervention_log: memory.blocks.intervention_log },
+          heute,
+        }) }],
+        reasoning: { effort: 'medium' },
+        max_output_tokens: 4000,
+        text: { format: { type: 'json_schema', name: 'capboy_wochen_coaching', strict: true, schema: wochenSchema(aktionsIds) } },
+      }),
+    });
+    if (antwort.status === 'incomplete') throw new Error(`OpenAI response incomplete: ${antwort.incomplete_details?.reason || 'unknown'}`);
+    const roh = outputText(antwort);
+    if (!roh) throw new Error('Leere Wochen-Coaching-Antwort');
+    // Regeln für Experimente gelten deterministisch vor dem Speichern
+    // (wochenBereinigen): fällige Urteile vollständig, neue Experimente nur
+    // regelkonform.
+    const laufend = (memory.interventions || []).filter((zeile: Row) => zeile.status === 'aktiv');
+    const faellige = laufend
+      .filter((zeile: Row) => zeile.review_date && String(zeile.review_date).slice(0, 10) <= heute)
+      .map((zeile: Row) => ({
+        id: String(zeile.id),
+        measurement: experimentMeasurement(zeile.target_metric_id, zeile.start_date, timeseries)?.text || '',
+        adherence: zeile.adherence || 'unbekannt',
+      }));
+    // Dieselbe Regel wie die Volumensperre (volumen.js) und Prompt-Regel 2.
+    const nichtRepraesentativ = wocheNichtRepraesentativ({ wochen: [reviewed.previous, reviewed.current], kaertchen }).length > 0;
+    const bereinigt = wochenBereinigen(JSON.parse(roh), {
+      aktionen: volumen.aktionen, faellige, heute, nichtRepraesentativ,
+      laufendeMetriken: laufend.map((zeile: Row) => zeile.target_metric_id).filter(Boolean),
+    });
+    if (bereinigt.verworfen.length) console.log('Wochen-Coaching: verworfen', userId, bereinigt.verworfen.join(' | '));
+    const ergebnis = {
+      ...bereinigt,
+      // Von der App, nicht von der KI: der Wochenvergleich für die Karte.
+      wochenvergleich: { week: weekly.week, previousWeek: weekly.previousWeek, from: weekly.from, to: weekly.to, comparison: weekly.comparison },
+    };
+    const { error } = await admin.from('coach_coachings').update({
+      status: 'bereit', ergebnis, bereiche: ergebnis.bereiche, modell: COACH_MODEL,
+    }).eq('id', anspruch.id).eq('status', 'laeuft');
+    if (error) throw error;
+    // Bilanz der Woche auch im bisherigen Verlauf, damit die nächste Woche den
+    // Fokus kennt (previousFocus liest recommendations[].action).
+    await saveWeeklyReview(userId, weekly, kaertchen || {}, {
+      ...ergebnis, recommendations: [{ action: ergebnis.fokus.text }, ...ergebnis.neuesExperiment],
+    }, anspruch.id);
+    const { error: gespraechFehler } = await admin.from('ai_coach_messages').insert({
+      user_id: userId, conversation_id: anspruch.id, role: 'assistant', content: wochenText(ergebnis),
+      context: { coaching: ergebnis, coachingId: anspruch.id, art: 'woche' },
+    });
+    if (gespraechFehler) console.error('Wochen-Coaching nicht im Gesprächsgedächtnis abgelegt', userId, gespraechFehler.message);
+    try {
+      await coachingPush(userId, heute, ergebnis.ueberschrift, 'Wochen-Coaching');
+    } catch (pushFehler) {
+      console.error('Wochen-Coaching gespeichert, Push fehlgeschlagen', userId, pushFehler instanceof Error ? pushFehler.message : pushFehler);
+    }
+    return 'erstellt';
+  } catch (error) {
+    const { error: statusFehler } = await admin.from('coach_coachings').update({
+      status: 'fehlgeschlagen', fehler: String((error as Error)?.message || error).slice(0, 500),
+    }).eq('id', anspruch.id).eq('status', 'laeuft');
+    if (statusFehler) console.error('Wochen-Coaching-Fehlerstatus konnte nicht gespeichert werden', userId, statusFehler);
+    throw error;
+  }
+}
+
 // Lauf über alle Konten. Nur um 21 Uhr in Europe/Berlin, außer erzwingen
 // (Test für ein einzelnes Konto über denselben geschützten Weg).
 async function coachingLauf({ erzwingen = false, userId = null as string | null } = {}) {
   const jetzt = new Date();
-  const { datum, stunde } = berlinTeile(jetzt);
+  const { datum, stunde, montag } = berlinTeile(jetzt);
   if (!erzwingen && stunde !== 21) return;
   const konten = userId ? [{ id: userId }] : await pagedRows(() => admin.from('profiles').select('id').order('id'));
   for (let index = 0; index < konten.length; index += 2) {
     await Promise.all(konten.slice(index, index + 2).map(async (konto: Row) => {
       try {
-        const ergebnis = await coachingFuerNutzer(konto.id, jetzt, datum);
-        console.log('Coaching', konto.id, ergebnis);
+        // Montags ersetzt das Wochen-Coaching den Tageslauf (höchstens ein
+        // bezahlter Lauf je Person und Tag).
+        const ergebnis = montag ? await wochenCoachingFuerNutzer(konto.id, jetzt, datum) : await coachingFuerNutzer(konto.id, jetzt, datum);
+        console.log(montag ? 'Wochen-Coaching' : 'Coaching', konto.id, ergebnis);
       } catch (error) {
         console.error('Coaching fehlgeschlagen', konto.id, error instanceof Error ? error.message : error);
       }

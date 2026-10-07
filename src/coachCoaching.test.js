@@ -53,7 +53,10 @@ describe('Antwort des Coachings', () => {
     expect(prompt).toContain('not a doctor');
     // Ausnahme nach GPT-Review 05.10.: nur aus eigenen Notizen, ein ruhiger Satz im Fokus, kein Alarm.
     expect(prompt).toContain("Only exception: if the user's own note clearly reports something beyond a training complaint");
-    expect(prompt).toContain('No alarm, no emergency wording, no diagnosis.');
+    // Ruhig, aber mit passender Dringlichkeit (GPT-Review 05.10., zweite Runde).
+    expect(prompt).toContain('have it checked by a doctor promptly, before training again');
+    expect(prompt).toContain('say to get urgent medical help now');
+    expect(prompt).toContain('No drama, no diagnosis.');
     expect(prompt).not.toMatch(/palpitations|red flag|sicherheitshinweis|112|emergency number/i);
   });
 

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  UMSTAENDE, checkinText, faelligeWoche, vergleichMarkup, wochenFrageMarkup, wochenHinweisMarkup, wochenTitel,
-} from './coachWeekly.js';
+import { UMSTAENDE, faelligeWoche, vergleichMarkup, wochenTitel } from './coachWeekly.js';
+import { kaertchenWoche } from './wochenKaertchen.js';
 import { gedaechtnisMarkup } from './coachMemory.js';
 import { WEEKLY_CIRCUMSTANCES } from '../supabase/functions/capboy-coach/weekly.ts';
 
@@ -25,36 +24,24 @@ describe('Wochen-Check-in: Woche', () => {
   });
 });
 
-describe('Wochen-Check-in im Chat', () => {
-  const massnahmen = [{ id: 'm1', action: '<b>Früher essen</b>', adherence: 'teilweise' }];
-
-  it('lädt als Nachricht des Coachs zum Check-in ein', () => {
-    const hinweis = wochenHinweisMarkup(woche);
-    expect(hinweis).toContain('coach-chat-window is-coach coach-woche-hinweis');
-    expect(hinweis).toContain('Die KW 38 ist vorbei. Wollen wir Bilanz ziehen?');
-    expect(hinweis).toContain('data-woche-starten');
-    expect(hinweis).toContain('data-woche-hinweis-weg');
-    expect(hinweis).not.toContain('data-woche-form');
+describe('Wochen-Kärtchen: Rückblick von Sonntag bis Montag 21 Uhr (Berliner Zeit)', () => {
+  // Zeitpunkte in UTC; im Oktober gilt in Berlin UTC+2.
+  it('blickt am Sonntag auf die laufende, am Montag vor 21 Uhr auf die letzte Woche zurück', () => {
+    expect(kaertchenWoche(new Date('2026-10-04T07:00:00Z'))).toEqual({ week: '2026-W40', from: '2026-09-28', to: '2026-10-04' });
+    expect(kaertchenWoche(new Date('2026-10-05T18:59:00Z')).week).toBe('2026-W40');
   });
 
-  it('stellt die Fragen als Nachricht: Umsetzung je Maßnahme, Umstände, Notiz', () => {
-    const frage = wochenFrageMarkup({ woche, massnahmen });
-    expect(frage).toContain('Die KW 38 ist vorbei');
-    expect(frage).toContain('data-woche-form');
-    expect(frage).toContain('&lt;b&gt;Früher essen&lt;/b&gt;');
-    expect(frage).toContain('<option value="teilweise" selected>');
-    for (const [id] of UMSTAENDE) expect(frage).toContain(`value="${id}"`);
-    expect(frage).toContain('maxlength="300"');
-    expect(frage).toContain('data-woche-spaeter');
-    expect(wochenFrageMarkup({ woche })).not.toContain('Wie gut hast du');
+  it('steht ab Montag 21 Uhr und an den übrigen Tagen nicht da', () => {
+    expect(kaertchenWoche(new Date('2026-10-05T19:00:00Z'))).toBeNull();
+    expect(kaertchenWoche(new Date('2026-10-06T10:00:00Z'))).toBeNull();
+    expect(kaertchenWoche(new Date('2026-10-03T21:59:00Z'))).toBeNull();
   });
 
-  it('fasst die Angaben als Nachricht des Nutzers zusammen', () => {
-    expect(checkinText({
-      woche, massnahmen,
-      bericht: { interventions: [{ id: 'm1', adherence: 'ueberwiegend' }, { id: 'fremd', adherence: 'voll' }], circumstances: ['krank', 'stress'], note: 'ab Mittwoch erkältet' },
-    })).toBe('Wochen-Check-in KW 38 · 14.09.–20.09.2026\nUmgesetzt – <b>Früher essen</b>: Überwiegend\nBesonders: Krank, Viel Stress\nNotiz: ab Mittwoch erkältet');
-    expect(checkinText({ woche, bericht: {} })).toBe('Wochen-Check-in KW 38 · 14.09.–20.09.2026\nBesonders: nichts');
+  it('richtet sich nach Berlin, nicht nach der Zeitzone des Geräts', () => {
+    // Samstag 22:30 UTC ist in Berlin schon Sonntag 00:30, in New York noch Samstag.
+    expect(kaertchenWoche(new Date('2026-10-03T22:30:00Z')).week).toBe('2026-W40');
+    // Montag 20:30 UTC ist in Berlin 22:30 – vorbei, auch wenn es in New York erst Nachmittag ist.
+    expect(kaertchenWoche(new Date('2026-10-05T20:30:00Z'))).toBeNull();
   });
 });
 

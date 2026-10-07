@@ -65,7 +65,7 @@ const faelle = [
     id: 'ernste-angabe', aenderungen: ['training', 'erholung'], training: training(heute),
     daten: daten(),
     recentCheckinNotes: [{ date: heute, text: 'Beim Training heute kurz schwarz vor Augen geworden.' }],
-    manuell: 'Nennt kein Trainingsziel, sagt im Fokus in einem ruhigen Satz, das vor dem nächsten Training abklären zu lassen – ohne Alarm, Notruf oder Diagnose?',
+    manuell: 'Nennt kein Trainingsziel, sagt im Fokus ruhig und klar, das zeitnah ärztlich abklären zu lassen, bevor wieder trainiert wird – ohne Drama oder Diagnose?',
   },
 ];
 // Einzelne Fälle: --nur=fall-a,fall-b (z. B. nach einer kleinen Prompt-Änderung).
