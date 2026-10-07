@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { COMP_ZURUECKSETZEN, compOptionaleSchritte, compOptionalMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
+import { COMP_ZURUECKSETZEN, neurotransmitterEmpfehlung, seminarEmpfehlungMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
 import { FALTEN, summe } from './measurements.js';
 import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
@@ -90,15 +90,7 @@ describe('Hautfaltenverlauf', () => {
   });
 });
 
-describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
-  const actionPlan = {
-    categories: { supplements: [
-      { text: 'B-Vitamine nur unter Berücksichtigung der Gesamtzufuhr ergänzen.', source: 'seminar' },
-      { text: 'Phase 1 ist dein aktueller Supplement-Schritt. Prüfe die aufgeführten Produkte.', source: 'seminar' },
-      { text: 'Aus dieser Messung ergibt sich aktuell kein Supplement-Schritt.', source: 'app' },
-    ] },
-    protocols: [{ name: 'YPSI Quadrizeps/Beinbizeps – Phase 1', supplemente: [{ slug: 'magnesium', dosierung: '300 mg abends' }], optionale_supplemente: [] }],
-  };
+describe('COMP: Seminar-Empfehlungen in der Neurotransmitter-Karte', () => {
   const neurotransmitter = {
     complete: true,
     relevant: [{}],
@@ -111,48 +103,30 @@ describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
     } },
   };
 
-  it('übernimmt die exakten Seminar-Dosierungen des Hautfalten-Plans und keine App- oder Verweissätze', () => {
-    const [falten] = compOptionaleSchritte({ actionPlan, faltenLabel: 'Beinbizeps' });
-    expect(falten.bereich).toBe('Hautfalten · Beinbizeps');
-    expect(falten.punkte).toContain('B-Vitamine nur unter Berücksichtigung der Gesamtzufuhr ergänzen.');
-    expect(falten.punkte.join(' ')).not.toMatch(/Phase 1 ist dein|kein Supplement-Schritt/);
-    expect(falten.dosierungen).toEqual([expect.objectContaining({
-      name: 'Magnesium', dosierung: '300 mg abends', protokoll: 'Quadrizeps/Beinbizeps – Phase 1', optional: false,
-    })]);
-    expect(falten.karte).toBe('Hautfalten');
-  });
-
+  // Seit 07.10.2026 in der Neurotransmitter-Karte statt in einer eigenen
+  // Hinweise-Karte; die Hautfalten-Karte zeigt ihren Handlungsplan selbst.
   it('übernimmt den Schwerpunkt des Neurotransmitter-Tests nur, wenn er auffällig ist', () => {
-    const [nt] = compOptionaleSchritte({ neurotransmitter });
-    expect(nt.bereich).toBe('Neurotransmitter · GABA (deutlich)');
+    const nt = neurotransmitterEmpfehlung(neurotransmitter);
+    expect(nt.bereich).toBe('GABA (deutlich)');
     expect(nt.punkte).toEqual([
       'Training: Intensität niedrig bis moderat, Volumen niedrig bis moderat',
       'Supplemente: Taurin, Inositol, B-Vitamine, Glycin',
       'Gewöhnliche GABA-Supplements erhöhen GABA nicht.',
     ]);
     expect(nt.dosierungen).toEqual([expect.objectContaining({ name: 'Taurin', dosierung: '500–1.000 mg', optional: true })]);
-    expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, relevant: [] } })).toEqual([]);
-    expect(compOptionaleSchritte({ neurotransmitter: { ...neurotransmitter, complete: false } })).toEqual([]);
-    expect(compOptionaleSchritte({})).toEqual([]);
+    expect(neurotransmitterEmpfehlung({ ...neurotransmitter, relevant: [] })).toBeNull();
+    expect(neurotransmitterEmpfehlung({ ...neurotransmitter, complete: false })).toBeNull();
+    expect(neurotransmitterEmpfehlung()).toBeNull();
   });
 
-  it('zeigt Hautfalten und Neurotransmitter als getrennte kompakte Aufklapper', () => {
-    const schritte = [
-      ...compOptionaleSchritte({ actionPlan, faltenLabel: 'Beinbizeps' }),
-      ...compOptionaleSchritte({ neurotransmitter }),
-    ];
-    const markup = compOptionalMarkup(schritte);
-
-    expect(markup.match(/<details class="comp-optional-card">/g)).toHaveLength(2);
-    expect(markup).toContain('Hautfalten · Beinbizeps');
-    expect(markup).toContain('Neurotransmitter · GABA (deutlich)');
-    expect(markup).toContain('300 mg abends');
+  it('zeigt die Empfehlungen als Aufklapper mit unveränderten Dosierungen', () => {
+    const markup = seminarEmpfehlungMarkup(neurotransmitterEmpfehlung(neurotransmitter));
+    expect(markup.match(/<details class="body-inner-details comp-seminar-empfehlung">/g)).toHaveLength(1);
+    expect(markup).toContain('Empfehlungen laut Seminar · GABA (deutlich)');
     expect(markup).toContain('500–1.000 mg');
-    expect(markup).not.toContain('<ul><li><small>');
-    // Eigene Karte auf COMP: keine zweite Aufklapp-Ebene, kein KI-Hinweis mehr.
-    expect(markup).not.toContain('comp-optional-group');
-    expect(markup).not.toContain('Optionale Seminarhinweise');
+    expect(markup).toContain('keine Einnahmeanweisung');
     expect(markup).not.toContain('KI');
+    expect(seminarEmpfehlungMarkup(null)).toBe('');
   });
 
   it('löscht bei LOGMAN nur manuelle Importe, nie die automatisch abgeglichenen Werte', () => {

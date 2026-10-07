@@ -172,14 +172,9 @@ function compFactsMarkup(state) {
 
 // Die zentrale KI-Auswertung samt „Neu bewerten“ ist mit Schritt 6 des
 // Coaching-Plans entfallen: Bewertet wird jetzt jeden Abend im Coaching und
-// montags im Wochen-Coaching. COMP zeigt die berechneten Werte; die optionalen
-// Seminarhinweise (Hautfalten, Neurotransmitter) stehen als eigene Karte da.
-function compOptionalKarteMarkup(schritte = []) {
-  return schritte.length ? `<section class="comp-central-assessment comp-optional-karte ${SPECIAL_DEX_CLASSES.content}">
-    <header><span><small>AUS DEINEN SEMINARUNTERLAGEN</small><h2>Optionale Hinweise</h2></span></header>
-    <div class="comp-assessment-body">${compOptionalMarkup(schritte)}</div>
-  </section>` : '';
-}
+// montags im Wochen-Coaching. Die Seminar-Empfehlungen stehen in ihren
+// Detailkarten: Hautfalten im Handlungsplan, Neurotransmitter in der
+// Neurotransmitter-Karte (eigene Hinweise-Karte entfernt, 07.10.2026).
 
 function compDetailCard(title, subtitle, content) {
   return `<details class="comp-detail-card ${SPECIAL_DEX_CLASSES.content}">
@@ -196,7 +191,6 @@ function compDetailsMarkup(state) {
     ${compDetailCard('Körperfett-Schätzung', 'Formeln und Verlauf', ypsiKfaMarkup(state))}
     ${compDetailCard('Neurotransmitter-Profil', 'Assessment und Strategien', neurotransmitterMarkup())}
     ${compDetailCard('Taillenumfang', 'Messwerte und Verlauf', waistMarkup(state))}
-    ${compDetailCard('Leistung', 'Importierte LOGMAN-Entwicklung', logmanMarkup(state))}
   </section>`;
 }
 
@@ -785,7 +779,7 @@ function neurotransmitterMarkup() {
   const answered = bravermanPositions().filter(({ type, index }) => typeof test.answers?.[type]?.[index] === 'boolean').length;
   const completedLabel = test.completedAt ? `Ausgewertet · ${datumKurz(String(test.completedAt).slice(0, 10))}` : 'Ausgewertet';
   return `<section class="body-v2-card neurotransmitter-card ${SPECIAL_DEX_CLASSES.content}" data-neurotransmitter-card><header><span><b>Neurotransmitter-Profil</b><small>${complete ? completedLabel : answered ? `${answered} Aussagen beantwortet` : 'Braverman-Assessment'}</small></span></header><div class="body-v2-card-body">
-    ${complete ? bravermanOverviewMarkup(test) : `${detailErklaerung('Was wird ausgewertet?', 'Der Selbsttest betrachtet Dopamin, Acetylcholin, GABA und Serotonin. Du kannst ihn jederzeit unterbrechen und später fortsetzen.')}<div class="braverman-intro"><span aria-hidden="true">🧠</span><div><b>Vier aktuelle Bereiche</b><p>Deine Antworten werden gespeichert und anschließend gemeinsam ausgewertet.</p></div></div>`}
+    ${complete ? `${bravermanOverviewMarkup(test)}${seminarEmpfehlungMarkup(neurotransmitterEmpfehlung(buildNeurotransmitterCoachPlan(test.answers)))}` : `${detailErklaerung('Was wird ausgewertet?', 'Der Selbsttest betrachtet Dopamin, Acetylcholin, GABA und Serotonin. Du kannst ihn jederzeit unterbrechen und später fortsetzen.')}<div class="braverman-intro"><span aria-hidden="true">🧠</span><div><b>Vier aktuelle Bereiche</b><p>Deine Antworten werden gespeichert und anschließend gemeinsam ausgewertet.</p></div></div>`}
     <button class="btn btn-primary btn-block neurotransmitter-open" type="button" data-braverman-open>${complete ? 'Strategien ansehen' : answered ? 'Test fortsetzen' : 'Test starten'}</button>
     <p class="neurotransmitter-note">Praxisorientierte Selbsteinschätzung · kein Labortest</p>
   </div></section>`;
@@ -822,120 +816,45 @@ function bodyCompMarkup(state) {
   </details>`;
 }
 
-// Optionale Schritte unter der KI-Bewertung: Die Auswahl samt Dosierungen
-// kommt deterministisch aus den Seminar-Auswertungen. Die zentrale KI darf
-// spaeter nur die Bedeutung zusammenfassen; Namen und Dosen bleiben dadurch
-// unveraendert und koennen nicht halluziniert werden.
-export function compOptionaleSchritte({ actionPlan = null, faltenLabel = '', neurotransmitter = null } = {}) {
-  const schritte = [];
-  // Der Satz "Phase n ist dein aktueller Supplement-Schritt ..." verweist auf
-  // die Produkte der Karte; hier nennt die Protokollzeile sie selbst.
-  const supplemente = (actionPlan?.categories?.supplements || [])
-    .filter((item) => item.source !== 'app' && !/^Phase \d/.test(item.text)).map((item) => item.text);
-  const dosierungen = (actionPlan?.protocols || []).flatMap((protocol, protocolIndex) => (
-    [
-      ...(protocol.supplemente || []).map((item) => ({ ...item, optional: false })),
-      ...(protocol.optionale_supplemente || []).map((item) => ({ ...item, optional: true })),
-    ].map((item, itemIndex) => ({
-      id: `hautfalten-${protocolIndex + 1}-${itemIndex + 1}`,
-      protokoll: String(protocol.name || '').replace(/^YPSI\s+/i, ''),
-      name: supplementName(item.slug),
-      dosierung: item.dosierung || '',
-      optional: item.optional,
-      hinweis: item.notiz || '',
-    }))
-  ));
-  if (supplemente.length || dosierungen.length) {
-    schritte.push({
-      id: 'hautfalten',
-      bereich: `Hautfalten${faltenLabel ? ` · ${faltenLabel}` : ''}`,
-      titel: 'Supplemente laut Seminar',
-      zusammenhang: actionPlan?.summary || '',
-      punkte: supplemente.slice(0, 3),
-      dosierungen,
-      karte: 'Hautfalten',
-    });
-  }
+// Seminar-Empfehlungen zum Schwerpunkt des Neurotransmitter-Tests. Auswahl
+// und Dosierungen kommen deterministisch aus den Seminar-Auswertungen; Namen
+// und Dosen bleiben dadurch unverändert. Nur bei auffälligem Schwerpunkt.
+export function neurotransmitterEmpfehlung(neurotransmitter = null) {
   const fokus = neurotransmitter?.complete && neurotransmitter.relevant?.length ? neurotransmitter.focus : null;
-  if (fokus) {
-    const r = fokus.recommendations || {};
-    const training = r.seminarTraining ? [r.seminarTraining.intensitaet && `Intensität ${r.seminarTraining.intensitaet}`, r.seminarTraining.volumen && `Volumen ${r.seminarTraining.volumen}`].filter(Boolean).join(', ') : '';
-    const punkte = [
-      r.seminarFoods?.length ? `Lebensmittel: ${r.seminarFoods.slice(0, 4).join(', ')}` : '',
-      [...(r.seminarLifestyle || []), ...(r.bravermanLifestyle || [])].length ? `Alltag: ${[...(r.seminarLifestyle || []), ...(r.bravermanLifestyle || [])].slice(0, 2).join('; ')}` : '',
-      training ? `Training: ${training}` : '',
-      r.seminarSupplements?.length ? `Supplemente: ${r.seminarSupplements.slice(0, 4).join(', ')}` : '',
-      r.seminarNote || '',
-    ].filter(Boolean);
-    const dosierungen = (r.supplements || []).filter((item) => item.name && item.dose).map((item, index) => ({
-      id: `neurotransmitter-${index + 1}`,
-      protokoll: fokus.area?.label || fokus.key,
-      name: item.name,
-      dosierung: item.dose,
-      optional: true,
-      hinweis: item.notiz || '',
-    }));
-    if (punkte.length || dosierungen.length) schritte.push({
-      id: 'neurotransmitter',
-      bereich: `Neurotransmitter · ${fokus.area?.label || fokus.key} (${fokus.severity?.label || ''})`.replace(' ()', ''),
-      titel: 'Empfehlungen laut Seminar',
-      zusammenhang: `Der Testschwerpunkt liegt bei ${fokus.area?.label || fokus.key}.`,
-      punkte,
-      dosierungen,
-      karte: 'Neurotransmitter-Profil',
-    });
-  }
-  return schritte;
+  if (!fokus) return null;
+  const r = fokus.recommendations || {};
+  const training = r.seminarTraining ? [r.seminarTraining.intensitaet && `Intensität ${r.seminarTraining.intensitaet}`, r.seminarTraining.volumen && `Volumen ${r.seminarTraining.volumen}`].filter(Boolean).join(', ') : '';
+  const punkte = [
+    r.seminarFoods?.length ? `Lebensmittel: ${r.seminarFoods.slice(0, 4).join(', ')}` : '',
+    [...(r.seminarLifestyle || []), ...(r.bravermanLifestyle || [])].length ? `Alltag: ${[...(r.seminarLifestyle || []), ...(r.bravermanLifestyle || [])].slice(0, 2).join('; ')}` : '',
+    training ? `Training: ${training}` : '',
+    r.seminarSupplements?.length ? `Supplemente: ${r.seminarSupplements.slice(0, 4).join(', ')}` : '',
+    r.seminarNote || '',
+  ].filter(Boolean);
+  const dosierungen = (r.supplements || []).filter((item) => item.name && item.dose).map((item, index) => ({
+    id: `neurotransmitter-${index + 1}`,
+    protokoll: fokus.area?.label || fokus.key,
+    name: item.name,
+    dosierung: item.dose,
+    optional: true,
+    hinweis: item.notiz || '',
+  }));
+  if (!punkte.length && !dosierungen.length) return null;
+  return {
+    bereich: `${fokus.area?.label || fokus.key} (${fokus.severity?.label || ''})`.replace(' ()', ''),
+    punkte,
+    dosierungen,
+  };
 }
 
-// Aus dem Seitenzustand: aktueller Hautfalten-Plan und Neurotransmitter-Test.
-// Ein Fehler hier darf die KI-Karte nie verhindern.
-function optionaleSchritteFuer(state) {
-  try {
-    const context = skinfoldAnalysisContext(state);
-    const plan = buildSkinfoldPlan(state.skinfolds, state.settings.calculation_basis, context);
-    const test = bravermanState();
-    return compOptionaleSchritte({
-      actionPlan: plan ? buildSkinfoldActionPlan(plan, context) : null,
-      faltenLabel: plan?.topFold?.label || '',
-      neurotransmitter: bravermanComplete(test.answers) ? buildNeurotransmitterCoachPlan(test.answers) : null,
-    });
-  } catch (error) {
-    console.warn('Optionale Schritte nicht berechnet:', error);
-    return [];
-  }
-}
-
-// Die optionalen Seminarhinweise als flache Liste (eigene Karte auf COMP, seit
-// Schritt 6 ohne zweites Aufklappmenü).
-export function compOptionalMarkup(schritte = []) {
-  if (!schritte.length) return '';
-  const hinweis = 'Auswahl und Dosierungen werden unverändert aus dem Seminarwissen übernommen.';
-  const karten = (kompakt = false) => `<div class="comp-optional-list">${schritte.map((schritt) => `<details class="comp-optional-card${kompakt ? ' comp-optional-card-compact' : ''}"><summary><span><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b></span>${materialIconMarkup('chevron_right')}</summary><div class="comp-optional-content">${schritt.summary ? `<p>${escapeHtml(schritt.summary)}</p>` : ''}${(schritt.punkte || []).length ? `<ul>${schritt.punkte.map((punkt) => `<li>${escapeHtml(punkt)}</li>`).join('')}</ul>` : ''}${schritt.dosierungen?.length ? `<div class="comp-optional-doses">${schritt.dosierungen.map((item) => `<span><b>${escapeHtml(item.name)}${item.optional ? ' · optional' : ''}</b><strong>${escapeHtml(item.dosierung || 'Keine Dosierung hinterlegt')}</strong>${item.protokoll ? `<small>${escapeHtml(item.protokoll)}</small>` : ''}</span>`).join('')}</div>` : ''}<em>Seminarwissen · Details in „${escapeHtml(schritt.karte)}“</em></div></details>`).join('')}</div>`;
-  return `<p class="comp-optional-hinweis">${hinweis}</p>${karten()}`;
-}
-
-function logmanMarkup(state) {
-  const trend = performanceTrend(state.performance);
-  const baselines = new Map();
-  [...state.performance]
-    .sort((a, b) => a.performed_on.localeCompare(b.performed_on))
-    .forEach((row) => {
-      const key = `${row.category}:${String(row.exercise).toLowerCase()}`;
-      if (!baselines.has(key) && Number(row.estimated_1rm) > 0) baselines.set(key, Number(row.estimated_1rm));
-    });
-  const daily = [...state.performance.reduce((days, row) => {
-    const date = row.performed_on;
-    const value = Number(row.estimated_1rm || 0);
-    const baseline = baselines.get(`${row.category}:${String(row.exercise).toLowerCase()}`);
-    if (!date || !value || !baseline) return days;
-    const current = days.get(date) || { sum: 0, count: 0 };
-    current.sum += value / baseline * 100;
-    current.count += 1;
-    days.set(date, current);
-    return days;
-  }, new Map())].map(([datum, value]) => ({ datum, wert: value.sum / value.count }));
-  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-logman-card><header><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch keine Werte'}</small></span></header><div class="body-v2-card-body">${detailErklaerung('So wird Leistung eingeordnet', 'Die LOGMAN-Daten zeigen, ob deine vergleichbare Trainingsleistung eher steigt, fällt oder stabil bleibt. COMP nutzt das nur als Zusatzsignal, nicht als alleinigen Beweis.')}${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Verbinde LOGMAN im Profil, dann kommen deine Sätze automatisch. Eine Exportdatei kannst du weiter über den Hinzufügen-Button importieren.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}<button class="body-reset-mini" type="button" data-reset-body="logman">Manuelle LOGMAN-Importe löschen</button></div></section>`;
+// Die Empfehlungen als aufklappbarer Bereich der Neurotransmitter-Karte.
+export function seminarEmpfehlungMarkup(empfehlung) {
+  if (!empfehlung) return '';
+  return `<details class="body-inner-details comp-seminar-empfehlung"><summary><span>Empfehlungen laut Seminar · ${escapeHtml(empfehlung.bereich)}</span>${materialIconMarkup('chevron_right')}</summary><div class="comp-optional-content">
+    ${empfehlung.punkte.length ? `<ul>${empfehlung.punkte.map((punkt) => `<li>${escapeHtml(punkt)}</li>`).join('')}</ul>` : ''}
+    ${empfehlung.dosierungen.length ? `<div class="comp-optional-doses">${empfehlung.dosierungen.map((item) => `<span><b>${escapeHtml(item.name)}${item.optional ? ' · optional' : ''}</b><strong>${escapeHtml(item.dosierung || 'Keine Dosierung hinterlegt')}</strong>${item.protokoll ? `<small>${escapeHtml(item.protokoll)}</small>` : ''}</span>`).join('')}</div>` : ''}
+    <em>Seminarwissen, unverändert übernommen · keine Einnahmeanweisung</em>
+  </div></details>`;
 }
 
 // Zurücksetzen-Knöpfe auf COMP: Tabelle, Text und bei LOGMAN nur die Zeilen
@@ -963,7 +882,6 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const markup = `
       ${bodyHeroMarkup(state)}
       ${compFactsMarkup(state)}
-      ${compOptionalKarteMarkup(optionaleSchritteFuer(state))}
       ${compDetailsMarkup(state)}`;
     const content = container.querySelector(':scope > .body-metrics-wrap > .kategorie-scrollinhalt');
     if (content) {

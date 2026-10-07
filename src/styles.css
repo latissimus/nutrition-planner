@@ -17000,204 +17000,188 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coaching-karte.is-fehler .coaching-marke{color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
 
 /* ============================================================
-   CHAT-MODUS (coach.js, COACHING-PLAN.md Schritt 4b)
-   Drei Farben: Coaching Gelb, Frage Hellblau, Bewertung & Schritte Rosa.
-   Der Modus steht immer als Wort da; die Farbe unterstützt nur. Die Eingabe
-   hat eine Werkzeugzeile (Rückmeldung 07.10., Aufbau 1): oben das
-   Schreibfeld, darunter Plus, Webwissen, Modus-Pille und Mikro/Senden.
+   CHAT-EINGABE UND PLUS-MENÜ (coach.js, COACHING-PLAN.md Schritt 4b)
+   Wie bei Gemini (Bildschirmaufnahme des Nutzers, 07.10.): eine Kapsel mit
+   Plus, Schreibfeld und Mikro/Senden, mit den gewohnten Konturen. Bei
+   geschlossener Tastatur ist sie schmaler, mit Tastatur breiter. Das Plus
+   öffnet eine Fläche von unten mit Kamera, Fotos, Dateien, Modus,
+   Webwissen und Neues Gespräch. Der Modus steht als Wort im Platzhalter
+   und am Etikett jeder Antwort.
    ============================================================ */
 :root{--modus-frage:#94DEFF;--modus-bewertung:var(--brand-pink,#FF69AE)}
 /* Die deckende Fläche hinter der Eingabe hängt unten fest und reicht bis zur
-   halben Höhe einer einzeiligen Kapsel. Oben verankert wuchs sie mit, sobald
-   Menü oder Anhang die Eingabe nach oben erweiterten (Rückmeldung 07.10.). */
-:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-eingabe-karte)::after{top:auto;height:calc(var(--app-dex-dock-bottom) + 34px)!important}
-:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form:has(.coach-eingabe-karte)::after{height:38px!important}
-:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte{
-  min-width:0;
-  display:flex!important;
-  flex-direction:column;
-  align-items:stretch;
-  gap:8px!important;
-  min-height:0!important;
-  padding:8px 8px 8px!important;
-  grid-template-columns:none!important;
-  border-radius:22px!important;
-}
-:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte::before{border-radius:22px}
-/* Schreibfeld wie in der Skizze: normale Schrift (Work Sans), ohne eigenen
-   Rahmen; 16 px, damit iOS beim Antippen nicht zoomt. */
-:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte textarea{
-  min-height:30px!important;
-  padding:4px 6px 0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-  font:500 16px/1.4 "Work Sans",sans-serif!important;
-  word-spacing:normal!important;
-}
-:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte :is(.coach-plus,.coach-send,.coach-mikro){width:32px!important;height:32px!important}
-:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte :is(.coach-plus,.coach-mikro) .coach-eingabe-icon{width:16px!important;height:16px!important}
-:root[data-theme][data-seite="coach"] #view .coach-werkzeugzeile{display:flex;align-items:center;gap:6px;min-width:0}
-:root[data-theme][data-seite="coach"] #view .coach-werkzeugzeile-rest{flex:1;min-width:0}
-/* Webwissen als Pille: an gelb, aus nur umrandet. */
-:root[data-theme][data-seite="coach"] #view .coach-web-pille{
-  position:relative;
-  display:inline-flex;
-  flex:none;
-  align-items:center;
-  gap:4px;
-  height:28px;
-  box-sizing:border-box;
-  padding:0 10px 0 7px;
-  border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:999px;
-  background:var(--ui-flaeche);
-  color:var(--ui-schrift);
-  font:700 12px/1 "Work Sans",sans-serif;
-  cursor:pointer;
-}
-:root[data-theme][data-seite="coach"] #view .coach-web-pille input{position:absolute;opacity:0;pointer-events:none}
-:root[data-theme][data-seite="coach"] #view .coach-web-pille .coach-web-symbol{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
-:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked){background:var(--fe-blue,#15CCFF)}
-:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:2px}
-/* Modus-Pille: Wort und Farbe, der Pfeil öffnet die Wahl. */
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille{
-  display:inline-flex;
-  align-items:center;
-  gap:3px;
-  min-width:0;
-  height:28px;
-  box-sizing:border-box;
-  margin:0;
-  padding:0 6px 0 10px;
-  border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:999px;
-  background:var(--ui-gefuellt,#111111)!important;
-  color:var(--ui-gefuellt-schrift,#ffffff);
-  box-shadow:none;
-  font:700 12px/1 "Work Sans",sans-serif;
-  letter-spacing:0;
-  text-transform:none;
-  cursor:pointer;
-}
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil{display:grid;flex:none;width:14px;height:14px;transform:rotate(90deg);transition:transform .2s ease}
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil svg{width:100%;height:100%;fill:var(--ui-gefuellt-schrift,#ffffff)}
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille[aria-expanded="true"] .coach-modus-pfeil{transform:rotate(-90deg)}
-:root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-werkzeugzeile :is(.coach-web-pille,.coach-modus-pille){opacity:.6}
-/* Ein Menü, zwei Ansichten: Plus (Foto, Neues Gespräch) oder Modus. */
-:root[data-theme][data-seite="coach"] #view .coach-menue[data-ansicht="werkzeuge"] .coach-menue-modi,
-:root[data-theme][data-seite="coach"] #view .coach-menue[data-ansicht="modus"] .coach-menue-werkzeuge{display:none}
-/* Das Menü wächst aus dem Knopf heraus, der es öffnet (--menue-ursprung). */
-:root[data-theme][data-seite="coach"] #view .coach-menue:not([hidden]){transform-origin:var(--menue-ursprung,24px) calc(100% + 40px);animation:menue-auf .26s cubic-bezier(.2,.9,.3,1.12) both}
-@keyframes menue-auf{from{opacity:0;transform:scale(.4) translateY(12px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-menue:not([hidden]){animation:none}}
-/* Vorschau eines PDF- oder Text-Anhangs: Symbol statt Bild. */
-:root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
-:root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
-:root[data-theme][data-seite="coach"] #view .coach-menue[data-ansicht="modus"] .coach-menue-modi{margin-top:0;padding-top:0;border-top:0}
-@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil{transition:none}}
+   halben Höhe der einzeiligen Kapsel; ein Anhang darüber lässt sie nicht
+   mitwachsen. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-inputbar)::after{top:auto;height:calc(var(--app-dex-dock-bottom) + 34px)!important}
+:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form:has(.coach-inputbar)::after{height:38px!important}
+/* Ohne Tastatur schmaler, mit Tastatur breiter; der Wechsel gleitet. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{padding-left:26px!important;padding-right:26px!important;transition:padding .32s cubic-bezier(.2,.9,.3,1)}
+:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form{padding-left:10px!important;padding-right:10px!important}
+@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{transition:none}}
+/* Schreibfeld in normaler Schrift (16 px, damit iOS nicht zoomt). */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar textarea{font:500 16px/1.35 "Work Sans",sans-serif!important;word-spacing:normal!important}
 
-/* PLUS-MENÜ wie in Apple Nachrichten (Screenshot des Nutzers, 07.10.): eine
-   runde Fläche über der Eingabe, große Zeilen mit rundem, farbigem Symbol.
-   Der Chat dahinter wird unscharf; ein Tipp daneben schließt das Menü. */
-:root[data-theme][data-seite="coach"] #view .coach-menue{
-  display:grid;
-  gap:2px;
-  justify-self:start;
-  width:min(310px,100%);
+/* Kleine Pille „Bewertung ×“ auf der oberen linken Ecke der Kapsel, nur in
+   diesem Modus; schwarz wie die Etiketten. Sie ragt über die Kontur, endet
+   aber oberhalb von Plus und Schreibfeld (Rückmeldung 07.10.). Während
+   einer Sprachaufnahme ausgeblendet. */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip{
+  position:absolute;
+  z-index:3;
+  top:0;
+  left:20px;
+  display:inline-flex;
+  align-items:center;
+  gap:1px;
+  height:17px;
+  margin:0;
+  padding:0 4px 0 7px;
   box-sizing:border-box;
-  margin:0 0 4px;
-  padding:6px;
   border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:22px;
+  border-radius:999px;
+  box-shadow:none;
+  transform:translateY(-75%);
+  font:700 10.5px/1 "Work Sans",sans-serif;
+  letter-spacing:.02em;
+  white-space:nowrap;
+  cursor:pointer;
+  animation:chip-auf .24s cubic-bezier(.2,.9,.3,1.2) both;
+}
+/* Größere Tippfläche, ohne die Pille zu vergrößern. */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip::after{content:"";position:absolute;inset:-10px -6px -4px}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar button.coach-modus-chip{background:var(--ui-gefuellt,#111111)!important;color:var(--ui-gefuellt-schrift,#ffffff)!important;-webkit-text-fill-color:var(--ui-gefuellt-schrift,#ffffff)!important}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip[hidden],
+:root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-inputbar .coach-modus-chip{display:none}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip :is(.material-svg,svg){width:12px;height:12px;fill:currentColor}
+/* Die Eingabe schneidet oben ab: Platz für den überstehenden Teil, auch
+   über einem Anhang. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-modus-chip:not([hidden])){padding-top:15px!important}
+:root[data-theme][data-seite="coach"] #view .coach-attachment:not([hidden])~.coach-inputbar:has(.coach-modus-chip:not([hidden])){margin-top:12px}
+@keyframes chip-auf{from{opacity:0;transform:translateY(-75%) scale(.6)}}
+@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip{animation:none}}
+
+/* Plus-Menü: Fläche von unten, Hintergrund abgedunkelt. */
+:root[data-theme][data-seite="coach"] #view .coach-sheet-grund{
+  position:fixed;
+  inset:0;
+  z-index:60;
+  background:rgba(4,6,14,.42);
+  opacity:0;
+  transition:opacity .28s ease;
+}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-grund.ist-offen{opacity:1}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-grund[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #view .coach-sheet{
+  position:fixed;
+  z-index:61;
+  left:8px;
+  right:8px;
+  bottom:calc(8px + env(safe-area-inset-bottom));
+  display:grid;
+  gap:10px;
+  max-width:560px;
+  max-height:calc(100dvh - 120px);
+  margin:0 auto;
+  padding:6px 12px 14px;
+  box-sizing:border-box;
+  overflow:auto;
+  overscroll-behavior:contain;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:30px;
   background:var(--ui-flaeche);
   color:var(--ui-schrift);
+  outline:none;
+  transform:translateY(calc(100% + 40px));
+  transition:transform .34s cubic-bezier(.2,.9,.25,1.04);
+  touch-action:pan-x;
 }
-:root[data-theme][data-seite="coach"] #view .coach-menue[hidden]{display:none}
-:root[data-theme][data-seite="coach"] #view .coach-menue-modi{display:grid;gap:2px;margin-top:4px;padding-top:4px;border-top:1px solid color-mix(in srgb,currentColor 18%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile{
+:root[data-theme][data-seite="coach"] #view .coach-sheet.ist-offen{transform:none}
+:root[data-theme][data-seite="coach"] #view .coach-sheet.wird-gezogen{transition:none}
+:root[data-theme][data-seite="coach"] #view .coach-sheet[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-griff{display:grid;place-items:center;height:18px;cursor:grab}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-griff i{width:40px;height:5px;border-radius:99px;background:color-mix(in srgb,currentColor 28%,transparent)}
+/* Kacheln wie Fotos/Kamera bei Gemini. */
+:root[data-theme][data-seite="coach"] #view .coach-sheet-kacheln{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-kachel{
+  position:relative;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:6px;
+  min-height:84px;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:20px;
+  background:color-mix(in srgb,currentColor 5%,var(--ui-flaeche));
+  font:700 14px/1.1 "Work Sans",sans-serif;
+  cursor:pointer;
+}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-kachel :is(.material-svg,svg){width:24px;height:24px;fill:currentColor}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-kachel:active{transform:scale(.97)}
+:root[data-theme][data-seite="coach"] #view :is(.coach-sheet-kachel,.coach-sheet-zeile) input{position:absolute;opacity:0;pointer-events:none}
+:root[data-theme][data-seite="coach"] #view :is(.coach-sheet-kachel,.coach-sheet-zeile):has(input:focus-visible){outline:3px solid var(--pink);outline-offset:2px}
+/* Zeilen mit Symbol, Titel und Unterzeile. */
+:root[data-theme][data-seite="coach"] #view .coach-sheet-liste{display:grid;gap:2px;padding-top:6px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile{
   position:relative;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
   width:100%;
-  min-height:44px;
+  min-height:56px;
   margin:0;
-  padding:4px 10px 4px 6px;
+  padding:6px 8px;
   box-sizing:border-box;
   border:0;
   border-radius:16px;
   background:transparent;
   color:inherit;
   box-shadow:none;
-  font:600 15px/1.2 "Work Sans",sans-serif;
+  font:600 16px/1.2 "Work Sans",sans-serif;
   letter-spacing:0;
   text-align:left;
   text-transform:none;
   cursor:pointer;
 }
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile[hidden]{display:none}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile:active{background:color-mix(in srgb,currentColor 10%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-text{display:grid;gap:1px;flex:1;min-width:0;white-space:nowrap}
-:root[data-theme][data-seite="coach"] #view .coach-menue-text small{color:var(--ui-neben);font:500 12px/1.25 "Work Sans",sans-serif}
-:root[data-theme][data-seite="coach"] #view .coach-menue-werkzeuge{display:grid;gap:2px}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile input{position:absolute;opacity:0;pointer-events:none}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:-3px}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol{
-  display:grid;
-  place-items:center;
-  flex:none;
-  width:32px;
-  height:32px;
-  border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:50%;
-  background:var(--farbe,#fff);
-  color:#111111;
+:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #view .coach-sheet button.coach-sheet-zeile{background:transparent!important;color:inherit!important}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:active{background:color-mix(in srgb,currentColor 9%,transparent)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-text{display:grid;gap:2px;flex:1;min-width:0}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-text small{color:var(--ui-neben);font:500 13px/1.25 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol{display:grid;place-items:center;flex:none;width:36px;height:36px;border:var(--kontur) solid var(--kontur-farbe);border-radius:50%;background:var(--farbe,#fff)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol :is(.material-svg,svg){width:18px;height:18px;color:#111111;fill:#111111}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol .coach-web-symbol{fill:none;stroke:#111111;stroke-width:2;stroke-linejoin:round}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol b{font:800 17px/1 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-frage{--farbe:var(--modus-frage)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-bewertung{--farbe:var(--modus-bewertung)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-web{--farbe:var(--fe-blue,#15CCFF)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-neu{--farbe:#FFFFFF}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-haken{display:grid;place-items:center;flex:none;width:22px;height:22px;visibility:hidden}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-haken :is(.material-svg,svg){width:22px;height:22px;fill:currentColor}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:has(input:checked) .coach-sheet-haken{visibility:visible}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-schalter{position:relative;flex:none;width:44px;height:26px;box-sizing:border-box;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:color-mix(in srgb,currentColor 12%,transparent)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-schalter::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border:1px solid var(--kontur-farbe);border-radius:50%;background:var(--ui-flaeche);transition:transform .2s ease}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:has(input:checked) .coach-sheet-schalter{background:var(--fe-blue,#15CCFF)}
+:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:has(input:checked) .coach-sheet-schalter::after{transform:translateX(18px)}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite="coach"] #view :is(.coach-sheet,.coach-sheet-grund,.coach-sheet-schalter::after){transition:none}
 }
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol :is(.material-svg,svg){width:17px;height:17px;color:#111111;fill:#111111}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol b{font:800 16px/1 "Work Sans",sans-serif;color:#111111}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-foto{--farbe:#C9BCF7}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-kamera{--farbe:#FFD9A8}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-datei{--farbe:#B8E6C9}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-web{--farbe:#FFD400}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-neu{--farbe:#FFFFFF}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-frage{--farbe:var(--modus-frage)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-bewertung{--farbe:var(--modus-bewertung)}
-/* Webwissen: kleiner Schalter; Modus: Haken an der gewählten Zeile. */
-:root[data-theme][data-seite="coach"] #view .coach-menue-schalter{position:relative;flex:none;width:40px;height:24px;box-sizing:border-box;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:color-mix(in srgb,currentColor 15%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-schalter::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--ui-flaeche);border:1px solid var(--kontur-farbe);transition:transform .2s ease}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:checked) .coach-menue-schalter{background:#FFD400}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:checked) .coach-menue-schalter::after{transform:translateX(16px)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-haken{display:grid;place-items:center;flex:none;width:20px;height:20px;margin-left:8px;visibility:hidden}
-:root[data-theme][data-seite="coach"] #view .coach-menue-haken :is(.material-svg,svg){width:20px;height:20px;color:currentColor;fill:currentColor}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:checked) .coach-menue-haken{visibility:visible}
-/* Chat und Wochen-Kärtchen hinter dem offenen Menü. */
-:root[data-theme][data-seite="coach"] #view .coach-page.menue-offen :is(.coach-answer,.coach-woche),
-:root[data-theme][data-seite="coach"] #view.menue-offen :is(.coach-answer,.coach-woche){filter:blur(6px);opacity:.55;pointer-events:none;transition:filter .2s ease,opacity .2s ease}
-@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-menue-schalter::after{transition:none}}
-/* Etikett jeder Antwort. */
+/* Vorschau eines PDF- oder Text-Anhangs: Symbol statt Bild. */
+:root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
+:root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
+
+/* Etikett jeder Antwort: gefüllt wie der Senden-Knopf, Schrift hell. */
 :root[data-theme][data-seite="coach"] #view .coach-modus-marke{justify-self:start;display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-gefuellt,#111111)!important;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+:root[data-theme][data-seite="coach"] #view .coach-modus-marke{color:var(--ui-gefuellt-schrift,#ffffff)!important;-webkit-text-fill-color:var(--ui-gefuellt-schrift,#ffffff)!important}
 :root[data-theme][data-seite="coach"] #view .coach-rueckfrage{margin:0;font:600 14.5px/1.45 "Work Sans",sans-serif}
-/* Quellen unter einer Frage-Antwort (statt „Datenlage“). */
+/* Quellen unter einer Antwort (statt „Datenlage“). */
 :root[data-theme][data-seite="coach"] #view .coach-quellen{display:grid;gap:4px;padding-top:9px;border-top:var(--haarlinie,1px) dashed color-mix(in srgb,currentColor 35%,transparent)}
 :root[data-theme][data-seite="coach"] #view .coach-quellen b{font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mac-farbe-neben,inherit)}
 :root[data-theme][data-seite="coach"] #view .coach-quellen ul{display:grid;gap:3px;margin:0;padding:0;list-style:none}
 :root[data-theme][data-seite="coach"] #view .coach-quellen li{font:500 12.5px/1.4 "JetBrains Mono",monospace;color:var(--mac-farbe-neben,inherit)}
 :root[data-theme][data-seite="coach"] #view .coach-quellen a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 :root[data-theme][data-seite="coach"] #view .coach-knopf.ist-schritte{border-color:var(--kontur-farbe)!important;background:var(--modus-bewertung)!important}
-/* Auf Hellblau und Rosa bleibt die Schrift dunkel, auch im Dark Mode. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-web-pille:has(input:checked),.coach-web-pille:has(input:checked) span,.coach-knopf.ist-schritte,.coach-menue-symbol,.coach-menue-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
-/* Modus-Pille und Etiketten: gefüllt wie der Senden-Knopf, Schrift hell.
-   Die Werkzeugzeile im Selektor schlägt die allgemeine Dark-Mode-Regel für
-   Knöpfe (#app :is(button:not(.app-dex-menu))). */
-:root[data-theme][data-seite="coach"] #view .coach-werkzeugzeile .coach-modus-pille{background:var(--ui-gefuellt,#111111)!important}
-:root[data-theme][data-seite="coach"] #view :is(.coach-modus-pille,.coach-modus-pille span,.coach-modus-marke){color:var(--ui-gefuellt-schrift,#ffffff)!important;-webkit-text-fill-color:var(--ui-gefuellt-schrift,#ffffff)!important}
-:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked) .coach-web-symbol{stroke:#111111!important;color:#111111!important}
-/* Kleinere Pillen, gleich große Tippfläche. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-web-pille,.coach-modus-pille){position:relative}
-:root[data-theme][data-seite="coach"] #view :is(.coach-web-pille,.coach-modus-pille)::after{content:"";position:absolute;inset:-8px -2px}
+/* Auf farbigen Flächen bleibt die Schrift dunkel, auch im Dark Mode. */
+:root[data-theme][data-seite="coach"] #view :is(.coach-knopf.ist-schritte,.coach-sheet-symbol,.coach-sheet-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
 /* Tagesabschluss bleibt bei den Tageswerten, ohne eine weitere Karte. */
 .nutrition-day-complete{width:100%;min-height:44px;margin-top:12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);color:var(--ink);font:700 13px/1.3 var(--ui);text-align:center;cursor:pointer}
 .nutrition-day-complete[aria-pressed="true"]{background:var(--accent-soft,#e8f5df)}

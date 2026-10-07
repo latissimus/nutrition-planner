@@ -363,70 +363,70 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     <section class="coach-woche" data-coach-woche hidden></section>
     <form class="coach-form" data-coach-form>
       <div class="coach-form-innen">
-        <div class="coach-compose-tools coach-menue" data-coach-tools data-ansicht="werkzeuge" hidden>
-          <div class="coach-menue-werkzeuge">
-            <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-kamera">${materialIconMarkup('photo_camera')}</span><span class="coach-menue-text">Kamera</span><input type="file" accept="image/*" capture="environment" data-coach-file></label>
-            <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-foto">${materialIconMarkup('add_photo_alternate')}</span><span class="coach-menue-text">Fotos</span><input type="file" accept="image/*" data-coach-file></label>
-            <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-datei">${materialIconMarkup('upload_file')}</span><span class="coach-menue-text">Dateien</span><input type="file" accept="application/pdf,.pdf,text/plain,.txt,text/csv,.csv,text/markdown,.md,image/*" data-coach-file></label>
-            <button class="coach-menue-zeile" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}><span class="coach-menue-symbol ist-neu">${materialIconMarkup('edit')}</span><span class="coach-menue-text">Neues Gespräch</span></button>
-          </div>
-          <div class="coach-menue-modi" role="radiogroup" aria-label="Modus">
-            ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-menue-zeile"><span class="coach-menue-symbol ist-${wert}">${wert === 'frage' ? '<b>?</b>' : materialIconMarkup('target')}</span><span class="coach-menue-text">${escapeHtml(text)}<small>${escapeHtml(MODUS_ERKLAERUNG[wert])}</small></span><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><i class="coach-menue-haken" aria-hidden="true">${materialIconMarkup('check_small')}</i></label>`).join('')}
-          </div>
-        </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
-        <div class="coach-inputbar coach-eingabe-karte">
+        <div class="coach-inputbar">
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-haspopup="dialog" aria-label="Anhängen, Modus und Webwissen"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
+          <button class="coach-modus-chip" type="button" data-coach-modus-chip aria-label="Bewertung & Schritte beenden, zurück zu Frage" hidden><span>Bewertung</span>${materialIconMarkup('close')}</button>
           <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
           <div class="coach-aufnahme" data-coach-aufnahme hidden>
             <button class="coach-aufnahme-weg" type="button" data-aufnahme-verwerfen aria-label="Aufnahme verwerfen">${materialIconMarkup('close', 'coach-eingabe-icon')}</button>
             <div class="coach-aufnahme-feld" aria-live="polite"><i class="coach-aufnahme-punkt" aria-hidden="true"></i><b data-aufnahme-zeit>0:00</b><span data-aufnahme-text>Aufnahme läuft</span></div>
           </div>
-          <div class="coach-werkzeugzeile">
-            <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Foto oder neues Gespräch"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
-            <label class="coach-web-pille"><input type="checkbox" role="switch" data-coach-web checked>${WELTKUGEL}<span>Web</span></label>
-            <button class="coach-modus-pille" type="button" data-coach-modus aria-expanded="false"><span data-coach-modus-text></span>${materialIconMarkup('chevron_right', 'coach-modus-pfeil')}</button>
-            <span class="coach-werkzeugzeile-rest"></span>
-            <button class="coach-mikro" type="button" data-coach-mikro aria-label="Sprachnachricht aufnehmen">${materialIconMarkup('mic', 'coach-eingabe-icon')}</button>
-            <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('arrow_forward_ios', 'coach-eingabe-icon')}</button>
-          </div>
+          <button class="coach-mikro" type="button" data-coach-mikro aria-label="Sprachnachricht aufnehmen">${materialIconMarkup('mic', 'coach-eingabe-icon')}</button>
+          <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('arrow_forward_ios', 'coach-eingabe-icon')}</button>
         </div>
       </div>
     </form>
+    <div class="coach-sheet-grund" data-coach-sheet-grund hidden></div>
+    <section class="coach-sheet" data-coach-tools role="dialog" aria-modal="true" aria-label="Anhängen, Modus und Webwissen" tabindex="-1" hidden>
+      <div class="coach-sheet-griff" data-coach-sheet-griff aria-hidden="true"><i></i></div>
+      <div class="coach-sheet-kacheln">
+        <label class="coach-sheet-kachel">${materialIconMarkup('photo_camera')}<span>Kamera</span><input type="file" accept="image/*" capture="environment" data-coach-file></label>
+        <label class="coach-sheet-kachel">${materialIconMarkup('add_photo_alternate')}<span>Fotos</span><input type="file" accept="image/*" data-coach-file></label>
+        <label class="coach-sheet-kachel">${materialIconMarkup('upload_file')}<span>Dateien</span><input type="file" accept="application/pdf,.pdf,text/plain,.txt,text/csv,.csv,text/markdown,.md,image/*" data-coach-file></label>
+      </div>
+      <div class="coach-sheet-liste" role="radiogroup" aria-label="Modus">
+        ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-sheet-zeile"><span class="coach-sheet-symbol ist-${wert}">${wert === 'frage' ? '<b>?</b>' : materialIconMarkup('target')}</span><span class="coach-sheet-text">${escapeHtml(text)}<small>${escapeHtml(MODUS_ERKLAERUNG[wert])}</small></span><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><i class="coach-sheet-haken" aria-hidden="true">${materialIconMarkup('check_small')}</i></label>`).join('')}
+      </div>
+      <div class="coach-sheet-liste">
+        <label class="coach-sheet-zeile"><span class="coach-sheet-symbol ist-web">${WELTKUGEL}</span><span class="coach-sheet-text">Webwissen<small>Antworten mit Webquellen</small></span><input type="checkbox" role="switch" data-coach-web checked><i class="coach-sheet-schalter" aria-hidden="true"></i></label>
+        <button class="coach-sheet-zeile" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}><span class="coach-sheet-symbol ist-neu">${materialIconMarkup('edit')}</span><span class="coach-sheet-text">Neues Gespräch<small>Leerer Chat ohne den bisherigen Verlauf</small></span></button>
+      </div>
+    </section>
   </main>`;
   const answer = container.querySelector('[data-coach-answer]');
   const form = container.querySelector('[data-coach-form]');
   const field = form.querySelector('textarea');
-  const neuesGespraech = form.querySelector('[data-neues-gespraech]');
-  const tools = form.querySelector('[data-coach-tools]');
+  const neuesGespraech = container.querySelector('[data-neues-gespraech]');
+  const tools = container.querySelector('[data-coach-tools]');
+  const sheetGrund = container.querySelector('[data-coach-sheet-grund]');
   const plus = form.querySelector('[data-coach-plus]');
-  const dateiFelder = [...form.querySelectorAll('[data-coach-file]')];
-  const webOption = form.querySelector('[data-coach-web]');
+  const dateiFelder = [...container.querySelectorAll('[data-coach-file]')];
+  const webOption = container.querySelector('[data-coach-web]');
   const attachmentBox = form.querySelector('[data-coach-attachment]');
 
-  // Modus: Das Kennzeichen an der Eingabe zeigt ihn und schaltet per Tipp um;
-  // im Plus-Menü steht dieselbe Wahl.
+  /* Modus: Die Wahl steht im Plus-Menü. „Bewertung & Schritte“ zeigt eine
+     kleine Pille auf der Ecke der Eingabe, auch während man tippt; ein Tipp
+     darauf führt zurück zu „Frage“, dem Standard ohne Pille. */
   let modus = modusLesen();
-  const modusKnopf = form.querySelector('[data-coach-modus]');
-  // Der Platzhalter nennt den Modus mit.
-  const PLATZHALTER = { frage: 'Frage an den Coach', bewertung: 'Was soll der Coach bewerten?' };
+  const PLATZHALTER = { frage: 'Frage an den Coach', bewertung: 'Bewertung anfordern' };
+  const modusWahlen = [...container.querySelectorAll('[data-coach-modus-wahl]')];
+  const modusChip = form.querySelector('[data-coach-modus-chip]');
   const modusZeigen = () => {
-    modusKnopf.className = `coach-modus-pille ist-${modus}`;
-    modusKnopf.querySelector('[data-coach-modus-text]').textContent = MODI[modus];
-    modusKnopf.setAttribute('aria-label', `Modus: ${MODI[modus]}. Antippen zum Wechseln.`);
     field.placeholder = PLATZHALTER[modus];
-    form.querySelectorAll('[data-coach-modus-wahl]').forEach((wahl) => { wahl.checked = wahl.value === modus; });
+    modusChip.hidden = modus !== 'bewertung';
+    modusWahlen.forEach((wahl) => { wahl.checked = wahl.value === modus; });
   };
   const modusSetzen = (neu) => {
     modus = neu === 'bewertung' ? 'bewertung' : 'frage';
     modusSchreiben(modus);
     modusZeigen();
   };
-  // Die Pille öffnet dasselbe Menü wie das Plus, aber mit den zwei Modi.
-  modusKnopf.onclick = () => menueZeigen(!tools.hidden && tools.dataset.ansicht === 'modus' ? null : 'modus');
-  form.querySelectorAll('[data-coach-modus-wahl]').forEach((wahl) => {
+  modusWahlen.forEach((wahl) => {
     wahl.onchange = () => { modusSetzen(wahl.value); werkzeugeZeigen(false); };
   });
+  modusChip.onclick = () => modusSetzen('frage');
   modusZeigen();
 
   // Die Eingabe sitzt fest am unteren Rand; der Verlauf bekommt unten so viel
@@ -497,34 +497,74 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     const vorschau = anhang?.art === 'bild' ? `<img src="${anhang.dataUrl}" alt="">` : materialIconMarkup('upload_file', 'coach-anhang-symbol');
     attachmentBox.innerHTML = anhang ? `${vorschau}<span>${escapeHtml(anhang.name)}</span><button type="button" data-remove-attachment aria-label="Anhang entfernen">×</button>` : '';
   };
-  /* Menü wie in Apple Nachrichten, der Chat dahinter wird unscharf. Das Plus
-     zeigt Kamera, Fotos, Dateien und Neues Gespräch, die Modus-Pille die zwei
-     Modi; beide stehen links in gleicher Breite und wachsen aus ihrem Knopf
-     heraus. Eine offene Tastatur schließt sich dabei. Frühere Coachings
-     liegen im Gedächtnis (Knopf im Kopf). */
-  const menueZeigen = (ansicht) => {
-    tools.hidden = !ansicht;
-    if (ansicht) {
-      tools.dataset.ansicht = ansicht;
+  /* Plus-Menü wie bei Gemini (Bildschirmaufnahme des Nutzers, 07.10.): Eine
+     Fläche gleitet von unten herein, der Chat dahinter wird abgedunkelt. Oben
+     Kacheln für Kamera, Fotos und Dateien, darunter Modus, Webwissen und Neues
+     Gespräch. Schließen per Tipp daneben, Escape oder Herunterziehen; eine
+     offene Tastatur geht beim Öffnen zu. Frühere Coachings liegen im
+     Gedächtnis (Knopf im Kopf). */
+  let sheetTimer = 0;
+  const werkzeugeZeigen = (offen) => {
+    if (offen === !tools.hidden && offen === tools.classList.contains('ist-offen')) return;
+    window.clearTimeout(sheetTimer);
+    plus.setAttribute('aria-expanded', String(offen));
+    tools.style.transform = '';
+    if (offen) {
       field.blur();
-      const innen = tools.getBoundingClientRect();
-      const knopf = (ansicht === 'modus' ? modusKnopf : plus).getBoundingClientRect();
-      tools.style.setProperty('--menue-ursprung', `${Math.round(knopf.left - innen.left + knopf.width / 2)}px`);
+      tools.hidden = false;
+      sheetGrund.hidden = false;
+      // Erst sichtbar machen, dann im nächsten Bild hereingleiten lassen.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        tools.classList.add('ist-offen');
+        sheetGrund.classList.add('ist-offen');
+        tools.focus({ preventScroll: true });
+      }));
+      return;
     }
-    plus.setAttribute('aria-expanded', String(ansicht === 'werkzeuge'));
-    modusKnopf.setAttribute('aria-expanded', String(ansicht === 'modus'));
-    container.classList.toggle('menue-offen', Boolean(ansicht));
+    tools.classList.remove('ist-offen');
+    sheetGrund.classList.remove('ist-offen');
+    // Nach dem Hinausgleiten ganz ausblenden (Dauer wie im CSS).
+    sheetTimer = window.setTimeout(() => {
+      tools.hidden = true;
+      sheetGrund.hidden = true;
+    }, 320);
   };
-  const werkzeugeZeigen = (offen) => menueZeigen(offen ? 'werkzeuge' : null);
-  plus.onclick = () => menueZeigen(!tools.hidden && tools.dataset.ansicht === 'werkzeuge' ? null : 'werkzeuge');
+  plus.onclick = () => werkzeugeZeigen(tools.hidden || !tools.classList.contains('ist-offen'));
+  sheetGrund.onclick = () => werkzeugeZeigen(false);
   container.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !tools.hidden) werkzeugeZeigen(false);
+    if (event.key === 'Escape' && !tools.hidden) {
+      werkzeugeZeigen(false);
+      plus.focus({ preventScroll: true });
+    }
   });
 
-  // Ein Tipp irgendwo in den Chat schließt das Plus-Menü wieder.
-  container.addEventListener('click', (event) => {
-    if (!tools.hidden && !event.target.closest('[data-coach-form]')) werkzeugeZeigen(false);
+  /* Herunterziehen schließt das Menü: Die Fläche folgt dem Finger nach unten
+     (nach oben nur gebremst); ab einem Viertel der Höhe oder bei schnellem
+     Wischen schließt sie, sonst federt sie zurück. */
+  let zug = null;
+  tools.addEventListener('pointerdown', (event) => {
+    if (event.button > 0 || event.target.closest('input, label, button')) return;
+    zug = { start: event.clientY, zeit: performance.now(), weg: 0, id: event.pointerId };
+    tools.setPointerCapture(event.pointerId);
+    tools.classList.add('wird-gezogen');
   });
+  tools.addEventListener('pointermove', (event) => {
+    if (!zug || event.pointerId !== zug.id) return;
+    const weg = event.clientY - zug.start;
+    zug.weg = weg > 0 ? weg : weg / 4;
+    tools.style.transform = `translateY(${zug.weg}px)`;
+  });
+  const zugEnde = (event) => {
+    if (!zug || event.pointerId !== zug.id) return;
+    const tempo = zug.weg / Math.max(1, performance.now() - zug.zeit);
+    const weit = zug.weg > tools.offsetHeight / 4 || tempo > 0.6;
+    zug = null;
+    tools.classList.remove('wird-gezogen');
+    tools.style.transform = '';
+    if (weit) werkzeugeZeigen(false);
+  };
+  tools.addEventListener('pointerup', zugEnde);
+  tools.addEventListener('pointercancel', zugEnde);
   dateiFelder.forEach((feld) => {
     feld.onchange = async () => {
       try {
