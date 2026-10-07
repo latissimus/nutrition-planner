@@ -609,6 +609,52 @@ Montagslauf → `capboy-coach` → App hochladen.
 - Bewerten-Knopf auf COMP entfernen, ebenso auf weiteren Seiten.
 - Doppelte Wege entfernen. Der manuelle LOGMAN-Import bleibt nur als Rückfall.
 
+### Stand Schritt 6 (07.10.2026, lokal gebaut, nicht bereitgestellt)
+
+- **COMP** (`src/bodyMetrics.js`): Die „Zentrale KI-Auswertung“ mit „Neu
+  bewerten“, „Bewertung erstellen“ und „Mit Coach besprechen“ ist entfernt,
+  ebenso der Knopf „Gesamtbild mit Coach einordnen“ (er hatte keine Funktion).
+  Der Gesamtstatus oben (Ring, Status, Datensicherheit) bleibt; er kommt aus
+  der App (`buildCompEvidence`). Die optionalen Seminarhinweise (Hautfalten,
+  Neurotransmitter, regelbasiert mit Dosierungen) stehen als eigene Karte
+  „Optionale Hinweise“, nur wenn es welche gibt. Infotext angepasst.
+- **`src/compAssessment.js`**: KI-Aufruf (`requestCompAssessment`), Laden der
+  gespeicherten Bewertung und `compCoachFrage` entfernt; die deterministische
+  Evidenz bleibt (samt Test).
+- **`capboy-coach`**: Die Anfrage nimmt nur noch den Chat an. Andere Bereiche
+  (`comp`, `sleep`, `skinfold`, `overall`) und `mode: 'weekly'` antworten mit
+  410 und einem Hinweis aufs Coaching (für zwischengespeicherte alte
+  App-Versionen). Entfernt: COMP-Prompt, Schema, `enforceCompSafety`,
+  `loadRunningExperiments`, `compAreaText`, Fingerabdruck-Cache und das
+  Schreiben in `ai_coach_analyses` (Tabelle bleibt als Verlauf). Der Zeitplan
+  mit Tages- und Wochen-Coaching ist unverändert.
+- **Texte:** FAQ (COMP-Frage, LOGMAN automatisch statt Export, Tages- und
+  Wochen-Coaching, Wochenrückblick), Gedächtnis-Seite (Wochenbilanz zeigt die
+  Überschrift des Wochen-Coachings; Leertext).
+- Bleibt bewusst: „Mit Coach besprechen“ auf der Schlafseite (öffnet nur den
+  Chat mit einer Frage), der manuelle LOGMAN-Import als Rückfall.
+- Alle 438 kostenlosen Tests grün (zwei Tests der entfernten Coach-Frage
+  entfallen). Ansicht der COMP-Seite im Browser steht aus (nicht angemeldet).
+- **GPT-Review Schritt 6 (07.10.2026), nachgebessert:**
+  1. „LOGMAN-Importe zurücksetzen“ hätte alle Leistungszeilen gelöscht, auch
+     die automatisch abgeglichenen, die ein unveränderter LOGMAN-Stand nicht
+     neu schreibt. Jetzt „Manuelle LOGMAN-Importe löschen“: nur Zeilen mit
+     `source = 'LOGMAN-Import'` (`COMP_ZURUECKSETZEN`, mit Test).
+  2. Optionale Hinweise ohne zweite Aufklapp-Ebene: flache Liste in der
+     eigenen Karte (Test: kein „Optionale Seminarhinweise“, kein KI-Hinweis).
+  3. COMP verweist bei fehlenden Leistungsdaten auf die Verbindung im Profil
+     statt auf den Dateiimport; „importiert“ aus den Texten entfernt.
+  Alle 439 kostenlosen Tests grün.
+- **Letzter Review-Punkt:** Nach „Manuelle LOGMAN-Importe löschen“ gleicht
+  die App sofort neu ab (`logmanNeuAufbauen`: erzwingen + neu), damit ein
+  ersetzter Abgleich-Wert zurückkommt; Tests in `src/logmanKopplung.test.js`
+  und `src/logmanAbgleich.test.js`. 443 Tests grün.
+- Ansicht angemeldet geprüft (375 px): Gesamtstatus, Messwerte, „Optionale
+  Hinweise“ als flache Liste, keine KI-Karte, Kapsel vollständig.
+- **Bereitgestellt am 07.10.2026:** `capboy-coach` ohne die alten Wege
+  (CORS 200, ohne Anmeldung 401, falsches Cron-Geheimnis 401, Chat ohne
+  Nutzer 401). Offen: App hochladen.
+
 ## Kosten
 
 Höchstens ein automatischer KI-Aufruf pro Tag mit neuen Daten; montags ersetzt

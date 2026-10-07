@@ -271,7 +271,7 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
   const bilanzListe = (wochenbilanzen || []).map((bilanz) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(bilanz.id)}">
       <details>
         <summary><b>KW ${Number(String(bilanz.week).slice(6))} · ${escapeHtml(String(bilanz.week).slice(0, 4))}</b><small>Erstellt am ${datum(String(bilanz.created_at || '').slice(0, 10))}</small></summary>
-        <p>${escapeHtml(bilanz.result?.summary || '')}</p>
+        <p>${escapeHtml(bilanz.result?.summary || bilanz.result?.ueberschrift || '')}</p>
         ${(bilanz.result?.recommendations || []).length ? `<ul>${bilanz.result.recommendations.map((eintrag) => `<li>${escapeHtml(eintrag.action || '')}</li>`).join('')}</ul>` : ''}
       </details>
       <div class="gedaechtnis-aktionen"><button class="coach-knopf" type="button" data-wochenbilanz-loeschen="${escapeHtml(bilanz.id)}">Löschen</button></div>
@@ -287,7 +287,7 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
     bereich('Gespräche', `<p class="gedaechtnis-hinweis">Der Coach sieht nur das laufende Gespräch. Mit „Fortsetzen“ holst du ein früheres zurück in den Chat.</p>
       ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="coach-knopf" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}`),
     wochenbilanzen ? bereich('Wochenbilanzen', `<p class="gedaechtnis-hinweis">Der Coach sieht davon nur den vorgeschlagenen Fokus der letzten Bilanz – in der Bilanz der folgenden Woche.</p>
-      ${wochenbilanzen.length ? `<ul class="gedaechtnis-liste">${bilanzListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Wochenbilanz. Nach jeder abgeschlossenen Woche bietet die Coach-Seite den Check-in an.</p>'}`) : '',
+      ${wochenbilanzen.length ? `<ul class="gedaechtnis-liste">${bilanzListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Wochenbilanz. Das Wochen-Coaching kommt montags um 21 Uhr.</p>'}`) : '',
   ].join('');
 }
 

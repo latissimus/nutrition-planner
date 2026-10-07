@@ -6,13 +6,11 @@ import { FALTEN, datumKurz, heute, summe, zahl } from './measurements.js';
 import { BODY_EXPLANATIONS, confirmedTrendChange, evaluateBodyComp, goalWeightInterpretation, weightTrendSummary } from './bodyComposition.js';
 import { parseLogmanExport, performanceTrend } from './logmanImport.js';
 import { materialIconMarkup } from './categoryIcons.js';
-import { coachIconMarkup } from './menuIcons.js';
-import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesChanges } from './realtime.js';
 import { getPreference, setPreference } from './userPreferences.js';
 import { collectionIsVisible } from './collectionPreferences.js';
-import { buildCompEvidence, compCoachFrage, loadLatestCompAssessment, requestCompAssessment } from './compAssessment.js';
+import { buildCompEvidence } from './compAssessment.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import { alterAmMessdatum, koerperfettAnteil, magermasse } from './ypsiFormel.js';
@@ -153,7 +151,7 @@ function bodyHeroMarkup(state) {
     <button class="body-analysis-info" type="button" aria-expanded="false" aria-label="COMP-Auswertung erklären">i</button>
   </section>
   <div class="body-analysis-help" hidden>
-    <p>Der Status verbindet die im Code berechneten Trends aus Gewicht, Faltensumme, Taille und Leistung. Das Sprachmodell erklärt diese Ergebnisse mit passenden Seminarstellen, berechnet sie aber nicht selbst.</p>
+    <p>Der Status verbindet die im Code berechneten Trends aus Gewicht, Faltensumme, Taille und Leistung. Eingeordnet werden sie jeden Abend im Coaching und montags im Wochen-Coaching im Chat; die KI berechnet dabei nichts selbst.</p>
   </div></div>`;
 }
 
@@ -172,36 +170,15 @@ function compFactsMarkup(state) {
   </section>`;
 }
 
-function compAssessmentMarkup() {
-  return `<section class="comp-central-assessment ${SPECIAL_DEX_CLASSES.content}" data-comp-assessment aria-live="polite">
-    <header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em data-comp-assessment-confidence>lädt</em></span></header>
-    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>Letzte Bewertung wird geladen</b></div>
-  </section>`;
-}
-
-// Während der Coach neu bewertet (nur nach Knopfdruck).
-function compAssessmentWorkingMarkup() {
-  return `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>prüft</em></span></header>
-    <div class="comp-assessment-loading" role="status">${sanduhrMarkup('coach-hourglass')}<b>${wartetextMarkup('Gesamtbild wird ausgewertet', 'Gesamtbild braucht noch einen Moment')}</b><p>Der Coach verbindet deine aktuellen Daten und Entwicklungen.</p></div>`;
-}
-
-// Noch keine gespeicherte Bewertung: erst auf Knopfdruck fragt die App die KI.
-function compAssessmentEmptyMarkup() {
-  return `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}</span></header>
-    <div class="comp-assessment-body">
-      <section><p>Noch keine Gesamtbewertung. Der Coach verbindet deine Messwerte, Trends und Seminarunterlagen zu einem Gesamtbild.</p></section>
-      ${compNeuBewertenMarkup('Bewertung erstellen')}
-    </div>`;
-}
-
-function compNeuBewertenMarkup(label = 'Neu bewerten') {
-  return `<div class="comp-neu-bewerten"><button class="btn btn-block" type="button" data-comp-neu>${label}</button><small>Nur auf Knopfdruck: Die KI bewertet mit deinen aktuellen Daten neu.</small></div>`;
-}
-
-const standFormat = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-function compStand(createdAt) {
-  const datum = createdAt ? new Date(createdAt) : null;
-  return datum && !Number.isNaN(datum.getTime()) ? `STAND ${standFormat.format(datum)}` : '';
+// Die zentrale KI-Auswertung samt „Neu bewerten“ ist mit Schritt 6 des
+// Coaching-Plans entfallen: Bewertet wird jetzt jeden Abend im Coaching und
+// montags im Wochen-Coaching. COMP zeigt die berechneten Werte; die optionalen
+// Seminarhinweise (Hautfalten, Neurotransmitter) stehen als eigene Karte da.
+function compOptionalKarteMarkup(schritte = []) {
+  return schritte.length ? `<section class="comp-central-assessment comp-optional-karte ${SPECIAL_DEX_CLASSES.content}">
+    <header><span><small>AUS DEINEN SEMINARUNTERLAGEN</small><h2>Optionale Hinweise</h2></span></header>
+    <div class="comp-assessment-body">${compOptionalMarkup(schritte)}</div>
+  </section>` : '';
 }
 
 function compDetailCard(title, subtitle, content) {
@@ -842,7 +819,7 @@ function bodyCompMarkup(state) {
       <details class="body-info"><summary>Einordnung und Einschränkungen<span>?</span></summary><p>${BODY_EXPLANATIONS.recovery}</p>${result.limitations.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}</details>
       <details class="body-inner-details"><summary><span>Orientierungsbereiche anpassen</span>${materialIconMarkup('chevron_right')}</summary><form class="body-threshold-form" data-bodycomp-thresholds><div class="body-threshold-explanation"><b>Was bedeuten diese Werte?</b><p>COMP vergleicht die durchschnittliche Gewichtsänderung pro Woche mit deinem aktuellen 7-Tage-Schnitt. Innerhalb der beiden ersten Grenzen gilt das Gewicht als stabil. Werden die äußeren Grenzen überschritten, wird die Ab- oder Zunahme als schnell eingeordnet. Die Werte sind Orientierung und keine biologische Exaktheit.</p></div><label><span>Gewichtsverlust erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.stableLoss), 2)}" data-threshold-stable-loss><i>%</i></span></label><label><span>Schneller Verlust ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(Math.abs(thresholds.slowLoss), 2)}" data-threshold-slow-loss><i>%</i></span></label><label><span>Gewichtszunahme erkannt ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.stableGain, 2)}" data-threshold-stable-gain><i>%</i></span></label><label><span>Schnelle Zunahme ab</span><span class="nutrition-unit-field"><input class="input" inputmode="decimal" value="${display(thresholds.slowGain, 2)}" data-threshold-slow-gain><i>%</i></span></label><button class="btn btn-primary" type="submit">Orientierungsbereiche speichern</button></form></details>
     </div>
-  </details><button class="body-coach-entry ${SPECIAL_DEX_CLASSES.content}" type="button" data-body-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Gesamtbild mit Coach einordnen</b><small>KI-Erklärung getrennt von Messwerten und Seminarregeln öffnen</small></span>${materialIconMarkup('chevron_right')}</button>`;
+  </details>`;
 }
 
 // Optionale Schritte unter der KI-Bewertung: Die Auswahl samt Dosierungen
@@ -929,32 +906,13 @@ function optionaleSchritteFuer(state) {
   }
 }
 
+// Die optionalen Seminarhinweise als flache Liste (eigene Karte auf COMP, seit
+// Schritt 6 ohne zweites Aufklappmenü).
 export function compOptionalMarkup(schritte = []) {
   if (!schritte.length) return '';
-  const kiZusammenfassung = schritte.some((schritt) => schritt.summary);
-  const hinweis = `${kiZusammenfassung ? 'Die KI fasst den Zusammenhang zusammen. ' : ''}Auswahl und Dosierungen werden unverändert aus dem Seminarwissen übernommen.`;
+  const hinweis = 'Auswahl und Dosierungen werden unverändert aus dem Seminarwissen übernommen.';
   const karten = (kompakt = false) => `<div class="comp-optional-list">${schritte.map((schritt) => `<details class="comp-optional-card${kompakt ? ' comp-optional-card-compact' : ''}"><summary><span><small>${escapeHtml(schritt.bereich)}</small><b>${escapeHtml(schritt.titel)}</b></span>${materialIconMarkup('chevron_right')}</summary><div class="comp-optional-content">${schritt.summary ? `<p>${escapeHtml(schritt.summary)}</p>` : ''}${(schritt.punkte || []).length ? `<ul>${schritt.punkte.map((punkt) => `<li>${escapeHtml(punkt)}</li>`).join('')}</ul>` : ''}${schritt.dosierungen?.length ? `<div class="comp-optional-doses">${schritt.dosierungen.map((item) => `<span><b>${escapeHtml(item.name)}${item.optional ? ' · optional' : ''}</b><strong>${escapeHtml(item.dosierung || 'Keine Dosierung hinterlegt')}</strong>${item.protokoll ? `<small>${escapeHtml(item.protokoll)}</small>` : ''}</span>`).join('')}</div>` : ''}<em>Seminarwissen · Details in „${escapeHtml(schritt.karte)}“</em></div></details>`).join('')}</div>`;
-  return `<section class="comp-optional comp-optional-wide"><h3>Optional</h3><p>${hinweis}</p>${karten()}</section><details class="comp-optional comp-optional-group"><summary><span><b>Optionale Seminarhinweise</b><small>${schritte.length} ${schritte.length === 1 ? 'Auswertung' : 'Auswertungen'}</small></span>${materialIconMarkup('chevron_right')}</summary><div><p>${hinweis}</p>${karten(true)}</div></details>`;
-}
-
-function compResultMarkup(result, { status = '', optionaleSchritte = [] } = {}) {
-  const basis = (result?.basis || []).slice(0, 4);
-  const uncertainty = (result?.uncertainty || []).slice(0, 3);
-  const nextSteps = (result?.nextSteps || []).slice(0, 3);
-  const sources = (result?.sources || []).slice(0, 5);
-  const schrittMarkup = (item) => `<li><b>${escapeHtml(item.action)}</b><span>${escapeHtml(item.rationale)}</span><small>${escapeHtml(item.timeframe)}</small></li>`;
-  const begruendung = `${basis.length ? `<section class="comp-reason-wide"><h3>Worauf die Aussage basiert</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}${uncertainty.length ? `<section class="comp-reason-wide"><h3>Was noch unsicher ist</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}${basis.length || uncertainty.length ? `<details class="comp-assessment-why"><summary><span>Warum diese Bewertung?</span>${materialIconMarkup('chevron_right')}</summary><div>${basis.length ? `<section><h3>Grundlage</h3><ul>${basis.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}${uncertainty.length ? `<section><h3>Noch unsicher</h3><ul>${uncertainty.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : ''}</div></details>` : ''}`;
-  const schritte = !nextSteps.length ? '' : `<section class="comp-next-wide"><h3>Nächste Schritte</h3><ol>${nextSteps.map(schrittMarkup).join('')}</ol></section><section class="comp-next-steps"><h3>Nächste Schritte</h3><ol>${nextSteps.map(schrittMarkup).join('')}</ol></section>`;
-  return `<header><span><small>ZENTRALE KI-AUSWERTUNG${status ? ` · ${escapeHtml(status)}` : ''}</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>${escapeHtml(result?.confidence || 'niedrig')}</em></span></header>
-    <div class="comp-assessment-body">
-      <section><h3>Wichtigste Entwicklung</h3><p>${escapeHtml(result?.keyDevelopment || 'Noch keine belastbare Gesamtbewertung verfügbar.')}</p></section>
-      ${begruendung}
-      ${schritte}
-      ${compOptionalMarkup(optionaleSchritte)}
-      <button class="body-coach-entry comp-coach-entry" type="button" data-comp-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Mit Coach besprechen</b><small>Wie du die Schritte konkret angehst</small></span>${materialIconMarkup('chevron_right')}</button>
-      ${sources.length ? `<details class="comp-assessment-sources"><summary>Verwendete Seminarquellen</summary><ul>${sources.map((source) => `<li><b>${escapeHtml(source.title || source.filename)}</b>${source.page ? `<span>Seite ${escapeHtml(source.page)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}
-      ${compNeuBewertenMarkup()}
-    </div>`;
+  return `<p class="comp-optional-hinweis">${hinweis}</p>${karten()}`;
 }
 
 function logmanMarkup(state) {
@@ -977,76 +935,27 @@ function logmanMarkup(state) {
     days.set(date, current);
     return days;
   }, new Map())].map(([datum, value]) => ({ datum, wert: value.sum / value.count }));
-  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-logman-card><header><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch kein Import'}</small></span></header><div class="body-v2-card-body">${detailErklaerung('So wird Leistung eingeordnet', 'Importierte LOGMAN-Daten zeigen, ob deine vergleichbare Trainingsleistung eher steigt, fällt oder stabil bleibt. COMP nutzt das nur als Zusatzsignal, nicht als alleinigen Beweis.')}${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} importierte Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Importiere einen LOGMAN-Export über den Hinzufügen-Button.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten importierten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}<button class="body-reset-mini" type="button" data-reset-body="logman">LOGMAN-Importe zurücksetzen</button></div></section>`;
+  return `<section class="body-v2-card ${SPECIAL_DEX_CLASSES.content}" data-logman-card><header><span><b>LOGMAN-Leistung</b><small>${state.performance.length ? `${state.performance.length} Werte · ${trend.percent > 0 ? '+' : ''}${display(trend.percent)} %` : 'Noch keine Werte'}</small></span></header><div class="body-v2-card-body">${detailErklaerung('So wird Leistung eingeordnet', 'Die LOGMAN-Daten zeigen, ob deine vergleichbare Trainingsleistung eher steigt, fällt oder stabil bleibt. COMP nutzt das nur als Zusatzsignal, nicht als alleinigen Beweis.')}${state.performance.length ? `<div class="body-latest-value"><small>VERGLEICHBARER TREND</small><strong>${trend.percent > 0 ? '+' : ''}${display(trend.percent)} <b>%</b></strong><span>${trend.comparableSessions} Leistungswerte</span></div>` : '<div class="body-chart-empty"><b>Noch keine LOGMAN-Daten</b><span>Verbinde LOGMAN im Profil, dann kommen deine Sätze automatisch. Eine Exportdatei kannst du weiter über den Hinzufügen-Button importieren.</span></div>'}<div class="body-chart-block"><header><b>VERLAUF</b><small>Leistungsindex · erster Wert = 100</small></header>${curveSvg([{ values: daily, className: 'trend', points: true }], { unit: '%' })}</div>${infoDetails('Wie wird Leistung verwendet?', `${BODY_EXPLANATIONS.performance} Der Verlauf normalisiert jede Übung auf ihren ersten Wert. Dadurch werden unterschiedliche Übungen nicht als absolute Kilogrammwerte miteinander vermischt.`)}<button class="body-reset-mini" type="button" data-reset-body="logman">Manuelle LOGMAN-Importe löschen</button></div></section>`;
 }
+
+// Zurücksetzen-Knöpfe auf COMP: Tabelle, Text und bei LOGMAN nur die Zeilen
+// einer Quelle (manueller Import), nie die automatisch abgeglichenen.
+export const COMP_ZURUECKSETZEN = {
+  weights: { table: 'weights', label: 'alle Gewichtswerte', toast: 'Gewichtsverlauf zurückgesetzt' },
+  skinfolds: { table: 'skinfolds', label: 'alle 13-Falten-Messungen', toast: '13-Falten-Werte zurückgesetzt' },
+  waist: { table: 'waist_measurements', label: 'alle Taillenmessungen', toast: 'Taillenumfang zurückgesetzt' },
+  // Nur manuelle Importe (Exportdatei). Die automatisch abgeglichenen Werte
+  // bleiben: Ein unveränderter LOGMAN-Stand schreibt sie nicht neu.
+  // Danach neu abgleichen: Ein gelöschter Import kann eine abgeglichene Zeile
+  // ersetzt haben, die sonst als Lücke bliebe.
+  logman: { table: 'logman_performance', nurQuelle: 'LOGMAN-Import', danachNeuAbgleichen: true, label: 'alle manuell importierten LOGMAN-Werte (Exportdatei); automatisch abgeglichene bleiben', toast: 'Manuelle LOGMAN-Importe gelöscht' },
+};
 
 export async function mountBodyMetrics(container, { session, profile, onProfileUpdated, signal, onRendered }) {
   const userId = session.user.id;
   let state;
   let activeRender = null;
   let renderQueued = false;
-  let assessmentSequence = 0;
-
-  // Zeigt eine Bewertung (gespeichert oder frisch) samt Knopf „Neu bewerten“.
-  const showCentralAssessment = (panel, result, status, optionaleSchritte) => {
-    panel.innerHTML = compResultMarkup(result, { status, optionaleSchritte: result?.optionalInsights || optionaleSchritte });
-    panel.querySelector('[data-comp-coach]')?.addEventListener('click', async () => {
-      const { openCoachQuestion } = await import('./coach.js');
-      openCoachQuestion({ question: compCoachFrage(result), senden: true });
-    });
-    panel.querySelector('[data-comp-neu]')?.addEventListener('click', reassessCentral);
-    const heroStatus = container.querySelector('[data-comp-hero-status]');
-    const heroConfidence = container.querySelector('[data-comp-hero-confidence]');
-    if (heroStatus) heroStatus.textContent = result?.status || result?.title || 'Gesamtbild aktualisiert';
-    if (heroConfidence) heroConfidence.textContent = datensicherheit(result?.confidence);
-  };
-
-  const showAssessmentError = (panel, error, retry) => {
-    panel.innerHTML = `<header><span><small>ZENTRALE KI-AUSWERTUNG</small><h2>Aktuelle Gesamtbewertung</h2></span><span class="comp-assessment-meta">${coachIconMarkup('coach-cap-badge')}<em>nicht verfügbar</em></span></header><div class="comp-assessment-error"><p>Die berechneten Fakten bleiben verfügbar. Die verständliche Gesamtbewertung konnte gerade nicht geladen werden.</p><button type="button" data-comp-retry>Erneut versuchen</button></div>`;
-    panel.querySelector('[data-comp-retry]').onclick = retry;
-    console.warn('COMP-Gesamtbewertung nicht geladen:', error);
-  };
-
-  // Beim Öffnen und nach jeder neuen Messung: nur die zuletzt gespeicherte
-  // Bewertung lesen. Das kostet keine KI-Anfrage.
-  const loadCentralAssessment = async () => {
-    const panel = container.querySelector('[data-comp-assessment]');
-    if (!panel || !state) return;
-    const sequence = ++assessmentSequence;
-    try {
-      const saved = await loadLatestCompAssessment(userId);
-      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      if (!saved) {
-        panel.innerHTML = compAssessmentEmptyMarkup();
-        panel.querySelector('[data-comp-neu]')?.addEventListener('click', reassessCentral);
-        return;
-      }
-      showCentralAssessment(panel, saved.result, compStand(saved.createdAt), optionaleSchritteFuer(state));
-    } catch (error) {
-      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      showAssessmentError(panel, error, loadCentralAssessment);
-    }
-  };
-
-  // Nur per Knopf: Der Server bewertet neu, wenn sich die Daten seit der
-  // letzten Bewertung geändert haben, sonst liefert er sie unverändert.
-  async function reassessCentral() {
-    const panel = container.querySelector('[data-comp-assessment]');
-    if (!panel || !state) return;
-    const sequence = ++assessmentSequence;
-    panel.innerHTML = compAssessmentWorkingMarkup();
-    try {
-      const context = getPreference(HAUTFALTEN_CONTEXT_PREFERENCE, {}) || {};
-      const optionaleSchritte = optionaleSchritteFuer(state);
-      const response = await requestCompAssessment(buildCompEvidence(state, context, optionaleSchritte));
-      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      const status = response.cached === true ? `UNVERÄNDERT · ${compStand(response.createdAt)}` : 'NEU BEWERTET';
-      showCentralAssessment(panel, response.result, status.replace(/ · $/, ''), optionaleSchritte);
-    } catch (error) {
-      if (signal?.aborted || sequence !== assessmentSequence || !container.contains(panel)) return;
-      showAssessmentError(panel, error, reassessCentral);
-    }
-  }
 
   const renderOnce = async () => {
     state = await queryState(userId, signal);
@@ -1054,7 +963,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const markup = `
       ${bodyHeroMarkup(state)}
       ${compFactsMarkup(state)}
-      ${compAssessmentMarkup()}
+      ${compOptionalKarteMarkup(optionaleSchritteFuer(state))}
       ${compDetailsMarkup(state)}`;
     const content = container.querySelector(':scope > .body-metrics-wrap > .kategorie-scrollinhalt');
     if (content) {
@@ -1072,7 +981,6 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     const pageMeta = container.querySelector('[data-food-scroll-meta]');
     if (pageMeta) pageMeta.textContent = `${state.weights.length} ${state.weights.length === 1 ? 'Wiegung' : 'Wiegungen'}`;
     bind();
-    loadCentralAssessment();
     // Nach jedem Re-Render bekommt main.js die Chance, den dex-eintraege-Slot
     // (Update-Hinweis mit eigenen COMP-Notizen) wieder anzuhängen und
     // renderDexEntries darauf loszulassen. Sonst überlebt der Slot nur den
@@ -1444,12 +1352,6 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       settings.innerHTML = `<div class="mess-einst body-reminder-settings"><label class="switchline mess-erinnerung-switch"><input type="checkbox" data-reminder-active${profile.falten_erinnerung ? ' checked' : ''}><i class="switchline-track"></i><span>Erinnerung aktiv</span></label><label class="mess-zeile"><span>alle</span><select class="input compact-input" data-reminder-weeks>${[2,3,4].map((weeks) => `<option value="${weeks}"${profile.falten_intervall_wochen === weeks ? ' selected' : ''}>${weeks} Wochen${weeks === 2 ? ' · kürzer als Seminar' : ''}</option>`).join('')}</select></label><label class="mess-zeile"><span>um</span><input class="input compact-input" type="time" value="${String(profile.falten_uhrzeit || '08:00').slice(0,5)}" data-reminder-time></label></div>`;
       settings.querySelectorAll('input,select').forEach((field) => { field.onchange = async () => { const values = { falten_erinnerung: settings.querySelector('[data-reminder-active]').checked, falten_intervall_wochen: Number(settings.querySelector('[data-reminder-weeks]').value), falten_uhrzeit: settings.querySelector('[data-reminder-time]').value, zeitzone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin' }; const { error } = await supabase.from('profiles').update(values).eq('id', userId); if (error) return toast('Einstellung nicht gespeichert'); Object.assign(profile, values); onProfileUpdated?.(profile); toast('Erinnerung gespeichert'); }; });
     }
-    const resetConfig = {
-      weights: { table: 'weights', label: 'alle Gewichtswerte', toast: 'Gewichtsverlauf zurückgesetzt' },
-      skinfolds: { table: 'skinfolds', label: 'alle 13-Falten-Messungen', toast: '13-Falten-Werte zurückgesetzt' },
-      waist: { table: 'waist_measurements', label: 'alle Taillenmessungen', toast: 'Taillenumfang zurückgesetzt' },
-      logman: { table: 'logman_performance', label: 'alle importierten LOGMAN-Leistungsdaten', toast: 'LOGMAN-Importe zurückgesetzt' },
-    };
     container.querySelectorAll('[data-falten-detail]').forEach((button) => {
       button.onclick = () => openFaltenDetail(button.dataset.faltenDetail);
     });
@@ -1461,12 +1363,23 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     });
     container.querySelectorAll('[data-reset-body]').forEach((button) => {
       button.onclick = async () => {
-        const config = resetConfig[button.dataset.resetBody];
+        const config = COMP_ZURUECKSETZEN[button.dataset.resetBody];
         if (!config || !confirm(`Wirklich ${config.label} löschen?`)) return;
-        const { error } = await supabase.from(config.table).delete().eq('user_id', userId);
+        let loeschen = supabase.from(config.table).delete().eq('user_id', userId);
+        if (config.nurQuelle) loeschen = loeschen.eq('source', config.nurQuelle);
+        const { error } = await loeschen;
         if (error) return toast('Daten konnten nicht gelöscht werden');
         notifyHomeCountsChanged('body');
         toast(config.toast);
+        if (config.danachNeuAbgleichen) {
+          try {
+            const { logmanNeuAufbauen } = await import('./logmanKopplung.js');
+            await logmanNeuAufbauen();
+          } catch (abgleichFehler) {
+            console.warn('LOGMAN-Neuabgleich nach dem Löschen:', abgleichFehler?.message);
+            toast('Gelöscht. Der Neuabgleich mit LOGMAN hat gerade nicht geklappt – tippe im Profil auf „Jetzt abgleichen“.');
+          }
+        }
         await render();
       };
     });

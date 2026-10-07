@@ -75,6 +75,14 @@ describe('LOGMAN-Abgleich: manuelle Importe schützen', () => {
       .toEqual(['LH Flachbankdrücken|HEAVYS', 'Kabelzug|MIDDLES']);
   });
 
+  it('schreibt den Wert wieder, sobald der manuelle Import gelöscht ist (Neuabgleich nach dem Löschen)', () => {
+    const mitImport = [zeile('2026-10-02', 'Kabelzug', 'LOGMAN-Import')];
+    expect(ohneFremdeZeilen(neu, mitImport).some((z) => z.exercise === 'Kabelzug' && z.category === 'HEAVYS')).toBe(false);
+    // „Manuelle LOGMAN-Importe löschen“ entfernt nur die Import-Zeile; danach ist der Schlüssel frei.
+    const nachDemLoeschen = mitImport.filter((z) => z.source !== 'LOGMAN-Import');
+    expect(ohneFremdeZeilen(neu, nachDemLoeschen).some((z) => z.exercise === 'Kabelzug' && z.category === 'HEAVYS')).toBe(true);
+  });
+
   it('behandelt Zeilen ohne Quelle wie manuelle und lässt andere Tage frei', () => {
     expect(ohneFremdeZeilen(neu, [zeile('2026-10-02', 'Kabelzug', null)])).toHaveLength(2);
     expect(ohneFremdeZeilen(neu, [zeile('2026-10-01', 'Kabelzug', 'LOGMAN-Import')])).toHaveLength(3);

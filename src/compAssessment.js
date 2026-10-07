@@ -1,4 +1,3 @@
-import { supabase } from './supabase.js';
 import { confirmedTrendChange, evaluateBodyComp, weightTrendSummary } from './bodyComposition.js';
 import { performanceTrend } from './logmanImport.js';
 import { FALTEN, summe } from './measurements.js';
@@ -164,40 +163,4 @@ export function buildCompEvidence(state, context = {}, optionalSeminarGuidance =
       recommendationsMustUseAllowedActionId: true,
     },
   };
-}
-
-// Die zuletzt gespeicherte Gesamtbewertung, direkt aus der Datenbank. Kostet
-// keine KI-Anfrage; neu bewertet wird nur per Knopf (requestCompAssessment).
-export async function loadLatestCompAssessment(userId) {
-  const { data, error } = await supabase.from('ai_coach_analyses').select('result,created_at')
-    .eq('user_id', userId).eq('scope', 'comp').order('created_at', { ascending: false }).limit(1).maybeSingle();
-  if (error) throw error;
-  return data?.result ? { result: data.result, createdAt: data.created_at } : null;
-}
-
-export async function requestCompAssessment(evidence) {
-  const { data, error } = await supabase.functions.invoke('capboy-coach', {
-    body: { scope: 'comp', mode: 'ensure', evidence },
-  });
-  if (error) {
-    let message = error.message;
-    try {
-      const payload = await error.context?.clone?.().json();
-      if (payload?.error) message = payload.error;
-    } catch {}
-    throw new Error(message);
-  }
-  if (data?.error) throw new Error(data.error);
-  return data;
-}
-
-// "Mit Coach besprechen": COMP nennt die wichtigsten Schritte, der Coach
-// bespricht, wie man sie angeht. Die Frage nennt die Schritte wörtlich.
-export function compCoachFrage(result) {
-  const schritte = (result?.nextSteps || []).slice(0, 3).map((schritt, index) => `${index + 1}. ${String(schritt.action || '').slice(0, 400)}`);
-  return [
-    'Lass uns meine COMP-Gesamtbewertung besprechen.',
-    ...(schritte.length ? ['Die nächsten Schritte daraus:', ...schritte] : []),
-    'Wie gehe ich das konkret an, was ist dabei am wichtigsten, und was fehlt oder läuft bei mir noch nicht rund?',
-  ].join('\n');
 }

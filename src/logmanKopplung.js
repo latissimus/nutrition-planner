@@ -54,6 +54,18 @@ export async function logmanImHintergrundAbgleichen() {
   }
 }
 
+/* Nach dem Löschen manueller Importe in COMP (GPT-Review Schritt 6): Ein
+   manueller Import kann eine abgeglichene Zeile mit gleichem Schlüssel ersetzt
+   haben. Ein unveränderter LOGMAN-Stand schreibt sie beim normalen Abgleich
+   nicht neu; deshalb hier neu aufbauen, wie „Jetzt abgleichen“ im Profil.
+   Ohne Kopplung passiert nichts. aufruf: nur für Tests austauschbar. */
+export async function logmanNeuAufbauen({ aufruf = aufrufen } = {}) {
+  let verbunden = '';
+  try { verbunden = localStorage.getItem(VERBUNDEN_KEY) || ''; } catch {}
+  if (verbunden === 'nein') return { verbunden: false };
+  return merken(await aufruf({ aktion: 'abgleichen', erzwingen: true, neu: true }));
+}
+
 const zeit = (iso) => new Date(iso).toLocaleString('de-DE', {
   day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
 });

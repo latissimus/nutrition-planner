@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compOptionaleSchritte, compOptionalMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
+import { COMP_ZURUECKSETZEN, compOptionaleSchritte, compOptionalMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
 import { FALTEN, summe } from './measurements.js';
 import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
@@ -149,5 +149,18 @@ describe('COMP: optionale Schritte aus den Seminar-Auswertungen', () => {
     expect(markup).toContain('300 mg abends');
     expect(markup).toContain('500–1.000 mg');
     expect(markup).not.toContain('<ul><li><small>');
+    // Eigene Karte auf COMP: keine zweite Aufklapp-Ebene, kein KI-Hinweis mehr.
+    expect(markup).not.toContain('comp-optional-group');
+    expect(markup).not.toContain('Optionale Seminarhinweise');
+    expect(markup).not.toContain('KI');
+  });
+
+  it('löscht bei LOGMAN nur manuelle Importe, nie die automatisch abgeglichenen Werte', () => {
+    expect(COMP_ZURUECKSETZEN.logman).toMatchObject({ table: 'logman_performance', nurQuelle: 'LOGMAN-Import' });
+    expect(COMP_ZURUECKSETZEN.logman.label).toContain('automatisch abgeglichene bleiben');
+    expect(COMP_ZURUECKSETZEN.weights.nurQuelle).toBeUndefined();
+    // Danach wird neu abgeglichen, damit keine Lücke bleibt (logmanNeuAufbauen).
+    expect(COMP_ZURUECKSETZEN.logman.danachNeuAbgleichen).toBe(true);
+    expect(COMP_ZURUECKSETZEN.weights.danachNeuAbgleichen).toBeUndefined();
   });
 });

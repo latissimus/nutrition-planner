@@ -1,10 +1,10 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION } from './knowledge.ts';
-import { COACH_MODEL, SHARED_SAFETY, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
+import { COACH_MODEL, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
-import { reviewWeeks, sanitizeWeeklyReport, weeklyBlock, weeklyQuestion } from './weekly.ts';
-import { followThroughActions, switchedOffAreas } from './followThrough.ts';
+import { reviewWeeks, weeklyBlock } from './weekly.ts';
+import { switchedOffAreas } from './followThrough.ts';
 import webpush from 'npm:web-push@3.6.7';
 import { COACHING_SCHEMA, coachingBereinigen, coachingSystemPrompt, coachingText, coachingUserPrompt, geaenderteBereiche, hatNeueDaten } from './coaching.ts';
 import { trainingsAuswertung } from './training.js';
@@ -40,21 +40,6 @@ type Row = Record<string, any>;
 
 
 const sleep = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value as Row).sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, entry]) => [key, stableValue(entry)]));
-  }
-  return value;
-}
-
-async function fingerprint(value: unknown) {
-  const data = new TextEncoder().encode(JSON.stringify(stableValue(value)));
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
 
 async function openAi(path: string, init: RequestInit = {}) {
   const response = await fetch(`https://api.openai.com/v1${path}`, {
@@ -193,18 +178,6 @@ const RULE_CONTEXT_KEY = 'comp:hautfalten-kontext-v1';
 const VISIBLE_PAGES_KEY = 'muscledex:sichtbare-sammlungen';
 const SLEEP_PAGE_MIGRATED_KEY = 'muscledex:sleep-dex-sichtbarkeit-v1';
 
-// The areas COMP looks at together; switched-off areas are named once and
-// left out. With every area on the sentence is the same as before.
-const AREA_NAMES: Record<string, string> = { nutrition: 'Ernährung', sleep: 'Schlaf', routines: 'Routinen' };
-const germanList = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} und ${items.at(-1)}` : items[0] || '');
-function compAreaText(off: string[]) {
-  const offNames = off.map((area) => AREA_NAMES[area]).filter(Boolean);
-  const areas = ['Körpermaße', 'Ernährung', 'Schlaf', 'Erholung', 'Routinen', 'Training'].filter((name) => !offNames.includes(name));
-  const text = `Betrachte alle Bereiche zusammen: ${germanList(areas)}.`;
-  return offNames.length
-    ? `${text} Im Profil ausgeschaltet hat die Person: ${germanList(offNames)} (switchedOffAreas). Dazu gibt es bewusst keine Daten: Bewerte nichts daraus, erwähne es nicht, auch nicht als fehlende Daten, und schlage dort weder Protokollieren noch Messen vor.`
-    : text;
-}
 
 // Loads the rows for the shared context. The time series needs twelve weeks;
 // buildCompFacts cuts the rows back to the previous windows and limits.
@@ -290,15 +263,6 @@ async function saveTurn(userId: string, conversationId: string, question: string
   return !error;
 }
 
-// Running experiments for the central COMP assessment, in the coach's form,
-// so COMP does not propose a change in a domain that already has one.
-// Without the table (migration not applied) there are none.
-async function loadRunningExperiments(userId: string, today: string, timeseries: Row) {
-  const { data, error } = await admin.from('coach_interventions').select(INTERVENTION_COLUMNS).eq('user_id', userId)
-    .eq('status', 'aktiv').order('start_date', { ascending: false }).limit(MEMORY_LIMITS.interventions);
-  if (error) console.error('CAPBOY running experiments unavailable', error);
-  return error ? '' : interventionBlock(data || [], today, timeseries);
-}
 
 // Weekly check-in (step 7): the latest review before the reviewed week, for
 // its focus. Without the table (migration not applied) there is none.
@@ -319,45 +283,6 @@ async function saveWeeklyReview(userId: string, weekly: Row, report: Row, result
   return !error;
 }
 
-const compResultSchema = {
-  type: 'object',
-  additionalProperties: false,
-  properties: {
-    title: { type: 'string' },
-    status: { type: 'string' },
-    confidence: { type: 'string', enum: ['niedrig', 'mittel', 'hoch'] },
-    keyDevelopment: { type: 'string' },
-    basis: { type: 'array', maxItems: 4, items: { type: 'string' } },
-    uncertainty: { type: 'array', maxItems: 3, items: { type: 'string' } },
-    nextSteps: {
-      type: 'array', maxItems: 3,
-      items: {
-        type: 'object', additionalProperties: false,
-        properties: {
-          actionId: { type: 'string' }, action: { type: 'string' }, rationale: { type: 'string' }, timeframe: { type: 'string' },
-        },
-        required: ['actionId', 'action', 'rationale', 'timeframe'],
-      },
-    },
-    optionalInsights: {
-      type: 'array', maxItems: 2,
-      items: {
-        type: 'object', additionalProperties: false,
-        properties: { guidanceId: { type: 'string' }, summary: { type: 'string' } },
-        required: ['guidanceId', 'summary'],
-      },
-    },
-    sources: {
-      type: 'array', maxItems: 5,
-      items: {
-        type: 'object', additionalProperties: false,
-        properties: { title: { type: 'string' }, filename: { type: 'string' }, page: { type: ['integer', 'null'] } },
-        required: ['title', 'filename', 'page'],
-      },
-    },
-  },
-  required: ['title', 'status', 'confidence', 'keyDevelopment', 'basis', 'uncertainty', 'nextSteps', 'optionalInsights', 'sources'],
-};
 
 function webSources(response: Row) {
   const cited: Row[] = [];
@@ -416,58 +341,6 @@ function safeOptionalSummary(value: unknown, fallback: unknown) {
   return summary || String(fallback || 'Diese Seminar-Auswertung ergänzt das Gesamtbild als optionale Orientierung.').slice(0, 600);
 }
 
-function enforceCompSafety(result: Row, evidence: Row, followThrough: Row | null = null) {
-  const allowed = new Map((evidence?.allowedActions || []).map((item: Row) => [item.id, item]));
-  const steps = (result?.nextSteps || []).flatMap((step: Row) => {
-    const authoritative = allowed.get(step.actionId);
-    if (!authoritative) return [];
-    return [{
-      actionId: step.actionId,
-      action: authoritative.action,
-      rationale: String(step.rationale || '').slice(0, 500),
-      timeframe: String(step.timeframe || '').slice(0, 120),
-    }];
-  });
-  // An open point always comes first: if the model named none, the most
-  // important one is put in front.
-  const [firstCheck] = followThrough?.checks || [];
-  const namesOpenPoint = steps.some((step: Row) => String(step.actionId).startsWith('umsetzung-'));
-  if (firstCheck && !namesOpenPoint && allowed.has(`umsetzung-${firstCheck.id}`)) {
-    steps.unshift({
-      actionId: `umsetzung-${firstCheck.id}`,
-      action: firstCheck.action,
-      rationale: FOLLOW_THROUGH_REASONS[firstCheck.kind] || '',
-      timeframe: 'die nächsten 14 Tage',
-    });
-  }
-  const nextSteps = steps.slice(0, 3);
-  const modelSummaries = new Map((result?.optionalInsights || []).map((item: Row) => [String(item.guidanceId || ''), String(item.summary || '').slice(0, 600)]));
-  const optionalInsights = (evidence?.optionalSeminarGuidance || []).slice(0, 2).map((item: Row) => ({
-    guidanceId: String(item.id || ''),
-    bereich: String(item.bereich || '').slice(0, 160),
-    titel: String(item.titel || '').slice(0, 160),
-    summary: safeOptionalSummary(modelSummaries.get(String(item.id || '')), item.zusammenhang),
-    punkte: (item.punkte || []).map(String).slice(0, 5),
-    dosierungen: (item.dosierungen || []).slice(0, 16).map((dose: Row) => ({
-      name: String(dose.name || '').slice(0, 160),
-      dosierung: String(dose.dosierung || '').slice(0, 240),
-      protokoll: String(dose.protokoll || '').slice(0, 200),
-      optional: dose.optional === true,
-    })),
-    karte: String(item.karte || '').slice(0, 120),
-  })).filter((item: Row) => item.guidanceId && (item.punkte.length || item.dosierungen.length));
-  return {
-    title: String(result?.title || 'Aktuelle Gesamtbewertung').slice(0, 120),
-    status: String(result?.status || 'Gesamtbild noch unklar').slice(0, 72),
-    confidence: ['niedrig', 'mittel', 'hoch'].includes(result?.confidence) ? result.confidence : 'niedrig',
-    keyDevelopment: String(result?.keyDevelopment || '').slice(0, 1200),
-    basis: (result?.basis || []).map(String).slice(0, 4),
-    uncertainty: (result?.uncertainty || []).map(String).slice(0, 3),
-    nextSteps,
-    optionalInsights,
-    sources: validateSources(result?.sources || []),
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Tägliches Coaching um 21 Uhr (COACHING-PLAN.md, Schritt 3)
@@ -813,94 +686,35 @@ Deno.serve(async (request) => {
 
   try {
     const body = await request.json();
-    const requestedScope = String(body?.scope || 'coach') as Scope;
-    const scope: Scope = ['coach', 'sleep', 'comp', 'skinfold', 'overall'].includes(requestedScope) ? requestedScope : 'coach';
-    // A weekly check-in asks no question of its own; the app names the week.
-    const weeklyMode = scope === 'coach' && body?.mode === 'weekly';
-    const question = weeklyMode ? '' : String(body?.question || '').trim().slice(0, 2000);
-    if (scope === 'coach' && !weeklyMode && question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
-    const webResearch = scope === 'coach' && body?.webResearch === true;
-    const imageDataUrls = scope === 'coach' && Array.isArray(body?.attachments)
+    // Seit Schritt 6 des Coaching-Plans gibt es hier nur noch den Chat. Die
+    // Seiten-Auswertungen (COMP „Neu bewerten“, Schlaf, Hautfalten, Gesamtbild)
+    // und die Wochenbilanz im Chat sind entfallen: Bewertet wird im täglichen
+    // Coaching und montags im Wochen-Coaching (Zeitplan oben).
+    if (String(body?.scope || 'coach') !== 'coach' || body?.mode === 'weekly') {
+      return json({ error: 'Diese Auswertung gibt es nicht mehr. Bewertet wird jeden Abend im Coaching; Fragen beantwortet der Coach im Chat.' }, 410);
+    }
+    const scope: Scope = 'coach';
+    const question = String(body?.question || '').trim().slice(0, 2000);
+    if (question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
+    const webResearch = body?.webResearch === true;
+    const imageDataUrls = Array.isArray(body?.attachments)
       ? body.attachments.slice(0, 1).flatMap((attachment: Row) => {
         const value = String(attachment?.dataUrl || '');
         return /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value) && value.length <= 3_000_000 ? [value] : [];
       })
       : [];
 
-    // Shared context: the same facts and time series for coach and COMP.
+    // Dieselben Fakten und Zeitreihen wie im Coaching.
     const now = new Date();
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
-    // Weekly check-in: the last completed week against the one before, with
-    // the user's report and the focus of the previous review.
-    const reviewed = weeklyMode ? reviewWeeks(timeseries) : null;
-    if (weeklyMode && !reviewed) return json({ error: 'Es gibt noch keine abgeschlossene Woche für eine Bilanz.' }, 400);
-    // Only the free coach has memory. A conversation continues when the client
-    // sends its id; otherwise a new one begins. A weekly check-in always
-    // begins one, so follow-up questions continue from the review.
-    const conversationId = scope === 'coach' ? (!weeklyMode && isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID()) : null;
-    const memory = conversationId ? await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries) : null;
-    const weeklyReport = weeklyMode ? sanitizeWeeklyReport(body?.weekly, memory?.interventions || []) : null;
-    const weekly = reviewed ? weeklyBlock(timeseries, weeklyReport, await loadPreviousReview(userId, reviewed.current.week), memory?.interventions || []) : null;
-    const coachQuestion = weekly ? weeklyQuestion(weekly.week) : question;
-    const clientEvidence = scope === 'comp' && body?.evidence && typeof body.evidence === 'object'
-      ? body.evidence as Row : null;
-    if (clientEvidence && JSON.stringify(clientEvidence).length > 120_000) return json({ error: 'Die COMP-Daten sind zu umfangreich.' }, 413);
-    const isCentralComp = scope === 'comp' && clientEvidence;
-    // Central COMP: what is missing or not followed through comes before the
-    // skinfold catalogue, and COMP knows the running experiments.
-    const compEvidence = isCentralComp ? {
-      ...clientEvidence,
-      allowedActions: [
-        ...followThroughActions(timeseries.followThrough),
-        ...(Array.isArray(clientEvidence!.allowedActions) ? clientEvidence!.allowedActions : []),
-      ],
-    } : null;
-    const runningExperiments = isCentralComp ? await loadRunningExperiments(userId, now.toISOString().slice(0, 10), timeseries) : '';
-
-    const canonicalSnapshot = { ...snapshot } as Row;
-    delete canonicalSnapshot.generatedAt;
-    const canonicalEvidence = clientEvidence ? { ...clientEvidence } : null;
-    if (canonicalEvidence) delete canonicalEvidence.generatedAt;
-    // Only the central COMP assessment reads the time series; the cache keys
-    // of the other scopes stay as they were.
-    const inputFingerprint = await fingerprint(isCentralComp
-      ? { scope, snapshot: canonicalSnapshot, timeseries, evidence: canonicalEvidence, experiments: runningExperiments }
-      : { scope, snapshot: canonicalSnapshot, evidence: canonicalEvidence });
-
-    if (scope === 'comp' && body?.mode === 'ensure') {
-      const { data: cached } = await admin.from('ai_coach_analyses').select('result,created_at,source_manifest')
-        .eq('user_id', userId).eq('scope', 'comp').eq('input_fingerprint', inputFingerprint).maybeSingle();
-      if (cached?.result) return json({ result: cached.result, scope, period: snapshot.period, cached: true, createdAt: cached.created_at });
-    }
-
+    // Ein Gespräch geht weiter, wenn die App seine id schickt; sonst beginnt ein neues.
+    const conversationId = isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID();
+    const memory = await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries);
     const vectorStoreId = await ensureKnowledgeBase();
 
-    const requestBody = isCentralComp ? {
-      model: COACH_MODEL,
-      instructions: `Du erstellst die einzige sichtbare Gesamtbewertung auf der CAPBOY-COMP-Seite. ${SHARED_SAFETY}
-
-Formuliere knapp und verständlich: genau eine wichtigste Entwicklung, bis zu vier konkrete Grundlagen, bis zu drei Unsicherheiten und höchstens drei nächste Schritte. Jeder nächste Schritt MUSS eine actionId aus allowedActions verwenden. Übernimm den zugehörigen Aktionstext sinngleich; neue Maßnahmen sind verboten. Quellen dürfen nur aus der bereitgestellten Seminar-Wissensbasis stammen. Gib den exakten Dateinamen und, wenn im Dokument erkennbar, die Seite an. Der kurze Status muss im Hero funktionieren. Antworte auf Deutsch.
-
-${compAreaText(contextRows.switchedOffAreas || [])} Im Verlauf steht unter followThrough, was in den letzten 14 Tagen fehlt oder nicht umgesetzt wird, nach Wichtigkeit sortiert; die App hat das berechnet. Nenne diese Punkte in keyDevelopment, basis oder uncertainty und sag klar, was fehlt und warum es zählt, ohne Vorwurf. Gibt es solche Punkte, ist der erste nächste Schritt einer davon (actionId beginnt mit „umsetzung-“), in der Regel der erste der Liste: Fehlende Daten und fällige Messungen gehen neuen Maßnahmen vor, weil sich ohne sie nichts sicher beurteilen lässt. Schlage keine neue Änderung in einem Bereich vor, in dem schon ein Experiment läuft; ist eines fällig (reviewDue), nenne das.
-
-optionalSeminarGuidance enthält bereits regelbasiert ausgewählte Hinweise aus Hautfaltenmessung und Neurotransmitter-Test. Erstelle für jeden vorhandenen Eintrag genau ein optionalInsight mit derselben guidanceId und einer kurzen verständlichen Zusammenfassung, warum er im Gesamtbild relevant sein könnte. Diese Hinweise bleiben getrennt von nextSteps. Wiederhole keine Dosierung und erfinde keine: Namen und exakte Seminar-Dosierungen setzt der Server anschließend unverändert ein.`,
-      input: [{ role: 'user', content: `Erstelle die zentrale COMP-Gesamtbewertung. Nutze zuerst die deterministischen Ergebnisse und Gegenprüfungen, dann suche nur die dafür relevanten Seminarpassagen.\n\nServerseitiger Gesamtsnapshot:\n${JSON.stringify(snapshot)}\n\nWöchentlicher Verlauf der letzten 12 Wochen (deterministisch, dieselbe Grundlage wie beim Coach; Veränderungen stehen in summary und werden nicht selbst berechnet):\n${JSON.stringify(timeseries)}\n\nLaufende Experimente:\n${runningExperiments || 'keine'}\n\nDeterministische COMP-Berechnungen, Regel-Gegenprüfungen und zulässige Aktionen aus der App:\n${JSON.stringify(compEvidence)}` }],
-      reasoning: { effort: 'high' },
-      max_output_tokens: 6000,
-      tools: [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 8 }],
-      tool_choice: 'auto',
-      include: ['file_search_call.results'],
-      text: {
-        format: {
-          type: 'json_schema',
-          name: 'capboy_comp_assessment',
-          strict: true,
-          schema: compResultSchema,
-        },
-      },
-    } : coachRequestBody({ scope, question: coachQuestion, snapshot, timeseries, memory: memory?.blocks, weekly, webResearch, vectorStoreId, imageDataUrls });
+    const requestBody = coachRequestBody({ scope, question, snapshot, timeseries, memory: memory?.blocks, webResearch, vectorStoreId, imageDataUrls });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -911,34 +725,16 @@ optionalSeminarGuidance enthält bereits regelbasiert ausgewählte Hinweise aus 
     }
     const raw = outputText(responsePayload);
     if (!raw) return json({ error: 'Die Coach-Antwort war leer.' }, 502);
-    const parsed = JSON.parse(raw);
-    const result = isCentralComp ? enforceCompSafety(parsed, compEvidence!, timeseries.followThrough) : {
-      ...parsed,
+    const result = {
+      ...JSON.parse(raw),
       webResearchRequested: webResearch,
       webSources: webResearch ? webSources(responsePayload) : [],
     };
 
-    if (scope !== 'coach') {
-      const { error } = await admin.from('ai_coach_analyses').upsert({
-        user_id: userId,
-        scope,
-        result,
-        model: COACH_MODEL,
-        data_from: snapshot.period.from,
-        data_to: snapshot.period.to,
-        input_fingerprint: inputFingerprint,
-        source_manifest: isCentralComp ? result.sources : [],
-        knowledge_hash: KNOWLEDGE_VERSION,
-      }, { onConflict: 'user_id,scope,input_fingerprint' });
-      if (error) throw error;
-    }
-
-    const memorySaved = conversationId && memory?.available ? await saveTurn(userId, conversationId, coachQuestion, result) : false;
-    const weeklySaved = weekly ? await saveWeeklyReview(userId, weekly, weeklyReport!, result, memorySaved ? conversationId : null) : false;
+    const memorySaved = memory?.available ? await saveTurn(userId, conversationId, question, result) : false;
     return json({
       result, scope, period: snapshot.period, cached: false,
-      ...(conversationId ? { conversationId, memoryAvailable: Boolean(memory?.available), memorySaved } : {}),
-      ...(weekly ? { weekly: { week: weekly.week, from: weekly.from, to: weekly.to, previousWeek: weekly.previousWeek, comparison: weekly.comparison, saved: weeklySaved } } : {}),
+      conversationId, memoryAvailable: Boolean(memory?.available), memorySaved,
     });
   } catch (error) {
     console.error('CAPBOY coach failed', error);
