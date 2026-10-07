@@ -7,14 +7,15 @@ import { toast } from './toast.js';
 import { spracheVerschriftlichen } from './kiWerkzeuge.js';
 import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from './sprachaufnahme.js';
 import {
-  ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
+  ENTSCHEIDUNGEN, GEDAECHTNIS_ZIEL_KEY, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
 import { vergleichMarkup } from './coachWeekly.js';
 import { mountWochenKaertchen } from './wochenKaertchen.js';
 import { fensterMarkup } from './coachFenster.js';
+import { coachIconMarkup } from './menuIcons.js';
 import { sanduhrMarkup } from './sanduhr.js';
 import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
-import { alsGelesenMarkieren, alsUebernommenMerken, coachingKarteMarkup, istFrisch, neuestesCoaching } from './coaching.js';
+import { alsGelesenMarkieren, alsUebernommenMerken, coachingKarteMarkup, coachingNachId, istFrisch, neuestesCoaching } from './coaching.js';
 
 export { fensterMarkup };
 
@@ -26,6 +27,7 @@ const GESPRAECH_KEY = 'muscledex:coach-gespraech';
 // für die Sitzung; eine neue Sitzung beginnt mit „Frage“.
 const MODUS_KEY = 'muscledex:coach-modus';
 export const MODI = { frage: 'Frage', bewertung: 'Bewertung & Schritte' };
+const MODUS_ERKLAERUNG = { frage: 'Kurze, direkte Antwort', bewertung: 'Auswertung mit nächsten Schritten' };
 export function modusLesen() {
   try { return sessionStorage.getItem(MODUS_KEY) === 'bewertung' ? 'bewertung' : 'frage'; } catch { return 'frage'; }
 }
@@ -34,6 +36,8 @@ function modusSchreiben(modus) {
 }
 // Antworten ohne Modus stammen aus der Zeit vor dem Schalter: Bewertungen.
 export const antwortModus = (result) => (result?.modus === 'frage' ? 'frage' : 'bewertung');
+// Weltkugel für „Web“ (bis die eigenen Icons kommen).
+const WELTKUGEL = '<svg class="coach-web-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/></svg>';
 const SCHRITTE_FRAGE_MAX = 1000;
 const SCHRITTE_ANTWORT_MAX = 3000;
 const escapeHtml = (value = '') => String(value)
@@ -88,6 +92,43 @@ async function bildAnhang(file) {
   canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
   return { name: file.name, dataUrl: canvas.toDataURL('image/jpeg', 0.82) };
 }
+
+/* Anhang aus „Dateien“: Bilder wie bisher verkleinert, PDF unverändert als
+   Datei, Textdateien (.txt, .csv, .md) als Text. Ein Anhang je Nachricht. */
+export const ANHANG_GRENZEN = { pdfBytes: 5 * 1024 * 1024, textBytes: 400 * 1024, textZeichen: 40000 };
+const istPdf = (file) => file?.type === 'application/pdf' || /\.pdf$/i.test(file?.name || '');
+const istText = (file) => /^text\//.test(file?.type || '') || /\.(txt|csv|md)$/i.test(file?.name || '');
+const leseDatei = (file, als) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = () => reject(new Error('Die Datei konnte nicht gelesen werden.'));
+  if (als === 'text') reader.readAsText(file); else reader.readAsDataURL(file);
+});
+async function dateiAnhang(file) {
+  if (!file) throw new Error('Keine Datei ausgewählt.');
+  if (file.type?.startsWith('image/')) return { art: 'bild', ...(await bildAnhang(file)) };
+  if (istPdf(file)) {
+    if (file.size > ANHANG_GRENZEN.pdfBytes) throw new Error('Das PDF darf höchstens 5 MB groß sein.');
+    const dataUrl = String(await leseDatei(file, 'url')).replace(/^data:[^;,]*;base64,/, 'data:application/pdf;base64,');
+    return { art: 'pdf', name: file.name, dataUrl };
+  }
+  if (istText(file)) {
+    if (file.size > ANHANG_GRENZEN.textBytes) throw new Error('Die Textdatei ist zu groß.');
+    const text = String(await leseDatei(file, 'text'));
+    if (text.length > ANHANG_GRENZEN.textZeichen) throw new Error('Die Textdatei ist zu lang (höchstens 40.000 Zeichen).');
+    if (!text.trim()) throw new Error('Die Datei ist leer.');
+    return { art: 'text', name: file.name, text };
+  }
+  throw new Error('Diese Dateiart geht nicht. Möglich sind Bilder, PDF und Textdateien (.txt, .csv, .md).');
+}
+// So geht ein Anhang an den Server; der Hinweis steht unter deiner Nachricht.
+export function anhangFuerServer(anhang) {
+  if (!anhang) return null;
+  if (anhang.art === 'pdf') return { type: 'file', name: anhang.name, dataUrl: anhang.dataUrl };
+  if (anhang.art === 'text') return { type: 'text', name: anhang.name, text: anhang.text };
+  return { type: 'image', dataUrl: anhang.dataUrl };
+}
+export const anhangHinweis = (anhang) => (!anhang ? '' : anhang.art === 'bild' || !anhang.art ? 'Bild angehängt' : `Datei angehängt: ${anhang.name}`);
 
 // Eine Empfehlung; seit Schritt 6 mit Art und bei Experimenten mit
 // Hypothese, Ausgangswert, Zielgröße und Prüfdatum. Ältere Antworten ohne
@@ -196,7 +237,8 @@ export function resultMarkup(result, { merken = false, schritteGemacht = false }
 
 const kurz = (text, grenze) => (text.length > grenze ? `${text.slice(0, grenze - 1)}…` : text);
 // bezug: bei „Daraus Schritte machen“ die Frage, zu der die Schritte gehören.
-const nutzerText = (text, hatAnhang = false, bezug = '') => `<p>${escapeHtml(text)}</p>${bezug ? `<small>zu „${escapeHtml(kurz(bezug, 80))}“</small>` : ''}${hatAnhang ? '<small>Bild angehängt</small>' : ''}`;
+// anhang: Hinweis unter der Nachricht; ältere Runden kennen nur hatAnhang (Bild).
+const nutzerText = (text, anhang = '', bezug = '') => `<p>${escapeHtml(text)}</p>${bezug ? `<small>zu „${escapeHtml(kurz(bezug, 80))}“</small>` : ''}${anhang ? `<small>${escapeHtml(anhang === true ? 'Bild angehängt' : anhang)}</small>` : ''}`;
 
 /* Auftrag für „Daraus Schritte machen“ (GPT-Review 4b): Frage und Antwort
    gehen mit, damit es auch bei Antworten außerhalb der letzten acht
@@ -217,7 +259,7 @@ export function schritteAnfrage(runde) {
 // zusätzlich ihren Wochenvergleich.
 export function verlaufMarkup(runden = [], avatar = '') {
   if (!runden.length) return '';
-  return runden.map((runde, index) => fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(runde.frage, runde.hatAnhang, runde.bezug) })
+  return runden.map((runde, index) => fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(runde.frage, runde.anhang || runde.hatAnhang, runde.bezug) })
     + fensterMarkup({ runde: index, inhalt: `${runde.weekly ? vergleichMarkup(runde.weekly) : ''}${resultMarkup(runde.result, { merken: true, schritteGemacht: runde.schritteGemacht })}` })).join('');
 }
 
@@ -295,6 +337,12 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   // Server das Coaching abgelegt hat; Rückfragen kennen es dadurch.
   let coaching = null;
   try { coaching = await neuestesCoaching(userId); } catch (error) { console.warn('Coaching nicht geladen:', error?.message); }
+  // Ein früheres Coaching, im Gedächtnis geöffnet: Seine Karte steht über
+  // seinem Gespräch, und ein neueres verdrängt es nicht.
+  if (gespraech?.id && coaching?.id !== gespraech.id) {
+    const frueher = await coachingNachId(userId, gespraech.id).catch(() => null);
+    if (frueher?.status === 'bereit') coaching = frueher;
+  }
   if (coaching?.status === 'bereit' && !coaching.gelesen_am && istFrisch(coaching) && !pending.question && gespraech?.id !== coaching.id) {
     gespraech = { id: coaching.id, runden: [] };
     gespraechSchreiben(gespraech);
@@ -307,32 +355,43 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const avatar = nutzerAvatarMarkup(coachProfile, (await supabase.auth.getUser()).data?.user?.email || '');
   container.classList.add('coach-page');
   // Zurück und Gedächtnis sitzen im App-Kopf (main.js); ein neues Gespräch
-  // beginnt über das Plus-Menü der Eingabe.
+  // beginnt über das Plus-Menü der Eingabe. Die Eingabe hat eine
+  // Werkzeugzeile (Rückmeldung 07.10.): oben das Schreibfeld, darunter Plus,
+  // Webwissen, Modus und Mikro/Senden.
   container.innerHTML = `<main class="coach-shell coach-chat">
     <section class="coach-answer" data-coach-answer aria-live="polite"></section>
     <section class="coach-woche" data-coach-woche hidden></section>
     <form class="coach-form" data-coach-form>
       <div class="coach-form-innen">
-        <div class="coach-compose-tools coach-menue" data-coach-tools hidden>
-          <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-foto">${materialIconMarkup('add_photo_alternate')}</span><span>Foto anhängen</span><input type="file" accept="image/*" data-coach-file></label>
-          <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-web">${materialIconMarkup('search')}</span><span>Webwissen</span><input type="checkbox" role="switch" data-coach-web checked><i class="coach-menue-schalter" aria-hidden="true"></i></label>
-          <button class="coach-menue-zeile" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}><span class="coach-menue-symbol ist-neu">${materialIconMarkup('edit')}</span><span>Neues Gespräch</span></button>
+        <div class="coach-compose-tools coach-menue" data-coach-tools data-ansicht="werkzeuge" hidden>
+          <div class="coach-menue-werkzeuge">
+            <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-kamera">${materialIconMarkup('photo_camera')}</span><span class="coach-menue-text">Kamera</span><input type="file" accept="image/*" capture="environment" data-coach-file></label>
+            <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-foto">${materialIconMarkup('add_photo_alternate')}</span><span class="coach-menue-text">Fotos</span><input type="file" accept="image/*" data-coach-file></label>
+            <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-datei">${materialIconMarkup('upload_file')}</span><span class="coach-menue-text">Dateien</span><input type="file" accept="application/pdf,.pdf,text/plain,.txt,text/csv,.csv,text/markdown,.md,image/*" data-coach-file></label>
+            <div class="coach-menue-trenner" role="presentation"></div>
+            <button class="coach-menue-zeile" type="button" data-fruehere-coachings><span class="coach-menue-symbol ist-coachings">${materialIconMarkup('menu_book')}</span><span class="coach-menue-text">Frühere Coachings</span></button>
+            <button class="coach-menue-zeile" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}><span class="coach-menue-symbol ist-neu">${materialIconMarkup('edit')}</span><span class="coach-menue-text">Neues Gespräch</span></button>
+          </div>
           <div class="coach-menue-modi" role="radiogroup" aria-label="Modus">
-            ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-menue-zeile"><span class="coach-menue-symbol ist-${wert}">${wert === 'frage' ? '<b>?</b>' : materialIconMarkup('target')}</span><span>${escapeHtml(text)}</span><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><i class="coach-menue-haken" aria-hidden="true">${materialIconMarkup('check_small')}</i></label>`).join('')}
+            ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-menue-zeile"><span class="coach-menue-symbol ist-${wert}">${wert === 'frage' ? '<b>?</b>' : materialIconMarkup('target')}</span><span class="coach-menue-text">${escapeHtml(text)}<small>${escapeHtml(MODUS_ERKLAERUNG[wert])}</small></span><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><i class="coach-menue-haken" aria-hidden="true">${materialIconMarkup('check_small')}</i></label>`).join('')}
           </div>
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
-        <div class="coach-inputbar">
-          <button class="coach-modus" type="button" data-coach-modus></button>
-          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Foto, Webwissen, neues Gespräch oder Modus"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
+        <div class="coach-inputbar coach-eingabe-karte">
           <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
           <div class="coach-aufnahme" data-coach-aufnahme hidden>
             <button class="coach-aufnahme-weg" type="button" data-aufnahme-verwerfen aria-label="Aufnahme verwerfen">${materialIconMarkup('close', 'coach-eingabe-icon')}</button>
             <div class="coach-aufnahme-feld" aria-live="polite"><i class="coach-aufnahme-punkt" aria-hidden="true"></i><b data-aufnahme-zeit>0:00</b><span data-aufnahme-text>Aufnahme läuft</span></div>
           </div>
-          <button class="coach-mikro" type="button" data-coach-mikro aria-label="Sprachnachricht aufnehmen">${materialIconMarkup('mic', 'coach-eingabe-icon')}</button>
-          <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('arrow_forward_ios', 'coach-eingabe-icon')}</button>
+          <div class="coach-werkzeugzeile">
+            <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Foto oder neues Gespräch"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
+            <label class="coach-web-pille"><input type="checkbox" role="switch" data-coach-web checked>${WELTKUGEL}<span>Web</span></label>
+            <button class="coach-modus-pille" type="button" data-coach-modus aria-expanded="false"><span data-coach-modus-text></span>${materialIconMarkup('chevron_right', 'coach-modus-pfeil')}</button>
+            <span class="coach-werkzeugzeile-rest"></span>
+            <button class="coach-mikro" type="button" data-coach-mikro aria-label="Sprachnachricht aufnehmen">${materialIconMarkup('mic', 'coach-eingabe-icon')}</button>
+            <button class="coach-send" type="submit" aria-label="Senden">${materialIconMarkup('arrow_forward_ios', 'coach-eingabe-icon')}</button>
+          </div>
         </div>
       </div>
     </form>
@@ -343,20 +402,21 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const neuesGespraech = form.querySelector('[data-neues-gespraech]');
   const tools = form.querySelector('[data-coach-tools]');
   const plus = form.querySelector('[data-coach-plus]');
-  const fileInput = form.querySelector('[data-coach-file]');
+  const dateiFelder = [...form.querySelectorAll('[data-coach-file]')];
   const webOption = form.querySelector('[data-coach-web]');
   const attachmentBox = form.querySelector('[data-coach-attachment]');
-  plus.classList.add('hat-web');
 
   // Modus: Das Kennzeichen an der Eingabe zeigt ihn und schaltet per Tipp um;
   // im Plus-Menü steht dieselbe Wahl.
   let modus = modusLesen();
   const modusKnopf = form.querySelector('[data-coach-modus]');
+  // Der Platzhalter nennt den Modus mit.
+  const PLATZHALTER = { frage: 'Frage an den Coach', bewertung: 'Was soll der Coach bewerten?' };
   const modusZeigen = () => {
-    const anderer = modus === 'frage' ? 'bewertung' : 'frage';
-    modusKnopf.className = `coach-modus ist-${modus}`;
-    modusKnopf.textContent = MODI[modus];
-    modusKnopf.setAttribute('aria-label', `Modus: ${MODI[modus]}. Antippen wechselt zu ${MODI[anderer]}.`);
+    modusKnopf.className = `coach-modus-pille ist-${modus}`;
+    modusKnopf.querySelector('[data-coach-modus-text]').textContent = MODI[modus];
+    modusKnopf.setAttribute('aria-label', `Modus: ${MODI[modus]}. Antippen zum Wechseln.`);
+    field.placeholder = PLATZHALTER[modus];
     form.querySelectorAll('[data-coach-modus-wahl]').forEach((wahl) => { wahl.checked = wahl.value === modus; });
   };
   const modusSetzen = (neu) => {
@@ -364,7 +424,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     modusSchreiben(modus);
     modusZeigen();
   };
-  modusKnopf.onclick = () => modusSetzen(modus === 'frage' ? 'bewertung' : 'frage');
+  // Die Pille öffnet dasselbe Menü wie das Plus, aber mit den zwei Modi.
+  modusKnopf.onclick = () => menueZeigen(!tools.hidden && tools.dataset.ansicht === 'modus' ? null : 'modus');
   form.querySelectorAll('[data-coach-modus-wahl]').forEach((wahl) => {
     wahl.onchange = () => { modusSetzen(wahl.value); werkzeugeZeigen(false); };
   });
@@ -413,7 +474,9 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const karteSichtbar = () => coaching?.status === 'bereit'
     && (gespraech?.id === coaching.id || (!runden.length && !karteAusgeblendet && istFrisch(coaching)));
   const statusSichtbar = () => Boolean(coaching) && coaching.status !== 'bereit' && !karteAusgeblendet && istFrisch(coaching);
-  const kopf = () => (karteSichtbar() || statusSichtbar() ? coachingKarteMarkup(coaching) : '');
+  // Wie jede Coach-Nachricht trägt die Karte das Coach-Zeichen links daneben.
+  const kopf = () => (karteSichtbar() || statusSichtbar()
+    ? `<div class="coaching-zeile">${coachIconMarkup('coach-chat-cap')}${coachingKarteMarkup(coaching)}</div>` : '');
   const zeichnen = (zusatz = '') => {
     answer.innerHTML = kopf() + (runden.length ? verlaufMarkup(runden, avatar) : (karteSichtbar() ? '' : startMarkup(start))) + zusatz;
     if (karteSichtbar()) alsGelesenMarkieren(coaching);
@@ -433,31 +496,55 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   });
   const renderAttachment = () => {
     attachmentBox.hidden = !anhang;
-    attachmentBox.innerHTML = anhang ? `<img src="${anhang.dataUrl}" alt=""><span>${escapeHtml(anhang.name)}</span><button type="button" data-remove-attachment aria-label="Anhang entfernen">×</button>` : '';
+    const vorschau = anhang?.art === 'bild' ? `<img src="${anhang.dataUrl}" alt="">` : materialIconMarkup('upload_file', 'coach-anhang-symbol');
+    attachmentBox.innerHTML = anhang ? `${vorschau}<span>${escapeHtml(anhang.name)}</span><button type="button" data-remove-attachment aria-label="Anhang entfernen">×</button>` : '';
   };
-  // Plus-Menü wie in Apple Nachrichten: Der Chat dahinter wird unscharf.
-  const werkzeugeZeigen = (offen) => {
-    tools.hidden = !offen;
-    plus.setAttribute('aria-expanded', String(offen));
-    container.classList.toggle('menue-offen', offen);
+  /* Menü wie in Apple Nachrichten, der Chat dahinter wird unscharf. Das Plus
+     zeigt Kamera, Fotos, Dateien, Frühere Coachings und Neues Gespräch, die
+     Modus-Pille die zwei Modi. Das Menü steht über dem Knopf, der es öffnet,
+     und wächst aus ihm heraus; eine offene Tastatur schließt sich dabei. */
+  const menueZeigen = (ansicht) => {
+    tools.hidden = !ansicht;
+    if (ansicht) {
+      tools.dataset.ansicht = ansicht;
+      field.blur();
+      tools.style.marginLeft = '0px';
+      const innen = tools.parentElement.getBoundingClientRect();
+      const knopf = (ansicht === 'modus' ? modusKnopf : plus).getBoundingClientRect();
+      const links = Math.max(0, Math.min(knopf.left - innen.left - 6, innen.width - tools.getBoundingClientRect().width));
+      tools.style.marginLeft = `${Math.round(links)}px`;
+      tools.style.setProperty('--menue-ursprung', `${Math.round(knopf.left - innen.left - links + knopf.width / 2)}px`);
+    }
+    plus.setAttribute('aria-expanded', String(ansicht === 'werkzeuge'));
+    modusKnopf.setAttribute('aria-expanded', String(ansicht === 'modus'));
+    container.classList.toggle('menue-offen', Boolean(ansicht));
   };
-  plus.onclick = () => werkzeugeZeigen(tools.hidden);
+  const werkzeugeZeigen = (offen) => menueZeigen(offen ? 'werkzeuge' : null);
+  plus.onclick = () => menueZeigen(!tools.hidden && tools.dataset.ansicht === 'werkzeuge' ? null : 'werkzeuge');
   container.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !tools.hidden) werkzeugeZeigen(false);
   });
+  // Frühere Coachings stehen im Gedächtnis; die Seite springt zu ihnen.
+  form.querySelector('[data-fruehere-coachings]').onclick = () => {
+    werkzeugeZeigen(false);
+    try { sessionStorage.setItem(GEDAECHTNIS_ZIEL_KEY, 'coachings'); } catch {}
+    window.dispatchEvent(new CustomEvent('muscledex:ansicht-neu-aufbauen', { detail: { route: 'coach-wissen' } }));
+    location.hash = 'coach-wissen';
+  };
   // Ein Tipp irgendwo in den Chat schließt das Plus-Menü wieder.
   container.addEventListener('click', (event) => {
     if (!tools.hidden && !event.target.closest('[data-coach-form]')) werkzeugeZeigen(false);
   });
-  webOption.onchange = () => plus.classList.toggle('hat-web', webOption.checked);
-  fileInput.onchange = async () => {
-    try {
-      anhang = await bildAnhang(fileInput.files?.[0]);
-      renderAttachment();
-      werkzeugeZeigen(false);
-    } catch (error) { toast(error?.message || 'Anhang konnte nicht geladen werden.'); }
-    fileInput.value = '';
-  };
+  dateiFelder.forEach((feld) => {
+    feld.onchange = async () => {
+      try {
+        anhang = await dateiAnhang(feld.files?.[0]);
+        renderAttachment();
+        werkzeugeZeigen(false);
+      } catch (error) { toast(error?.message || 'Anhang konnte nicht geladen werden.'); }
+      feld.value = '';
+    };
+  });
   attachmentBox.onclick = (event) => {
     if (!event.target.closest('[data-remove-attachment]')) return;
     anhang = null;
@@ -655,7 +742,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     }
     werkzeugeZeigen(false);
     answer.innerHTML = kopf() + verlaufMarkup(runden, avatar)
-      + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang, bezug) })
+      + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang ? anhangHinweis(anhang) : '', bezug) })
       + tipptMarkup((webResearch ? LADEPHASEN.web : LADEPHASEN.coach)[0]);
     const ladephasenStoppen = ladephasenStarten(answer, webResearch ? LADEPHASEN.web : LADEPHASEN.coach);
     nachUnten();
@@ -665,7 +752,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       const response = await rufeCoach({
         scope: 'coach', question, webResearch, modus: anfrageModus,
         ...(gespraechsId ? { conversationId: gespraechsId } : {}),
-        ...(mitAnhang ? { attachments: [{ type: 'image', dataUrl: anhang.dataUrl }] } : {}),
+        ...(mitAnhang ? { attachments: [anhangFuerServer(anhang)] } : {}),
         ...(schritteAus ? { schritteAus } : {}),
       });
       // Nur wenn der Server die Runde gespeichert hat, gibt es ein
@@ -673,7 +760,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       // aus der Schritte gemacht wurden, zeigt den Knopf nicht mehr.
       const frueher = gespraech?.id === response.conversationId
         ? runden.map((runde, index) => (index === quelle ? { ...runde, schritteGemacht: true } : runde)) : [];
-      const runde = { frage: question, result: response.result, hatAnhang: mitAnhang, ...(bezug ? { bezug } : {}) };
+      const runde = { frage: question, result: response.result, ...(mitAnhang ? { anhang: anhangHinweis(anhang) } : {}), ...(bezug ? { bezug } : {}) };
       if (response.conversationId && response.memorySaved) {
         runden = [...frueher, runde].slice(-8);
         gespraech = { id: response.conversationId, runden };

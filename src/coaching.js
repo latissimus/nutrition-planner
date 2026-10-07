@@ -31,6 +31,14 @@ const besuchteRouten = (id) => {
 };
 
 /** Das neueste Coaching der Person (Tag oder Woche), auch wenn es noch läuft oder fehlschlug. */
+/** Ein bestimmtes Coaching, etwa ein früheres, das im Gedächtnis geöffnet wurde. */
+export async function coachingNachId(userId, id) {
+  const { data, error } = await supabase.from('coach_coachings')
+    .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am')
+    .eq('user_id', userId).eq('id', id).maybeSingle();
+  return error ? null : data;
+}
+
 export async function neuestesCoaching(userId) {
   const { data, error } = await supabase.from('coach_coachings')
     .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am')

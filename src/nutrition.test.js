@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { calculateEnergyNeed, localDateKey } from './nutrition.js';
+import { calculateEnergyNeed, localDateKey, saveNutritionDayStatus } from './nutrition.js';
+
+describe('Tagesabschluss im Tracker', () => {
+  it('schreibt nur das gewählte Konto und Datum, ohne Lebensmittel oder Ziel zu ändern', async () => {
+    const calls = [];
+    const client = { from(table) { calls.push(table); return { upsert(row, options) { calls.push(row, options); return Promise.resolve({ error: null }); } }; } };
+    expect((await saveNutritionDayStatus('user-1', '2026-10-07', true, client)).error).toBeNull();
+    expect(calls).toEqual(['nutrition_day_status', { user_id: 'user-1', log_date: '2026-10-07', complete: true, excluded: false }, { onConflict: 'user_id,log_date' }]);
+  });
+});
 
 describe('Kalorienbedarf', () => {
   it('verwendet unabhängig von einem historischen KFA immer Mifflin–St. Jeor', () => {

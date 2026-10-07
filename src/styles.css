@@ -16966,6 +16966,15 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coaching-karte footer{margin-top:12px;color:var(--ui-neben);font:500 12px/1.35 "JetBrains Mono",monospace}
 :root[data-theme][data-seite="coach"] #view .coaching-karte.is-status p{color:var(--ui-neben)}
 :root[data-theme][data-seite="coach"] #view .coaching-karte.is-fehler .coaching-marke{background:var(--ui-auswahl);color:var(--ui-schrift)}
+/* Nachrichten und Eingabe haben dieselbe Kante wie Kopfzeile und Menüband:
+   12 px vom Rand. Auf Handys bis 400 px Breite rückte eine ältere Regel den
+   Verlauf auf 8 px hinaus, er ragte dort 4 px über die Eingabe. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat{padding-left:12px;padding-right:12px}
+/* Coach-Zeichen links neben der Karte, wie bei jeder Coach-Nachricht: auf
+   der 12-px-Kante der Eingabe, die Karte 42 px eingerückt. */
+:root[data-theme][data-seite="coach"] #view .coaching-zeile{position:relative;margin:0 0 14px 42px}
+:root[data-theme][data-seite="coach"] #view .coaching-zeile>.coach-chat-cap{position:absolute;top:12px;left:-42px;z-index:2;display:grid}
+:root[data-theme][data-seite="coach"] #view .coaching-zeile>.coaching-karte{margin:0}
 /* Wochen-Coaching (Schritt 5): Volumen, Experimente, Wochenvergleich. */
 :root[data-theme][data-seite="coach"] #view .coaching-volumen{display:grid;gap:4px;margin:0 0 12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:14px}
 :root[data-theme][data-seite="coach"] #view .coaching-volumen b{font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
@@ -16993,49 +17002,104 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* ============================================================
    CHAT-MODUS (coach.js, COACHING-PLAN.md Schritt 4b)
    Drei Farben: Coaching Gelb, Frage Hellblau, Bewertung & Schritte Rosa.
-   Der Modus steht immer als Wort da; die Farbe unterstützt nur. Das
-   Kennzeichen sitzt als Reiter auf der Oberkante der Eingabe-Kapsel und
-   schaltet per Tipp um.
+   Der Modus steht immer als Wort da; die Farbe unterstützt nur. Die Eingabe
+   hat eine Werkzeugzeile (Rückmeldung 07.10., Aufbau 1): oben das
+   Schreibfeld, darunter Plus, Webwissen, Modus-Pille und Mikro/Senden.
    ============================================================ */
 :root{--modus-frage:#94DEFF;--modus-bewertung:var(--brand-pink,#FF69AE)}
-:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus{
-  position:absolute;
-  z-index:2;
-  top:0;
-  left:22px;
+/* Die deckende Fläche hinter der Eingabe hängt unten fest und reicht bis zur
+   halben Höhe einer einzeiligen Kapsel. Oben verankert wuchs sie mit, sobald
+   Menü oder Anhang die Eingabe nach oben erweiterten (Rückmeldung 07.10.). */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-eingabe-karte)::after{top:auto;height:calc(var(--app-dex-dock-bottom) + 34px)!important}
+:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form:has(.coach-eingabe-karte)::after{height:38px!important}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte{
+  min-width:0;
+  display:flex!important;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px!important;
+  min-height:0!important;
+  padding:8px 8px 8px!important;
+  grid-template-columns:none!important;
+  border-radius:22px!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte::before{border-radius:22px}
+/* Schreibfeld wie in der Skizze: normale Schrift (Work Sans), ohne eigenen
+   Rahmen; 16 px, damit iOS beim Antippen nicht zoomt. */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte textarea{
+  min-height:30px!important;
+  padding:4px 6px 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  font:500 16px/1.4 "Work Sans",sans-serif!important;
+  word-spacing:normal!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte :is(.coach-plus,.coach-send,.coach-mikro){width:32px!important;height:32px!important}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.coach-eingabe-karte :is(.coach-plus,.coach-mikro) .coach-eingabe-icon{width:16px!important;height:16px!important}
+:root[data-theme][data-seite="coach"] #view .coach-werkzeugzeile{display:flex;align-items:center;gap:6px;min-width:0}
+:root[data-theme][data-seite="coach"] #view .coach-werkzeugzeile-rest{flex:1;min-width:0}
+/* Webwissen als Pille: an gelb, aus nur umrandet. */
+:root[data-theme][data-seite="coach"] #view .coach-web-pille{
+  position:relative;
+  display:inline-flex;
+  flex:none;
+  align-items:center;
+  gap:4px;
+  height:28px;
+  box-sizing:border-box;
+  padding:0 10px 0 7px;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:999px;
+  background:var(--ui-flaeche);
+  color:var(--ui-schrift);
+  font:700 12px/1 "Work Sans",sans-serif;
+  cursor:pointer;
+}
+:root[data-theme][data-seite="coach"] #view .coach-web-pille input{position:absolute;opacity:0;pointer-events:none}
+:root[data-theme][data-seite="coach"] #view .coach-web-pille .coach-web-symbol{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked){background:#FFD400}
+:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:2px}
+/* Modus-Pille: Wort und Farbe, der Pfeil öffnet die Wahl. */
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille{
   display:inline-flex;
   align-items:center;
-  height:24px;
+  gap:3px;
+  min-width:0;
+  height:28px;
+  box-sizing:border-box;
   margin:0;
-  padding:0 11px;
+  padding:0 6px 0 10px;
   border:var(--kontur) solid var(--kontur-farbe);
   border-radius:999px;
   background:var(--modus-frage)!important;
-  color:#111111;
   box-shadow:none;
-  /* Ganz über der Kapsel, die Unterkante liegt auf ihrer Kontur: So berührt
-     der Reiter das Schreibfeld nicht (Rückmeldung 07.10.). */
-  transform:translateY(calc(-100% + var(--kontur)));
-  font:800 11px/1 "Work Sans",sans-serif;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  white-space:nowrap;
+  font:700 12px/1 "Work Sans",sans-serif;
+  letter-spacing:0;
+  text-transform:none;
   cursor:pointer;
 }
-/* Die Eingabe schneidet über ihrer Oberkante ab (overflow:hidden); sie
-   bekommt oben Platz für den Reiter, die Hinterlegung rückt mit. */
-:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-modus){padding-top:26px!important}
-/* Die deckende Fläche hinter der Eingabe hängt unten fest und reicht bis zur
-   halben Höhe der einzeiligen Kapsel. Oben verankert wuchs sie mit, sobald
-   Plus-Menü oder Anhang die Eingabe nach oben erweiterten (Rückmeldung 07.10.). */
-:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-modus)::after{top:auto;height:calc(var(--app-dex-dock-bottom) + 34px)!important}
-:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form:has(.coach-modus)::after{height:38px!important}
-/* Größere Tippfläche, ohne den Reiter zu vergrößern. */
-:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus::after{content:"";position:absolute;inset:-10px -6px}
-:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus.ist-bewertung{background:var(--modus-bewertung)!important}
-:root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-inputbar .coach-modus{display:none}
-/* Steht das Plus-Menü oder ein Anhang über der Kapsel, bekommt der Reiter Luft. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-compose-tools:not([hidden]),.coach-attachment:not([hidden]))~.coach-inputbar{margin-top:26px}
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille.ist-bewertung{background:var(--modus-bewertung)!important}
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil{display:grid;flex:none;width:14px;height:14px;transform:rotate(90deg);transition:transform .2s ease}
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil svg{width:100%;height:100%;fill:#111111}
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille[aria-expanded="true"] .coach-modus-pfeil{transform:rotate(-90deg)}
+:root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-werkzeugzeile :is(.coach-web-pille,.coach-modus-pille){opacity:.6}
+/* Ein Menü, zwei Ansichten: Plus (Foto, Neues Gespräch) oder Modus. */
+:root[data-theme][data-seite="coach"] #view .coach-menue[data-ansicht="werkzeuge"] .coach-menue-modi,
+:root[data-theme][data-seite="coach"] #view .coach-menue[data-ansicht="modus"] .coach-menue-werkzeuge{display:none}
+/* Das Menü wächst aus dem Knopf heraus, der es öffnet (--menue-ursprung). */
+:root[data-theme][data-seite="coach"] #view .coach-menue:not([hidden]){transform-origin:var(--menue-ursprung,24px) calc(100% + 40px);animation:menue-auf .26s cubic-bezier(.2,.9,.3,1.12) both}
+@keyframes menue-auf{from{opacity:0;transform:scale(.4) translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-menue:not([hidden]){animation:none}}
+/* Sprungziel „Frühere Coachings“: nicht unter der Kopfzeile verschwinden. */
+:root[data-seite] #view .gedaechtnis-bereich.ist-coachings{scroll-margin-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h,64px) + 12px)}
+/* Vorschau eines PDF- oder Text-Anhangs: Symbol statt Bild. */
+:root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
+:root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
+:root[data-theme][data-seite="coach"] #view .coach-menue[data-ansicht="modus"] .coach-menue-modi{margin-top:0;padding-top:0;border-top:0}
+@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil{transition:none}}
 
 /* PLUS-MENÜ wie in Apple Nachrichten (Screenshot des Nutzers, 07.10.): eine
    runde Fläche über der Eingabe, große Zeilen mit rundem, farbigem Symbol.
@@ -17044,33 +17108,35 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:grid;
   gap:2px;
   justify-self:start;
-  width:min(330px,100%);
+  width:max-content;
+  min-width:200px;
+  max-width:100%;
   box-sizing:border-box;
   margin:0 0 4px;
-  padding:10px 8px;
+  padding:6px;
   border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:30px;
+  border-radius:22px;
   background:var(--ui-flaeche);
   color:var(--ui-schrift);
 }
 :root[data-theme][data-seite="coach"] #view .coach-menue[hidden]{display:none}
-:root[data-theme][data-seite="coach"] #view .coach-menue-modi{display:grid;gap:2px;margin-top:6px;padding-top:8px;border-top:1px solid color-mix(in srgb,currentColor 18%,transparent)}
+:root[data-theme][data-seite="coach"] #view .coach-menue-modi{display:grid;gap:2px;margin-top:4px;padding-top:4px;border-top:1px solid color-mix(in srgb,currentColor 18%,transparent)}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile{
   position:relative;
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:10px;
   width:100%;
-  min-height:54px;
+  min-height:44px;
   margin:0;
-  padding:5px 12px;
+  padding:4px 10px 4px 6px;
   box-sizing:border-box;
   border:0;
-  border-radius:20px;
+  border-radius:16px;
   background:transparent;
   color:inherit;
   box-shadow:none;
-  font:600 18px/1.2 "Work Sans",sans-serif;
+  font:600 15px/1.2 "Work Sans",sans-serif;
   letter-spacing:0;
   text-align:left;
   text-transform:none;
@@ -17078,23 +17144,29 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile[hidden]{display:none}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile:active{background:color-mix(in srgb,currentColor 10%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-zeile>span:nth-child(2){flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-theme][data-seite="coach"] #view .coach-menue-text{display:grid;gap:1px;flex:1;min-width:0;white-space:nowrap}
+:root[data-theme][data-seite="coach"] #view .coach-menue-text small{color:var(--ui-neben);font:500 12px/1.25 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #view .coach-menue-werkzeuge{display:grid;gap:2px}
+:root[data-theme][data-seite="coach"] #view .coach-menue-trenner{height:1px;margin:3px 8px;background:color-mix(in srgb,currentColor 18%,transparent)}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile input{position:absolute;opacity:0;pointer-events:none}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:-3px}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol{
   display:grid;
   place-items:center;
   flex:none;
-  width:40px;
-  height:40px;
+  width:32px;
+  height:32px;
   border:var(--kontur) solid var(--kontur-farbe);
   border-radius:50%;
   background:var(--farbe,#fff);
   color:#111111;
 }
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol :is(.material-svg,svg){width:22px;height:22px;color:#111111;fill:#111111}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol b{font:800 21px/1 "Work Sans",sans-serif;color:#111111}
+:root[data-theme][data-seite="coach"] #view .coach-menue-symbol :is(.material-svg,svg){width:17px;height:17px;color:#111111;fill:#111111}
+:root[data-theme][data-seite="coach"] #view .coach-menue-symbol b{font:800 16px/1 "Work Sans",sans-serif;color:#111111}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-foto{--farbe:#C9BCF7}
+:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-kamera{--farbe:#FFD9A8}
+:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-datei{--farbe:#B8E6C9}
+:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-coachings{--farbe:var(--coaching-farbe,#FFE07A)}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-web{--farbe:#FFD400}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-neu{--farbe:#FFFFFF}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-frage{--farbe:var(--modus-frage)}
@@ -17104,8 +17176,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-menue-schalter::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--ui-flaeche);border:1px solid var(--kontur-farbe);transition:transform .2s ease}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:checked) .coach-menue-schalter{background:#FFD400}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:checked) .coach-menue-schalter::after{transform:translateX(16px)}
-:root[data-theme][data-seite="coach"] #view .coach-menue-haken{display:grid;place-items:center;flex:none;width:24px;height:24px;visibility:hidden}
-:root[data-theme][data-seite="coach"] #view .coach-menue-haken :is(.material-svg,svg){width:24px;height:24px;color:currentColor;fill:currentColor}
+:root[data-theme][data-seite="coach"] #view .coach-menue-haken{display:grid;place-items:center;flex:none;width:20px;height:20px;margin-left:8px;visibility:hidden}
+:root[data-theme][data-seite="coach"] #view .coach-menue-haken :is(.material-svg,svg){width:20px;height:20px;color:currentColor;fill:currentColor}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:checked) .coach-menue-haken{visibility:visible}
 /* Chat und Wochen-Kärtchen hinter dem offenen Menü. */
 :root[data-theme][data-seite="coach"] #view .coach-page.menue-offen :is(.coach-answer,.coach-woche),
@@ -17123,4 +17195,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-quellen a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 :root[data-theme][data-seite="coach"] #view .coach-knopf.ist-schritte{border-color:var(--kontur-farbe)!important;background:var(--modus-bewertung)!important}
 /* Auf Hellblau und Rosa bleibt die Schrift dunkel, auch im Dark Mode. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-modus,.coach-modus-marke,.coach-knopf.ist-schritte,.coach-menue-symbol,.coach-menue-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme][data-seite="coach"] #view :is(.coach-modus-pille,.coach-modus-pille span,.coach-web-pille:has(input:checked),.coach-web-pille:has(input:checked) span,.coach-modus-marke,.coach-knopf.ist-schritte,.coach-menue-symbol,.coach-menue-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked) .coach-web-symbol{stroke:#111111!important;color:#111111!important}
+/* Kleinere Pillen, gleich große Tippfläche. */
+:root[data-theme][data-seite="coach"] #view :is(.coach-web-pille,.coach-modus-pille){position:relative}
+:root[data-theme][data-seite="coach"] #view :is(.coach-web-pille,.coach-modus-pille)::after{content:"";position:absolute;inset:-8px -2px}
+/* Tagesabschluss bleibt bei den Tageswerten, ohne eine weitere Karte. */
+.nutrition-day-complete{width:100%;min-height:44px;margin-top:12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);color:var(--ink);font:700 13px/1.3 var(--ui);text-align:center;cursor:pointer}
+.nutrition-day-complete[aria-pressed="true"]{background:var(--accent-soft,#e8f5df)}
+.nutrition-day-complete:disabled{opacity:.55;cursor:default}
+:root[data-seite="sleep"] #view .sleep-history>.sleep-reset-button{display:flex;align-items:center;justify-content:center;width:calc(100% - 24px);min-height:44px;margin:12px;padding:8px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);color:var(--ink);font:700 13px/1.3 var(--ui);text-align:center}
+:root[data-seite="sleep"] #view .sleep-history>.sleep-reset-button:disabled{opacity:.55}

@@ -28,6 +28,18 @@ describe('Bewertung & Schritte bleibt der bisherige Chat', () => {
   it('nimmt ohne Modus und mit „bewertung“ dieselbe Anfrage', () => {
     expect(anfrage('bewertung')).toEqual(anfrage());
   });
+
+  it('füllt bei vorhandener Tagesprüfung den festen Limits-Block ohne die übrigen Blöcke umzubenennen', () => {
+    const request = coachRequestBody({
+      scope: 'coach', question: 'Soll ich Kalorien ändern?', snapshot: {}, timeseries: {}, memory: {},
+      limits: { calorieChangeAllowed: false, completeDays: 0 }, webResearch: false, vectorStoreId: null,
+    });
+    const input = request.input[0].content;
+    expect(input).toContain('<limits>');
+    expect(input).toContain('"calorieChangeAllowed":false');
+    expect(input).toContain('<comp_facts>');
+    expect(input).toContain('<timeseries>');
+  });
 });
 
 describe('Frage-Prompt', () => {

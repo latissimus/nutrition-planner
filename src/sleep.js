@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { hole, schluessel } from './datenspeicher.js';
+import { hole, schluessel, verwerfen } from './datenspeicher.js';
 import { materialIconMarkup } from './categoryIcons.js';
 import { coachIconMarkup } from './menuIcons.js';
 import { openSleepSoundTimer } from './meditationTimer.js';
@@ -63,6 +63,13 @@ export function calculateSleepSummary(logs = []) {
     averageEnergy: mean(logs.map((log) => Number(log.energy))),
     consistencyMinutes: Math.round(mean(bedtimes.map((value) => Math.abs(value - bedAverage)))),
   };
+}
+
+export async function resetSleepLogs(userId, client = supabase) {
+  if (!userId) return { error: new Error('Konto fehlt.') };
+  const { error } = await client.from('sleep_logs').delete().eq('user_id', userId);
+  if (!error) verwerfen('sleep');
+  return { error };
 }
 
 export function analyzeSleepTrends(logs = []) {
@@ -343,7 +350,7 @@ async function render(container, userId, state, refresh) {
       <div>${trends.map((hint) => `<p>${materialIconMarkup('stat_1')}<span>${escapeHtml(hint)}</span></p>`).join('')}</div>
       <button class="sleep-coach-entry" type="button" data-sleep-coach>${coachIconMarkup('coach-entry-cap')}<span><b>Mit Coach besprechen</b><small>Was fehlt und was du besser machen kannst</small></span>${materialIconMarkup('chevron_right')}</button>
     </section>
-    ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div></section>` : ''}`;
+    ${state.logs.length ? `<section class="sleep-section sleep-history ${SPECIAL_DEX_CLASSES.card} ${SPECIAL_DEX_CLASSES.listCard}"><header><div class="sleep-section-title">${materialIconMarkup('stars')}<h2>Letzte Nächte</h2></div></header><div>${state.logs.slice(0, 14).map((log) => `<button type="button" data-edit-sleep-log="${log.id}"><span><b>${new Date(`${log.sleep_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}</b><small>${String(log.bedtime).slice(0, 5)} → ${String(log.wake_time).slice(0, 5)}</small></span><strong>${durationLabel(sleepDurationMinutes(log.bedtime, log.wake_time))}</strong><em>${'★'.repeat(log.quality)}${'☆'.repeat(5 - log.quality)}</em></button>`).join('')}</div><button class="sleep-reset-button" type="button" data-reset-sleep-logs>Schlaf-Check-ins zurücksetzen</button></section>` : ''}`;
 
   content.querySelector('[data-sleep-coach]')?.addEventListener('click', async () => {
     const { openCoachQuestion } = await import('./coach.js');
@@ -361,6 +368,15 @@ async function render(container, userId, state, refresh) {
     event.currentTarget.setAttribute('aria-expanded', String(open));
   });
   content.querySelectorAll('[data-edit-sleep-log]').forEach((button) => { button.onclick = () => checkinEditor({ userId, state, existing: state.logs.find((log) => log.id === button.dataset.editSleepLog), onSaved: refresh }); });
+  content.querySelector('[data-reset-sleep-logs]')?.addEventListener('click', async (event) => {
+    if (!confirm('Alle Schlaf-Check-ins löschen? Dein Schlafplan bleibt erhalten.')) return;
+    event.currentTarget.disabled = true;
+    const { error } = await resetSleepLogs(userId);
+    if (error) { toast('Schlaf-Check-ins konnten nicht gelöscht werden.'); event.currentTarget.disabled = false; return; }
+    notifyHomeCountsChanged('sleep');
+    toast('Schlaf-Check-ins zurückgesetzt');
+    await refresh();
+  });
 }
 
 export async function mountSleepDex(container, { userId, signal }) {

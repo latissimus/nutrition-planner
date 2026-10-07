@@ -5,6 +5,8 @@ import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
+// Sprungziel beim Öffnen der Seite, z. B. „Frühere Coachings“ aus dem Chat.
+export const GEDAECHTNIS_ZIEL_KEY = 'muscledex:gedaechtnis-ziel';
 
 /* „Was der Coach über mich weiß“ – sein Gedächtnis (Schritt 5).
    Drei Teile, alle nur für den Nutzer selbst sichtbar (RLS):
@@ -137,14 +139,14 @@ export function gespraechRunden(nachrichten = [], bilanz = null) {
 
 // Holt ein gespeichertes Gespräch zurück in den Chat; die nächste Frage setzt
 // es fort. Die Coach-Ansicht wird neu aufgebaut, damit sie es liest (main.js).
-export async function setzeGespraechFort(userId, conversationId) {
+export async function setzeGespraechFort(userId, conversationId, { leerErlaubt = false } = {}) {
   const [nachrichten, bilanz] = await Promise.all([
     supabase.from('ai_coach_messages').select('role,content,context,created_at').eq('user_id', userId).eq('conversation_id', conversationId).order('created_at', { ascending: true }),
     supabase.from('coach_weekly_reviews').select('week,comparison').eq('user_id', userId).eq('conversation_id', conversationId).maybeSingle(),
   ]);
   if (nachrichten.error) throw nachrichten.error;
   const runden = gespraechRunden(nachrichten.data || [], bilanz.error ? null : bilanz.data);
-  if (!runden.length) throw new Error('Das Gespräch enthält noch keine Antwort.');
+  if (!runden.length && !leerErlaubt) throw new Error('Das Gespräch enthält noch keine Antwort.');
   sessionStorage.setItem(COACH_CONVERSATION_KEY, JSON.stringify({ id: conversationId, runden }));
   window.dispatchEvent(new CustomEvent('muscledex:ansicht-neu-aufbauen', { detail: { route: 'coach' } }));
   location.hash = 'coach';
@@ -231,7 +233,24 @@ function massnahmeFormular(massnahme = {}) {
 }
 
 // wochenbilanzen: null, solange die Tabelle des Wochen-Check-ins fehlt.
-export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [], wochenbilanzen = null, eingerichtet = true, tag = heute(), bearbeiten = null } = {}) {
+/* Frühere Coachings (täglich und Wochen-Coaching), neueste zuerst. Jedes
+   lässt sich im Chat öffnen: Die Karte steht dann über seinem Gespräch. */
+export function coachingListeMarkup(coachings = []) {
+  return coachings.map((coaching) => {
+    const ergebnis = coaching.ergebnis || {};
+    const art = coaching.art === 'woche' ? 'Wochen-Coaching' : 'Coaching';
+    return `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(coaching.id)}">
+      <details>
+        <summary><b>${escapeHtml(ergebnis.ueberschrift || art)}</b><small>${art} · ${datum(coaching.datum)}</small></summary>
+        ${(ergebnis.punkte || []).length ? `<ul>${ergebnis.punkte.map((punkt) => `<li>${escapeHtml(punkt.text || '')}</li>`).join('')}</ul>` : ''}
+        ${ergebnis.fokus?.text ? `<p class="gedaechtnis-ergebnis">Fokus: ${escapeHtml(ergebnis.fokus.text)}</p>` : ''}
+      </details>
+      <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="button" data-coaching-oeffnen="${escapeHtml(coaching.id)}">Im Chat öffnen</button></div>
+    </li>`;
+  }).join('');
+}
+
+export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [], wochenbilanzen = null, coachings = null, eingerichtet = true, tag = heute(), bearbeiten = null } = {}) {
   if (!eingerichtet) {
     return fensterMarkup({ inhalt: '<p>Das Gedächtnis ist noch nicht eingerichtet. Die Datenbank wird gerade erweitert. Bis dahin beantworte ich jede Frage ohne Gedächtnis – deine Messwerte sehe ich trotzdem.</p>' });
   }
@@ -261,9 +280,15 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
       </div>
     </li>`;
   }).join('');
-  const gespraechListe = gespraeche.map((gespraech) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(gespraech.id)}">
+  // Ein Coaching ohne Rückfrage steht nur unter „Coachings“; mit Rückfragen
+  // auch hier, mit dem Coaching als Titel.
+  const coachingNach = new Map((coachings || []).map((coaching) => [coaching.id, coaching]));
+  const gespraechsTitel = (gespraech) => (coachingNach.has(gespraech.id)
+    ? `${coachingNach.get(gespraech.id).art === 'woche' ? 'Wochen-Coaching' : 'Coaching'} vom ${datum(coachingNach.get(gespraech.id).datum)}`
+    : kuerzen(gespraech.verlauf.find((nachricht) => nachricht.role === 'user')?.content || 'Gespräch', 90));
+  const gespraechListe = gespraeche.filter((gespraech) => !(coachingNach.has(gespraech.id) && !gespraech.fragen)).map((gespraech) => `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(gespraech.id)}">
       <details>
-        <summary><b>${escapeHtml(kuerzen(gespraech.verlauf.find((nachricht) => nachricht.role === 'user')?.content || 'Gespräch', 90))}</b><small>${datum(gespraech.beginn)} · ${gespraech.fragen} ${gespraech.fragen === 1 ? 'Frage' : 'Fragen'}</small></summary>
+        <summary><b>${escapeHtml(gespraechsTitel(gespraech))}</b><small>${datum(gespraech.beginn)} · ${gespraech.fragen} ${gespraech.fragen === 1 ? 'Frage' : 'Fragen'}</small></summary>
         <ol class="gedaechtnis-verlauf">${gespraech.verlauf.map((nachricht) => `<li class="${nachricht.role === 'user' ? 'ist-frage' : 'ist-antwort'}"><small>${nachricht.role === 'user' ? 'Du' : 'Coach'}</small><p>${escapeHtml(nachricht.content)}</p></li>`).join('')}</ol>
       </details>
       <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="button" data-gespraech-fortsetzen="${escapeHtml(gespraech.id)}">Fortsetzen</button><button class="coach-knopf" type="button" data-gespraech-loeschen="${escapeHtml(gespraech.id)}">Löschen</button></div>
@@ -276,7 +301,7 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
       </details>
       <div class="gedaechtnis-aktionen"><button class="coach-knopf" type="button" data-wochenbilanz-loeschen="${escapeHtml(bilanz.id)}">Löschen</button></div>
     </li>`).join('');
-  const bereich = (titel, inhalt) => fensterMarkup({ von: 'bereich', titel, bild: '', klasse: 'gedaechtnis-bereich', inhalt });
+  const bereich = (titel, inhalt, klasse = '') => fensterMarkup({ von: 'bereich', titel, bild: '', klasse: `gedaechtnis-bereich${klasse ? ` ${klasse}` : ''}`, inhalt });
   return [
     bereich('Über mich', `<p class="gedaechtnis-hinweis">Feste Fakten, die der Coach bei jeder Antwort beachtet: Verletzungen, Ausstattung, Zeitplan, Vorlieben. Deine Messwerte kennt er ohnehin aus den Fachseiten.</p>
       ${fakten.length ? `<ul class="gedaechtnis-liste">${faktListe}</ul>` : '<p class="gedaechtnis-leer">Noch nichts eingetragen.</p>'}
@@ -284,6 +309,8 @@ export function gedaechtnisMarkup({ fakten = [], massnahmen = [], gespraeche = [
     bereich('Maßnahmen', `<p class="gedaechtnis-hinweis">Ist das Prüfdatum erreicht, bewertet der Coach die Maßnahme zuerst, bevor er etwas Neues im selben Bereich vorschlägt.</p>
       ${massnahmen.length ? `<ul class="gedaechtnis-liste">${massnahmenListe}</ul>` : '<p class="gedaechtnis-leer">Noch keine Maßnahme. Übernimm eine Empfehlung des Coachs oder lege selbst eine an.</p>'}
       ${bearbeiten === 'massnahme:neu' ? massnahmeFormular() : '<button class="coach-knopf" type="button" data-massnahme-neu>+ Maßnahme anlegen</button>'}`),
+    coachings ? bereich('Coachings', `<p class="gedaechtnis-hinweis">Deine früheren Coachings vom Abend und vom Montag. „Im Chat öffnen“ zeigt die Karte wieder über ihrem Gespräch.</p>
+      ${coachings.length ? `<ul class="gedaechtnis-liste">${coachingListeMarkup(coachings)}</ul>` : '<p class="gedaechtnis-leer">Noch kein Coaching. Es kommt jeden Abend um 21 Uhr, wenn es neue Daten gibt.</p>'}`, 'ist-coachings') : '',
     bereich('Gespräche', `<p class="gedaechtnis-hinweis">Der Coach sieht nur das laufende Gespräch. Mit „Fortsetzen“ holst du ein früheres zurück in den Chat.</p>
       ${gespraeche.length ? `<ul class="gedaechtnis-liste">${gespraechListe}</ul><button class="coach-knopf" type="button" data-gespraeche-loeschen>Alle Gespräche löschen</button>` : '<p class="gedaechtnis-leer">Noch keine gespeicherten Gespräche.</p>'}`),
     wochenbilanzen ? bereich('Wochenbilanzen', `<p class="gedaechtnis-hinweis">Der Coach sieht davon nur den vorgeschlagenen Fokus der letzten Bilanz – in der Bilanz der folgenden Woche.</p>
@@ -313,7 +340,19 @@ export async function ladeGedaechtnis(userId) {
     throw fehler;
   }
   const liste = [...(massnahmen.data || [])].sort((a, b) => Number(b.status === 'aktiv') - Number(a.status === 'aktiv') || String(b.start_date).localeCompare(String(a.start_date)));
-  return { eingerichtet: true, fakten: fakten.data || [], massnahmen: liste, gespraeche: gruppiereGespraeche(nachrichten.data || []), wochenbilanzen: await ladeWochenbilanzen(userId) };
+  const [wochenbilanzen, coachings] = await Promise.all([ladeWochenbilanzen(userId), ladeCoachings(userId)]);
+  return { eingerichtet: true, fakten: fakten.data || [], massnahmen: liste, gespraeche: gruppiereGespraeche(nachrichten.data || []), wochenbilanzen, coachings };
+}
+
+// Frühere Coachings; fehlt die Tabelle noch, erscheint der Bereich nicht (null).
+async function ladeCoachings(userId) {
+  const { data, error } = await supabase.from('coach_coachings').select('id,art,datum,status,ergebnis,erstellt_am').eq('user_id', userId)
+    .eq('status', 'bereit').order('datum', { ascending: false }).limit(60);
+  if (error) {
+    if (!istNichtEingerichtet(error) && !/coach_coachings/i.test(error.message || '')) throw error;
+    return null;
+  }
+  return data || [];
 }
 
 // Wochenbilanzen (Schritt 7). Fehlt deren Tabelle noch, bleibt der Rest der
@@ -369,6 +408,19 @@ export async function mountCoachMemoryPage(container, { userId }) {
     try {
       stand = await ladeGedaechtnis(userId);
       zeichnen();
+      let ziel = null;
+      try { ziel = sessionStorage.getItem(GEDAECHTNIS_ZIEL_KEY); sessionStorage.removeItem(GEDAECHTNIS_ZIEL_KEY); } catch {}
+      // Die Ansicht hängt beim ersten Zeichnen oft noch nicht im Dokument.
+      const springen = (versuche = 0) => {
+        const bereich = inhalt.querySelector('.ist-coachings');
+        if (!bereich) return;
+        if (!bereich.isConnected || !bereich.getClientRects().length) {
+          if (versuche < 60) requestAnimationFrame(() => springen(versuche + 1));
+          return;
+        }
+        bereich.scrollIntoView({ block: 'start' });
+      };
+      if (ziel === 'coachings') springen();
     } catch (error) {
       inhalt.innerHTML = fensterMarkup({ klasse: 'is-fehler', inhalt: '<p>Das Gedächtnis konnte nicht geladen werden. Versuche es später erneut.</p>' });
       toast(error?.message || 'Gedächtnis konnte nicht geladen werden.');
@@ -408,6 +460,14 @@ export async function mountCoachMemoryPage(container, { userId }) {
     if (dataset.massnahmeLoeschen) {
       if (!confirm('Diese Maßnahme löschen?')) return;
       ausfuehren(() => ergebnis(supabase.from('coach_interventions').delete().eq('id', dataset.massnahmeLoeschen).eq('user_id', userId)), 'Gelöscht.');
+      return;
+    }
+    if (dataset.coachingOeffnen) {
+      knopf.disabled = true;
+      setzeGespraechFort(userId, dataset.coachingOeffnen, { leerErlaubt: true }).catch((error) => {
+        knopf.disabled = false;
+        toast(error?.message || 'Das Coaching konnte nicht geöffnet werden.');
+      });
       return;
     }
     if (dataset.gespraechFortsetzen) {

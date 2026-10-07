@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   analyzeSleepTrends,
   calculateSleepSummary,
+  resetSleepLogs,
   saveSleepPlan,
   scheduleDeviationLabel,
   sleepDurationMinutes,
@@ -10,6 +11,12 @@ import {
 } from './sleep.js';
 
 describe('SLEEP-DEX-Auswertung', () => {
+  it('setzt nur Schlaf-Check-ins dieses Kontos zurück, nicht den Schlafplan', async () => {
+    const calls = [];
+    const client = { from(table) { calls.push(table); return { delete() { return { async eq(column, value) { calls.push([column, value]); return { error: null }; } }; } }; } };
+    expect((await resetSleepLogs('user-1', client)).error).toBeNull();
+    expect(calls).toEqual(['sleep_logs', ['user_id', 'user-1']]);
+  });
   it('berechnet Schlaf über Mitternacht', () => {
     expect(timeToMinutes('22:30')).toBe(1350);
     expect(sleepDurationMinutes('22:30', '06:30')).toBe(480);

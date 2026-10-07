@@ -1,6 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION } from './knowledge.ts';
-import { COACH_MODEL, coachRequestBody, frageBereinigen, outputText, schritteAuftrag, type Scope } from './coachPrompt.ts';
+import { COACH_MODEL, anhaengeAuswerten, coachRequestBody, frageBereinigen, outputText, schritteAuftrag, type Scope } from './coachPrompt.ts';
 import { bewertungsQuellenAus, seminarTitelAus, webSources } from './quellen.ts';
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
@@ -12,6 +12,7 @@ import { trainingsAuswertung } from './training.js';
 import { BEIBEHALTEN, fensterWerte, nichtRepraesentativ as wocheNichtRepraesentativ, volumenEntscheidung } from './volumen.js';
 import { wochenBereinigen, wochenSchema, wochenSystemPrompt, wochenText, wochenUserPrompt } from './wochenCoaching.ts';
 import { experimentMeasurement } from './experiments.ts';
+import { calorieBasis, enforceCalorieBasis } from './calorieGuard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -676,24 +677,26 @@ Deno.serve(async (request) => {
     // machen“ ist eine Bewertung mit eigenem Auftrag aus Frage und Antwort.
     const modus: 'frage' | 'bewertung' = body?.modus === 'frage' ? 'frage' : 'bewertung';
     const schritteText = modus === 'bewertung' ? schritteAuftrag(body?.schritteAus) : null;
-    const imageDataUrls = Array.isArray(body?.attachments)
-      ? body.attachments.slice(0, 1).flatMap((attachment: Row) => {
-        const value = String(attachment?.dataUrl || '');
-        return /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value) && value.length <= 3_000_000 ? [value] : [];
-      })
-      : [];
+    // Ein Anhang aus Kamera, Fotos oder Dateien (Bild, PDF oder Text).
+    const { imageDataUrls, dateien, texte } = anhaengeAuswerten(body?.attachments);
 
     // Dieselben Fakten und Zeitreihen wie im Coaching.
     const now = new Date();
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
+    const since = dateDaysAgo(now, 15);
+    const { data: dayStatus, error: dayStatusError } = await admin.from('nutrition_day_status')
+      .select('log_date,complete,excluded').eq('user_id', userId).gte('log_date', since);
+    // A failed completeness lookup must never make a numeric change eligible.
+    const limits = calorieBasis(dayStatusError ? [] : dayStatus || [], now,
+      contextRows.nutritionEntries.map((entry: Row) => String(entry.log_date)));
     // Ein Gespräch geht weiter, wenn die App seine id schickt; sonst beginnt ein neues.
     const conversationId = isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID();
     const memory = await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries);
     const vectorStoreId = await ensureKnowledgeBase();
 
-    const requestBody = coachRequestBody({ scope, question: schritteText || question, snapshot, timeseries, memory: memory?.blocks, webResearch, vectorStoreId, imageDataUrls, modus });
+    const requestBody = coachRequestBody({ scope, question: schritteText || question, snapshot, timeseries, memory: memory?.blocks, limits, webResearch, vectorStoreId, imageDataUrls, dateien, texte, modus });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -705,13 +708,13 @@ Deno.serve(async (request) => {
     const raw = outputText(responsePayload);
     if (!raw) return json({ error: 'Die Coach-Antwort war leer.' }, 502);
     const geparst = JSON.parse(raw);
-    const result = {
+    const result = enforceCalorieBasis({
       ...(modus === 'frage'
         ? frageBereinigen(geparst, { seminarTitel: seminarTitelAus(responsePayload) })
         : { ...geparst, modus, sources: bewertungsQuellenAus(geparst, responsePayload) }),
       webResearchRequested: webResearch,
       webSources: webResearch ? webSources(responsePayload) : [],
-    };
+    }, limits);
 
     // Im Gedächtnis steht bei „Daraus Schritte machen“, zu welcher Frage.
     const bezug = schritteText ? String(body?.schritteAus?.frage || '').trim().slice(0, 300) : '';
