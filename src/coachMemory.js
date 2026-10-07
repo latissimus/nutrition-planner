@@ -5,8 +5,6 @@ import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
 const COACH_CONVERSATION_KEY = 'muscledex:coach-gespraech';
-// Sprungziel beim Öffnen der Seite, z. B. „Frühere Coachings“ aus dem Chat.
-export const GEDAECHTNIS_ZIEL_KEY = 'muscledex:gedaechtnis-ziel';
 
 /* „Was der Coach über mich weiß“ – sein Gedächtnis (Schritt 5).
    Drei Teile, alle nur für den Nutzer selbst sichtbar (RLS):
@@ -408,19 +406,6 @@ export async function mountCoachMemoryPage(container, { userId }) {
     try {
       stand = await ladeGedaechtnis(userId);
       zeichnen();
-      let ziel = null;
-      try { ziel = sessionStorage.getItem(GEDAECHTNIS_ZIEL_KEY); sessionStorage.removeItem(GEDAECHTNIS_ZIEL_KEY); } catch {}
-      // Die Ansicht hängt beim ersten Zeichnen oft noch nicht im Dokument.
-      const springen = (versuche = 0) => {
-        const bereich = inhalt.querySelector('.ist-coachings');
-        if (!bereich) return;
-        if (!bereich.isConnected || !bereich.getClientRects().length) {
-          if (versuche < 60) requestAnimationFrame(() => springen(versuche + 1));
-          return;
-        }
-        bereich.scrollIntoView({ block: 'start' });
-      };
-      if (ziel === 'coachings') springen();
     } catch (error) {
       inhalt.innerHTML = fensterMarkup({ klasse: 'is-fehler', inhalt: '<p>Das Gedächtnis konnte nicht geladen werden. Versuche es später erneut.</p>' });
       toast(error?.message || 'Gedächtnis konnte nicht geladen werden.');

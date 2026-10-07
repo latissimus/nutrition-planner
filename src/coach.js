@@ -7,7 +7,7 @@ import { toast } from './toast.js';
 import { spracheVerschriftlichen } from './kiWerkzeuge.js';
 import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from './sprachaufnahme.js';
 import {
-  ENTSCHEIDUNGEN, GEDAECHTNIS_ZIEL_KEY, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
+  ENTSCHEIDUNGEN, RICHTUNGEN, URTEILE, ZIELGROESSEN, istNichtEingerichtet, merkeEmpfehlung, uebernimmAuswertung,
 } from './coachMemory.js';
 import { vergleichMarkup } from './coachWeekly.js';
 import { mountWochenKaertchen } from './wochenKaertchen.js';
@@ -368,8 +368,6 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
             <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-kamera">${materialIconMarkup('photo_camera')}</span><span class="coach-menue-text">Kamera</span><input type="file" accept="image/*" capture="environment" data-coach-file></label>
             <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-foto">${materialIconMarkup('add_photo_alternate')}</span><span class="coach-menue-text">Fotos</span><input type="file" accept="image/*" data-coach-file></label>
             <label class="coach-menue-zeile"><span class="coach-menue-symbol ist-datei">${materialIconMarkup('upload_file')}</span><span class="coach-menue-text">Dateien</span><input type="file" accept="application/pdf,.pdf,text/plain,.txt,text/csv,.csv,text/markdown,.md,image/*" data-coach-file></label>
-            <div class="coach-menue-trenner" role="presentation"></div>
-            <button class="coach-menue-zeile" type="button" data-fruehere-coachings><span class="coach-menue-symbol ist-coachings">${materialIconMarkup('menu_book')}</span><span class="coach-menue-text">Frühere Coachings</span></button>
             <button class="coach-menue-zeile" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}><span class="coach-menue-symbol ist-neu">${materialIconMarkup('edit')}</span><span class="coach-menue-text">Neues Gespräch</span></button>
           </div>
           <div class="coach-menue-modi" role="radiogroup" aria-label="Modus">
@@ -500,20 +498,18 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     attachmentBox.innerHTML = anhang ? `${vorschau}<span>${escapeHtml(anhang.name)}</span><button type="button" data-remove-attachment aria-label="Anhang entfernen">×</button>` : '';
   };
   /* Menü wie in Apple Nachrichten, der Chat dahinter wird unscharf. Das Plus
-     zeigt Kamera, Fotos, Dateien, Frühere Coachings und Neues Gespräch, die
-     Modus-Pille die zwei Modi. Das Menü steht über dem Knopf, der es öffnet,
-     und wächst aus ihm heraus; eine offene Tastatur schließt sich dabei. */
+     zeigt Kamera, Fotos, Dateien und Neues Gespräch, die Modus-Pille die zwei
+     Modi; beide stehen links in gleicher Breite und wachsen aus ihrem Knopf
+     heraus. Eine offene Tastatur schließt sich dabei. Frühere Coachings
+     liegen im Gedächtnis (Knopf im Kopf). */
   const menueZeigen = (ansicht) => {
     tools.hidden = !ansicht;
     if (ansicht) {
       tools.dataset.ansicht = ansicht;
       field.blur();
-      tools.style.marginLeft = '0px';
-      const innen = tools.parentElement.getBoundingClientRect();
+      const innen = tools.getBoundingClientRect();
       const knopf = (ansicht === 'modus' ? modusKnopf : plus).getBoundingClientRect();
-      const links = Math.max(0, Math.min(knopf.left - innen.left - 6, innen.width - tools.getBoundingClientRect().width));
-      tools.style.marginLeft = `${Math.round(links)}px`;
-      tools.style.setProperty('--menue-ursprung', `${Math.round(knopf.left - innen.left - links + knopf.width / 2)}px`);
+      tools.style.setProperty('--menue-ursprung', `${Math.round(knopf.left - innen.left + knopf.width / 2)}px`);
     }
     plus.setAttribute('aria-expanded', String(ansicht === 'werkzeuge'));
     modusKnopf.setAttribute('aria-expanded', String(ansicht === 'modus'));
@@ -524,13 +520,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   container.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !tools.hidden) werkzeugeZeigen(false);
   });
-  // Frühere Coachings stehen im Gedächtnis; die Seite springt zu ihnen.
-  form.querySelector('[data-fruehere-coachings]').onclick = () => {
-    werkzeugeZeigen(false);
-    try { sessionStorage.setItem(GEDAECHTNIS_ZIEL_KEY, 'coachings'); } catch {}
-    window.dispatchEvent(new CustomEvent('muscledex:ansicht-neu-aufbauen', { detail: { route: 'coach-wissen' } }));
-    location.hash = 'coach-wissen';
-  };
+
   // Ein Tipp irgendwo in den Chat schließt das Plus-Menü wieder.
   container.addEventListener('click', (event) => {
     if (!tools.hidden && !event.target.closest('[data-coach-form]')) werkzeugeZeigen(false);

@@ -17059,7 +17059,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme][data-seite="coach"] #view .coach-web-pille input{position:absolute;opacity:0;pointer-events:none}
 :root[data-theme][data-seite="coach"] #view .coach-web-pille .coach-web-symbol{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
-:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked){background:#FFD400}
+:root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked){background:var(--fe-blue,#15CCFF)}
 :root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:2px}
 /* Modus-Pille: Wort und Farbe, der Pfeil öffnet die Wahl. */
 :root[data-theme][data-seite="coach"] #view .coach-modus-pille{
@@ -17073,17 +17073,17 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   padding:0 6px 0 10px;
   border:var(--kontur) solid var(--kontur-farbe);
   border-radius:999px;
-  background:var(--modus-frage)!important;
+  background:var(--ui-gefuellt,#111111)!important;
+  color:var(--ui-gefuellt-schrift,#ffffff);
   box-shadow:none;
   font:700 12px/1 "Work Sans",sans-serif;
   letter-spacing:0;
   text-transform:none;
   cursor:pointer;
 }
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille.ist-bewertung{background:var(--modus-bewertung)!important}
 :root[data-theme][data-seite="coach"] #view .coach-modus-pille>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 :root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil{display:grid;flex:none;width:14px;height:14px;transform:rotate(90deg);transition:transform .2s ease}
-:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil svg{width:100%;height:100%;fill:#111111}
+:root[data-theme][data-seite="coach"] #view .coach-modus-pille .coach-modus-pfeil svg{width:100%;height:100%;fill:var(--ui-gefuellt-schrift,#ffffff)}
 :root[data-theme][data-seite="coach"] #view .coach-modus-pille[aria-expanded="true"] .coach-modus-pfeil{transform:rotate(-90deg)}
 :root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-werkzeugzeile :is(.coach-web-pille,.coach-modus-pille){opacity:.6}
 /* Ein Menü, zwei Ansichten: Plus (Foto, Neues Gespräch) oder Modus. */
@@ -17093,8 +17093,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-menue:not([hidden]){transform-origin:var(--menue-ursprung,24px) calc(100% + 40px);animation:menue-auf .26s cubic-bezier(.2,.9,.3,1.12) both}
 @keyframes menue-auf{from{opacity:0;transform:scale(.4) translateY(12px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-menue:not([hidden]){animation:none}}
-/* Sprungziel „Frühere Coachings“: nicht unter der Kopfzeile verschwinden. */
-:root[data-seite] #view .gedaechtnis-bereich.ist-coachings{scroll-margin-top:calc(env(safe-area-inset-top) + var(--app-dex-header-h,64px) + 12px)}
 /* Vorschau eines PDF- oder Text-Anhangs: Symbol statt Bild. */
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
@@ -17108,9 +17106,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
   display:grid;
   gap:2px;
   justify-self:start;
-  width:max-content;
-  min-width:200px;
-  max-width:100%;
+  width:min(310px,100%);
   box-sizing:border-box;
   margin:0 0 4px;
   padding:6px;
@@ -17147,7 +17143,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-menue-text{display:grid;gap:1px;flex:1;min-width:0;white-space:nowrap}
 :root[data-theme][data-seite="coach"] #view .coach-menue-text small{color:var(--ui-neben);font:500 12px/1.25 "Work Sans",sans-serif}
 :root[data-theme][data-seite="coach"] #view .coach-menue-werkzeuge{display:grid;gap:2px}
-:root[data-theme][data-seite="coach"] #view .coach-menue-trenner{height:1px;margin:3px 8px;background:color-mix(in srgb,currentColor 18%,transparent)}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile input{position:absolute;opacity:0;pointer-events:none}
 :root[data-theme][data-seite="coach"] #view .coach-menue-zeile:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:-3px}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol{
@@ -17166,7 +17161,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-foto{--farbe:#C9BCF7}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-kamera{--farbe:#FFD9A8}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-datei{--farbe:#B8E6C9}
-:root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-coachings{--farbe:var(--coaching-farbe,#FFE07A)}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-web{--farbe:#FFD400}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-neu{--farbe:#FFFFFF}
 :root[data-theme][data-seite="coach"] #view .coach-menue-symbol.ist-frage{--farbe:var(--modus-frage)}
@@ -17184,8 +17178,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view.menue-offen :is(.coach-answer,.coach-woche){filter:blur(6px);opacity:.55;pointer-events:none;transition:filter .2s ease,opacity .2s ease}
 @media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-menue-schalter::after{transition:none}}
 /* Etikett jeder Antwort. */
-:root[data-theme][data-seite="coach"] #view .coach-modus-marke{justify-self:start;display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--modus-frage)!important;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
-:root[data-theme][data-seite="coach"] #view .coach-modus-marke.ist-bewertung{background:var(--modus-bewertung)!important}
+:root[data-theme][data-seite="coach"] #view .coach-modus-marke{justify-self:start;display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-gefuellt,#111111)!important;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
 :root[data-theme][data-seite="coach"] #view .coach-rueckfrage{margin:0;font:600 14.5px/1.45 "Work Sans",sans-serif}
 /* Quellen unter einer Frage-Antwort (statt „Datenlage“). */
 :root[data-theme][data-seite="coach"] #view .coach-quellen{display:grid;gap:4px;padding-top:9px;border-top:var(--haarlinie,1px) dashed color-mix(in srgb,currentColor 35%,transparent)}
@@ -17195,7 +17188,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-quellen a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 :root[data-theme][data-seite="coach"] #view .coach-knopf.ist-schritte{border-color:var(--kontur-farbe)!important;background:var(--modus-bewertung)!important}
 /* Auf Hellblau und Rosa bleibt die Schrift dunkel, auch im Dark Mode. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-modus-pille,.coach-modus-pille span,.coach-web-pille:has(input:checked),.coach-web-pille:has(input:checked) span,.coach-modus-marke,.coach-knopf.ist-schritte,.coach-menue-symbol,.coach-menue-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
+:root[data-theme][data-seite="coach"] #view :is(.coach-web-pille:has(input:checked),.coach-web-pille:has(input:checked) span,.coach-knopf.ist-schritte,.coach-menue-symbol,.coach-menue-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
+/* Modus-Pille und Etiketten: gefüllt wie der Senden-Knopf, Schrift hell.
+   Die Werkzeugzeile im Selektor schlägt die allgemeine Dark-Mode-Regel für
+   Knöpfe (#app :is(button:not(.app-dex-menu))). */
+:root[data-theme][data-seite="coach"] #view .coach-werkzeugzeile .coach-modus-pille{background:var(--ui-gefuellt,#111111)!important}
+:root[data-theme][data-seite="coach"] #view :is(.coach-modus-pille,.coach-modus-pille span,.coach-modus-marke){color:var(--ui-gefuellt-schrift,#ffffff)!important;-webkit-text-fill-color:var(--ui-gefuellt-schrift,#ffffff)!important}
 :root[data-theme][data-seite="coach"] #view .coach-web-pille:has(input:checked) .coach-web-symbol{stroke:#111111!important;color:#111111!important}
 /* Kleinere Pillen, gleich große Tippfläche. */
 :root[data-theme][data-seite="coach"] #view :is(.coach-web-pille,.coach-modus-pille){position:relative}
