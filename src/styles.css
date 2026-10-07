@@ -17202,5 +17202,5 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 .nutrition-day-complete{width:100%;min-height:44px;margin-top:12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);color:var(--ink);font:700 13px/1.3 var(--ui);text-align:center;cursor:pointer}
 .nutrition-day-complete[aria-pressed="true"]{background:var(--accent-soft,#e8f5df)}
 .nutrition-day-complete:disabled{opacity:.55;cursor:default}
-:root[data-seite="sleep"] #view .sleep-history>.sleep-reset-button{display:flex;align-items:center;justify-content:center;width:calc(100% - 24px);min-height:44px;margin:12px;padding:8px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);color:var(--ink);font:700 13px/1.3 var(--ui);text-align:center}
-:root[data-seite="sleep"] #view .sleep-history>.sleep-reset-button:disabled{opacity:.55}
+:root[data-theme][data-seite="sleep"] #view .sleep-reset-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:8px;padding:0 16px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:transparent;color:var(--kontur-farbe);box-shadow:none;font:750 13px/1.2 "Work Sans",sans-serif;text-transform:none}
+:root[data-theme][data-seite="sleep"] #view .sleep-reset-button:disabled{opacity:.55;cursor:default}
