@@ -41,10 +41,21 @@ describe('Antwort des Coachings', () => {
     expect(ergebnis).toMatchObject({ datenlage: 'mittel', fokus: { bereich: 'training' } });
   });
 
-  it('speichert keine leere Karte ohne Punkt und Fokus', () => {
+  it('speichert keine leere Karte ohne Überschrift oder Punkt', () => {
     expect(() => coachingBereinigen({ punkte: 'x', datenlage: 'sehr hoch' })).toThrow('Coaching-Antwort');
-    expect(() => coachingBereinigen({ ueberschrift: 'Heute', punkte: [{ bereich: 'training', text: 'Gut.' }] })).toThrow('Coaching-Antwort');
     expect(() => coachingBereinigen({ ueberschrift: 'Heute', punkte: [], fokus: { bereich: 'training', text: 'Morgen.' } })).toThrow('Coaching-Antwort');
+  });
+
+  // Rückmeldung des Nutzers 07.10.: Im ersten Zyklus kam als Fokus nur der
+  // geplante Bereich einer beliebigen Übung („Beinpresse 6–10 Wdh.“).
+  it('lässt den Fokus ohne echten Hebel weg, statt einen beliebigen zu erzwingen', () => {
+    const ohne = coachingBereinigen({ ueberschrift: 'Heute', punkte: [{ bereich: 'training', text: 'Gut.' }], fokus: { bereich: 'training', text: ' ' } });
+    expect(ohne.fokus).toBeNull();
+    expect(ohne.bereiche).toEqual(['training']);
+    expect(coachingBereinigen({ ueberschrift: 'Heute', punkte: [{ bereich: 'schlaf', text: 'Kurz.' }] }).fokus).toBeNull();
+    const prompt = coachingSystemPrompt();
+    expect(prompt).toContain('Never build a focus from an "erstmals" target');
+    expect(prompt).toContain('no focus is better than a random one');
   });
 
   it('bleibt ein Coach für Muskelaufbau: kein Sicherheitshinweis, nur eine knappe Ausnahme für eindeutig Ernstes', () => {

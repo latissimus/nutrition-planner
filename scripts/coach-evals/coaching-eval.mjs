@@ -22,10 +22,26 @@ const training = (datum, vergleich = 'gesteigert') => ({
   muskeln: [],
 });
 
+/* Erster Zyklus nach dem Koppeln (Rückmeldung des Nutzers 07.10.): kein
+   Vergleich, die nächste Einheit hat nur „erstmals“-Ziele (der geplante
+   Bereich aus LOGMAN), kein Schlaf, keine Kalorien. */
+const ersterZyklus = {
+  stand: { cycle: 1, deload: false, cyclesBisDeload: 7, zuletztTrainiert: heute, tageSeitLetzterEinheit: 0 },
+  heute: [{ datum: heute, einheit: 'OK-H', uebungen: [
+    { name: 'Rear Delt Rows', satzart: 'HEAVY', bestE1: 52, vergleich: 'erstmals', differenzE1: null, lastsprung: null, rirUeberZiel: true, saetze: [{ w: 40, r: 9, rir: 2 }, { w: 40, r: 8, rir: 2 }] },
+    { name: 'Schrägbankdrücken', satzart: 'HEAVY', bestE1: 98, vergleich: 'erstmals', differenzE1: null, lastsprung: null, rirUeberZiel: false, saetze: [{ w: 75, r: 9, rir: 1 }] },
+  ] }],
+  naechsteEinheit: { cycle: 1, einheit: 'UK-H', uebungen: [
+    { name: 'PlateLoaded Beinpresse', muskel: 'Quadrizeps', satzart: 'HEAVY', ziel: { art: 'erstmals', bereich: '6–10' } },
+    { name: 'Beinbeuger sitzend', muskel: 'Beinbeuger', satzart: 'HEAVY', ziel: { art: 'erstmals', bereich: '6–10' } },
+  ] },
+  uebungen: [], muskeln: [],
+};
+
 const faelle = [
   {
     id: 'steigerung', aenderungen: ['training'], training: training(heute),
-    daten: daten(), erwarteterErsterBereich: 'training',
+    daten: daten(), erwarteterErsterBereich: 'training', fokusErwartet: true,
     manuell: 'Nennt die Verbesserung und das Ziel 100 kg × 8 für die nächste Einheit, ohne neue Last zu errechnen?',
   },
   {
@@ -66,6 +82,12 @@ const faelle = [
     daten: daten(),
     recentCheckinNotes: [{ date: heute, text: 'Beim Training heute kurz schwarz vor Augen geworden.' }],
     manuell: 'Nennt kein Trainingsziel, sagt im Fokus ruhig und klar, das zeitnah ärztlich abklären zu lassen, bevor wieder trainiert wird – ohne Drama oder Diagnose?',
+  },
+  {
+    id: 'erster-zyklus', aenderungen: ['training'], training: ersterZyklus,
+    daten: daten({ sleep: { checkins: 0 }, nutrition: { completeDays: 0 } }),
+    erwarteterErsterBereich: 'training', fokusErwartet: false,
+    manuell: 'Lässt den Fokus leer, statt den geplanten Bereich einer beliebigen Übung zu nennen, und wiederholt die geplanten Bereiche der nächsten Einheit nicht?',
   },
 ];
 // Einzelne Fälle: --nur=fall-a,fall-b (z. B. nach einer kleinen Prompt-Änderung).
@@ -119,6 +141,8 @@ for (const { fall, body } of anfragen) {
   try {
     ergebnis = coachingBereinigen(JSON.parse(text));
     if (fall.erwarteterErsterBereich && ergebnis.punkte[0]?.bereich !== fall.erwarteterErsterBereich) befund.push('Erster Bereich anders als erwartet');
+    if (fall.fokusErwartet === true && !ergebnis.fokus) befund.push('Fokus fehlt');
+    if (fall.fokusErwartet === false && ergebnis.fokus) befund.push(`Fokus ohne echten Hebel: ${ergebnis.fokus.text}`);
   } catch (error) {
     befund.push(`Antwort nicht verwendbar: ${error.message}`);
   }

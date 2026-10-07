@@ -58,6 +58,9 @@ describe('Coaching: Karte', () => {
     expect(html).toContain('class="coaching-fokus"');
     expect(html).toContain('Auf Basis deiner Daten');
     expect(html).not.toContain('Datenlage');
+    const ohneFokus = coachingKarteMarkup(frisch({ ergebnis: { ...frisch().ergebnis, fokus: null } }));
+    expect(ohneFokus).not.toContain('coaching-fokus');
+    expect(ohneFokus).toContain('<h2>Titel</h2>');
   });
 
 

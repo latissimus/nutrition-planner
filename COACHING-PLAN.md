@@ -68,6 +68,20 @@ Ernährung und Körpergewicht. Diese Daten hat nur CAPBOY.
   `npm run eval:coaching -- --live --nur=ernste-angabe` (ein bezahlter Aufruf).
 - **Offen:** 4b (Chat-Schalter), 5 (Wochenteil montags, „Wochenbilanz
   starten“ entfällt), 6 (COMP-KI-Karte und Bewerten-Knöpfe entfernen).
+- **Rückmeldung 07.10.2026 zum Tages-Coaching (bereitgestellt am 07.10.,
+  Prüfungen 200/401/401/401):** Der Fokus „Peile bei der PlateLoaded Beinpresse 6–10
+  Wiederholungen an“ war beliebig: Im ersten Zyklus hat die nächste Einheit
+  nur „erstmals“-Ziele, also LOGMANs geplanten Bereich, und die Regel
+  verlangte immer einen Fokus. Jetzt: Fokus nur mit echtem Hebel (Ziel
+  „wiederholung_mehr“/„last_erhoehen“/„deload“, Stillstand oder Fallen mit
+  belegtem Grund, klares Erholungs-/Schlaf-/Ernährungsproblem), sonst leer
+  (`coachingBereinigen` erlaubt das, die Karte zeigt dann keinen Fokus);
+  „erstmals“-Bereiche werden nicht wiederholt. Wochen-Prompt unverändert.
+  Neuer Fall `erster-zyklus` in `eval:coaching` (Fokus muss fehlen),
+  `steigerung` prüft, dass ein echter Fokus bleibt.
+  Bezahlter Lauf 07.10. (`results/2026-10-07T19-13-27-327Z-coaching.json`):
+  `erster-zyklus` ohne Fokus, keine geplanten Bereiche wiederholt;
+  `steigerung` behält „Kniebeuge 100 kg für 8 Wiederholungen“. Bestanden.
 - **Stand 07.10.2026 abends:** 5 und 6 bereitgestellt, 4b bereitgestellt
   (capboy-coach); offen ist nur noch der App-Push des Nutzers. Danach: gemeinsame
   Neubewertung („unfairer Vorteil“) und Coach-Icon finalisieren.

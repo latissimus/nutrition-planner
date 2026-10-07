@@ -80,7 +80,7 @@ An area listed in "switchedOffAreas" was switched off by the user: never mention
 
 <rules>
 1. The app calculates, you interpret. Copy numbers exactly as given, with their unit and German decimal commas. Never compute differences, averages, percentages or new targets yourself. Targets for the next session come only from "naechsteEinheit".
-2. If the user trained today, the training comes first: what improved, what stayed or fell compared with last time, and the target for the next session of the rotation with its numbers. If training changed since the last coaching but the session date is earlier than today, discuss the latest session as a backdated update and name its date. A load jump or sets further from failure than planned are worth one sentence.
+2. If the user trained today, the training comes first: what improved, what stayed or fell compared with last time, and the target for the next session of the rotation with its numbers. A target of type "erstmals" is no target: it is only the planned range that LOGMAN already shows, so do not restate it. If training changed since the last coaching but the session date is earlier than today, discuss the latest session as a backdated update and name its date. A load jump or sets further from failure than planned are worth one sentence.
 3. Connect the areas only where the data supports it. If an exercise stalls ("ohneFortschritt" at least 2) or falls repeatedly, look in sleep, recovery check-ins, "recentDays" and body composition (rule 10) for the most plausible supported explanation and say it is a likely reason, not a proven one. Mention another area only if it changes today's assessment or the next session; otherwise leave it out.
 4. On a day without training, judge recovery and readiness for the next session from sleep, recovery, nutrition entered today and routines.
 5. Fatigue shortly before the deload ("cyclesBisDeload" 0–1) is expected. Do not propose changes of volume, level or sets; the weekly review decides that.
@@ -92,7 +92,7 @@ ${COACHING_GRENZEN}
 <output>
 - ueberschrift: the single most important insight of the day, concrete, at most 70 characters. It is also the text of the push notification. No greeting.
 - punkte: one to three points, the most important first. Each has the area it is about and one or two short sentences with the numbers it relies on.
-- fokus: exactly one concrete thing for the next session or for tomorrow, in one sentence. For training, take the target from "naechsteEinheit".
+- fokus: one concrete thing for the next session or for tomorrow, in one sentence, only if today's data gives a real lever: a target from "naechsteEinheit" of type "wiederholung_mehr", "last_erhoehen" or "deload" (take its numbers), a stall or repeated fall with a supported reason, or a clear recovery, sleep or nutrition issue in today's data. Never build a focus from an "erstmals" target and never pick a single exercise without a reason in the data. Without a real lever, leave fokus.text empty (fokus.bereich is then ignored): no focus is better than a random one.
 - datenlage: how well today's data supports the coaching ("niedrig", "mittel", "hoch").
 Write German, address the user as "du", short sentences, no filler, no praise the data does not support.
 </output>`;
@@ -150,7 +150,9 @@ export function coachingBereinigen(roh: Row) {
   const fokusText = kurz(roh?.fokus?.text, 300);
   const fokus = fokusBereich && fokusText ? { bereich: fokusBereich, text: fokusText } : null;
   const ueberschrift = kurz(roh?.ueberschrift, 70);
-  if (!ueberschrift || !punkte.length || !fokus) throw new Error('Coaching-Antwort ohne Überschrift, Punkt oder Fokus');
+  // Ein Fokus nur mit echtem Hebel (Rückmeldung des Nutzers 07.10.): ohne ihn
+  // bleibt er leer, die Karte zeigt dann keinen.
+  if (!ueberschrift || !punkte.length) throw new Error('Coaching-Antwort ohne Überschrift oder Punkt');
   return {
     ueberschrift,
     punkte,
