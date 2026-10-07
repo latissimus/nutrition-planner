@@ -162,6 +162,6 @@ export function coachingKarteMarkup(coaching) {
     ${punkte ? `<ul class="coaching-punkte">${punkte}</ul>` : ''}
     ${woche ? wochenteilMarkup(coaching) : ''}
     ${ergebnis.fokus ? `<div class="coaching-fokus"><b>${woche ? 'Fokus der Woche' : 'Fokus'}</b><p>${escapeHtml(ergebnis.fokus.text)}</p></div>` : ''}
-    <footer>Datenlage: ${escapeHtml(ergebnis.datenlage || 'niedrig')} · Frag einfach unten nach.</footer>
+    <footer>Auf Basis deiner Daten · Frag einfach unten nach.</footer>
   </section>`;
 }

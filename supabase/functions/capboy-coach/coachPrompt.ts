@@ -320,9 +320,13 @@ export function coachUserPrompt(scope: Scope, question: string, snapshot: unknow
 
 // Request body of the free coach and of the non-central scopes. The central
 // COMP assessment builds its own body in index.ts.
-export function coachRequestBody({ scope, question, snapshot, timeseries, memory, weekly, webResearch, vectorStoreId, imageDataUrls }: {
+export function coachRequestBody({ scope, question, snapshot, timeseries, memory, weekly, webResearch, vectorStoreId, imageDataUrls, modus }: {
   scope: Scope; question: string; snapshot: unknown; timeseries?: unknown; memory?: CoachMemory; weekly?: unknown; webResearch: boolean; vectorStoreId: string | null; imageDataUrls?: string[];
+  // Schritt 4b: 'frage' nutzt den Frage-Prompt und sein Schema; ohne Angabe
+  // oder 'bewertung' bleibt die Anfrage genau wie bisher.
+  modus?: 'frage' | 'bewertung';
 }) {
+  const frageModus = scope === 'coach' && modus === 'frage';
   const tools: Row[] = vectorStoreId
     ? [{ type: 'file_search', vector_store_ids: [vectorStoreId], max_num_results: 6 }]
     : [];
@@ -337,7 +341,7 @@ export function coachRequestBody({ scope, question, snapshot, timeseries, memory
     : prompt;
   return {
     model: COACH_MODEL,
-    instructions: coachSystemPrompt(scope, webResearch),
+    instructions: frageModus ? frageSystemPrompt(webResearch) : coachSystemPrompt(scope, webResearch),
     input: [{ role: 'user', content }],
     reasoning: { effort: scope === 'coach' ? 'medium' : 'high' },
     max_output_tokens: 4000,
@@ -347,9 +351,9 @@ export function coachRequestBody({ scope, question, snapshot, timeseries, memory
     text: {
       format: {
         type: 'json_schema',
-        name: 'capboy_coach_result',
+        name: frageModus ? 'capboy_coach_frage' : 'capboy_coach_result',
         strict: true,
-        schema: scope === 'coach' ? coachResultSchema : resultSchema,
+        schema: frageModus ? frageSchema : (scope === 'coach' ? coachResultSchema : resultSchema),
       },
     },
   };
@@ -364,4 +368,168 @@ export function outputText(response: Row) {
     }
   }
   return parts.join('');
+}
+
+// ---------------------------------------------------------------------------
+// Frage-Modus (COACHING-PLAN.md, Schritt 4b)
+// ---------------------------------------------------------------------------
+// Eine Frage bekommt eine Antwort, keine Auswertung mit Schritten. Eingabe,
+// Datenregeln, Datenlage, Wissen, Sicherheit und Ton sind dieselben wie im
+// Bewertungs-Prompt: Sie werden zur Laufzeit aus ihm ausgeschnitten und können
+// so nicht auseinanderlaufen (Test prüft Wortgleichheit).
+
+export const FRAGE_GEMEINSAME_ABSCHNITTE = ['input_contract', 'data_rules', 'confidence', 'knowledge_handling', 'safety_constraints', 'tone_of_voice'] as const;
+
+// Ein Abschnitt beginnt und endet mit seinem Tag auf eigener Zeile; Verweise
+// im Fließtext („as defined in <safety_constraints>“) zählen nicht.
+export function promptAbschnitt(prompt: string, tag: string) {
+  const treffer = prompt.match(new RegExp(`(?:^|\\n)(<${tag}>\\n[\\s\\S]*?\\n</${tag}>)(?=\\n|$)`));
+  if (!treffer) throw new Error(`Prompt-Abschnitt ${tag} fehlt`);
+  return treffer[1];
+}
+
+export function frageSystemPrompt(webResearch: boolean) {
+  const bewertung = freeCoachSystemPrompt(webResearch);
+  const gemeinsam = FRAGE_GEMEINSAME_ABSCHNITTE.map((tag) => promptAbschnitt(bewertung, tag)).join('\n\n');
+  return `# Coach — question mode in CAPBOY
+
+<role_and_mission>
+You are the Coach, the data-driven body composition coach inside CAPBOY, a personal tracking app. The user calls you "Coach"; CAPBOY is the name of the app, not yours.
+The user has chosen question mode: they want an answer to their question, not an assessment with next steps.
+- Answer exactly the question in <user_question>, directly, as one coherent text, the way an experienced coach who knows this person's data would.
+- Use the whole picture to get the answer right, but mention another area (for example nutrition when the question is about training) only if it changes the answer.
+- Give no recommendations, experiments, experiment reviews, or lists of open points, unless the question explicitly asks what to do, change, or improve; then name the most important steps briefly in the text. A full assessment with steps is a separate request the user can make.
+- This overrides the instruction in <input_contract> to evaluate due experiments first: mention an experiment only if the question is about it.
+- Say each point once. No headings, no recap at the end.
+- Use numbers only where they carry the answer.
+</role_and_mission>
+
+${gemeinsam}
+
+<output_rules>
+Fill the response schema as follows:
+- answer: the direct answer in German, usually two to six short sentences; short paragraphs if needed, no headings, and no bullet list unless the user asks for one. Where the rules above mention "summary", "facts", "interpretations", or "recommendations", they mean this text: copy numbers exactly with their unit, label knowledge-based statements inline as defined in <knowledge_handling>, and report a seminar dose or protocol only as documented seminar knowledge with its source, never as a personal instruction.
+- confidence: "niedrig", "mittel", or "hoch" as defined in <confidence>.
+- followUpQuestion: at most one question, and only if its answer would change your answer; otherwise an empty string.
+- safetyNote: required only for a clearly present red flag, a clear disordered-eating signal, risky substances, or an unsafe request, as defined in <safety_constraints>. Otherwise it is empty. If you set the analysis aside for a red flag or disordered eating, the answer says so supportively and the safety note carries the recommendation. Keep the safety note calm and short: one or two sentences on what to do and how soon. Do not list further symptoms to watch for, and use no dramatic wording.
+- If the question asks for a risky substance or an unsafe plan, the answer opens with the clear "no" and the main risk. Never lead with possible benefits.
+- stepsUseful: whether the app should offer to turn this answer into concrete next steps. True only if the answer leads to something the user can actually do or change: it names a concrete action, or it answers a decision the user now has to carry out. False for pure knowledge, explanation, or reassurance with nothing to do (for example "a week off costs no muscle"), and false whenever safetyNote is set.
+- sources: what this answer actually rests on, shown to the user under the answer.
+  - userData: the areas of the user's own data that the answer uses ("koerper", "training", "ernaehrung", "schlaf", "erholung", "routinen"); empty if it uses none.
+  - seminarFiles: the exact file names of the seminar files from file_search whose content the answer uses; empty if none. Never name a file that file_search did not return.
+  - generalKnowledge: true if the answer also rests on general training, nutrition, or physiology knowledge beyond the user's data and the seminar.
+</output_rules>
+
+<final_check>
+Before answering, verify silently:
+- Did I answer exactly the question asked, without advice nobody asked for?
+- Did I mention another area only where it changes the answer?
+- Is every number copied exactly from the input blocks, with its unit, and nothing computed?
+- Does every point appear only once?
+- Does the answer respect <safety_constraints>, including risky substances, very low intake, and red flags?
+Fix any violation before answering.
+</final_check>
+
+Always respond to the user in German.`;
+}
+
+export const DATEN_BEREICHE = ['koerper', 'training', 'ernaehrung', 'schlaf', 'erholung', 'routinen'] as const;
+
+export const frageSchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    answer: { type: 'string' },
+    confidence: { type: 'string', enum: ['niedrig', 'mittel', 'hoch'] },
+    followUpQuestion: { type: 'string' },
+    safetyNote: { type: 'string' },
+    stepsUseful: { type: 'boolean' },
+    sources: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        userData: { type: 'array', items: { type: 'string', enum: [...DATEN_BEREICHE] } },
+        seminarFiles: { type: 'array', items: { type: 'string' } },
+        generalKnowledge: { type: 'boolean' },
+      },
+      required: ['userData', 'seminarFiles', 'generalKnowledge'],
+    },
+  },
+  required: ['answer', 'confidence', 'followUpQuestion', 'safetyNote', 'stepsUseful', 'sources'],
+};
+
+/** Feste Form einer Frage-Antwort; ohne Text gilt sie als gescheitert.
+    seminarTitel: Titel einer Seminardatei, die file_search in dieser Anfrage
+    tatsächlich geliefert hat, sonst null. So erscheint keine Quelle, die das
+    Modell nur genannt, aber nicht abgerufen hat. Mit Sicherheitshinweis gibt
+    es kein „Daraus Schritte machen“. */
+export function frageBereinigen(roh: Row, { seminarTitel = (_datei: string): string | null => null } = {}) {
+  const answer = String(roh?.answer ?? '').trim().slice(0, 4000);
+  if (!answer) throw new Error('Frage-Antwort ohne Text');
+  const safetyNote = String(roh?.safetyNote ?? '').trim().slice(0, 800);
+  const quellen = roh?.sources || {};
+  const seminar = [...new Set((Array.isArray(quellen.seminarFiles) ? quellen.seminarFiles : [])
+    .map((datei: unknown) => seminarTitel(String(datei ?? '').trim()))
+    .filter(Boolean) as string[])].slice(0, 4);
+  return {
+    modus: 'frage' as const,
+    answer,
+    confidence: ['niedrig', 'mittel', 'hoch'].includes(roh?.confidence) ? roh.confidence : 'niedrig',
+    followUpQuestion: String(roh?.followUpQuestion ?? '').trim().slice(0, 300),
+    safetyNote,
+    stepsUseful: roh?.stepsUseful === true && !safetyNote,
+    sources: {
+      userData: DATEN_BEREICHE.filter((bereich) => (Array.isArray(quellen.userData) ? quellen.userData : []).includes(bereich)),
+      seminar,
+      generalKnowledge: quellen.generalKnowledge === true,
+    },
+  };
+}
+
+/* Anzeigename eines Seminar-Dokuments: Die kontrollierte Fassung und das
+   Original sind für den Nutzer dasselbe Dokument. */
+export const seminarAnzeigeTitel = (titel: string) => String(titel || '').replace(/^Kontrolliertes Seminarwissen:\s*/, '').trim();
+
+/* Quellen einer Bewertung (Schritt 4b, Rückmeldung 07.10.): ohne Änderung an
+   Prompt und Schema aus dem Text abgeleitet. Ein Seminar-Dokument zählt nur,
+   wenn der Text es mit Dateinamen nennt (so verlangt es <knowledge_handling>)
+   und file_search es in dieser Anfrage geliefert hat (kandidaten); ein
+   „[Seminarwissen …]“ ohne solches Dokument belegt nichts (GPT-Review).
+   Fakten stammen aus den Daten der Person; „[Evidenz]“ kennzeichnet
+   allgemeines Fachwissen. */
+const ohneEndung = (name: string) => name.replace(/\.(pdf|md|json)(\.txt)?$/, '');
+export function bewertungQuellen(result: Row, kandidaten: { title: string; filename: string; original?: string }[] = []) {
+  const texte: string[] = [];
+  const sammeln = (wert: unknown) => {
+    if (typeof wert === 'string') texte.push(wert);
+    else if (Array.isArray(wert)) wert.forEach(sammeln);
+    else if (wert && typeof wert === 'object') Object.values(wert).forEach(sammeln);
+  };
+  ['summary', 'facts', 'interpretations', 'recommendations', 'uncertainties', 'experimentReviews', 'safetyNote'].forEach((feld) => sammeln(result?.[feld]));
+  const text = texte.join('\n');
+  const genannt = kandidaten.filter((quelle) => [quelle.filename, ohneEndung(quelle.filename), quelle.original, quelle.original && ohneEndung(quelle.original)]
+    .some((name) => name && text.includes(name)));
+  const seminar = [...new Set(genannt.map((quelle) => seminarAnzeigeTitel(quelle.title)))].slice(0, 4);
+  return {
+    userData: [] as string[],
+    ownData: (result?.facts || []).length > 0,
+    seminar,
+    generalKnowledge: /\[Evidenz\]/.test(text),
+  };
+}
+
+/* „Daraus Schritte machen“ (GPT-Review 4b): ein eigener Auftrag mit Frage und
+   Antwort, nicht dieselbe Frage noch einmal. Die App schickt beides mit, damit
+   es auch bei älteren Antworten außerhalb des Gesprächsgedächtnisses geht. */
+export const SCHRITTE_FRAGE_MAX = 1000;
+export const SCHRITTE_ANTWORT_MAX = 3000;
+export function schritteAuftrag(quelle: Row | null | undefined) {
+  const frage = String(quelle?.frage ?? '').trim().slice(0, SCHRITTE_FRAGE_MAX);
+  const antwort = String(quelle?.antwort ?? '').trim().slice(0, SCHRITTE_ANTWORT_MAX);
+  if (!antwort) return null;
+  return [
+    'Leite aus deiner Antwort unten konkrete nächste Schritte für mich ab. Bleib beim Thema dieser Frage und Antwort; fang keine neue Gesamtbewertung an.',
+    frage ? `Meine Frage war: ${frage}` : '',
+    `Deine Antwort war: ${antwort}`,
+  ].filter(Boolean).join('\n\n');
 }

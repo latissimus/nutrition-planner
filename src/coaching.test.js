@@ -56,6 +56,8 @@ describe('Coaching: Karte', () => {
     expect(html).toContain('Punkt &lt;b&gt;');
     expect(html).toContain('<span class="coaching-bereich">Training</span>');
     expect(html).toContain('class="coaching-fokus"');
+    expect(html).toContain('Auf Basis deiner Daten');
+    expect(html).not.toContain('Datenlage');
   });
 
 

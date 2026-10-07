@@ -78,9 +78,10 @@ export function interventionBlock(rows: Row[], today: string, timeseries?: Row |
 
 // What is stored of a coach answer as the coach's turn: the core of the
 // answer, not the whole JSON. Numbers stay exactly as the coach wrote them.
+// A question-mode answer (step 4b) has no summary; its answer text is stored.
 export function assistantMemoryText(result: Row) {
   const parts = [
-    result?.summary ? String(result.summary) : '',
+    result?.summary ? String(result.summary) : (result?.answer ? String(result.answer) : ''),
     ...(result?.recommendations || []).map((item: Row, index: number) => `Empfehlung ${index + 1}: ${item.action}${item.timeframe ? ` (${item.timeframe})` : ''}`),
   ].filter(Boolean);
   return cut(parts.join(' '), MEMORY_LIMITS.messageChars);

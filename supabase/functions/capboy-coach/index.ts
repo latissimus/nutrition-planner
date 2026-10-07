@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.58.0';
 import { KNOWLEDGE_DOCUMENTS, KNOWLEDGE_SOURCES, KNOWLEDGE_VERSION } from './knowledge.ts';
-import { COACH_MODEL, coachRequestBody, outputText, type Scope } from './coachPrompt.ts';
+import { COACH_MODEL, coachRequestBody, frageBereinigen, outputText, schritteAuftrag, type Scope } from './coachPrompt.ts';
+import { bewertungsQuellenAus, seminarTitelAus, webSources } from './quellen.ts';
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
 import { reviewWeeks, weeklyBlock } from './weekly.ts';
@@ -283,33 +284,6 @@ async function saveWeeklyReview(userId: string, weekly: Row, report: Row, result
   return !error;
 }
 
-
-function webSources(response: Row) {
-  const cited: Row[] = [];
-  const retrieved: Row[] = [];
-  for (const item of response.output || []) {
-    if (item.type === 'web_search_call') {
-      for (const source of item.action?.sources || []) retrieved.push(source);
-    }
-    if (item.type === 'message') {
-      for (const content of item.content || []) {
-        for (const annotation of content.annotations || []) {
-          if (annotation.type !== 'url_citation') continue;
-          cited.push(annotation.url_citation || annotation);
-        }
-      }
-    }
-  }
-  return [...cited, ...retrieved].flatMap((source) => {
-    try {
-      const url = new URL(String(source.url || ''));
-      if (!['http:', 'https:'].includes(url.protocol)) return [];
-      return [{ title: String(source.title || url.hostname).slice(0, 240), url: url.href }];
-    } catch {
-      return [];
-    }
-  }).filter((source, index, all) => all.findIndex((item) => item.url === source.url) === index).slice(0, 8);
-}
 
 function validateSources(sources: Row[] = []) {
   return sources.flatMap((source) => {
@@ -697,6 +671,11 @@ Deno.serve(async (request) => {
     const question = String(body?.question || '').trim().slice(0, 2000);
     if (question.length < 2) return json({ error: 'Bitte stelle eine Frage.' }, 400);
     const webResearch = body?.webResearch === true;
+    // Schritt 4b: „Frage“ beantwortet nur die Frage. Ohne Angabe (ältere
+    // App-Version) bleibt es bei „Bewertung & Schritte“. „Daraus Schritte
+    // machen“ ist eine Bewertung mit eigenem Auftrag aus Frage und Antwort.
+    const modus: 'frage' | 'bewertung' = body?.modus === 'frage' ? 'frage' : 'bewertung';
+    const schritteText = modus === 'bewertung' ? schritteAuftrag(body?.schritteAus) : null;
     const imageDataUrls = Array.isArray(body?.attachments)
       ? body.attachments.slice(0, 1).flatMap((attachment: Row) => {
         const value = String(attachment?.dataUrl || '');
@@ -714,7 +693,7 @@ Deno.serve(async (request) => {
     const memory = await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries);
     const vectorStoreId = await ensureKnowledgeBase();
 
-    const requestBody = coachRequestBody({ scope, question, snapshot, timeseries, memory: memory?.blocks, webResearch, vectorStoreId, imageDataUrls });
+    const requestBody = coachRequestBody({ scope, question: schritteText || question, snapshot, timeseries, memory: memory?.blocks, webResearch, vectorStoreId, imageDataUrls, modus });
     const responsePayload = await openAi('/responses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -725,13 +704,19 @@ Deno.serve(async (request) => {
     }
     const raw = outputText(responsePayload);
     if (!raw) return json({ error: 'Die Coach-Antwort war leer.' }, 502);
+    const geparst = JSON.parse(raw);
     const result = {
-      ...JSON.parse(raw),
+      ...(modus === 'frage'
+        ? frageBereinigen(geparst, { seminarTitel: seminarTitelAus(responsePayload) })
+        : { ...geparst, modus, sources: bewertungsQuellenAus(geparst, responsePayload) }),
       webResearchRequested: webResearch,
       webSources: webResearch ? webSources(responsePayload) : [],
     };
 
-    const memorySaved = memory?.available ? await saveTurn(userId, conversationId, question, result) : false;
+    // Im Gedächtnis steht bei „Daraus Schritte machen“, zu welcher Frage.
+    const bezug = schritteText ? String(body?.schritteAus?.frage || '').trim().slice(0, 300) : '';
+    const gespeicherteFrage = schritteText && bezug ? `${question} (zur Frage: ${bezug})` : question;
+    const memorySaved = memory?.available ? await saveTurn(userId, conversationId, gespeicherteFrage, result) : false;
     return json({
       result, scope, period: snapshot.period, cached: false,
       conversationId, memoryAvailable: Boolean(memory?.available), memorySaved,

@@ -19,7 +19,8 @@ describe('Coach-Webquellen', () => {
       webResearchRequested: true,
       webSources: [{ title: 'Studie & Leitlinie', url: 'https://example.org/study?q=1&lang=de' }],
     });
-    expect(html).toContain('Verwendete Webquellen');
+    expect(html).toContain('<summary>Recherchetreffer</summary>');
+    expect(html).not.toContain('Web: ');
     expect(html).toContain('target="_blank" rel="noopener noreferrer"');
     expect(html).toContain('Studie &amp; Leitlinie');
     expect(html).toContain('https://example.org/study?q=1&amp;lang=de');
@@ -44,7 +45,7 @@ describe('Coach-Webquellen', () => {
       webSources: [{ title: 'Nicht sicher', url: 'javascript:alert(1)' }],
     });
     expect(html).not.toContain('javascript:');
-    expect(html).not.toContain('Verwendete Webquellen');
+    expect(html).not.toContain('Web: ');
     expect(html).toContain('Keine Webquelle verwendet');
   });
 
@@ -88,7 +89,7 @@ describe('Coach-Chat: Retro-Fenster', () => {
     expect(html.indexOf('Kurz gesagt')).toBeLessThan(html.indexOf('<details class="coach-mehr">'));
     expect(html).toContain('<summary>Daten &amp; Einordnung</summary><h4>Daten</h4>');
     expect(html).toContain('<h4>Noch unsicher</h4>');
-    expect(html).toContain('Datenlage: mittel');
+    expect(html).not.toContain('Datenlage');
     expect(resultMarkup(baseResult)).not.toContain('coach-mehr');
   });
 });

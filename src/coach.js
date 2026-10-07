@@ -21,6 +21,21 @@ export { fensterMarkup };
 const CONTEXT_KEY = 'muscledex:coach-context';
 // Laufendes Gespräch dieses Tabs: ID vom Server und die bisherigen Runden.
 const GESPRAECH_KEY = 'muscledex:coach-gespraech';
+// Chat-Modus (COACHING-PLAN.md, Schritt 4b): „Frage“ beantwortet nur die
+// Frage, „Bewertung & Schritte“ wertet aus und schlägt Schritte vor. Er gilt
+// für die Sitzung; eine neue Sitzung beginnt mit „Frage“.
+const MODUS_KEY = 'muscledex:coach-modus';
+export const MODI = { frage: 'Frage', bewertung: 'Bewertung & Schritte' };
+export function modusLesen() {
+  try { return sessionStorage.getItem(MODUS_KEY) === 'bewertung' ? 'bewertung' : 'frage'; } catch { return 'frage'; }
+}
+function modusSchreiben(modus) {
+  try { sessionStorage.setItem(MODUS_KEY, modus); } catch {}
+}
+// Antworten ohne Modus stammen aus der Zeit vor dem Schalter: Bewertungen.
+export const antwortModus = (result) => (result?.modus === 'frage' ? 'frage' : 'bewertung');
+const SCHRITTE_FRAGE_MAX = 1000;
+const SCHRITTE_ANTWORT_MAX = 3000;
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -101,43 +116,109 @@ function auswertungenMarkup(auswertungen = [], merken = false) {
 
 const liste = (eintraege) => `<ul>${eintraege.map((item) => `<li>${escapeHtml(readableModelText(item))}</li>`).join('')}</ul>`;
 
+// Etikett jeder Antwort: Der Modus steht als Wort da, die Farbe unterstützt.
+export const modusMarke = (modus) => `<span class="coach-modus-marke ist-${modus}">${escapeHtml(MODI[modus])}</span>`;
+
+function webQuellen(result) {
+  return (result.webSources || []).flatMap((source) => {
+    const url = safeExternalUrl(source?.url);
+    return url ? [{ title: source?.title || new URL(url).hostname, url, zitiert: source?.zitiert === true }] : [];
+  }).slice(0, 8);
+}
+const webLink = (source) => `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a>`;
+
+const DATEN_BEREICHE = {
+  koerper: 'Körper', training: 'Training', ernaehrung: 'Ernährung', schlaf: 'Schlaf', erholung: 'Erholung', routinen: 'Routinen',
+};
+// Worauf eine Antwort beruht – statt der früheren „Datenlage“: deine Daten,
+// Seminar, Web, Fachwissen. Quelle ist nur, was nachweislich einging: Seminar-
+// dokumente prüft der Server gegen das, was file_search geliefert hat; Web
+// nur, wenn die Antwort die Seite zitiert. Bloße Suchtreffer stehen getrennt
+// und zugeklappt als „Recherchetreffer“. Bei einer Bewertung leitet der Server
+// die Quellen aus dem Text ab (ownData ohne Bereiche); ältere Antworten
+// haben keine.
+function quellenMarkup(result) {
+  const quellen = result.sources || {};
+  const daten = (quellen.userData || []).flatMap((bereich) => (DATEN_BEREICHE[bereich] ? [DATEN_BEREICHE[bereich]] : []));
+  const seminar = (quellen.seminar || []).map((titel) => escapeHtml(titel));
+  const web = webQuellen(result);
+  const zitiert = web.filter((source) => source.zitiert);
+  const treffer = web.filter((source) => !source.zitiert);
+  const zeilen = [
+    daten.length ? `Deine Daten: ${escapeHtml(daten.join(', '))}` : (quellen.ownData ? 'Deine Daten' : ''),
+    seminar.length ? `Seminar: ${seminar.join(', ')}` : '',
+    zitiert.length ? `Web: ${zitiert.map(webLink).join(', ')}` : '',
+    quellen.generalKnowledge ? 'Allgemeines Fachwissen' : '',
+  ].filter(Boolean);
+  return `${zeilen.length ? `<div class="coach-quellen"><b>Quellen</b><ul>${zeilen.map((zeile) => `<li>${zeile}</li>`).join('')}</ul></div>` : ''}
+    ${treffer.length ? `<details class="coach-mehr coach-web-sources"><summary>Recherchetreffer</summary><p>Bei der Websuche gefunden. Nicht jeder Treffer floss in die Antwort ein.</p><ul>${treffer.map((source) => `<li>${webLink(source)}</li>`).join('')}</ul></details>` : ''}
+    ${result.webResearchRequested && !web.length ? '<small class="coach-web-status">Keine Webquelle verwendet</small>' : ''}`;
+}
+
+// Frage-Antwort (Schritt 4b): nur der Text, keine Karten. „Daraus Schritte
+// machen“ steht nur da, wo die Antwort zu etwas führt, das man tun kann
+// (stepsUseful), und fragt erst beim Antippen eine Bewertung an.
+function frageMarkup(result, { merken = false, schritteGemacht = false } = {}) {
+  return `<div class="coach-result ist-frage">
+    ${modusMarke('frage')}
+    <p class="coach-antwort">${escapeHtml(readableModelText(result.answer || ''))}</p>
+    ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
+    ${result.followUpQuestion ? `<p class="coach-rueckfrage">${escapeHtml(readableModelText(result.followUpQuestion))}</p>` : ''}
+    ${quellenMarkup(result)}
+    ${merken && result.stepsUseful === true && !schritteGemacht ? '<button class="coach-knopf ist-schritte" type="button" data-schritte-aus>Daraus Schritte machen</button>' : ''}
+  </div>`;
+}
+
 // Eine Antwort als Chatnachricht: zuerst die Antwort selbst, dann was zu tun
 // ist; Daten, Einordnung und Unsicherheiten stehen zugeklappt darunter.
-export function resultMarkup(result, { merken = false } = {}) {
+export function resultMarkup(result, { merken = false, schritteGemacht = false } = {}) {
   if (!result) return '';
+  if (antwortModus(result) === 'frage') return frageMarkup(result, { merken, schritteGemacht });
   const facts = (result.facts || []).slice(0, 6);
   const interpretations = (result.interpretations || []).slice(0, 5);
   const uncertainties = (result.uncertainties || []).slice(0, 5);
   const recommendations = (result.recommendations || []).slice(0, 3);
-  const webSources = (result.webSources || []).flatMap((source) => {
-    const url = safeExternalUrl(source?.url);
-    return url ? [{ title: source?.title || new URL(url).hostname, url }] : [];
-  }).slice(0, 8);
   const mehr = [
     facts.length ? `<h4>Daten</h4>${liste(facts)}` : '',
     interpretations.length ? `<h4>Einordnung</h4>${liste(interpretations)}` : '',
     uncertainties.length ? `<h4>Noch unsicher</h4>${liste(uncertainties)}` : '',
   ].join('');
-  return `<div class="coach-result">
+  return `<div class="coach-result ist-bewertung">
+    ${modusMarke('bewertung')}
     <p class="coach-antwort">${escapeHtml(readableModelText(result.summary || ''))}</p>
     ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
     ${auswertungenMarkup((result.experimentReviews || []).slice(0, 5), merken)}
     ${recommendations.length ? `<section class="coach-schritte"><h4>Nächste Schritte</h4>${recommendations.map((item, index) => empfehlungMarkup(item, index, merken)).join('')}</section>` : ''}
     ${mehr ? `<details class="coach-mehr"><summary>Daten &amp; Einordnung</summary>${mehr}</details>` : ''}
-    ${webSources.length ? `<details class="coach-mehr coach-web-sources"><summary>Verwendete Webquellen</summary><ul>${webSources.map((source) => `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`).join('')}</ul></details>` : ''}
-    ${result.webResearchRequested && !webSources.length ? '<small class="coach-web-status">Keine Webquelle verwendet</small>' : ''}
-    ${result.confidence ? `<small class="coach-datenlage">Datenlage: ${escapeHtml(result.confidence)}</small>` : ''}
+    ${quellenMarkup(result)}
   </div>`;
 }
 
-const nutzerText = (text, hatAnhang = false) => `<p>${escapeHtml(text)}</p>${hatAnhang ? '<small>Bild angehängt</small>' : ''}`;
+const kurz = (text, grenze) => (text.length > grenze ? `${text.slice(0, grenze - 1)}…` : text);
+// bezug: bei „Daraus Schritte machen“ die Frage, zu der die Schritte gehören.
+const nutzerText = (text, hatAnhang = false, bezug = '') => `<p>${escapeHtml(text)}</p>${bezug ? `<small>zu „${escapeHtml(kurz(bezug, 80))}“</small>` : ''}${hatAnhang ? '<small>Bild angehängt</small>' : ''}`;
+
+/* Auftrag für „Daraus Schritte machen“ (GPT-Review 4b): Frage und Antwort
+   gehen mit, damit es auch bei Antworten außerhalb der letzten acht
+   Nachrichten des Gesprächsgedächtnisses funktioniert. */
+export function schritteAnfrage(runde) {
+  if (antwortModus(runde?.result) !== 'frage' || !runde.result.answer || runde.result.stepsUseful !== true) return null;
+  return {
+    question: 'Daraus Schritte machen',
+    modus: 'bewertung',
+    schritteAus: {
+      frage: String(runde.frage || '').slice(0, SCHRITTE_FRAGE_MAX),
+      antwort: String(runde.result.answer).slice(0, SCHRITTE_ANTWORT_MAX),
+    },
+  };
+}
 
 // Das Gespräch: jede Runde als Frage und Antwort. Die Wochenbilanz trägt
 // zusätzlich ihren Wochenvergleich.
 export function verlaufMarkup(runden = [], avatar = '') {
   if (!runden.length) return '';
-  return runden.map((runde, index) => fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(runde.frage, runde.hatAnhang) })
-    + fensterMarkup({ runde: index, inhalt: `${runde.weekly ? vergleichMarkup(runde.weekly) : ''}${resultMarkup(runde.result, { merken: true })}` })).join('');
+  return runden.map((runde, index) => fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(runde.frage, runde.hatAnhang, runde.bezug) })
+    + fensterMarkup({ runde: index, inhalt: `${runde.weekly ? vergleichMarkup(runde.weekly) : ''}${resultMarkup(runde.result, { merken: true, schritteGemacht: runde.schritteGemacht })}` })).join('');
 }
 
 const tipptMarkup = (text) => fensterMarkup({ klasse: 'is-loading', inhalt: `<p class="coach-tippt" role="status">${sanduhrMarkup()}<span data-coach-ladestatus>${escapeHtml(text)}</span></p>` });
@@ -158,10 +239,6 @@ function ladephasenStarten(container, phasen) {
   return () => window.clearInterval(timer);
 }
 const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
-
-async function invokeCoach(scope, question = '', webResearch = false, conversationId = null, attachments = []) {
-  return rufeCoach({ scope, question, webResearch, ...(conversationId ? { conversationId } : {}), ...(attachments.length ? { attachments } : {}) });
-}
 
 async function rufeCoach(body) {
   const { data, error } = await supabase.functions.invoke('capboy-coach', { body });
@@ -240,10 +317,14 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
           <label class="coach-werkzeug">${materialIconMarkup('add_photo_alternate')}<span>Bild anhängen</span><input type="file" accept="image/*" data-coach-file></label>
           <label class="coach-werkzeug"><input type="checkbox" data-coach-web checked><span>Webwissen einbeziehen</span></label>
           <button class="coach-werkzeug" type="button" data-neues-gespraech${gespraech ? '' : ' hidden'}>${materialIconMarkup('edit')}<span>Neues Gespräch</span></button>
+          <div class="coach-modus-wahl" role="radiogroup" aria-label="Modus">
+            ${Object.entries(MODI).map(([wert, text]) => `<label class="coach-werkzeug ist-${wert}"><input type="radio" name="coach-modus" value="${wert}" data-coach-modus-wahl><span>${escapeHtml(text)}</span></label>`).join('')}
+          </div>
         </div>
         <div class="coach-attachment" data-coach-attachment hidden></div>
         <div class="coach-inputbar">
-          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen oder neues Gespräch"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
+          <button class="coach-modus" type="button" data-coach-modus></button>
+          <button class="coach-plus" type="button" data-coach-plus aria-expanded="false" aria-label="Bild, Webwissen, neues Gespräch oder Modus"><span class="material-svg coach-eingabe-icon" aria-hidden="true">${plusSvg}</span></button>
           <label class="sr-only" for="coach-question">Nachricht an den Coach</label>
           <textarea id="coach-question" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Nachricht an den Coach">${escapeHtml(pending.question || '')}</textarea>
           <div class="coach-aufnahme" data-coach-aufnahme hidden>
@@ -266,6 +347,28 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const webOption = form.querySelector('[data-coach-web]');
   const attachmentBox = form.querySelector('[data-coach-attachment]');
   plus.classList.add('hat-web');
+
+  // Modus: Das Kennzeichen an der Eingabe zeigt ihn und schaltet per Tipp um;
+  // im Plus-Menü steht dieselbe Wahl.
+  let modus = modusLesen();
+  const modusKnopf = form.querySelector('[data-coach-modus]');
+  const modusZeigen = () => {
+    const anderer = modus === 'frage' ? 'bewertung' : 'frage';
+    modusKnopf.className = `coach-modus ist-${modus}`;
+    modusKnopf.textContent = MODI[modus];
+    modusKnopf.setAttribute('aria-label', `Modus: ${MODI[modus]}. Antippen wechselt zu ${MODI[anderer]}.`);
+    form.querySelectorAll('[data-coach-modus-wahl]').forEach((wahl) => { wahl.checked = wahl.value === modus; });
+  };
+  const modusSetzen = (neu) => {
+    modus = neu === 'bewertung' ? 'bewertung' : 'frage';
+    modusSchreiben(modus);
+    modusZeigen();
+  };
+  modusKnopf.onclick = () => modusSetzen(modus === 'frage' ? 'bewertung' : 'frage');
+  form.querySelectorAll('[data-coach-modus-wahl]').forEach((wahl) => {
+    wahl.onchange = () => { modusSetzen(wahl.value); werkzeugeZeigen(false); };
+  });
+  modusZeigen();
 
   // Die Eingabe sitzt fest am unteren Rand; der Verlauf bekommt unten so viel
   // Platz, wie sie hoch ist. Öffnet sich die Tastatur, sitzt die Eingabe direkt
@@ -403,7 +506,14 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       }
       return;
     }
-    const ergebnis = runden[Number(event.target.closest('[data-runde]')?.dataset.runde)]?.result;
+    const rundenIndex = Number(event.target.closest('[data-runde]')?.dataset.runde);
+    const ergebnis = runden[rundenIndex]?.result;
+    const schritteKnopf = event.target.closest('[data-schritte-aus]');
+    if (schritteKnopf) {
+      const anfrage = schritteAnfrage(runden[rundenIndex]);
+      if (anfrage && !laeuft) senden({ ...anfrage, quelle: rundenIndex });
+      return;
+    }
     const auswertungsKnopf = event.target.closest('[data-auswertung-uebernehmen]');
     const auswertung = auswertungsKnopf && ergebnis?.experimentReviews?.[Number(auswertungsKnopf.dataset.auswertungUebernehmen)];
     if (auswertung) {
@@ -522,33 +632,43 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   };
   form.querySelector('[data-aufnahme-verwerfen]').onclick = aufnahmeVerwerfen;
 
-  form.onsubmit = async (event) => {
-    event.preventDefault();
-    // Während der Aufnahme sendet der Pfeil die Sprachnachricht.
-    if (aufnahme) { aufnahmeSenden(); return; }
-    if (form.classList.contains('verschriftlicht')) return;
-    const question = field.value.trim();
-    if (question.length < 2) return;
+  /* Eine Anfrage an den Coach: getippte Nachricht im gewählten Modus oder
+     „Daraus Schritte machen“ zu einer Frage-Antwort (quelle = ihre Runde).
+     Die Schritte-Anfrage lässt Eingabefeld und Bildanhang unberührt. */
+  let laeuft = false;
+  const senden = async ({ question, modus: anfrageModus, schritteAus = null, quelle = null }) => {
+    if (laeuft) return;
+    laeuft = true;
     const webResearch = webOption.checked;
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    const mitAnhang = Boolean(anhang);
-    field.value = '';
-    resizeField();
+    const mitAnhang = !schritteAus && Boolean(anhang);
+    const bezug = schritteAus?.frage || '';
+    if (!schritteAus) {
+      field.value = '';
+      resizeField();
+    }
     werkzeugeZeigen(false);
     answer.innerHTML = kopf() + verlaufMarkup(runden, avatar)
-      + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang) })
+      + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang, bezug) })
       + tipptMarkup((webResearch ? LADEPHASEN.web : LADEPHASEN.coach)[0]);
     const ladephasenStoppen = ladephasenStarten(answer, webResearch ? LADEPHASEN.web : LADEPHASEN.coach);
     nachUnten();
     try {
       // Steht die Coaching-Karte über einem leeren Chat, gehört die Frage zu ihr.
       const gespraechsId = gespraech?.id || (karteSichtbar() && coaching.status === 'bereit' ? coaching.id : null);
-      const response = await invokeCoach('coach', question, webResearch, gespraechsId, anhang ? [{ type: 'image', dataUrl: anhang.dataUrl }] : []);
+      const response = await rufeCoach({
+        scope: 'coach', question, webResearch, modus: anfrageModus,
+        ...(gespraechsId ? { conversationId: gespraechsId } : {}),
+        ...(mitAnhang ? { attachments: [{ type: 'image', dataUrl: anhang.dataUrl }] } : {}),
+        ...(schritteAus ? { schritteAus } : {}),
+      });
       // Nur wenn der Server die Runde gespeichert hat, gibt es ein
-      // Gespräch, an das die nächste Frage anschließen kann.
-      const frueher = gespraech?.id === response.conversationId ? runden : [];
-      const runde = { frage: question, result: response.result, hatAnhang: mitAnhang };
+      // Gespräch, an das die nächste Frage anschließen kann. Eine Antwort,
+      // aus der Schritte gemacht wurden, zeigt den Knopf nicht mehr.
+      const frueher = gespraech?.id === response.conversationId
+        ? runden.map((runde, index) => (index === quelle ? { ...runde, schritteGemacht: true } : runde)) : [];
+      const runde = { frage: question, result: response.result, hatAnhang: mitAnhang, ...(bezug ? { bezug } : {}) };
       if (response.conversationId && response.memorySaved) {
         runden = [...frueher, runde].slice(-8);
         gespraech = { id: response.conversationId, runden };
@@ -558,18 +678,35 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         runden = [runde];
       }
       zeichnen();
-      anhang = null;
-      renderAttachment();
+      if (mitAnhang) {
+        anhang = null;
+        renderAttachment();
+      }
     } catch (error) {
-      field.value = question;
-      resizeField();
-      zeichnen(fehlerMarkup('Keine Antwort erstellt. Deine Frage steht wieder im Eingabefeld; versuche es gleich noch einmal.'));
+      if (!schritteAus) {
+        field.value = question;
+        resizeField();
+      }
+      zeichnen(fehlerMarkup(schritteAus
+        ? 'Keine Schritte erstellt. Versuche es gleich noch einmal.'
+        : 'Keine Antwort erstellt. Deine Frage steht wieder im Eingabefeld; versuche es gleich noch einmal.'));
       toast(error?.message || 'Coach konnte nicht antworten.');
     } finally {
+      laeuft = false;
       ladephasenStoppen();
       button.disabled = false;
       nachUnten();
     }
+  };
+
+  form.onsubmit = (event) => {
+    event.preventDefault();
+    // Während der Aufnahme sendet der Pfeil die Sprachnachricht.
+    if (aufnahme) { aufnahmeSenden(); return; }
+    if (form.classList.contains('verschriftlicht')) return;
+    const question = field.value.trim();
+    if (question.length < 2) return;
+    senden({ question, modus });
   };
 
   if (pending.question && pending.senden) form.requestSubmit();

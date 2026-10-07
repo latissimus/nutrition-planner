@@ -15,6 +15,7 @@
     "eval:coach": "node --disable-warning=ExperimentalWarning scripts/coach-evals/run.mjs",
     "eval:coaching": "node --disable-warning=ExperimentalWarning scripts/coach-evals/coaching-eval.mjs",
     "eval:wochen": "node --disable-warning=ExperimentalWarning scripts/coach-evals/wochen-eval.mjs",
+    "eval:frage": "node --disable-warning=ExperimentalWarning scripts/coach-evals/frage-eval.mjs",
     "coach:wissensbasis": "node --disable-warning=ExperimentalWarning scripts/coach-evals/sync-wissensbasis.mjs",
     "check:ypsi-formula": "node scripts/check-ypsi-formula-workbook.mjs",
     "check:seminar-knowledge": "python3 -m unittest discover -s scripts/seminar-audit -p 'test_*.py' && python3 scripts/seminar-audit/validate_knowledge.py",

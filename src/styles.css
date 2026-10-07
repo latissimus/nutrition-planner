@@ -16989,3 +16989,61 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Texte allgemein weiß setzt. */
 :root[data-theme][data-seite="coach"] #view :is(.coaching-marke,.coaching-fokus,.coaching-fokus b,.coaching-fokus p){color:#111111!important;-webkit-text-fill-color:#111111!important}
 :root[data-theme][data-seite="coach"] #view .coaching-karte.is-fehler .coaching-marke{color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
+
+/* ============================================================
+   CHAT-MODUS (coach.js, COACHING-PLAN.md Schritt 4b)
+   Drei Farben: Coaching Gelb, Frage Hellblau, Bewertung & Schritte Rosa.
+   Der Modus steht immer als Wort da; die Farbe unterstützt nur. Das
+   Kennzeichen sitzt als Reiter auf der Oberkante der Eingabe-Kapsel und
+   schaltet per Tipp um.
+   ============================================================ */
+:root{--modus-frage:#94DEFF;--modus-bewertung:var(--brand-pink,#FF69AE)}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus{
+  position:absolute;
+  z-index:2;
+  top:0;
+  left:22px;
+  display:inline-flex;
+  align-items:center;
+  height:24px;
+  margin:0;
+  padding:0 11px;
+  border:var(--kontur) solid var(--kontur-farbe);
+  border-radius:999px;
+  background:var(--modus-frage)!important;
+  color:#111111;
+  box-shadow:none;
+  transform:translateY(-62%);
+  font:800 11px/1 "Work Sans",sans-serif;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  cursor:pointer;
+}
+/* Die Eingabe schneidet über ihrer Oberkante ab (overflow:hidden); sie
+   bekommt oben Platz für den Reiter, die Hinterlegung rückt mit. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-modus){padding-top:16px!important}
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-modus)::after{top:50px}
+/* Größere Tippfläche, ohne den Reiter zu vergrößern. */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus::after{content:"";position:absolute;inset:-10px -6px}
+:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus.ist-bewertung{background:var(--modus-bewertung)!important}
+:root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-inputbar .coach-modus{display:none}
+/* Steht das Plus-Menü oder ein Anhang über der Kapsel, bekommt der Reiter Luft. */
+:root[data-theme][data-seite="coach"] #view :is(.coach-compose-tools:not([hidden]),.coach-attachment:not([hidden]))~.coach-inputbar{margin-top:10px}
+/* Wahl im Plus-Menü: dieselben Farben. */
+:root[data-theme][data-seite="coach"] #view .coach-modus-wahl{display:flex;flex-wrap:wrap;gap:7px}
+:root[data-theme][data-seite="coach"] #view .coach-werkzeug.ist-frage:has(input:checked){background:var(--modus-frage)!important}
+:root[data-theme][data-seite="coach"] #view .coach-werkzeug.ist-bewertung:has(input:checked){background:var(--modus-bewertung)!important}
+/* Etikett jeder Antwort. */
+:root[data-theme][data-seite="coach"] #view .coach-modus-marke{justify-self:start;display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--modus-frage)!important;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+:root[data-theme][data-seite="coach"] #view .coach-modus-marke.ist-bewertung{background:var(--modus-bewertung)!important}
+:root[data-theme][data-seite="coach"] #view .coach-rueckfrage{margin:0;font:600 14.5px/1.45 "Work Sans",sans-serif}
+/* Quellen unter einer Frage-Antwort (statt „Datenlage“). */
+:root[data-theme][data-seite="coach"] #view .coach-quellen{display:grid;gap:4px;padding-top:9px;border-top:var(--haarlinie,1px) dashed color-mix(in srgb,currentColor 35%,transparent)}
+:root[data-theme][data-seite="coach"] #view .coach-quellen b{font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mac-farbe-neben,inherit)}
+:root[data-theme][data-seite="coach"] #view .coach-quellen ul{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+:root[data-theme][data-seite="coach"] #view .coach-quellen li{font:500 12.5px/1.4 "JetBrains Mono",monospace;color:var(--mac-farbe-neben,inherit)}
+:root[data-theme][data-seite="coach"] #view .coach-quellen a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+:root[data-theme][data-seite="coach"] #view .coach-knopf.ist-schritte{border-color:var(--kontur-farbe)!important;background:var(--modus-bewertung)!important}
+/* Auf Hellblau und Rosa bleibt die Schrift dunkel, auch im Dark Mode. */
+:root[data-theme][data-seite="coach"] #view :is(.coach-modus,.coach-modus-marke,.coach-knopf.ist-schritte,.coach-werkzeug:is(.ist-frage,.ist-bewertung):has(input:checked) span){color:#111111!important;-webkit-text-fill-color:#111111!important}
