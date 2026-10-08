@@ -2,7 +2,7 @@ type Row = Record<string, any>;
 
 const date = (value: Date) => value.toISOString().slice(0, 10);
 
-export function calorieBasis(status: Row[], now: Date, entryDates?: string[]) {
+export function calorieBasis(entries: Row[], now: Date) {
   const berlinDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
   const today = new Date(`${berlinDay}T00:00:00Z`);
   const days = Array.from({ length: 14 }, (_, index) => {
@@ -10,15 +10,13 @@ export function calorieBasis(status: Row[], now: Date, entryDates?: string[]) {
     day.setUTCDate(day.getUTCDate() - index - 1);
     return date(day);
   });
-  const byDate = new Map(status.map((row) => [row.log_date, row]));
-  const daysWithEntries = entryDates ? new Set(entryDates) : null;
-  const eligible = days.filter((day) => !byDate.get(day)?.excluded);
-  const isComplete = (day: string) => byDate.get(day)?.complete && (!daysWithEntries || daysWithEntries.has(day));
-  const complete = eligible.filter(isComplete);
-  const recent = days.slice(0, 2).some(isComplete);
-  const allowed = eligible.length >= 10 && complete.length >= Math.ceil(eligible.length * 0.8) && recent;
-  return { calorieChangeAllowed: allowed, completeDays: complete.length, eligibleDays: eligible.length,
-    reason: allowed ? '' : 'Keine konkrete Änderung des Kalorienziels oder der Kalorienzufuhr in kcal empfehlen. Zuerst aktuelle, vollständige Ernährungstage erfassen; geplante Kalorienänderungen nur als Frage besprechen.' };
+  const loggedDates = new Set(entries.map((row) => String(row.log_date).slice(0, 10)));
+  const loggedDays = days.filter((day) => loggedDates.has(day)).length;
+  const recent = days.slice(0, 2).some((day) => loggedDates.has(day));
+  // The count is evidence of logging regularity, not proof of complete intake.
+  const allowed = loggedDays >= 12 && recent;
+  return { calorieChangeAllowed: allowed, loggedDays, windowDays: days.length,
+    reason: allowed ? '' : 'Keine konkrete Änderung des Kalorienziels oder der Kalorienzufuhr in kcal empfehlen. Zuerst an mindestens 12 der letzten 14 abgeschlossenen Tage Ernährung erfassen, darunter einer der letzten zwei Tage. Einträge und Zielnähe beweisen keine Vollständigkeit.' };
 }
 
 // This is deliberately an output guard, not a semantic grader. If a numeric
@@ -37,7 +35,7 @@ export function quantifiedCalorieAction(value: unknown) {
 
 export function enforceCalorieBasis(result: Row, basis: ReturnType<typeof calorieBasis>) {
   if (basis.calorieChangeAllowed) return result;
-  const safe = 'Für eine konkrete Kalorienänderung fehlen noch ausreichend aktuelle, vollständig protokollierte Tage. Protokolliere zunächst deine Ernährung vollständig; danach können wir das Ziel gemeinsam prüfen.';
+  const safe = 'Für eine konkrete Kalorienänderung fehlen noch ausreichend aktuelle Ernährungseinträge. Erfasse zunächst regelmäßig deine Mahlzeiten; danach können wir das Ziel gemeinsam prüfen.';
   if (result.modus === 'frage') return quantifiedCalorieAction(result.answer)
     ? { ...result, answer: safe, followUpQuestion: '', confidence: 'niedrig', stepsUseful: false }
     : { ...result, followUpQuestion: quantifiedCalorieAction(result.followUpQuestion) ? '' : result.followUpQuestion };

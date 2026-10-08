@@ -17,12 +17,12 @@ const anfrage = (modus) => coachRequestBody({
 });
 
 describe('Bewertung & Schritte bleibt der bisherige Chat', () => {
-  // Fingerabdrücke vom 07.10.2026 vor dem Umbau. Ändert sich einer, gelten die
-  // Chat-Evals und ihre Baselines nicht mehr.
-  it('hat Prompt und Anfrage Zeichen für Zeichen wie vor dem Schalter', () => {
-    expect(fingerabdruck(coachSystemPrompt('coach', false))).toBe('dd0c53bacd02839e');
-    expect(fingerabdruck(coachSystemPrompt('coach', true))).toBe('8ae51691956db36a');
-    expect(fingerabdruck(anfrage())).toBe('a5d9053dee229ee0');
+  // Der Ernährungskontext wurde bewusst erweitert; die Baselines vor dieser
+  // Änderung gelten nicht mehr als unveränderte Prompt-Baselines.
+  it('hält den freigegebenen neuen Prompt und die Anfrage stabil', () => {
+    expect(fingerabdruck(coachSystemPrompt('coach', false))).toBe('63a76d17c6aeef56');
+    expect(fingerabdruck(coachSystemPrompt('coach', true))).toBe('9561e8446b76d00a');
+    expect(fingerabdruck(anfrage())).toBe('9dc9daba7b5d258c');
   });
 
   it('nimmt ohne Modus und mit „bewertung“ dieselbe Anfrage', () => {
@@ -32,7 +32,7 @@ describe('Bewertung & Schritte bleibt der bisherige Chat', () => {
   it('füllt bei vorhandener Tagesprüfung den festen Limits-Block ohne die übrigen Blöcke umzubenennen', () => {
     const request = coachRequestBody({
       scope: 'coach', question: 'Soll ich Kalorien ändern?', snapshot: {}, timeseries: {}, memory: {},
-      limits: { calorieChangeAllowed: false, completeDays: 0 }, webResearch: false, vectorStoreId: null,
+      limits: { calorieChangeAllowed: false, loggedDays: 0 }, webResearch: false, vectorStoreId: null,
     });
     const input = request.input[0].content;
     expect(input).toContain('<limits>');

@@ -6,6 +6,7 @@
 
 import { YPSI_FORMULA } from './knowledge.ts';
 import { buildFollowThrough, durationMinutes } from './followThrough.ts';
+import { currentCalorieTarget, nutritionTargetStatus } from './nutritionTarget.js';
 
 type Row = Record<string, any>;
 
@@ -18,7 +19,7 @@ export type ContextRows = {
   performance: Row[];         // performed_on, exercise, category, estimated_1rm, volume
   sleep: Row[];               // sleep_date, bedtime, wake_time, quality, energy, awakenings, tags
   checkins: Row[];            // checkin_date, recovery, mood, hunger, illness, travel, unusual_meals
-  nutritionEntries: Row[];    // log_date, energy_kcal, protein_g, carbs_g, fat_g
+  nutritionEntries: Row[];    // log_date, period, name, amount, unit, energy_kcal, protein_g, carbs_g, fat_g
   routines: Row[];            // all routines (active and paused), ordered by position; created_at
   completions: Row[];         // routine_id, completed_on (last FETCH_WINDOW_DAYS days)
   ruleContext: Row;           // user_preferences comp:hautfalten-kontext-v1
@@ -150,7 +151,7 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
       age,
       heightCm: settings?.height_cm || null,
       goal: settings?.goal || 'unknown',
-      calorieTarget: off.has('nutrition') ? null : settings?.adaptive_target || settings?.custom_calorie_target || null,
+      calorieTarget: off.has('nutrition') ? null : currentCalorieTarget(settings, latestWeight, now),
     },
     bodyComposition: {
       currentWeightKg: latestWeight,
@@ -394,7 +395,7 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
   // everything eaten) next to the current daily calorie target, with the
   // difference computed here. The target is today's setting (custom target
   // first, as in the app); earlier settings are not stored.
-  const target = number(rows.settings?.custom_calorie_target) || number(rows.settings?.adaptive_target) || null;
+  const target = currentCalorieTarget(rows.settings, rows.weights[0]?.kg, now);
   const recentDates = Array.from({ length: RECENT_DAYS }, (_, index) => plusDays(today, index - RECENT_DAYS + 1));
   const recentEntries = new Map(recentDates.map((date) => [date, { kcal: 0, protein: 0, entries: 0 }]));
   for (const row of rows.nutritionEntries) {
@@ -414,21 +415,46 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
       enteredKcal,
       enteredProteinG: day.entries ? round(day.protein, 0) : null,
       differenceKcal: enteredKcal != null && target ? round(enteredKcal - target, 0) : null,
+      targetStatus: nutritionTargetStatus(enteredKcal, target, day.entries > 0),
     };
   });
   const loggedPastDays = recentList.filter((day) => day.entries && !day.today);
   const averageEnteredKcal = round(mean(loggedPastDays.map((day) => day.enteredKcal!)), 0);
+  const recentMeals = recentDates.map((date) => {
+    const periods = new Map<string, Row>();
+    for (const row of rows.nutritionEntries) {
+      if (String(row.log_date).slice(0, 10) !== date) continue;
+      const period = String(row.period || 'unbekannt');
+      const meal = periods.get(period) || { period, kcal: 0, proteinG: 0, carbsG: 0, fatG: 0, items: [] };
+      meal.kcal += number(row.energy_kcal);
+      meal.proteinG += number(row.protein_g);
+      meal.carbsG += number(row.carbs_g);
+      meal.fatG += number(row.fat_g);
+      meal.items.push({ name: String(row.name || '').slice(0, 160),
+        amount: row.amount == null ? null : number(row.amount), unit: row.unit || null,
+        kcal: round(number(row.energy_kcal), 0), proteinG: round(number(row.protein_g), 0),
+        carbsG: round(number(row.carbs_g), 0), fatG: round(number(row.fat_g), 0) });
+      periods.set(period, meal);
+    }
+    return { date, meals: [...periods.values()].map((meal) => ({ ...meal,
+      kcal: round(meal.kcal, 0), proteinG: round(meal.proteinG, 0),
+      carbsG: round(meal.carbsG, 0), fatG: round(meal.fatG, 0) })) };
+  }).filter((day) => day.meals.length);
 
   return withoutSwitchedOff({
     window: { from: first, to: today, weeks },
     recentDays: off.has('nutrition') ? SWITCHED_OFF : {
       targetKcal: target,
+      targetTolerancePercent: 10,
+      targetRangeKcal: target ? { from: Math.ceil(target * 0.9), to: Math.floor(target * 1.1) } : null,
       days: recentList,
       pastDaysWithEntries: loggedPastDays.length,
       pastDaysWithoutEntries: recentList.filter((day) => !day.entries && !day.today).length,
       averageEnteredKcalOnPastDaysWithEntries: averageEnteredKcal,
       averageDifferenceKcalOnPastDaysWithEntries: averageEnteredKcal != null && target ? round(averageEnteredKcal - target, 0) : null,
+      averageTargetStatus: nutritionTargetStatus(averageEnteredKcal, target, loggedPastDays.length > 0),
     },
+    recentMeals: off.has('nutrition') ? SWITCHED_OFF : recentMeals,
     // What is missing or not followed through (followThrough.ts).
     followThrough: buildFollowThrough(rows, now),
     summary: {

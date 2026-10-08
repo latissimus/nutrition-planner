@@ -1,21 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { calorieBasis, enforceCalorieBasis, quantifiedCalorieAction } from '../supabase/functions/capboy-coach/calorieGuard.ts';
 
-const days = (count, complete = true) => Array.from({ length: count }, (_, index) => {
+const days = (count) => Array.from({ length: count }, (_, index) => {
   const date = new Date(Date.UTC(2026, 9, 7));
   date.setUTCDate(date.getUTCDate() - index - 1);
-  return { log_date: date.toISOString().slice(0, 10), complete, excluded: false };
+  return { log_date: date.toISOString().slice(0, 10), energy_kcal: 2400 };
 });
 
 describe('Kalorien-Entscheidungssperre', () => {
-  it('fordert aktuelle, vollständig erfasste Tage', () => {
+  it('zählt automatisch Tage mit Einträgen, nicht einen manuell gesetzten Haken', () => {
     const now = new Date('2026-10-07T12:00:00Z');
     expect(calorieBasis([], now).calorieChangeAllowed).toBe(false);
     expect(calorieBasis(days(11), now).calorieChangeAllowed).toBe(false);
     expect(calorieBasis(days(12), now).calorieChangeAllowed).toBe(true);
-    expect(calorieBasis(days(12), now, days(11).map((day) => day.log_date)).calorieChangeAllowed).toBe(false);
-    expect(calorieBasis(days(12), now, days(12).map((day) => day.log_date)).calorieChangeAllowed).toBe(true);
-    expect(calorieBasis(days(14).map((day, index) => ({ ...day, complete: index > 1 })), now).calorieChangeAllowed).toBe(false);
+    expect(calorieBasis(days(12).map((day) => ({ ...day, complete: false })), now).calorieChangeAllowed).toBe(true);
+    expect(calorieBasis(days(14).slice(2), now).calorieChangeAllowed).toBe(false);
+    expect(calorieBasis([...days(12), ...days(12)], now).loggedDays).toBe(12);
   });
 
   it('fängt konkrete Änderungen auch bei „Daraus Schritte machen“ ab', () => {

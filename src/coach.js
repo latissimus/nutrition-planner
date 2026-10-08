@@ -13,6 +13,7 @@ import { vergleichMarkup } from './coachWeekly.js';
 import { mountWochenKaertchen } from './wochenKaertchen.js';
 import { fensterMarkup } from './coachFenster.js';
 import { coachIconMarkup } from './menuIcons.js';
+import { inhaltMitfedern } from './federn.js';
 import { sanduhrMarkup } from './sanduhr.js';
 import { ladeOffenePunkte, startMarkup } from './coachStatus.js';
 import { alsGelesenMarkieren, alsUebernommenMerken, coachingKarteMarkup, coachingNachId, istFrisch, neuestesCoaching } from './coaching.js';
@@ -447,8 +448,23 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   };
   window.visualViewport?.addEventListener('resize', tastatur);
   window.visualViewport?.addEventListener('scroll', tastatur);
-  field.addEventListener('focus', () => { setTimeout(tastatur, 60); setTimeout(() => nachUnten(false), 320); });
-  field.addEventListener('blur', () => setTimeout(tastatur, 60));
+  // Wie bei Gemini wird die Kapsel schon beim Antippen breit, nicht erst,
+  // wenn die Tastatur ganz steht; beim Verlassen des Feldes wieder schmal.
+  field.addEventListener('focus', () => { form.classList.add('ist-aktiv'); setTimeout(tastatur, 60); setTimeout(() => nachUnten(false), 320); });
+  field.addEventListener('blur', () => { form.classList.remove('ist-aktiv'); setTimeout(tastatur, 60); });
+  /* Bei aktivem Feld federt die Kapsel beim Antippen wie das Menüband beim
+     Antippen eines Reiters: Rahmen und Fläche (::before) wachsen kurz, der
+     Inhalt rückt mit (federn.js). Die Eck-Pille trägt ihre Lage in transform
+     und bleibt deshalb stehen. */
+  const kapsel = form.querySelector('.coach-inputbar');
+  kapsel.addEventListener('pointerdown', () => {
+    if (!form.classList.contains('ist-aktiv')) return;
+    kapsel.classList.remove('ist-angetippt');
+    void kapsel.offsetWidth;
+    kapsel.classList.add('ist-angetippt');
+    inhaltMitfedern(kapsel, [...kapsel.children].filter((element) => !element.matches('.coach-modus-chip')));
+  });
+  kapsel.addEventListener('animationend', () => kapsel.classList.remove('ist-angetippt'));
   const nachUnten = (sanft = true) => requestAnimationFrame(() => container.scrollTo({ top: container.scrollHeight, behavior: sanft ? 'smooth' : 'auto' }));
 
   // Startnachricht eines leeren Chats: was gerade offen ist. Die Punkte laden

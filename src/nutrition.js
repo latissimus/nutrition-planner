@@ -12,6 +12,7 @@ import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from 
 import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp, initialEnergyEstimate, weightTrendSummary } from './bodyComposition.js';
 import { performanceTrend } from './logmanImport.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
+import { nutritionTargetStatus } from '../supabase/functions/capboy-coach/nutritionTarget.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
@@ -49,11 +50,6 @@ export function calculateEnergyNeed(input) { return initialEnergyEstimate(input)
 
 function total(entries, field) { return entries.reduce((sum, item) => sum + number(item[field]), 0); }
 
-export async function saveNutritionDayStatus(userId, date, complete, client = supabase) {
-  if (!userId || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: new Error('Ungültiger Tag oder Benutzer.') };
-  return client.from('nutrition_day_status').upsert({ user_id: userId, log_date: date, complete: complete === true, excluded: false }, { onConflict: 'user_id,log_date' });
-}
-
 /* Die Tagesansicht baut sich stufenweise auf: erst der Kern, dann die
    Kalibrierung. Beide werden deshalb EINZELN gehalten – eine Huelle um den
    Gesamtaufruf wuerde den Mount-Pfad nicht erreichen. */
@@ -66,7 +62,6 @@ async function ladeKern(userId, date) {
   let settingsQuery = supabase.from('nutrition_settings').select('*').eq('user_id', userId).maybeSingle();
   let logQuery = supabase.from('nutrition_log_entries').select('*').eq('user_id', userId).eq('log_date', date).order('created_at');
   let ownQuery = supabase.from('nutrition_products').select('*').eq('user_id', userId).eq('source', 'manual').order('updated_at', { ascending: false });
-  let dayQuery = supabase.from('nutrition_day_status').select('complete').eq('user_id', userId).eq('log_date', date).maybeSingle();
   if (signal) {
     settingsQuery = settingsQuery.abortSignal(signal); logQuery = logQuery.abortSignal(signal);
     ownQuery = ownQuery.abortSignal(signal);
@@ -74,10 +69,10 @@ async function ladeKern(userId, date) {
   /* Das aktuelle Gewicht wurde hier frueher ein zweites Mal geholt – dieselbe
      Tabelle, dieselben Spalten, nur andere Sortierung. Es steckt bereits in
      der Reihe aus loadNutritionCalibration und wird dort entnommen. */
-  const [settings, entries, own, day] = await Promise.all([
-    settingsQuery, logQuery, ownQuery, dayQuery,
+  const [settings, entries, own] = await Promise.all([
+    settingsQuery, logQuery, ownQuery,
   ]);
-  const error = settings.error || entries.error || own.error || day.error;
+  const error = settings.error || entries.error || own.error;
   if (error) throw error;
   const entryList = entries.data || [];
   const signed = await signImagePaths(entryList.map((entry) => entry.product_snapshot?.image_path));
@@ -86,7 +81,7 @@ async function ladeKern(userId, date) {
     if (path && signed.has(path)) entry.product_snapshot.image_url = signed.get(path);
   });
   return {
-    settings: settings.data || {}, entries: entryList, ownProducts: own.data || [], dayComplete: day.data?.complete === true,
+    settings: settings.data || {}, entries: entryList, ownProducts: own.data || [],
   };
 }
 
@@ -206,6 +201,14 @@ function summaryMarkup(state, date) {
   const carbs = rounded(total(state.entries, 'carbs_g'));
   const fat = rounded(total(state.entries, 'fat_g'));
   const { calculated, target } = nutritionTarget(state);
+  const targetStatus = nutritionTargetStatus(kcal, target, state.entries.length > 0);
+  const targetStatusText = {
+    im_zielbereich: 'Im Zielbereich (±10 %)',
+    unter_zielbereich: 'Unter dem Zielbereich (−10 %)',
+    ueber_zielbereich: 'Über dem Zielbereich (+10 %)',
+    keine_eintraege: 'Noch keine Einträge',
+    kein_ziel: 'Noch kein Kalorienziel',
+  }[targetStatus];
   const remaining = Math.max(0, target - kcal);
   const over = Math.max(0, kcal - target);
   const adaptive = adaptiveModel(state, calculated, target);
@@ -244,7 +247,7 @@ function summaryMarkup(state, date) {
         <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
         ${materialIconMarkup('edit')}
       </button>
-      <button class="nutrition-day-complete" type="button" data-nutrition-day-complete aria-pressed="${state.dayComplete === true}"${state.entries.length ? '' : ' disabled'}>${state.dayComplete ? '✓ Tag vollständig protokolliert' : 'Tag vollständig protokolliert'}${state.entries.length ? '' : ' · erst Einträge erfassen'}</button>
+      <p class="nutrition-target-status">${targetStatusText}${state.entries.length ? ' · nur erfasste Mahlzeiten' : ''}</p>
     </div>
   </details>`;
 }
@@ -976,13 +979,12 @@ export async function mountNutrition(container, { userId, signal }) {
   let date = localDateKey();
   let automaticToday = true;
   let state = {
-    settings: {}, entries: [], ownProducts: [], dayComplete: false, latestWeight: 0,
+    settings: {}, entries: [], ownProducts: [], latestWeight: 0,
     weights: [], historyDays: [], skinfolds: [], waists: [], performance: [], sleep: [], bodyCheckins: [],
   };
   const deleteEntryById = async (id) => {
     const { error } = await supabase.from('nutrition_log_entries').delete().eq('id', id).eq('user_id', userId);
     if (error) { toast('Eintrag konnte nicht gelöscht werden'); return false; }
-    await supabase.from('nutrition_day_status').update({ complete: false }).eq('user_id', userId).eq('log_date', date);
     await refresh();
     return true;
   };
@@ -1057,7 +1059,6 @@ export async function mountNutrition(container, { userId, signal }) {
   };
   const saveEntry = async (payload) => {
     try {
-      const previousDate = payload.id ? state.entries.find((entry) => entry.id === payload.id)?.log_date : null;
       let productId = payload.product_id || null;
       if (payload.product?.barcode) {
         const product = payload.product;
@@ -1098,10 +1099,6 @@ export async function mountNutrition(container, { userId, signal }) {
         : supabase.from('nutrition_log_entries').insert(row);
       const { error } = await request;
       if (error) throw error;
-      await supabase.from('nutrition_day_status').update({ complete: false }).eq('user_id', userId).eq('log_date', row.log_date);
-      if (previousDate && previousDate !== row.log_date) {
-        await supabase.from('nutrition_day_status').update({ complete: false }).eq('user_id', userId).eq('log_date', previousDate);
-      }
       playInterfaceSound('bonus', { retrigger: 'restart' });
       toast(payload.id ? 'Mahlzeit aktualisiert' : 'Kalorien eingetragen');
       /* Verwirft auch die gemerkte Ansicht dieser Seite: ohne das zeigte der
@@ -1183,15 +1180,6 @@ export async function mountNutrition(container, { userId, signal }) {
   };
 
   function bind() {
-    container.querySelector('[data-nutrition-day-complete]')?.addEventListener('click', async (event) => {
-      const button = event.currentTarget;
-      button.disabled = true;
-      const next = !state.dayComplete;
-      const { error } = await saveNutritionDayStatus(userId, date, next);
-      if (error) { button.disabled = false; return toast('Tagesabschluss konnte nicht gespeichert werden.'); }
-      toast(next ? 'Tag als vollständig markiert' : 'Tag wieder geöffnet');
-      await refresh();
-    });
     const trackingToggle = container.querySelector('[data-nutrition-enabled]');
     if (trackingToggle) trackingToggle.onchange = async () => {
       trackingToggle.disabled = true;

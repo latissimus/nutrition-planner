@@ -7,7 +7,8 @@
   },
   "erzeugtMit": "node scripts/coach-evals/fixtures/erzeuge-comp-facts-referenz.mjs",
   "bewussteAenderungen": [
-    "27.09.2026: nutrition zählt jeden Tag mit Einträgen statt nur der als vollständig markierten Tage (daysWithEntries statt completeDays; 43 Tage, Ø 2229 kcal, 137 g Protein, 207 g KH, 67 g Fett). Werte unabhängig aus kontext-tabellen.json nachgerechnet; das Erzeugungsskript liefert weiter den alten Stand."
+    "27.09.2026: nutrition zählt jeden Tag mit Einträgen statt nur der als vollständig markierten Tage (daysWithEntries statt completeDays; 43 Tage, Ø 2229 kcal, 137 g Protein, 207 g KH, 67 g Fett). Werte unabhängig aus kontext-tabellen.json nachgerechnet; das Erzeugungsskript liefert weiter den alten Stand.",
+    "08.10.2026: profile.calorieTarget verwendet wie der Tracker das ausdrücklich gewählte Ziel vor dem adaptiven Vorschlag. Die Fixture enthält beides (custom 2400, adaptive 2350); richtig ist 2400."
   ],
   "snapshot": {
     "generatedAt": "2026-09-26T08:00:00.000Z",
@@ -19,7 +20,7 @@
       "age": 37,
       "heightCm": 178,
       "goal": "fat_loss",
-      "calorieTarget": 2350
+      "calorieTarget": 2400
     },
     "bodyComposition": {
       "currentWeightKg": 84.3,

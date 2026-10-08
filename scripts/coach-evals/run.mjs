@@ -920,7 +920,7 @@ async function trockenlauf() {
     `Labels und Gate: ${gateProben.labelDateien} Label-Datei(en) stimmig, ${gateProben.labelFehler} Label-Fehler und ${gateProben.gate} Gate-Szenarien richtig erkannt.`,
     `Prompt: freier Coach neu (${promptProben.hash}), ${promptProben.bereiche} andere Bereiche unverändert wie legacy, Anfrage sonst gleich, ${promptProben.regeln} Regeln zum Prompt richtig.`,
     `Wochenverlauf: ${verlaufProben.rechnung} Rechenproben, ${verlaufProben.faelle} Fälle mit <timeseries>, ${verlaufProben.zahlen} Zahlenproben – alles richtig; Standardfälle ohne Verlauf.`,
-    `Fixture: buildCompFacts gleicht der bisherigen Snapshot-Ausgabe (${fixtureProbe.werte} Werte, Referenz aus ${fixtureProbe.commit}); alle alten Grenzen überschritten.`,
+    `Fixture: buildCompFacts gleicht der dokumentierten Referenz (${fixtureProbe.werte} Werte, Ursprung ${fixtureProbe.commit} mit erklärten Korrekturen); alle alten Grenzen überschritten.`,
     `Gedächtnis: ${gedaechtnisProben.bloecke} Blockproben, ${gedaechtnisProben.faelle} Fälle mit Gedächtnis, ${gedaechtnisProben.zahlen} Zahlen- und ${gedaechtnisProben.regeln} Regelproben – alles richtig; Standardfälle ohne Gedächtnis.`,
     `Experimente: ${experimentProben.messung} Messproben, ${experimentProben.pruefungen} Prüfproben, ${experimentProben.faelle} Fälle, ${experimentProben.gate} Gate-Proben zum Akzeptieren – alles richtig.`,
     `Wissensbasis: Code in sich stimmig (Stand ${KNOWLEDGE_VERSION.slice(0, 16)}, ${wissensProben.dokumente} Dokumente, Dateinamen wie in der Edge Function), ${wissensProben.vergleich} Vergleichs- und ${wissensProben.lesen} Leseproben – alles richtig.`,
@@ -1456,7 +1456,7 @@ function trockenlaufZeitreihe(fehler) {
   const tage = mitLueckeVerlauf.recentDays;
   gleich([tage.targetKcal, tage.pastDaysWithEntries, tage.pastDaysWithoutEntries, tage.averageEnteredKcalOnPastDaysWithEntries, tage.averageDifferenceKcalOnPastDaysWithEntries],
     [2700, 10, 1, 2400, -300], 'Tagesliste');
-  gleich(tage.days.find((tag) => tag.date === '2026-09-19'), { date: '2026-09-19', today: false, entries: 0, enteredKcal: null, enteredProteinG: null, differenceKcal: null }, 'Tag ohne Einträge');
+  gleich(tage.days.find((tag) => tag.date === '2026-09-19'), { date: '2026-09-19', today: false, entries: 0, enteredKcal: null, enteredProteinG: null, differenceKcal: null, targetStatus: 'keine_eintraege' }, 'Tag ohne Einträge');
   gleich(/complete/i.test(JSON.stringify([mitLueckeFakten, mitLueckeVerlauf])), false, 'kein Rest der Vollständig-Markierung');
 
   // Zahlenabgleich gegen Wochenwerte (Fall mit Reise: Wochenmittel 93,9 … 90,6 kg,
@@ -2017,8 +2017,8 @@ async function trockenlaufFixture(fehler) {
     if (!Object.is(soll, wert)) unterschiede.push(`${pfad}: erwartet ${JSON.stringify(soll)}, ist ${JSON.stringify(wert)}`);
   };
   vergleiche(referenz.snapshot, ist, 'snapshot');
-  if (unterschiede.length) fehler.push(`Fixture: buildCompFacts weicht von der bisherigen Ausgabe ab – ${unterschiede.slice(0, 5).join('; ')}${unterschiede.length > 5 ? ` (+${unterschiede.length - 5})` : ''}`);
-  if (JSON.stringify(ist) !== JSON.stringify(referenz.snapshot)) fehler.push('Fixture: Reihenfolge der Felder weicht ab (wichtig für den Cache-Schlüssel der COMP-Bewertung)');
+  if (unterschiede.length) fehler.push(`Fixture: buildCompFacts weicht von der dokumentierten Referenz ab – ${unterschiede.slice(0, 5).join('; ')}${unterschiede.length > 5 ? ` (+${unterschiede.length - 5})` : ''}`);
+  if (!unterschiede.length && JSON.stringify(ist) !== JSON.stringify(referenz.snapshot)) fehler.push('Fixture: Reihenfolge der Felder weicht ab (wichtig für den Cache-Schlüssel der COMP-Bewertung)');
 
   // Der Verlauf aus denselben Zeilen: pausierte Routine mit Abschlüssen enthalten, keine Quote.
   const verlauf = buildTimeseries(zeilen, jetzt);

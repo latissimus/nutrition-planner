@@ -190,14 +190,14 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     nutritionSettings, weights, skinfolds, waists, performance, sleep, checkins,
     nutritionEntries, routines, completions, preferences,
   ] = await Promise.all([
-    admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,bodycomp_thresholds').eq('user_id', userId).maybeSingle(),
+    admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,pal,bodycomp_thresholds').eq('user_id', userId).maybeSingle(),
     userRows('weights', userId, 'gemessen_am', FETCH_LIMITS.weights, 'gemessen_am,kg'),
     userRows('skinfolds', userId, 'gemessen_am', FETCH_LIMITS.skinfolds, 'gemessen_am,falten,standardisiert,messqualitaet'),
     userRows('waist_measurements', userId, 'gemessen_am', FETCH_LIMITS.waists, 'gemessen_am,cm,standardisiert'),
     userRows('logman_performance', userId, 'performed_on', FETCH_LIMITS.performance, 'performed_on,exercise,category,estimated_1rm,volume,source'),
     userRows('sleep_logs', userId, 'sleep_date', FETCH_LIMITS.sleep, 'sleep_date,bedtime,wake_time,quality,energy,awakenings,tags'),
     userRows('bodycomp_checkins', userId, 'checkin_date', FETCH_LIMITS.checkins, 'checkin_date,recovery,mood,hunger,illness,travel,unusual_meals,note'),
-    pagedRows(() => admin.from('nutrition_log_entries').select('log_date,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }).order('id')),
+    pagedRows(() => admin.from('nutrition_log_entries').select('id,log_date,period,name,amount,unit,energy_kcal,protein_g,carbs_g,fat_g').eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: false }).order('id')),
     // All routines, paused ones included, so every completion has a name.
     admin.from('routines').select('id,name,period,weekdays,active,created_at').eq('user_id', userId).order('position'),
     pagedRows(() => admin.from('routine_completions').select('routine_id,completed_on').eq('user_id', userId).gte('completed_on', since).order('completed_on', { ascending: false }).order('routine_id')),
@@ -685,12 +685,7 @@ Deno.serve(async (request) => {
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
-    const since = dateDaysAgo(now, 15);
-    const { data: dayStatus, error: dayStatusError } = await admin.from('nutrition_day_status')
-      .select('log_date,complete,excluded').eq('user_id', userId).gte('log_date', since);
-    // A failed completeness lookup must never make a numeric change eligible.
-    const limits = calorieBasis(dayStatusError ? [] : dayStatus || [], now,
-      contextRows.nutritionEntries.map((entry: Row) => String(entry.log_date)));
+    const limits = calorieBasis(contextRows.nutritionEntries, now);
     // Ein Gespräch geht weiter, wenn die App seine id schickt; sonst beginnt ein neues.
     const conversationId = isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID();
     const memory = await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries);

@@ -39,6 +39,7 @@ describe('Im Profil ausgeschaltete Bereiche', () => {
 
     const verlauf = buildTimeseries(rows, jetzt);
     expect(verlauf.recentDays).toEqual({ switchedOff: true });
+    expect(verlauf.recentMeals).toEqual({ switchedOff: true });
     expect(verlauf.routines).toEqual({ switchedOff: true });
     expect(verlauf.weeks[0].nutrition).toEqual({ switchedOff: true });
     expect(verlauf.weeks[0].sleep).toEqual({ switchedOff: true });
@@ -56,5 +57,24 @@ describe('Im Profil ausgeschaltete Bereiche', () => {
     expect(verlauf).not.toHaveProperty('switchedOffAreas');
     expect(verlauf.weeks[0].nutrition).toHaveProperty('daysWithEntries', 0);
     expect(weeklyBlock(verlauf, null).notMeasuredThisWeek).toContain('Schlafdauer');
+  });
+
+  it('zeigt einzelne Mahlzeiten und den automatisch berechneten Zielbereich', () => {
+    const rows = zeilen({ nutritionEntries: [
+      { log_date: '2026-09-28', period: 'breakfast', name: 'Quark', amount: 250, unit: 'g', energy_kcal: 240, protein_g: 30, carbs_g: 10, fat_g: 2 },
+      { log_date: '2026-09-28', period: 'breakfast', name: 'Beeren', amount: 100, unit: 'g', energy_kcal: 60, protein_g: 1, carbs_g: 14, fat_g: 0 },
+      { log_date: '2026-09-28', period: 'dinner', name: 'Reis mit Gemüse', amount: 1, unit: 'portion', energy_kcal: 2100, protein_g: 60, carbs_g: 100, fat_g: 30 },
+    ] });
+    const verlauf = buildTimeseries(rows, jetzt);
+    expect(verlauf.recentDays.days.find((tag) => tag.date === '2026-09-28')).toMatchObject({ enteredKcal: 2400, targetStatus: 'im_zielbereich' });
+    expect(verlauf.recentMeals).toEqual([{ date: '2026-09-28', meals: [
+      { period: 'breakfast', kcal: 300, proteinG: 31, carbsG: 24, fatG: 2, items: [
+        { name: 'Quark', amount: 250, unit: 'g', kcal: 240, proteinG: 30, carbsG: 10, fatG: 2 },
+        { name: 'Beeren', amount: 100, unit: 'g', kcal: 60, proteinG: 1, carbsG: 14, fatG: 0 },
+      ] },
+      { period: 'dinner', kcal: 2100, proteinG: 60, carbsG: 100, fatG: 30, items: [
+        { name: 'Reis mit Gemüse', amount: 1, unit: 'portion', kcal: 2100, proteinG: 60, carbsG: 100, fatG: 30 },
+      ] },
+    ] }]);
   });
 });

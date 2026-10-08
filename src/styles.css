@@ -17014,12 +17014,39 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    mitwachsen. */
 :root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-inputbar)::after{top:auto;height:calc(var(--app-dex-dock-bottom) + 34px)!important}
 :root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form:has(.coach-inputbar)::after{height:38px!important}
-/* Ohne Tastatur schmaler, mit Tastatur breiter; der Wechsel gleitet. */
-:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{padding-left:26px!important;padding-right:26px!important;transition:padding .32s cubic-bezier(.2,.9,.3,1)}
-:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form{padding-left:10px!important;padding-right:10px!important}
+/* Ohne Tastatur schmaler; sobald das Feld aktiv ist oder die Tastatur
+   steht, so breit wie die Karten im Chat (12 px Rand). Der Wechsel gleitet. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{padding-left:28px!important;padding-right:28px!important;transition:padding .3s cubic-bezier(.2,.9,.3,1)}
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form.ist-aktiv,
+:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form{padding-left:12px!important;padding-right:12px!important}
 @media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{transition:none}}
-/* Schreibfeld in normaler Schrift (16 px, damit iOS nicht zoomt). */
-:root[data-theme][data-seite="coach"] #view .coach-inputbar textarea{font:500 16px/1.35 "Work Sans",sans-serif!important;word-spacing:normal!important}
+/* Kapsel wie bei Gemini: Kontur außen, das Schreibfeld ohne eigenen Rahmen
+   direkt in der Kapsel, Plus und Mikro als gefüllte Kreise ohne Rand. Der
+   Senden-Knopf bleibt gefüllt wie bisher. */
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar{min-height:64px!important;padding:4px 10px!important;gap:6px!important;grid-template-columns:40px minmax(0,1fr) 40px!important}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar textarea{
+  min-height:40px!important;
+  padding:9px 2px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  font:500 17px/1.3 "Work Sans",sans-serif!important;
+  word-spacing:normal!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar textarea::placeholder{color:var(--ui-neben)!important}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar :is(.coach-plus,.coach-mikro){
+  width:40px!important;
+  height:40px!important;
+  border:0!important;
+  background:color-mix(in srgb,var(--ui-schrift) 9%,var(--ui-flaeche))!important;
+  color:var(--ui-schrift)!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar :is(.coach-plus,.coach-mikro) :is(.coach-eingabe-icon,svg){color:var(--ui-schrift)!important;fill:var(--ui-schrift)!important}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar .coach-send{width:40px!important;height:40px!important}
+/* Antippen bei aktivem Feld: dieselbe Feder wie das Menüband (coach.js). */
+:root[data-theme][data-seite="coach"] #view .coach-inputbar.ist-angetippt::before{animation:leiste-federn .52s both}
+@media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-inputbar.ist-angetippt::before{animation:none}}
 
 /* Kleine Pille „Bewertung ×“ auf der oberen linken Ecke der Kapsel, nur in
    diesem Modus; schwarz wie die Etiketten. Sie ragt über die Kontur, endet
@@ -17183,8 +17210,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Auf farbigen Flächen bleibt die Schrift dunkel, auch im Dark Mode. */
 :root[data-theme][data-seite="coach"] #view :is(.coach-knopf.ist-schritte,.coach-sheet-symbol,.coach-sheet-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
 /* Tagesabschluss bleibt bei den Tageswerten, ohne eine weitere Karte. */
-.nutrition-day-complete{width:100%;min-height:44px;margin-top:12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:10px;background:var(--surface);color:var(--ink);font:700 13px/1.3 var(--ui);text-align:center;cursor:pointer}
-.nutrition-day-complete[aria-pressed="true"]{background:var(--accent-soft,#e8f5df)}
-.nutrition-day-complete:disabled{opacity:.55;cursor:default}
+.nutrition-target-status{margin:12px 0 0;color:var(--ink);font:600 13px/1.4 var(--ui)}
 :root[data-theme][data-seite="sleep"] #view .sleep-reset-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:8px;padding:0 16px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:transparent;color:var(--kontur-farbe);box-shadow:none;font:750 13px/1.2 "Work Sans",sans-serif;text-transform:none}
 :root[data-theme][data-seite="sleep"] #view .sleep-reset-button:disabled{opacity:.55;cursor:default}
