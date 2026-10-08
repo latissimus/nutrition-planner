@@ -20,9 +20,9 @@ describe('Bewertung & Schritte bleibt der bisherige Chat', () => {
   // Der Ernährungskontext wurde bewusst erweitert; die Baselines vor dieser
   // Änderung gelten nicht mehr als unveränderte Prompt-Baselines.
   it('hält den freigegebenen neuen Prompt und die Anfrage stabil', () => {
-    expect(fingerabdruck(coachSystemPrompt('coach', false))).toBe('63a76d17c6aeef56');
-    expect(fingerabdruck(coachSystemPrompt('coach', true))).toBe('9561e8446b76d00a');
-    expect(fingerabdruck(anfrage())).toBe('9dc9daba7b5d258c');
+    expect(fingerabdruck(coachSystemPrompt('coach', false))).toBe('ecb73d1706fbbad2');
+    expect(fingerabdruck(coachSystemPrompt('coach', true))).toBe('c8a2b4cdb9890aa9');
+    expect(fingerabdruck(anfrage())).toBe('f8cedaef9c7a6cf9');
   });
 
   it('nimmt ohne Modus und mit „bewertung“ dieselbe Anfrage', () => {

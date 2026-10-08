@@ -247,7 +247,7 @@ function summaryMarkup(state, date) {
         <span><small>KALORIENZIEL</small><b>${target ? `${decimal(target)} kcal` : 'Einrichten'}</b></span>
         ${materialIconMarkup('edit')}
       </button>
-      <p class="nutrition-target-status">${targetStatusText}${state.entries.length ? ' · nur erfasste Mahlzeiten' : ''}</p>
+      <p class="nutrition-target-status">${targetStatusText}</p>
     </div>
   </details>`;
 }
