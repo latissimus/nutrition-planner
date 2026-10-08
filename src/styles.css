@@ -17195,6 +17195,41 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
 
+/* CHAT WIE BEI GEMINI (Bildschirmaufnahme des Nutzers, 08.10.): Nur deine
+   Nachrichten sind Karten – runde Sprechblasen rechts. Antworten des
+   Coaches, Begrüßung, Ladeanzeige und Fehler stehen als Text auf der Seite,
+   über die volle Breite, ohne Rahmen und ohne Symbol. Die Coaching-Karte
+   (Abend und Montag) bleibt eine Karte. */
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window:is(.is-coach,.is-user)>header{display:none!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach .coach-chat-message{padding:0 2px!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{
+  max-width:min(82%,520px)!important;
+  margin-right:0!important;
+  border-radius:22px!important;
+}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message{padding:10px 16px!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-fehler .coach-chat-message{color:var(--ui-neben)}
+/* Neueste Wörter der einlaufenden Antwort blenden weich ein. */
+:root[data-theme][data-seite="coach"] #view .coach-antwort .wort-neu{animation:wort-auf .5s ease both}
+@keyframes wort-auf{from{opacity:0}}
+
+/* Kapsel zweizeilig, sobald der Text nicht mehr in eine Zeile passt: oben
+   der Text über die volle Breite, unten links Plus, rechts Mikro/Senden. */
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig{grid-template-rows:auto 40px;row-gap:2px!important;padding:8px 10px 8px!important}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig::before{border-radius:28px}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig textarea{grid-column:1 / -1;grid-row:1;padding:6px 6px 2px!important}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig .coach-plus{grid-column:1;grid-row:2}
+:root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig :is(.coach-mikro,.coach-send){grid-column:3;grid-row:2}
+
 /* Flüssiger Chat (Rückmeldung 08.10., nach Gemini): neue Fenster gleiten
    ein, die Statuszeile wechselt weich, die Antwort läuft Wort für Wort ein
    und erst danach erscheinen Quellen, Schritte und Knöpfe (coach.js). */

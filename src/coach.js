@@ -304,6 +304,7 @@ function antwortEinblenden(fenster, mitlaufen) {
   text.textContent = '';
   const beginn = performance.now();
   let fertig = false;
+  let gezeigt = 0;
   const abschliessen = () => {
     if (fertig) return;
     fertig = true;
@@ -311,6 +312,8 @@ function antwortEinblenden(fenster, mitlaufen) {
     ergebnis.classList.replace('wird-geschrieben', 'ist-geschrieben');
     mitlaufen();
   };
+  // Jedes neue Wort kommt als eigenes Stück dazu und blendet weich ein
+  // (.wort-neu); am Ende wird daraus wieder schlichter Text.
   const schritt = (jetzt) => {
     if (fertig) return;
     const ziel = Math.floor(((jetzt - beginn) / 1000) * tempo);
@@ -321,9 +324,18 @@ function antwortEinblenden(fenster, mitlaufen) {
       if (woerter >= ziel) break;
       woerter += 1;
     }
-    text.textContent = teile.slice(0, bis).join('');
+    for (; gezeigt < bis; gezeigt += 1) {
+      if (!teile[gezeigt].trim()) {
+        text.append(teile[gezeigt]);
+        continue;
+      }
+      const wort = document.createElement('span');
+      wort.className = 'wort-neu';
+      wort.textContent = teile[gezeigt];
+      text.append(wort);
+    }
     mitlaufen();
-    if (bis >= teile.length) abschliessen();
+    if (bis >= teile.length) window.setTimeout(abschliessen, 450);
     else requestAnimationFrame(schritt);
   };
   requestAnimationFrame(schritt);
@@ -517,13 +529,40 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   /* Mitscrollen, solange eine Antwort einläuft – aber nur, solange man unten
      ist: Wer nach oben scrollt, um Älteres zu lesen, wird nicht gestört;
      wer wieder nach unten scrollt, ist wieder dabei. */
+  /* Wie bei Gemini: Nach dem Senden rückt deine Frage nach oben, die Antwort
+     läuft darunter ein. Erst wenn sie über den sichtbaren Bereich wächst,
+     scrollt der Chat mit. Wischt oder scrollt man dabei selbst, hört das
+     Mitlaufen für diese Antwort sofort auf. Damit die Frage oben stehen kann,
+     bekommt der Verlauf darunter so viel Platz wie nötig (paddingBottom),
+     und nur so viel. */
   let folgen = true;
-  container.addEventListener('scroll', () => {
-    const rest = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (rest > 120) folgen = false;
-    else if (rest < 40) folgen = true;
-  }, { passive: true });
-  const mitlaufen = () => { if (folgen) container.scrollTop = container.scrollHeight; };
+  const selbstGescrollt = () => { folgen = false; };
+  container.addEventListener('touchmove', selbstGescrollt, { passive: true });
+  container.addEventListener('wheel', selbstGescrollt, { passive: true });
+  const kopfAbstand = () => parseFloat(getComputedStyle(answer.closest('.coach-shell')).paddingTop) || 0;
+  const sichtOben = () => container.getBoundingClientRect().top + kopfAbstand();
+  const sichtUnten = () => form.getBoundingClientRect().top - 12;
+  const letzteFrage = () => [...answer.querySelectorAll('.coach-chat-window.is-user')].at(-1);
+  const platzAnpassen = () => {
+    const frage = letzteFrage();
+    if (!frage) return;
+    const bisher = parseFloat(answer.style.paddingBottom) || 0;
+    const darunter = answer.getBoundingClientRect().bottom - bisher - frage.getBoundingClientRect().top;
+    answer.style.paddingBottom = `${Math.max(0, Math.round(sichtUnten() - sichtOben() - darunter))}px`;
+  };
+  const frageNachOben = () => {
+    const frage = letzteFrage();
+    if (!frage) return;
+    platzAnpassen();
+    container.scrollTo({ top: container.scrollTop + frage.getBoundingClientRect().top - sichtOben(), behavior: 'smooth' });
+  };
+  const mitlaufen = () => {
+    platzAnpassen();
+    if (!folgen) return;
+    const ende = [...answer.children].filter((kind) => kind.offsetHeight).at(-1)?.getBoundingClientRect().bottom ?? 0;
+    const ueber = ende - sichtUnten();
+    if (ueber > 0) container.scrollTop += ueber;
+  };
   // Neue Fenster (deine Nachricht, „Coach tippt“, die Antwort) gleiten ein.
   const neuMarkieren = (anzahl) => [...answer.querySelectorAll('.coach-chat-window')].slice(-anzahl)
     .forEach((fenster) => fenster.classList.add('ist-neu'));
@@ -556,7 +595,20 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     answer.innerHTML = kopf() + (runden.length ? verlaufMarkup(runden, avatar) : (karteSichtbar() ? '' : startMarkup(start))) + zusatz;
     if (karteSichtbar()) alsGelesenMarkieren(coaching);
   };
+  /* Passt der Text nicht mehr in eine Zeile neben Plus und Mikro, wird die
+     Kapsel zweizeilig wie bei Gemini. Gemessen wird an der Breite der
+     einzeiligen Kapsel, damit sie nicht hin- und herspringt. */
+  const messen = document.createElement('canvas').getContext('2d');
   const resizeField = () => {
+    const stil = getComputedStyle(field);
+    messen.font = `${stil.fontWeight} ${stil.fontSize} ${stil.fontFamily}`;
+    // Ein leeres Feld bleibt einzeilig; ohne messbare Breite (Ansicht noch
+    // nicht sichtbar) bleibt alles, wie es ist.
+    if (!field.value) kapsel.classList.remove('ist-mehrzeilig');
+    else if (kapsel.clientWidth) {
+      const einzeilig = !field.value.includes('\n') && messen.measureText(field.value).width <= kapsel.clientWidth - 116;
+      kapsel.classList.toggle('ist-mehrzeilig', !einzeilig);
+    }
     field.style.height = 'auto';
     field.style.height = `${Math.min(field.scrollHeight, 120)}px`;
     // Sobald Text im Feld steht, zeigt der gefüllte Senden-Knopf: abschickbar.
@@ -670,6 +722,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     runden = [];
     gespraechSchreiben(null);
     neuesGespraech.hidden = true;
+    answer.style.paddingBottom = '';
     start.neu = true;
     answer.innerHTML = startMarkup(start);
     field.focus();
@@ -854,7 +907,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     neuMarkieren(2);
     const ladephasenStoppen = ladephasenStarten(answer, webResearch ? LADEPHASEN.web : LADEPHASEN.coach);
     folgen = true;
-    nachUnten();
+    requestAnimationFrame(frageNachOben);
     let eingeblendet = false;
     try {
       // Steht die Coaching-Karte über einem leeren Chat, gehört die Frage zu ihr.
@@ -902,7 +955,10 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       laeuft = false;
       ladephasenStoppen();
       button.disabled = false;
-      if (!eingeblendet) nachUnten();
+      if (!eingeblendet) {
+        answer.style.paddingBottom = '';
+        nachUnten();
+      }
     }
   };
 
