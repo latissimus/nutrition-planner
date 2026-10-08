@@ -35,14 +35,14 @@ const besuchteRouten = (id) => {
 /** Ein bestimmtes Coaching, etwa ein früheres, das im Gedächtnis geöffnet wurde. */
 export async function coachingNachId(userId, id) {
   const { data, error } = await supabase.from('coach_coachings')
-    .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am')
+    .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am,fehler')
     .eq('user_id', userId).eq('id', id).maybeSingle();
   return error ? null : data;
 }
 
 export async function neuestesCoaching(userId) {
   const { data, error } = await supabase.from('coach_coachings')
-    .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am')
+    .select('id,art,datum,status,ergebnis,bereiche,erstellt_am,gelesen_am,fehler')
     .eq('user_id', userId)
     .order('datum', { ascending: false }).limit(1).maybeSingle();
   // Ohne Tabelle (Migration fehlt) gibt es schlicht kein Coaching.
@@ -171,7 +171,12 @@ export function coachingKarteMarkup(coaching) {
     return `<section class="coaching-karte is-status" aria-live="polite"><p>Dein ${marke} wird gerade erstellt …</p></section>`;
   }
   if (coaching.status !== 'bereit') {
-    return `<section class="coaching-karte is-status is-fehler"><p>Das ${marke} konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.</p></section>`;
+    // Ist das OpenAI-Guthaben aufgebraucht, antwortet auch der Chat nicht; das
+    // steht dann klar da statt „frag einfach im Chat“.
+    const ohneGuthaben = /credits|quota|billing|\b429\b/i.test(coaching.fehler || '');
+    return `<section class="coaching-karte is-status is-fehler"><p>${ohneGuthaben
+      ? `Das ${marke} konnte diesmal nicht erstellt werden: Das Guthaben bei OpenAI ist aufgebraucht. Sobald es aufgeladen ist, klappt das nächste ${marke} wieder; bis dahin antwortet auch der Chat nicht.`
+      : `Das ${marke} konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.`}</p></section>`;
   }
   const ergebnis = coaching.ergebnis || {};
   let bereich = null;

@@ -77,6 +77,10 @@ describe('Coaching: Karte', () => {
   it('zeigt einen klaren Status, solange das Coaching läuft oder wenn es scheiterte', () => {
     expect(coachingKarteMarkup(frisch({ status: 'laeuft', ergebnis: null }))).toContain('wird gerade erstellt');
     expect(coachingKarteMarkup(frisch({ status: 'fehlgeschlagen', ergebnis: null }))).toContain('konnte diesmal nicht erstellt werden');
+    // Fehlt OpenAI-Guthaben, steht der Grund da und kein „frag im Chat“.
+    const ohneGuthaben = coachingKarteMarkup(frisch({ status: 'fehlgeschlagen', ergebnis: null, fehler: 'OpenAI /responses: 429 You have no credits remaining.' }));
+    expect(ohneGuthaben).toContain('Guthaben bei OpenAI ist aufgebraucht');
+    expect(ohneGuthaben).not.toContain('jederzeit hier im Chat');
     expect(coachingKarteMarkup(null)).toBe('');
   });
 
