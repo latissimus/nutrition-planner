@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fensterMarkup, resultMarkup, verlaufMarkup } from './coach.js';
+import { quellenAus, quellenSheetMarkup } from './chatLeiste.js';
 
 const baseResult = {
   title: 'CAPBOY COACH',
@@ -14,39 +15,36 @@ const baseResult = {
 
 describe('Coach-Webquellen', () => {
   it('zeigt echte Webquellen als sichere externe Links', () => {
-    const html = resultMarkup({
+    const html = quellenSheetMarkup(quellenAus({
       ...baseResult,
       webResearchRequested: true,
       webSources: [{ title: 'Studie & Leitlinie', url: 'https://example.org/study?q=1&lang=de' }],
-    });
-    expect(html).toContain('<summary>Recherchetreffer</summary>');
-    expect(html).not.toContain('Web: ');
+    }));
+    expect(html).toContain('<h3 class="coach-sheet-titel">Recherchetreffer</h3>');
+    expect(html).not.toContain('<h3 class="coach-sheet-titel">Quellen</h3>');
     expect(html).toContain('target="_blank" rel="noopener noreferrer"');
     expect(html).toContain('Studie &amp; Leitlinie');
     expect(html).toContain('https://example.org/study?q=1&amp;lang=de');
   });
 
-  it('entfernt technische Markdown-Links aus dem Fließtext', () => {
+  it('macht Links des Modells zu kleinen Zitat-Pillen im Fließtext', () => {
     const html = resultMarkup({
       ...baseResult,
-      summary: 'Aktueller Stand ([Fachquelle](https://example.org/study))',
+      summary: 'Aktueller Stand ([Fachquelle](https://example.org/study)). Mehr bei ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/1/)).',
       webResearchRequested: true,
       webSources: [{ title: 'Fachquelle', url: 'https://example.org/study' }],
     });
-    expect(html).toContain('Aktueller Stand (Fachquelle)');
+    expect(html).toContain('Aktueller Stand <a class="coach-zitat" href="https://example.org/study" target="_blank" rel="noopener noreferrer">Fachquelle</a>.');
+    expect(html).toContain('>pubmed</a>.');
     expect(html).not.toContain('[Fachquelle]');
-    expect(html).toContain('href="https://example.org/study"');
+    expect(html).not.toContain('(<a');
   });
 
-  it('verwirft unsichere Protokolle und kennzeichnet ausbleibende Quellen', () => {
-    const html = resultMarkup({
-      ...baseResult,
-      webResearchRequested: true,
-      webSources: [{ title: 'Nicht sicher', url: 'javascript:alert(1)' }],
-    });
-    expect(html).not.toContain('javascript:');
-    expect(html).not.toContain('Web: ');
-    expect(html).toContain('Keine Webquelle verwendet');
+  it('verwirft unsichere Protokolle', () => {
+    const result = { ...baseResult, webResearchRequested: true, webSources: [{ title: 'Nicht sicher', url: 'javascript:alert(1)' }], summary: 'Siehe [hier](javascript:alert(1))' };
+    expect(quellenSheetMarkup(quellenAus(result))).toBe('');
+    expect(resultMarkup(result, { merken: true })).not.toContain('href="javascript:');
+    expect(resultMarkup(result, { merken: true })).not.toContain('coach-quellen-chip');
   });
 
   it('blendet ohne angeforderte Webrecherche unnötige Statuszeilen aus', () => {

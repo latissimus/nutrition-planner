@@ -16999,9 +16999,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    Wie bei Gemini (Bildschirmaufnahme des Nutzers, 07.10.): eine Kapsel mit
    Plus, Schreibfeld und Mikro/Senden, mit den gewohnten Konturen. Bei
    geschlossener Tastatur ist sie schmaler, mit Tastatur breiter. Das Plus
-   öffnet eine Fläche von unten mit Kamera, Fotos, Dateien, Modus,
-   Webwissen und Neues Gespräch. Der Modus steht als Wort im Platzhalter
-   und am Etikett jeder Antwort.
+   öffnet ein kleines Menü (siehe „Chat wie bei ChatGPT“ weiter unten). Der
+   Modus steht als Wort im Platzhalter und im „…“-Menü jeder Antwort.
    ============================================================ */
 :root{--modus-frage:#94DEFF;--modus-bewertung:var(--brand-pink,#FF69AE)}
 /* Die Eingabe schneidet nichts ab, damit ihre Kontur ganz bleibt, auch beim
@@ -17081,171 +17080,9 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes chip-auf{from{opacity:0;transform:translateY(-75%) scale(.6)}}
 @media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip{animation:none}}
 
-/* Plus-Menü: Fläche von unten, Hintergrund abgedunkelt. */
-:root[data-theme][data-seite="coach"] #view .coach-sheet-grund{
-  position:fixed;
-  inset:0;
-  z-index:60;
-  background:rgba(4,6,14,.42);
-  opacity:0;
-  transition:opacity .28s ease;
-}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-grund.ist-offen{opacity:1}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-grund[hidden]{display:none}
-:root[data-theme][data-seite="coach"] #view .coach-sheet{
-  position:fixed;
-  z-index:61;
-  left:8px;
-  right:8px;
-  bottom:calc(8px + env(safe-area-inset-bottom));
-  display:grid;
-  gap:10px;
-  max-width:560px;
-  max-height:calc(100dvh - 120px);
-  margin:0 auto;
-  padding:6px 12px 14px;
-  box-sizing:border-box;
-  overflow:auto;
-  overscroll-behavior:contain;
-  border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:30px;
-  background:var(--ui-flaeche);
-  color:var(--ui-schrift);
-  outline:none;
-  transform:translateY(calc(100% + 40px));
-  transition:transform .34s cubic-bezier(.2,.9,.25,1.04);
-  touch-action:pan-x;
-}
-:root[data-theme][data-seite="coach"] #view .coach-sheet.ist-offen{transform:none}
-:root[data-theme][data-seite="coach"] #view .coach-sheet.wird-gezogen{transition:none}
-:root[data-theme][data-seite="coach"] #view .coach-sheet[hidden]{display:none}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-griff{display:grid;place-items:center;height:18px;cursor:grab}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-griff i{width:40px;height:5px;border-radius:99px;background:color-mix(in srgb,currentColor 28%,transparent)}
-/* Kacheln wie Fotos/Kamera bei Gemini. */
-:root[data-theme][data-seite="coach"] #view .coach-sheet-kacheln{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-kachel{
-  position:relative;
-  display:grid;
-  place-items:center;
-  align-content:center;
-  gap:6px;
-  min-height:84px;
-  border:var(--kontur) solid var(--kontur-farbe);
-  border-radius:20px;
-  background:color-mix(in srgb,currentColor 5%,var(--ui-flaeche));
-  font:700 14px/1.1 "Work Sans",sans-serif;
-  cursor:pointer;
-}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-kachel :is(.material-svg,svg){width:24px;height:24px;fill:currentColor}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-kachel:active{transform:scale(.97)}
-:root[data-theme][data-seite="coach"] #view :is(.coach-sheet-kachel,.coach-sheet-zeile) input{position:absolute;opacity:0;pointer-events:none}
-:root[data-theme][data-seite="coach"] #view :is(.coach-sheet-kachel,.coach-sheet-zeile):has(input:focus-visible){outline:3px solid var(--pink);outline-offset:2px}
-/* Zeilen mit Symbol, Titel und Unterzeile. */
-:root[data-theme][data-seite="coach"] #view .coach-sheet-liste{display:grid;gap:2px;padding-top:6px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile{
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  width:100%;
-  min-height:56px;
-  margin:0;
-  padding:6px 8px;
-  box-sizing:border-box;
-  border:0;
-  border-radius:16px;
-  background:transparent;
-  color:inherit;
-  box-shadow:none;
-  font:600 16px/1.2 "Work Sans",sans-serif;
-  letter-spacing:0;
-  text-align:left;
-  text-transform:none;
-  cursor:pointer;
-}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile[hidden]{display:none}
-:root[data-theme][data-seite="coach"] #view .coach-sheet button.coach-sheet-zeile{background:transparent!important;color:inherit!important}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:active{background:color-mix(in srgb,currentColor 9%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-text{display:grid;gap:2px;flex:1;min-width:0}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-text small{color:var(--ui-neben);font:500 13px/1.25 "Work Sans",sans-serif}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol{display:grid;place-items:center;flex:none;width:36px;height:36px;border:var(--kontur) solid var(--kontur-farbe);border-radius:50%;background:var(--farbe,#fff)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol :is(.material-svg,svg){width:18px;height:18px;color:#111111;fill:#111111}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol .coach-web-symbol{fill:none;stroke:#111111;stroke-width:2;stroke-linejoin:round}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol b{font:800 17px/1 "Work Sans",sans-serif}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-frage{--farbe:var(--modus-frage)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-bewertung{--farbe:var(--modus-bewertung)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-web{--farbe:var(--fe-blue,#15CCFF)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-symbol.ist-neu{--farbe:#FFFFFF}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-haken{display:grid;place-items:center;flex:none;width:22px;height:22px;visibility:hidden}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-haken :is(.material-svg,svg){width:22px;height:22px;fill:currentColor}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:has(input:checked) .coach-sheet-haken{visibility:visible}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-schalter{position:relative;flex:none;width:44px;height:26px;box-sizing:border-box;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:color-mix(in srgb,currentColor 12%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-schalter::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border:1px solid var(--kontur-farbe);border-radius:50%;background:var(--ui-flaeche);transition:transform .2s ease}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:has(input:checked) .coach-sheet-schalter{background:var(--fe-blue,#15CCFF)}
-:root[data-theme][data-seite="coach"] #view .coach-sheet-zeile:has(input:checked) .coach-sheet-schalter::after{transform:translateX(18px)}
-@media (prefers-reduced-motion:reduce){
-  :root[data-theme][data-seite="coach"] #view :is(.coach-sheet,.coach-sheet-grund,.coach-sheet-schalter::after){transition:none}
-}
 /* Vorschau eines PDF- oder Text-Anhangs: Symbol statt Bild. */
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
-
-/* CHAT WIE BEI GEMINI (Bildschirmaufnahme des Nutzers, 08.10.): Nur deine
-   Nachrichten sind Karten – runde Sprechblasen rechts. Antworten des
-   Coaches, Begrüßung, Ladeanzeige und Fehler stehen als Text auf der Seite,
-   über die volle Breite, ohne Rahmen und ohne Symbol. Die Coaching-Karte
-   (Abend und Montag) bleibt eine Karte. */
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{
-  width:100%!important;
-  max-width:none!important;
-  margin-left:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window:is(.is-coach,.is-user)>header{display:none!important}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach .coach-chat-message{padding:0 2px!important}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{
-  max-width:min(82%,520px)!important;
-  margin-right:0!important;
-  border-radius:22px!important;
-}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message{padding:10px 16px!important}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-fehler .coach-chat-message{color:var(--ui-neben)}
-/* Coach-Nachricht wie bei Gemini mit CAPBOY-Charme (Rückmeldung 08.10.):
-   Kopfzeile mit Coach-Gesicht und Etikett, ruhiger Fließtext, Quellen als
-   Pillen, darunter eine kleine Symbolleiste. Das Coaching um 21 Uhr und
-   montags sieht genauso aus: keine Karte mehr, nur der gelbe Fokus bleibt. */
-:root[data-theme][data-seite="coach"] #view .coach-antwort-kopf{display:flex;align-items:center;gap:8px}
-:root[data-theme][data-seite="coach"] #view .coach-antwort-gesicht{flex:none;width:28px;height:28px}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result{gap:12px!important}
-:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result .coach-antwort{font:500 16.5px/1.55 "Work Sans",sans-serif!important;letter-spacing:0!important}
-:root[data-theme][data-seite="coach"] #view .coach-quellen{display:flex!important;flex-wrap:wrap;align-items:center;gap:6px!important;padding-top:0!important;border-top:0!important}
-:root[data-theme][data-seite="coach"] #view .coach-quellen b{margin-right:2px}
-:root[data-theme][data-seite="coach"] #view .coach-quellen>span{display:inline-flex;align-items:center;gap:4px;max-width:100%;padding:4px 10px;box-sizing:border-box;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-flaeche);color:var(--ui-schrift);font:600 12.5px/1.25 "Work Sans",sans-serif;overflow-wrap:anywhere}
-:root[data-theme][data-seite="coach"] #view .coach-quellen>span a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-/* Symbolleiste unter der Antwort. */
-:root[data-theme][data-seite="coach"] #view .coach-aktionen{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:-2px 0 0 -8px}
-:root[data-theme][data-seite="coach"] #view .coach-aktionen button[data-aktion]{display:grid;place-items:center;width:38px;height:38px;margin:0;padding:0;border:0!important;border-radius:50%;background:transparent!important;color:var(--ui-neben)!important;box-shadow:none;cursor:pointer}
-:root[data-theme][data-seite="coach"] #view .coach-aktionen button[data-aktion]:active,
-:root[data-theme][data-seite="coach"] #view .coach-aktionen button[data-aktion][aria-pressed="true"]{background:color-mix(in srgb,var(--ui-schrift) 10%,transparent)!important;color:var(--ui-schrift)!important}
-:root[data-theme][data-seite="coach"] #view .coach-aktion-symbol{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-/* Umriss-Symbole bleiben ungefüllt, auch wo der Dark Mode Symbole füllt. */
-:root[data-theme][data-seite="coach"] #view .coach-chat .coach-aktionen button svg.coach-aktion-symbol,
-:root[data-theme][data-seite="coach"] #view .coach-chat .coach-aktionen button svg.coach-aktion-symbol :is(rect,path){fill:none!important;stroke:currentColor!important}
-:root[data-theme][data-seite="coach"] #view .coach-aktionen button.ist-schritte{display:inline-flex;align-items:center;gap:6px;height:34px;margin:0 0 0 6px;padding:0 13px 0 10px;border:var(--kontur) solid var(--kontur-farbe)!important;border-radius:999px;background:var(--modus-bewertung)!important;color:#111111!important;-webkit-text-fill-color:#111111;box-shadow:none;font:700 13px/1 "Work Sans",sans-serif;cursor:pointer}
-:root[data-theme][data-seite="coach"] #view .coach-aktionen button.ist-schritte .coach-aktion-symbol{width:18px;height:18px;stroke:#111111}
-/* Coaching ohne Karte. */
-:root[data-theme][data-seite="coach"] #view .coaching-karte{margin:0 0 6px!important;padding:0 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-:root[data-theme][data-seite="coach"] #view .coaching-karte header{justify-content:flex-start!important;gap:8px}
-:root[data-theme][data-seite="coach"] #view .coaching-karte header small{margin-left:auto}
-:root[data-theme][data-seite="coach"] #view .coaching-karte h2{font:800 19px/1.3 "Work Sans",sans-serif!important}
-:root[data-theme][data-seite="coach"] #view .coaching-karte p{font:500 16.5px/1.55 "Work Sans",sans-serif}
-
-/* Neueste Wörter der einlaufenden Antwort blenden weich ein. */
-:root[data-theme][data-seite="coach"] #view .coach-antwort .wort-neu{animation:wort-auf .5s ease both}
-@keyframes wort-auf{from{opacity:0}}
 
 /* Kapsel zweizeilig, sobald der Text nicht mehr in eine Zeile passt: oben
    der Text über die volle Breite, unten links Plus, rechts Mikro/Senden. */
@@ -17255,34 +17092,173 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig .coach-plus{grid-column:1;grid-row:2}
 :root[data-theme][data-seite="coach"] #view .coach-form .coach-inputbar.ist-mehrzeilig :is(.coach-mikro,.coach-send){grid-column:3;grid-row:2}
 
-/* Flüssiger Chat (Rückmeldung 08.10., nach Gemini): neue Fenster gleiten
-   ein, die Statuszeile wechselt weich, die Antwort läuft Wort für Wort ein
-   und erst danach erscheinen Quellen, Schritte und Knöpfe (coach.js). */
+/* ============================================================
+   CHAT WIE BEI CHATGPT (Rückmeldung 08.10., Bildschirmfotos des Nutzers)
+   Bis auf die Kapsel wie das Vorbild, auf dem gewohnten Hintergrund:
+   Deine Nachrichten sind rosa Sprechblasen ohne Kontur. Antworten des
+   Coaches – auch das Coaching um 21 Uhr und montags – sind schlichter Text
+   ohne Kopf und ohne Karten; Fettes und Zwischenzeilen gliedern. Darunter
+   Kopieren, Teilen, „…“ (kleines Menü) und „Quellen“ mit Seitensymbolen,
+   die eine Liste von unten öffnen. Das Plus öffnet ein kleines Menü über
+   der Kapsel. #app #view sticht die allgemeinen Knopf-Regeln des Dark Mode.
+   ============================================================ */
+:root[data-seite="coach"]{--coach-blase:#FFE1EF;--coach-blase-schrift:#8A0F4D;--coach-schwebe:#FFFFFF;--coach-schwebe-linie:rgba(0,0,0,.09);--coach-kreis:rgba(0,0,0,.06)}
+:root[data-theme="dark"][data-seite="coach"]{--coach-blase:#4A1335;--coach-blase-schrift:#FFC6E2;--coach-schwebe:#262B37;--coach-schwebe-linie:rgba(255,255,255,.09);--coach-kreis:rgba(255,255,255,.09)}
+
+/* Coach-Fenster ohne Rahmen über die volle Breite, ohne Kopf. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{width:100%!important;max-width:none!important;margin-left:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window:is(.is-coach,.is-user)>header{display:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach .coach-chat-message{padding:0 2px!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-fehler .coach-chat-message{color:var(--ui-neben)}
+
+/* Deine Nachricht: Sprechblase rechts. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{max-width:min(80%,520px)!important;margin-right:0!important;border:0!important;border-radius:24px!important;background:var(--coach-blase)!important;box-shadow:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message{padding:11px 18px!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message :is(p,small){color:var(--coach-blase-schrift)!important;-webkit-text-fill-color:var(--coach-blase-schrift)!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message p{margin:0;font:400 17px/1.45 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message small{display:block;margin-top:4px;opacity:.75;font:500 13px/1.3 "Work Sans",sans-serif!important}
+
+/* Antworttext. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result{display:grid!important;gap:16px!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort{display:grid;gap:14px;margin:0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort,.coaching-karte,.coach-schritt) :is(p,li){margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:400 17px/1.55 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort .coach-safety{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort :is(ul,ol){display:grid;gap:8px;margin:0;padding-left:1.4em}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort,.coaching-karte,.coach-schritt) b{font-weight:700}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort h2{margin:0;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:700 21px/1.3 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort h4,.coaching-bereich,.coaching-fokus h4,.coach-schritte>h4){display:block;margin:4px 0 -8px;padding:0!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:700 17px/1.4 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important;opacity:1!important}
+/* Zitate im Text: kleine graue Pille mit dem Seitennamen. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-zitat{display:inline-block;max-width:14em;margin:0 1px;padding:0 8px;overflow:hidden;border-radius:999px;background:var(--coach-kreis);color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:500 13px/1.75 "Work Sans",sans-serif;text-decoration:none;text-overflow:ellipsis;vertical-align:1px;white-space:nowrap}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-link{color:inherit;text-decoration:underline;text-underline-offset:3px}
+/* Einlaufen: Nur gezeigte Wörter und Pillen sind sichtbar (coach.js). */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort.laeuft .wort:not(.ist-da),
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort.laeuft :is(p,li,ul,ol,h2,h4):not(:has(.ist-da)){display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort.laeuft .wort.ist-da{animation:wort-auf .5s ease both}
+@keyframes wort-auf{from{opacity:0}}
+
+/* Nächste Schritte als Liste; „Merken“ als kleine graue Pille. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte{display:grid!important;gap:14px!important;margin:0;padding:0!important;border:0!important;background:transparent!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritte :is(ol,ul){display:grid;gap:16px;margin:0;padding-left:1.4em}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{display:list-item!important;margin:0;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--ui-schrift)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>*{display:block;margin:4px 0 0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>:first-child{margin-top:0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>b{font:700 17px/1.5 "Work Sans",sans-serif!important;color:var(--ui-schrift)!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt em{font-style:normal;font-weight:600}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-schritt,.coaching-volumen,.coaching-experiment) small{display:block;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:400 15px/1.45 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-art{display:inline!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) button.coach-merken{display:inline-flex!important;align-items:center!important;width:auto;min-height:34px!important;margin-top:8px;padding:0 14px!important;border:0!important;border-radius:999px!important;background:var(--coach-kreis)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;box-shadow:none!important;font:500 14px/1 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) button.coach-merken:disabled{color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;opacity:1}
+/* Daten & Einordnung, Wochenvergleich: graue Zeile mit Pfeil zum Aufklappen. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr,.coaching-vergleich){margin:0;padding:0!important;border:0!important;background:transparent!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr,.coaching-vergleich)>summary{display:inline-flex;align-items:center;gap:8px;padding:4px 0!important;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:500 15px/1.3 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important;list-style:none;cursor:pointer}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr,.coaching-vergleich)>summary::-webkit-details-marker{display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr,.coaching-vergleich)>summary::before{content:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr,.coaching-vergleich)>summary::after{content:"";width:7px;height:7px;border-right:1.8px solid currentColor;border-bottom:1.8px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr,.coaching-vergleich)[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-mehr h4{margin:12px 0 4px;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:700 15.5px/1.3 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-mehr ul{display:grid;gap:6px;margin:0;padding-left:1.3em}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-mehr li{color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:400 15.5px/1.5 "Work Sans",sans-serif!important}
+
+/* Coaching: wie jede Antwort, ohne Karte und ohne gelbe Fläche. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coaching-karte{display:grid!important;gap:16px!important;margin:0 0 8px!important;padding:0 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coaching-karte.is-status p{color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coaching-fokus,.coaching-volumen,.coaching-experiment){display:grid;gap:14px;justify-items:start;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
+
+/* Leiste unter der Antwort: Kopieren, Teilen, „…“, Quellen. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:-4px 0 0 -10px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:40px;height:40px;margin:0;padding:0;border:0!important;border-radius:999px!important;background:transparent!important;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;box-shadow:none!important;font:500 15.5px/1 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important;cursor:pointer}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button[data-aktion="mehr"]{width:50px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button.coach-quellen-chip{padding:0 12px 0 8px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button:is(:active,[aria-expanded="true"]){background:var(--coach-kreis)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
+/* Umriss-Symbole bleiben ungefüllt, auch wo der Dark Mode Symbole füllt. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-aktion-symbol{flex:none;width:21px;height:21px;fill:none!important;stroke:currentColor!important;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-aktion-symbol *{fill:none!important;stroke:currentColor!important}
+/* Kleine runde Seitensymbole, im Knopf überlappend wie bei ChatGPT. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder{display:inline-flex;align-items:center}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder>*{margin-left:-7px;box-shadow:0 0 0 2px var(--coach-grund,var(--ui-flaeche))}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder>:first-child{margin-left:0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;padding:2px;box-sizing:border-box;overflow:hidden;border-radius:50%;background:#FFFFFF;object-fit:contain}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) span.coach-quelle-bild{padding:0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-gesicht{display:block;width:20px;height:20px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild.ist-daten :is(.coach-quelle-gesicht,.coach-quelle-gesicht *){color:#111111!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-gesicht svg{display:block;width:100%;height:100%}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild:is(.ist-seminar,.ist-wissen){background:#E4E6EA}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-quelle-symbol{width:14px;height:14px;fill:none!important;stroke:#111111!important;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-quelle-symbol *{fill:none!important;stroke:#111111!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild.ist-zeichen{background:#5C5F66;color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;font:700 11px/1 "Work Sans",sans-serif!important}
+
+/* Schwebende Menüs (Plus und „…“). */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe{position:fixed;z-index:64;box-sizing:border-box;padding:8px;border-radius:28px;background:var(--coach-schwebe);color:var(--ui-schrift);box-shadow:0 0 0 1px var(--coach-schwebe-linie),0 16px 48px rgba(0,0,0,.28);opacity:0;transform:scale(.9);transition:opacity .16s ease,transform .24s cubic-bezier(.2,.9,.3,1.15)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe.ist-offen{opacity:1;transform:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe-grund{position:fixed;inset:0;z-index:62;background:transparent}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe-grund[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-shell.coach-chat .coach-form.menue-offen{z-index:63}
+/* „…“: Zeit und Art oben, darunter Zeilen mit Symbol. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-mehr-menue{width:min(272px,calc(100vw - 24px))}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-kopf{margin:8px 14px 6px;color:var(--ui-neben);font:500 14px/1.3 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe hr{margin:6px 14px;border:0;border-top:1px solid var(--coach-schwebe-linie)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr-menue button,.coach-menue-zeile){position:relative;display:flex;align-items:center;gap:14px;width:100%;min-height:50px;margin:0;padding:0 14px;box-sizing:border-box;border:0!important;border-radius:18px!important;background:transparent!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;box-shadow:none!important;font:400 17px/1.25 "Work Sans",sans-serif!important;letter-spacing:0!important;text-align:left;text-transform:none!important;cursor:pointer}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-mehr-menue button,.coach-menue-zeile):active{background:var(--coach-kreis)!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schwebe svg.coach-aktion-symbol{width:22px;height:22px;color:var(--ui-schrift)!important}
+/* Plus-Menü: über der Kapsel, links an ihr ausgerichtet; Symbole in Kreisen.
+   „Bewertung & Schritte“ und „Webwissen“ schaltet man ein und aus; an ist
+   der Kreis farbig (Rosa, Blau) und rechts steht ein Haken. */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form-innen{position:relative}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-plus-menue{position:absolute;left:0;bottom:calc(100% + 10px);width:min(300px,calc(100vw - 40px));border-radius:32px;transform-origin:22px 100%}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile{min-height:58px;padding:0 10px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:-3px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-kreis{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:50%;background:var(--coach-kreis);transition:background .2s ease}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-text{flex:1;min-width:0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-haken{display:grid;place-items:center;flex:none;width:22px;height:22px;visibility:hidden}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-haken svg.coach-aktion-symbol{width:20px;height:20px;stroke-width:2.2}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile:has(input:checked) .coach-menue-haken{visibility:visible}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile.ist-bewertung:has(input:checked) .coach-menue-kreis{background:var(--modus-bewertung)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile.ist-web:has(input:checked) .coach-menue-kreis{background:var(--fe-blue,#15CCFF)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-menue-zeile:has(input:checked) .coach-menue-kreis svg.coach-aktion-symbol{color:#111111!important}
+/* Pfeil zurück ans Ende, mittig über der Kapsel. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-nach-unten{position:absolute;z-index:2;left:50%;bottom:calc(100% + 12px);display:grid;place-items:center;width:42px;height:42px;margin:0 0 0 -21px;padding:0;border:0!important;border-radius:50%!important;background:var(--coach-schwebe)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;box-shadow:0 0 0 1px var(--coach-schwebe-linie),0 6px 18px rgba(0,0,0,.22)!important;cursor:pointer;animation:antwort-rest .2s ease both}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-nach-unten[hidden]{display:none}
+
+/* Quellen: Liste von unten mit Griff, Seitensymbol, Seite und Titel. */
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-grund{position:fixed;inset:0;z-index:65;background:rgba(4,6,14,.45);opacity:0;transition:opacity .28s ease}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-grund.ist-offen{opacity:1}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-grund[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet{position:fixed;z-index:66;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));display:flex;flex-direction:column;max-width:600px;max-height:min(76dvh,720px);margin:0 auto;padding:0;box-sizing:border-box;border:0;border-radius:34px;background:var(--coach-schwebe);color:var(--ui-schrift);box-shadow:0 0 0 1px var(--coach-schwebe-linie),0 -8px 40px rgba(0,0,0,.25);outline:none;transform:translateY(calc(100% + 40px));transition:transform .34s cubic-bezier(.2,.9,.25,1.04)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet.ist-offen{transform:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet.wird-gezogen{transition:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet[hidden]{display:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-griff{display:grid;place-items:center;flex:none;height:28px;cursor:grab;touch-action:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-griff i{width:44px;height:5px;border-radius:99px;background:color-mix(in srgb,currentColor 28%,transparent)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-inhalt{min-height:0;padding:0 22px 12px;overflow:auto;overscroll-behavior:contain}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-titel{margin:4px 0 0;padding:0 0 12px;border-bottom:1px solid var(--coach-schwebe-linie);color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:700 15px/1.3 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-sheet-hinweis{margin:10px 0 0;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:400 14px/1.4 "Work Sans",sans-serif!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-liste{margin:0 0 14px;padding:0;list-style:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-liste li+li{border-top:1px solid var(--coach-schwebe-linie)}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-liste :is(a,div){display:grid;gap:5px;padding:16px 0;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;text-decoration:none}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-seite{display:flex;align-items:center;gap:9px;min-width:0;font:400 16px/1.3 "Work Sans",sans-serif}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-seite>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-liste b{font:700 16.5px/1.38 "Work Sans",sans-serif;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-schwebe,.coach-sheet,.coach-sheet-grund){transition:none}
+}
+
+/* Flüssiger Chat: neue Fenster gleiten ein, die Statuszeile wechselt weich,
+   die Antwort läuft Wort für Wort ein und erst danach erscheinen Schritte
+   und die Leiste (coach.js). */
 :root[data-theme][data-seite="coach"] #view .coach-chat-window.ist-neu{animation:fenster-auf .32s cubic-bezier(.2,.9,.3,1) both}
 @keyframes fenster-auf{from{opacity:0;transform:translateY(12px)}}
 :root[data-theme][data-seite="coach"] #view [data-coach-ladestatus]{transition:opacity .18s ease}
 :root[data-theme][data-seite="coach"] #view [data-coach-ladestatus].wechselt{opacity:0}
-:root[data-theme][data-seite="coach"] #view .coach-result.wird-geschrieben>:not(.coach-antwort):not(.coach-antwort-kopf){display:none!important}
-:root[data-theme][data-seite="coach"] #view .coach-result.ist-geschrieben>:not(.coach-antwort):not(.coach-antwort-kopf){animation:antwort-rest .36s ease both}
+:root[data-theme][data-seite="coach"] #view .coach-result.wird-geschrieben>:not(.coach-antwort){display:none!important}
+:root[data-theme][data-seite="coach"] #view .coach-result.ist-geschrieben>:not(.coach-antwort){animation:antwort-rest .36s ease both}
 @keyframes antwort-rest{from{opacity:0;transform:translateY(6px)}}
 @media (prefers-reduced-motion:reduce){
   :root[data-theme][data-seite="coach"] #view :is(.coach-chat-window.ist-neu,.coach-result.ist-geschrieben>*){animation:none!important}
   :root[data-theme][data-seite="coach"] #view [data-coach-ladestatus]{transition:none}
 }
-
-/* Etikett jeder Antwort: gefüllt wie der Senden-Knopf, Schrift hell. */
-:root[data-theme][data-seite="coach"] #view .coach-modus-marke{justify-self:start;display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-gefuellt,#111111)!important;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
-:root[data-theme][data-seite="coach"] #view .coach-modus-marke{color:var(--ui-gefuellt-schrift,#ffffff)!important;-webkit-text-fill-color:var(--ui-gefuellt-schrift,#ffffff)!important}
-:root[data-theme][data-seite="coach"] #view .coach-rueckfrage{margin:0;font:600 14.5px/1.45 "Work Sans",sans-serif}
-/* Quellen unter einer Antwort (statt „Datenlage“). */
-:root[data-theme][data-seite="coach"] #view .coach-quellen{display:grid;gap:4px;padding-top:9px;border-top:var(--haarlinie,1px) dashed color-mix(in srgb,currentColor 35%,transparent)}
-:root[data-theme][data-seite="coach"] #view .coach-quellen b{font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mac-farbe-neben,inherit)}
-:root[data-theme][data-seite="coach"] #view .coach-quellen ul{display:grid;gap:3px;margin:0;padding:0;list-style:none}
-:root[data-theme][data-seite="coach"] #view .coach-quellen li{font:500 12.5px/1.4 "JetBrains Mono",monospace;color:var(--mac-farbe-neben,inherit)}
-:root[data-theme][data-seite="coach"] #view .coach-quellen a{color:inherit;text-decoration:underline;text-underline-offset:3px}
-:root[data-theme][data-seite="coach"] #view .coach-knopf.ist-schritte{border-color:var(--kontur-farbe)!important;background:var(--modus-bewertung)!important}
-/* Auf farbigen Flächen bleibt die Schrift dunkel, auch im Dark Mode. */
-:root[data-theme][data-seite="coach"] #view :is(.coach-knopf.ist-schritte,.coach-sheet-symbol,.coach-sheet-symbol b){color:#111111!important;-webkit-text-fill-color:#111111!important}
 /* Tagesabschluss bleibt bei den Tageswerten, ohne eine weitere Karte. */
 .nutrition-target-status{margin:12px 0 0;color:var(--ink);font:600 13px/1.4 var(--ui)}
 :root[data-theme][data-seite="sleep"] #view .sleep-reset-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:8px;padding:0 16px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:transparent;color:var(--kontur-farbe);box-shadow:none;font:750 13px/1.2 "Work Sans",sans-serif;text-transform:none}

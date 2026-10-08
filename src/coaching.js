@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { escapeHtml } from './coachFenster.js';
-import { coachIconMarkup } from './menuIcons.js';
+import { aktionenMarkup, quellenAus } from './chatLeiste.js';
 import { ENTSCHEIDUNGEN, URTEILE, ZIELGROESSEN } from './coachMemory.js';
 import { vergleichMarkup } from './coachWeekly.js';
 
@@ -124,7 +124,7 @@ function wochenteilMarkup(coaching) {
     ? `<button class="coach-merken" type="button" disabled>${escapeHtml(fertig)}</button>`
     : `<button class="coach-merken" type="button" ${attribut}="${index}">${escapeHtml(text)}</button>`);
   const aktion = ergebnis.volumen?.aktion;
-  const volumen = aktion ? `<div class="coaching-volumen"><b>Volumen</b>
+  const volumen = aktion ? `<div class="coaching-volumen"><h4 class="coaching-bereich">Volumen</h4>
       <p>${escapeHtml(aktion.art === 'beibehalten' ? 'Unverändert lassen.' : aktion.text)}</p>
       ${ergebnis.volumen.begruendung ? `<small>${escapeHtml(ergebnis.volumen.begruendung)}</small>` : ''}
     </div>` : '';
@@ -146,31 +146,48 @@ function wochenteilMarkup(coaching) {
   return volumen + urteile + neu + vergleich;
 }
 
-/** Karte über dem Gespräch: Überschrift, Punkte, Fokus. Laufend oder gescheitert ein klarer Status. */
+/* Das Coaching sieht aus wie jede Antwort des Coaches (Rückmeldung 08.10.,
+   nach ChatGPT): Überschrift, die Punkte unter fetten Zwischenzeilen je
+   Bereich, der Fokus genauso, darunter dieselbe Leiste. Zeit und Art stehen
+   oben im „…“-Menü (coachingKopf). Laufend oder gescheitert ein klarer Status. */
+export const coachingKopf = (coaching) => `${datumText(coaching)} · ${coaching.art === 'woche' ? 'Wochen-Coaching' : 'Coaching'}`;
+// Das Coaching beruht auf den Daten der angesprochenen Bereiche.
+export const coachingQuellen = (coaching) => quellenAus({ sources: { userData: coaching?.bereiche || [], ownData: true } });
+// Als schlichter Text für Kopieren, Vorlesen und Teilen.
+export function coachingText(coaching) {
+  const ergebnis = coaching?.ergebnis || {};
+  return [
+    ergebnis.ueberschrift,
+    ...(ergebnis.punkte || []).map((punkt) => punkt.text),
+    ergebnis.fokus?.text ? `${coaching.art === 'woche' ? 'Fokus der Woche' : 'Fokus'}: ${ergebnis.fokus.text}` : '',
+  ].filter(Boolean).join('\n\n');
+}
+
 export function coachingKarteMarkup(coaching) {
   if (!coaching) return '';
   const woche = coaching.art === 'woche';
   const marke = woche ? 'Wochen-Coaching' : 'Coaching';
   if (coaching.status === 'laeuft' && !haengt(coaching)) {
-    return `<section class="coaching-karte is-status" aria-live="polite">
-      <header>${coachIconMarkup('coach-antwort-gesicht')}<span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
-      <p>Dein ${marke} wird gerade erstellt …</p>
-    </section>`;
+    return `<section class="coaching-karte is-status" aria-live="polite"><p>Dein ${marke} wird gerade erstellt …</p></section>`;
   }
   if (coaching.status !== 'bereit') {
-    return `<section class="coaching-karte is-status is-fehler">
-      <header>${coachIconMarkup('coach-antwort-gesicht')}<span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
-      <p>Das ${marke} konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.</p>
-    </section>`;
+    return `<section class="coaching-karte is-status is-fehler"><p>Das ${marke} konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.</p></section>`;
   }
   const ergebnis = coaching.ergebnis || {};
-  const punkte = (ergebnis.punkte || []).map((punkt) => `<li><span class="coaching-bereich">${escapeHtml(BEREICH_NAMEN[punkt.bereich] || punkt.bereich)}</span><p>${escapeHtml(punkt.text)}</p></li>`).join('');
+  let bereich = null;
+  const punkte = (ergebnis.punkte || []).map((punkt) => {
+    const name = BEREICH_NAMEN[punkt.bereich] || punkt.bereich;
+    const zwischenzeile = name && name !== bereich ? `<h4 class="coaching-bereich">${escapeHtml(name)}</h4>` : '';
+    bereich = name;
+    return `${zwischenzeile}<p>${escapeHtml(punkt.text)}</p>`;
+  }).join('');
   return `<section class="coaching-karte${woche ? ' is-woche' : ''}" aria-label="${marke}">
-    <header>${coachIconMarkup('coach-antwort-gesicht')}<span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
-    <h2>${escapeHtml(ergebnis.ueberschrift || '')}</h2>
-    ${punkte ? `<ul class="coaching-punkte">${punkte}</ul>` : ''}
+    <div class="coach-antwort">
+      <h2>${escapeHtml(ergebnis.ueberschrift || '')}</h2>
+      ${punkte}
+    </div>
     ${woche ? wochenteilMarkup(coaching) : ''}
-    ${ergebnis.fokus ? `<div class="coaching-fokus"><b>${woche ? 'Fokus der Woche' : 'Fokus'}</b><p>${escapeHtml(ergebnis.fokus.text)}</p></div>` : ''}
-    <footer>Auf Basis deiner Daten · Frag einfach unten nach.</footer>
+    ${ergebnis.fokus ? `<div class="coaching-fokus"><h4>${woche ? 'Fokus der Woche' : 'Fokus'}</h4><p>${escapeHtml(ergebnis.fokus.text)}</p></div>` : ''}
+    ${aktionenMarkup({ quellen: coachingQuellen(coaching) })}
   </section>`;
 }

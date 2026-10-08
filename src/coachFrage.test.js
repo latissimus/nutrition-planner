@@ -6,7 +6,8 @@ import {
 } from '../supabase/functions/capboy-coach/coachPrompt.ts';
 import { assistantMemoryText } from '../supabase/functions/capboy-coach/memory.ts';
 import { bewertungsQuellenAus, seminarTitelAus, webSources } from '../supabase/functions/capboy-coach/quellen.ts';
-import { antwortModus, modusLesen, resultMarkup, schritteAnfrage, verlaufMarkup } from './coach.js';
+import { antwortKopf, antwortModus, modusLesen, resultMarkup, schritteAnfrage, verlaufMarkup } from './coach.js';
+import { menueMarkup, quellenAus, quellenSheetMarkup } from './chatLeiste.js';
 
 // Chat-Schalter „Frage / Bewertung & Schritte“ (COACHING-PLAN.md, Schritt 4b).
 
@@ -142,10 +143,12 @@ describe('Quellen einer Bewertung', () => {
   });
 
   it('zeigt bei einer Bewertung Quellen statt Datenlage', () => {
-    const html = resultMarkup({ summary: 'Kurz', confidence: 'mittel', facts: ['Gewicht 82 kg'], sources: { userData: [], ownData: true, seminar: ['Hautfalten Notizen'], generalKnowledge: false } });
-    expect(html).toContain('<span>Deine Daten</span>');
-    expect(html).toContain('Seminar: Hautfalten Notizen');
-    expect(html).not.toContain('Datenlage');
+    const result = { summary: 'Kurz', confidence: 'mittel', facts: ['Gewicht 82 kg'], sources: { userData: [], ownData: true, seminar: ['Hautfalten Notizen'], generalKnowledge: false } };
+    const html = quellenSheetMarkup(quellenAus(result));
+    expect(html).toContain('<b>Deine Daten</b>');
+    expect(html).toContain('<span>Seminar</span></span><b>Hautfalten Notizen</b>');
+    expect(resultMarkup(result, { merken: true })).toContain('data-aktion="quellen"');
+    expect(resultMarkup(result, { merken: true })).not.toContain('Datenlage');
   });
 });
 
@@ -176,11 +179,10 @@ describe('Nachweis der Quellen aus der Modellantwort', () => {
   });
 
   it('zeigt Suchtreffer zugeklappt als Recherchetreffer, nicht als Quelle', () => {
-    const html = resultMarkup({ modus: 'frage', answer: 'Antwort', webResearchRequested: true, webSources: webSources(antwort) });
-    expect(html).toContain('Web: <a href="https://a.example/x"');
-    expect(html).toContain('<summary>Recherchetreffer</summary>');
+    const html = quellenSheetMarkup(quellenAus({ modus: 'frage', answer: 'Antwort', webResearchRequested: true, webSources: webSources(antwort) }));
+    expect(html.indexOf('href="https://a.example/x"')).toBeLessThan(html.indexOf('Recherchetreffer'));
+    expect(html).toContain('<h3 class="coach-sheet-titel">Recherchetreffer</h3>');
     expect(html.indexOf('https://b.example/y')).toBeGreaterThan(html.indexOf('Recherchetreffer'));
-    expect(html).not.toContain('Keine Webquelle verwendet');
   });
 });
 
@@ -220,44 +222,50 @@ describe('Chat: Modus und Etikett', () => {
     expect(modusLesen()).toBe('frage');
   });
 
-  it('zeigt eine Frage-Antwort als Text mit Etikett, ohne Schritte-Karten und ohne Datenlage', () => {
+  it('zeigt eine Frage-Antwort als schlichten Text ohne Kopf; der Modus steht im „…“-Menü', () => {
     const result = { modus: 'frage', answer: 'Ja <b>klar</b>.', confidence: 'mittel', followUpQuestion: 'Wie schläfst du?', safetyNote: '', stepsUseful: true };
     const html = resultMarkup(result, { merken: true });
-    expect(html).toContain('coach-modus-marke ist-frage">Frage<');
+    expect(html).not.toContain('coach-modus-marke');
     expect(html).toContain('Ja &lt;b&gt;klar&lt;/b&gt;.');
     expect(html).toContain('Wie schläfst du?');
     expect(html).not.toContain('Nächste Schritte');
     expect(html).not.toContain('Datenlage');
+    expect(antwortKopf({ zeit: '2026-10-08T18:41:00Z', result })).toMatch(/^8\. Okt\., \d\d:41 · Frage$/);
+    expect(antwortKopf({ result })).toBe('Frage');
   });
 
-  it('bietet „Daraus Schritte machen“ nur an, wo die Antwort zu etwas führt, das man tun kann', () => {
+  it('bietet „Daraus Schritte machen“ im „…“-Menü nur an, wo die Antwort zu etwas führt, das man tun kann', () => {
     const tun = { modus: 'frage', answer: 'Ja, mach eine Woche Pause.', stepsUseful: true };
     const wissen = { modus: 'frage', answer: 'Nein, eine Woche Pause kostet keine Muskeln.', stepsUseful: false };
-    expect(resultMarkup(tun, { merken: true })).toContain('data-schritte-aus');
-    expect(resultMarkup(wissen, { merken: true })).not.toContain('data-schritte-aus');
-    expect(resultMarkup(tun)).not.toContain('data-schritte-aus');
-    expect(resultMarkup(tun, { merken: true, schritteGemacht: true })).not.toContain('data-schritte-aus');
+    expect(resultMarkup(tun, { merken: true })).toContain('data-schritte-moeglich');
+    expect(resultMarkup(wissen, { merken: true })).not.toContain('data-schritte-moeglich');
+    expect(resultMarkup(tun)).not.toContain('data-schritte-moeglich');
+    expect(resultMarkup(tun, { merken: true, schritteGemacht: true })).not.toContain('data-schritte-moeglich');
+    expect(menueMarkup({ schritte: true })).toContain('data-menue="schritte"');
+    expect(menueMarkup({ schritte: false })).not.toContain('data-menue="schritte"');
   });
 
   it('nennt die Quellen statt der Datenlage', () => {
-    const html = resultMarkup({
+    const result = {
       modus: 'frage', answer: 'Antwort',
       sources: { userData: ['training', 'erholung'], seminar: ['Hautfalten <Notizen>'], generalKnowledge: true },
       webSources: [{ title: 'Studie', url: 'https://example.org/studie', zitiert: true }, { title: 'böse', url: 'javascript:alert(1)', zitiert: true }],
-    });
+    };
+    const html = quellenSheetMarkup(quellenAus(result));
     expect(html).toContain('Deine Daten: Training, Erholung');
-    expect(html).toContain('Seminar: Hautfalten &lt;Notizen&gt;');
-    expect(html).toContain('Web: <a href="https://example.org/studie"');
+    expect(html).toContain('<b>Hautfalten &lt;Notizen&gt;</b>');
+    expect(html).toContain('<a href="https://example.org/studie"');
     expect(html).not.toContain('javascript:');
     expect(html).toContain('Allgemeines Fachwissen');
-    expect(resultMarkup({ modus: 'frage', answer: 'Antwort' })).not.toContain('coach-quellen');
+    expect(resultMarkup(result, { merken: true })).toContain('coach-quellen-chip');
+    expect(resultMarkup({ modus: 'frage', answer: 'Antwort' }, { merken: true })).not.toContain('coach-quellen-chip');
   });
 
   it('kennzeichnet Bewertungen, auch ältere ohne Modus', () => {
     const alt = { summary: 'Einordnung', recommendations: [] };
     expect(antwortModus(alt)).toBe('bewertung');
-    expect(resultMarkup(alt)).toContain('coach-modus-marke ist-bewertung">Bewertung &amp; Schritte<');
-    expect(resultMarkup({ ...alt, modus: 'bewertung' })).not.toContain('data-schritte-aus');
+    expect(antwortKopf({ result: alt })).toBe('Bewertung & Schritte');
+    expect(resultMarkup({ ...alt, modus: 'bewertung' }, { merken: true })).not.toContain('data-schritte-moeglich');
   });
 });
 
@@ -281,7 +289,7 @@ describe('„Daraus Schritte machen“ in der App', () => {
       { frage: 'Daraus Schritte machen', bezug: 'Soll ich pausieren?', result: { modus: 'bewertung', summary: 'Plan' } },
     ]);
     expect(html).toContain('zu „Soll ich pausieren?“');
-    expect(html).not.toContain('data-schritte-aus');
+    expect(html).not.toContain('data-schritte-moeglich');
     expect(html).toContain('ist-bewertung');
   });
 });

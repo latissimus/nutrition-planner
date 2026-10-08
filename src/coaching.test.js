@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { COACHING_ROUTEN, coachingHinweise, coachingKarteMarkup, routeBesucht } from './coaching.js';
+import { COACHING_ROUTEN, coachingHinweise, coachingKarteMarkup, coachingKopf, coachingQuellen, coachingText, routeBesucht } from './coaching.js';
+import { quellenSheetMarkup } from './chatLeiste.js';
 
 // Kleiner Speicher-Ersatz: Die besuchten Reiter liegen im localStorage.
 beforeEach(() => {
@@ -50,19 +51,28 @@ describe('Coaching: Hinweise in Kopf und Menüband', () => {
 });
 
 describe('Coaching: Karte', () => {
-  it('zeigt Überschrift, Punkte mit Bereich und Fokus und maskiert Text', () => {
+  it('zeigt Überschrift, Punkte mit Bereich und Fokus wie eine Antwort und maskiert Text', () => {
     const html = coachingKarteMarkup(frisch());
     expect(html).toContain('<h2>Titel</h2>');
     expect(html).toContain('Punkt &lt;b&gt;');
-    expect(html).toContain('<span class="coaching-bereich">Training</span>');
+    expect(html).toContain('<h4 class="coaching-bereich">Training</h4>');
     expect(html).toContain('class="coaching-fokus"');
-    expect(html).toContain('Auf Basis deiner Daten');
+    // Dieselbe Leiste wie unter jeder Antwort; die Quellen sind deine Daten.
+    expect(html).toContain('data-aktion="mehr"');
+    expect(html).toContain('data-aktion="quellen"');
+    expect(quellenSheetMarkup(coachingQuellen(frisch()))).toContain('Deine Daten: Training, Schlaf, Erholung, Körper');
     expect(html).not.toContain('Datenlage');
     const ohneFokus = coachingKarteMarkup(frisch({ ergebnis: { ...frisch().ergebnis, fokus: null } }));
     expect(ohneFokus).not.toContain('coaching-fokus');
     expect(ohneFokus).toContain('<h2>Titel</h2>');
   });
 
+
+  it('gibt Text und Kopf für Kopieren, Teilen und das „…“-Menü', () => {
+    expect(coachingText(frisch())).toBe('Titel\n\nPunkt <b>\n\nFokus: Fokus');
+    expect(coachingKopf(frisch())).toMatch(/, 21 Uhr · Coaching$/);
+    expect(coachingKopf(frisch({ art: 'woche' }))).toMatch(/ · Wochen-Coaching$/);
+  });
 
   it('zeigt einen klaren Status, solange das Coaching läuft oder wenn es scheiterte', () => {
     expect(coachingKarteMarkup(frisch({ status: 'laeuft', ergebnis: null }))).toContain('wird gerade erstellt');

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { anhaengeAuswerten, coachRequestBody } from '../supabase/functions/capboy-coach/coachPrompt.ts';
 import { anhangFuerServer, anhangHinweis, antwortText, resultMarkup, schreibTempo, verlaufMarkup } from './coach.js';
+import { inlineMarkup, menueMarkup, quellenAus, quellenChipMarkup, seitenName, textMarkup } from './chatLeiste.js';
 import { coachingListeMarkup, gedaechtnisMarkup } from './coachMemory.js';
 
 // Plus-Menü (Rückmeldung 07.10.): Kamera, Fotos, Dateien, Frühere Coachings.
@@ -98,16 +99,24 @@ describe('Einlaufen der Antwort', () => {
   });
 });
 
-describe('Symbolleiste unter einer Coach-Antwort', () => {
+describe('Leiste unter einer Coach-Antwort (wie ChatGPT)', () => {
   const frage = { modus: 'frage', answer: 'Ja, eine Woche Pause.', followUpQuestion: 'Wie schläfst du?', stepsUseful: true };
 
-  it('zeigt im Verlauf Kopieren, Vorlesen, Teilen und nur wo sinnvoll „Schritte“', () => {
+  it('zeigt im Verlauf Kopieren, Teilen und „…“; Quellen nur, wenn es welche gibt', () => {
     const html = resultMarkup(frage, { merken: true });
-    ['kopieren', 'vorlesen', 'teilen'].forEach((aktion) => expect(html).toContain(`data-aktion="${aktion}"`));
-    expect(html).toContain('data-schritte-aus');
-    expect(html).toContain('coach-antwort-kopf');
-    expect(resultMarkup({ ...frage, stepsUseful: false }, { merken: true })).not.toContain('data-schritte-aus');
+    ['kopieren', 'teilen', 'mehr'].forEach((aktion) => expect(html).toContain(`data-aktion="${aktion}"`));
+    expect(html).not.toContain('data-aktion="quellen"');
+    expect(html).not.toContain('coach-antwort-kopf');
+    expect(resultMarkup({ ...frage, sources: { userData: ['schlaf'], generalKnowledge: false } }, { merken: true })).toContain('data-aktion="quellen"');
     expect(resultMarkup(frage)).not.toContain('coach-aktionen');
+  });
+
+  it('zeigt im „…“-Menü Zeit und Modus, Vorlesen und die Quellen', () => {
+    const html = menueMarkup({ kopf: '8. Okt., 20:41 · Frage', quellen: true });
+    expect(html).toContain('<p class="coach-menue-kopf">8. Okt., 20:41 · Frage</p>');
+    expect(html).toContain('data-menue="vorlesen"');
+    expect(html).toContain('data-menue="quellen"');
+    expect(menueMarkup({ vorlesen: true })).toContain('Vorlesen beenden');
   });
 
   it('gibt die Antwort als schlichten Text weiter, bei Bewertungen mit den Schritten', () => {
@@ -115,5 +124,35 @@ describe('Symbolleiste unter einer Coach-Antwort', () => {
     expect(antwortText({ summary: 'Zwei Ruhetage.', recommendations: [{ action: 'Ruhetage einlegen' }] }))
       .toBe('Zwei Ruhetage.\n\nNächste Schritte:\n– Ruhetage einlegen');
     expect(antwortText(null)).toBe('');
+  });
+});
+
+describe('Antworttext wie bei ChatGPT', () => {
+  it('gliedert in Absätze und Listen, setzt **fett** und maskiert alles andere', () => {
+    expect(textMarkup('Erst <b>das</b>.\n\n**Dann** das.')).toBe('<p>Erst &lt;b&gt;das&lt;/b&gt;.</p><p><b>Dann</b> das.</p>');
+    expect(textMarkup('- eins\n- zwei')).toBe('<ul><li>eins</li><li>zwei</li></ul>');
+    expect(textMarkup('1. eins\n2. zwei')).toBe('<ol><li>eins</li><li>zwei</li></ol>');
+    expect(textMarkup('Zeile\nnoch eine')).toBe('<p>Zeile<br>noch eine</p>');
+  });
+
+  it('zeigt [Evidenz] und Links als kleine Pillen mit kurzem Seitennamen', () => {
+    expect(inlineMarkup('[Evidenz] Protein hilft.')).toBe('<span class="coach-zitat ist-evidenz">Evidenz</span> Protein hilft.');
+    expect(seitenName('pubmed.ncbi.nlm.nih.gov')).toBe('pubmed');
+    expect(seitenName('www.examine.com')).toBe('examine');
+    expect(seitenName('www.bbc.co.uk')).toBe('bbc');
+    expect(inlineMarkup('laut [ISSN](https://jissn.biomedcentral.com/a)')).toContain('<a class="coach-link" href="https://jissn.biomedcentral.com/a"');
+  });
+
+  it('zeigt im Quellen-Knopf höchstens drei kleine Bilder, Webseiten mit ihrem Symbol', () => {
+    const quellen = quellenAus({
+      sources: { userData: ['training'], seminar: ['Supplements'], generalKnowledge: true },
+      webSources: [{ title: 'A', url: 'https://a.example/x', zitiert: true }],
+    });
+    const html = quellenChipMarkup(quellen);
+    expect(html.match(/class="coach-quelle-bild/g)).toHaveLength(3);
+    expect(html).toContain('src="https://icons.duckduckgo.com/ip3/a.example.ico"');
+    expect(html).toContain('<span>Quellen</span>');
+    expect(quellenChipMarkup(quellenAus({ webSources: [{ url: 'https://b.example/y' }] }))).toContain('<span>Recherche</span>');
+    expect(quellenChipMarkup(quellenAus({}))).toBe('');
   });
 });
