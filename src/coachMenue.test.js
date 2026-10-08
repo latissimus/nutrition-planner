@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { anhaengeAuswerten, coachRequestBody } from '../supabase/functions/capboy-coach/coachPrompt.ts';
-import { anhangFuerServer, anhangHinweis, schreibTempo, verlaufMarkup } from './coach.js';
+import { anhangFuerServer, anhangHinweis, antwortText, resultMarkup, schreibTempo, verlaufMarkup } from './coach.js';
 import { coachingListeMarkup, gedaechtnisMarkup } from './coachMemory.js';
 
 // Plus-Menü (Rückmeldung 07.10.): Kamera, Fotos, Dateien, Frühere Coachings.
@@ -95,5 +95,25 @@ describe('Einlaufen der Antwort', () => {
     expect(schreibTempo(30)).toBe(40);
     expect(schreibTempo(200)).toBe(100);
     expect(200 / schreibTempo(200)).toBeLessThanOrEqual(2);
+  });
+});
+
+describe('Symbolleiste unter einer Coach-Antwort', () => {
+  const frage = { modus: 'frage', answer: 'Ja, eine Woche Pause.', followUpQuestion: 'Wie schläfst du?', stepsUseful: true };
+
+  it('zeigt im Verlauf Kopieren, Vorlesen, Teilen und nur wo sinnvoll „Schritte“', () => {
+    const html = resultMarkup(frage, { merken: true });
+    ['kopieren', 'vorlesen', 'teilen'].forEach((aktion) => expect(html).toContain(`data-aktion="${aktion}"`));
+    expect(html).toContain('data-schritte-aus');
+    expect(html).toContain('coach-antwort-kopf');
+    expect(resultMarkup({ ...frage, stepsUseful: false }, { merken: true })).not.toContain('data-schritte-aus');
+    expect(resultMarkup(frage)).not.toContain('coach-aktionen');
+  });
+
+  it('gibt die Antwort als schlichten Text weiter, bei Bewertungen mit den Schritten', () => {
+    expect(antwortText(frage)).toBe('Ja, eine Woche Pause.\n\nWie schläfst du?');
+    expect(antwortText({ summary: 'Zwei Ruhetage.', recommendations: [{ action: 'Ruhetage einlegen' }] }))
+      .toBe('Zwei Ruhetage.\n\nNächste Schritte:\n– Ruhetage einlegen');
+    expect(antwortText(null)).toBe('');
   });
 });

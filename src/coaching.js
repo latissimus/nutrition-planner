@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { escapeHtml } from './coachFenster.js';
+import { coachIconMarkup } from './menuIcons.js';
 import { ENTSCHEIDUNGEN, URTEILE, ZIELGROESSEN } from './coachMemory.js';
 import { vergleichMarkup } from './coachWeekly.js';
 
@@ -152,20 +153,20 @@ export function coachingKarteMarkup(coaching) {
   const marke = woche ? 'Wochen-Coaching' : 'Coaching';
   if (coaching.status === 'laeuft' && !haengt(coaching)) {
     return `<section class="coaching-karte is-status" aria-live="polite">
-      <header><span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
+      <header>${coachIconMarkup('coach-antwort-gesicht')}<span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
       <p>Dein ${marke} wird gerade erstellt …</p>
     </section>`;
   }
   if (coaching.status !== 'bereit') {
     return `<section class="coaching-karte is-status is-fehler">
-      <header><span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
+      <header>${coachIconMarkup('coach-antwort-gesicht')}<span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
       <p>Das ${marke} konnte diesmal nicht erstellt werden. Deine Daten sind sicher; der nächste Versuch kommt mit dem nächsten Coaching. Fragen kannst du den Coach jederzeit hier im Chat.</p>
     </section>`;
   }
   const ergebnis = coaching.ergebnis || {};
   const punkte = (ergebnis.punkte || []).map((punkt) => `<li><span class="coaching-bereich">${escapeHtml(BEREICH_NAMEN[punkt.bereich] || punkt.bereich)}</span><p>${escapeHtml(punkt.text)}</p></li>`).join('');
   return `<section class="coaching-karte${woche ? ' is-woche' : ''}" aria-label="${marke}">
-    <header><span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
+    <header>${coachIconMarkup('coach-antwort-gesicht')}<span class="coaching-marke">${marke}</span><small>${escapeHtml(datumText(coaching))}</small></header>
     <h2>${escapeHtml(ergebnis.ueberschrift || '')}</h2>
     ${punkte ? `<ul class="coaching-punkte">${punkte}</ul>` : ''}
     ${woche ? wochenteilMarkup(coaching) : ''}

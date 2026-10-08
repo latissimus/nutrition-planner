@@ -143,7 +143,7 @@ describe('Quellen einer Bewertung', () => {
 
   it('zeigt bei einer Bewertung Quellen statt Datenlage', () => {
     const html = resultMarkup({ summary: 'Kurz', confidence: 'mittel', facts: ['Gewicht 82 kg'], sources: { userData: [], ownData: true, seminar: ['Hautfalten Notizen'], generalKnowledge: false } });
-    expect(html).toContain('<li>Deine Daten</li>');
+    expect(html).toContain('<span>Deine Daten</span>');
     expect(html).toContain('Seminar: Hautfalten Notizen');
     expect(html).not.toContain('Datenlage');
   });

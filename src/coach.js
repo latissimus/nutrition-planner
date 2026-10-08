@@ -192,9 +192,40 @@ function quellenMarkup(result) {
     zitiert.length ? `Web: ${zitiert.map(webLink).join(', ')}` : '',
     quellen.generalKnowledge ? 'Allgemeines Fachwissen' : '',
   ].filter(Boolean);
-  return `${zeilen.length ? `<div class="coach-quellen"><b>Quellen</b><ul>${zeilen.map((zeile) => `<li>${zeile}</li>`).join('')}</ul></div>` : ''}
+  return `${zeilen.length ? `<div class="coach-quellen"><b>Quellen</b>${zeilen.map((zeile) => `<span>${zeile}</span>`).join('')}</div>` : ''}
     ${treffer.length ? `<details class="coach-mehr coach-web-sources"><summary>Recherchetreffer</summary><p>Bei der Websuche gefunden. Nicht jeder Treffer floss in die Antwort ein.</p><ul>${treffer.map((source) => `<li>${webLink(source)}</li>`).join('')}</ul></details>` : ''}
     ${result.webResearchRequested && !web.length ? '<small class="coach-web-status">Keine Webquelle verwendet</small>' : ''}`;
+}
+
+/* Look wie bei Gemini mit CAPBOY-Charme (Rückmeldung 08.10.): Jede Coach-
+   Nachricht beginnt mit dem Coach-Gesicht und ihrem Etikett und endet mit
+   einer kleinen Symbolleiste: Kopieren, Vorlesen, Teilen und – wo die
+   Antwort zu etwas führt, das man tun kann – „Schritte“. Aus einem Schritt
+   wird mit „Merken“ eine Maßnahme im Gedächtnis. */
+const SYMBOL = {
+  kopieren: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>',
+  vorlesen: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>',
+  teilen: '<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8"/>',
+  schritte: '<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5 2.5-2.5M3.5 18l1.5 1.5 2.5-2.5"/>',
+};
+const symbol = (name) => `<svg class="coach-aktion-symbol" viewBox="0 0 24 24" aria-hidden="true">${SYMBOL[name]}</svg>`;
+const kopfMarkup = (modus) => `<div class="coach-antwort-kopf">${coachIconMarkup('coach-antwort-gesicht')}${modusMarke(modus)}</div>`;
+function aktionenMarkup({ schritte = false } = {}) {
+  return `<div class="coach-aktionen" role="toolbar" aria-label="Aktionen zur Antwort">
+    <button type="button" data-aktion="kopieren" aria-label="Antwort kopieren">${symbol('kopieren')}</button>
+    <button type="button" data-aktion="vorlesen" aria-label="Antwort vorlesen" aria-pressed="false">${symbol('vorlesen')}</button>
+    <button type="button" data-aktion="teilen" aria-label="Antwort teilen">${symbol('teilen')}</button>
+    ${schritte ? `<button type="button" class="ist-schritte" data-schritte-aus aria-label="Daraus Schritte machen">${symbol('schritte')}<span>Schritte</span></button>` : ''}
+  </div>`;
+}
+// Die Antwort als schlichter Text für Kopieren, Vorlesen und Teilen.
+export function antwortText(result) {
+  if (!result) return '';
+  if (antwortModus(result) === 'frage') {
+    return [result.answer, result.followUpQuestion, result.safetyNote].filter(Boolean).map(readableModelText).join('\n\n');
+  }
+  const schritte = (result.recommendations || []).slice(0, 3).map((item) => `– ${item.action}`);
+  return [result.summary, result.safetyNote, schritte.length ? `Nächste Schritte:\n${schritte.join('\n')}` : ''].filter(Boolean).map(readableModelText).join('\n\n');
 }
 
 // Frage-Antwort (Schritt 4b): nur der Text, keine Karten. „Daraus Schritte
@@ -202,12 +233,12 @@ function quellenMarkup(result) {
 // (stepsUseful), und fragt erst beim Antippen eine Bewertung an.
 function frageMarkup(result, { merken = false, schritteGemacht = false } = {}) {
   return `<div class="coach-result ist-frage">
-    ${modusMarke('frage')}
+    ${kopfMarkup('frage')}
     <p class="coach-antwort">${escapeHtml(readableModelText(result.answer || ''))}</p>
     ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
     ${result.followUpQuestion ? `<p class="coach-rueckfrage">${escapeHtml(readableModelText(result.followUpQuestion))}</p>` : ''}
     ${quellenMarkup(result)}
-    ${merken && result.stepsUseful === true && !schritteGemacht ? '<button class="coach-knopf ist-schritte" type="button" data-schritte-aus>Daraus Schritte machen</button>' : ''}
+    ${merken ? aktionenMarkup({ schritte: result.stepsUseful === true && !schritteGemacht }) : ''}
   </div>`;
 }
 
@@ -226,13 +257,14 @@ export function resultMarkup(result, { merken = false, schritteGemacht = false }
     uncertainties.length ? `<h4>Noch unsicher</h4>${liste(uncertainties)}` : '',
   ].join('');
   return `<div class="coach-result ist-bewertung">
-    ${modusMarke('bewertung')}
+    ${kopfMarkup('bewertung')}
     <p class="coach-antwort">${escapeHtml(readableModelText(result.summary || ''))}</p>
     ${result.safetyNote ? `<p class="coach-safety">${escapeHtml(readableModelText(result.safetyNote))}</p>` : ''}
     ${auswertungenMarkup((result.experimentReviews || []).slice(0, 5), merken)}
     ${recommendations.length ? `<section class="coach-schritte"><h4>Nächste Schritte</h4>${recommendations.map((item, index) => empfehlungMarkup(item, index, merken)).join('')}</section>` : ''}
     ${mehr ? `<details class="coach-mehr"><summary>Daten &amp; Einordnung</summary>${mehr}</details>` : ''}
     ${quellenMarkup(result)}
+    ${merken ? aktionenMarkup() : ''}
   </div>`;
 }
 
@@ -588,9 +620,8 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const karteSichtbar = () => coaching?.status === 'bereit'
     && (gespraech?.id === coaching.id || (!runden.length && !karteAusgeblendet && istFrisch(coaching)));
   const statusSichtbar = () => Boolean(coaching) && coaching.status !== 'bereit' && !karteAusgeblendet && istFrisch(coaching);
-  // Wie jede Coach-Nachricht trägt die Karte das Coach-Zeichen links daneben.
-  const kopf = () => (karteSichtbar() || statusSichtbar()
-    ? `<div class="coaching-zeile">${coachIconMarkup('coach-chat-cap')}${coachingKarteMarkup(coaching)}</div>` : '');
+  // Das Coaching sieht aus wie jede Coach-Nachricht (coaching.js).
+  const kopf = () => (karteSichtbar() || statusSichtbar() ? coachingKarteMarkup(coaching) : '');
   const zeichnen = (zusatz = '') => {
     answer.innerHTML = kopf() + (runden.length ? verlaufMarkup(runden, avatar) : (karteSichtbar() ? '' : startMarkup(start))) + zusatz;
     if (karteSichtbar()) alsGelesenMarkieren(coaching);
@@ -728,7 +759,45 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     field.focus();
   };
 
+  /* Symbolleiste unter einer Antwort: Kopieren, Vorlesen (Sprachausgabe des
+     Geräts, erneutes Antippen stoppt) und Teilen (Teilen-Menü des Geräts,
+     sonst Kopieren). */
+  const antwortAktion = async (knopf, ergebnis) => {
+    const text = antwortText(ergebnis);
+    if (!text) return;
+    const art = knopf.dataset.aktion;
+    if (art === 'vorlesen') {
+      const sprache = window.speechSynthesis;
+      if (!sprache || typeof SpeechSynthesisUtterance === 'undefined') { toast('Vorlesen geht auf diesem Gerät nicht.'); return; }
+      const lief = knopf.getAttribute('aria-pressed') === 'true';
+      sprache.cancel();
+      answer.querySelectorAll('[data-aktion="vorlesen"]').forEach((andere) => andere.setAttribute('aria-pressed', 'false'));
+      if (lief) return;
+      const satz = new SpeechSynthesisUtterance(text);
+      satz.lang = 'de-DE';
+      satz.onend = () => knopf.setAttribute('aria-pressed', 'false');
+      knopf.setAttribute('aria-pressed', 'true');
+      sprache.speak(satz);
+      return;
+    }
+    if (art === 'teilen' && navigator.share) {
+      try { await navigator.share({ text }); } catch {}
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Antwort kopiert.');
+    } catch {
+      toast('Kopieren geht hier gerade nicht.');
+    }
+  };
+
   answer.addEventListener('click', async (event) => {
+    const aktion = event.target.closest('[data-aktion]');
+    if (aktion) {
+      antwortAktion(aktion, runden[Number(event.target.closest('[data-runde]')?.dataset.runde)]?.result);
+      return;
+    }
     const vorschlag = event.target.closest('[data-vorschlag]');
     if (vorschlag) {
       field.value = vorschlag.dataset.vorschlag;
@@ -891,6 +960,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   const senden = async ({ question, modus: anfrageModus, schritteAus = null, quelle = null }) => {
     if (laeuft) return;
     laeuft = true;
+    window.speechSynthesis?.cancel();
     const webResearch = webOption.checked;
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;

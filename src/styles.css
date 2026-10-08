@@ -16970,11 +16970,6 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    12 px vom Rand. Auf Handys bis 400 px Breite rückte eine ältere Regel den
    Verlauf auf 8 px hinaus, er ragte dort 4 px über die Eingabe. */
 :root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat{padding-left:12px;padding-right:12px}
-/* Coach-Zeichen links neben der Karte, wie bei jeder Coach-Nachricht: auf
-   der 12-px-Kante der Eingabe, die Karte 42 px eingerückt. */
-:root[data-theme][data-seite="coach"] #view .coaching-zeile{position:relative;margin:0 0 14px 42px}
-:root[data-theme][data-seite="coach"] #view .coaching-zeile>.coach-chat-cap{position:absolute;top:12px;left:-42px;z-index:2;display:grid}
-:root[data-theme][data-seite="coach"] #view .coaching-zeile>.coaching-karte{margin:0}
 /* Wochen-Coaching (Schritt 5): Volumen, Experimente, Wochenvergleich. */
 :root[data-theme][data-seite="coach"] #view .coaching-volumen{display:grid;gap:4px;margin:0 0 12px;padding:10px 12px;border:var(--kontur) solid var(--kontur-farbe);border-radius:14px}
 :root[data-theme][data-seite="coach"] #view .coaching-volumen b{font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}
@@ -17218,6 +17213,36 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 }
 :root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message{padding:10px 16px!important}
 :root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-fehler .coach-chat-message{color:var(--ui-neben)}
+/* Coach-Nachricht wie bei Gemini mit CAPBOY-Charme (Rückmeldung 08.10.):
+   Kopfzeile mit Coach-Gesicht und Etikett, ruhiger Fließtext, Quellen als
+   Pillen, darunter eine kleine Symbolleiste. Das Coaching um 21 Uhr und
+   montags sieht genauso aus: keine Karte mehr, nur der gelbe Fokus bleibt. */
+:root[data-theme][data-seite="coach"] #view .coach-antwort-kopf{display:flex;align-items:center;gap:8px}
+:root[data-theme][data-seite="coach"] #view .coach-antwort-gesicht{flex:none;width:28px;height:28px}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result{gap:12px!important}
+:root[data-theme][data-seite="coach"] #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result .coach-antwort{font:500 16.5px/1.55 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #view .coach-quellen{display:flex!important;flex-wrap:wrap;align-items:center;gap:6px!important;padding-top:0!important;border-top:0!important}
+:root[data-theme][data-seite="coach"] #view .coach-quellen b{margin-right:2px}
+:root[data-theme][data-seite="coach"] #view .coach-quellen>span{display:inline-flex;align-items:center;gap:4px;max-width:100%;padding:4px 10px;box-sizing:border-box;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-flaeche);color:var(--ui-schrift);font:600 12.5px/1.25 "Work Sans",sans-serif;overflow-wrap:anywhere}
+:root[data-theme][data-seite="coach"] #view .coach-quellen>span a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+/* Symbolleiste unter der Antwort. */
+:root[data-theme][data-seite="coach"] #view .coach-aktionen{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:-2px 0 0 -8px}
+:root[data-theme][data-seite="coach"] #view .coach-aktionen button[data-aktion]{display:grid;place-items:center;width:38px;height:38px;margin:0;padding:0;border:0!important;border-radius:50%;background:transparent!important;color:var(--ui-neben)!important;box-shadow:none;cursor:pointer}
+:root[data-theme][data-seite="coach"] #view .coach-aktionen button[data-aktion]:active,
+:root[data-theme][data-seite="coach"] #view .coach-aktionen button[data-aktion][aria-pressed="true"]{background:color-mix(in srgb,var(--ui-schrift) 10%,transparent)!important;color:var(--ui-schrift)!important}
+:root[data-theme][data-seite="coach"] #view .coach-aktion-symbol{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/* Umriss-Symbole bleiben ungefüllt, auch wo der Dark Mode Symbole füllt. */
+:root[data-theme][data-seite="coach"] #view .coach-chat .coach-aktionen button svg.coach-aktion-symbol,
+:root[data-theme][data-seite="coach"] #view .coach-chat .coach-aktionen button svg.coach-aktion-symbol :is(rect,path){fill:none!important;stroke:currentColor!important}
+:root[data-theme][data-seite="coach"] #view .coach-aktionen button.ist-schritte{display:inline-flex;align-items:center;gap:6px;height:34px;margin:0 0 0 6px;padding:0 13px 0 10px;border:var(--kontur) solid var(--kontur-farbe)!important;border-radius:999px;background:var(--modus-bewertung)!important;color:#111111!important;-webkit-text-fill-color:#111111;box-shadow:none;font:700 13px/1 "Work Sans",sans-serif;cursor:pointer}
+:root[data-theme][data-seite="coach"] #view .coach-aktionen button.ist-schritte .coach-aktion-symbol{width:18px;height:18px;stroke:#111111}
+/* Coaching ohne Karte. */
+:root[data-theme][data-seite="coach"] #view .coaching-karte{margin:0 0 6px!important;padding:0 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-theme][data-seite="coach"] #view .coaching-karte header{justify-content:flex-start!important;gap:8px}
+:root[data-theme][data-seite="coach"] #view .coaching-karte header small{margin-left:auto}
+:root[data-theme][data-seite="coach"] #view .coaching-karte h2{font:800 19px/1.3 "Work Sans",sans-serif!important}
+:root[data-theme][data-seite="coach"] #view .coaching-karte p{font:500 16.5px/1.55 "Work Sans",sans-serif}
+
 /* Neueste Wörter der einlaufenden Antwort blenden weich ein. */
 :root[data-theme][data-seite="coach"] #view .coach-antwort .wort-neu{animation:wort-auf .5s ease both}
 @keyframes wort-auf{from{opacity:0}}
@@ -17237,8 +17262,8 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 @keyframes fenster-auf{from{opacity:0;transform:translateY(12px)}}
 :root[data-theme][data-seite="coach"] #view [data-coach-ladestatus]{transition:opacity .18s ease}
 :root[data-theme][data-seite="coach"] #view [data-coach-ladestatus].wechselt{opacity:0}
-:root[data-theme][data-seite="coach"] #view .coach-result.wird-geschrieben>:not(.coach-antwort):not(.coach-modus-marke){display:none!important}
-:root[data-theme][data-seite="coach"] #view .coach-result.ist-geschrieben>:not(.coach-antwort):not(.coach-modus-marke){animation:antwort-rest .36s ease both}
+:root[data-theme][data-seite="coach"] #view .coach-result.wird-geschrieben>:not(.coach-antwort):not(.coach-antwort-kopf){display:none!important}
+:root[data-theme][data-seite="coach"] #view .coach-result.ist-geschrieben>:not(.coach-antwort):not(.coach-antwort-kopf){animation:antwort-rest .36s ease both}
 @keyframes antwort-rest{from{opacity:0;transform:translateY(6px)}}
 @media (prefers-reduced-motion:reduce){
   :root[data-theme][data-seite="coach"] #view :is(.coach-chat-window.ist-neu,.coach-result.ist-geschrieben>*){animation:none!important}
