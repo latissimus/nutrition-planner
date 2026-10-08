@@ -62,8 +62,8 @@ const mean = (values: number[]) => values.length ? values.reduce((sum, value) =>
 const round = (value: number | null, digits = 1) => value == null ? null : Number(value.toFixed(digits));
 
 export function dateDaysAgo(now: Date, days: number) {
-  const date = new Date(now.getTime());
-  date.setDate(date.getDate() - days);
+  const date = new Date(`${berlinDay(now)}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - days);
   return date.toISOString().slice(0, 10);
 }
 
@@ -146,7 +146,7 @@ export function buildCompFacts(rows: ContextRows, now: Date) {
 
   return withoutSwitchedOff({
     generatedAt: now.toISOString(),
-    period: { from: since42, to: now.toISOString().slice(0, 10) },
+    period: { from: since42, to: berlinDay(now) },
     profile: {
       age,
       heightCm: settings?.height_cm || null,

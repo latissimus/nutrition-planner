@@ -13,7 +13,7 @@ import { BEIBEHALTEN, fensterWerte, nichtRepraesentativ as wocheNichtRepraesenta
 import { wochenBereinigen, wochenSchema, wochenSystemPrompt, wochenText, wochenUserPrompt } from './wochenCoaching.ts';
 import { experimentMeasurement } from './experiments.ts';
 import { calorieBasis, enforceCalorieBasis } from './calorieGuard.ts';
-import { targetPhaseDay } from './nutritionTarget.js';
+import { berlinDay, targetPhaseDay } from './nutritionTarget.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -689,7 +689,7 @@ Deno.serve(async (request) => {
     const limits = calorieBasis(contextRows.nutritionEntries, now, targetPhaseDay(contextRows.settings));
     // Ein Gespräch geht weiter, wenn die App seine id schickt; sonst beginnt ein neues.
     const conversationId = isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID();
-    const memory = await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries);
+    const memory = await loadMemory(userId, conversationId, berlinDay(now), timeseries);
     const vectorStoreId = await ensureKnowledgeBase();
 
     const requestBody = coachRequestBody({ scope, question: schritteText || question, snapshot, timeseries, memory: memory?.blocks, limits, webResearch, vectorStoreId, imageDataUrls, dateien, texte, modus });

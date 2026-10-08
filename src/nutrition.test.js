@@ -3,7 +3,7 @@ import { calculateEnergyNeed, localDateKey } from './nutrition.js';
 import { berlinDay, currentCalorieTarget, nutritionTargetStatus, targetPhaseDay } from '../supabase/functions/capboy-coach/nutritionTarget.js';
 import { buildFollowThrough } from '../supabase/functions/capboy-coach/followThrough.ts';
 import { fensterWerte } from '../supabase/functions/capboy-coach/volumen.js';
-import { buildTimeseries } from '../supabase/functions/capboy-coach/context.ts';
+import { buildCompFacts, buildTimeseries, dateDaysAgo } from '../supabase/functions/capboy-coach/context.ts';
 import { goalLabel, goalSettingsUpdate } from './nutritionGoals.js';
 
 describe('Automatischer Kalorien-Zielbereich', () => {
@@ -52,6 +52,11 @@ describe('Automatischer Kalorien-Zielbereich', () => {
     expect(berlinDay(new Date('2026-10-08T22:30:00Z'))).toBe('2026-10-09');
     expect(berlinDay(new Date('2026-12-08T23:30:00Z'))).toBe('2026-12-09');
     expect(targetPhaseDay({ target_changed_at: '2026-10-07T22:30:00Z' })).toBe('2026-10-08');
+    expect(dateDaysAgo(new Date('2026-10-08T22:30:00Z'), 0)).toBe('2026-10-09');
+    expect(dateDaysAgo(new Date('2026-10-08T22:30:00Z'), 1)).toBe('2026-10-08');
+    const empty = { settings: null, weights: [], skinfolds: [], waists: [], performance: [], sleep: [], checkins: [],
+      nutritionEntries: [], routines: [], completions: [], ruleContext: {} };
+    expect(buildCompFacts(empty, new Date('2026-10-08T22:30:00Z')).period.to).toBe('2026-10-09');
   });
 
   it('vergleicht Tage vor einem Zielwechsel nicht nachträglich mit dem neuen Ziel', () => {
