@@ -49,6 +49,14 @@ describe('adaptive Kalorienkalibrierung', () => {
     expect(ohneHaken.reason).not.toMatch(/vollständig|protokolliert/);
   });
 
+  it('kalibriert bei wiederholt sehr niedrigen Tageseinträgen kein scheinbar präzises Ziel', () => {
+    const fraglich = nutrition.map((day, index) => (index === 6 || index === 15 ? { ...day, kcal: 800 } : day));
+    const result = adaptiveEnergyEstimate({ nutritionDays: fraglich, weights, currentTarget: 2300 });
+    expect(result).toMatchObject({ eligible: false, doubtfulDays: 2 });
+    expect(result.reason).toContain('tatsächlicher Zufuhr oder fehlenden Einträgen');
+    expect(adaptiveEnergyEstimate({ nutritionDays: fraglich.map((day, index) => index === 15 ? { ...day, kcal: 2300 } : day), weights, currentTarget: 2300 }).eligible).toBe(true);
+  });
+
   it('meldet die Abdeckung in Prozent, auch wenn Wiegungen fehlen', () => {
     const wenigWiegungen = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights: weights.filter((_, i) => i % 7 === 0) });
     expect([wenigWiegungen.eligible, wenigWiegungen.coverage]).toEqual([false, 100]);

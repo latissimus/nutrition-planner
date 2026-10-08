@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { COMP_ZURUECKSETZEN, neurotransmitterEmpfehlung, seminarEmpfehlungMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
+import { COMP_ZURUECKSETZEN, compGoalMarkup, neurotransmitterEmpfehlung, seminarEmpfehlungMarkup, skinfoldEntryMarkup, skinfoldHistoryMarkup, skinfoldRecord, weightHistoryMarkup } from './bodyMetrics.js';
 import { FALTEN, summe } from './measurements.js';
 import { SUMMEN_FALTEN } from './ypsiFormel.js';
+
+describe('Ziel auf COMP', () => {
+  it('zeigt dasselbe Ziel wie der Tracker und lässt es direkt ändern', () => {
+    const markup = compGoalMarkup({ settings: { goal: 'bodycomp' } });
+    expect(markup).toContain('DEIN ZIEL');
+    expect(markup).toContain('data-comp-goal-form');
+    expect(markup).toContain('value="bodycomp" selected');
+    expect(markup).toContain('Gilt auch für den Tracker');
+  });
+});
 
 describe('Gewichtsverlauf', () => {
   it('zeigt gespeicherte Wiegungen mit der neuesten zuerst', () => {

@@ -187,6 +187,12 @@ export function adaptiveEnergyEstimate({ nutritionDays = [], weights = [], curre
   const coverage = rounded((logged.length / spanDays) * 100, 1);
   if (spanDays < 21) return { eligible: false, confidence: 'niedrig', spanDays, coverage, reason: 'Eine adaptive Schätzung beginnt frühestens nach 21 Tagen mit Einträgen.' };
   if (coverage < 80) return { eligible: false, confidence: 'niedrig', spanDays, coverage, reason: 'An mindestens 80 % der Tage braucht es Ernährungseinträge.' };
+  // A logged item is eaten, but sparse daily entries cannot establish total
+  // intake. Never calibrate a lower target from repeated implausibly low days.
+  const lowDayLimit = Math.max(600, Number(currentTarget) > 0 ? Number(currentTarget) * 0.5 : 600);
+  const doubtfulDays = logged.filter((day) => day.kcal < lowDayLimit).length;
+  if (doubtfulDays >= 2) return { eligible: false, confidence: 'niedrig', spanDays, coverage, doubtfulDays,
+    reason: 'Mehrere Tage haben sehr wenig eingetragene Energie. Das kann an tatsächlicher Zufuhr oder fehlenden Einträgen liegen; daraus kalibrieren wir das Ziel nicht.' };
   const weightWindow = weights.filter((row) => {
     const date = row.date || row.datum || row.gemessen_am;
     return date && dayNumber(date) >= startDay && dayNumber(date) <= endDay;

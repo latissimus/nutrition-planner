@@ -171,7 +171,7 @@ function compFactsMarkup(state) {
   </section>`;
 }
 
-function compGoalMarkup(state) {
+export function compGoalMarkup(state) {
   const selected = state.settings.goal || 'maintain';
   return `<details class="comp-goal-setting ${SPECIAL_DEX_CLASSES.content}">
     <summary><span><small>DEIN ZIEL</small><b>${escapeHtml(goalLabel(selected))}</b></span><span>Ziel ändern ${materialIconMarkup('chevron_right')}</span></summary>
