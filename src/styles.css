@@ -17009,11 +17009,12 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    und am Etikett jeder Antwort.
    ============================================================ */
 :root{--modus-frage:#94DEFF;--modus-bewertung:var(--brand-pink,#FF69AE)}
-/* Die deckende Fläche hinter der Eingabe hängt unten fest und reicht bis zur
-   halben Höhe der einzeiligen Kapsel; ein Anhang darüber lässt sie nicht
-   mitwachsen. */
-:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-inputbar)::after{top:auto;height:calc(var(--app-dex-dock-bottom) + 34px)!important}
-:root[data-theme][data-seite="coach"] #view:is(.tastatur-offen,:has(.coach-page.tastatur-offen)) .coach-shell.coach-chat .coach-form:has(.coach-inputbar)::after{height:38px!important}
+/* Die Eingabe schneidet nichts ab, damit ihre Kontur ganz bleibt, auch beim
+   Federn – wie beim Menüband. Keine deckende Fläche dahinter: Die
+   Chatkarten laufen beim Scrollen sichtbar unter der Kapsel durch
+   (Rückmeldung 08.10.). */
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{overflow:visible!important}
+:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form::after{display:none!important}
 /* Ohne Tastatur schmaler; sobald das Feld aktiv ist oder die Tastatur
    steht, so breit wie die Karten im Chat (12 px Rand). Der Wechsel gleitet. */
 :root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form{padding-left:28px!important;padding-right:28px!important;transition:padding .3s cubic-bezier(.2,.9,.3,1)}
@@ -17080,9 +17081,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip[hidden],
 :root[data-theme][data-seite="coach"] #view .coach-form.nimmt-auf .coach-inputbar .coach-modus-chip{display:none}
 :root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip :is(.material-svg,svg){width:12px;height:12px;fill:currentColor}
-/* Die Eingabe schneidet oben ab: Platz für den überstehenden Teil, auch
-   über einem Anhang. */
-:root[data-theme][data-seite="coach"] #view .coach-shell.coach-chat .coach-form:has(.coach-modus-chip:not([hidden])){padding-top:15px!important}
+/* Über einem Anhang Platz für den überstehenden Teil der Pille. */
 :root[data-theme][data-seite="coach"] #view .coach-attachment:not([hidden])~.coach-inputbar:has(.coach-modus-chip:not([hidden])){margin-top:12px}
 @keyframes chip-auf{from{opacity:0;transform:translateY(-75%) scale(.6)}}
 @media (prefers-reduced-motion:reduce){:root[data-theme][data-seite="coach"] #view .coach-inputbar .coach-modus-chip{animation:none}}
@@ -17195,6 +17194,21 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 /* Vorschau eines PDF- oder Text-Anhangs: Symbol statt Bild. */
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol{display:grid;place-items:center;flex:none;width:28px;height:28px}
 :root[data-theme][data-seite="coach"] #view .coach-attachment .coach-anhang-symbol svg{width:22px;height:22px;fill:currentColor}
+
+/* Flüssiger Chat (Rückmeldung 08.10., nach Gemini): neue Fenster gleiten
+   ein, die Statuszeile wechselt weich, die Antwort läuft Wort für Wort ein
+   und erst danach erscheinen Quellen, Schritte und Knöpfe (coach.js). */
+:root[data-theme][data-seite="coach"] #view .coach-chat-window.ist-neu{animation:fenster-auf .32s cubic-bezier(.2,.9,.3,1) both}
+@keyframes fenster-auf{from{opacity:0;transform:translateY(12px)}}
+:root[data-theme][data-seite="coach"] #view [data-coach-ladestatus]{transition:opacity .18s ease}
+:root[data-theme][data-seite="coach"] #view [data-coach-ladestatus].wechselt{opacity:0}
+:root[data-theme][data-seite="coach"] #view .coach-result.wird-geschrieben>:not(.coach-antwort):not(.coach-modus-marke){display:none!important}
+:root[data-theme][data-seite="coach"] #view .coach-result.ist-geschrieben>:not(.coach-antwort):not(.coach-modus-marke){animation:antwort-rest .36s ease both}
+@keyframes antwort-rest{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme][data-seite="coach"] #view :is(.coach-chat-window.ist-neu,.coach-result.ist-geschrieben>*){animation:none!important}
+  :root[data-theme][data-seite="coach"] #view [data-coach-ladestatus]{transition:none}
+}
 
 /* Etikett jeder Antwort: gefüllt wie der Senden-Knopf, Schrift hell. */
 :root[data-theme][data-seite="coach"] #view .coach-modus-marke{justify-self:start;display:inline-flex;align-items:center;padding:4px 10px;border:var(--kontur) solid var(--kontur-farbe);border-radius:999px;background:var(--ui-gefuellt,#111111)!important;font:800 11px/1.1 "Work Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase}

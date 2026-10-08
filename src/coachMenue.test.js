@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { anhaengeAuswerten, coachRequestBody } from '../supabase/functions/capboy-coach/coachPrompt.ts';
-import { anhangFuerServer, anhangHinweis, verlaufMarkup } from './coach.js';
+import { anhangFuerServer, anhangHinweis, schreibTempo, verlaufMarkup } from './coach.js';
 import { coachingListeMarkup, gedaechtnisMarkup } from './coachMemory.js';
 
 // Plus-Menü (Rückmeldung 07.10.): Kamera, Fotos, Dateien, Frühere Coachings.
@@ -87,5 +87,13 @@ describe('Frühere Coachings im Gedächtnis', () => {
     expect(html).toContain('<b>Wie viel Eiweiß?</b>');
     expect(html).not.toContain('data-gespraech-fortsetzen="c1"');
     expect(gedaechtnisMarkup({ coachings: null, gespraeche: [] })).not.toContain('ist-coachings');
+  });
+});
+
+describe('Einlaufen der Antwort', () => {
+  it('läuft kurze Antworten mit 40 Wörtern je Sekunde ein und lange in höchstens zwei Sekunden', () => {
+    expect(schreibTempo(30)).toBe(40);
+    expect(schreibTempo(200)).toBe(100);
+    expect(200 / schreibTempo(200)).toBeLessThanOrEqual(2);
   });
 });

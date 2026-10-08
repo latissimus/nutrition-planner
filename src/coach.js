@@ -270,16 +270,64 @@ const LADEPHASEN = {
   web: ['Coach ordnet deine Daten', 'Coach prüft das Seminarwissen', 'Coach recherchiert im Web', 'Coach gleicht die Quellen ab', 'Coach formuliert die Antwort'],
   woche: ['Coach ordnet deine Woche', 'Coach vergleicht deine Entwicklungen', 'Coach prüft laufende Experimente', 'Coach formuliert die Bilanz'],
 };
+// Die Statuszeile wechselt weich (kurz ausblenden, Text tauschen, einblenden),
+// damit sie beim Warten nicht unruhig wirkt.
 function ladephasenStarten(container, phasen) {
   const status = container.querySelector('[data-coach-ladestatus]');
   if (!status || phasen.length < 2) return () => {};
   let index = 0;
   const timer = window.setInterval(() => {
     index = Math.min(index + 1, phasen.length - 1);
-    status.textContent = phasen[index];
+    status.classList.add('wechselt');
+    window.setTimeout(() => {
+      status.textContent = phasen[index];
+      status.classList.remove('wechselt');
+    }, 180);
     if (index === phasen.length - 1) window.clearInterval(timer);
   }, 3200);
   return () => window.clearInterval(timer);
+}
+
+/* Einblenden der neuen Antwort wie beim Streaming (Rückmeldung 08.10.,
+   nach Gemini): Der Antworttext läuft Wort für Wort ein, danach erscheinen
+   Quellen, Schritte und Knöpfe. Die Antwort liegt schon ganz vor; damit das
+   Einblenden nichts verzögert, dauert es höchstens etwa zwei Sekunden.
+   Ein Tipp auf die Antwort zeigt sofort alles. */
+export const schreibTempo = (woerter) => Math.max(40, woerter / 2);
+function antwortEinblenden(fenster, mitlaufen) {
+  const text = fenster?.querySelector('.coach-antwort');
+  const ergebnis = text?.closest('.coach-result');
+  if (!ergebnis || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const teile = text.textContent.split(/(\s+)/);
+  const tempo = schreibTempo(teile.filter((teil) => teil.trim()).length);
+  ergebnis.classList.add('wird-geschrieben');
+  text.textContent = '';
+  const beginn = performance.now();
+  let fertig = false;
+  const abschliessen = () => {
+    if (fertig) return;
+    fertig = true;
+    text.textContent = teile.join('');
+    ergebnis.classList.replace('wird-geschrieben', 'ist-geschrieben');
+    mitlaufen();
+  };
+  const schritt = (jetzt) => {
+    if (fertig) return;
+    const ziel = Math.floor(((jetzt - beginn) / 1000) * tempo);
+    let woerter = 0;
+    let bis = 0;
+    for (; bis < teile.length; bis += 1) {
+      if (!teile[bis].trim()) continue;
+      if (woerter >= ziel) break;
+      woerter += 1;
+    }
+    text.textContent = teile.slice(0, bis).join('');
+    mitlaufen();
+    if (bis >= teile.length) abschliessen();
+    else requestAnimationFrame(schritt);
+  };
+  requestAnimationFrame(schritt);
+  ergebnis.addEventListener('click', abschliessen, { once: true });
 }
 const fehlerMarkup = (text) => fensterMarkup({ klasse: 'is-fehler', inhalt: `<p>${escapeHtml(text)}</p>` });
 
@@ -466,6 +514,19 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
   });
   kapsel.addEventListener('animationend', () => kapsel.classList.remove('ist-angetippt'));
   const nachUnten = (sanft = true) => requestAnimationFrame(() => container.scrollTo({ top: container.scrollHeight, behavior: sanft ? 'smooth' : 'auto' }));
+  /* Mitscrollen, solange eine Antwort einläuft – aber nur, solange man unten
+     ist: Wer nach oben scrollt, um Älteres zu lesen, wird nicht gestört;
+     wer wieder nach unten scrollt, ist wieder dabei. */
+  let folgen = true;
+  container.addEventListener('scroll', () => {
+    const rest = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (rest > 120) folgen = false;
+    else if (rest < 40) folgen = true;
+  }, { passive: true });
+  const mitlaufen = () => { if (folgen) container.scrollTop = container.scrollHeight; };
+  // Neue Fenster (deine Nachricht, „Coach tippt“, die Antwort) gleiten ein.
+  const neuMarkieren = (anzahl) => [...answer.querySelectorAll('.coach-chat-window')].slice(-anzahl)
+    .forEach((fenster) => fenster.classList.add('ist-neu'));
 
   // Startnachricht eines leeren Chats: was gerade offen ist. Die Punkte laden
   // im Hintergrund und ersetzen dann nur die Startnachricht, wenn sie noch
@@ -790,8 +851,11 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
     answer.innerHTML = kopf() + verlaufMarkup(runden, avatar)
       + fensterMarkup({ von: 'user', avatar, inhalt: nutzerText(question, mitAnhang ? anhangHinweis(anhang) : '', bezug) })
       + tipptMarkup((webResearch ? LADEPHASEN.web : LADEPHASEN.coach)[0]);
+    neuMarkieren(2);
     const ladephasenStoppen = ladephasenStarten(answer, webResearch ? LADEPHASEN.web : LADEPHASEN.coach);
+    folgen = true;
     nachUnten();
+    let eingeblendet = false;
     try {
       // Steht die Coaching-Karte über einem leeren Chat, gehört die Frage zu ihr.
       const gespraechsId = gespraech?.id || (karteSichtbar() && coaching.status === 'bereit' ? coaching.id : null);
@@ -816,6 +880,11 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
         runden = [runde];
       }
       zeichnen();
+      const neu = answer.querySelector(`.coach-chat-window[data-runde="${runden.length - 1}"]`);
+      neu?.classList.add('ist-neu');
+      antwortEinblenden(neu, mitlaufen);
+      eingeblendet = true;
+      mitlaufen();
       if (mitAnhang) {
         anhang = null;
         renderAttachment();
@@ -833,7 +902,7 @@ export async function mountCoachPage(container, { userId, backRoute = 'body' }) 
       laeuft = false;
       ladephasenStoppen();
       button.disabled = false;
-      nachUnten();
+      if (!eingeblendet) nachUnten();
     }
   };
 
