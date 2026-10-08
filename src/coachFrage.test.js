@@ -18,12 +18,13 @@ const anfrage = (modus) => coachRequestBody({
 });
 
 describe('Bewertung & Schritte bleibt der bisherige Chat', () => {
-  // Der Ernährungskontext wurde bewusst erweitert; die Baselines vor dieser
-  // Änderung gelten nicht mehr als unveränderte Prompt-Baselines.
+  // Ernährungskontext und Zielphasenvertrag wurden bewusst erweitert; ältere
+  // Prompt-Baselines gelten deshalb nicht als wortgleich.
   it('hält den freigegebenen neuen Prompt und die Anfrage stabil', () => {
-    expect(fingerabdruck(coachSystemPrompt('coach', false))).toBe('ecb73d1706fbbad2');
-    expect(fingerabdruck(coachSystemPrompt('coach', true))).toBe('c8a2b4cdb9890aa9');
-    expect(fingerabdruck(anfrage())).toBe('f8cedaef9c7a6cf9');
+    expect(fingerabdruck(coachSystemPrompt('coach', false))).toBe('d8c6fce0e01189dd');
+    expect(fingerabdruck(coachSystemPrompt('coach', true))).toBe('7e80aaf64db01812');
+    expect(fingerabdruck(anfrage())).toBe('d129d99df6c48ce9');
+    expect(coachSystemPrompt('coach', false)).toContain('Never compare such days with today\'s target');
   });
 
   it('nimmt ohne Modus und mit „bewertung“ dieselbe Anfrage', () => {
