@@ -16,7 +16,9 @@
 // changed within the window can make them slightly off; the app states only
 // planned and completed days, never a quota.
 //
-// Pure module without imports, shared with the evals.
+// Pure calculation shared with the evals.
+
+import { berlinDay, currentCalorieTarget, targetPhaseDay } from './nutritionTarget.js';
 
 type Row = Record<string, any>;
 
@@ -76,12 +78,13 @@ export function switchedOffAreas(visibleRoutes: unknown): string[] {
 // "messung" (a body measurement is due), "umsetzung" (a plan is not kept),
 // "verbesserung" (a value is below a sensible target). Most important first.
 export function buildFollowThrough(rows: Row, now: Date) {
-  const today = now.toISOString().slice(0, 10);
+  const today = berlinDay(now);
   const from = plusDays(today, -FOLLOW_THROUGH_DAYS);
   const to = plusDays(today, -1);
   const inWindow = (value: unknown) => { const date = day(value); return date != null && date >= from && date <= to; };
-  const target = number(rows.settings?.custom_calorie_target) || number(rows.settings?.adaptive_target) || null;
   const latestWeight = rows.weights?.[0] ? number(rows.weights[0].kg) || null : null;
+  const target = currentCalorieTarget(rows.settings, latestWeight, now);
+  const phaseStart = targetPhaseDay(rows.settings);
   const checks: Row[] = [];
   const add = (id: string, kind: string, area: string, values: Row, action: string) => checks.push({ id, kind, area, ...values, action });
 
@@ -96,10 +99,11 @@ export function buildFollowThrough(rows: Row, now: Date) {
     nutritionDays.set(date, current);
   }
   const daysWithEntries = nutritionDays.size;
-  const averageKcal = round(mean([...nutritionDays.values()].map((entry) => entry.kcal)), 0);
+  const comparableEntries = [...nutritionDays].filter(([date]) => !phaseStart || date >= phaseStart).map(([, entry]) => entry);
+  const averageKcal = round(mean(comparableEntries.map((entry) => entry.kcal)), 0);
   const averageProteinG = round(mean([...nutritionDays.values()].map((entry) => entry.protein)), 0);
   const percentOfTarget = averageKcal != null && target ? round((averageKcal / target) * 100, 0) : null;
-  const judgeIntake = daysWithEntries >= LIMITS.minDays && percentOfTarget != null;
+  const judgeIntake = comparableEntries.length >= LIMITS.minDays && percentOfTarget != null;
 
   if (daysWithEntries < FOLLOW_THROUGH_DAYS * LIMITS.loggedShare) {
     add('ernaehrung-eintraege', 'daten', 'ernaehrung', { nutrition: { daysWithEntries, windowDays: FOLLOW_THROUGH_DAYS } },

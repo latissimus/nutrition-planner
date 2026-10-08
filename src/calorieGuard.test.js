@@ -16,6 +16,7 @@ describe('Kalorien-Entscheidungssperre', () => {
     expect(calorieBasis(days(12).map((day) => ({ ...day, complete: false })), now).calorieChangeAllowed).toBe(true);
     expect(calorieBasis(days(14).slice(2), now).calorieChangeAllowed).toBe(false);
     expect(calorieBasis([...days(12), ...days(12)], now).loggedDays).toBe(12);
+    expect(calorieBasis(days(14), now, '2026-10-04').calorieChangeAllowed).toBe(false);
   });
 
   it('fängt konkrete Änderungen auch bei „Daraus Schritte machen“ ab', () => {

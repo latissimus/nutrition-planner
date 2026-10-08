@@ -2,7 +2,7 @@ type Row = Record<string, any>;
 
 const date = (value: Date) => value.toISOString().slice(0, 10);
 
-export function calorieBasis(entries: Row[], now: Date) {
+export function calorieBasis(entries: Row[], now: Date, targetPhaseFrom: string | null = null) {
   const berlinDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
   const today = new Date(`${berlinDay}T00:00:00Z`);
   const days = Array.from({ length: 14 }, (_, index) => {
@@ -11,12 +11,12 @@ export function calorieBasis(entries: Row[], now: Date) {
     return date(day);
   });
   const loggedDates = new Set(entries.map((row) => String(row.log_date).slice(0, 10)));
-  const loggedDays = days.filter((day) => loggedDates.has(day)).length;
-  const recent = days.slice(0, 2).some((day) => loggedDates.has(day));
+  const loggedDays = days.filter((day) => loggedDates.has(day) && (!targetPhaseFrom || day >= targetPhaseFrom)).length;
+  const recent = days.slice(0, 2).some((day) => loggedDates.has(day) && (!targetPhaseFrom || day >= targetPhaseFrom));
   // The count is evidence of logging regularity, not proof of complete intake.
   const allowed = loggedDays >= 12 && recent;
   return { calorieChangeAllowed: allowed, loggedDays, windowDays: days.length,
-    reason: allowed ? '' : 'Keine konkrete Änderung des Kalorienziels oder der Kalorienzufuhr in kcal empfehlen. Zuerst an mindestens 12 der letzten 14 abgeschlossenen Tage Ernährung erfassen, darunter einer der letzten zwei Tage. Einträge und Zielnähe beweisen keine Vollständigkeit.' };
+    reason: allowed ? '' : 'Keine konkrete Änderung des Kalorienziels oder der Kalorienzufuhr in kcal empfehlen. Zuerst an mindestens 12 der letzten 14 abgeschlossenen Tage in der aktuellen Zielphase Ernährung erfassen, darunter einer der letzten zwei Tage. Einträge und Zielnähe beweisen keine Vollständigkeit.' };
 }
 
 // This is deliberately an output guard, not a semantic grader. If a numeric

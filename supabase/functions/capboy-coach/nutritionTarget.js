@@ -1,4 +1,14 @@
 // A target comparison describes logged intake, not whether every meal was logged.
+export const berlinDay = (now = new Date()) => new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit',
+}).format(now);
+
+export function targetPhaseDay(settings) {
+  const stamp = settings?.target_changed_at;
+  const date = stamp ? new Date(stamp) : null;
+  return date && !Number.isNaN(date.getTime()) ? berlinDay(date) : null;
+}
+
 export function currentCalorieTarget(settings, weightKg, now = new Date()) {
   const custom = Number(settings?.custom_calorie_target);
   if (Number.isFinite(custom) && custom > 0) return custom;
@@ -9,7 +19,7 @@ export function currentCalorieTarget(settings, weightKg, now = new Date()) {
   const birth = String(settings?.birth_date || '');
   if (!Number.isFinite(weight) || weight <= 0 || !Number.isFinite(height) || height <= 0
     || !/^\d{4}-\d{2}-\d{2}$/.test(birth)) return null;
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  const today = berlinDay(now);
   const [year, month, day] = today.split('-').map(Number);
   const [birthYear, birthMonth, birthDay] = birth.split('-').map(Number);
   const age = year - birthYear - (month < birthMonth || (month === birthMonth && day < birthDay) ? 1 : 0);

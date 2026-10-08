@@ -6,7 +6,7 @@
 
 import { YPSI_FORMULA } from './knowledge.ts';
 import { buildFollowThrough, durationMinutes } from './followThrough.ts';
-import { currentCalorieTarget, nutritionTargetStatus } from './nutritionTarget.js';
+import { berlinDay, currentCalorieTarget, nutritionTargetStatus, targetPhaseDay } from './nutritionTarget.js';
 
 type Row = Record<string, any>;
 
@@ -236,7 +236,7 @@ const plusDays = (date: string, days: number) => new Date(new Date(`${date}T00:0
 // null when the week has no data for it. Changes are computed here, never by
 // the model.
 export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES_WEEKS) {
-  const today = now.toISOString().slice(0, 10);
+  const today = berlinDay(now);
   const off = new Set(rows.switchedOffAreas || []);
   const currentMonday = mondayOf(today);
   const mondays = Array.from({ length: weeks }, (_, index) => plusDays(currentMonday, -7 * (weeks - 1 - index)));
@@ -391,11 +391,17 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
     ].filter(Boolean) as { date: string; type: string }[])
     .sort((a, b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type));
 
-  // The last RECENT_DAYS days, one by one: what was entered (not necessarily
-  // everything eaten) next to the current daily calorie target, with the
-  // difference computed here. The target is today's setting (custom target
-  // first, as in the app); earlier settings are not stored.
+  // The last RECENT_DAYS days. Before target_changed_at the previous goal is
+  // unknown, so no retrospective comparison is made. Within the current
+  // phase a formula-based target uses the weight known on that day.
   const target = currentCalorieTarget(rows.settings, rows.weights[0]?.kg, now);
+  const phaseStart = targetPhaseDay(rows.settings);
+  const targetForDate = (date: string) => {
+    if (phaseStart && date < phaseStart) return null;
+    if (!phaseStart) return target; // Legacy eval fixtures predating the migration.
+    const weight = rows.weights.find((row) => String(row.gemessen_am).slice(0, 10) <= date)?.kg;
+    return currentCalorieTarget(rows.settings, weight, new Date(`${date}T12:00:00Z`));
+  };
   const recentDates = Array.from({ length: RECENT_DAYS }, (_, index) => plusDays(today, index - RECENT_DAYS + 1));
   const recentEntries = new Map(recentDates.map((date) => [date, { kcal: 0, protein: 0, entries: 0 }]));
   for (const row of rows.nutritionEntries) {
@@ -408,18 +414,23 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
   const recentList = recentDates.map((date) => {
     const day = recentEntries.get(date)!;
     const enteredKcal = day.entries ? round(day.kcal, 0) : null;
+    const dailyTarget = targetForDate(date);
     return {
       date,
       today: date === today,
       entries: day.entries,
       enteredKcal,
       enteredProteinG: day.entries ? round(day.protein, 0) : null,
-      differenceKcal: enteredKcal != null && target ? round(enteredKcal - target, 0) : null,
-      targetStatus: nutritionTargetStatus(enteredKcal, target, day.entries > 0),
+      ...(phaseStart ? { targetKcal: dailyTarget } : {}),
+      differenceKcal: enteredKcal != null && dailyTarget ? round(enteredKcal - dailyTarget, 0) : null,
+      targetStatus: phaseStart && date < phaseStart ? 'zielphase_unbekannt' : nutritionTargetStatus(enteredKcal, dailyTarget, day.entries > 0),
     };
   });
   const loggedPastDays = recentList.filter((day) => day.entries && !day.today);
+  const comparablePastDays = loggedPastDays.filter((day) => targetForDate(day.date));
   const averageEnteredKcal = round(mean(loggedPastDays.map((day) => day.enteredKcal!)), 0);
+  const averageComparableKcal = round(mean(comparablePastDays.map((day) => day.enteredKcal!)), 0);
+  const averageComparableTarget = round(mean(comparablePastDays.map((day) => targetForDate(day.date)!)), 0);
   const recentMeals = recentDates.map((date) => {
     const periods = new Map<string, Row>();
     for (const row of rows.nutritionEntries) {
@@ -449,10 +460,11 @@ export function buildTimeseries(rows: ContextRows, now: Date, weeks = TIMESERIES
       targetRangeKcal: target ? { from: Math.ceil(target * 0.9), to: Math.floor(target * 1.1) } : null,
       days: recentList,
       pastDaysWithEntries: loggedPastDays.length,
+      ...(phaseStart ? { pastDaysWithComparableTarget: comparablePastDays.length, targetPhaseFrom: phaseStart } : {}),
       pastDaysWithoutEntries: recentList.filter((day) => !day.entries && !day.today).length,
       averageEnteredKcalOnPastDaysWithEntries: averageEnteredKcal,
-      averageDifferenceKcalOnPastDaysWithEntries: averageEnteredKcal != null && target ? round(averageEnteredKcal - target, 0) : null,
-      averageTargetStatus: nutritionTargetStatus(averageEnteredKcal, target, loggedPastDays.length > 0),
+      averageDifferenceKcalOnPastDaysWithEntries: averageComparableKcal != null && averageComparableTarget ? round(averageComparableKcal - averageComparableTarget, 0) : null,
+      averageTargetStatus: nutritionTargetStatus(averageComparableKcal, averageComparableTarget, comparablePastDays.length > 0),
     },
     recentMeals: off.has('nutrition') ? SWITCHED_OFF : recentMeals,
     // What is missing or not followed through (followThrough.ts).

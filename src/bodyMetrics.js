@@ -11,6 +11,7 @@ import { notifyCoinBalanceChanged, notifyHomeCountsChanged, subscribeToTablesCha
 import { getPreference, setPreference } from './userPreferences.js';
 import { collectionIsVisible } from './collectionPreferences.js';
 import { buildCompEvidence } from './compAssessment.js';
+import { NUTRITION_GOALS, goalLabel, goalSettingsUpdate } from './nutritionGoals.js';
 import hautfaltenData from './data/hautfalten.json';
 import ypsiProtokolle from './data/ypsi-protokolle.json';
 import { alterAmMessdatum, koerperfettAnteil, magermasse } from './ypsiFormel.js';
@@ -168,6 +169,17 @@ function compFactsMarkup(state) {
     <article><small>TAILLE</small><b>${value(facts.waist.currentCm, 'cm')}</b><span>${facts.waist.count} Messungen</span></article>
     <article><small>LEISTUNG</small><b>${performance}</b><span>${facts.performance.importedValues} LOGMAN-Werte</span></article>
   </section>`;
+}
+
+function compGoalMarkup(state) {
+  const selected = state.settings.goal || 'maintain';
+  return `<details class="comp-goal-setting ${SPECIAL_DEX_CLASSES.content}">
+    <summary><span><small>DEIN ZIEL</small><b>${escapeHtml(goalLabel(selected))}</b></span><span>Ziel ändern ${materialIconMarkup('chevron_right')}</span></summary>
+    <form data-comp-goal-form><label for="comp-goal-select">Wonach soll der Coach bewerten?</label>
+      <select id="comp-goal-select" class="input" name="goal">${Object.entries(NUTRITION_GOALS).map(([key, [label]]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('')}</select>
+      <p>Gilt auch für den Tracker. Ein eigenes Kalorienziel bleibt erhalten; ein automatisch angepasstes Ziel wird beim Zielwechsel neu berechnet.</p>
+      <button class="btn btn-primary" type="submit">Ziel speichern</button></form>
+  </details>`;
 }
 
 // Die zentrale KI-Auswertung samt „Neu bewerten“ ist mit Schritt 6 des
@@ -881,6 +893,7 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
     if (signal?.aborted) return;
     const markup = `
       ${bodyHeroMarkup(state)}
+      ${compGoalMarkup(state)}
       ${compFactsMarkup(state)}
       ${compDetailsMarkup(state)}`;
     const content = container.querySelector(':scope > .body-metrics-wrap > .kategorie-scrollinhalt');
@@ -1256,6 +1269,22 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
   };
 
   const bind = () => {
+    const goalForm = container.querySelector('[data-comp-goal-form]');
+    if (goalForm) goalForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const goal = goalForm.elements.goal.value;
+      const button = goalForm.querySelector('button[type="submit"]');
+      button.disabled = true;
+      try {
+        const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, ...goalSettingsUpdate(state.settings, goal) }, { onConflict: 'user_id' });
+        if (error) throw error;
+        toast('Ziel für COMP, Tracker und Coach gespeichert');
+        await render();
+      } catch {
+        button.disabled = false;
+        toast('Ziel konnte nicht gespeichert werden');
+      }
+    };
     const infoButton = container.querySelector('.body-analysis-info');
     const infoHelp = container.querySelector('.body-analysis-help');
     infoButton.onclick = () => {

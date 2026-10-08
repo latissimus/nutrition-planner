@@ -12,17 +12,13 @@ import { AUFNAHME_MAX_MS, aufnahmeStarten, aufnahmeZeit, spracheMoeglich } from 
 import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evaluateBodyComp, initialEnergyEstimate, weightTrendSummary } from './bodyComposition.js';
 import { performanceTrend } from './logmanImport.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
-import { nutritionTargetStatus } from '../supabase/functions/capboy-coach/nutritionTarget.js';
+import { nutritionTargetStatus, targetPhaseDay } from '../supabase/functions/capboy-coach/nutritionTarget.js';
+import { NUTRITION_GOALS as GOALS, goalSettingsUpdate } from './nutritionGoals.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
   ['lunch', 'Mittagessen'], ['snack_afternoon', 'Snack nachmittags'], ['dinner', 'Abendessen'],
 ];
-const GOALS = {
-  lose: ['Langsam reduzieren', -300], maintain: ['Gewicht halten', 0],
-  gain: ['Muskelaufbau', 200], gain_fast: ['Deutlich zunehmen', 350],
-  bodycomp: ['BodyComp – Muskulatur aufbauen und Fett reduzieren', 0],
-};
 const PAL_LEVELS = [
   [1.4, 'Wenig aktiv · überwiegend sitzend'],
   [1.5, 'Leicht aktiv · Alltag + 1–2 Trainings'],
@@ -254,8 +250,10 @@ function summaryMarkup(state, date) {
 
 function adaptiveModel(state, calculated, target) {
   const evidence = adaptiveBodyCompEvidence(state);
+  const phaseStart = targetPhaseDay(state.settings);
   const result = adaptiveEnergyEstimate({
-    nutritionDays: state.historyDays, weights: state.weights, currentTarget: target || calculated?.target,
+    nutritionDays: phaseStart ? state.historyDays.filter((day) => (day.date || day.log_date) >= phaseStart) : state.historyDays,
+    weights: state.weights, currentTarget: target || calculated?.target,
     goal: state.settings?.goal || 'maintain', combinedEvidence: evidence.supported,
     lastAdjustmentDate: state.settings?.adaptive_updated_at,
   });
@@ -1129,7 +1127,7 @@ export async function mountNutrition(container, { userId, signal }) {
         birth_date: form.querySelector('[data-calc-birth]').value || null,
         height_cm: number(form.querySelector('[data-calc-height]').value) || null,
         pal: number(form.querySelector('[data-calc-pal]').value) || 1.6,
-        goal: form.querySelector('[data-calc-goal]').value,
+        ...goalSettingsUpdate(state.settings, form.querySelector('[data-calc-goal]').value),
         custom_calorie_target: rounded(number(form.querySelector('[data-calc-custom]').value)) || null,
       };
       const enteredWeight = number(form.querySelector('[data-calc-weight]').value);

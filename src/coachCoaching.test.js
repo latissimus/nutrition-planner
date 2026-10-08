@@ -121,9 +121,14 @@ describe('Eingabe und Prompt des Coachings', () => {
     expect(text).not.toContain('<profile_memory>');
   });
 
-  it('nennt Muskelaufbau als Ziel und überlässt Volumenänderungen der Wochenbilanz', () => {
-    const prompt = coachingSystemPrompt();
-    expect(prompt).toContain('The user\'s goal is muscle growth');
+  it('übernimmt jedes gewählte Ziel, ohne bei fehlendem Ziel Muskelaufbau zu unterstellen', () => {
+    expect(coachingSystemPrompt('lose')).toContain('Selected goal: gradual fat loss');
+    expect(coachingSystemPrompt('maintain')).toContain('Selected goal: weight maintenance');
+    expect(coachingSystemPrompt('gain')).toContain('Selected goal: muscle gain');
+    expect(coachingSystemPrompt('gain_fast')).toContain('Selected goal: faster weight gain');
+    expect(coachingSystemPrompt('bodycomp')).toContain('Selected goal: body recomposition');
+    expect(coachingSystemPrompt()).toContain('No goal is selected');
+    const prompt = coachingSystemPrompt('gain');
     expect(prompt).toContain('Targets for the next session come only from "naechsteEinheit"');
     expect(prompt).toContain('the weekly review decides that');
   });

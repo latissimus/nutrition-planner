@@ -17,6 +17,7 @@ import { katalogMitEigenen } from './logman/eigene-uebungen.js';
 import { einheitenAus, saetzeJeMuskel, trainingsAuswertung, uebungsVerlauf } from './training.js';
 import { FOLLOW_THROUGH_LIMITS, durationMinutes } from './followThrough.ts';
 import { reviewWeeks } from './weekly.ts';
+import { currentCalorieTarget, targetPhaseDay } from './nutritionTarget.js';
 
 export const VOLUMEN_GRENZEN = {
   // Satz-Erfüllung je Muskel und Zyklus (erledigt ÷ geplant).
@@ -187,12 +188,13 @@ export function vergleichbareZyklen(payload, einheiten, verlauf = []) {
 export function fensterWerte(rows, heute) {
   const von = plusTage(heute, -G.fensterTage);
   const bis = plusTage(heute, -1);
+  const phaseStart = targetPhaseDay(rows.settings);
   const imFenster = (wert) => { const datum = tag(wert); return datum != null && datum >= von && datum <= bis; };
   const erholung = (rows.checkins || []).filter((zeile) => imFenster(zeile.checkin_date)).map((zeile) => zahl(zeile.recovery)).filter(Boolean);
   const naechte = (rows.sleep || []).filter((zeile) => imFenster(zeile.sleep_date) && zeile.bedtime && zeile.wake_time);
   const tage = new Map();
   (rows.nutritionEntries || []).forEach((zeile) => {
-    if (!imFenster(zeile.log_date)) return;
+    if (!imFenster(zeile.log_date) || (phaseStart && tag(zeile.log_date) < phaseStart)) return;
     const datum = tag(zeile.log_date);
     const bisher = tage.get(datum) || { kcal: 0, protein: 0 };
     bisher.kcal += zahl(zeile.energy_kcal);
@@ -212,7 +214,7 @@ export function fensterWerte(rows, heute) {
       kcal: runde(mittel([...tage.values()].map((t) => t.kcal)), 0),
       protein: runde(mittel([...tage.values()].map((t) => t.protein)), 0),
     },
-    kalorienZiel: zahl(rows.settings?.custom_calorie_target) || zahl(rows.settings?.adaptive_target) || null,
+    kalorienZiel: currentCalorieTarget(rows.settings, rows.weights?.[0]?.kg, new Date(`${heute}T12:00:00Z`)),
     gewichtKg: rows.weights?.[0] ? zahl(rows.weights[0].kg) || null : null,
   };
 }

@@ -43,6 +43,12 @@ describe('Wochen-Coaching: Schema und Prompt', () => {
     expect(prompt).not.toContain('and whether the week is representative');
   });
 
+  it('übernimmt das Ziel auch in die Wochenbilanz', () => {
+    expect(wochenSystemPrompt('lose')).toContain('Selected goal: gradual fat loss');
+    expect(wochenSystemPrompt('bodycomp')).toContain('Selected goal: body recomposition');
+    expect(wochenSystemPrompt()).toContain('No goal is selected');
+  });
+
   it('bettet Wochenvergleich, Training und Volumen ohne interne Felder ein', () => {
     const volumen = {
       stand: { cycle: 3 }, sperren: [], zyklen: [2, 3],

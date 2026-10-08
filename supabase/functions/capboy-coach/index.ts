@@ -13,6 +13,7 @@ import { BEIBEHALTEN, fensterWerte, nichtRepraesentativ as wocheNichtRepraesenta
 import { wochenBereinigen, wochenSchema, wochenSystemPrompt, wochenText, wochenUserPrompt } from './wochenCoaching.ts';
 import { experimentMeasurement } from './experiments.ts';
 import { calorieBasis, enforceCalorieBasis } from './calorieGuard.ts';
+import { targetPhaseDay } from './nutritionTarget.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -190,7 +191,7 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     nutritionSettings, weights, skinfolds, waists, performance, sleep, checkins,
     nutritionEntries, routines, completions, preferences,
   ] = await Promise.all([
-    admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,pal,bodycomp_thresholds').eq('user_id', userId).maybeSingle(),
+    admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,pal,bodycomp_thresholds,target_changed_at').eq('user_id', userId).maybeSingle(),
     userRows('weights', userId, 'gemessen_am', FETCH_LIMITS.weights, 'gemessen_am,kg'),
     userRows('skinfolds', userId, 'gemessen_am', FETCH_LIMITS.skinfolds, 'gemessen_am,falten,standardisiert,messqualitaet'),
     userRows('waist_measurements', userId, 'gemessen_am', FETCH_LIMITS.waists, 'gemessen_am,cm,standardisiert'),
@@ -429,7 +430,7 @@ async function coachingFuerNutzer(userId: string, jetzt: Date, heute: string) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: COACH_MODEL,
-        instructions: coachingSystemPrompt(),
+        instructions: coachingSystemPrompt(snapshot.profile?.goal),
         input: [{ role: 'user', content: coachingUserPrompt({
           snapshot, timeseries, training, logmanStatus, aenderungen, recentCheckinNotes,
           vortag: vortag ? { datum: vortag.datum, ...(vortag.ergebnis || {}) } : null,
@@ -542,7 +543,7 @@ async function wochenCoachingFuerNutzer(userId: string, jetzt: Date, heute: stri
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: COACH_MODEL,
-        instructions: wochenSystemPrompt(),
+        instructions: wochenSystemPrompt(snapshot.profile?.goal),
         input: [{ role: 'user', content: wochenUserPrompt({
           snapshot, timeseries, weekly, training, volumen, recentCheckinNotes,
           vortag: vortag ? { datum: vortag.datum, ...(vortag.ergebnis || {}) } : null,
@@ -685,7 +686,7 @@ Deno.serve(async (request) => {
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
-    const limits = calorieBasis(contextRows.nutritionEntries, now);
+    const limits = calorieBasis(contextRows.nutritionEntries, now, targetPhaseDay(contextRows.settings));
     // Ein Gespräch geht weiter, wenn die App seine id schickt; sonst beginnt ein neues.
     const conversationId = isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID();
     const memory = await loadMemory(userId, conversationId, now.toISOString().slice(0, 10), timeseries);
