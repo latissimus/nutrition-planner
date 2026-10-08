@@ -17102,8 +17102,19 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
    die eine Liste von unten öffnen. Das Plus öffnet ein kleines Menü über
    der Kapsel. #app #view sticht die allgemeinen Knopf-Regeln des Dark Mode.
    ============================================================ */
-:root[data-seite="coach"]{--coach-blase:#FFE1EF;--coach-blase-schrift:#8A0F4D;--coach-schwebe:#FFFFFF;--coach-schwebe-linie:rgba(0,0,0,.09);--coach-kreis:rgba(0,0,0,.06)}
-:root[data-theme="dark"][data-seite="coach"]{--coach-blase:#4A1335;--coach-blase-schrift:#FFC6E2;--coach-schwebe:#262B37;--coach-schwebe-linie:rgba(255,255,255,.09);--coach-kreis:rgba(255,255,255,.09)}
+:root[data-seite="coach"]{--chat-grund:#94DEFF;--chat-schrift:440 16.5px/1.6 "Work Sans",sans-serif;--chat-sperrung:-.012em;--coach-blase:#FDECF4;--coach-blase-schrift:#C0156A;--coach-schwebe:#FFFFFF;--coach-schwebe-linie:rgba(0,0,0,.09);--coach-kreis:rgba(0,0,0,.06)}
+:root[data-theme="dark"][data-seite="coach"]{--chat-grund:#101A2B;--coach-blase:#FFFFFF;--coach-blase-schrift:#111111;--coach-schwebe:#262B37;--coach-schwebe-linie:rgba(255,255,255,.09);--coach-kreis:rgba(255,255,255,.09)}
+
+/* Ruhiger Grund nur im Chat (Rückmeldung 08.10.): einfarbig ohne Muster,
+   damit der Text nicht auf Blau mit Muster steht. Retro: unser Hellblau ohne
+   Muster, der Kopf der App wie auf jeder Seite in derselben Farbe. Dark: die übliche
+   Hintergrundfarbe, nur ohne Raster; die Schrift ein weiches Weiß wie bei
+   ChatGPT, deine Nachrichten weiße Blasen. Das Gedächtnis behält seinen Look. */
+:root[data-theme][data-seite="coach"] #app #view:has(>.coach-shell.coach-chat:not(.coach-gedaechtnis-seite)){background-color:var(--chat-grund)!important;background-image:none!important}
+:root[data-theme="retro"][data-seite="coach"]:has(#view>.coach-shell.coach-chat:not(.coach-gedaechtnis-seite)),
+:root[data-theme="retro"][data-seite="coach"]:has(#view>.coach-shell.coach-chat:not(.coach-gedaechtnis-seite)) body{--dex-seitenfarbe:var(--chat-grund)!important;background:var(--chat-grund)!important}
+:root[data-theme="retro"][data-seite="coach"]:has(#view>.coach-shell.coach-chat:not(.coach-gedaechtnis-seite)) .app-dex-header{background:var(--chat-grund)!important}
+:root[data-theme="dark"][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite){--ui-schrift:#ECEEF2}
 
 /* Coach-Fenster ohne Rahmen über die volle Breite, ohne Kopf. */
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-coach{width:100%!important;max-width:none!important;margin-left:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
@@ -17115,18 +17126,18 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user{max-width:min(80%,520px)!important;margin-right:0!important;border:0!important;border-radius:24px!important;background:var(--coach-blase)!important;box-shadow:none!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message{padding:11px 18px!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message :is(p,small){color:var(--coach-blase-schrift)!important;-webkit-text-fill-color:var(--coach-blase-schrift)!important}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message p{margin:0;font:400 17px/1.45 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message p{margin:0;font:440 16.5px/1.45 "Work Sans",sans-serif!important;letter-spacing:var(--chat-sperrung)!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-chat-window.is-user .coach-chat-message small{display:block;margin-top:4px;opacity:.75;font:500 13px/1.3 "Work Sans",sans-serif!important}
 
 /* Antworttext. */
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result{display:grid!important;gap:16px!important}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort{display:grid;gap:14px;margin:0}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort,.coaching-karte,.coach-schritt) :is(p,li){margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:400 17px/1.55 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-result{display:grid!important;gap:20px!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort{display:grid;gap:20px;margin:0}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort,.coaching-karte,.coach-schritt) :is(p,li){margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:var(--chat-schrift)!important;letter-spacing:var(--chat-sperrung)!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort .coach-safety{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort :is(ul,ol){display:grid;gap:8px;margin:0;padding-left:1.4em}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort,.coaching-karte,.coach-schritt) b{font-weight:700}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort h2{margin:0;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:700 21px/1.3 "Work Sans",sans-serif!important;letter-spacing:0!important}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort h4,.coaching-bereich,.coaching-fokus h4,.coach-schritte>h4){display:block;margin:4px 0 -8px;padding:0!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:700 17px/1.4 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important;opacity:1!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort,.coaching-karte,.coach-schritt) b{font-weight:650}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-antwort h2{margin:0;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:680 20px/1.32 "Work Sans",sans-serif!important;letter-spacing:-.015em!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-antwort h4,.coaching-bereich,.coaching-fokus h4,.coach-schritte>h4){display:block;margin:6px 0 -12px;padding:0!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:650 16.5px/1.4 "Work Sans",sans-serif!important;letter-spacing:var(--chat-sperrung)!important;text-transform:none!important;opacity:1!important}
 /* Zitate im Text: kleine graue Pille mit dem Seitennamen. */
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-zitat{display:inline-block;max-width:14em;margin:0 1px;padding:0 8px;overflow:hidden;border-radius:999px;background:var(--coach-kreis);color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:500 13px/1.75 "Work Sans",sans-serif;text-decoration:none;text-overflow:ellipsis;vertical-align:1px;white-space:nowrap}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-link{color:inherit;text-decoration:underline;text-underline-offset:3px}
@@ -17142,7 +17153,7 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt{display:list-item!important;margin:0;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--ui-schrift)}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>*{display:block;margin:4px 0 0}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>:first-child{margin-top:0}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>b{font:700 17px/1.5 "Work Sans",sans-serif!important;color:var(--ui-schrift)!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt>b{font:650 16.5px/1.6 "Work Sans",sans-serif!important;letter-spacing:var(--chat-sperrung)!important;color:var(--ui-schrift)!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-schritt em{font-style:normal;font-weight:600}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-schritt,.coaching-volumen,.coaching-experiment) small{display:block;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:400 15px/1.45 "Work Sans",sans-serif!important;letter-spacing:0!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-art{display:inline!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;text-transform:none!important}
@@ -17160,14 +17171,14 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-mehr li{color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:400 15.5px/1.5 "Work Sans",sans-serif!important}
 
 /* Coaching: wie jede Antwort, ohne Karte und ohne gelbe Fläche. */
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coaching-karte{display:grid!important;gap:16px!important;margin:0 0 8px!important;padding:0 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coaching-karte{display:grid!important;gap:20px!important;margin:0 0 8px!important;padding:0 2px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coaching-karte.is-status p{color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coaching-fokus,.coaching-volumen,.coaching-experiment){display:grid;gap:14px;justify-items:start;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coaching-fokus,.coaching-volumen,.coaching-experiment){display:grid;gap:20px;justify-items:start;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
 
 /* Startnachricht (leerer Chat, Neues Gespräch), Ladezeile und Fehler im
    selben Stil wie jede Antwort; Vorschläge als graue Pillen wie bei ChatGPT. */
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-welcome .coach-chat-message{display:grid;gap:14px}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-welcome .coach-chat-message>p,.coach-offen li,.is-fehler .coach-chat-message p){margin:0;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:400 17px/1.55 "Work Sans",sans-serif!important;letter-spacing:0!important}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-welcome .coach-chat-message{display:grid;gap:20px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) :is(.coach-welcome .coach-chat-message>p,.coach-offen li,.is-fehler .coach-chat-message p){margin:0;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important;font:var(--chat-schrift)!important;letter-spacing:var(--chat-sperrung)!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .is-fehler .coach-chat-message p{color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-offen{display:grid;gap:6px;margin:0;padding-left:1.4em}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-vorschlaege{display:flex;flex-wrap:wrap;gap:8px!important;margin:2px 0 0}
@@ -17178,21 +17189,22 @@ html.overlay-scroll-gesperrt .app-shell>#view{overflow:hidden}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-tippt{gap:10px;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;font:400 16px/1.4 "Work Sans",sans-serif!important;letter-spacing:0!important}
 
 /* Leiste unter der Antwort: Kopieren, Teilen, „…“, Quellen. */
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:-4px 0 0 -10px}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:40px;height:40px;margin:0;padding:0;border:0!important;border-radius:999px!important;background:transparent!important;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;box-shadow:none!important;font:500 15.5px/1 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important;cursor:pointer}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button[data-aktion="mehr"]{width:50px}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button.coach-quellen-chip{padding:0 12px 0 8px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen{display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:-6px 0 0 -8px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:36px;height:36px;margin:0;padding:0;border:0!important;border-radius:999px!important;background:transparent!important;color:var(--ui-neben)!important;-webkit-text-fill-color:var(--ui-neben)!important;box-shadow:none!important;font:500 15px/1 "Work Sans",sans-serif!important;letter-spacing:0!important;text-transform:none!important;cursor:pointer}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button[data-aktion="mehr"]{width:44px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button.coach-quellen-chip{margin-left:4px;padding:0 10px 0 6px}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-aktionen button:is(:active,[aria-expanded="true"]){background:var(--coach-kreis)!important;color:var(--ui-schrift)!important;-webkit-text-fill-color:var(--ui-schrift)!important}
 /* Umriss-Symbole bleiben ungefüllt, auch wo der Dark Mode Symbole füllt. */
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-aktion-symbol{flex:none;width:21px;height:21px;fill:none!important;stroke:currentColor!important;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-aktion-symbol{flex:none;width:20px;height:20px;fill:none!important;stroke:currentColor!important;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) svg.coach-aktion-symbol *{fill:none!important;stroke:currentColor!important}
 /* Kleine runde Seitensymbole, im Knopf überlappend wie bei ChatGPT. */
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder{display:inline-flex;align-items:center}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder>*{margin-left:-7px;box-shadow:0 0 0 2px var(--coach-grund,var(--ui-flaeche))}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder>*{margin-left:-7px;box-shadow:0 0 0 2px var(--chat-grund)}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quellen-bilder>:first-child{margin-left:0}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;padding:2px;box-sizing:border-box;overflow:hidden;border-radius:50%;background:#FFFFFF;object-fit:contain}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild{display:inline-grid;place-items:center;flex:none;width:20px;height:20px;padding:2px;box-sizing:border-box;overflow:hidden;border-radius:50%;background:#FFFFFF;object-fit:contain}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) span.coach-quelle-bild{padding:0}
-:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-gesicht{display:block;width:20px;height:20px}
+:root:not([data-theme="dark"])[data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild{outline:1px solid rgba(0,0,0,.12);outline-offset:-1px}
+:root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-gesicht{display:block;width:15px;height:15px}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild.ist-daten :is(.coach-quelle-gesicht,.coach-quelle-gesicht *){color:#111111!important}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-gesicht svg{display:block;width:100%;height:100%}
 :root[data-theme][data-seite="coach"] #app #view .coach-chat:not(.coach-gedaechtnis-seite) .coach-quelle-bild:is(.ist-seminar,.ist-wissen){background:#E4E6EA}
