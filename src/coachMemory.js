@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
 import { fensterMarkup } from './coachFenster.js';
+import { inlineMarkup, ohneFett } from './chatLeiste.js';
 import { sanduhrMarkup, wartetextMarkup } from './sanduhr.js';
 import { EXPERIMENT_METRICS } from '../supabase/functions/capboy-coach/experiments.ts';
 
@@ -239,9 +240,9 @@ export function coachingListeMarkup(coachings = []) {
     const art = coaching.art === 'woche' ? 'Wochen-Coaching' : 'Coaching';
     return `<li class="gedaechtnis-eintrag" data-id="${escapeHtml(coaching.id)}">
       <details>
-        <summary><b>${escapeHtml(ergebnis.ueberschrift || art)}</b><small>${art} · ${datum(coaching.datum)}</small></summary>
-        ${(ergebnis.punkte || []).length ? `<ul>${ergebnis.punkte.map((punkt) => `<li>${escapeHtml(punkt.text || '')}</li>`).join('')}</ul>` : ''}
-        ${ergebnis.fokus?.text ? `<p class="gedaechtnis-ergebnis">Fokus: ${escapeHtml(ergebnis.fokus.text)}</p>` : ''}
+        <summary><b>${escapeHtml(ohneFett(ergebnis.ueberschrift || art))}</b><small>${art} · ${datum(coaching.datum)}</small></summary>
+        ${(ergebnis.punkte || []).length ? `<ul>${ergebnis.punkte.map((punkt) => `<li>${inlineMarkup(punkt.text || '')}</li>`).join('')}</ul>` : ''}
+        ${ergebnis.fokus?.text ? `<p class="gedaechtnis-ergebnis">Fokus: ${inlineMarkup(ergebnis.fokus.text)}</p>` : ''}
       </details>
       <div class="gedaechtnis-aktionen"><button class="coach-knopf ist-wichtig" type="button" data-coaching-oeffnen="${escapeHtml(coaching.id)}">Im Chat öffnen</button></div>
     </li>`;

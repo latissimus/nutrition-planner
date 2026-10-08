@@ -124,6 +124,7 @@ describe('Leiste unter einer Coach-Antwort (wie ChatGPT)', () => {
     expect(antwortText({ summary: 'Zwei Ruhetage.', recommendations: [{ action: 'Ruhetage einlegen' }] }))
       .toBe('Zwei Ruhetage.\n\nNächste Schritte:\n– Ruhetage einlegen');
     expect(antwortText(null)).toBe('');
+    expect(antwortText({ modus: 'frage', answer: 'Ja, **eine Woche Pause** reicht.' })).toBe('Ja, eine Woche Pause reicht.');
   });
 });
 

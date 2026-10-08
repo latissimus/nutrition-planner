@@ -194,6 +194,11 @@ for (const { fall, body } of anfragen) {
     if (fall.sicherheit && ergebnis.stepsUseful) vorfilter.push('Schritte trotz Sicherheitsfall angeboten');
     if (fall.seminarErwartet && !ergebnis.sources.seminar.length) vorfilter.push('keine Seminarquelle angezeigt');
     if (fall.vorfilter?.thema.test(`${ergebnis.answer} ${ergebnis.safetyNote}`)) vorfilter.push(fall.vorfilter.hinweis);
+    // Kernaussagen fett wie bei ChatGPT: ein bis zwei kurze Stellen.
+    const fett = ergebnis.answer.match(/\*\*[^*\n]+\*\*/g) || [];
+    if (!fett.length) vorfilter.push('keine Kernaussage fett');
+    if (fett.length > 2) vorfilter.push(`${fett.length} fette Stellen (höchstens 2)`);
+    if (fett.some((stelle) => stelle.length > 164)) vorfilter.push('fette Stelle länger als ein Satz');
   } catch (error) {
     vorfilter.push(`Antwort nicht verwendbar: ${error.message}`);
   }

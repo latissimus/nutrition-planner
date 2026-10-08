@@ -8,7 +8,7 @@
 // Keine npm:- oder Remote-Importe, damit Node die Datei für Evals laden kann.
 
 import { coachInput, coachResultSchema } from './coachPrompt.ts';
-import { COACHING_GRENZEN, COACHING_SCHEMA, coachingBereinigen } from './coaching.ts';
+import { COACHING_FETT, COACHING_GRENZEN, COACHING_SCHEMA, coachingBereinigen } from './coaching.ts';
 import { EXPERIMENT_DIRECTIONS, EXPERIMENT_METRIC_IDS } from './experiments.ts';
 import { aktionWaehlen } from './volumen.js';
 
@@ -82,6 +82,7 @@ ${COACHING_GRENZEN}
 - neuesExperiment: as in rule 5; an empty list or exactly one entry.
 - fokus: exactly one concrete thing for the coming week, in one sentence.
 - datenlage: how well the week's data supports the coaching ("niedrig", "mittel", "hoch").
+${COACHING_FETT}
 Write German, address the user as "du", short sentences, no filler, no praise the data does not support.
 </output>`;
 }

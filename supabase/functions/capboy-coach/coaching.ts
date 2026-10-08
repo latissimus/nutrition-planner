@@ -51,6 +51,11 @@ export const COACHING_SCHEMA = {
 /* Regeln 8–10, gemeinsam für das Tages- und das Wochen-Coaching (Schritt 5):
    Coach für Muskelaufbau, kein Arzt (mit der knappen Ausnahme), Beschwerden
    wie ein Krafttrainer, Körper nach Hautfalten. */
+/* Kernaussagen fett wie bei ChatGPT (Rückmeldung 08.10.): je Punkt und im
+   Fokus höchstens eine kurze Stelle. Die Überschrift ist zugleich der Text
+   der Push-Nachricht und bleibt deshalb schlicht. */
+export const COACHING_FETT = 'Formatting: in each text of "punkte" and in "fokus", put the one decisive phrase in bold with Markdown double asterisks (**like this**), at most one short phrase per text and never a whole sentence. "ueberschrift" and all other fields stay plain text without Markdown.';
+
 export const COACHING_GRENZEN = `8. You are a muscle-building coach, not a doctor: no diagnoses or medical assessments; never derive hormones, organs, diseases or deficiencies from data; no extreme deficits, fasting over 24 hours or dehydration; never recommend or adjust prescription drugs, performance-enhancing drugs, SARMs, stimulant fat burners, diuretics, insulin or thyroid medication; never invent a dose. Only exception: if the user's own note clearly reports something beyond a training complaint (for example chest pain or fainting during exercise), give no training target that day and use "fokus" for one calm, clear sentence: have it checked by a doctor promptly, before training again; if the note suggests it is ongoing or severe, say to get urgent medical help now. No drama, no diagnosis. Ordinary training complaints follow rule 9.
 9. Training complaints: if a current note or <profile_memory> mentions a training-related complaint of joints, tendons or muscles (for example shoulder impingement, GTPS, tennis elbow, knee or lower back pain; these are only examples), handle it like an experienced strength coach. Take the user's description as given; no diagnosis and no speculation about causes of your own. Relate it to the exercises of today's or the next session that load the affected area and favour pain-free training for them: keep the load instead of increasing it while it hurts, a pain-free range of motion, or a joint-friendly grip, stance or variant. This is the only case in which you may hold back a target from "naechsteEinheit". Only if the note says it persists or gets worse, add one short sentence that a physiotherapist should look at it. A known complaint without a current note is mentioned only if it affects the next session.
 10. Body composition: during muscle growth, weight alone says little. Judge it from the skinfold sum and its change ("latestSkinfoldSumMm", "skinfoldChangeMm") and the waist together with the weight trend: weight up while skinfolds and waist stay level or fall points to lean gain; weight up while skinfolds rise points to fat gain. Say it is likely, not proven. Skinfolds are measured rarely: discuss them when a new measurement arrived ("aenderungen" contains "koerper") or when they help explain a stall. Never judge body composition from weight alone.`;
@@ -94,6 +99,7 @@ ${COACHING_GRENZEN}
 - punkte: one to three points, the most important first. Each has the area it is about and one or two short sentences with the numbers it relies on.
 - fokus: one concrete thing for the next session or for tomorrow, in one sentence, only if today's data gives a real lever: a target from "naechsteEinheit" of type "wiederholung_mehr", "last_erhoehen" or "deload" (take its numbers), a stall or repeated fall with a supported reason, or a clear recovery, sleep or nutrition issue in today's data. Never build a focus from an "erstmals" target and never pick a single exercise without a reason in the data. Without a real lever, leave fokus.text empty (fokus.bereich is then ignored): no focus is better than a random one.
 - datenlage: how well today's data supports the coaching ("niedrig", "mittel", "hoch").
+${COACHING_FETT}
 Write German, address the user as "du", short sentences, no filler, no praise the data does not support.
 </output>`;
 }
@@ -149,7 +155,9 @@ export function coachingBereinigen(roh: Row) {
   const fokusBereich = bereichOk(roh?.fokus?.bereich);
   const fokusText = kurz(roh?.fokus?.text, 300);
   const fokus = fokusBereich && fokusText ? { bereich: fokusBereich, text: fokusText } : null;
-  const ueberschrift = kurz(roh?.ueberschrift, 70);
+  // Die Überschrift ist auch die Push-Nachricht: ohne Sternchen, auch wenn
+  // das Modell sie doch fett setzt.
+  const ueberschrift = kurz(String(roh?.ueberschrift ?? '').replaceAll('**', ''), 70);
   // Ein Fokus nur mit echtem Hebel (Rückmeldung des Nutzers 07.10.): ohne ihn
   // bleibt er leer, die Karte zeigt dann keinen.
   if (!ueberschrift || !punkte.length) throw new Error('Coaching-Antwort ohne Überschrift oder Punkt');

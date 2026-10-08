@@ -68,6 +68,15 @@ describe('Coaching: Karte', () => {
   });
 
 
+  it('zeigt Kernaussagen fett, die Überschrift und den kopierten Text ohne Sternchen', () => {
+    const coaching = frisch({ ergebnis: { ueberschrift: 'Titel **neu**', punkte: [{ bereich: 'training', text: 'Plus **5 kg** <b>' }], fokus: { bereich: 'training', text: 'Peile **6–10 Wdh.** an.' } } });
+    const html = coachingKarteMarkup(coaching);
+    expect(html).toContain('<h2>Titel neu</h2>');
+    expect(html).toContain('<p>Plus <b>5 kg</b> &lt;b&gt;</p>');
+    expect(html).toContain('<p>Peile <b>6–10 Wdh.</b> an.</p>');
+    expect(coachingText(coaching)).toBe('Titel neu\n\nPlus 5 kg <b>\n\nFokus: Peile 6–10 Wdh. an.');
+  });
+
   it('gibt Text und Kopf für Kopieren, Teilen und das „…“-Menü', () => {
     expect(coachingText(frisch())).toBe('Titel\n\nPunkt <b>\n\nFokus: Fokus');
     expect(coachingKopf(frisch())).toMatch(/, 21 Uhr · Coaching$/);

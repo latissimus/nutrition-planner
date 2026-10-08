@@ -269,6 +269,17 @@ describe('Chat: Modus und Etikett', () => {
   });
 });
 
+describe('Kernaussagen fett wie bei ChatGPT', () => {
+  it('lässt im Frage-Modus ein bis zwei Kernaussagen fett setzen, sonst kein Markdown', () => {
+    [false, true].forEach((web) => {
+      const prompt = frageSystemPrompt(web);
+      expect(prompt).toContain('Put the one or two statements the answer hinges on in bold with Markdown double asterisks (**like this**)');
+      expect(prompt).toContain('Use no other Markdown.');
+      expect(prompt).toContain('Are only the one or two key statements in bold?');
+    });
+  });
+});
+
 describe('„Daraus Schritte machen“ in der App', () => {
   const runde = { frage: 'Soll ich pausieren?', result: { modus: 'frage', answer: 'Ja, eine Woche.', stepsUseful: true } };
 

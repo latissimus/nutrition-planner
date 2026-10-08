@@ -13,7 +13,7 @@ import { vergleichMarkup } from './coachWeekly.js';
 import { mountWochenKaertchen } from './wochenKaertchen.js';
 import { fensterMarkup } from './coachFenster.js';
 import {
-  aktionenMarkup, hatQuellen, inlineMarkup, menueMarkup, quellenAus, quellenSheetMarkup, symbol, textMarkup, zeitText,
+  aktionenMarkup, hatQuellen, inlineMarkup, menueMarkup, ohneFett, quellenAus, quellenSheetMarkup, symbol, textMarkup, zeitText,
 } from './chatLeiste.js';
 import { inhaltMitfedern } from './federn.js';
 import { sanduhrMarkup } from './sanduhr.js';
@@ -158,10 +158,10 @@ export const antwortKopf = (runde) => [zeitText(runde?.zeit), MODI[antwortModus(
 export function antwortText(result) {
   if (!result) return '';
   if (antwortModus(result) === 'frage') {
-    return [result.answer, result.followUpQuestion, result.safetyNote].filter(Boolean).map(readableModelText).join('\n\n');
+    return [result.answer, result.followUpQuestion, result.safetyNote].filter(Boolean).map((text) => ohneFett(readableModelText(text))).join('\n\n');
   }
   const schritte = (result.recommendations || []).slice(0, 3).map((item) => `– ${item.action}`);
-  return [result.summary, result.safetyNote, schritte.length ? `Nächste Schritte:\n${schritte.join('\n')}` : ''].filter(Boolean).map(readableModelText).join('\n\n');
+  return [result.summary, result.safetyNote, schritte.length ? `Nächste Schritte:\n${schritte.join('\n')}` : ''].filter(Boolean).map((text) => ohneFett(readableModelText(text))).join('\n\n');
 }
 
 /* Antworten wie bei ChatGPT (Rückmeldung 08.10.): schlichter Text ohne Kopf

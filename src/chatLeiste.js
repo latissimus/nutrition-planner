@@ -81,6 +81,8 @@ export function inlineMarkup(roh = '') {
   }
   return html + formatiert(text.slice(bis));
 }
+// Für Kopieren, Vorlesen, Teilen und Überschriften: **fett** als schlichter Text.
+export const ohneFett = (text = '') => String(text ?? '').replace(/\*\*([^*\n]+)\*\*/g, '$1').replaceAll('**', '');
 const LISTENPUNKT = /^\s*(?:[-–•*]|\d+[.)])\s+/;
 export function textMarkup(roh = '') {
   return String(roh || '').trim().split(/\n\s*\n/).filter((absatz) => absatz.trim()).map((absatz) => {

@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { escapeHtml } from './coachFenster.js';
-import { aktionenMarkup, quellenAus } from './chatLeiste.js';
+import { aktionenMarkup, inlineMarkup, ohneFett, quellenAus } from './chatLeiste.js';
 import { ENTSCHEIDUNGEN, URTEILE, ZIELGROESSEN } from './coachMemory.js';
 import { vergleichMarkup } from './coachWeekly.js';
 
@@ -160,7 +160,7 @@ export function coachingText(coaching) {
     ergebnis.ueberschrift,
     ...(ergebnis.punkte || []).map((punkt) => punkt.text),
     ergebnis.fokus?.text ? `${coaching.art === 'woche' ? 'Fokus der Woche' : 'Fokus'}: ${ergebnis.fokus.text}` : '',
-  ].filter(Boolean).join('\n\n');
+  ].filter(Boolean).map(ohneFett).join('\n\n');
 }
 
 export function coachingKarteMarkup(coaching) {
@@ -184,15 +184,15 @@ export function coachingKarteMarkup(coaching) {
     const name = BEREICH_NAMEN[punkt.bereich] || punkt.bereich;
     const zwischenzeile = name && name !== bereich ? `<h4 class="coaching-bereich">${escapeHtml(name)}</h4>` : '';
     bereich = name;
-    return `${zwischenzeile}<p>${escapeHtml(punkt.text)}</p>`;
+    return `${zwischenzeile}<p>${inlineMarkup(punkt.text)}</p>`;
   }).join('');
   return `<section class="coaching-karte${woche ? ' is-woche' : ''}" aria-label="${marke}">
     <div class="coach-antwort">
-      <h2>${escapeHtml(ergebnis.ueberschrift || '')}</h2>
+      <h2>${escapeHtml(ohneFett(ergebnis.ueberschrift || ''))}</h2>
       ${punkte}
     </div>
     ${woche ? wochenteilMarkup(coaching) : ''}
-    ${ergebnis.fokus ? `<div class="coaching-fokus"><h4>${woche ? 'Fokus der Woche' : 'Fokus'}</h4><p>${escapeHtml(ergebnis.fokus.text)}</p></div>` : ''}
+    ${ergebnis.fokus ? `<div class="coaching-fokus"><h4>${woche ? 'Fokus der Woche' : 'Fokus'}</h4><p>${inlineMarkup(ergebnis.fokus.text)}</p></div>` : ''}
     ${aktionenMarkup({ quellen: coachingQuellen(coaching) })}
   </section>`;
 }

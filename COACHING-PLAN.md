@@ -519,6 +519,33 @@ Bewertungsmodus braucht keinen neuen Gesamtlauf.
   Kosten, `--live` neun Aufrufe, `--nur=`).
 - Offen: App pushen (Nutzer).
 
+### Kernaussagen fett (08.10.2026, lokal gebaut, nicht bereitgestellt)
+
+Nach dem Umbau des Chats auf das ChatGPT-Vorbild: GPT gliedert mit fett
+gesetzten Kernaussagen, unser Coach schrieb reinen Fließtext.
+
+- **Frage-Prompt** (`output_rules` → answer): Absätze mit Leerzeile, die ein
+  bis zwei tragenden Aussagen mit `**…**` fett (kurze Stelle oder ein Satz,
+  nie ein ganzer Absatz), sonst kein Markdown; dazu eine Zeile in
+  `final_check`. Der Bewertungs-Prompt bleibt eingefroren (Fingerabdruck
+  unverändert).
+- **Tages- und Wochen-Coaching:** gemeinsame Zeile `COACHING_FETT` – je Punkt
+  und im Fokus höchstens eine kurze fette Stelle; die Überschrift ist auch
+  die Push-Nachricht und bleibt schlicht. `coachingBereinigen` entfernt
+  Sternchen aus der Überschrift, falls das Modell sie doch setzt.
+- **App:** Antworttext, Coaching-Punkte, Fokus und die Coaching-Liste im
+  Gedächtnis zeigen `**…**` fett; Kopieren, Teilen, Vorlesen und
+  Überschriften ohne Sternchen. Ältere Antworten ohne Fett sehen aus wie
+  bisher.
+- **Kostenlose Vorprüfung in den Fallsätzen:** `eval:frage` meldet „keine
+  Kernaussage fett“, mehr als zwei fette Stellen oder eine zu lange;
+  `eval:coaching` meldet eine fette Überschrift, keinen fetten Text oder mehr
+  als eine fette Stelle je Text.
+- Offen: GPT-Review, je ein bezahlter Lauf `eval:frage --live` und
+  `eval:coaching --live` (Nutzer), dann Deploy von capboy-coach mit Freigabe
+  und abgestimmt mit der parallelen Sitzung; App pushen (Nutzer). Die App
+  kommt ohne Deploy aus: Ohne Fett im Text bleibt alles wie bisher.
+
 ## Schritt 5 – Wochenteil automatisch (Konzept 05.10.2026, zur Prüfung)
 
 **Ziel:** Montags um 21 Uhr bekommt die Person statt des Tages-Coachings ein

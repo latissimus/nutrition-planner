@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   volumenFuerKi, wochenBereinigen, wochenSchema, wochenSystemPrompt, wochenText, wochenUserPrompt,
 } from '../supabase/functions/capboy-coach/wochenCoaching.ts';
-import { COACHING_GRENZEN, coachingSystemPrompt } from '../supabase/functions/capboy-coach/coaching.ts';
+import { COACHING_FETT, COACHING_GRENZEN, coachingBereinigen, coachingSystemPrompt } from '../supabase/functions/capboy-coach/coaching.ts';
 import { BEIBEHALTEN } from '../supabase/functions/capboy-coach/volumen.js';
 
 const AKTIONEN = [
@@ -16,6 +16,15 @@ const antwort = (aenderung = {}) => ({
 });
 
 describe('Wochen-Coaching: Schema und Prompt', () => {
+  it('setzt in Tages- und Wochen-Coaching je Text eine Kernaussage fett, die Überschrift (Push) bleibt schlicht', () => {
+    expect(wochenSystemPrompt()).toContain(COACHING_FETT);
+    expect(coachingSystemPrompt()).toContain(COACHING_FETT);
+    expect(COACHING_FETT).toContain('"ueberschrift" and all other fields stay plain text');
+    const ergebnis = coachingBereinigen({ ueberschrift: 'Beinpresse **steigt**', punkte: [{ bereich: 'training', text: 'Plus **5 kg**.' }] });
+    expect(ergebnis.ueberschrift).toBe('Beinpresse steigt');
+    expect(ergebnis.punkte[0].text).toBe('Plus **5 kg**.');
+  });
+
   it('lässt als Volumen-Aktion nur die erlaubten IDs zu', () => {
     expect(wochenSchema(['beibehalten', 'plus1:Brust']).properties.volumen.properties.aktion.enum).toEqual(['beibehalten', 'plus1:Brust']);
     expect(wochenSchema([]).properties.volumen.properties.aktion.enum).toEqual(['beibehalten']);

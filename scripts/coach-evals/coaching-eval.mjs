@@ -139,7 +139,13 @@ for (const { fall, body } of anfragen) {
   let ergebnis = null;
   const befund = [];
   try {
-    ergebnis = coachingBereinigen(JSON.parse(text));
+    const roh = JSON.parse(text);
+    ergebnis = coachingBereinigen(roh);
+    // Kernaussagen fett: je Text höchstens eine Stelle, die Überschrift (Push) schlicht.
+    if (String(roh?.ueberschrift || '').includes('**')) befund.push('Überschrift fett gesetzt (Push zeigt Sternchen, wird entfernt)');
+    const texte = [...ergebnis.punkte.map((punkt) => punkt.text), ...(ergebnis.fokus ? [ergebnis.fokus.text] : [])];
+    if (!texte.some((text) => text.includes('**'))) befund.push('keine Kernaussage fett');
+    if (texte.some((text) => (text.match(/\*\*[^*\n]+\*\*/g) || []).length > 1)) befund.push('mehr als eine fette Stelle in einem Text');
     if (fall.erwarteterErsterBereich && ergebnis.punkte[0]?.bereich !== fall.erwarteterErsterBereich) befund.push('Erster Bereich anders als erwartet');
     if (fall.fokusErwartet === true && !ergebnis.fokus) befund.push('Fokus fehlt');
     if (fall.fokusErwartet === false && ergebnis.fokus) befund.push(`Fokus ohne echten Hebel: ${ergebnis.fokus.text}`);
