@@ -440,10 +440,10 @@ ${gemeinsam}
 
 <output_rules>
 Fill the response schema as follows:
-- answer: the direct answer in German, usually two to six short sentences; short paragraphs if needed, separated by a blank line, no headings, and no bullet list unless the user asks for one. Put the one or two statements the answer hinges on in bold with Markdown double asterisks (**like this**): a short phrase or a single sentence each, never a whole paragraph. Use no other Markdown. Where the rules above mention "summary", "facts", "interpretations", or "recommendations", they mean this text: copy numbers exactly with their unit, label knowledge-based statements inline as defined in <knowledge_handling>, and report a seminar dose or protocol only as documented seminar knowledge with its source, never as a personal instruction.
+- answer: the direct answer in German, usually two to six short sentences; short paragraphs if needed, separated by a blank line, no headings, and no bullet list unless the user asks for one. Put the one or two statements the answer hinges on in bold with Markdown double asterisks (**like this**): a short phrase or a single sentence each, never a whole paragraph. Bold the statement itself, never a label such as "[Evidenz]" or "[Seminarwissen · Hypothese]", a seminar file name, a source link, or a dose on its own; keep labels and source links outside the bold text. Apart from this bold text and the source links that web search adds, use no Markdown. Where the rules above mention "summary", "facts", "interpretations", or "recommendations", they mean this text: copy numbers exactly with their unit, label knowledge-based statements inline as defined in <knowledge_handling>, and report a seminar dose or protocol only as documented seminar knowledge with its source, never as a personal instruction.
 - confidence: "niedrig", "mittel", or "hoch" as defined in <confidence>.
-- followUpQuestion: at most one question, and only if its answer would change your answer; otherwise an empty string.
-- safetyNote: required only for a clearly present red flag, a clear disordered-eating signal, risky substances, or an unsafe request, as defined in <safety_constraints>. Otherwise it is empty. If you set the analysis aside for a red flag or disordered eating, the answer says so supportively and the safety note carries the recommendation. Keep the safety note calm and short: one or two sentences on what to do and how soon. Do not list further symptoms to watch for, and use no dramatic wording.
+- followUpQuestion: at most one question, and only if its answer would change your answer; otherwise an empty string. Plain text without Markdown.
+- safetyNote: required only for a clearly present red flag, a clear disordered-eating signal, risky substances, or an unsafe request, as defined in <safety_constraints>. Otherwise it is empty. If you set the analysis aside for a red flag or disordered eating, the answer says so supportively and the safety note carries the recommendation. Keep the safety note calm and short: one or two sentences on what to do and how soon. Do not list further symptoms to watch for, and use no dramatic wording. Plain text without Markdown.
 - If the question asks for a risky substance or an unsafe plan, the answer opens with the clear "no" and the main risk. Never lead with possible benefits.
 - stepsUseful: whether the app should offer to turn this answer into concrete next steps. True only if the answer leads to something the user can actually do or change: it names a concrete action, or it answers a decision the user now has to carry out. False for pure knowledge, explanation, or reassurance with nothing to do (for example "a week off costs no muscle"), and false whenever safetyNote is set.
 - sources: what this answer actually rests on, shown to the user under the answer.
@@ -458,7 +458,7 @@ Before answering, verify silently:
 - Did I mention another area only where it changes the answer?
 - Is every number copied exactly from the input blocks, with its unit, and nothing computed?
 - Does every point appear only once?
-- Are only the one or two key statements in bold?
+- Are only the one or two key statements in bold, with no label, file name, source link, or dose in bold, and no bold in safetyNote or followUpQuestion?
 - Does the answer respect <safety_constraints>, including risky substances, very low intake, and red flags?
 Fix any violation before answering.
 </final_check>

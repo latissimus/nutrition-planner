@@ -20,6 +20,7 @@ import { assistantMemoryText, conversationBlock } from '../../supabase/functions
 import { bewertungsQuellenAus, seminarTitelAus, webSources } from '../../supabase/functions/capboy-coach/quellen.ts';
 import { KNOWLEDGE_VERSION } from '../../supabase/functions/capboy-coach/knowledge.ts';
 import { nachweisZeile, pruefeWissensbasis } from './wissensbasis.mjs';
+import { fettBefundFrage } from './fett.mjs';
 import { basis } from './cases.mjs';
 
 const daten = (aenderung = {}) => {
@@ -194,11 +195,7 @@ for (const { fall, body } of anfragen) {
     if (fall.sicherheit && ergebnis.stepsUseful) vorfilter.push('Schritte trotz Sicherheitsfall angeboten');
     if (fall.seminarErwartet && !ergebnis.sources.seminar.length) vorfilter.push('keine Seminarquelle angezeigt');
     if (fall.vorfilter?.thema.test(`${ergebnis.answer} ${ergebnis.safetyNote}`)) vorfilter.push(fall.vorfilter.hinweis);
-    // Kernaussagen fett wie bei ChatGPT: ein bis zwei kurze Stellen.
-    const fett = ergebnis.answer.match(/\*\*[^*\n]+\*\*/g) || [];
-    if (!fett.length) vorfilter.push('keine Kernaussage fett');
-    if (fett.length > 2) vorfilter.push(`${fett.length} fette Stellen (höchstens 2)`);
-    if (fett.some((stelle) => stelle.length > 164)) vorfilter.push('fette Stelle länger als ein Satz');
+    vorfilter.push(...fettBefundFrage(ergebnis));
   } catch (error) {
     vorfilter.push(`Antwort nicht verwendbar: ${error.message}`);
   }

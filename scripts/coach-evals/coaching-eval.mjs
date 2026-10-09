@@ -10,6 +10,7 @@ import {
 } from '../../supabase/functions/capboy-coach/coaching.ts';
 import { COACH_MODEL } from '../../supabase/functions/capboy-coach/coachPrompt.ts';
 import { basis } from './cases.mjs';
+import { fettBefundCoaching } from './fett.mjs';
 
 const heute = '2026-10-03';
 const daten = (aenderung = {}) => ({ ...basis(), generatedAt: '2026-10-03T19:00:00.000Z', ...aenderung });
@@ -141,11 +142,7 @@ for (const { fall, body } of anfragen) {
   try {
     const roh = JSON.parse(text);
     ergebnis = coachingBereinigen(roh);
-    // Kernaussagen fett: je Text höchstens eine Stelle, die Überschrift (Push) schlicht.
-    if (String(roh?.ueberschrift || '').includes('**')) befund.push('Überschrift fett gesetzt (Push zeigt Sternchen, wird entfernt)');
-    const texte = [...ergebnis.punkte.map((punkt) => punkt.text), ...(ergebnis.fokus ? [ergebnis.fokus.text] : [])];
-    if (!texte.some((text) => text.includes('**'))) befund.push('keine Kernaussage fett');
-    if (texte.some((text) => (text.match(/\*\*[^*\n]+\*\*/g) || []).length > 1)) befund.push('mehr als eine fette Stelle in einem Text');
+    befund.push(...fettBefundCoaching(roh, ergebnis));
     if (fall.erwarteterErsterBereich && ergebnis.punkte[0]?.bereich !== fall.erwarteterErsterBereich) befund.push('Erster Bereich anders als erwartet');
     if (fall.fokusErwartet === true && !ergebnis.fokus) befund.push('Fokus fehlt');
     if (fall.fokusErwartet === false && ergebnis.fokus) befund.push(`Fokus ohne echten Hebel: ${ergebnis.fokus.text}`);

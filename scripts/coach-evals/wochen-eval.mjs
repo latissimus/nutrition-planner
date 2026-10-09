@@ -14,6 +14,7 @@ import {
 import { COACH_MODEL } from '../../supabase/functions/capboy-coach/coachPrompt.ts';
 import { BEIBEHALTEN } from '../../supabase/functions/capboy-coach/volumen.js';
 import { basis } from './cases.mjs';
+import { fettBefundCoaching } from './fett.mjs';
 
 const heute = '2026-10-05';
 const daten = (aenderung = {}) => ({ ...basis(), generatedAt: '2026-10-05T19:00:00.000Z', ...aenderung });
@@ -122,11 +123,13 @@ for (const { fall, body } of anfragen) {
   let ergebnis = null;
   const befund = [];
   try {
-    ergebnis = wochenBereinigen(JSON.parse(text), {
+    const roh = JSON.parse(text);
+    ergebnis = wochenBereinigen(roh, {
       aktionen: fall.volumen.aktionen, faellige: (fall.faelligeIds || []).map((id) => ({ id })), heute,
       nichtRepraesentativ: fall.volumen.sperren.length > 0 && fall.id === 'krankheitswoche',
     });
     if (ergebnis.verworfen.length) befund.push(`verworfen: ${ergebnis.verworfen.join('; ')}`);
+    befund.push(...fettBefundCoaching(roh, ergebnis));
     if (ergebnis.experimente.some((urteil) => urteil.ergaenzt)) befund.push('Fälliges Experiment nicht bewertet (ergänzt)');
     if (ergebnis.volumen.aktion.id !== fall.erwarteteAktion) befund.push(`Volumen: ${ergebnis.volumen.aktion.id} statt ${fall.erwarteteAktion}`);
     if (fall.keinNeuesExperiment && ergebnis.neuesExperiment.length) befund.push('Neues Experiment trotz nicht repräsentativer Woche');

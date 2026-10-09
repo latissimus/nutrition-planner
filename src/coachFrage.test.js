@@ -275,8 +275,14 @@ describe('Kernaussagen fett wie bei ChatGPT', () => {
     [false, true].forEach((web) => {
       const prompt = frageSystemPrompt(web);
       expect(prompt).toContain('Put the one or two statements the answer hinges on in bold with Markdown double asterisks (**like this**)');
-      expect(prompt).toContain('Use no other Markdown.');
-      expect(prompt).toContain('Are only the one or two key statements in bold?');
+      // GPT-Nach-Review 09.10.: Fett an der Aussage, nicht an Etiketten,
+      // Quellen oder Dosen; Quellenlinks der Websuche bleiben erlaubt;
+      // Sicherheitshinweis und Rückfrage ohne Fett.
+      expect(prompt).toContain('never a label such as "[Evidenz]" or "[Seminarwissen · Hypothese]", a seminar file name, a source link, or a dose on its own');
+      expect(prompt).toContain('Apart from this bold text and the source links that web search adds, use no Markdown.');
+      expect(prompt).toContain('otherwise an empty string. Plain text without Markdown.');
+      expect(prompt).toContain('use no dramatic wording. Plain text without Markdown.');
+      expect(prompt).toContain('no bold in safetyNote or followUpQuestion?');
     });
   });
 });

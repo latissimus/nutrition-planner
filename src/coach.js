@@ -170,7 +170,7 @@ export function antwortText(result) {
    Antwort zu etwas führt, das man tun kann (stepsUseful). */
 function frageMarkup(result, { merken = false, schritteGemacht = false } = {}) {
   return `<div class="coach-result ist-frage">
-    <div class="coach-antwort">${textMarkup(result.answer)}${result.safetyNote ? `<p class="coach-safety">${inlineMarkup(result.safetyNote)}</p>` : ''}${result.followUpQuestion ? `<p class="coach-rueckfrage">${inlineMarkup(result.followUpQuestion)}</p>` : ''}</div>
+    <div class="coach-antwort">${textMarkup(result.answer)}${result.safetyNote ? `<p class="coach-safety">${inlineMarkup(ohneFett(result.safetyNote))}</p>` : ''}${result.followUpQuestion ? `<p class="coach-rueckfrage">${inlineMarkup(ohneFett(result.followUpQuestion))}</p>` : ''}</div>
     ${merken ? aktionenMarkup({ quellen: quellenAus(result), schritte: result.stepsUseful === true && !schritteGemacht }) : ''}
   </div>`;
 }
@@ -190,7 +190,7 @@ export function resultMarkup(result, { merken = false, schritteGemacht = false }
     uncertainties.length ? `<h4>Noch unsicher</h4>${liste(uncertainties)}` : '',
   ].join('');
   return `<div class="coach-result ist-bewertung">
-    <div class="coach-antwort">${textMarkup(result.summary)}${result.safetyNote ? `<p class="coach-safety">${inlineMarkup(result.safetyNote)}</p>` : ''}</div>
+    <div class="coach-antwort">${textMarkup(result.summary)}${result.safetyNote ? `<p class="coach-safety">${inlineMarkup(ohneFett(result.safetyNote))}</p>` : ''}</div>
     ${auswertungenMarkup((result.experimentReviews || []).slice(0, 5), merken)}
     ${recommendations.length ? `<section class="coach-schritte"><h4>Nächste Schritte</h4><ol>${recommendations.map((item, index) => empfehlungMarkup(item, index, merken)).join('')}</ol></section>` : ''}
     ${mehr ? `<details class="coach-mehr"><summary>Daten &amp; Einordnung</summary>${mehr}</details>` : ''}

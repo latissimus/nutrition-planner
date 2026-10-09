@@ -519,7 +519,7 @@ Bewertungsmodus braucht keinen neuen Gesamtlauf.
   Kosten, `--live` neun Aufrufe, `--nur=`).
 - Offen: App pushen (Nutzer).
 
-### Kernaussagen fett (08.10.2026, lokal gebaut, nicht bereitgestellt)
+### Kernaussagen fett (08.10.2026, mit capboy-coach v31 bereitgestellt)
 
 Nach dem Umbau des Chats auf das ChatGPT-Vorbild: GPT gliedert mit fett
 gesetzten Kernaussagen, unser Coach schrieb reinen Fließtext.
@@ -541,10 +541,30 @@ gesetzten Kernaussagen, unser Coach schrieb reinen Fließtext.
   Kernaussage fett“, mehr als zwei fette Stellen oder eine zu lange;
   `eval:coaching` meldet eine fette Überschrift, keinen fetten Text oder mehr
   als eine fette Stelle je Text.
-- Offen: GPT-Review, je ein bezahlter Lauf `eval:frage --live` und
-  `eval:coaching --live` (Nutzer), dann Deploy von capboy-coach mit Freigabe
-  und abgestimmt mit der parallelen Sitzung; App pushen (Nutzer). Die App
-  kommt ohne Deploy aus: Ohne Fett im Text bleibt alles wie bisher.
+- Stand 09.10.: Die parallele Sitzung hat capboy-coach am 08.10. um 22:35
+  als v31 bereitgestellt (Kalorien/Zielphasen); der bereitgestellte Code ist
+  identisch mit dem Repo und enthält diese Änderung. Sie ist damit live,
+  ohne Review und ohne bezahlten Lauf.
+- **GPT-Nach-Review 09.10.:** kein Rollback; Darstellung sauber (Escaping,
+  Kopieren/Teilen/Vorlesen ohne Sternchen). Umgesetzt (lokal, nicht
+  bereitgestellt):
+  - Frage-Prompt: Fett an der Aussage selbst, nie an einem Etikett
+    („[Evidenz]“, „[Seminarwissen · …]“), Dateinamen, Quellenlink oder einer
+    Dosis allein; Quellenlinks der Websuche ausdrücklich erlaubt (statt „kein
+    anderes Markdown“); `safetyNote` und `followUpQuestion` schlicht ohne
+    Markdown; `final_check` entsprechend. Bewertungs-Prompt unverändert.
+  - App: Sicherheitshinweis und Rückfrage zeigen kein Fett, auch wenn das
+    Modell es setzt.
+  - Gemeinsame Vorprüfung `scripts/coach-evals/fett.mjs` für `eval:frage`,
+    `eval:coaching` und jetzt auch `eval:wochen`: fehlendes oder zu viel Fett,
+    Etikett/Quelle/Dosis fett, zu lange Stelle, Fett in Überschrift (Push),
+    Hinweis, Rückfrage oder übrigen Feldern. Weiche Hinweise, kein
+    Fehlschlag. Tests: `src/coachFett.test.js`.
+- Offen: Deploy von capboy-coach mit Freigabe (abgestimmt mit der parallelen
+  Sitzung). Danach, sobald das OpenAI-Guthaben aufgeladen ist, je ein
+  bezahlter Lauf `eval:frage --live`, `eval:coaching --live` und
+  `eval:wochen --live`; Antworten von Hand auf Quellenetiketten und
+  Sicherheitsfälle lesen. Vorher nichts Kostenpflichtiges.
 
 ## Schritt 5 – Wochenteil automatisch (Konzept 05.10.2026, zur Prüfung)
 
