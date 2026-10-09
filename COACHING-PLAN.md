@@ -560,11 +560,27 @@ gesetzten Kernaussagen, unser Coach schrieb reinen Fließtext.
     Etikett/Quelle/Dosis fett, zu lange Stelle, Fett in Überschrift (Push),
     Hinweis, Rückfrage oder übrigen Feldern. Weiche Hinweise, kein
     Fehlschlag. Tests: `src/coachFett.test.js`.
-- Offen: Deploy von capboy-coach mit Freigabe (abgestimmt mit der parallelen
-  Sitzung). Danach, sobald das OpenAI-Guthaben aufgeladen ist, je ein
-  bezahlter Lauf `eval:frage --live`, `eval:coaching --live` und
-  `eval:wochen --live`; Antworten von Hand auf Quellenetiketten und
-  Sicherheitsfälle lesen. Vorher nichts Kostenpflichtiges.
+- Bereitgestellt 09.10. abends mit Freigabe, auf v32 der parallelen Sitzung
+  (einziger Unterschied: diese Prompt-Korrekturen; bereitgestellter Code =
+  Repo). Rauchtest ohne Kosten: OPTIONS 200, ohne Anmeldung 401, falscher
+  Cron-Schlüssel 401, anonymer Chat 401.
+- **Bezahlte Läufe 09.10.** (`results/2026-10-09T18-14-00-598Z-frage.json`,
+  `…T18-16-09-888Z-coaching.json`, `…T18-17-38-475Z-wochen.json`, Wissensbasis
+  3b847f99 nachgewiesen): Vorprüfung in allen 22 Fällen ohne Befund.
+  Von Hand gelesen:
+  - Frage: Fett sitzt an der Kernaussage, Etiketten („[Evidenz]“,
+    „[Seminarwissen · Erfahrungswert]“), Dateinamen und Quellenlinks stehen
+    außerhalb.
+  - Sicherheitsfälle (SARMs, 1000 kcal, schwarz vor Augen): das klare „Nein“
+    fett, Hinweis ohne Fett, ruhig und kurz, keine Dosis.
+  - Tages- und Wochen-Coaching: je Text eine Stelle, Überschriften schlicht.
+  - Kleine Schwäche: In 5 von etwa 38 fetten Stellen ist nur eine Zahl fett
+    („**105 kg**“, „**+0,3 kg**“) statt der Aussage. Harmlos; keine weitere
+    Prompt-Runde.
+  - Nebenbefund für die parallele Sitzung (nicht Teil dieser Änderung): Drei
+    Wochenfälle fordern „Wähle dein Ziel“, vermutlich weil die Fixtures kein
+    Ziel gesetzt haben.
+  - Abnahme: bestanden.
 
 ## Schritt 5 – Wochenteil automatisch (Konzept 05.10.2026, zur Prüfung)
 
