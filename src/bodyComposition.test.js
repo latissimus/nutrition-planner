@@ -72,6 +72,23 @@ describe('adaptive Kalorienkalibrierung', () => {
     expect(result.requiresConfirmation).toBe(true);
   });
 
+  it('schlägt bei stagnierendem Gewicht im Aufbau keine Senkung Richtung Erhaltung vor', () => {
+    const stableWeights = dates(28, (date) => ({ date, kg: 90 }));
+    const gain = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights: stableWeights, currentTarget: 2300, goal: 'gain' });
+    const loss = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights: stableWeights, currentTarget: 2300, goal: 'lose' });
+    const maintain = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights: stableWeights, currentTarget: 2300, goal: 'maintain' });
+    expect(gain).toMatchObject({ eligible: true, observedMaintenance: 2300, suggestedChange: 100, suggestedTarget: 2400 });
+    expect(loss).toMatchObject({ eligible: true, observedMaintenance: 2300, suggestedChange: -100, suggestedTarget: 2200 });
+    expect(maintain).toMatchObject({ eligible: true, observedMaintenance: 2300, suggestedChange: 0, suggestedTarget: 2300 });
+  });
+
+  it('lässt das Aufbauziel bei einer zum Überschuss passenden Zunahme unverändert', () => {
+    const gainingWeights = dates(28, (date, index) => ({ date, kg: 90 + index * 200 / 7700 }));
+    const result = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights: gainingWeights, currentTarget: 2300, goal: 'gain' });
+    expect(result.eligible).toBe(true);
+    expect(result.suggestedChange).toBe(0);
+  });
+
   it('ändert im BodyComp-Modus nie allein aufgrund des Gewichts die Kalorien', () => {
     const result = adaptiveEnergyEstimate({ nutritionDays: nutrition, weights, currentTarget: 2300, goal: 'bodycomp' });
     expect(result.eligible).toBe(false);

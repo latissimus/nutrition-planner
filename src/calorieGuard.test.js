@@ -30,6 +30,16 @@ describe('Kalorien-Entscheidungssperre', () => {
     expect(safe.recommendations[0].action).not.toContain('200 kcal');
   });
 
+  it('drängt bei ausgeschaltetem Tracker nicht zum Ernährungstracking', () => {
+    const basis = calorieBasis(days(14), new Date('2026-10-07T12:00:00Z'), null, false);
+    expect(basis).toMatchObject({ calorieChangeAllowed: false, nutritionUnavailable: true, loggedDays: 0 });
+    expect(basis.reason).not.toContain('Ernährung erfassen');
+    const result = enforceCalorieBasis({ modus: 'frage', answer: 'Erhöhe um 200 kcal pro Tag.' }, basis);
+    expect(result.answer).not.toContain('200 kcal');
+    expect(result.answer).not.toContain('Erfasse zunächst');
+    expect(result.answer).toContain('Trainingsleistung');
+  });
+
   it('lässt Messwerte und reines Besprechen des Kalorienziels stehen', () => {
     expect(quantifiedCalorieAction('Zuletzt waren 2400 kcal eingetragen.')).toBe(false);
     expect(quantifiedCalorieAction('Du isst 200 kcal weniger als geplant.')).toBe(false);

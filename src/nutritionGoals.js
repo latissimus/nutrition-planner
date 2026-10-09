@@ -1,5 +1,5 @@
-// One visible goal vocabulary for Tracker and COMP. The server uses the same
-// stored enum when choosing its daily and weekly coaching strategy.
+// The goal direction is chosen on COMP. The optional Tracker reads the same
+// stored value to calculate a starting calorie estimate when no manual target exists.
 export const NUTRITION_GOALS = {
   lose: ['Langsam reduzieren', -300],
   maintain: ['Gewicht halten', 0],

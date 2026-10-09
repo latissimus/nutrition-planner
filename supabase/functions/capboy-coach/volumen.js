@@ -188,6 +188,7 @@ export function vergleichbareZyklen(payload, einheiten, verlauf = []) {
 export function fensterWerte(rows, heute) {
   const von = plusTage(heute, -G.fensterTage);
   const bis = plusTage(heute, -1);
+  const ohneErnaehrung = (rows.switchedOffAreas || []).includes('nutrition');
   const phaseStart = targetPhaseDay(rows.settings);
   const imFenster = (wert) => { const datum = tag(wert); return datum != null && datum >= von && datum <= bis; };
   const erholung = (rows.checkins || []).filter((zeile) => imFenster(zeile.checkin_date)).map((zeile) => zahl(zeile.recovery)).filter(Boolean);
@@ -209,12 +210,12 @@ export function fensterWerte(rows, heute) {
       minuten: runde(mittel(naechte.map((zeile) => durationMinutes(zeile.bedtime, zeile.wake_time))), 0),
       qualitaet: runde(mittel(naechte.map((zeile) => zahl(zeile.quality)).filter(Boolean))),
     },
-    ernaehrung: {
+    ernaehrung: ohneErnaehrung ? { switchedOff: true } : {
       tage: tage.size,
       kcal: runde(mittel([...tage.values()].map((t) => t.kcal)), 0),
       protein: runde(mittel([...tage.values()].map((t) => t.protein)), 0),
     },
-    kalorienZiel: currentCalorieTarget(rows.settings, rows.weights?.[0]?.kg, new Date(`${heute}T12:00:00Z`)),
+    kalorienZiel: ohneErnaehrung ? null : currentCalorieTarget(rows.settings, rows.weights?.[0]?.kg, new Date(`${heute}T12:00:00Z`)),
     gewichtKg: rows.weights?.[0] ? zahl(rows.weights[0].kg) || null : null,
   };
 }

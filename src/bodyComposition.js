@@ -1,3 +1,5 @@
+import { NUTRITION_GOALS } from './nutritionGoals.js';
+
 const DAY_MS = 86_400_000;
 
 const numeric = (value) => {
@@ -55,8 +57,7 @@ export function initialEnergyEstimate(input) {
   const weight = numeric(input.weightKg);
   const pal = numeric(input.pal) || 1.6;
   const maintenance = base.resting * pal;
-  const adjustments = { lose: -300, maintain: 0, gain: 200, gain_fast: 350, bodycomp: 0 };
-  const target = Math.max(1200, maintenance + (adjustments[input.goal] || 0));
+  const target = Math.max(1200, maintenance + (NUTRITION_GOALS[input.goal]?.[1] || 0));
   // Eine alltagstaugliche Spanne macht sichtbar, dass PAL und Formel keine Messung sind.
   const uncertainty = Math.max(150, maintenance * 0.1);
   return {
@@ -203,8 +204,13 @@ export function adaptiveEnergyEstimate({ nutritionDays = [], weights = [], curre
   if (!model) return { eligible: false, confidence: 'niedrig', reason: 'Der Gewichtstrend ist noch nicht belastbar.' };
   const averageCalories = logged.reduce((sum, day) => sum + day.kcal, 0) / logged.length;
   const observedMaintenance = averageCalories - 7700 * model.slopePerDay;
-  const difference = observedMaintenance - Number(currentTarget || observedMaintenance);
+  // Calibrate toward the selected goal, not toward maintenance for every goal.
+  // Otherwise a stable-weight muscle-gain phase could suggest fewer calories.
+  const desiredTarget = Math.max(1200, observedMaintenance + (NUTRITION_GOALS[goal]?.[1] || 0));
+  const difference = desiredTarget - Number(currentTarget || observedMaintenance);
   const limitedChange = Math.max(-100, Math.min(100, difference));
+  // Tiny changes are not meaningful at this level of measurement precision.
+  const practicalChange = Math.round(limitedChange / 50) * 50;
   const bodyCompBlocked = goal === 'bodycomp' && !combinedEvidence;
   const lastAdjustmentDay = lastAdjustmentDate ? dayNumber(String(lastAdjustmentDate).slice(0, 10)) : null;
   const reviewBlocked = lastAdjustmentDay != null && endDay - lastAdjustmentDay < 7;
@@ -223,15 +229,15 @@ export function adaptiveEnergyEstimate({ nutritionDays = [], weights = [], curre
     measurementsPerWeek: trend.measurementsPerWeek,
     averageCalories: Math.round(averageCalories),
     observedMaintenance: Math.round(observedMaintenance),
-    suggestedTarget: Math.round(Number(currentTarget || observedMaintenance) + limitedChange),
-    suggestedChange: Math.round(limitedChange),
+    suggestedTarget: Math.round(Number(currentTarget || observedMaintenance) + practicalChange),
+    suggestedChange: practicalChange,
     nextReview,
     weightTrend: trend,
     reason: bodyCompBlocked
       ? 'Im BodyComp-Modus löst der Gewichtstrend allein keine Kalorienänderung aus. Körpermaße, Leistung und Erholung müssen den Vorschlag stützen.'
       : reviewBlocked
         ? `Die letzte Anpassung ist noch keine Woche her. Die nächste Bewertung ist am ${new Date(`${nextReview}T12:00:00`).toLocaleDateString('de-DE')}.`
-      : 'Vorsichtige Kalibrierung aus eingetragener Energiezufuhr und geglättetem Gewichtstrend.',
+      : 'Vorsichtige Kalibrierung aus eingetragener Energiezufuhr, geglättetem Gewichtstrend und gewählter Zielrichtung.',
   };
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateEnergyNeed, localDateKey } from './nutrition.js';
+import { calculateEnergyNeed, calculatorMarkup, localDateKey } from './nutrition.js';
 import { berlinDay, currentCalorieTarget, nutritionTargetStatus, targetPhaseDay } from '../supabase/functions/capboy-coach/nutritionTarget.js';
 import { buildFollowThrough } from '../supabase/functions/capboy-coach/followThrough.ts';
 import { fensterWerte } from '../supabase/functions/capboy-coach/volumen.js';
@@ -14,7 +14,19 @@ describe('Automatischer Kalorien-Zielbereich', () => {
       adaptive_rejected_target: null, adaptive_rejected_at: null,
     });
     expect(goalSettingsUpdate({ goal: 'gain' }, 'gain')).toEqual({ goal: 'gain' });
+    expect(goalSettingsUpdate({ goal: 'gain', custom_calorie_target: 2500 }, 'lose')).not.toHaveProperty('custom_calorie_target');
     expect(() => goalSettingsUpdate({ goal: 'gain' }, 'unbekannt')).toThrow('Unbekanntes Ziel');
+  });
+
+  it('lässt die Zielrichtung nur auf COMP ändern und das Kalorienziel im Tracker', () => {
+    const result = calculateEnergyNeed({ calculationBasis: 'male', birthDate: '1990-01-01', heightCm: 180,
+      weightKg: 80, pal: 1.6, goal: 'gain', referenceDate: new Date('2026-10-08T12:00:00Z') });
+    const markup = calculatorMarkup({ settings: { goal: 'gain', custom_calorie_target: 2600 }, latestWeight: 80 }, result);
+    expect(markup).toContain('Muskelaufbau');
+    expect(markup).toContain('auf COMP');
+    expect(markup).toContain('Eigenes Kalorienziel');
+    expect(markup).toContain('2600');
+    expect(markup).not.toContain('data-calc-goal');
   });
   it('verwendet ±10 % inklusive der Grenzen, ohne Vollständigkeit zu behaupten', () => {
     expect(nutritionTargetStatus(2160, 2400)).toBe('im_zielbereich');
@@ -33,6 +45,16 @@ describe('Automatischer Kalorien-Zielbereich', () => {
     expect(currentCalorieTarget(settings, 80, now)).toBe(expected);
     expect(currentCalorieTarget({ ...settings, adaptive_target: 2300, custom_calorie_target: 2500 }, 80, now)).toBe(2500);
     expect(currentCalorieTarget(settings, null, now)).toBeNull();
+  });
+
+  it('hält die Zielaufschläge im Tracker und beim Coach für alle Zielrichtungen gleich', () => {
+    const now = new Date('2026-10-08T12:00:00Z');
+    for (const goal of ['lose', 'maintain', 'gain', 'gain_fast', 'bodycomp']) {
+      const settings = { calculation_basis: 'male', birth_date: '1990-01-01', height_cm: 180, pal: 1.6, goal };
+      const fromTracker = calculateEnergyNeed({ calculationBasis: 'male', birthDate: '1990-01-01', heightCm: 180,
+        weightKg: 80, pal: 1.6, goal, referenceDate: now }).target;
+      expect(currentCalorieTarget(settings, 80, now)).toBe(fromTracker);
+    }
   });
 
   it('benutzt für COMP, die Lückenprüfung und das Wochenvolumen dasselbe Ziel', () => {

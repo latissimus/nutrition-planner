@@ -5,7 +5,7 @@ import { bewertungsQuellenAus, seminarTitelAus, webSources } from './quellen.ts'
 import { FETCH_LIMITS, FETCH_WINDOW_DAYS, buildCompFacts, buildTimeseries, dateDaysAgo, type ContextRows } from './context.ts';
 import { MEMORY_LIMITS, assistantMemoryText, conversationBlock, interventionBlock, isUuid, profileBlock } from './memory.ts';
 import { reviewWeeks, weeklyBlock } from './weekly.ts';
-import { switchedOffAreas } from './followThrough.ts';
+import { coachSwitchedOffAreas } from './followThrough.ts';
 import webpush from 'npm:web-push@3.6.7';
 import { COACHING_SCHEMA, coachingBereinigen, coachingSystemPrompt, coachingText, coachingUserPrompt, geaenderteBereiche, hatNeueDaten } from './coaching.ts';
 import { trainingsAuswertung } from './training.js';
@@ -191,7 +191,7 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
     nutritionSettings, weights, skinfolds, waists, performance, sleep, checkins,
     nutritionEntries, routines, completions, preferences,
   ] = await Promise.all([
-    admin.from('nutrition_settings').select('goal,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,pal,bodycomp_thresholds,target_changed_at').eq('user_id', userId).maybeSingle(),
+    admin.from('nutrition_settings').select('goal,tracking_enabled,custom_calorie_target,adaptive_target,height_cm,birth_date,calculation_basis,pal,bodycomp_thresholds,target_changed_at').eq('user_id', userId).maybeSingle(),
     userRows('weights', userId, 'gemessen_am', FETCH_LIMITS.weights, 'gemessen_am,kg'),
     userRows('skinfolds', userId, 'gemessen_am', FETCH_LIMITS.skinfolds, 'gemessen_am,falten,standardisiert,messqualitaet'),
     userRows('waist_measurements', userId, 'gemessen_am', FETCH_LIMITS.waists, 'gemessen_am,cm,standardisiert'),
@@ -208,8 +208,8 @@ async function fetchContextRows(userId: string, now: Date): Promise<ContextRows>
   if (failures.length) throw failures[0].error;
   const preference = (key: string) => (preferences.data || []).find((row: Row) => row.key === key)?.value;
   const visiblePages = preference(VISIBLE_PAGES_KEY);
-  const off = switchedOffAreas(Array.isArray(visiblePages) && preference(SLEEP_PAGE_MIGRATED_KEY) !== true
-    ? [...visiblePages, 'sleep'] : visiblePages);
+  const off = coachSwitchedOffAreas(Array.isArray(visiblePages) && preference(SLEEP_PAGE_MIGRATED_KEY) !== true
+    ? [...visiblePages, 'sleep'] : visiblePages, nutritionSettings.data?.tracking_enabled);
   return {
     settings: nutritionSettings.data || null,
     weights, skinfolds, waists, performance,
@@ -686,7 +686,7 @@ Deno.serve(async (request) => {
     const contextRows = await fetchContextRows(userId, now);
     const snapshot = buildCompFacts(contextRows, now);
     const timeseries = buildTimeseries(contextRows, now);
-    const limits = calorieBasis(contextRows.nutritionEntries, now, targetPhaseDay(contextRows.settings));
+    const limits = calorieBasis(contextRows.nutritionEntries, now, targetPhaseDay(contextRows.settings), !contextRows.switchedOffAreas?.includes('nutrition'));
     // Ein Gespräch geht weiter, wenn die App seine id schickt; sonst beginnt ein neues.
     const conversationId = isUuid(body?.conversationId) ? body.conversationId as string : crypto.randomUUID();
     const memory = await loadMemory(userId, conversationId, berlinDay(now), timeseries);

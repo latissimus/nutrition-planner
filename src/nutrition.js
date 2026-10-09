@@ -13,7 +13,7 @@ import { BODY_EXPLANATIONS, adaptiveEnergyEstimate, confirmedTrendChange, evalua
 import { performanceTrend } from './logmanImport.js';
 import { createSpecialDexOverlay, SPECIAL_DEX_CLASSES } from './specialDex.js';
 import { nutritionTargetStatus, targetPhaseDay } from '../supabase/functions/capboy-coach/nutritionTarget.js';
-import { NUTRITION_GOALS as GOALS, goalSettingsUpdate } from './nutritionGoals.js';
+import { goalLabel } from './nutritionGoals.js';
 
 const PERIODS = [
   ['breakfast', 'Frühstück'], ['snack_morning', 'Snack vormittags'],
@@ -299,19 +299,19 @@ function adaptiveOverlayMarkup(model) {
     <details class="nutrition-technical"><summary>Technische Einordnung ${materialIconMarkup('chevron_right', 'nutrition-chevron')}</summary><p>Für längere Gewichtstrends nutzt CAPBOY ungefähr 7.700 kcal als grobe rechnerische Entsprechung pro Kilogramm. Das ist keine Tagesregel und keine exakte Messung. Deshalb werden nur geglättete Verläufe bewertet, Vorschläge auf etwa 100 kcal begrenzt und immer von dir bestätigt.</p></details>`;
 }
 
-function calculatorMarkup(state, result) {
+export function calculatorMarkup(state, result) {
   const value = (key, fallback = '') => escapeHtml(state.settings?.[key] ?? fallback);
   return `<p class="nutrition-calc-note">${BODY_EXPLANATIONS.initialCalories}</p>
+    <p>Deine Zielrichtung ist <b>${escapeHtml(goalLabel(state.settings?.goal || 'maintain'))}</b>. Du änderst sie auf COMP; hier legst du nur dein Kalorienziel fest. Deine eigene Zahl hat Vorrang. Ohne eigene Zahl gilt ein von dir übernommener Anpassungsvorschlag oder die Startschätzung.</p>
     <div class="nutrition-calc-grid">
       <label><span>Berechnungsbasis</span><select class="input" data-calc-basis><option value="male"${value('calculation_basis', 'male') === 'male' ? ' selected' : ''}>Männlich</option><option value="female"${value('calculation_basis') === 'female' ? ' selected' : ''}>Weiblich</option></select></label>
       <label><span>Geburtsdatum</span><input class="input" type="date" data-calc-birth value="${value('birth_date')}"></label>
       <label><span>Größe</span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" data-calc-height value="${value('height_cm')}" placeholder="180"><i>cm</i></span></label>
       <label><span>Gewicht</span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="decimal" data-calc-weight value="${state.latestWeight || ''}" placeholder="80"><i>kg</i></span><small>Wird auch in COMP gespeichert.</small></label>
       <label class="nutrition-wide"><span>Aktivität</span><select class="input" data-calc-pal>${PAL_LEVELS.map(([pal, label]) => `<option value="${pal}"${number(value('pal', 1.6)) === pal ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
-      <label class="nutrition-wide"><span>Ziel</span><select class="input" data-calc-goal>${Object.entries(GOALS).map(([key, [label, adjustment]]) => `<option value="${key}"${value('goal', 'maintain') === key ? ' selected' : ''}>${label}${adjustment ? ` · ${adjustment > 0 ? '+' : ''}${adjustment} kcal` : ''}</option>`).join('')}</select></label>
       <label class="nutrition-wide"><span>Eigenes Kalorienziel <small>optional</small></span><span class="nutrition-unit-field"><input class="input" type="text" inputmode="numeric" data-calc-custom value="${value('custom_calorie_target')}" placeholder="Automatisch"><i>kcal</i></span></label>
     </div>
-    <div class="nutrition-calculation" data-nutrition-calculation>${calculationResultMarkup(result, number(state.settings?.custom_calorie_target))}</div>
+    <div class="nutrition-calculation" data-nutrition-calculation>${calculationResultMarkup(result, number(state.settings?.custom_calorie_target) || number(state.settings?.adaptive_target))}</div>
     <button class="btn btn-primary btn-block" type="submit">Bedarf speichern</button>`;
 }
 
@@ -1114,9 +1114,10 @@ export async function mountNutrition(container, { userId, signal }) {
         heightCm: calculatorForm.querySelector('[data-calc-height]').value,
         weightKg: calculatorForm.querySelector('[data-calc-weight]').value,
         pal: calculatorForm.querySelector('[data-calc-pal]').value,
-        goal: calculatorForm.querySelector('[data-calc-goal]').value,
+        goal: state.settings?.goal || 'maintain',
       });
-      calculatorForm.querySelector('[data-nutrition-calculation]').innerHTML = calculationResultMarkup(preview, number(calculatorForm.querySelector('[data-calc-custom]').value));
+      calculatorForm.querySelector('[data-nutrition-calculation]').innerHTML = calculationResultMarkup(preview,
+        number(calculatorForm.querySelector('[data-calc-custom]').value) || number(state.settings?.adaptive_target));
     };
     calculatorForm.addEventListener('input', updateCalculatorPreview);
     calculatorForm.addEventListener('change', updateCalculatorPreview);
@@ -1127,7 +1128,6 @@ export async function mountNutrition(container, { userId, signal }) {
         birth_date: form.querySelector('[data-calc-birth]').value || null,
         height_cm: number(form.querySelector('[data-calc-height]').value) || null,
         pal: number(form.querySelector('[data-calc-pal]').value) || 1.6,
-        ...goalSettingsUpdate(state.settings, form.querySelector('[data-calc-goal]').value),
         custom_calorie_target: rounded(number(form.querySelector('[data-calc-custom]').value)) || null,
       };
       const enteredWeight = number(form.querySelector('[data-calc-weight]').value);

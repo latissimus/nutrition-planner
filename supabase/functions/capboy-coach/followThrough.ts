@@ -74,6 +74,14 @@ export function switchedOffAreas(visibleRoutes: unknown): string[] {
   return Object.keys(SWITCHABLE_AREAS).filter((area) => !visibleRoutes.includes(SWITCHABLE_AREAS[area]));
 }
 
+// Turning calorie tracking off is independent of whether the Tracker page is
+// visible. Keep the selected goal, but omit historical nutrition logs and all
+// nutrition-based gaps from the coach's context.
+export function coachSwitchedOffAreas(visibleRoutes: unknown, trackingEnabled: unknown): string[] {
+  const off = switchedOffAreas(visibleRoutes);
+  return trackingEnabled === false && !off.includes('nutrition') ? ['nutrition', ...off] : off;
+}
+
 // kind: "daten" (logging missing - later conclusions depend on it),
 // "messung" (a body measurement is due), "umsetzung" (a plan is not kept),
 // "verbesserung" (a value is below a sensible target). Most important first.

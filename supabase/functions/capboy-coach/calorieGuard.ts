@@ -2,7 +2,7 @@ type Row = Record<string, any>;
 
 const date = (value: Date) => value.toISOString().slice(0, 10);
 
-export function calorieBasis(entries: Row[], now: Date, targetPhaseFrom: string | null = null) {
+export function calorieBasis(entries: Row[], now: Date, targetPhaseFrom: string | null = null, nutritionAvailable = true) {
   const berlinDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
   const today = new Date(`${berlinDay}T00:00:00Z`);
   const days = Array.from({ length: 14 }, (_, index) => {
@@ -11,12 +11,14 @@ export function calorieBasis(entries: Row[], now: Date, targetPhaseFrom: string 
     return date(day);
   });
   const loggedDates = new Set(entries.map((row) => String(row.log_date).slice(0, 10)));
-  const loggedDays = days.filter((day) => loggedDates.has(day) && (!targetPhaseFrom || day >= targetPhaseFrom)).length;
-  const recent = days.slice(0, 2).some((day) => loggedDates.has(day) && (!targetPhaseFrom || day >= targetPhaseFrom));
+  const loggedDays = nutritionAvailable ? days.filter((day) => loggedDates.has(day) && (!targetPhaseFrom || day >= targetPhaseFrom)).length : 0;
+  const recent = nutritionAvailable && days.slice(0, 2).some((day) => loggedDates.has(day) && (!targetPhaseFrom || day >= targetPhaseFrom));
   // The count is evidence of logging regularity, not proof of complete intake.
-  const allowed = loggedDays >= 12 && recent;
-  return { calorieChangeAllowed: allowed, loggedDays, windowDays: days.length,
-    reason: allowed ? '' : 'Keine konkrete Änderung des Kalorienziels oder der Kalorienzufuhr in kcal empfehlen. Zuerst an mindestens 12 der letzten 14 abgeschlossenen Tage in der aktuellen Zielphase Ernährung erfassen, darunter einer der letzten zwei Tage. Einträge und Zielnähe beweisen keine Vollständigkeit.' };
+  const allowed = nutritionAvailable && loggedDays >= 12 && recent;
+  return { calorieChangeAllowed: allowed, ...(!nutritionAvailable ? { nutritionUnavailable: true } : {}), loggedDays, windowDays: days.length,
+    reason: !nutritionAvailable
+      ? 'Ernährungsdaten sind für den Coach ausgeschaltet. Keine konkrete Kalorienänderung in kcal empfehlen und nicht zum Einschalten des Trackers drängen. Die Zielrichtung bleibt gültig; Ernährung ist keine verfügbare Datenquelle.'
+      : allowed ? '' : 'Keine konkrete Änderung des Kalorienziels oder der Kalorienzufuhr in kcal empfehlen. Zuerst an mindestens 12 der letzten 14 abgeschlossenen Tage in der aktuellen Zielphase Ernährung erfassen, darunter einer der letzten zwei Tage. Einträge und Zielnähe beweisen keine Vollständigkeit.' };
 }
 
 // This is deliberately an output guard, not a semantic grader. If a numeric
@@ -35,7 +37,9 @@ export function quantifiedCalorieAction(value: unknown) {
 
 export function enforceCalorieBasis(result: Row, basis: ReturnType<typeof calorieBasis>) {
   if (basis.calorieChangeAllowed) return result;
-  const safe = 'Für eine konkrete Kalorienänderung fehlen noch ausreichend aktuelle Ernährungseinträge. Erfasse zunächst regelmäßig deine Mahlzeiten; danach können wir das Ziel gemeinsam prüfen.';
+  const safe = basis.nutritionUnavailable
+    ? 'Ohne freigegebene Ernährungseinträge lässt sich eine konkrete Kalorienänderung nicht ableiten. Gewicht, Trainingsleistung und Erholung können wir trotzdem gemeinsam beurteilen.'
+    : 'Für eine konkrete Kalorienänderung fehlen noch ausreichend aktuelle Ernährungseinträge. Erfasse zunächst regelmäßig deine Mahlzeiten; danach können wir das Ziel gemeinsam prüfen.';
   if (result.modus === 'frage') return quantifiedCalorieAction(result.answer)
     ? { ...result, answer: safe, followUpQuestion: '', confidence: 'niedrig', stepsUseful: false }
     : { ...result, followUpQuestion: quantifiedCalorieAction(result.followUpQuestion) ? '' : result.followUpQuestion };

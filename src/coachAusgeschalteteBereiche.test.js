@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildFollowThrough, switchedOffAreas } from '../supabase/functions/capboy-coach/followThrough.ts';
+import { buildFollowThrough, coachSwitchedOffAreas, switchedOffAreas } from '../supabase/functions/capboy-coach/followThrough.ts';
 import { buildCompFacts, buildTimeseries } from '../supabase/functions/capboy-coach/context.ts';
 import { weeklyBlock } from '../supabase/functions/capboy-coach/weekly.ts';
+import { fensterWerte } from '../supabase/functions/capboy-coach/volumen.js';
 
 const jetzt = new Date('2026-09-29T10:00:00Z');
 const zeilen = (extra = {}) => ({
@@ -17,6 +18,25 @@ describe('Im Profil ausgeschaltete Bereiche', () => {
     expect(switchedOffAreas(['reminders', 'habits', 'sleep', 'body'])).toEqual([]);
     expect(switchedOffAreas(['reminders', 'sleep'])).toEqual(['routines']);
     expect(switchedOffAreas(['body'])).toEqual(['nutrition', 'routines', 'sleep']);
+  });
+
+  it('lässt die Zielrichtung bei ausgeschaltetem Kalorienzählen bestehen, aber keine Ernährung zum Coach durch', () => {
+    expect(coachSwitchedOffAreas(['reminders', 'habits', 'sleep', 'body'], false)).toEqual(['nutrition']);
+    expect(coachSwitchedOffAreas(['reminders', 'habits', 'sleep', 'body'], true)).toEqual([]);
+    expect(coachSwitchedOffAreas(['body'], false)).toEqual(['nutrition', 'routines', 'sleep']);
+    const rows = zeilen({
+      settings: { goal: 'gain', tracking_enabled: false, custom_calorie_target: 2500 },
+      nutritionEntries: [], switchedOffAreas: coachSwitchedOffAreas(null, false),
+      weights: [{ gemessen_am: '2026-09-28', kg: 80 }],
+    });
+    const facts = buildCompFacts(rows, jetzt);
+    const series = buildTimeseries(rows, jetzt);
+    expect(facts.profile.goal).toBe('gain');
+    expect(facts.profile.calorieTarget).toBeNull();
+    expect(facts.nutrition).toEqual({ switchedOff: true });
+    expect(series.recentMeals).toEqual({ switchedOff: true });
+    expect(series.followThrough.checks.some((check) => check.area === 'ernaehrung')).toBe(false);
+    expect(fensterWerte(rows, '2026-09-29')).toMatchObject({ ernaehrung: { switchedOff: true }, kalorienZiel: null });
   });
 
   it('meldet dort keine offenen Punkte', () => {

@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { hole, schluessel } from './datenspeicher.js';
+import { hole, schluessel, verwerfen } from './datenspeicher.js';
 import { toast } from './toast.js';
 import { curveSvg } from './curve.js';
 import { FALTEN, datumKurz, heute, summe, zahl } from './measurements.js';
@@ -174,11 +174,11 @@ function compFactsMarkup(state) {
 export function compGoalMarkup(state) {
   const selected = state.settings.goal || 'maintain';
   return `<details class="comp-goal-setting ${SPECIAL_DEX_CLASSES.content}">
-    <summary><span><small>DEIN ZIEL</small><b>${escapeHtml(goalLabel(selected))}</b></span><span>Ziel ändern ${materialIconMarkup('chevron_right')}</span></summary>
+    <summary><span><small>DEINE ZIELRICHTUNG</small><b>${escapeHtml(goalLabel(selected))}</b></span><span>Ändern ${materialIconMarkup('chevron_right')}</span></summary>
     <form data-comp-goal-form><label for="comp-goal-select">Wonach soll der Coach bewerten?</label>
       <select id="comp-goal-select" class="input" name="goal">${Object.entries(NUTRITION_GOALS).map(([key, [label]]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('')}</select>
-      <p>Gilt auch für den Tracker. Ein eigenes Kalorienziel bleibt erhalten; ein automatisch angepasstes Ziel wird beim Zielwechsel neu berechnet.</p>
-      <button class="btn btn-primary" type="submit">Ziel speichern</button></form>
+      <p>Die Zielrichtung hilft COMP und dem Coach, deinen Verlauf einzuordnen – auch ohne Ernährungstracking. Wenn du den Tracker nutzt, stellst du dort dein Kalorienziel separat ein. Eine selbst eingegebene Zahl bleibt bei einem Zielwechsel erhalten; ein automatisch angepasstes Ziel wird zurückgesetzt.</p>
+      <button class="btn btn-primary" type="submit">Zielrichtung speichern</button></form>
   </details>`;
 }
 
@@ -1278,7 +1278,8 @@ export async function mountBodyMetrics(container, { session, profile, onProfileU
       try {
         const { error } = await supabase.from('nutrition_settings').upsert({ user_id: userId, ...goalSettingsUpdate(state.settings, goal) }, { onConflict: 'user_id' });
         if (error) throw error;
-        toast('Ziel für COMP, Tracker und Coach gespeichert');
+        verwerfen(['body', 'reminders']);
+        toast('Zielrichtung für COMP und Coach gespeichert');
         await render();
       } catch {
         button.disabled = false;

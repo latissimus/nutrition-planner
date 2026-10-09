@@ -4,12 +4,13 @@ import { FALTEN, summe } from './measurements.js';
 import { SUMMEN_FALTEN } from './ypsiFormel.js';
 
 describe('Ziel auf COMP', () => {
-  it('zeigt dasselbe Ziel wie der Tracker und lässt es direkt ändern', () => {
+  it('stellt die Zielrichtung unabhängig vom optionalen Ernährungstracking ein', () => {
     const markup = compGoalMarkup({ settings: { goal: 'bodycomp' } });
-    expect(markup).toContain('DEIN ZIEL');
+    expect(markup).toContain('DEINE ZIELRICHTUNG');
     expect(markup).toContain('data-comp-goal-form');
     expect(markup).toContain('value="bodycomp" selected');
-    expect(markup).toContain('Gilt auch für den Tracker');
+    expect(markup).toContain('auch ohne Ernährungstracking');
+    expect(markup).toContain('Kalorienziel separat');
   });
 });
 
